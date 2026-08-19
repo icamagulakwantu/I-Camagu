@@ -32,6 +32,7 @@ import Profile from './pages/Profile.jsx'
 import PinSetup from './pages/PinSetup.jsx'
 import PublicPlanView from './pages/PublicPlanView.jsx'
 import More from './pages/More.jsx'
+import Activity from './pages/Activity.jsx'
 import Notifications from './pages/Notifications.jsx'           // ✅ NEW
 import ResetPassword from './pages/ResetPassword.jsx'
 import AccountSettings from './pages/AccountSettings.jsx'
@@ -73,6 +74,7 @@ const MORE_SCREENS = [
   'notifications',   // ✅ NEW
   'account',
   'help',
+  'activity',
 ]
 
 // ---------- Dashboard (enhanced with loading, errors, empty states) ----------
@@ -255,6 +257,7 @@ function MainApp() {
   const [basketCount, setBasketCount] = useState(0)
   const [ceremonyHubType, setCeremonyHubType] = useState(null)
   const [timelineType, setTimelineType] = useState(null)
+  const [selectedCeremonyId, setSelectedCeremonyId] = useState(null)
 
   const goHome = () => setScreen('home')
   const goMore = () => setScreen('more')
@@ -281,6 +284,11 @@ function MainApp() {
     setScreen('timeline')
   }
 
+  const openExistingCeremony = (ceremonyId) => {
+    setSelectedCeremonyId(ceremonyId)
+    setScreen('ceremony')
+  }
+
   const [pendingApprovals, setPendingApprovals] = useState(0)
 
   const refreshPendingApprovals = () => {
@@ -295,7 +303,7 @@ function MainApp() {
   const renderScreen = () => {
     switch (screen) {
       case 'ceremonyhub':
-        return <CeremonyHub onBack={goHome} onOpenType={openCeremonyType} />
+        return <CeremonyHub onBack={goHome} onOpenType={openCeremonyType} onSelectCeremony={openExistingCeremony} />
       case 'store':
         return <Store onGoToBasket={() => setScreen('basket')} basketCount={basketCount} />
       case 'basket':
@@ -306,6 +314,7 @@ function MainApp() {
             onBack={goMore}
             defaultType={ceremonyHubType}
             onViewTimeline={openTimeline}
+            selectedCeremonyId={selectedCeremonyId}
           />
         )
       case 'timeline':
@@ -344,6 +353,8 @@ function MainApp() {
         return <Stokvels onBack={goHome} />
       case 'notifications':                                 // ✅ NEW
         return <Notifications onBack={goHome} onNavigate={setScreen} />
+      case 'activity':
+        return <Activity onBack={goMore} />
       case 'account':
         return <AccountSettings onBack={goMore} />
       case 'help':
@@ -406,11 +417,11 @@ function AuthenticatedApp() {
 
   // Debugging fallback: If accessToken is null, ensure Login actually renders
   if (!accessToken) {
-    return <Login /> || <div>Login Screen Failed to Render</div>
+    return <Login />
   }
 
   if (!user?.username) {
-    return <Username /> || <div>Username Setup Screen Failed to Render</div>
+    return <Username />
   }
 
   return <MainApp />
