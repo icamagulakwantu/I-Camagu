@@ -4,6 +4,8 @@ import { verifyPassword } from '../services/passwordService.js';
 export async function exportMyData(req, res) {
   try {
     const userId = req.userId;
+    const memberships = await prisma.stokvelMember.findMany({ where: { userId }, select: { id: true } });
+    const memberIds = memberships.map(m => m.id);
     const [user, stokvelMemberships, contributions, plans, reciprocityEntries, ukusokaEntries, expenditures] = await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
@@ -14,7 +16,7 @@ export async function exportMyData(req, res) {
         },
       }),
       prisma.stokvelMember.findMany({ where: { userId }, include: { stokvel: { select: { name: true } } } }),
-      prisma.contribution.findMany({ where: { memberId: userId } }),
+      prisma.contribution.findMany({ where: { memberId: { in: memberIds } } }),
       prisma.preparationPlan.findMany({ where: { hostId: userId }, include: { checklistItems: true } }),
       prisma.reciprocityEntry.findMany({ where: { userId } }),
       prisma.ukusokaEntry.findMany({ where: { recordedById: userId } }),

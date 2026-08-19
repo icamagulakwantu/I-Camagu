@@ -3,8 +3,11 @@ import prisma from '../config/db.js';
 export async function getMyActivity(req, res) {
       const userId = req.userId;
         try {
-                const [contributions, payouts, plans, orders] = await Promise.all([
-                          prisma.contribution.findMany({ where: { memberId: userId }, include: { stokvel: true }, orderBy: { createdAt: 'desc' }, take: 10 }),
+                const memberships = await prisma.stokvelMember.findMany({ where: { userId }, select: { id: true } });
+        const memberIds = memberships.map(m => m.id);
+
+        const [contributions, payouts, plans, orders] = await Promise.all([
+                          prisma.contribution.findMany({ where: { memberId: { in: memberIds } }, include: { stokvel: true }, orderBy: { createdAt: 'desc' }, take: 10 }),
                                 prisma.payout.findMany({ where: { recipientId: userId }, include: { stokvel: true }, orderBy: { createdAt: 'desc' }, take: 10 }),
                                       prisma.preparationPlan.findMany({ where: { hostId: userId, isTemplate: false }, orderBy: { createdAt: 'desc' }, take: 10 }),
                                             prisma.orderLineConfirmation.findMany({ where: { memberId: userId }, include: { document: true }, orderBy: { confirmedAt: 'desc' }, take: 10 }),

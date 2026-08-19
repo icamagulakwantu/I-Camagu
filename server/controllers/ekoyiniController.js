@@ -1,6 +1,6 @@
 import prisma from '../config/db.js';
 
-const MAX_TOURISM_SHARE_PERCENT = 0.20; // confirmed hard cap, Section 4.11.4a
+const MAX_TOURISM_SHARE_PERCENT = 0.30; // founder direction: host share must not exceed 30%
 
 export async function createBarBooking(req, res) {
   const { ceremonyId } = req.body;

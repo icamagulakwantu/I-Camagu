@@ -52,7 +52,7 @@ export async function confirmContribution(req, res) {
 
 export async function submitContribution(req, res) {
   const userId = req.userId;
-  const { stokvelId, amount, note } = req.body;
+  const { stokvelId, amount, note, proofNote } = req.body;
 
   // Validate input
   if (!stokvelId || !amount) {
@@ -75,10 +75,10 @@ export async function submitContribution(req, res) {
     const contribution = await prisma.contribution.create({
       data: {
         stokvelId,
-        userId,
+        memberId: membership.id,
         amount: parseFloat(amount),
         status: 'PENDING',
-        note: note || '',
+        note: note || proofNote || null,
       },
     });
 
@@ -114,7 +114,7 @@ export async function getPendingContributions(req, res) {
 
 export async function recordInterest(req, res) {
           const userId = req.userId;
-                  const { stokvelId, amount } = req.body;
+                  const { stokvelId, amount, note, proofNote } = req.body;
 
                             if (!stokvelId || !amount) return res.status(400).json({ error: 'stokvelId and amount are required' });
 

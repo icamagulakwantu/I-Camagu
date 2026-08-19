@@ -59,6 +59,35 @@ export async function addItem(req, res) {
           }
 }
 
+
+export async function updateItem(req, res) {
+  const { itemId } = req.params;
+  const { quantity } = req.body;
+
+  if (!quantity || parseInt(quantity) < 1) {
+    return res.status(400).json({ error: 'Quantity must be at least 1 case' });
+  }
+
+  try {
+    const item = await prisma.basketItem.findFirst({
+      where: { id: itemId, basket: { userId: req.userId, status: 'DRAFT' } },
+      include: { sku: true },
+    });
+    if (!item) return res.status(404).json({ error: 'Item not found in your basket' });
+
+    const updated = await prisma.basketItem.update({
+      where: { id: itemId },
+      data: { quantity: parseInt(quantity) },
+      include: { sku: true },
+    });
+
+    res.json({ item: updated, message: `${updated.quantity} case(s) of ${item.sku.name} in your basket.` });
+  } catch (error) {
+    console.error('Update item error:', error.message);
+    res.status(500).json({ error: 'Could not update item' });
+  }
+}
+
 export async function removeItem(req, res) {
   const { itemId } = req.params;
 
