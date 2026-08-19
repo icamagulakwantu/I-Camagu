@@ -1,0 +1,818 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ---------- ENUMS ----------
+
+enum StokvelType {
+  ALCOHOL_BULK_POOL
+  UMGALELO_ROTATING
+  CEREMONY_SAVINGS
+  EXISTING_STOKVEL_UPGRADE
+  RECIPROCAL_GIFTING
+}
+
+enum BankingTrack {
+  AFRICAN_BANK
+  GOTYME_YOCO
+}
+
+enum BasketStatus {
+  DRAFT
+  PARKED
+  MATCHED
+  FULFILLED
+  CANCELLED
+}
+
+enum PartnerType {
+  TAVERN
+  BUTCHERY
+}
+
+enum TransactionStatus {
+  PENDING_APPROVAL
+  CLEARED
+  UNMATCHED
+  FAILED
+}
+
+enum ContributionStatus {
+  PENDING
+  CONFIRMED
+  MISSED
+  DEFERRED
+}
+
+enum CeremonyType {
+  UMSEBENZI_WENKOMO
+  IMIGIDI
+  UMGIDI
+  ULWALUKO
+  WEDDING
+  GENERAL_EVENT
+  INTAMBO_ENKULU
+  UKUKHAPHA
+  UKUBUYISA
+  INKOBE_ZIKA_MAMA
+  UMSEBENZI_WEGQIRHA
+}
+
+enum PortalVisibility {
+  FAMILY_PRIVATE
+  CLAN_SCOPED
+  PUBLIC
+}
+
+enum OfficialRole {
+  CHAIRPERSON
+  TREASURER
+  SECRETARY
+}
+
+// ---------- CORE MODELS ----------
+
+model User {
+  id                     String               @id @default(uuid())
+  email                  String               @unique
+  firstName              String
+  lastName               String
+  username               String?              @unique
+  passwordHash           String?
+  googleId               String?              @unique
+  address                String?
+  age                    Int?
+  phoneNumber            String?
+  location               String?
+  passwordResetTokenHash String?
+  passwordResetExpiresAt DateTime?
+  profileImage           String?              @db.Text
+  paternalIziduko        String?
+  maternalIziduko        String?
+  paternalGrandmotherIziduko String?
+  maternalGrandmotherIziduko String?
+  pinHash                String?
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+
+  stokvelMemberships     StokvelMember[]
+  organisedStokvels      Stokvel[]            @relation("StokvelOrganiser")
+  officialRoles          StokvelOfficial[]
+  baskets                Basket[]
+  digitalPortals         DigitalPortal[]
+  reciprocityEntries     ReciprocityEntry[]
+  expenditureEntries     ExpenditureEntry[]
+  hostedCeremonies       Ceremony[]
+  preparationPlans       PreparationPlan[]
+  barBookingsHosted      BarServiceBooking[]
+  tourismPackages        TourismPackage[]
+  otpCodes               OtpCode[]
+  refreshTokens          RefreshToken[]
+  notifications          Notification[]       // ✅ added
+  recordedUkusokaEntries UkusokaEntry[]
+  announcementsPosted    StokvelAnnouncement[]
+  poolPayments            PoolPayment[]
+}
+model UkusokaEntry {
+  id              String    @id @default(cuid())
+  recordedById    String
+  recordedBy      User      @relation(fields: [recordedById], references: [id])
+  ceremonyId      String?
+  ceremony        Ceremony? @relation(fields: [ceremonyId], references: [id])
+  initiateName    String
+  giverName       String
+  relationship    String?
+  itemDescription String
+  category        String
+  dateReceived    DateTime
+  createdAt       DateTime  @default(now())
+}
+
+model Practitioner {
+  id          String    @id @default(cuid())
+  userId      String?
+  name        String
+  role        String
+  area        String
+  isVerified  Boolean   @default(false)
+  verifiedAt  DateTime?
+  idDocUrl    String?   @db.Text
+  contactInfo String?
+  createdAt   DateTime  @default(now())
+}
+
+model Vendor {
+  id          String   @id @default(cuid())
+  name        String
+  category    String
+  area        String
+  contactInfo String?
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model OtpCode {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model RefreshToken {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  lastUsedAt DateTime  @default(now())
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+// ---------- CLAN / IZIDUKO ----------
+
+model ClanGroup {
+  id        String   @id @default(cuid())
+  clanName  String   @unique
+  createdAt DateTime @default(now())
+
+  surnameGroups SurnameSubgroup[]
+  aliases       ClanAlias[]
+}
+
+model ClanAlias {
+  id          String    @id @default(cuid())
+  clanGroupId String
+  clanGroup   ClanGroup @relation(fields: [clanGroupId], references: [id])
+  aliasForm   String    @unique
+}
+
+model SurnameSubgroup {
+  id          String    @id @default(cuid())
+  clanGroupId String
+  clanGroup   ClanGroup @relation(fields: [clanGroupId], references: [id])
+  surname     String
+
+  @@unique([clanGroupId, surname])
+}
+
+// ---------- STOKVEL ----------
+
+model Stokvel {
+  id                    String              @id @default(cuid())
+  type                  StokvelType
+  name                  String
+  organiserId           String
+  organiser             User                @relation("StokvelOrganiser", fields: [organiserId], references: [id])
+  bankingTrack          BankingTrack
+  contributionAmount    Decimal?
+  contributionFrequency String?
+  targetAmount          Decimal?
+  targetDate            DateTime?
+  ceremonyType          CeremonyType?
+  rotationOrder         Json?
+  currentRotationIndex  Int?                @default(0)
+  requiredApprovals     Int                 @default(2)
+  bereavementActive     Boolean             @default(false)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  members       StokvelMember[]
+  officials     StokvelOfficial[]
+  contributions Contribution[]
+  payouts       Payout[]
+  baskets       Basket[]
+  rawBankLogs   RawBankLog[]
+  groupLedger   StokvelGroupLedger?
+  announcements StokvelAnnouncement[]
+}
+
+model StokvelMember {
+  id            String   @id @default(cuid())
+  stokvelId     String
+  stokvel       Stokvel  @relation(fields: [stokvelId], references: [id])
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  referenceCode String
+  subAccountRef String?
+  joinedAt      DateTime @default(now())
+
+  @@unique([stokvelId, userId])
+  @@unique([stokvelId, referenceCode])
+}
+
+model StokvelOfficial {
+  id        String       @id @default(cuid())
+  stokvelId String
+  stokvel   Stokvel      @relation(fields: [stokvelId], references: [id])
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  role      OfficialRole
+  createdAt DateTime     @default(now())
+
+  approvals PayoutApproval[]
+
+  @@unique([stokvelId, userId])
+}
+
+model Contribution {
+  id           String             @id @default(cuid())
+  stokvelId    String
+  stokvel      Stokvel            @relation(fields: [stokvelId], references: [id])
+  memberId     String
+  amount       Decimal
+  status       ContributionStatus @default(PENDING)
+  cycleNumber  Int?
+  rawBankLogId String?
+  rawBankLog   RawBankLog?        @relation(fields: [rawBankLogId], references: [id])
+  createdAt    DateTime           @default(now())
+}
+
+model Payout {
+  id           String            @id @default(cuid())
+  stokvelId    String
+  stokvel      Stokvel           @relation(fields: [stokvelId], references: [id])
+  recipientId  String
+  amount       Decimal
+  status       TransactionStatus @default(PENDING_APPROVAL)
+  cycleNumber  Int?
+  rawBankLogId String?
+  rawBankLog   RawBankLog?       @relation(fields: [rawBankLogId], references: [id])
+  createdAt    DateTime          @default(now())
+  clearedAt    DateTime?
+
+  approvals PayoutApproval[]
+  tithe     ShrineTithe?
+}
+
+model PayoutApproval {
+  id         String          @id @default(cuid())
+  payoutId   String
+  payout     Payout          @relation(fields: [payoutId], references: [id])
+  officialId String
+  official   StokvelOfficial @relation(fields: [officialId], references: [id])
+  approvedAt DateTime        @default(now())
+
+  @@unique([payoutId, officialId])
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   // "PAYOUT_APPROVAL_NEEDED" | "POOL_CHANGED" | "CONTRIBUTION_CONFIRMED" | "QUOTE_STATUS" | "ORDER_MATCHED"
+  message     String
+  linkScreen  String?  // which screen to navigate to on tap, e.g. "stokvels"
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model ShrineTithe {
+  id        String   @id @default(cuid())
+  payoutId  String   @unique
+  payout    Payout   @relation(fields: [payoutId], references: [id])
+  amount    Decimal
+  createdAt DateTime @default(now())
+}
+
+// ---------- BANK RECONCILIATION LAYERS ----------
+
+model RawBankLog {
+  id              String   @id @default(cuid())
+  stokvelId       String
+  stokvel         Stokvel  @relation(fields: [stokvelId], references: [id])
+  rawPayload      Json
+  narration       String?
+  amount          Decimal
+  direction       String
+  matchedMemberId String?
+  receivedAt      DateTime @default(now())
+
+  contributions Contribution[]
+  payouts       Payout[]
+}
+
+model StokvelGroupLedger {
+  id             String   @id @default(cuid())
+  stokvelId      String   @unique
+  stokvel        Stokvel  @relation(fields: [stokvelId], references: [id])
+  totalBalance   Decimal
+  interestEarned Decimal  @default(0)
+  groupExpenses  Decimal  @default(0)
+  updatedAt      DateTime @updatedAt
+}
+
+// ---------- BASKET / MATCHING ----------
+
+model Basket {
+  id           String        @id @default(cuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  stokvelId    String?
+  stokvel      Stokvel?      @relation(fields: [stokvelId], references: [id])
+  status       BasketStatus  @default(DRAFT)
+  ceremonyType CeremonyType?
+  poolId       String?
+  pool         BulkPool?     @relation(fields: [poolId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  items BasketItem[]
+}
+
+model BasketItem {
+  id       String @id @default(cuid())
+  basketId String
+  basket   Basket @relation(fields: [basketId], references: [id])
+  skuId    String
+  sku      Sku    @relation(fields: [skuId], references: [id])
+  quantity Int
+}
+
+model Sku {
+  id                String   @id @default(cuid())
+  name              String
+  category          String
+  productType       String
+  bottleFormat      String?
+  unitsPerCase      Int
+  casePriceZAR      Decimal  @db.Decimal(10, 2)
+  palletPackQty     Int?
+  palletPriceZAR    Decimal? @db.Decimal(10, 2)
+  supplierPortfolio String?
+  imageUrl          String?
+  createdAt         DateTime @default(now())
+
+  basketItems BasketItem[]
+
+  @@unique([name, bottleFormat])
+}
+
+model BulkPool {
+  id        String    @id @default(cuid())
+  partnerId String
+  partner   Partner   @relation(fields: [partnerId], references: [id])
+  area      String
+  deadline  DateTime?
+  moqTarget Int
+  status    String    @default("OPEN")
+  createdAt DateTime  @default(now())
+
+  baskets       Basket[]
+  payments      PoolPayment[]
+  orderDocument OrderConfirmationDocument?
+}
+
+// ---------- ORDER CONFIRMATION & SAFE DELIVERY ----------
+
+model PoolPayment {
+  id                String   @id @default(cuid())
+  poolId            String
+  pool              BulkPool @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  provider          String
+  providerReference String?
+  amountZAR         Decimal  @db.Decimal(10, 2)
+  status            String   @default("PENDING")
+  refundRequestedAt DateTime?
+  refundFeeZAR      Decimal? @db.Decimal(10, 2)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([poolId, status])
+  @@index([userId, createdAt])
+}
+
+model OrderConfirmationDocument {
+  id               String    @id @default(cuid())
+  poolId           String    @unique
+  pool             BulkPool  @relation(fields: [poolId], references: [id])
+  groupCode        String    @unique
+  totalAmountZAR   Decimal   @db.Decimal(10, 2)
+  deliveryLocation String
+  deliveryDate     DateTime?
+  status           String    @default("PENDING_MEMBER_CONFIRMATION")
+  createdAt        DateTime  @default(now())
+
+  lineItems OrderLineConfirmation[]
+}
+
+model OrderLineConfirmation {
+  id              String                    @id @default(cuid())
+  documentId      String
+  document        OrderConfirmationDocument @relation(fields: [documentId], references: [id])
+  memberId        String
+  itemDescription String
+  quantity        Int
+  unitType        String
+  confirmedAt     DateTime?
+}
+
+model Partner {
+  id        String      @id @default(cuid())
+  name      String
+  type      PartnerType
+  area      String
+  moq       Int?
+  createdAt DateTime    @default(now())
+
+  pools BulkPool[]
+}
+
+// ---------- STOKVEL ANNOUNCEMENTS ----------
+
+model StokvelAnnouncement {
+  id          String   @id @default(cuid())
+  stokvelId   String
+  stokvel     Stokvel  @relation(fields: [stokvelId], references: [id], onDelete: Cascade)
+  postedById  String
+  postedBy    User     @relation(fields: [postedById], references: [id])
+  message     String
+  createdAt   DateTime @default(now())
+
+  @@index([stokvelId, createdAt])
+}
+
+// ---------- DIGITAL PORTAL ----------
+
+model DigitalPortal {
+  id           String           @id @default(cuid())
+  createdById  String
+  createdBy    User             @relation(fields: [createdById], references: [id])
+  ceremonyType CeremonyType?
+  title        String
+  visibility   PortalVisibility @default(FAMILY_PRIVATE)
+  deletedAt    DateTime?
+  createdAt    DateTime         @default(now())
+
+  media PortalMedia[]
+}
+
+model PortalMedia {
+  id         String        @id @default(cuid())
+  portalId   String
+  portal     DigitalPortal @relation(fields: [portalId], references: [id])
+  mediaType  String
+  url        String
+  deletedAt  DateTime?
+  uploadedAt DateTime      @default(now())
+}
+
+// ---------- RECIPROCITY LEDGER (Ukugida) ----------
+
+model ReciprocityEntry {
+  id               String        @id @default(cuid())
+  userId           String
+  user             User          @relation(fields: [userId], references: [id])
+  direction        String
+  counterpartyName String
+  itemDescription  String
+  quantity         Int?
+  unitType         String?
+  ceremonyType     CeremonyType?
+  ceremonyLabel    String?
+  location         String?
+  eventDate        DateTime
+  createdAt        DateTime      @default(now())
+
+  @@index([userId, direction])
+}
+
+// ---------- PERSONAL EXPENDITURE LEDGER ----------
+
+model ExpenditureEntry {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  itemName        String
+  price           Decimal
+  category        String?
+  source          String
+  receiptImageUrl String?
+  needsReview     Boolean  @default(false)
+  purchasedAt     DateTime
+  createdAt       DateTime @default(now())
+}
+
+// ---------- CEREMONY PREPARATION GUIDE ----------
+
+model PreparationPlan {
+  id           String        @id @default(cuid())
+  hostId       String
+  host         User          @relation(fields: [hostId], references: [id])
+  ceremonyType CeremonyType
+  ceremonyId   String?
+  ceremony     Ceremony?     @relation(fields: [ceremonyId], references: [id])
+  title        String
+  shareToken   String?       @unique
+  isTemplate   Boolean       @default(false)
+  clonedFromId String?
+  createdAt    DateTime      @default(now())
+
+  checklistItems ChecklistItem[]
+  pledges        ContributionPledge[]
+}
+
+model ChecklistItem {
+  id            String          @id @default(cuid())
+  planId        String
+  plan          PreparationPlan @relation(fields: [planId], references: [id])
+  phase         String
+  label         String
+  isChecked     Boolean         @default(false)
+  targetCostZAR Decimal?        @db.Decimal(10, 2)
+  actualCostZAR Decimal?        @db.Decimal(10, 2)
+  assignedTo    String?
+  notes         String?
+
+  pledges ContributionPledge[]
+}
+
+model ContributionPledge {
+  id                    String          @id @default(cuid())
+  planId                String
+  plan                  PreparationPlan @relation(fields: [planId], references: [id])
+  pledgerName           String
+  relationship          String?
+  pledgedItem           String
+  pledgedAmountZAR      Decimal?        @db.Decimal(10, 2)
+  paidAmountZAR         Decimal         @default(0.00) @db.Decimal(10, 2)
+  linkedChecklistItemId String?
+  linkedItem            ChecklistItem?  @relation(fields: [linkedChecklistItemId], references: [id])
+  createdAt             DateTime        @default(now())
+}
+
+// ---------- UMGIDI HIERARCHY & ALLOCATION ENGINE ----------
+
+model CeremonyGroup {
+  id            String   @id @default(cuid())
+  ceremonyId    String
+  ceremony      Ceremony @relation(fields: [ceremonyId], references: [id])
+  groupLabel    String
+  estimatedSize Int?
+  seatOrder     Int?
+  speakerOrder  Int?
+  responsibilityNote String?
+  createdAt     DateTime @default(now())
+
+  allocations GroupAllocation[]
+}
+
+model GroupAllocation {
+  id              String        @id @default(cuid())
+  ceremonyGroupId String
+  ceremonyGroup   CeremonyGroup @relation(fields: [ceremonyGroupId], references: [id])
+  itemDescription String
+  quantity        Int
+  unitType        String
+}
+
+// ---------- EKOYINI MOBILE BAR ----------
+
+model BarServiceBooking {
+  id         String   @id @default(cuid())
+  ceremonyId String
+  ceremony   Ceremony @relation(fields: [ceremonyId], references: [id])
+  hostId     String
+  host       User     @relation(fields: [hostId], references: [id])
+  status     String
+  createdAt  DateTime @default(now())
+
+  wristbandTiers WristbandTier[]
+}
+
+model EkoyiniQuoteRequest {
+  id                     String    @id @default(cuid())
+  requestedById          String
+  ceremonyId             String?
+
+  fullName               String
+  surname                String
+  clientEmail            String
+  cellPhone              String
+  whatsappNumber         String?
+  altContactName         String?
+  altContactNumber       String?
+  hearAboutUs            String?
+  referralName           String?
+
+  eventType              String
+  otherEventType         String?
+  eventDate              DateTime
+  eventStartTime         String?
+  eventEndTime           String?
+  barServiceStart        String?
+  barServiceEnd          String?
+  setupAccessTime        String?
+  breakdownCompleteBy    String?
+
+  venueName              String?
+  physicalAddress        String?
+  venueArea              String
+  city                   String?
+  venueType              String?
+  parkingAvailable       String?
+  parkingNote            String?
+  powerAccess            String?
+  waterAccess            String?
+
+  guestCount             Int
+  ageRanges              String?
+  minorsPresent          Boolean   @default(false)
+  nonAlcoholicNeeded     Boolean   @default(false)
+
+  packageSelected        String
+  customGuestCount       Int?
+  customBudget           String?
+
+  addOns                 String?
+  additionalHookahPipes  Int?
+  otherRequests          String?
+
+  drinkMenuStyle         String?
+  specificBrands         String?
+  alcoholSupplier        String?
+  budgetPerPerson        String?
+  allergiesInfo          String?
+
+  vipAreaNeeded          Boolean   @default(false)
+  vipGuestCount          Int?
+  toastSpeechMoment      Boolean   @default(false)
+  dressCodeTheme         String?
+  culturalProtocols      String?
+  setupRestrictions      String?
+
+  preferredPaymentMethod String?
+
+  status                 String    @default("PENDING")
+  createdAt              DateTime  @default(now())
+}
+
+model WristbandTier {
+  id          String            @id @default(cuid())
+  bookingId   String
+  booking     BarServiceBooking @relation(fields: [bookingId], references: [id])
+  colorLabel  String
+  entitlement String
+  guestCount  Int?
+}
+
+// ---------- CULTURAL TOURISM ADD-ON ----------
+
+model TourismPackage {
+  id              String   @id @default(cuid())
+  ceremonyId      String   @unique
+  ceremony        Ceremony @relation(fields: [ceremonyId], references: [id])
+  hostId          String
+  host            User     @relation(fields: [hostId], references: [id])
+  isEnabled       Boolean  @default(false)
+  pricePerHeadZAR Decimal  @db.Decimal(10, 2)
+  hostShareZAR    Decimal  @db.Decimal(10, 2)
+  maxGroupSize    Int?
+  traditionalFoodIncluded Boolean @default(true)
+  umqombothiIncluded Boolean @default(true)
+  supervisedPhotography Boolean @default(true)
+  ekoyiniExclusive Boolean @default(true)
+  securityIncluded Boolean @default(true)
+  transportIncluded Boolean @default(false)
+  entertainmentIncluded Boolean @default(false)
+  initiateGreetingIncluded Boolean @default(true)
+  minimumStickOfferingZAR Decimal? @db.Decimal(10, 2) @default(100)
+  ikrwalaSeatingByPermission Boolean @default(true)
+  startTime       String? @default("13:00")
+  createdAt       DateTime @default(now())
+
+  bookings TourismBooking[]
+}
+
+model TourismBooking {
+  id                 String         @id @default(cuid())
+  tourismPackageId   String
+  tourismPackage     TourismPackage @relation(fields: [tourismPackageId], references: [id])
+  tourismCompanyName String
+  groupSize          Int
+  totalPaidZAR       Decimal        @db.Decimal(10, 2)
+  status             String
+  createdAt          DateTime       @default(now())
+}
+
+// ---------- CEREMONY ----------
+
+model Ceremony {
+  id        String       @id @default(cuid())
+  hostId    String
+  host      User         @relation(fields: [hostId], references: [id])
+  type      CeremonyType
+  title     String
+  eventDate DateTime?
+  status    String       @default("PLANNING")
+  notes     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @default(now())
+
+  checklistItems   CeremonyChecklistItem[]
+  costItems        CeremonyCostItem[]
+  preparationPlans PreparationPlan[]
+  ceremonyGroups   CeremonyGroup[]
+  barBookings      BarServiceBooking[]
+  tourismPackage   TourismPackage?
+  ukusokaEntries   UkusokaEntry[]
+}
+
+// ---------- CEREMONY CHECKLIST & COST ITEMS ----------
+
+model CeremonyChecklistItem {
+  id          String   @id @default(cuid())
+  ceremonyId  String
+  ceremony    Ceremony @relation(fields: [ceremonyId], references: [id], onDelete: Cascade)
+  phase       String
+  label       String
+  isOptional  Boolean  @default(false)
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([ceremonyId])
+}
+
+model CeremonyCostItem {
+  id              String   @id @default(cuid())
+  ceremonyId      String
+  ceremony        Ceremony @relation(fields: [ceremonyId], references: [id], onDelete: Cascade)
+  phase           String
+  label           String
+  category        String
+  unit            String
+  unitCost        Float
+  quantity        Float
+  isInputField    Boolean  @default(false)
+  inputType       String?
+  suggestedAmount String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([ceremonyId])
+}
+
+// ---------- XHOSA LEGENDS ----------
+
+model LegendEntry {
+  id                 String    @id @default(cuid())
+  title              String
+  bodyText            String
+  category            String
+  isFeatured          Boolean   @default(false)
+  verificationStatus  String    @default("PENDING_REVIEW")
+  sourceNote          String?
+  reviewedAt          DateTime?
+  createdAt            DateTime  @default(now())
+}
