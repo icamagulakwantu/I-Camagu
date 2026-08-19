@@ -1,0 +1,119 @@
+import prisma from '../config/db.js';
+import { notifyEkoyiniOfQuoteRequest, confirmQuoteToClient } from '../services/notificationService.js';
+
+export async function submitQuoteRequest(req, res) {
+      const body = req.body;
+
+        if (!body.fullName || !body.surname || !body.clientEmail || !body.cellPhone || !body.eventType || !body.eventDate || !body.venueArea || !body.guestCount || !body.packageSelected) {
+                return res.status(400).json({ error: 'Please fill in all required fields (marked with *)' });
+        }
+
+          try {
+                  const quote = await prisma.ekoyiniQuoteRequest.create({
+                            data: {
+                                        requestedById: req.userId,
+                                                ceremonyId: body.ceremonyId || null,
+                                                        fullName: body.fullName,
+                                                                surname: body.surname,
+                                                                        clientEmail: body.clientEmail,
+                                                                                cellPhone: body.cellPhone,
+                                                                                        whatsappNumber: body.whatsappNumber || null,
+                                                                                                altContactName: body.altContactName || null,
+                                                                                                        altContactNumber: body.altContactNumber || null,
+                                                                                                                hearAboutUs: body.hearAboutUs || null,
+                                                                                                                        referralName: body.referralName || null,
+                                                                                                                                eventType: body.eventType,
+                                                                                                                                        otherEventType: body.otherEventType || null,
+                                                                                                                                                eventDate: new Date(body.eventDate),
+                                                                                                                                                        eventStartTime: body.eventStartTime || null,
+                                                                                                                                                                eventEndTime: body.eventEndTime || null,
+                                                                                                                                                                        barServiceStart: body.barServiceStart || null,
+                                                                                                                                                                                barServiceEnd: body.barServiceEnd || null,
+                                                                                                                                                                                        setupAccessTime: body.setupAccessTime || null,
+                                                                                                                                                                                                breakdownCompleteBy: body.breakdownCompleteBy || null,
+                                                                                                                                                                                                        venueName: body.venueName || null,
+                                                                                                                                                                                                                physicalAddress: body.physicalAddress || null,
+                                                                                                                                                                                                                        venueArea: body.venueArea,
+                                                                                                                                                                                                                                city: body.city || null,
+                                                                                                                                                                                                                                        venueType: body.venueType || null,
+                                                                                                                                                                                                                                                parkingAvailable: body.parkingAvailable || null,
+                                                                                                                                                                                                                                                        parkingNote: body.parkingNote || null,
+                                                                                                                                                                                                                                                                powerAccess: body.powerAccess || null,
+                                                                                                                                                                                                                                                                        waterAccess: body.waterAccess || null,
+                                                                                                                                                                                                                                                                                guestCount: parseInt(body.guestCount),
+                                                                                                                                                                                                                                                                                        ageRanges: body.ageRanges || null,
+                                                                                                                                                                                                                                                                                                minorsPresent: !!body.minorsPresent,
+                                                                                                                                                                                                                                                                                                        nonAlcoholicNeeded: !!body.nonAlcoholicNeeded,
+                                                                                                                                                                                                                                                                                                                packageSelected: body.packageSelected,
+                                                                                                                                                                                                                                                                                                                        customGuestCount: body.customGuestCount ? parseInt(body.customGuestCount) : null,
+                                                                                                                                                                                                                                                                                                                                customBudget: body.customBudget || null,
+                                                                                                                                                                                                                                                                                                                                        addOns: body.addOns || null,
+                                                                                                                                                                                                                                                                                                                                                additionalHookahPipes: body.additionalHookahPipes ? parseInt(body.additionalHookahPipes) : null,
+                                                                                                                                                                                                                                                                                                                                                        otherRequests: body.otherRequests || null,
+                                                                                                                                                                                                                                                                                                                                                                drinkMenuStyle: body.drinkMenuStyle || null,
+                                                                                                                                                                                                                                                                                                                                                                        specificBrands: body.specificBrands || null,
+                                                                                                                                                                                                                                                                                                                                                                                alcoholSupplier: body.alcoholSupplier || null,
+                                                                                                                                                                                                                                                                                                                                                                                        budgetPerPerson: body.budgetPerPerson || null,
+                                                                                                                                                                                                                                                                                                                                                                                                allergiesInfo: body.allergiesInfo || null,
+                                                                                                                                                                                                                                                                                                                                                                                                        vipAreaNeeded: !!body.vipAreaNeeded,
+                                                                                                                                                                                                                                                                                                                                                                                                                vipGuestCount: body.vipGuestCount ? parseInt(body.vipGuestCount) : null,
+                                                                                                                                                                                                                                                                                                                                                                                                                        toastSpeechMoment: !!body.toastSpeechMoment,
+                                                                                                                                                                                                                                                                                                                                                                                                                                dressCodeTheme: body.dressCodeTheme || null,
+                                                                                                                                                                                                                                                                                                                                                                                                                                        culturalProtocols: body.culturalProtocols || null,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                setupRestrictions: body.setupRestrictions || null,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        preferredPaymentMethod: body.preferredPaymentMethod || null,
+                            },
+                  });
+
+                      await notifyEkoyiniOfQuoteRequest(quote);
+                          await confirmQuoteToClient(quote);
+
+                              res.status(201).json({ quote, message: 'Quote request sent! Ekoyini will be in touch shortly.' });
+          } catch (error) {
+                  console.error('Submit quote request error:', error.message);
+                      res.status(500).json({ error: 'Could not submit quote request' });
+          }
+}
+
+const ADMIN_EMAILS = ['icamagulakwantu@gmail.com'];
+
+export async function getAllQuoteRequests(req, res) {
+  const user = await prisma.user.findUnique({ where: { id: req.userId } });
+  if (!ADMIN_EMAILS.includes(user.email)) return res.status(403).json({ error: 'Admin only' });
+
+  try {
+    const quotes = await prisma.ekoyiniQuoteRequest.findMany({ orderBy: { createdAt: 'desc' } });
+    res.json(quotes);
+  } catch (error) {
+    res.status(500).json({ error: 'Could not fetch quote requests' });
+  }
+}
+
+export async function updateQuoteStatus(req, res) {
+  const { quoteId, status } = req.body;
+  const user = await prisma.user.findUnique({ where: { id: req.userId } });
+  if (!ADMIN_EMAILS.includes(user.email)) return res.status(403).json({ error: 'Admin only' });
+
+  const validStatuses = ['PENDING', 'QUOTED', 'CONFIRMED', 'DECLINED'];
+  if (!validStatuses.includes(status)) return res.status(400).json({ error: 'Invalid status' });
+
+  try {
+    const quote = await prisma.ekoyiniQuoteRequest.update({ where: { id: quoteId }, data: { status } });
+    res.json(quote);
+  } catch (error) {
+    res.status(500).json({ error: 'Could not update status' });
+  }
+}
+
+export async function getMyQuoteRequests(req, res) {
+      try {
+              const quotes = await prisma.ekoyiniQuoteRequest.findMany({
+                        where: { requestedById: req.userId },
+                              orderBy: { createdAt: 'desc' },
+              });
+                  res.json(quotes);
+      } catch (error) {
+              console.error('Get quote requests error:', error.message);
+                  res.status(500).json({ error: 'Could not fetch quote requests' });
+      }
+}
