@@ -273,6 +273,7 @@ model Contribution {
   cycleNumber  Int?
   rawBankLogId String?
   rawBankLog   RawBankLog?        @relation(fields: [rawBankLogId], references: [id])
+  note         String?
   createdAt    DateTime           @default(now())
 }
 
