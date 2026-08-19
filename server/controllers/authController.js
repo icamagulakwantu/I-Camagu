@@ -26,16 +26,27 @@ function serializeUser(user) {
 
 export async function checkEmail(req, res) {
   const { email } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required' });
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
-    res.json({ exists: !!user, hasPassword: !!user?.passwordHash });
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    res.json({
+      exists: !!user,
+      hasPassword: !!user?.passwordHash,
+    });
   } catch (error) {
-  console.error('CHECK EMAIL ERROR:', error);
-  res.status(500).json({
-    error: 'Could not check email',
-    details: error.message,
-  });
+    console.error('CHECK EMAIL ERROR:', error);
+    res.status(500).json({
+      error: 'Could not check email',
+      details: error.message,
+    });
+  }
 }
 
 // NEW: full registration with a real password, replacing the OTP-only flow as primary
