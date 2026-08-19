@@ -22,6 +22,9 @@ import {
   updateChecklistItem,
   updateCostItem,
   getCostEstimate,
+  getCeremonyTypes,
+  deletePledge,
+  getPlanPledges,
   addCeremonyChecklistItem,
   toggleCeremonyChecklistItem,
 } from '../controllers/ceremonyController.js';
@@ -29,6 +32,7 @@ import {
 const router = express.Router();
 
 // ─── EXISTING ROUTES (keep all) ────────────────────────────────────────────
+router.get('/types', requireAuth, getCeremonyTypes);
 router.get('/my', requireAuth, getMyCeremonies);
 router.get('/timeline/:ceremonyType', getCeremonyTimeline);
 router.post('/plans/:planId/share-link', requireAuth, generateShareLink);
@@ -41,9 +45,11 @@ router.get('/plans/:planId/budget', requireAuth, getPlanBudget);
 router.get('/plans/my', requireAuth, getMyPlans);
 router.patch('/plans/items/:itemId/toggle', requireAuth, toggleChecklistItem);
 router.patch('/plans/items/:itemId/cost', requireAuth, updateChecklistItemCost);
+router.get('/plans/:planId/pledges', requireAuth, getPlanPledges);
 router.post('/plans/pledges', requireAuth, addPledge);
-router.delete('/:ceremonyId', requireAuth, deleteCeremony);
+router.delete('/plans/pledges/:pledgeId', requireAuth, deletePledge);
 router.delete('/plans/:planId', requireAuth, deletePreparationPlan);
+router.delete('/:ceremonyId', requireAuth, deleteCeremony);
 
 // ─── NEW ROUTES ──────────────────────────────────────────────────────────────
 // Auto‑generate ceremony with checklist & cost items

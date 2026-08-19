@@ -2,7 +2,7 @@ import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { getCatalogue, getCategories } from '../controllers/catalogueController.js';
 import { submitToPool, getPartners, getMyOrderDocuments, confirmOrderLine } from '../controllers/poolController.js';
-import { getMyBasket, addItem, removeItem } from '../controllers/basketController.js';
+import { getMyBasket, addItem, updateItem, removeItem } from '../controllers/basketController.js';
 
 const router = express.Router();
 
@@ -11,6 +11,7 @@ router.get('/catalogue/categories', getCategories);
 
 router.get('/', requireAuth, getMyBasket);
 router.post('/items', requireAuth, addItem);
+router.patch('/items/:itemId', requireAuth, updateItem);
 router.post('/order-documents/confirm-line', requireAuth, confirmOrderLine);
 router.delete('/items/:itemId', requireAuth, removeItem);
 
