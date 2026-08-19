@@ -103,4 +103,4 @@ export default function More({ onNavigate }) {
       </div>
     </div>
   )
-        }
+}

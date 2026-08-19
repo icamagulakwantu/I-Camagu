@@ -110,7 +110,7 @@ export default function FamilyContributions({ onBack }) {
               ← All plans
             </button>
             <h1 className="font-display font-bold text-3xl">{activePlan.title}</h1>
-            <p className="text-white/70 text-sm mt-1">Uncle Sipho → the goat. Aunt Thandi → groceries.</p>
+            <p className="text-white/70 text-sm mt-1">Track family pledges and responsibilities for this ceremony.</p>
           </div>
         </div>
 
@@ -142,7 +142,7 @@ export default function FamilyContributions({ onBack }) {
               />
               <input
                 type="text"
-                placeholder="What they're bringing (e.g. The ritual goat)"
+                placeholder="What they're bringing (e.g. livestock or groceries)"
                 value={form.pledgedItem}
                 onChange={(e) => handleInputChange('pledgedItem', e.target.value)}
                 className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"

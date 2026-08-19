@@ -45,4 +45,4 @@ function Activity({ onBack }) {
               )
 }
 
-export default Activity                
+export default Activity

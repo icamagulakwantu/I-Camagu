@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 
-const EVENT_TYPES = ['IMIGIDI', 'UMSEBENZI_WENKOMO', 'WEDDING', 'BIRTHDAY', 'CORPORATE', 'OTHER']
+const EVENT_TYPES = ['UMGIDI', 'ULWALUKO', 'INTAMBO_ENKULU', 'UKUKHAPHA', 'INKOBE_ZIKA_MAMA', 'UKUBUYISA', 'UMSEBENZI_WEGQIRHA', 'WEDDING', 'BIRTHDAY', 'CORPORATE', 'OTHER']
 const ADD_ONS = ['VIP Lounge Setup', 'Selfie Swing', 'Alcoholic Games', 'Lighting Upgrade', 'Hookah Bar', 'Branded Backdrop', 'Pallet Furniture', 'Content Creation', 'Custom Signature Cocktails', 'Non-Alcoholic Mocktail Station', 'Champagne Tower', 'Shot Station']
 const AGE_RANGES = ['18-25', '26-35', '36-45', '46-55', '56+', 'Mixed ages']
 const HEAR_OPTIONS = ['Instagram', 'Facebook', 'Referral', 'Word of Mouth', 'Previous Event', 'Other']

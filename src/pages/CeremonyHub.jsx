@@ -1,34 +1,37 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 
-const PRIMARY_CEREMONIES = [
-  { type: 'ULWALUKO', label: 'Ulwaluko', desc: 'Initiation planning, practitioners, blankets', emoji: '⛰️' },
-  { type: 'UMGIDI', label: 'Umgidi', desc: 'Homecoming feast, kraal seating, alcohol', emoji: '🎉' },
-  { type: 'INTAMBO_ENKULU', label: 'Intambo Enkulu', desc: 'Family bonding, protective rituals', emoji: '🔗' },
-]
+const CEREMONY_META = {
+  ULWALUKO: { label: 'Ulwaluko', desc: 'Initiation planning and preparation', emoji: '⛰️' },
+  UMGIDI: { label: 'Umgidi', desc: 'Homecoming celebration and preparation', emoji: '🎉' },
+  INTAMBO_ENKULU: { label: 'Intambo Enkulu', desc: 'Ceremony planning and preparation', emoji: '🔗' },
+  UKUKHAPHA: { label: 'Ukukhapha', desc: 'Ceremony planning and preparation', emoji: '🕊️' },
+  INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', desc: 'Ceremony planning and preparation', emoji: '🌾' },
+  UKUBUYISA: { label: 'Ukubuyisa', desc: 'Ceremony planning and preparation', emoji: '🏠' },
+  UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', desc: 'Ceremony planning and preparation', emoji: '🌿' },
+  WEDDING: { label: 'Wedding', desc: 'Marriage celebration planning', emoji: '💍' },
+  GENERAL_EVENT: { label: 'General Event', desc: 'Custom ceremony or event planning', emoji: '📅' },
+}
 
-const IMISEBENZI_YENKOMO = [
-  { type: 'UKUKHAPHA', label: 'Ukukhapha', desc: 'Accompanying an ancestor\'s spirit' },
-  { type: 'UKUBUYISA', label: 'Ukubuyisa', desc: 'Bringing the ancestor\'s spirit home' },
-  { type: 'INKOBE_ZIKA_MAMA', label: 'Inkobe zikaMama', desc: 'Thanksgiving for maternal figures' },
-  { type: 'UMSEBENZI_WEGQIRHA', label: 'Umsebenzi wegqirha', desc: 'Healer milestone, intlombe dance' },
-]
-
-// NEW: added props onCreateNew and onSelectCeremony
 function CeremonyHub({ onBack, onOpenType, onCreateNew, onSelectCeremony }) {
   const { accessToken } = useAuth()
-  const [showImisebenzi, setShowImisebenzi] = useState(false)
   const [ceremonies, setCeremonies] = useState([])
+  const [ceremonyTypes, setCeremonyTypes] = useState([])
   const [loading, setLoading] = useState(true) // NEW: loading state
 
   useEffect(() => {
     setLoading(true)
-    fetch('/api/ceremonies/my', { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch ceremonies')
-        return res.json()
+    Promise.all([
+      fetch('/api/ceremonies/my', { headers: { Authorization: `Bearer ${accessToken}` } }),
+      fetch('/api/ceremonies/types', { headers: { Authorization: `Bearer ${accessToken}` } }),
+    ])
+      .then(async ([ceremonyRes, typeRes]) => {
+        if (!ceremonyRes.ok) throw new Error('Failed to fetch ceremonies')
+        const ceremonyData = await ceremonyRes.json()
+        const typeData = typeRes.ok ? await typeRes.json() : []
+        setCeremonies(Array.isArray(ceremonyData) ? ceremonyData : [])
+        setCeremonyTypes(Array.isArray(typeData) ? typeData.filter(type => type !== 'IMIGIDI' && type !== 'UMSEBENZI_WENKOMO') : [])
       })
-      .then((data) => setCeremonies(Array.isArray(data) ? data : []))
       .catch(err => console.error('Error fetching ceremonies:', err))
       .finally(() => setLoading(false))
   }, [accessToken]) // added dependency
@@ -65,42 +68,19 @@ function CeremonyHub({ onBack, onOpenType, onCreateNew, onSelectCeremony }) {
       </div>
 
       <div className="px-4 mt-4 space-y-3">
-        {PRIMARY_CEREMONIES.map((c) => (
-          <button key={c.type} onClick={() => onOpenType(c.type)}
+        {ceremonyTypes.map((type) => {
+          const meta = CEREMONY_META[type] || {}
+          return (
+          <button key={type} onClick={() => onOpenType(type)}
             className="w-full bg-white border-2 border-ink rounded-soft p-4 flex items-center gap-4 text-left active:scale-[0.98] transition-transform">
-            <span className="text-3xl">{c.emoji}</span>
+            <span className="text-3xl">{meta.emoji || '🎉'}</span>
             <div>
-              <p className="font-bold text-ink">{c.label}</p>
-              <p className="text-xs text-ink-muted">{c.desc}</p>
+              <p className="font-bold text-ink">{meta.label || type.replace(/_/g, ' ')}</p>
+              <p className="text-xs text-ink-muted">{meta.desc || 'Ceremony planning'}</p>
             </div>
           </button>
-        ))}
-
-        <button onClick={() => setShowImisebenzi(!showImisebenzi)}
-          className="w-full bg-white border-2 border-terracotta rounded-soft p-4 flex items-center justify-between text-left">
-          <div className="flex items-center gap-4">
-            <span className="text-3xl">🐄</span>
-            <div>
-              <p className="font-bold text-ink">Imisebenzi yeNkomo</p>
-              <p className="text-xs text-ink-muted">4 ceremonies — tap to expand</p>
-            </div>
-          </div>
-          <span className="text-ink-muted">{showImisebenzi ? '▲' : '▼'}</span>
-        </button>
-
-        {showImisebenzi && (
-          <div className="pl-4 space-y-2">
-            {IMISEBENZI_YENKOMO.map((c) => (
-              <button key={c.type} onClick={() => onOpenType(c.type)}
-                className="w-full bg-sage-50 border-2 border-sage-200 rounded-soft p-3 flex items-center gap-3 text-left">
-                <div>
-                  <p className="font-bold text-sm text-ink">{c.label}</p>
-                  <p className="text-xs text-ink-muted">{c.desc}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
+          )
+        })}
       </div>
 
       {loading ? (

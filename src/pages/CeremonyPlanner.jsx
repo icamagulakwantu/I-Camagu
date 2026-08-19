@@ -9,24 +9,24 @@ import { cn } from '../lib/utils'
 // --------------------------------------------------------------
 // Display‑ready ceremony types (from File 1)
 // --------------------------------------------------------------
-const CEREMONY_TYPES_DISPLAY = [
-  { id: 'ulwaluko', name: 'Ulwaluko', emoji: '✂️', desc: 'Initiation & manhood' },
-  { id: 'umgidi', name: 'Umgidi', emoji: '🎉', desc: 'Homecoming celebration' },
-  { id: 'intambo_enkulu', name: 'Intambo Enkulu', emoji: '🪢', desc: 'Ancestral binding' },
-  { id: 'ukukhapha', name: 'Ukukhapha', emoji: '🕊️', desc: 'Sending off ceremony' },
-  { id: 'inkobe_zika_mama', name: 'Inkobe zikaMama', emoji: '🌾', desc: 'Maternal ceremony' },
-  { id: 'ukubuyisa', name: 'Ukubuyisa', emoji: '🏠', desc: 'Return ceremony' },
-  { id: 'umsebenzi_wegqirha', name: 'Umsebenzi weGqirha', emoji: '🌿', desc: 'Healer ceremony' },
-  { id: 'wedding', name: 'Wedding', emoji: '💍', desc: 'Marriage celebration' },
-  { id: 'general_event', name: 'General Event', emoji: '📅', desc: 'Custom ceremony/event' },
-]
+const CEREMONY_META = {
+  ULWALUKO: { name: 'Ulwaluko', emoji: '✂️', desc: 'Initiation & manhood' },
+  UMGIDI: { name: 'Umgidi', emoji: '🎉', desc: 'Homecoming celebration' },
+  INTAMBO_ENKULU: { name: 'Intambo Enkulu', emoji: '🔗', desc: 'Ceremony planning' },
+  UKUKHAPHA: { name: 'Ukukhapha', emoji: '🕊️', desc: 'Ceremony planning' },
+  INKOBE_ZIKA_MAMA: { name: 'Inkobe zikaMama', emoji: '🌾', desc: 'Ceremony planning' },
+  UKUBUYISA: { name: 'Ukubuyisa', emoji: '🏠', desc: 'Ceremony planning' },
+  UMSEBENZI_WEGQIRHA: { name: 'Umsebenzi weGqirha', emoji: '🌿', desc: 'Ceremony planning' },
+  WEDDING: { name: 'Wedding', emoji: '💍', desc: 'Marriage celebration' },
+  GENERAL_EVENT: { name: 'General Event', emoji: '📅', desc: 'Custom event' },
+}
 
 const mapDisplayTypeToBackend = (displayId) => displayId.toUpperCase()
 
 // --------------------------------------------------------------
 // Main component
 // --------------------------------------------------------------
-export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline }) {
+export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, selectedCeremonyId }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
 
@@ -36,6 +36,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline })
   const [loading, setLoading] = useState(true)
   const [newTitle, setNewTitle] = useState('')
   const [newType, setNewType] = useState(defaultType || 'ULWALUKO')
+  const [ceremonyTypes, setCeremonyTypes] = useState([])
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [newChecklistItem, setNewChecklistItem] = useState({ phase: 'CUSTOM', label: '', isOptional: true })
 
@@ -62,6 +63,10 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline })
             }))
           : []
         setPlans(nextPlans)
+        if (selectedCeremonyId) {
+          const selectedPlan = nextPlans.find(plan => plan.ceremonyId === selectedCeremonyId)
+          if (selectedPlan) setActivePlan(selectedPlan)
+        }
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -69,7 +74,11 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline })
 
   useEffect(() => {
     fetchPlans()
-  }, [])
+    fetch('/api/ceremonies/types', { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then(res => res.json())
+      .then(data => setCeremonyTypes(Array.isArray(data) ? data.filter(type => type !== 'IMIGIDI' && type !== 'UMSEBENZI_WENKOMO') : []))
+      .catch(() => setCeremonyTypes([]))
+  }, [accessToken, selectedCeremonyId])
 
   useEffect(() => {
     if (defaultType) setNewType(defaultType)
@@ -221,10 +230,10 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline })
     }
   }
 
-  // ----- Pledge API calls (from File 1) -----
-  const fetchPledges = (ceremonyType) => {
-    if (!ceremonyType) return
-    fetch(`/api/ceremonies/pledges?ceremonyType=${ceremonyType}`, {
+  // ----- Pledge API calls (schema-backed plan pledges) -----
+  const fetchPledges = (planId) => {
+    if (!planId) return
+    fetch(`/api/ceremonies/plans/${planId}/pledges`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
       .then(res => res.json())
@@ -233,27 +242,27 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline })
   }
 
   useEffect(() => {
-    if (activePlan) {
-      fetchPledges(activePlan.ceremonyType)
-    }
-  }, [activePlan])
+    if (activePlan?.id) fetchPledges(activePlan.id)
+  }, [activePlan?.id])
 
   const addPledge = async (e) => {
     e.preventDefault()
-    if (!newPledge.contributorName || !newPledge.pledgeItem) {
+    if (!activePlan?.id || !newPledge.contributorName || !newPledge.pledgeItem) {
       showToast('Please fill in all fields', 'error')
       return
     }
     try {
-      const res = await fetch('/api/ceremonies/pledges', {
+      const res = await fetch('/api/ceremonies/plans/pledges', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          ...newPledge,
-          ceremonyType: activePlan.ceremonyType,
+          planId: activePlan.id,
+          pledgerName: newPledge.contributorName,
+          pledgedItem: newPledge.pledgeItem,
+          pledgedAmountZAR: newPledge.pledgeValue ? parseFloat(newPledge.pledgeValue) : null,
         }),
       })
       const data = await res.json()
@@ -269,14 +278,12 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline })
 
   const deletePledge = async (pledgeId) => {
     try {
-      const res = await fetch(`/api/ceremonies/pledges/${pledgeId}`, {
+      const res = await fetch(`/api/ceremonies/plans/pledges/${pledgeId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${accessToken}` },
       })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || 'Failed to delete pledge')
-      }
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || 'Failed to delete pledge')
       setPledges(prev => prev.filter(p => p.id !== pledgeId))
       showToast('Pledge removed', 'info')
     } catch (err) {
@@ -567,19 +574,21 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline })
 
       {/* Ceremony Type Selector (File 1 style) */}
       <div className="flex gap-2 px-4 mt-5 overflow-x-auto no-scrollbar pb-2">
-        {CEREMONY_TYPES_DISPLAY.map((type) => (
+        {ceremonyTypes.map((typeId) => {
+          const type = CEREMONY_META[typeId] || {}
+          return (
           <button
-            key={type.id}
+            key={typeId}
             type="button"
             onClick={() => {
-              const backendType = mapDisplayTypeToBackend(type.id)
+              const backendType = mapDisplayTypeToBackend(typeId)
               const existing = plans.find(p => p.ceremonyType === backendType)
               if (existing) {
                 setActivePlan(existing)
               } else {
                 setNewType(backendType)
-                setNewTitle(`New ${type.name} Plan`)
-                showToast(`No plan for ${type.name} – fill in the form to create one`, 'info')
+                setNewTitle(`New ${type.name || typeId.replace(/_/g, ' ')} Plan`)
+                showToast(`No plan for ${type.name || typeId.replace(/_/g, ' ')} – fill in the form to create one`, 'info')
               }
             }}
             className={cn(
@@ -587,13 +596,14 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline })
               'bg-white text-ink border-2 border-cream-dark hover:border-sage-300'
             )}
           >
-            <span className="text-lg">{type.emoji}</span>
+            <span className="text-lg">{type.emoji || '🎉'}</span>
             <div className="text-left">
-              <div className="text-xs leading-tight">{type.name}</div>
-              <div className="text-[10px] font-medium leading-tight text-ink-muted">{type.desc}</div>
+              <div className="text-xs leading-tight">{type.name || typeId.replace(/_/g, ' ')}</div>
+              <div className="text-[10px] font-medium leading-tight text-ink-muted">{type.desc || 'Ceremony planning'}</div>
             </div>
           </button>
-        ))}
+          )
+        })}
       </div>
 
       {/* Create Plan Form (styled like File 1) */}
@@ -605,11 +615,13 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline })
             onChange={(e) => setNewType(e.target.value)}
             className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
           >
-            {CEREMONY_TYPES_DISPLAY.map((t) => (
-              <option key={t.id} value={mapDisplayTypeToBackend(t.id)}>
-                {t.emoji} {t.name}
+            {ceremonyTypes.map((typeId) => {
+              const t = CEREMONY_META[typeId] || {}
+              return (
+              <option key={typeId} value={mapDisplayTypeToBackend(typeId)}>
+                {t.emoji || '🎉'} {t.name || typeId.replace(/_/g, ' ')}
               </option>
-            ))}
+            )})}
           </select>
           <input
             type="text"

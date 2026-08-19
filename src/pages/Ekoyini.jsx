@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { cn } from '../lib/utils'
+import EkoyiniQuoteForm from './EkoyiniQuoteForm.jsx'
 
 const PACKAGES = [
   { id: 'heritage', name: 'Heritage', emoji: '🥂', price: 'R4,500', desc: 'Essential bar setup' },
@@ -31,6 +32,21 @@ export default function Ekoyini({ onBack }) {
     specialRequests: '',
   })
   const [submitting, setSubmitting] = useState(false)
+
+  if (selectedPackage && step === 3) {
+    const packageData = PACKAGES.find(pkg => pkg.id === selectedPackage) || PACKAGES[0]
+    return (
+      <EkoyiniQuoteForm
+        selectedPackage={{ ...packageData, id: packageData.id.toUpperCase() }}
+        onBack={() => setStep(1)}
+        onSubmitted={(message) => {
+          showToast(message || 'Quote request sent!', 'success')
+          setStep(1)
+          setSelectedPackage(null)
+        }}
+      />
+    )
+  }
 
   const updateForm = (key, value) => setForm(prev => ({ ...prev, [key]: value }))
 
@@ -182,7 +198,7 @@ export default function Ekoyini({ onBack }) {
               {[
                 { key: 'cocktailService', label: 'Cocktail Service', emoji: '🍸' },
                 { key: 'glasswareUpgrade', label: 'Premium Glassware', emoji: '🥃' },
-                { key: 'culturalTourism', label: 'Cultural Tourism (20% host share)', emoji: '🌍' },
+                { key: 'culturalTourism', label: 'Cultural Tourism (up to 30% host share)', emoji: '🌍' },
               ].map((addon) => (
                 <button
                   key={addon.key}
