@@ -31,8 +31,11 @@ export async function checkEmail(req, res) {
     const user = await prisma.user.findUnique({ where: { email } });
     res.json({ exists: !!user, hasPassword: !!user?.passwordHash });
   } catch (error) {
-    res.status(500).json({ error: 'Could not check email' });
-  }
+  console.error('CHECK EMAIL ERROR:', error);
+  res.status(500).json({
+    error: 'Could not check email',
+    details: error.message,
+  });
 }
 
 // NEW: full registration with a real password, replacing the OTP-only flow as primary
