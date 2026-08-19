@@ -1,0 +1,37 @@
+import React from 'react'
+
+export default function ActionCard({ children, onClick, className = '', badge = null, icon = null }) {
+  const handleInteraction = (e) => {
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(8)
+      } catch (err) {
+        // Safe fallback for devices/browsers blocking vibration
+      }
+    }
+    if (onClick) onClick(e)
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleInteraction}
+      className={`relative w-full text-left bg-white/90 backdrop-blur-md rounded-soft p-4 
+        border-2 border-brand-black/10 shadow-sm active:scale-[0.98] transition-all duration-150 ${className}`}
+    >
+      {badge !== null && badge !== undefined && Number(badge) > 0 && (
+        <span className="absolute top-2 right-2 bg-brand-ochre text-brand-cream text-[10px] font-black w-5 h-5 rounded-pill flex items-center justify-center shadow-sm">
+          {badge}
+        </span>
+      )}
+      <div className="flex items-center gap-3">
+        {icon && (
+          <div className="w-10 h-10 rounded-soft bg-brand-sageLight/30 border border-brand-black/10 flex items-center justify-center text-xl shrink-0">
+            {icon}
+          </div>
+        )}
+        <div className="flex-1 min-w-0">{children}</div>
+      </div>
+    </button>
+  )
+}
