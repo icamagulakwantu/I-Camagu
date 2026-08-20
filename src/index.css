@@ -23,6 +23,17 @@
 }
 
 @layer utilities {
+  .icamagu-bg {
+    background-color: theme('colors.cream.DEFAULT');
+    background-image:
+      radial-gradient(ellipse 900px 650px at 8% -8%, rgba(196, 92, 38, 0.22), transparent 60%),
+      radial-gradient(ellipse 750px 550px at 108% 8%, rgba(217, 164, 65, 0.24), transparent 55%),
+      radial-gradient(ellipse 700px 550px at 50% 115%, rgba(74, 122, 74, 0.12), transparent 60%),
+      repeating-linear-gradient(45deg, rgba(45, 42, 38, 0.04) 0px, rgba(45, 42, 38, 0.04) 2px, transparent 2px, transparent 22px),
+      repeating-linear-gradient(-45deg, rgba(45, 42, 38, 0.04) 0px, rgba(45, 42, 38, 0.04) 2px, transparent 2px, transparent 22px);
+    background-attachment: fixed;
+  }
+
   .pressable {
     @apply transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none;
   }
