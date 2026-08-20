@@ -26,7 +26,7 @@ const mapDisplayTypeToBackend = (displayId) => displayId.toUpperCase()
 // --------------------------------------------------------------
 // Main component
 // --------------------------------------------------------------
-export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, selectedCeremonyId }) {
+export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, onViewBudget, selectedCeremonyId }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
 
@@ -378,6 +378,12 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, s
             className={`flex-1 border-2 border-sage-500 text-sage-600 font-bold py-2.5 rounded-pill text-sm ${pressable}`}
           >
             📑 Save as Template
+          </button>
+          <button
+            onClick={() => onViewBudget?.(activePlan.id, activePlan.title)}
+            className={`flex-1 border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+          >
+            💰 Budget
           </button>
           <button
             onClick={shareChecklist}

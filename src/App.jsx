@@ -37,6 +37,7 @@ import Notifications from './pages/Notifications.jsx'           // ✅ NEW
 import ResetPassword from './pages/ResetPassword.jsx'
 import AccountSettings from './pages/AccountSettings.jsx'
 import Help from './pages/Help.jsx'
+import BudgetDashboard from './pages/BudgetDashboard.jsx'
 
 // Components
 import BottomNav from './components/BottomNav.jsx'
@@ -55,6 +56,7 @@ const MORE_SCREENS = [
   'more',
   'ceremony',
   'timeline',
+  'budget',
   'templates',
   'family',
   'ukugida',
@@ -258,6 +260,8 @@ function MainApp() {
   const [ceremonyHubType, setCeremonyHubType] = useState(null)
   const [timelineType, setTimelineType] = useState(null)
   const [selectedCeremonyId, setSelectedCeremonyId] = useState(null)
+  const [budgetPlanId, setBudgetPlanId] = useState(null)
+  const [budgetPlanTitle, setBudgetPlanTitle] = useState('')
 
   const goHome = () => setScreen('home')
   const goMore = () => setScreen('more')
@@ -282,6 +286,12 @@ function MainApp() {
   const openTimeline = (ceremonyType) => {
     setTimelineType(ceremonyType)
     setScreen('timeline')
+  }
+
+  const openBudget = (planId, planTitle) => {
+    setBudgetPlanId(planId)
+    setBudgetPlanTitle(planTitle)
+    setScreen('budget')
   }
 
   const openExistingCeremony = (ceremonyId) => {
@@ -314,11 +324,20 @@ function MainApp() {
             onBack={goMore}
             defaultType={ceremonyHubType}
             onViewTimeline={openTimeline}
+            onViewBudget={openBudget}
             selectedCeremonyId={selectedCeremonyId}
           />
         )
       case 'timeline':
         return <CeremonyTimeline ceremonyType={timelineType} onBack={() => setScreen('ceremony')} />
+      case 'budget':
+        return (
+          <BudgetDashboard
+            planId={budgetPlanId}
+            planTitle={budgetPlanTitle}
+            onBack={() => setScreen('ceremony')}
+          />
+        )
       case 'templates':
         return <Templates onBack={goMore} />
       case 'family':
