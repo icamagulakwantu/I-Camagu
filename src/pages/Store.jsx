@@ -100,21 +100,6 @@ function Store({ onGoToBasket, basketCount }) {
         ))}
       </div>
 
-      <div key={sku.id} className="bg-white border-2 border-ink rounded-soft p-3 flex justify-between items-center shadow-soft">
-  <div className="flex items-center gap-3">
-    {sku.imageUrl && <img src={sku.imageUrl} alt="" className="w-12 h-12 rounded-soft object-cover flex-shrink-0" />}
-    <div>
-      <h3 className="font-bold text-sm text-ink">{sku.name}</h3>
-      <p className="text-xs text-ink-muted">{sku.bottleFormat} • {sku.unitsPerCase} per case</p>
-      <p className="text-sm font-bold text-terracotta">R{parseFloat(sku.casePriceZAR).toFixed(2)} / case</p>
-    </div>
-  </div>
-  <button onClick={() => addToBasket(sku)} disabled={addingId === sku.id}
-    className="bg-terracotta text-white text-xs font-bold px-4 py-2 rounded-pill active:scale-90 transition-transform disabled:opacity-50">
-    {addingId === sku.id ? '✓' : 'Add case'}
-  </button>
-</div>
-
       {/* Product List */}
       <div className="px-4 mt-4">
         {loading ? (
@@ -130,8 +115,8 @@ function Store({ onGoToBasket, basketCount }) {
             {skus.map((sku) => (
               <div key={sku.id} className="bg-white border-2 border-ink rounded-soft p-3 flex justify-between items-center shadow-soft">
                 <div className="flex items-center gap-3">
-                  {sku.ImageUrl && (
-                    <img src={sku.ImageUrl} alt={sku.name} className="w-12 h-12 rounded-soft object-cover flex-shrink-0" />
+                  {sku.imageUrl && (
+                    <img src={sku.imageUrl} alt={sku.name} className="w-12 h-12 rounded-soft object-cover flex-shrink-0" />
                   )}
                   <div>
                     <h3 className="font-bold text-sm text-ink">{sku.name}</h3>
