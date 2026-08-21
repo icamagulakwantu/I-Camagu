@@ -1,16 +1,31 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
+import { EmptyState } from '../components/ui/EmptyState.jsx'
 
 function BudgetDashboard({ planId, planTitle, onBack }) {
       const { accessToken } = useAuth()
         const [budget, setBudget] = useState(null)
+        const [error, setError] = useState('')
 
           useEffect(() => {
                   fetch(`/api/ceremonies/plans/${planId}/budget`, { headers: { Authorization: `Bearer ${accessToken}` } })
-                        .then(res => res.json())
-                              .then(setBudget)
-          }, [planId])
+                        .then(async (res) => {
+                              const data = await res.json()
+                              if (!res.ok) throw new Error(data.error || 'Could not load budget')
+                              setBudget(data)
+                        })
+                        .catch((err) => setError(err.message))
+          }, [planId, accessToken])
+
+            if (error) {
+                  return (
+                        <div className="min-h-screen bg-cream px-4 pt-10">
+                              <button onClick={onBack} className="text-sm text-ink-muted mb-4 block">← Back</button>
+                              <EmptyState emoji="⚠️" title="Could not load budget" description={error} />
+                        </div>
+                  )
+            }
 
             if (!budget) return <div className="p-4"><Skeleton className="h-40 w-full" /></div>
 

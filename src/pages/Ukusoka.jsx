@@ -22,8 +22,13 @@ function Ukusoka({ onBack }) {
 
   const fetchEntries = () => {
     fetch('/api/ukusoka/my', { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then(res => res.json())
-      .then((data) => { setEntries(Array.isArray(data) ? data : []); setLoading(false) })
+      .then(async (res) => {
+        const data = await res.json()
+        if (!res.ok) throw new Error()
+        setEntries(Array.isArray(data) ? data : [])
+      })
+      .catch(() => { showToast('Could not load entries', 'error'); setEntries([]) })
+      .finally(() => setLoading(false))
   }
 
   useEffect(() => { fetchEntries() }, [])

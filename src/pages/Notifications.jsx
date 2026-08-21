@@ -12,6 +12,7 @@ function Notifications({ onBack, onNavigate }) {
                   fetch('/api/notifications/my', { headers: { Authorization: `Bearer ${accessToken}` } })
                         .then(res => res.json())
                               .then((data) => setNotifications(Array.isArray(data) ? data : []))
+                              .catch(() => setNotifications([]))
           }
 
             useEffect(() => { fetchAll() }, [])

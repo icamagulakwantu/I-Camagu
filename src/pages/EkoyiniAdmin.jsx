@@ -11,26 +11,47 @@ function EkoyiniAdmin({ onBack }) {
         const { showToast } = useToast()
           const [quotes, setQuotes] = useState([])
             const [loading, setLoading] = useState(true)
+            const [forbidden, setForbidden] = useState(false)
 
               const fetchQuotes = () => {
                       fetch('/api/ekoyini/quote/all', { headers: { Authorization: `Bearer ${accessToken}` } })
-                            .then(res => res.json())
-                                  .then((data) => { setQuotes(Array.isArray(data) ? data : []); setLoading(false) })
+                            .then(async (res) => {
+                                  if (res.status === 403) { setForbidden(true); return }
+                                  const data = await res.json()
+                                  if (!res.ok) throw new Error()
+                                  setQuotes(Array.isArray(data) ? data : [])
+                            })
+                            .catch(() => showToast('Could not load quote requests', 'error'))
+                            .finally(() => setLoading(false))
               }
 
                 useEffect(() => { fetchQuotes() }, [])
 
                   const updateStatus = async (quoteId, status) => {
-                          await fetch('/api/ekoyini/quote/status', {
+                          try {
+                                const res = await fetch('/api/ekoyini/quote/status', {
                                     method: 'PATCH',
                                           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
                                                 body: JSON.stringify({ quoteId, status }),
-                          })
+                                })
+                                if (!res.ok) throw new Error((await res.json()).error || 'Could not update status')
                               showToast('Status updated', 'success')
                                   fetchQuotes()
+                          } catch (err) {
+                                showToast(err.message, 'error')
+                          }
                   }
 
                     if (loading) return <div className="p-4 text-ink-muted">Loading...</div>
+
+                    if (forbidden) {
+                          return (
+                                <div className="min-h-screen bg-cream px-4 pt-10">
+                                      <button onClick={onBack} className="text-sm text-ink-muted mb-4 block">← Back</button>
+                                      <EmptyState emoji="🔒" title="Admins only" description="This screen is restricted to the Ekoyini team." />
+                                </div>
+                          )
+                    }
 
                       return (
                               <div className="min-h-screen pb-24 bg-cream px-4 pt-6">

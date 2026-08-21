@@ -5,7 +5,13 @@ function LegendsExplore({ onBack }) {
         const [activeCategory, setActiveCategory] = useState('')
 
           useEffect(() => {
-                  fetch('/api/legends').then(res => res.json()).then(setLegends)
+                  fetch('/api/legends')
+                        .then(async (res) => {
+                              const data = await res.json()
+                              if (!res.ok) throw new Error()
+                              setLegends(Array.isArray(data) ? data : [])
+                        })
+                        .catch(() => setLegends([]))
           }, [])
 
             const categories = [...new Set(legends.map(l => l.category))]

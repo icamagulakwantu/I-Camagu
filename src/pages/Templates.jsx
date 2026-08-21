@@ -14,6 +14,7 @@ function Templates({ onBack }) {
     fetch('/api/ceremonies/templates/my', { headers: { Authorization: `Bearer ${accessToken}` } })
       .then(res => res.json())
       .then((data) => setTemplates(Array.isArray(data) ? data : []))
+      .catch(() => { showToast('Could not load templates', 'error'); setTemplates([]) })
   }
 
   useEffect(() => { fetchTemplates() }, [])

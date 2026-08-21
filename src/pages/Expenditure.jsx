@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useToast } from '../components/ui/Toast.jsx'
 
 function Expenditure({ onBack }) {
   const { accessToken } = useAuth()
+  const { showToast } = useToast()
   const [entries, setEntries] = useState([])
   const [total, setTotal] = useState(0)
 
@@ -11,23 +13,37 @@ function Expenditure({ onBack }) {
   const [category, setCategory] = useState('')
   const [purchasedAt, setPurchasedAt] = useState('')
 
-  const fetchEntries = () => {
-    fetch('/api/expenditure/my', { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then(res => res.json())
-      .then((data) => { setEntries(data.entries); setTotal(data.total) })
+  const fetchEntries = async () => {
+    try {
+      const res = await fetch('/api/expenditure/my', { headers: { Authorization: `Bearer ${accessToken}` } })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not load spending')
+      setEntries(Array.isArray(data.entries) ? data.entries : [])
+      setTotal(data.total || 0)
+    } catch (err) {
+      showToast(err.message, 'error')
+      setEntries([])
+      setTotal(0)
+    }
   }
 
   useEffect(() => { fetchEntries() }, [])
 
   const addEntry = async (e) => {
     e.preventDefault()
-    await fetch('/api/expenditure', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({ itemName, price, category, purchasedAt: purchasedAt || new Date().toISOString() }),
-    })
-    setItemName(''); setPrice(''); setCategory(''); setPurchasedAt('')
-    fetchEntries()
+    try {
+      const res = await fetch('/api/expenditure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ itemName, price, category, purchasedAt: purchasedAt || new Date().toISOString() }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not add expense')
+      setItemName(''); setPrice(''); setCategory(''); setPurchasedAt('')
+      fetchEntries()
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
   }
 
   return (

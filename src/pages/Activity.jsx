@@ -13,8 +13,13 @@ function Activity({ onBack }) {
 
             useEffect(() => {
                     fetch('/api/activity/my', { headers: { Authorization: `Bearer ${accessToken}` } })
-                          .then(res => res.json())
-                                .then((data) => { setFeed(Array.isArray(data) ? data : []); setLoading(false) })
+                          .then(async (res) => {
+                                const data = await res.json()
+                                if (!res.ok) throw new Error()
+                                setFeed(Array.isArray(data) ? data : [])
+                          })
+                          .catch(() => setFeed([]))
+                          .finally(() => setLoading(false))
             }, [])
 
               return (

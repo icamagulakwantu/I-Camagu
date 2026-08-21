@@ -1,25 +1,39 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useToast } from '../components/ui/Toast.jsx'
 
 function MyOrders({ onBack }) {
       const { accessToken } = useAuth()
+      const { showToast } = useToast()
         const [documents, setDocuments] = useState([])
 
-          const fetchDocs = () => {
-                  fetch('/api/basket/order-documents/my', { headers: { Authorization: `Bearer ${accessToken}` } })
-                        .then(res => res.json())
-                              .then(setDocuments)
+          const fetchDocs = async () => {
+            try {
+              const res = await fetch('/api/basket/order-documents/my', { headers: { Authorization: `Bearer ${accessToken}` } })
+              const data = await res.json()
+              if (!res.ok) throw new Error(data.error || 'Could not load orders')
+              setDocuments(Array.isArray(data) ? data : [])
+            } catch (err) {
+              showToast(err.message, 'error')
+              setDocuments([])
+            }
           }
 
             useEffect(() => { fetchDocs() }, [])
 
               const confirmLine = async (lineItemId) => {
-                      await fetch('/api/basket/order-documents/confirm-line', {
+                try {
+                  const res = await fetch('/api/basket/order-documents/confirm-line', {
                                 method: 'POST',
                                       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
                                             body: JSON.stringify({ lineItemId }),
-                      })
+                  })
+                  const data = await res.json()
+                  if (!res.ok) throw new Error(data.error || 'Could not confirm')
                           fetchDocs()
+                } catch (err) {
+                  showToast(err.message, 'error')
+                }
               }
 
                 return (
