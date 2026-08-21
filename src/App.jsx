@@ -40,6 +40,7 @@ import AccountSettings from './pages/AccountSettings.jsx'
 import Help from './pages/Help.jsx'
 import BudgetDashboard from './pages/BudgetDashboard.jsx'
 import SupplierDashboard from './pages/SupplierDashboard.jsx'
+import EkoyiniBooking from './pages/EkoyiniBooking.jsx'
 
 // Components
 import BottomNav from './components/BottomNav.jsx'
@@ -58,6 +59,7 @@ const MORE_SCREENS = [
   'ceremony',
   'timeline',
   'budget',
+  'ekoyinibooking',
   'templates',
   'family',
   'ukugida',
@@ -263,6 +265,8 @@ function MainApp() {
   const [selectedCeremonyId, setSelectedCeremonyId] = useState(null)
   const [budgetPlanId, setBudgetPlanId] = useState(null)
   const [budgetPlanTitle, setBudgetPlanTitle] = useState('')
+  const [ekoyiniBookingCeremonyId, setEkoyiniBookingCeremonyId] = useState(null)
+  const [ekoyiniBookingCeremonyTitle, setEkoyiniBookingCeremonyTitle] = useState('')
 
   const goHome = () => setScreen('home')
   const goMore = () => setScreen('more')
@@ -293,6 +297,12 @@ function MainApp() {
     setBudgetPlanId(planId)
     setBudgetPlanTitle(planTitle)
     setScreen('budget')
+  }
+
+  const openEkoyiniBooking = (ceremonyId, ceremonyTitle) => {
+    setEkoyiniBookingCeremonyId(ceremonyId)
+    setEkoyiniBookingCeremonyTitle(ceremonyTitle)
+    setScreen('ekoyinibooking')
   }
 
   const openExistingCeremony = (ceremonyId) => {
@@ -326,6 +336,7 @@ function MainApp() {
             defaultType={ceremonyHubType}
             onViewTimeline={openTimeline}
             onViewBudget={openBudget}
+            onBookEkoyini={openEkoyiniBooking}
             selectedCeremonyId={selectedCeremonyId}
           />
         )
@@ -336,6 +347,14 @@ function MainApp() {
           <BudgetDashboard
             planId={budgetPlanId}
             planTitle={budgetPlanTitle}
+            onBack={() => setScreen('ceremony')}
+          />
+        )
+      case 'ekoyinibooking':
+        return (
+          <EkoyiniBooking
+            ceremonyId={ekoyiniBookingCeremonyId}
+            ceremonyTitle={ekoyiniBookingCeremonyTitle}
             onBack={() => setScreen('ceremony')}
           />
         )

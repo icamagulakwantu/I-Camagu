@@ -33,6 +33,9 @@ export async function addWristbandTier(req, res) {
         }
 
           try {
+                  const booking = await prisma.barServiceBooking.findUnique({ where: { id: bookingId } });
+                  if (!booking || booking.hostId !== req.userId) return res.status(403).json({ error: 'Not your booking' });
+
                   const tier = await prisma.wristbandTier.create({
                             data: { bookingId, colorLabel, entitlement, guestCount: guestCount ? parseInt(guestCount) : null },
                   });
@@ -93,6 +96,18 @@ export async function toggleTourismPackage(req, res) {
                 console.error('Toggle tourism package error:', error.message);
                     res.status(500).json({ error: 'Could not update package' });
         }
+}
+
+export async function getTourismPackage(req, res) {
+  const { ceremonyId } = req.params;
+  try {
+    const pkg = await prisma.tourismPackage.findUnique({ where: { ceremonyId } });
+    if (pkg && pkg.hostId !== req.userId) return res.status(403).json({ error: 'Not your package' });
+    res.json(pkg);
+  } catch (error) {
+    console.error('Get tourism package error:', error.message);
+    res.status(500).json({ error: 'Could not fetch package' });
+  }
 }
 
 export async function getBarBooking(req, res) {

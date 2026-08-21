@@ -26,7 +26,7 @@ const mapDisplayTypeToBackend = (displayId) => displayId.toUpperCase()
 // --------------------------------------------------------------
 // Main component
 // --------------------------------------------------------------
-export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, onViewBudget, selectedCeremonyId }) {
+export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, onViewBudget, onBookEkoyini, selectedCeremonyId }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
 
@@ -414,6 +414,14 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           >
             🕐 Timeline
           </button>
+          {activePlan.ceremonyId && (
+            <button
+              onClick={() => onBookEkoyini?.(activePlan.ceremonyId, activePlan.title)}
+              className={`flex-1 border-2 border-ink text-ink font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+            >
+              🍸 Ekoyini Bar
+            </button>
+          )}
           <button
             onClick={shareChecklist}
             className={`flex-1 bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
