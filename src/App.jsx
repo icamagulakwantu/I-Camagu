@@ -8,6 +8,7 @@ import { Skeleton } from './components/ui/Skeleton.jsx'
 // Screen Imports
 import Login from './pages/Login.jsx'
 import Username from './pages/Username.jsx'
+import Onboarding from './pages/Onboarding.jsx'
 import Store from './pages/Store.jsx'
 import Basket from './pages/Basket.jsx'
 import CeremonyHub from './pages/CeremonyHub.jsx'
@@ -422,6 +423,7 @@ function MainApp() {
 // ---------- AuthenticatedApp (enhanced loading spinner) ----------
 function AuthenticatedApp() {
   const { accessToken, user, checkingSession, debugInfo } = useAuth()
+  const [onboardingComplete, setOnboardingComplete] = useState(false)
 
   if (checkingSession) {
     return (
@@ -441,6 +443,11 @@ function AuthenticatedApp() {
 
   if (!user?.username) {
     return <Username />
+  }
+
+  const onboardingDone = onboardingComplete || (user?.id && localStorage.getItem(`icamagu_onboarding_done:${user.id}`) === '1')
+  if (!onboardingDone) {
+    return <Onboarding onDone={() => setOnboardingComplete(true)} />
   }
 
   return <MainApp />
