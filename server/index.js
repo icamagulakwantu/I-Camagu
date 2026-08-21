@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import portalRoutes from './routes/portal.js';
 import ukusokaRoutes from './routes/ukusoka.js';
 import publicRoutes from './routes/public.js';
@@ -34,10 +35,10 @@ app.use(cors({
   origin: true,
   credentials: true,
 }));
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/activity', activityRoutes);
 app.use(express.json({ limit: '5mb' }));
 app.use(cookieParser());
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/activity', activityRoutes);
 
 // API routes
 app.get('/api/health', async (req, res) => {

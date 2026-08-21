@@ -1,7 +1,7 @@
 import prisma from '../config/db.js';
+import { isAdminEmail } from '../config/admin.js';
 
 // Configuration
-const ADMIN_EMAILS = ['icamagulakwantu@gmail.com'];
 const MAX_DOC_SIZE_BYTES = 2_000_000; // ~2MB Limit
 
 /**
@@ -78,7 +78,7 @@ export async function verifyPractitioner(req, res) {
   try {
     const user = await prisma.user.findUnique({ where: { id: req.userId } });
 
-    if (!user || !ADMIN_EMAILS.includes(user.email)) {
+    if (!user || !isAdminEmail(user.email)) {
       return res.status(403).json({ error: 'Admin access required' });
     }
 
@@ -132,6 +132,7 @@ export async function addVendor(req, res) {
   try {
     const vendor = await prisma.vendor.create({
       data: {
+        createdById: req.userId,
         name,
         category,
         area,
@@ -144,5 +145,20 @@ export async function addVendor(req, res) {
   } catch (error) {
     console.error('Add vendor error:', error.message);
     res.status(500).json({ error: 'Could not add vendor' });
+  }
+}
+
+export async function deleteVendor(req, res) {
+  const { vendorId } = req.params;
+  try {
+    const vendor = await prisma.vendor.findUnique({ where: { id: vendorId } });
+    if (!vendor) return res.status(404).json({ error: 'Vendor not found' });
+    if (vendor.createdById !== req.userId) return res.status(403).json({ error: 'You can only remove listings you created' });
+
+    await prisma.vendor.delete({ where: { id: vendorId } });
+    res.json({ message: 'Vendor listing removed' });
+  } catch (error) {
+    console.error('Delete vendor error:', error.message);
+    res.status(500).json({ error: 'Could not remove vendor listing' });
   }
 }

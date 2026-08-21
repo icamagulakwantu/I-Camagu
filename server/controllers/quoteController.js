@@ -1,5 +1,6 @@
 import prisma from '../config/db.js';
 import { notifyEkoyiniOfQuoteRequest, confirmQuoteToClient } from '../services/notificationService.js';
+import { isAdminEmail } from '../config/admin.js';
 
 export async function submitQuoteRequest(req, res) {
       const body = req.body;
@@ -75,11 +76,9 @@ export async function submitQuoteRequest(req, res) {
           }
 }
 
-const ADMIN_EMAILS = ['icamagulakwantu@gmail.com'];
-
 export async function getAllQuoteRequests(req, res) {
   const user = await prisma.user.findUnique({ where: { id: req.userId } });
-  if (!ADMIN_EMAILS.includes(user.email)) return res.status(403).json({ error: 'Admin only' });
+  if (!isAdminEmail(user.email)) return res.status(403).json({ error: 'Admin only' });
 
   try {
     const quotes = await prisma.ekoyiniQuoteRequest.findMany({ orderBy: { createdAt: 'desc' } });
@@ -92,7 +91,7 @@ export async function getAllQuoteRequests(req, res) {
 export async function updateQuoteStatus(req, res) {
   const { quoteId, status } = req.body;
   const user = await prisma.user.findUnique({ where: { id: req.userId } });
-  if (!ADMIN_EMAILS.includes(user.email)) return res.status(403).json({ error: 'Admin only' });
+  if (!isAdminEmail(user.email)) return res.status(403).json({ error: 'Admin only' });
 
   const validStatuses = ['PENDING', 'QUOTED', 'CONFIRMED', 'DECLINED'];
   if (!validStatuses.includes(status)) return res.status(400).json({ error: 'Invalid status' });

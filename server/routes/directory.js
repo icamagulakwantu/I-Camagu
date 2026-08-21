@@ -6,6 +6,7 @@ import {
   verifyPractitioner,
   getVendors,
   addVendor,
+  deleteVendor,
 } from '../controllers/directoryController.js';
 
 const router = express.Router();
@@ -23,5 +24,6 @@ router
   .route('/vendors')
   .get(getVendors)
   .post(requireAuth, addVendor);
+router.delete('/vendors/:vendorId', requireAuth, deleteVendor);
 
 export default router;

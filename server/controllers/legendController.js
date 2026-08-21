@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import { isAdminEmail } from '../config/admin.js';
 
 export async function getFeaturedLegend(req, res) {
       try {
@@ -33,7 +34,7 @@ export async function verifyLegendEntry(req, res) {
 
       try {
             const user = await prisma.user.findUnique({ where: { id: req.userId } });
-            if (!user || user.email !== 'icamagulakwantu@gmail.com') {
+            if (!user || !isAdminEmail(user.email)) {
                   return res.status(403).json({ error: 'Admin access required' });
             }
 

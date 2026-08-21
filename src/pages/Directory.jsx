@@ -66,6 +66,21 @@ function Directory({ onBack }) {
     setShowForm(false)
   }
 
+  const removeVendor = async (vendorId) => {
+    try {
+      const res = await fetch(`/api/directory/vendors/${vendorId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not remove listing')
+      setVendors((prev) => prev.filter((v) => v.id !== vendorId))
+      showToast('Listing removed', 'info')
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
+
   const handleDocSelect = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -361,6 +376,15 @@ function Directory({ onBack }) {
                     <p className="text-xs text-ink mt-2">
                       <span className="font-semibold">Contact:</span> {v.contactInfo}
                     </p>
+                  )}
+                  {v.createdById === user?.id && (
+                    <button
+                      type="button"
+                      onClick={() => removeVendor(v.id)}
+                      className="text-[11px] text-terracotta font-bold underline mt-2"
+                    >
+                      Remove listing
+                    </button>
                   )}
                 </div>
               ))}
