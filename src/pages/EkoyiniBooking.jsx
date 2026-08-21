@@ -25,6 +25,13 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
   const [maxGroupSize, setMaxGroupSize] = useState('')
   const [savingTourism, setSavingTourism] = useState(false)
 
+  const [tourismBookings, setTourismBookings] = useState([])
+  const [showBookingForm, setShowBookingForm] = useState(false)
+  const [companyName, setCompanyName] = useState('')
+  const [bookingGroupSize, setBookingGroupSize] = useState('')
+  const [totalPaid, setTotalPaid] = useState('')
+  const [loggingBooking, setLoggingBooking] = useState(false)
+
   const authedFetch = useCallback((url, options = {}) => fetch(url, {
     ...options,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}`, ...options.headers },
@@ -47,6 +54,10 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
         setPricePerHead(String(tourismData.pricePerHeadZAR))
         setHostShare(String(tourismData.hostShareZAR))
         setMaxGroupSize(tourismData.maxGroupSize ? String(tourismData.maxGroupSize) : '')
+
+        const bookingsRes = await authedFetch(`/api/ekoyini/tourism/${tourismData.id}/bookings`)
+        const bookingsData = await bookingsRes.json()
+        if (bookingsRes.ok) setTourismBookings(Array.isArray(bookingsData) ? bookingsData : [])
       }
     } catch (err) {
       showToast(err.message, 'error')
@@ -138,6 +149,31 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
       showToast(data.isEnabled ? 'Tourism package enabled' : 'Tourism package disabled', 'success')
     } catch (err) {
       showToast(err.message, 'error')
+    }
+  }
+
+  const logBooking = async (e) => {
+    e.preventDefault()
+    setLoggingBooking(true)
+    try {
+      const res = await authedFetch('/api/ekoyini/tourism/bookings', {
+        method: 'POST',
+        body: JSON.stringify({
+          tourismPackageId: tourism.id,
+          tourismCompanyName: companyName,
+          groupSize: bookingGroupSize,
+          totalPaidZAR: totalPaid,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not log booking')
+      setCompanyName(''); setBookingGroupSize(''); setTotalPaid(''); setShowBookingForm(false)
+      showToast('Booking logged', 'success')
+      load()
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setLoggingBooking(false)
     }
   }
 
@@ -255,6 +291,66 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
                 {savingTourism ? 'Saving...' : tourism ? 'Update Package' : 'Create Package'}
               </button>
             </form>
+
+            {tourism && (
+              <div className="mt-4 pt-4 border-t border-ink/10">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-bold text-ink">Bookings log</p>
+                  <button
+                    type="button" onClick={() => setShowBookingForm(!showBookingForm)}
+                    className={`text-[11px] font-bold text-sage-600 ${pressable}`}
+                  >
+                    {showBookingForm ? 'Cancel' : '+ Log a booking'}
+                  </button>
+                </div>
+
+                {showBookingForm && (
+                  <form onSubmit={logBooking} className="space-y-2 mb-3">
+                    <input
+                      type="text" placeholder="Tour company / group name" value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required
+                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="number" placeholder="Group size" value={bookingGroupSize}
+                        onChange={(e) => setBookingGroupSize(e.target.value)}
+                        className="flex-1 border border-ink/30 rounded-soft px-3 py-2 text-sm" required
+                      />
+                      <input
+                        type="number" placeholder="Total paid (ZAR)" value={totalPaid}
+                        onChange={(e) => setTotalPaid(e.target.value)}
+                        className="flex-1 border border-ink/30 rounded-soft px-3 py-2 text-sm" required
+                      />
+                    </div>
+                    <button
+                      type="submit" disabled={loggingBooking}
+                      className={`w-full border-2 border-ink text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}
+                    >
+                      {loggingBooking ? 'Saving...' : 'Log Booking'}
+                    </button>
+                  </form>
+                )}
+
+                {tourismBookings.length === 0 ? (
+                  <p className="text-xs text-ink-muted">No bookings logged yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {tourismBookings.map((b) => (
+                      <div key={b.id} className="flex items-center justify-between bg-cream rounded-soft p-2.5">
+                        <div>
+                          <p className="text-xs font-bold text-ink">{b.tourismCompanyName}</p>
+                          <p className="text-[10px] text-ink-muted">{b.groupSize} people · R{parseFloat(b.totalPaidZAR).toFixed(0)}</p>
+                        </div>
+                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-pill ${BOOKING_STATUS_COLOR[b.status] || 'bg-cream-dark text-ink-muted'}`}>
+                          {b.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

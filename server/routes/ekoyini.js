@@ -4,6 +4,7 @@ import { getAllQuoteRequests, updateQuoteStatus, submitQuoteRequest, getMyQuoteR
 import {
       createBarBooking, addWristbandTier, getBarBooking, removeWristbandTier,
         createTourismPackage, toggleTourismPackage, getTourismPackage,
+        logTourismBooking, getTourismBookings,
 } from '../controllers/ekoyiniController.js';
 
 const router = express.Router();
@@ -18,5 +19,7 @@ router.get('/quote/mine', requireAuth, getMyQuoteRequests);
 router.get('/quote/all', requireAuth, getAllQuoteRequests);
 router.patch('/quote/status', requireAuth, updateQuoteStatus);
 router.patch('/tourism/toggle', requireAuth, toggleTourismPackage);
+router.post('/tourism/bookings', requireAuth, logTourismBooking);
+router.get('/tourism/:tourismPackageId/bookings', requireAuth, getTourismBookings);
 
 export default router;

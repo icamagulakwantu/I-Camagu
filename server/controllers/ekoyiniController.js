@@ -110,6 +110,52 @@ export async function getTourismPackage(req, res) {
   }
 }
 
+const VALID_BOOKING_STATUSES = ['CONFIRMED', 'COMPLETED', 'CANCELLED'];
+
+export async function logTourismBooking(req, res) {
+  const { tourismPackageId, tourismCompanyName, groupSize, totalPaidZAR, status } = req.body;
+  if (!tourismPackageId || !tourismCompanyName || !groupSize || totalPaidZAR === undefined) {
+    return res.status(400).json({ error: 'tourismPackageId, tourismCompanyName, groupSize, and totalPaidZAR are required' });
+  }
+  const resolvedStatus = status && VALID_BOOKING_STATUSES.includes(status) ? status : 'CONFIRMED';
+
+  try {
+    const pkg = await prisma.tourismPackage.findUnique({ where: { id: tourismPackageId } });
+    if (!pkg || pkg.hostId !== req.userId) return res.status(403).json({ error: 'Not your package' });
+
+    const booking = await prisma.tourismBooking.create({
+      data: {
+        tourismPackageId,
+        tourismCompanyName,
+        groupSize: parseInt(groupSize, 10),
+        totalPaidZAR: parseFloat(totalPaidZAR),
+        status: resolvedStatus,
+      },
+    });
+    res.status(201).json(booking);
+  } catch (error) {
+    console.error('Log tourism booking error:', error.message);
+    res.status(500).json({ error: 'Could not log booking' });
+  }
+}
+
+export async function getTourismBookings(req, res) {
+  const { tourismPackageId } = req.params;
+  try {
+    const pkg = await prisma.tourismPackage.findUnique({ where: { id: tourismPackageId } });
+    if (!pkg || pkg.hostId !== req.userId) return res.status(403).json({ error: 'Not your package' });
+
+    const bookings = await prisma.tourismBooking.findMany({
+      where: { tourismPackageId },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(bookings);
+  } catch (error) {
+    console.error('Get tourism bookings error:', error.message);
+    res.status(500).json({ error: 'Could not fetch bookings' });
+  }
+}
+
 export async function getBarBooking(req, res) {
   const { ceremonyId } = req.params;
   try {
