@@ -8,22 +8,35 @@ export function AuthProvider({ children }) {
   const [checkingSession, setCheckingSession] = useState(true)
   const [debugInfo, setDebugInfo] = useState('')
 
-  useEffect(() => {
-    fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' })
+  const silentRefresh = () => {
+    return fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' })
       .then(async (res) => {
         if (!res.ok) throw new Error('Session expired')
         const data = await res.json()
         if (!data.accessToken) throw new Error('Invalid session data')
         setAccessToken(data.accessToken)
         setUser(data.user)
+        return true
       })
       .catch((err) => {
         setDebugInfo(err.message)
+        setAccessToken(null)
+        setUser(null)
+        return false
       })
-      .finally(() => {
-        setCheckingSession(false)
-      })
+  }
+
+  useEffect(() => {
+    silentRefresh().finally(() => setCheckingSession(false))
   }, [])
+
+  // The access token expires after 15 minutes server-side; refresh it well
+  // before that so a long testing/usage session doesn't suddenly 401 everywhere.
+  useEffect(() => {
+    if (!accessToken) return
+    const interval = setInterval(() => { silentRefresh() }, 10 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [accessToken])
 
   const login = (token, userData) => {
     setAccessToken(token)
