@@ -7,24 +7,29 @@ const SECTIONS = [
     title: 'Ceremony & Culture',
     items: [
       { id: 'ceremony', emoji: '📋', label: 'Ceremony Preparation' },
+      { id: 'templates', emoji: '📑', label: 'Ceremony Templates' },
       { id: 'family', emoji: '👨‍👩‍👧', label: 'Family Contributions' },
       { id: 'hierarchy', emoji: '👥', label: 'Umgidi Hierarchy' },
       { id: 'legends', emoji: '🏛️', label: 'House of AmaXhosa' },
       { id: 'ukusoka', emoji: '🎁', label: 'Ukusoka' },
+      { id: 'umqombothi', emoji: '🍺', label: 'Umqombothi Brewing' },
+      { id: 'iziduko', emoji: '🤝', label: 'Iziduko Network' },
     ],
   },
   {
     title: 'Money & Community',
     items: [
-      { id: 'ukugida', emoji: '🎁', label: 'Ukugida' },
+      { id: 'ukugida', emoji: '📤', label: 'Ukugida' },
       { id: 'myorders', emoji: '📦', label: 'My Orders' },
       { id: 'expenditure', emoji: '💰', label: 'My Spending' },
+      { id: 'supplier', emoji: '🏪', label: 'Supplier Dashboard' },
     ],
   },
   {
     title: 'Services',
     items: [
       { id: 'ekoyini', emoji: '🍸', label: 'Ekoyini Mobile Bar' },
+      { id: 'ekoyiniadmin', emoji: '⚙️', label: 'Ekoyini Admin' },
       { id: 'portal', emoji: '🖼️', label: 'Digital Portal' },
       { id: 'directory', emoji: '📖', label: 'Directory' },
     ],
@@ -32,6 +37,8 @@ const SECTIONS = [
   {
     title: 'Account',
     items: [
+      { id: 'profile', emoji: '👤', label: 'Profile' },
+      { id: 'activity', emoji: '📜', label: 'My Activity' },
       { id: 'pin', emoji: '🔐', label: 'Security PIN' },
       { id: 'account', emoji: '🔒', label: 'Account & Privacy' },
       { id: 'help', emoji: '❓', label: 'Help & Support' },

@@ -1,10 +1,10 @@
-function BottomNav({ activeScreen, onNavigate, basketCount = 0, onOpenDrawer, pendingApprovals = 0 }) {
+function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals = 0 }) {
   const tabs = [
     { id: 'home', label: 'Home', icon: '🏠' },
     { id: 'ceremonyhub', label: 'Ceremonies', icon: '📿' },
     { id: 'store', label: 'Store', icon: '🛒', isCenter: true },
     { id: 'stokvels', label: 'Stokvels', icon: '🏘️', badge: pendingApprovals },
-    { id: 'more', label: 'More', icon: '☰', action: 'drawer' },
+    { id: 'more', label: 'More', icon: '☰' },
   ]
 
   return (
@@ -20,7 +20,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, onOpenDrawer, pe
           ))}
           <div className="w-16" />
           {tabs.filter(t => !t.isCenter).slice(2).map((tab) => (
-            <button key={tab.id} onClick={() => tab.action === 'drawer' ? onOpenDrawer() : onNavigate(tab.id)}
+            <button key={tab.id} onClick={() => onNavigate(tab.id)}
               className={`flex-1 flex flex-col items-center py-2 transition-colors relative ${activeScreen === tab.id ? 'text-brand-blue' : 'text-brand-black/40'}`}>
               <span className="text-xl mb-0.5">{tab.icon}</span>
               {tab.badge > 0 && (

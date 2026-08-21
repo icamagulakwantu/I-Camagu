@@ -390,6 +390,12 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             💰 Budget
           </button>
           <button
+            onClick={() => onViewTimeline?.(activePlan.ceremonyType)}
+            className={`flex-1 border-2 border-sage-500 text-sage-600 font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+          >
+            🕐 Timeline
+          </button>
+          <button
             onClick={shareChecklist}
             className={`flex-1 bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
           >

@@ -43,7 +43,6 @@ import SupplierDashboard from './pages/SupplierDashboard.jsx'
 
 // Components
 import BottomNav from './components/BottomNav.jsx'
-import SideDrawer from './components/SideDrawer.jsx'
 import DidYouKnow from './components/DidYouKnow.jsx'
 import PatternStrip from './components/PatternStrip.jsx'
 import ActionCard from './components/ActionCard.jsx'
@@ -258,7 +257,6 @@ function Dashboard({ onNavigate, basketCount = 0 }) {
 function MainApp() {
   const { accessToken, user } = useAuth()
   const [screen, setScreen] = useState('home')
-  const [drawerOpen, setDrawerOpen] = useState(false)
   const [basketCount, setBasketCount] = useState(0)
   const [ceremonyHubType, setCeremonyHubType] = useState(null)
   const [timelineType, setTimelineType] = useState(null)
@@ -408,17 +406,11 @@ function MainApp() {
   return (
     <div className="icamagu-bg min-h-screen">
       {renderScreen()}
-      <SideDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        onNavigate={setScreen}
-        user={user}
-      />
       <BottomNav
         activeScreen={activeTab}
         onNavigate={setScreen}
         basketCount={basketCount}
-        onOpenDrawer={() => setDrawerOpen(true)}
+        pendingApprovals={pendingApprovals}
       />
     </div>
   )
