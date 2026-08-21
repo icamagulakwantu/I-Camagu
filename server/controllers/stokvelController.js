@@ -237,7 +237,11 @@ export async function getStokvel(req, res) {
 
 export async function getStokvelsById(req, res) {
   const { stokvelId } = req.params;
+  const userId = req.userId;
   try {
+    const membership = await prisma.stokvelMember.findFirst({ where: { stokvelId, userId } });
+    if (!membership) return res.status(403).json({ error: 'You are not a member of this stokvel' });
+
     const stokvel = await prisma.stokvel.findUnique({
       where: { id: stokvelId },
       include: {

@@ -20,6 +20,12 @@ export async function getPractitioners(req, res) {
         { isVerified: 'desc' },
         { name: 'asc' },
       ],
+      select: {
+        id: true, name: true, role: true, area: true,
+        isVerified: true, verifiedAt: true, contactInfo: true, createdAt: true,
+        // idDocUrl deliberately excluded — this endpoint is public and unauthenticated,
+        // a practitioner's uploaded ID document must never be returned here.
+      },
     });
 
     res.json(practitioners);
