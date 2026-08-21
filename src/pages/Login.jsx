@@ -43,7 +43,7 @@ function Login() {
         credentials: 'include', body: JSON.stringify({ idToken: response.credential }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Google sign-in failed')
+      if (!res.ok) throw new Error(data.detail || data.error || 'Google sign-in failed')
       login(data.accessToken, data.user)
       if (data.needsIziduko) setStep('iziduko-followup')
     } catch (err) {

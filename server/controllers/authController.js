@@ -130,7 +130,7 @@ export async function googleAuth(req, res) {
     res.json({ accessToken, user: serializeUser(user), needsIziduko: !user.paternalIziduko });
   } catch (error) {
     console.error('Google auth error:', error.message);
-    res.status(401).json({ error: 'Could not verify Google sign-in' });
+    res.status(401).json({ error: 'Could not verify Google sign-in', detail: error.message });
   }
 }
 
