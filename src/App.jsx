@@ -1,5 +1,5 @@
 // ===================== IMPORTS =====================
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import { ToastProvider, useToast } from './components/ui/Toast.jsx'
 import { EmptyState } from './components/ui/EmptyState.jsx'
@@ -270,6 +270,29 @@ function MainApp() {
 
   const goHome = () => setScreen('home')
   const goMore = () => setScreen('more')
+
+  // Sync in-app screen navigation with browser/hardware history so the
+  // Android back button (or a swipe-back gesture) moves between screens
+  // instead of immediately exiting the app.
+  const isPoppingRef = useRef(false)
+
+  useEffect(() => {
+    window.history.replaceState({ screen: 'home' }, '')
+    const onPopState = (e) => {
+      isPoppingRef.current = true
+      setScreen(e.state?.screen || 'home')
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
+  useEffect(() => {
+    if (isPoppingRef.current) {
+      isPoppingRef.current = false
+      return
+    }
+    window.history.pushState({ screen }, '')
+  }, [screen])
 
   const refreshBasketCount = () => {
     if (!accessToken) return
