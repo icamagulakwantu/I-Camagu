@@ -35,6 +35,12 @@ enum PartnerType {
   BUTCHERY
 }
 
+enum ClanConnectionStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
 enum TransactionStatus {
   PENDING_APPROVAL
   CLEARED
@@ -117,6 +123,22 @@ model User {
   recordedUkusokaEntries UkusokaEntry[]
   announcementsPosted    StokvelAnnouncement[]
   poolPayments            PoolPayment[]
+  sentClanConnections     ClanConnection[]      @relation("ClanConnectionRequester")
+  receivedClanConnections ClanConnection[]      @relation("ClanConnectionRecipient")
+}
+
+model ClanConnection {
+  id          String               @id @default(cuid())
+  requesterId String
+  requester   User                 @relation("ClanConnectionRequester", fields: [requesterId], references: [id])
+  recipientId String
+  recipient   User                 @relation("ClanConnectionRecipient", fields: [recipientId], references: [id])
+  status      ClanConnectionStatus @default(PENDING)
+  message     String?
+  createdAt   DateTime             @default(now())
+  respondedAt DateTime?
+
+  @@unique([requesterId, recipientId])
 }
 model UkusokaEntry {
   id              String    @id @default(cuid())

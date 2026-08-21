@@ -116,3 +116,157 @@ export async function registerClanAlias(aliasForm, canonicalClanName) {
     create: { aliasForm, clanGroupId: clanGroup.id },
   });
 }
+
+// ---------- CLAN CONNECTIONS (request -> accept, never raw broadcast) ----------
+
+async function isConfirmedClanMatch(userAId, userBId) {
+  const matches = await findClanMatches(userAId);
+  return matches.some((m) => m.id === userBId);
+}
+
+export async function sendClanConnectionRequest(requesterId, recipientId, message) {
+  if (requesterId === recipientId) {
+    const err = new Error('You cannot send a connection request to yourself');
+    err.status = 400;
+    throw err;
+  }
+
+  const isMatch = await isConfirmedClanMatch(requesterId, recipientId);
+  if (!isMatch) {
+    const err = new Error('You can only connect with confirmed clan matches');
+    err.status = 403;
+    throw err;
+  }
+
+  const reverse = await prisma.clanConnection.findUnique({
+    where: { requesterId_recipientId: { requesterId: recipientId, recipientId: requesterId } },
+  });
+
+  if (reverse) {
+    if (reverse.status === 'ACCEPTED') return { connection: reverse, mutual: false };
+    if (reverse.status === 'PENDING') {
+      const connection = await prisma.clanConnection.update({
+        where: { id: reverse.id },
+        data: { status: 'ACCEPTED', respondedAt: new Date() },
+      });
+      return { connection, mutual: true };
+    }
+    // reverse.status === 'DECLINED' — fall through and let them try a fresh request
+  }
+
+  try {
+    const connection = await prisma.clanConnection.create({
+      data: { requesterId, recipientId, message: message?.trim() || null },
+    });
+    return { connection, mutual: false };
+  } catch (error) {
+    if (error.code === 'P2002') {
+      const err = new Error('You already sent a connection request to this person');
+      err.status = 409;
+      throw err;
+    }
+    throw error;
+  }
+}
+
+export async function respondToClanConnectionRequest(connectionId, recipientId, accept) {
+  const connection = await prisma.clanConnection.findUnique({ where: { id: connectionId } });
+  if (!connection) {
+    const err = new Error('Connection request not found');
+    err.status = 404;
+    throw err;
+  }
+  if (connection.recipientId !== recipientId) {
+    const err = new Error('You are not authorized to respond to this request');
+    err.status = 403;
+    throw err;
+  }
+  if (connection.status !== 'PENDING') {
+    const err = new Error('This request has already been responded to');
+    err.status = 409;
+    throw err;
+  }
+
+  return prisma.clanConnection.update({
+    where: { id: connectionId },
+    data: { status: accept ? 'ACCEPTED' : 'DECLINED', respondedAt: new Date() },
+  });
+}
+
+export async function withdrawClanConnectionRequest(connectionId, requesterId) {
+  const connection = await prisma.clanConnection.findUnique({ where: { id: connectionId } });
+  if (!connection) {
+    const err = new Error('Connection request not found');
+    err.status = 404;
+    throw err;
+  }
+  if (connection.requesterId !== requesterId) {
+    const err = new Error('You are not authorized to withdraw this request');
+    err.status = 403;
+    throw err;
+  }
+  if (connection.status !== 'PENDING') {
+    const err = new Error('This request has already been responded to');
+    err.status = 409;
+    throw err;
+  }
+
+  await prisma.clanConnection.delete({ where: { id: connectionId } });
+}
+
+const REQUEST_USER_SELECT = {
+  id: true, firstName: true, lastName: true, profileImage: true,
+  paternalIziduko: true, maternalIziduko: true,
+};
+
+export async function getClanConnectionRequests(userId) {
+  const [incoming, outgoing] = await Promise.all([
+    prisma.clanConnection.findMany({
+      where: { recipientId: userId, status: 'PENDING' },
+      include: { requester: { select: REQUEST_USER_SELECT } },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.clanConnection.findMany({
+      where: { requesterId: userId, status: 'PENDING' },
+      include: { recipient: { select: REQUEST_USER_SELECT } },
+      orderBy: { createdAt: 'desc' },
+    }),
+  ]);
+  return { incoming, outgoing };
+}
+
+export async function getClanConnections(userId) {
+  const connections = await prisma.clanConnection.findMany({
+    where: { status: 'ACCEPTED', OR: [{ requesterId: userId }, { recipientId: userId }] },
+    include: {
+      requester: { select: { ...REQUEST_USER_SELECT, phoneNumber: true } },
+      recipient: { select: { ...REQUEST_USER_SELECT, phoneNumber: true } },
+    },
+    orderBy: { respondedAt: 'desc' },
+  });
+  return connections.map((c) => (c.requesterId === userId ? c.recipient : c.requester));
+}
+
+export async function getConnectionStatusesForUsers(userId, otherUserIds) {
+  if (otherUserIds.length === 0) return {};
+
+  const rows = await prisma.clanConnection.findMany({
+    where: {
+      OR: [
+        { requesterId: userId, recipientId: { in: otherUserIds } },
+        { recipientId: userId, requesterId: { in: otherUserIds } },
+      ],
+    },
+  });
+
+  const map = {};
+  for (const row of rows) {
+    const otherId = row.requesterId === userId ? row.recipientId : row.requesterId;
+    const iAmRequester = row.requesterId === userId;
+    let status = 'none';
+    if (row.status === 'ACCEPTED') status = 'connected';
+    else if (row.status === 'PENDING') status = iAmRequester ? 'pending_sent' : 'pending_received';
+    map[otherId] = { status, connectionId: row.id };
+  }
+  return map;
+}
