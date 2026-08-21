@@ -271,6 +271,13 @@ const samplePartners = [
   { name: "Coke's Tavern", type: 'TAVERN', area: 'Motherwell', moq: 40 },
 ];
 
+const practitionerSeeds = [
+  { name: 'Bhut\' Sizwe Ingcibi Services', role: 'INGCIBI', area: 'Gugulethu', contactInfo: '021 555 0101' },
+  { name: 'Mama Noku Ikhankatha Care', role: 'IKHANKATHA', area: 'Khayelitsha', contactInfo: '021 555 0102' },
+  { name: 'Tata Zola Traditional Guidance', role: 'CULTURAL_ADVISOR', area: 'Motherwell', contactInfo: '041 555 0103' },
+  { name: 'Nkosi Ingcibi Practice', role: 'INGCIBI', area: 'Mdantsane', contactInfo: '043 555 0104' },
+];
+
 const vendorSeeds = [
   { name: 'Makro Liquor', category: 'LIQUOR_SUPPLIER', area: 'South Africa', description: 'Major liquor retail/wholesale source for catalogue and partner sourcing.' },
   { name: "Preston's", category: 'LIQUOR_SUPPLIER', area: 'South Africa', description: 'Liquor retail source for vendor discovery and sourcing.' },
@@ -425,6 +432,13 @@ async function main() {
     if (!existing) await prisma.vendor.create({ data: vendor });
   }
   console.log('Vendor sources seeded.');
+
+  console.log('Seeding practitioner directory...');
+  for (const practitioner of practitionerSeeds) {
+    const existing = await prisma.practitioner.findFirst({ where: { name: practitioner.name } });
+    if (!existing) await prisma.practitioner.create({ data: practitioner });
+  }
+  console.log('Practitioner directory seeded.');
 
   console.log('Seeding legend entries...');
   for (const legend of legendEntries) {
