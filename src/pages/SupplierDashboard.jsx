@@ -152,6 +152,25 @@ function SupplierDashboard({ onBack }) {
 
   useEffect(() => { load() }, [load])
 
+  const [confirmingId, setConfirmingId] = useState(null)
+  const confirmPayment = async (paymentId) => {
+    setConfirmingId(paymentId)
+    try {
+      const res = await fetch(`/api/supplier/pool-payments/${paymentId}/confirm`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not confirm payment')
+      showToast('Payment confirmed', 'success')
+      load()
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setConfirmingId(null)
+    }
+  }
+
   return (
     <div className="min-h-screen pb-24 bg-cream">
       <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
@@ -199,6 +218,35 @@ function SupplierDashboard({ onBack }) {
                       <p className="text-[10px] text-ink-muted mt-1">
                         {pool.orderDocument.confirmed}/{pool.orderDocument.totalLines} members confirmed · Total {money(pool.orderDocument.totalAmountZAR)}
                       </p>
+                    </div>
+                  )}
+
+                  {(pool.payments || []).length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-ink/10">
+                      <p className="text-[10px] font-black uppercase text-ink-muted mb-2">Member Payments</p>
+                      <div className="space-y-2">
+                        {pool.payments.map((p) => (
+                          <div key={p.id} className="flex items-center justify-between bg-cream rounded-soft p-2.5">
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-ink truncate">{p.memberName}</p>
+                              <p className="text-[10px] text-ink-muted">
+                                {money(p.amountZAR)}{p.providerReference ? ` · ref: ${p.providerReference}` : ' · no reference yet'}
+                              </p>
+                            </div>
+                            {p.status === 'PENDING' ? (
+                              <button
+                                onClick={() => confirmPayment(p.id)}
+                                disabled={confirmingId === p.id}
+                                className={`text-[11px] font-bold text-white bg-sage-500 px-3 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
+                              >
+                                {confirmingId === p.id ? '...' : 'Confirm received'}
+                              </button>
+                            ) : (
+                              <span className="text-[10px] font-bold text-sage-600 flex-shrink-0">✓ Cleared</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>

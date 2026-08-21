@@ -35,7 +35,7 @@ export async function submitBasketToPool(userId, basketId, partnerId) {
   });
 
   const result = await checkAndMatchPool(pool.id);
-  return { pool, matched: result.matched, currentCases: result.currentCases, moqTarget: pool.moqTarget };
+  return { pool, matched: result.matched, currentCases: result.currentCases, moqTarget: pool.moqTarget, groupCode: result.groupCode };
 }
 
 export async function checkAndMatchPool(poolId) {
@@ -85,8 +85,10 @@ export async function checkAndMatchPool(poolId) {
   });
 
   for (const basket of pool.baskets) {
+    let memberAmountZAR = 0;
     for (const item of basket.items) {
       const sku = skuMap[item.skuId];
+      memberAmountZAR += item.quantity * parseFloat(sku.casePriceZAR);
       await prisma.orderLineConfirmation.create({
         data: {
           documentId: document.id,
@@ -98,6 +100,19 @@ export async function checkAndMatchPool(poolId) {
       });
     }
     await prisma.basket.update({ where: { id: basket.id }, data: { status: 'MATCHED' } });
+
+    // One PENDING PoolPayment per member for their share — manual EFT to the
+    // supplier for now (no PSP yet); the supplier confirms receipt from their
+    // own dashboard, mirroring how stokvel contributions get confirmed.
+    await prisma.poolPayment.create({
+      data: {
+        poolId: pool.id,
+        userId: basket.userId,
+        provider: 'MANUAL_EFT',
+        amountZAR: memberAmountZAR,
+        status: 'PENDING',
+      },
+    });
   }
 
   await prisma.bulkPool.update({ where: { id: pool.id }, data: { status: 'MATCHED' } });

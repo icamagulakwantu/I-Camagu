@@ -13,7 +13,7 @@ export async function submitToPool(req, res) {
     res.json({
       ...result,
       message: result.matched
-        ? `Your order matched! Group code: ${result.pool ? '' : ''}`
+        ? `Your order matched! Group code: ${result.groupCode}`
         : `Basket parked. ${result.currentCases}/${result.moqTarget} cases needed to reach the bulk order minimum.`,
     });
   } catch (error) {
@@ -50,6 +50,42 @@ export async function getMyOrderDocuments(req, res) {
     res.status(500).json({ error: 'Could not fetch order documents' });
   }
 }
+export async function getMyPoolPayments(req, res) {
+  try {
+    const payments = await prisma.poolPayment.findMany({
+      where: { userId: req.userId },
+      include: { pool: { include: { partner: true, orderDocument: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(payments);
+  } catch (error) {
+    console.error('Get my pool payments error:', error.message);
+    res.status(500).json({ error: 'Could not fetch payments' });
+  }
+}
+
+export async function submitPoolPaymentReference(req, res) {
+  const { paymentId, providerReference } = req.body;
+  if (!paymentId || !providerReference) {
+    return res.status(400).json({ error: 'paymentId and providerReference are required' });
+  }
+
+  try {
+    const payment = await prisma.poolPayment.findUnique({ where: { id: paymentId } });
+    if (!payment || payment.userId !== req.userId) return res.status(403).json({ error: 'Not your payment' });
+    if (payment.status !== 'PENDING') return res.status(409).json({ error: `Payment is already ${payment.status}` });
+
+    const updated = await prisma.poolPayment.update({
+      where: { id: paymentId },
+      data: { providerReference },
+    });
+    res.json({ payment: updated, message: 'Reference saved — the supplier will confirm once they see your EFT.' });
+  } catch (error) {
+    console.error('Submit pool payment reference error:', error.message);
+    res.status(500).json({ error: 'Could not save reference' });
+  }
+}
+
 export async function confirmOrderLine(req, res) {
   const { lineItemId } = req.body;
   if (!lineItemId) return res.status(400).json({ error: 'lineItemId is required' });

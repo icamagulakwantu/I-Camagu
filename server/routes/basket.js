@@ -1,7 +1,7 @@
 import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { getCatalogue, getCategories } from '../controllers/catalogueController.js';
-import { submitToPool, getPartners, getMyOrderDocuments, confirmOrderLine } from '../controllers/poolController.js';
+import { submitToPool, getPartners, getMyOrderDocuments, confirmOrderLine, getMyPoolPayments, submitPoolPaymentReference } from '../controllers/poolController.js';
 import { getMyBasket, addItem, updateItem, removeItem } from '../controllers/basketController.js';
 
 const router = express.Router();
@@ -18,5 +18,7 @@ router.delete('/items/:itemId', requireAuth, removeItem);
 router.get('/partners', getPartners);
 router.post('/submit-to-pool', requireAuth, submitToPool);
 router.get('/order-documents/my', requireAuth, getMyOrderDocuments);
+router.get('/pool-payments/my', requireAuth, getMyPoolPayments);
+router.post('/pool-payments/reference', requireAuth, submitPoolPaymentReference);
 
 export default router;

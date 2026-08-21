@@ -1,4 +1,4 @@
-import { registerAsSupplier, getSupplierProfile, getSupplierPools } from '../services/supplierService.js';
+import { registerAsSupplier, getSupplierProfile, getSupplierPools, confirmPoolPayment } from '../services/supplierService.js';
 
 export async function becomeSupplier(req, res) {
   try {
@@ -28,5 +28,16 @@ export async function getMySupplierPools(req, res) {
   } catch (error) {
     console.error('Get supplier pools error:', error.message);
     res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not fetch pools' });
+  }
+}
+
+export async function confirmSupplierPoolPayment(req, res) {
+  const { paymentId } = req.params;
+  try {
+    const payment = await confirmPoolPayment(req.userId, paymentId);
+    res.json({ payment, message: 'Payment marked as received' });
+  } catch (error) {
+    console.error('Confirm pool payment error:', error.message);
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not confirm payment' });
   }
 }
