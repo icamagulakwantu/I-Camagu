@@ -152,6 +152,25 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     }
   }
 
+  const updateItemActualCost = async (itemId, actualCostZAR) => {
+    try {
+      const res = await fetch(`/api/ceremonies/plans/items/${itemId}/cost`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ actualCostZAR: actualCostZAR === '' ? null : parseFloat(actualCostZAR) }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not save cost')
+      setActivePlan(prev => ({
+        ...prev,
+        checklistItems: prev.checklistItems.map(i => i.id === itemId ? data : i),
+      }))
+      showToast('Cost saved', 'success')
+    } catch (err) {
+      showToast(err.message || 'Could not save cost', 'error')
+    }
+  }
+
   const addChecklistItem = async (e) => {
     e.preventDefault()
     if (!newChecklistItem.label.trim() || !activePlan?.ceremonyId) return
@@ -443,30 +462,49 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           </div>
           <div className="divide-y divide-cream-dark/50">
             {items.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => toggleItem(item.id)}
-                className="w-full flex items-center gap-3 py-4 text-left group transition-colors hover:bg-sage-50/50 -mx-2 px-2 rounded-xl"
-              >
-                <div
-                  className={cn(
-                    'w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all duration-300 ease-bounce-subtle',
-                    (item.isCompleted || item.isChecked)
-                      ? 'bg-sage-500 border-sage-500 scale-110'
-                      : 'border-cream-dark group-hover:border-sage-300'
-                  )}
+              <div key={item.id} className="flex items-center gap-3 py-3">
+                <button
+                  onClick={() => toggleItem(item.id)}
+                  className="flex-1 flex items-center gap-3 text-left group transition-colors hover:bg-sage-50/50 -mx-2 px-2 py-1 rounded-xl min-w-0"
                 >
-                  {(item.isCompleted || item.isChecked) && <span className="text-white text-xs font-bold">✓</span>}
-                </div>
-                <span
-                  className={cn(
-                    'text-sm font-medium transition-all duration-200',
-                    (item.isCompleted || item.isChecked) ? 'text-ink-muted line-through' : 'text-ink'
-                  )}
-                >
-                  {item.label}
-                </span>
-              </button>
+                  <div
+                    className={cn(
+                      'w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all duration-300 ease-bounce-subtle',
+                      (item.isCompleted || item.isChecked)
+                        ? 'bg-sage-500 border-sage-500 scale-110'
+                        : 'border-cream-dark group-hover:border-sage-300'
+                    )}
+                  >
+                    {(item.isCompleted || item.isChecked) && <span className="text-white text-xs font-bold">✓</span>}
+                  </div>
+                  <span
+                    className={cn(
+                      'text-sm font-medium transition-all duration-200 truncate',
+                      (item.isCompleted || item.isChecked) ? 'text-ink-muted line-through' : 'text-ink'
+                    )}
+                  >
+                    {item.label}
+                  </span>
+                </button>
+                {!item.ceremonyId && (
+                  <div className="flex-shrink-0 text-right">
+                    {item.targetCostZAR != null && (
+                      <p className="text-[9px] text-ink-muted uppercase">Est. R{parseFloat(item.targetCostZAR).toFixed(0)}</p>
+                    )}
+                    <input
+                      type="number"
+                      placeholder="Actual R"
+                      defaultValue={item.actualCostZAR != null ? parseFloat(item.actualCostZAR) : ''}
+                      onBlur={(e) => {
+                        const val = e.target.value
+                        if (val !== '' && parseFloat(val) === parseFloat(item.actualCostZAR)) return
+                        updateItemActualCost(item.id, val)
+                      }}
+                      className="w-20 border border-cream-dark rounded-soft px-2 py-1 text-xs text-right"
+                    />
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>
