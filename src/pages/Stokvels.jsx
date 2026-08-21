@@ -435,6 +435,16 @@ function Stokvels({ onBack }) {
           <h1 className="font-display font-bold text-2xl">{stokvel.name}</h1>
           <p className="text-white/70 text-xs uppercase mt-1 tracking-wider">{stokvel.type.replace(/_/g, ' ')}</p>
           <p className="text-white/90 text-sm mt-2">Ref: <strong className="font-mono bg-white/10 px-2 py-0.5 rounded">{myReferenceCode}</strong></p>
+          <button
+            type="button"
+            onClick={() => {
+              navigator.clipboard?.writeText(stokvel.id)
+              showToast('Stokvel ID copied — share it with people you want to invite', 'success')
+            }}
+            className={`text-xs text-white/80 mt-1.5 flex items-center gap-1 ${pressable}`}
+          >
+            📋 Copy Stokvel ID to invite members
+          </button>
           <p className="font-display font-bold text-3xl mt-2">R{balance.toFixed(2)}</p>
           {isOfficial && <p className="text-xs text-white/90 font-bold mt-2 bg-white/20 inline-block px-2.5 py-1 rounded-pill">You are an official</p>}
         </div>
