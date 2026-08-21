@@ -8,7 +8,8 @@ import {
   getStokvelsById,
   deleteStokvel,
   getPendingApprovalCount,
-  toggleBereavementProtocol
+  toggleBereavementProtocol,
+  updateStokvel
 } from '../controllers/stokvelController.js';
 import {
   submitContribution,
@@ -30,6 +31,7 @@ router.post('/interest/record', requireAuth, recordInterest);
 router.get('/pending-approvals/count', requireAuth, getPendingApprovalCount);
 router.get('/my', requireAuth, getMyStokvels);
 router.get('/:stokvelId', requireAuth, getStokvel);
+router.patch('/:stokvelId', requireAuth, updateStokvel);
 router.get('/id/:stokvelId', requireAuth, getStokvelsById);
 router.post('/bereavement/toggle', requireAuth, toggleBereavementProtocol);
 router.post('/announcements', requireAuth, postAnnouncement);

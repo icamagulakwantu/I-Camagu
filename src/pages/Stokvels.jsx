@@ -19,7 +19,7 @@ const pressable = "transition-transform duration-100 ease-out active:scale-[0.96
 const inputStyle = "w-full border border-ink/30 rounded-soft px-3 py-2 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
 
 function Stokvels({ onBack }) {
-  const { accessToken } = useAuth()
+  const { accessToken, user } = useAuth()
   const { showToast } = useToast()
 
   const [view, setView] = useState('list')
@@ -50,6 +50,13 @@ function Stokvels({ onBack }) {
   const [interestAmount, setInterestAmount] = useState('')
   const [recordingInterest, setRecordingInterest] = useState(false)
   const [togglingBereavement, setTogglingBereavement] = useState(false)
+  const [editingDetails, setEditingDetails] = useState(false)
+  const [editName, setEditName] = useState('')
+  const [editContribution, setEditContribution] = useState('')
+  const [editFrequency, setEditFrequency] = useState('')
+  const [editTargetAmount, setEditTargetAmount] = useState('')
+  const [editTargetDate, setEditTargetDate] = useState('')
+  const [savingDetails, setSavingDetails] = useState(false)
 
   const fetchMyStokvels = async () => {
     try {
@@ -159,6 +166,43 @@ function Stokvels({ onBack }) {
       showToast(err.message, 'error')
     } finally {
       setTogglingBereavement(false)
+    }
+  }
+
+  const openEditDetails = () => {
+    setEditName(detail.stokvel.name || '')
+    setEditContribution(detail.stokvel.contributionAmount != null ? String(detail.stokvel.contributionAmount) : '')
+    setEditFrequency(detail.stokvel.contributionFrequency || '')
+    setEditTargetAmount(detail.stokvel.targetAmount != null ? String(detail.stokvel.targetAmount) : '')
+    setEditTargetDate(detail.stokvel.targetDate ? detail.stokvel.targetDate.slice(0, 10) : '')
+    setEditingDetails(true)
+  }
+
+  const saveStokvelDetails = async (e) => {
+    e.preventDefault()
+    if (savingDetails) return
+    setSavingDetails(true)
+    try {
+      const res = await fetch(`/api/stokvels/${detail.stokvel.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({
+          name: editName.trim(),
+          contributionAmount: editContribution,
+          contributionFrequency: editFrequency.trim(),
+          targetAmount: editTargetAmount,
+          targetDate: editTargetDate,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not update stokvel')
+      showToast(data.message || 'Stokvel updated', 'success')
+      setEditingDetails(false)
+      await fetchDetail(detail.stokvel.id)
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setSavingDetails(false)
     }
   }
 
@@ -612,6 +656,60 @@ function Stokvels({ onBack }) {
                   )}
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Organiser-only: edit stokvel details */}
+          {stokvel.organiserId === user?.id && (
+            <div className="bg-white border-2 border-ink rounded-soft p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Stokvel Details</p>
+                <button
+                  type="button"
+                  onClick={() => editingDetails ? setEditingDetails(false) : openEditDetails()}
+                  className={`text-xs font-bold text-sage-600 ${pressable}`}
+                >
+                  {editingDetails ? 'Cancel' : 'Edit'}
+                </button>
+              </div>
+              {editingDetails && (
+                <form onSubmit={saveStokvelDetails} className="space-y-2">
+                  <input
+                    type="text" placeholder="Stokvel name" value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className={inputStyle} required minLength={2}
+                  />
+                  <input
+                    type="number" placeholder="Contribution amount (ZAR)" value={editContribution}
+                    onChange={(e) => setEditContribution(e.target.value)}
+                    className={inputStyle} min="0" step="any"
+                  />
+                  <input
+                    type="text" placeholder="Contribution frequency (e.g. Monthly)" value={editFrequency}
+                    onChange={(e) => setEditFrequency(e.target.value)}
+                    className={inputStyle}
+                  />
+                  <input
+                    type="number" placeholder="Target amount (ZAR, optional)" value={editTargetAmount}
+                    onChange={(e) => setEditTargetAmount(e.target.value)}
+                    className={inputStyle} min="0" step="any"
+                  />
+                  <div>
+                    <label className="text-[10px] text-ink-muted block mb-1">Target date (optional)</label>
+                    <input
+                      type="date" value={editTargetDate}
+                      onChange={(e) => setEditTargetDate(e.target.value)}
+                      className={inputStyle}
+                    />
+                  </div>
+                  <button
+                    type="submit" disabled={savingDetails}
+                    className={`w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+                  >
+                    {savingDetails ? 'Saving...' : 'Save changes'}
+                  </button>
+                </form>
+              )}
             </div>
           )}
 

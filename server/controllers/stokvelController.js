@@ -269,10 +269,23 @@ export async function getStokvels(req, res) {
   }
 }
 
+const UPDATABLE_STOKVEL_FIELDS = ['name', 'contributionAmount', 'contributionFrequency', 'targetAmount', 'targetDate', 'ceremonyType'];
+
 export async function updateStokvel(req, res) {
   const { stokvelId } = req.params;
   const userId = req.userId;
-  const updateData = req.body;
+
+  const updateData = {};
+  for (const field of UPDATABLE_STOKVEL_FIELDS) {
+    if (req.body[field] === undefined) continue;
+    if (field === 'contributionAmount' || field === 'targetAmount') {
+      updateData[field] = req.body[field] === null || req.body[field] === '' ? null : parseFloat(req.body[field]);
+    } else if (field === 'targetDate') {
+      updateData[field] = req.body[field] ? new Date(req.body[field]) : null;
+    } else {
+      updateData[field] = req.body[field] || null;
+    }
+  }
 
   try {
     const stokvel = await prisma.stokvel.findUnique({ where: { id: stokvelId } });
