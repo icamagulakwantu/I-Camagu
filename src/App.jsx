@@ -39,6 +39,7 @@ import ResetPassword from './pages/ResetPassword.jsx'
 import AccountSettings from './pages/AccountSettings.jsx'
 import Help from './pages/Help.jsx'
 import BudgetDashboard from './pages/BudgetDashboard.jsx'
+import SupplierDashboard from './pages/SupplierDashboard.jsx'
 
 // Components
 import BottomNav from './components/BottomNav.jsx'
@@ -63,6 +64,7 @@ const MORE_SCREENS = [
   'ukugida',
   'ukusoka',
   'iziduko',
+  'supplier',
   'portal',
   'ekoyini',
   'ekoyiniadmin',
@@ -349,6 +351,8 @@ function MainApp() {
         return <Ukusoka onBack={goMore} />
       case 'iziduko':
         return <IzidukoNetwork onBack={goMore} />
+      case 'supplier':
+        return <SupplierDashboard onBack={goMore} />
       case 'portal':
         return <Portal onBack={goMore} />
       case 'ekoyini':

@@ -125,6 +125,7 @@ model User {
   poolPayments            PoolPayment[]
   sentClanConnections     ClanConnection[]      @relation("ClanConnectionRequester")
   receivedClanConnections ClanConnection[]      @relation("ClanConnectionRecipient")
+  partner                 Partner?
 }
 
 model ClanConnection {
@@ -482,6 +483,8 @@ model OrderLineConfirmation {
 
 model Partner {
   id        String      @id @default(cuid())
+  userId    String?     @unique
+  user      User?       @relation(fields: [userId], references: [id])
   name      String
   type      PartnerType
   area      String

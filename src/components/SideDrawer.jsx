@@ -16,6 +16,7 @@ function SideDrawer({ open, onClose, onNavigate, user }) {
   { id: 'activity', emoji: '📜', label: 'My Activity' },
   { id: 'ukusoka', emoji: '🎁', label: 'Ukusoka' },
   { id: 'iziduko', emoji: '🤝', label: 'Iziduko Network' },
+  { id: 'supplier', emoji: '📦', label: 'Supplier Dashboard' },
   { id: 'directory', emoji: '📖', label: 'Directory' },
   { id: 'legends', emoji: '🏛️', label: 'House of AmaXhosa' },
 ]
