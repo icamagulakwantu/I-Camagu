@@ -430,7 +430,9 @@ async function main() {
   for (const legend of legendEntries) {
     const existing = await prisma.legendEntry.findFirst({ where: { title: legend.title } });
     if (!existing) {
-      await prisma.legendEntry.create({ data: { ...legend, verificationStatus: 'PENDING_REVIEW', reviewedAt: null } });
+      // Seeded legends are curated content, not user submissions — mark verified
+      // so they're eligible for the home dashboard's "Did You Know?" card.
+      await prisma.legendEntry.create({ data: { ...legend, verificationStatus: 'VERIFIED', reviewedAt: new Date() } });
     }
   }
   console.log('Legend entries seeded.');
