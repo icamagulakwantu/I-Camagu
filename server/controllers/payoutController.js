@@ -55,9 +55,19 @@ export async function requestPayout(req, res) {
 
 export async function approvePayout(req, res) {
       const userId = req.userId;
-        const { payoutId } = req.body;
+        const { payoutId, pin } = req.body;
 
           if (!payoutId) return res.status(400).json({ error: 'payoutId is required' });
+          if (!pin) return res.status(400).json({ error: 'PIN is required to approve a payout' });
+
+          const { verifyPin } = await import('../services/pinService.js');
+          const pinCheck = await verifyPin(userId, pin);
+          if (!pinCheck.valid) {
+            const message = pinCheck.reason === 'NO_PIN_SET'
+              ? 'You need to set a security PIN first — go to More → Security PIN.'
+              : 'Incorrect PIN';
+            return res.status(401).json({ error: message });
+          }
 
             try {
                     const payout = await prisma.payout.findUnique({

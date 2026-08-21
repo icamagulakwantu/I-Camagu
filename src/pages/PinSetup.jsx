@@ -1,6 +1,63 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth } from '../context/AuthContext.jsx'
+import { useToast } from '../components/ui/Toast.jsx'
+
+const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50'
 
 export default function PinSetup({ onBack }) {
+  const { accessToken } = useAuth()
+  const { showToast } = useToast()
+
+  const [loading, setLoading] = useState(true)
+  const [hasPinSet, setHasPinSet] = useState(false)
+  const [changing, setChanging] = useState(false)
+  const [pin, setPin] = useState('')
+  const [confirmPin, setConfirmPin] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    fetch('/api/user/pin/status', { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then((res) => res.json())
+      .then((data) => setHasPinSet(!!data.hasPinSet))
+      .catch(() => setError('Could not check PIN status'))
+      .finally(() => setLoading(false))
+  }, [accessToken])
+
+  const submit = async (e) => {
+    e.preventDefault()
+    setError('')
+
+    if (!/^\d{4,6}$/.test(pin)) {
+      setError('PIN must be 4-6 digits')
+      return
+    }
+    if (pin !== confirmPin) {
+      setError('PINs do not match')
+      return
+    }
+
+    setSaving(true)
+    try {
+      const res = await fetch('/api/user/pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ pin }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not set PIN')
+      showToast(hasPinSet ? 'PIN updated' : 'PIN set — you can now confirm contributions and approve payouts', 'success')
+      setHasPinSet(true)
+      setChanging(false)
+      setPin('')
+      setConfirmPin('')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <div className="px-5 pt-6 pb-28 max-w-md mx-auto">
       <button
@@ -10,8 +67,50 @@ export default function PinSetup({ onBack }) {
       >
         ← Back
       </button>
-      <h1 className="text-xl font-black text-brand-black mb-2">PIN Setup</h1>
-      <p className="text-sm text-brand-black/60">PIN security feature coming soon.</p>
+      <h1 className="text-xl font-black text-brand-black mb-1">Security PIN</h1>
+      <p className="text-sm text-brand-black/60 mb-6">Required to confirm contributions and approve stokvel payouts.</p>
+
+      {loading ? (
+        <p className="text-sm text-ink-muted">Checking...</p>
+      ) : hasPinSet && !changing ? (
+        <div className="bg-white border-2 border-ink rounded-soft p-5">
+          <p className="text-sm font-bold text-sage-600 mb-1">🔐 PIN is active</p>
+          <p className="text-xs text-ink-muted mb-4">Your account has a security PIN set.</p>
+          <button
+            onClick={() => setChanging(true)}
+            className={`w-full border-2 border-ink font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+          >
+            Change PIN
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={submit} className="bg-white border-2 border-ink rounded-soft p-5 space-y-3">
+          <input
+            type="password" inputMode="numeric" placeholder="New PIN (4-6 digits)" value={pin}
+            onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest"
+            maxLength={6}
+          />
+          <input
+            type="password" inputMode="numeric" placeholder="Confirm PIN" value={confirmPin}
+            onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest"
+            maxLength={6}
+          />
+          {error && <p className="text-terracotta text-sm">{error}</p>}
+          <button
+            type="submit" disabled={saving}
+            className={`w-full bg-sage-500 text-white font-bold py-3 rounded-pill ${pressable}`}
+          >
+            {saving ? 'Saving...' : hasPinSet ? 'Update PIN' : 'Set PIN'}
+          </button>
+          {hasPinSet && (
+            <button type="button" onClick={() => { setChanging(false); setError('') }} className="w-full text-xs text-ink-muted underline">
+              Cancel
+            </button>
+          )}
+        </form>
+      )}
     </div>
   )
 }

@@ -1,15 +1,20 @@
-import crypto from 'crypto';
-import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+import prisma from '../config/db.js';
 
-const prisma = new PrismaClient();
+export async function hashPin(pin) {
+  return bcrypt.hash(String(pin), 10);
+}
 
-export const hashPin = (pin) => {
-  return crypto.createHash('sha256').update(String(pin)).digest('hex');
-};
+export function validatePinFormat(pin) {
+  return typeof pin === 'string' && /^\d{4,6}$/.test(pin);
+}
 
 export const setPin = async (userId, pin) => {
-  const pinHash = hashPin(pin);
-  return await prisma.user.update({
+  if (!validatePinFormat(pin)) {
+    throw new Error('PIN must be 4-6 digits');
+  }
+  const pinHash = await hashPin(pin);
+  return prisma.user.update({
     where: { id: userId },
     data: { pinHash },
   });
@@ -17,8 +22,9 @@ export const setPin = async (userId, pin) => {
 
 export async function verifyPin(userId, pin) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user.pinHash) return { valid: false, reason: 'NO_PIN_SET' };
-  return { valid: user.pinHash === hashPin(pin), reason: user.pinHash === hashPin(pin) ? null : 'INCORRECT_PIN' };
+  if (!user?.pinHash) return { valid: false, reason: 'NO_PIN_SET' };
+  const valid = await bcrypt.compare(String(pin), user.pinHash);
+  return { valid, reason: valid ? null : 'INCORRECT_PIN' };
 }
 
 export const hasPinSet = async (userId) => {
@@ -36,6 +42,7 @@ export const checkPinStatus = async (userId) => {
 
 export default {
   hashPin,
+  validatePinFormat,
   setPin,
   setUserPin: setPin,
   verifyPin,

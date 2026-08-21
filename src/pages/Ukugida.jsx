@@ -8,21 +8,23 @@ import { cn } from '../lib/utils'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
+const emptyForm = {
+  direction: 'GIVEN',
+  itemDescription: '',
+  quantity: '',
+  unitType: 'bottle',
+  counterpartyName: '',
+  ceremonyLabel: '',
+  eventDate: new Date().toISOString().slice(0, 10),
+}
+
 export default function Ukugida({ onBack }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({
-    type: 'given',
-    item: '',
-    quantity: '',
-    unit: 'bottle',
-    personName: '',
-    occasion: '',
-    notes: '',
-  })
+  const [form, setForm] = useState(emptyForm)
 
   const fetchEntries = useCallback(async () => {
     setLoading(true)
@@ -60,16 +62,31 @@ export default function Ukugida({ onBack }) {
       if (!res.ok) throw new Error(data.error || 'Failed to save')
       fetchEntries()
       setShowForm(false)
-      setForm({ type: 'given', item: '', quantity: '', unit: 'bottle', personName: '', occasion: '', notes: '' })
+      setForm(emptyForm)
       showToast('Entry recorded', 'success')
     } catch (err) {
       showToast(err.message, 'error')
     }
   }
 
+  const deleteEntry = async (entryId) => {
+    try {
+      const res = await fetch(`/api/reciprocity/${entryId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to delete')
+      setEntries((prev) => prev.filter((e) => e.id !== entryId))
+      showToast('Entry deleted', 'info')
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
+
   const balance = entries.reduce((acc, e) => {
-    const val = parseFloat(e.quantity) || 0
-    return e.type === 'received' ? acc + val : acc - val
+    const val = e.quantity || 0
+    return e.direction === 'RECEIVED' ? acc + val : acc - val
   }, 0)
 
   return (
@@ -87,7 +104,7 @@ export default function Ukugida({ onBack }) {
               'font-display font-bold text-2xl mt-1',
               balance >= 0 ? 'text-white' : 'text-terracotta-light'
             )}>
-              {balance >= 0 ? '+' : ''}{balance} bottles
+              {balance >= 0 ? '+' : ''}{balance} items
             </p>
           </div>
         </div>
@@ -108,17 +125,17 @@ export default function Ukugida({ onBack }) {
       {showForm && (
         <form onSubmit={addEntry} className="px-4 mt-4 bg-white border-2 border-ink rounded-soft p-5 shadow-soft space-y-3 animate-fade-in">
           <div className="flex gap-2">
-            {['given', 'received'].map(t => (
+            {[['GIVEN', 'Given'], ['RECEIVED', 'Received']].map(([value, label]) => (
               <button
-                key={t}
+                key={value}
                 type="button"
-                onClick={() => setForm(p => ({ ...p, type: t }))}
+                onClick={() => setForm(p => ({ ...p, direction: value }))}
                 className={cn(
                   'flex-1 py-2.5 rounded-soft text-xs font-bold capitalize transition-all',
-                  form.type === t ? 'bg-sage-500 text-white shadow-glow' : 'bg-cream text-ink-muted border-2 border-cream-dark'
+                  form.direction === value ? 'bg-sage-500 text-white shadow-glow' : 'bg-cream text-ink-muted border-2 border-cream-dark'
                 )}
               >
-                {t}
+                {label}
               </button>
             ))}
           </div>
@@ -126,8 +143,8 @@ export default function Ukugida({ onBack }) {
           <input
             type="text"
             placeholder="Item (e.g. Whiskey, Beer)"
-            value={form.item}
-            onChange={(e) => setForm(p => ({ ...p, item: e.target.value }))}
+            value={form.itemDescription}
+            onChange={(e) => setForm(p => ({ ...p, itemDescription: e.target.value }))}
             className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
             required
           />
@@ -139,11 +156,10 @@ export default function Ukugida({ onBack }) {
               value={form.quantity}
               onChange={(e) => setForm(p => ({ ...p, quantity: e.target.value }))}
               className="w-24 h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
-              required
             />
             <select
-              value={form.unit}
-              onChange={(e) => setForm(p => ({ ...p, unit: e.target.value }))}
+              value={form.unitType}
+              onChange={(e) => setForm(p => ({ ...p, unitType: e.target.value }))}
               className="flex-1 h-12 border-2 border-cream-dark rounded-soft px-4 text-sm bg-white focus:outline-none focus:border-sage-500"
             >
               <option value="bottle">Bottle</option>
@@ -155,8 +171,8 @@ export default function Ukugida({ onBack }) {
           <input
             type="text"
             placeholder="Person (e.g. Uncle Bongani)"
-            value={form.personName}
-            onChange={(e) => setForm(p => ({ ...p, personName: e.target.value }))}
+            value={form.counterpartyName}
+            onChange={(e) => setForm(p => ({ ...p, counterpartyName: e.target.value }))}
             className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
             required
           />
@@ -164,9 +180,17 @@ export default function Ukugida({ onBack }) {
           <input
             type="text"
             placeholder="Occasion (e.g. Umgidi waThemba)"
-            value={form.occasion}
-            onChange={(e) => setForm(p => ({ ...p, occasion: e.target.value }))}
+            value={form.ceremonyLabel}
+            onChange={(e) => setForm(p => ({ ...p, ceremonyLabel: e.target.value }))}
             className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
+          />
+
+          <input
+            type="date"
+            value={form.eventDate}
+            onChange={(e) => setForm(p => ({ ...p, eventDate: e.target.value }))}
+            className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-sage-500"
+            required
           />
 
           <button type="submit" className={`w-full bg-terracotta text-white font-bold py-3 rounded-pill shadow-terracotta ${pressable}`}>
@@ -175,17 +199,19 @@ export default function Ukugida({ onBack }) {
         </form>
       )}
 
-      <button
-        onClick={() => {
+      <div className="px-4">
+        <button
+          onClick={() => {
             const summary = `My Ukugida (reciprocity) record:\n\n` +
-                  entries.map(e => `${e.direction === 'GIVEN' ? '→ Gave' : '← Received'}: ${e.itemDescription} ${e.counterpartyName ? `(${e.direction === 'GIVEN' ? 'to' : 'from'} ${e.counterpartyName})` : ''}`).join('\n') +
-                        `\n\nTracked on iCamagu 🌾`
-                            shareToWhatsApp(summary)
-                              }}
-                                className="w-full bg-[#25D366] text-white font-bold py-2.5 rounded-pill text-sm mb-4"
-                                >
-                                  💬 Share on WhatsApp
-                                  </button>
+              entries.map(e => `${e.direction === 'GIVEN' ? '→ Gave' : '← Received'}: ${e.itemDescription} ${e.counterpartyName ? `(${e.direction === 'GIVEN' ? 'to' : 'from'} ${e.counterpartyName})` : ''}`).join('\n') +
+              `\n\nTracked on iCamagu 🌾`
+            shareToWhatsApp(summary)
+          }}
+          className="w-full bg-[#25D366] text-white font-bold py-2.5 rounded-pill text-sm mb-4"
+        >
+          💬 Share on WhatsApp
+        </button>
+      </div>
 
       {/* Entries List */}
       <div className="px-4 mt-6">
@@ -212,30 +238,38 @@ export default function Ukugida({ onBack }) {
                 key={entry.id}
                 className={cn(
                   'bg-white border-2 rounded-soft p-4 shadow-soft flex items-start gap-3',
-                  entry.type === 'received' ? 'border-sage-300' : 'border-ink/10'
+                  entry.direction === 'RECEIVED' ? 'border-sage-300' : 'border-ink/10'
                 )}
               >
                 <div className={cn(
                   'w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0',
-                  entry.type === 'received' ? 'bg-sage-50' : 'bg-cream-dark'
+                  entry.direction === 'RECEIVED' ? 'bg-sage-50' : 'bg-cream-dark'
                 )}>
-                  {entry.type === 'received' ? '📥' : '📤'}
+                  {entry.direction === 'RECEIVED' ? '📥' : '📤'}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">
-                    <p className="font-bold text-sm text-ink truncate">{entry.item}</p>
+                    <p className="font-bold text-sm text-ink truncate">{entry.itemDescription}</p>
                     <span className={cn(
-                      'text-xs font-bold px-2 py-0.5 rounded-pill',
-                      entry.type === 'received' ? 'bg-sage-50 text-sage-700' : 'bg-cream-dark text-ink-muted'
+                      'text-xs font-bold px-2 py-0.5 rounded-pill flex-shrink-0',
+                      entry.direction === 'RECEIVED' ? 'bg-sage-50 text-sage-700' : 'bg-cream-dark text-ink-muted'
                     )}>
-                      {entry.quantity} {entry.unit}
+                      {entry.quantity ? `${entry.quantity} ${entry.unitType || ''}`.trim() : ''}
                     </span>
                   </div>
                   <p className="text-xs text-ink-muted mt-0.5">
-                    {entry.type === 'received' ? 'From' : 'To'}: <strong className="text-ink">{entry.personName}</strong>
+                    {entry.direction === 'RECEIVED' ? 'From' : 'To'}: <strong className="text-ink">{entry.counterpartyName}</strong>
                   </p>
-                  {entry.occasion && <p className="text-[11px] text-ink-muted mt-0.5">{entry.occasion}</p>}
+                  {entry.ceremonyLabel && <p className="text-[11px] text-ink-muted mt-0.5">{entry.ceremonyLabel}</p>}
+                  <p className="text-[10px] text-ink-muted mt-0.5">{new Date(entry.eventDate).toLocaleDateString()}</p>
                 </div>
+                <button
+                  onClick={() => deleteEntry(entry.id)}
+                  className="text-ink-muted text-xs flex-shrink-0"
+                  aria-label="Delete entry"
+                >
+                  🗑️
+                </button>
               </div>
             ))}
           </div>

@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import { notifyEkoyiniOfBooking } from '../services/notificationService.js';
 
 const MAX_TOURISM_SHARE_PERCENT = 0.30; // founder direction: host share must not exceed 30%
 

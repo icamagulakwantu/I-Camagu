@@ -78,6 +78,27 @@ export async function notifyEkoyiniOfQuoteRequest(q) {
       }
 }
 
+export async function notifyEkoyiniOfBooking(booking, ceremony, host) {
+  try {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: EKOYINI_BUSINESS_EMAIL,
+      subject: `New Bar Service Booking — ${host?.firstName || ''} ${host?.lastName || ''}`.trim(),
+      html: `
+        <h2>New Ekoyini Mobile Bar Booking Request</h2>
+        ${row('Host', `${host?.firstName || ''} ${host?.lastName || ''}`.trim())}
+        ${row('Host Email', host?.email)}
+        ${row('Host Phone', host?.phoneNumber)}
+        ${row('Ceremony', ceremony?.type)}
+        ${row('Booking ID', booking?.id)}
+        ${row('Status', booking?.status)}
+      `,
+    });
+  } catch (error) {
+    console.error('Ekoyini booking notification failed:', error.message);
+  }
+}
+
 export async function confirmQuoteToClient(q) {
       try {
               await resend.emails.send({
