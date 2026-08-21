@@ -47,6 +47,9 @@ function Stokvels({ onBack }) {
   const [payoutAmount, setPayoutAmount] = useState('')
   const [announcements, setAnnouncements] = useState([])
   const [newAnnouncement, setNewAnnouncement] = useState('')
+  const [interestAmount, setInterestAmount] = useState('')
+  const [recordingInterest, setRecordingInterest] = useState(false)
+  const [togglingBereavement, setTogglingBereavement] = useState(false)
 
   const fetchMyStokvels = async () => {
     try {
@@ -114,6 +117,48 @@ function Stokvels({ onBack }) {
       showToast('Announcement posted', 'success')
     } catch (err) {
       showToast(err.message, 'error')
+    }
+  }
+
+  const recordInterest = async (e) => {
+    e.preventDefault()
+    if (!detail?.stokvel?.id || !interestAmount) return
+    setRecordingInterest(true)
+    try {
+      const res = await fetch('/api/stokvels/interest/record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ stokvelId: detail.stokvel.id, amount: interestAmount }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not record interest')
+      setInterestAmount('')
+      showToast(data.message || 'Interest recorded', 'success')
+      await fetchDetail(detail.stokvel.id)
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setRecordingInterest(false)
+    }
+  }
+
+  const toggleBereavement = async () => {
+    if (!detail?.stokvel?.id) return
+    setTogglingBereavement(true)
+    try {
+      const res = await fetch('/api/stokvels/bereavement/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ stokvelId: detail.stokvel.id, active: !detail.stokvel.bereavementActive }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not update bereavement status')
+      showToast(data.message || 'Updated', 'success')
+      await fetchDetail(detail.stokvel.id)
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setTogglingBereavement(false)
     }
   }
 
@@ -567,6 +612,50 @@ function Stokvels({ onBack }) {
                   )}
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Officials-only group settings */}
+          {isOfficial && (
+            <div className="bg-white border-2 border-ink rounded-soft p-4 space-y-4">
+              <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Group Settings</p>
+
+              <form onSubmit={recordInterest} className="space-y-2">
+                <p className="text-xs font-bold text-ink">Record interest earned</p>
+                <div className="flex gap-2">
+                  <input
+                    type="number" placeholder="Amount (ZAR)" value={interestAmount}
+                    onChange={(e) => setInterestAmount(e.target.value)}
+                    className={`${inputStyle} flex-1`} min="0.01" step="any" required
+                  />
+                  <button
+                    type="submit" disabled={recordingInterest}
+                    className={`bg-sage-500 text-white font-bold px-4 rounded-pill text-sm ${pressable}`}
+                  >
+                    {recordingInterest ? '...' : 'Add'}
+                  </button>
+                </div>
+                <p className="text-[10px] text-ink-muted">Adds to the group balance, e.g. bank/savings interest received this cycle.</p>
+              </form>
+
+              <div className="pt-2 border-t border-ink/10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold text-ink">Bereavement mode</p>
+                    <p className="text-[10px] text-ink-muted mt-0.5">
+                      {stokvel.bereavementActive ? 'Active — flagged as a sensitive period for this group.' : 'Not active.'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={toggleBereavement}
+                    disabled={togglingBereavement}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-pill flex-shrink-0 ${stokvel.bereavementActive ? 'bg-terracotta text-white' : 'border-2 border-ink/20 text-ink-muted'} ${pressable}`}
+                  >
+                    {stokvel.bereavementActive ? 'Deactivate' : 'Activate'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 

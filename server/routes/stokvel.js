@@ -1,20 +1,20 @@
 import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
-import { 
-  createStokvel, 
-  joinStokvel, 
-  getMyStokvels, 
-  getStokvel, 
+import {
+  createStokvel,
+  joinStokvel,
+  getMyStokvels,
+  getStokvel,
   getStokvelsById,
   deleteStokvel,
-  getPendingApprovalCount, 
-  recordInterest,
-  toggleBereavementProtocol 
+  getPendingApprovalCount,
+  toggleBereavementProtocol
 } from '../controllers/stokvelController.js';
-import { 
-  submitContribution, 
-  confirmContribution, 
-  getPendingContributions 
+import {
+  submitContribution,
+  confirmContribution,
+  getPendingContributions,
+  recordInterest,
 } from '../controllers/contributionController.js';
 import { postAnnouncement, getAnnouncements } from '../controllers/announcementController.js';
 import { 

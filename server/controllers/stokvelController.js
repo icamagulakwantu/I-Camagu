@@ -56,14 +56,6 @@ export async function createStokvel(req, res) {
   }
 }
 
-export const recordInterest = async (req, res) => {
-  try {
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 // src/controllers/stokvelController.js
 
 export async function getPendingApprovalCount(req, res) {
