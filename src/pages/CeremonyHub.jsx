@@ -13,7 +13,7 @@ const CEREMONY_META = {
   GENERAL_EVENT: { label: 'General Event', desc: 'Custom ceremony or event planning', emoji: '📅' },
 }
 
-function CeremonyHub({ onBack, onOpenType, onCreateNew, onSelectCeremony }) {
+function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
   const { accessToken } = useAuth()
   const [ceremonies, setCeremonies] = useState([])
   const [ceremonyTypes, setCeremonyTypes] = useState([])
@@ -50,20 +50,9 @@ function CeremonyHub({ onBack, onOpenType, onCreateNew, onSelectCeremony }) {
     <div className="min-h-screen pb-24 bg-cream">
       <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
         <button onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-display font-bold text-2xl">Ceremonies</h1>
-            <p className="text-white/70 text-sm mt-1">Plan, save, and execute — from first checklist to final day.</p>
-          </div>
-          {/* NEW: Create Ceremony button */}
-          {onCreateNew && (
-            <button
-              onClick={onCreateNew}
-              className="bg-white text-sage-700 font-bold px-4 py-2 rounded-soft text-sm shadow-md hover:bg-sage-50 transition"
-            >
-              + New
-            </button>
-          )}
+        <div>
+          <h1 className="font-display font-bold text-2xl">Ceremonies</h1>
+          <p className="text-white/70 text-sm mt-1">Plan, save, and execute — from first checklist to final day.</p>
         </div>
       </div>
 

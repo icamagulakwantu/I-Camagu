@@ -244,23 +244,6 @@ export default function Basket({ onBack, onBasketChanged }) {
             </div>
           </div>
 
-          <button
-  onClick={() => {
-    const summary = `My iCamagu basket:\n\n` +
-      basketData.items.map(i => `${i.quantity} case(s) — ${i.sku.name}`).join('\n') +
-      `\n\nTotal: R${basketData.totalZAR.toFixed(2)}\nShared from iCamagu 🌾`
-    if (navigator.share) {
-      navigator.share({ title: 'My iCamagu Basket', text: summary }).catch(() => {})
-    } else if (navigator.clipboard) {
-      navigator.clipboard.writeText(summary)
-      showToast('Basket copied — paste it into WhatsApp', 'success')
-    }
-  }}
-  className="w-full border-2 border-ink text-ink font-bold py-2.5 rounded-pill text-sm mb-3"
->
-  📤 Share Basket
-</button>
-
           {/* Partner Bulk Pool Section */}
           <div className="bg-white border border-cream-dark rounded-soft p-4 shadow-soft">
             <p className="text-xs font-black uppercase text-ink-muted mb-2">Join a Bulk Order</p>
