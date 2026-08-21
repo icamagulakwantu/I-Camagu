@@ -178,16 +178,20 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
 
   const deletePlan = async (planId) => {
     try {
-      await fetch(`/api/ceremonies/plans/${planId}`, {
+      const res = await fetch(`/api/ceremonies/plans/${planId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${accessToken}` },
       })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Could not delete plan')
+      }
       setPlans(plans.filter(p => p.id !== planId))
       setActivePlan(null)
       setConfirmDelete(null)
       showToast('Plan deleted', 'info')
-    } catch {
-      showToast('Could not delete plan', 'error')
+    } catch (err) {
+      showToast(err.message || 'Could not delete plan', 'error')
     }
   }
 
