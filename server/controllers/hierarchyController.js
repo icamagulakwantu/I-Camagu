@@ -39,9 +39,18 @@ export async function setGroupAllocation(req, res) {
                 return res.status(400).json({ error: 'ceremonyGroupId, itemDescription, quantity, and unitType are required' });
         }
 
+          const qty = parseInt(quantity, 10);
+          if (isNaN(qty)) return res.status(400).json({ error: 'quantity must be a number' });
+
           try {
+                  const group = await prisma.ceremonyGroup.findUnique({
+                            where: { id: ceremonyGroupId },
+                                  include: { ceremony: true },
+                  });
+                      if (!group || group.ceremony.hostId !== req.userId) return res.status(403).json({ error: 'Not your ceremony' });
+
                   const allocation = await prisma.groupAllocation.create({
-                            data: { ceremonyGroupId, itemDescription, quantity: parseInt(quantity), unitType },
+                            data: { ceremonyGroupId, itemDescription, quantity: qty, unitType },
                   });
                       res.status(201).json(allocation);
           } catch (error) {
@@ -53,6 +62,9 @@ export async function setGroupAllocation(req, res) {
 export async function getCeremonyGroups(req, res) {
       const { ceremonyId } = req.params;
         try {
+                const ceremony = await prisma.ceremony.findUnique({ where: { id: ceremonyId } });
+                    if (!ceremony || ceremony.hostId !== req.userId) return res.status(403).json({ error: 'Not your ceremony' });
+
                 const groups = await prisma.ceremonyGroup.findMany({
                           where: { ceremonyId },
                                 include: { allocations: true },
@@ -66,6 +78,9 @@ export async function getCeremonyGroups(req, res) {
 export async function getAlcoholSummary(req, res) {
   const { ceremonyId } = req.params;
   try {
+    const ceremony = await prisma.ceremony.findUnique({ where: { id: ceremonyId } });
+    if (!ceremony || ceremony.hostId !== req.userId) return res.status(403).json({ error: 'Not your ceremony' });
+
     const groups = await prisma.ceremonyGroup.findMany({
       where: { ceremonyId },
       include: { allocations: true },
