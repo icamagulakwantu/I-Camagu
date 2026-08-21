@@ -79,7 +79,7 @@ export async function checkAndMatchPool(poolId) {
       totalAmountZAR,
       // Default safety measure per Section 4.2: collection points default to
       // a location near a police station, mirroring real-world SAB delivery practice.
-      deliveryLocation: `Near [police station closest to] ${pool.area} — to be confirmed`,
+      deliveryLocation: `Near the police station closest to ${pool.area} — exact location to be confirmed`,
       status: 'PENDING_MEMBER_CONFIRMATION',
     },
   });

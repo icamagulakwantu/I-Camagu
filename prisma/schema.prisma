@@ -790,7 +790,7 @@ model Ceremony {
   status    String       @default("PLANNING")
   notes     String?
   createdAt DateTime     @default(now())
-  updatedAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   checklistItems   CeremonyChecklistItem[]
   costItems        CeremonyCostItem[]
