@@ -23,7 +23,7 @@ function getItemImage(item) {
 }
 
 export default function Basket({ onBack, onBasketChanged }) {
-  const { accessToken } = useAuth()
+  const { accessToken, user } = useAuth()
   const { showToast } = useToast()
   
   const [basketData, setBasketData] = useState({ basket: null, items: [], totalCases: 0, totalZAR: 0 })
@@ -59,13 +59,16 @@ export default function Basket({ onBack, onBasketChanged }) {
 
   useEffect(() => {
     fetchBasket()
-    fetch('/api/basket/partners', {
+    const geoQuery = user?.latitude != null && user?.longitude != null
+      ? `?lat=${user.latitude}&lng=${user.longitude}`
+      : ''
+    fetch(`/api/basket/partners${geoQuery}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setPartners(Array.isArray(data) ? data : []))
       .catch(() => setPartners([]))
-  }, [accessToken, fetchBasket])
+  }, [accessToken, fetchBasket, user?.latitude, user?.longitude])
 
   const updateQuantity = async (itemId, newQuantity) => {
     if (newQuantity < 1) return removeItem(itemId)
@@ -269,7 +272,7 @@ export default function Basket({ onBack, onBasketChanged }) {
               <option value="">Choose a partner tavern/butchery</option>
               {partners.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} ({p.area})
+                  {p.name} ({p.area}){p.distanceKm != null ? ` · ${p.distanceKm}km away` : ''}
                 </option>
               ))}
             </select>

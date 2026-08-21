@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
+import { captureLocation } from '../lib/geolocation.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50'
 const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
@@ -29,8 +30,23 @@ function RegisterForm({ onRegistered }) {
   const [type, setType] = useState('TAVERN')
   const [area, setArea] = useState('')
   const [moq, setMoq] = useState('')
+  const [coords, setCoords] = useState(null)
+  const [locating, setLocating] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  const useMyLocation = async () => {
+    setLocating(true)
+    try {
+      const loc = await captureLocation()
+      setCoords(loc)
+      showToast('Location captured', 'success')
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setLocating(false)
+    }
+  }
 
   const submit = async (e) => {
     e.preventDefault()
@@ -40,7 +56,7 @@ function RegisterForm({ onRegistered }) {
       const res = await fetch('/api/supplier/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ name, type, area, moq: moq || undefined }),
+        body: JSON.stringify({ name, type, area, moq: moq || undefined, ...(coords || {}) }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Could not register')
@@ -76,6 +92,13 @@ function RegisterForm({ onRegistered }) {
             onChange={(e) => setArea(e.target.value)}
             className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm" required
           />
+          <button
+            type="button" onClick={useMyLocation} disabled={locating}
+            className="text-xs font-bold text-sage-600"
+          >
+            📍 {locating ? 'Locating...' : coords ? 'Location captured ✓' : 'Pin exact location (recommended)'}
+          </button>
+          <p className="text-[10px] text-ink-muted -mt-1">Lets members find you as the nearest supplier and helps us plan delivery logistics.</p>
           <input
             type="number" placeholder="Minimum order quantity (optional, cases)" value={moq}
             onChange={(e) => setMoq(e.target.value)}

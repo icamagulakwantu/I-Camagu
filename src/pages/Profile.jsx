@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { cn } from '../lib/utils'
+import { captureLocation } from '../lib/geolocation.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96]'
 
@@ -12,6 +13,21 @@ export default function Profile() {
 
   const [editing, setEditing] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [locating, setLocating] = useState(false)
+  const [coords, setCoords] = useState(null)
+
+  const useMyLocation = async () => {
+    setLocating(true)
+    try {
+      const loc = await captureLocation()
+      setCoords(loc)
+      showToast('Location captured — save to apply', 'success')
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setLocating(false)
+    }
+  }
 
   const [form, setForm] = useState({
     paternalIziduko: user?.paternalIziduko || '',
@@ -75,6 +91,7 @@ export default function Profile() {
           address: form.address,
           age: form.age,
           phoneNumber: form.phoneNumber,
+          ...(coords || {}),
         }),
       })
       const profData = await profRes.json()
@@ -150,6 +167,12 @@ export default function Profile() {
             <input placeholder="Address" value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
               className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
+            <button
+              type="button" onClick={useMyLocation} disabled={locating}
+              className="text-xs font-bold text-sage-600"
+            >
+              📍 {locating ? 'Locating...' : coords ? 'Location captured ✓' : 'Use my current location'}
+            </button>
             <input type="number" placeholder="Age" value={form.age}
               onChange={(e) => setForm({ ...form, age: e.target.value })}
               className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
@@ -179,7 +202,11 @@ export default function Profile() {
               <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Maternal grandmother</p>
               <p className="font-bold text-ink">{user?.maternalGrandmotherIziduko || '—'}</p>
             </div>
-            {user?.address && <p className="col-span-2 text-sm text-ink-muted">📍 {user.address}</p>}
+            {user?.address && (
+              <p className="col-span-2 text-sm text-ink-muted">
+                📍 {user.address}{user?.latitude != null && <span className="text-sage-600 font-bold"> · located</span>}
+              </p>
+            )}
             {user?.phoneNumber && <p className="col-span-2 text-sm text-ink-muted">📞 {user.phoneNumber}</p>}
           </div>
         )}

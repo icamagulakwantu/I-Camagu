@@ -95,6 +95,8 @@ model User {
   age                    Int?
   phoneNumber            String?
   location               String?
+  latitude               Float?
+  longitude              Float?
   passwordResetTokenHash String?
   passwordResetExpiresAt DateTime?
   profileImage           String?              @db.Text
@@ -488,6 +490,8 @@ model Partner {
   name      String
   type      PartnerType
   area      String
+  latitude  Float?
+  longitude Float?
   moq       Int?
   createdAt DateTime    @default(now())
 

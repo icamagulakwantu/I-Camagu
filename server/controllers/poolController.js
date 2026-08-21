@@ -1,5 +1,6 @@
 import prisma from '../config/db.js';
 import { submitBasketToPool } from '../services/matchmakerService.js';
+import { sortByDistance } from '../utils/geo.js';
 
 export async function submitToPool(req, res) {
   const { basketId, partnerId } = req.body;
@@ -23,7 +24,9 @@ export async function submitToPool(req, res) {
 export async function getPartners(req, res) {
   try {
     const partners = await prisma.partner.findMany({ orderBy: { name: 'asc' } });
-    res.json(partners);
+    const lat = req.query.lat ? parseFloat(req.query.lat) : null;
+    const lng = req.query.lng ? parseFloat(req.query.lng) : null;
+    res.json(sortByDistance(partners, lat, lng));
   } catch (error) {
     console.error('Get partners error:', error.message);
     res.status(500).json({ error: 'Could not fetch partners' });

@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
+import { captureLocation } from '../lib/geolocation.js'
 
 const STEPS = ['welcome', 'ancestry', 'details']
 
@@ -37,6 +38,21 @@ function Onboarding({ onDone }) {
   const [address, setAddress] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [age, setAge] = useState('')
+  const [coords, setCoords] = useState(null)
+  const [locating, setLocating] = useState(false)
+
+  const useMyLocation = async () => {
+    setLocating(true)
+    try {
+      const loc = await captureLocation()
+      setCoords(loc)
+      showToast('Location captured', 'success')
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setLocating(false)
+    }
+  }
 
   const handlePhotoSelect = (e) => {
     const file = e.target.files?.[0]
@@ -108,7 +124,7 @@ function Onboarding({ onDone }) {
 
   const saveDetailsAndFinish = async () => {
     setError('')
-    const hasDetails = address || phoneNumber || age
+    const hasDetails = address || phoneNumber || age || coords
     if (!hasDetails) {
       finishOnboarding()
       return
@@ -119,7 +135,7 @@ function Onboarding({ onDone }) {
       const res = await fetch('/api/user/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ address, phoneNumber, age }),
+        body: JSON.stringify({ address, phoneNumber, age, ...(coords || {}) }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Could not save your details')
@@ -238,6 +254,13 @@ function Onboarding({ onDone }) {
                 onChange={(e) => setAddress(e.target.value)}
                 className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm"
               />
+              <button
+                type="button" onClick={useMyLocation} disabled={locating}
+                className="text-xs font-bold text-sage-600 flex items-center gap-1"
+              >
+                📍 {locating ? 'Locating...' : coords ? 'Location captured ✓' : 'Use my current location'}
+              </button>
+              <p className="text-[10px] text-ink-muted -mt-1">Helps us match you with the nearest suppliers and pools — not shared with other members.</p>
               <input
                 type="number" placeholder="Age" value={age}
                 onChange={(e) => setAge(e.target.value)}

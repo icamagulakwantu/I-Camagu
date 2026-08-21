@@ -50,7 +50,7 @@ export async function updateIziduko(req, res) {
 }
 
 export async function updateProfile(req, res) {
-  const { address, age, phoneNumber, location, profileImage } = req.body;
+  const { address, age, phoneNumber, location, profileImage, latitude, longitude } = req.body;
   try {
     if (profileImage && profileImage.length > 2_000_000) {
       return res.status(400).json({ error: 'Image too large — please choose a smaller photo (under ~1.5MB)' });
@@ -64,6 +64,8 @@ export async function updateProfile(req, res) {
         phoneNumber: phoneNumber !== undefined ? phoneNumber : undefined,
         location: location !== undefined ? location : undefined,
         profileImage: profileImage !== undefined ? profileImage : undefined,
+        latitude: latitude !== undefined ? latitude : undefined,
+        longitude: longitude !== undefined ? longitude : undefined,
       },
     });
 
@@ -73,6 +75,8 @@ export async function updateProfile(req, res) {
       phoneNumber: user.phoneNumber,
       location: user.location,
       profileImage: user.profileImage,
+      latitude: user.latitude,
+      longitude: user.longitude,
     });
   } catch (error) {
     console.error('Update profile error:', error.message);

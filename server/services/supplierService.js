@@ -2,7 +2,7 @@ import prisma from '../config/db.js';
 
 const VALID_TYPES = ['TAVERN', 'BUTCHERY'];
 
-export async function registerAsSupplier(userId, { name, type, area, moq }) {
+export async function registerAsSupplier(userId, { name, type, area, moq, latitude, longitude }) {
   if (!name || !name.trim()) {
     const err = new Error('Business name is required');
     err.status = 400;
@@ -27,6 +27,8 @@ export async function registerAsSupplier(userId, { name, type, area, moq }) {
         type,
         area: area.trim(),
         moq: moq ? parseInt(moq, 10) : null,
+        latitude: latitude != null ? latitude : null,
+        longitude: longitude != null ? longitude : null,
       },
     });
   } catch (error) {
