@@ -21,6 +21,8 @@ function serializeUser(user) {
     paternalGrandmotherIziduko: user.paternalGrandmotherIziduko,
     maternalGrandmotherIziduko: user.maternalGrandmotherIziduko,
     username: user.username, profileImage: user.profileImage,
+    address: user.address, age: user.age, phoneNumber: user.phoneNumber,
+    location: user.location, latitude: user.latitude, longitude: user.longitude,
   };
 }
 

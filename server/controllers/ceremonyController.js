@@ -216,7 +216,6 @@ export const deletePreparationPlan = async (req, res) => {
 export const toggleChecklistItem = async (req, res) => {
       try {
               const { itemId } = req.params;
-                  const { isChecked } = req.body;
 
                       const item = await prisma.checklistItem.findUnique({
                                 where: { id: itemId },
@@ -228,7 +227,7 @@ export const toggleChecklistItem = async (req, res) => {
 
                                   const updated = await prisma.checklistItem.update({
                                             where: { id: itemId },
-                                                  data: { isChecked: !!isChecked },
+                                                  data: { isChecked: !item.isChecked },
                                   });
                                       res.json(updated);
       } catch (error) {
