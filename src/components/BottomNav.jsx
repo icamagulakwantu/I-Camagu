@@ -31,7 +31,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
           ))}
         </div>
 
-        <button onClick={() => onNavigate('store')}
+        <button onClick={() => onNavigate('store')} aria-label="Store"
           className="absolute left-1/2 -translate-x-1/2 -top-6 w-16 h-16 rounded-pill bg-brand-ochre shadow-[0_4px_14px_rgba(193,98,47,0.4)] flex items-center justify-center border-4 border-brand-cream">
           <span className="text-2xl">🛒</span>
           {basketCount > 0 && (
