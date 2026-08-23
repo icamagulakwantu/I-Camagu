@@ -74,7 +74,7 @@ The current authoritative default checklist registry in `server/controllers/cere
 13. **ALCOHOL DISTRIBUTION** — Main distribution supplies (5-8 bottles, 1-2 cases per group)
 14. **ALCOHOL DISTRIBUTION** — Ingxotha (final round) supplies
 15. **VIP EKOYINI** — Book Ekoyini Mobile Bar for VIP/friends phase
-16. **CLOSURE** — Kunxitiswa - new clothes and remaining alcohol for the next day
+16. **CLOSURE** — Ukunxityiswa - new clothes and remaining alcohol for the next day
 
 #### Intambo Enkulu — 25 items
 

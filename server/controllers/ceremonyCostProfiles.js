@@ -127,7 +127,7 @@ const UMGIDI_DEFAULT_ITEMS = [
   { phase: 'ALCOHOL_DISTRIBUTION', label: 'Main distribution supplies (5-8 bottles, 1-2 cases per group)' },
   { phase: 'ALCOHOL_DISTRIBUTION', label: 'Ingxotha (final round) supplies' },
   { phase: 'VIP_EKOYINI', label: 'Book Ekoyini Mobile Bar for VIP/friends phase' },
-  { phase: 'CLOSURE', label: 'Kunxitiswa - new clothes and remaining alcohol for the next day' },
+  { phase: 'CLOSURE', label: 'Ukunxityiswa - new clothes and remaining alcohol for the next day' },
 ];
 
 const INTAMBO_ENKULU_DEFAULT_ITEMS = [
@@ -339,7 +339,7 @@ const UMGIDI_COST_PROFILE = {
     { label: 'Book Ekoyini Mobile Bar for VIP/friends phase', category: 'services', unit: 'booking', unitCost: 2500.00, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'R2,500 - R5,000' },
   ],
   'CLOSURE': [
-    { label: 'Kunxitiswa - new clothes and remaining alcohol for the next day', category: 'supplies', unit: 'mixed', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Budget R2,000 - R4,000' },
+    { label: 'Ukunxityiswa - new clothes and remaining alcohol for the next day', category: 'supplies', unit: 'mixed', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Budget R2,000 - R4,000' },
   ],
 };
 

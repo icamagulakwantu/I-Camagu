@@ -395,36 +395,44 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         </div>
 
         {/* Action Buttons (File 1 style) */}
-        <div className="mx-4 mt-4 flex flex-wrap gap-2">
+        <div className="mx-4 mt-4">
+          <div className={`grid ${activePlan.ceremonyId ? 'grid-cols-4' : 'grid-cols-3'} gap-2`}>
           <button
             onClick={saveAsTemplate}
-            className={`flex-1 border-2 border-sage-500 text-sage-600 font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+            className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
           >
-            📑 Save as Template
+            <span className="text-xl">📑</span>
+            <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Save as Template</span>
           </button>
           <button
             onClick={() => onViewBudget?.(activePlan.id, activePlan.title)}
-            className={`flex-1 border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+            className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
           >
-            💰 Budget
+            <span className="text-xl">💰</span>
+            <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Budget</span>
           </button>
           <button
             onClick={() => onViewTimeline?.(activePlan.ceremonyType)}
-            className={`flex-1 border-2 border-sage-500 text-sage-600 font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+            className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
           >
-            🕐 Timeline
+            <span className="text-xl">🕐</span>
+            <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Timeline</span>
           </button>
           {activePlan.ceremonyId && (
             <button
               onClick={() => onBookEkoyini?.(activePlan.ceremonyId, activePlan.title)}
-              className={`flex-1 border-2 border-ink text-ink font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+              className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
             >
-              🍸 Ekoyini Bar
+              <span className="text-xl">🍸</span>
+              <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Ekoyini Bar</span>
             </button>
           )}
+          </div>
+
+          <div className="flex gap-2 mt-2">
           <button
             onClick={shareChecklist}
-            className={`flex-1 bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+            className={`flex-1 border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm ${pressable}`}
           >
             📤 Share
           </button>
@@ -434,11 +442,13 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           >
             💬 WhatsApp
           </button>
+          </div>
+
           <button
             onClick={() => setConfirmDelete(activePlan.id)}
-            className={`border-2 border-ink text-ink font-bold px-4 py-2.5 rounded-pill text-sm ${pressable}`}
+            className={`w-full text-center text-terracotta text-xs font-bold mt-3 py-1 ${pressable}`}
           >
-            🗑️ Delete
+            🗑️ Delete this plan
           </button>
         </div>
 
