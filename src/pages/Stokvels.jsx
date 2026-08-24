@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton, StokvelCardSkeleton, StokvelDetailSkeleton } from '../components/ui/Skeleton.jsx'
+import Icon from '../components/Icon.jsx'
 
 const STOKVEL_TYPES = [
   'ALCOHOL_BULK_POOL',
@@ -818,11 +819,14 @@ function Stokvels({ onBack, onOpenShrineFund }) {
           onClick={onOpenShrineFund}
           className={`w-full bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 text-left flex items-center justify-between ${pressable}`}
         >
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-white/80">Ubuhlanti bakwa Xhosa</p>
-            <p className="font-display font-bold text-base">Shrine Fund — see it growing</p>
+          <div className="flex items-center gap-3">
+            <Icon name="flame" size={22} color="#ffffff" strokeWidth={1.5} />
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/80">Ubuhlanti bakwa Xhosa</p>
+              <p className="font-display font-bold text-base">Shrine Fund — see it growing</p>
+            </div>
           </div>
-          <span className="text-xl">→</span>
+          <Icon name="arrowRight" size={18} color="#ffffff" />
         </button>
       )}
 

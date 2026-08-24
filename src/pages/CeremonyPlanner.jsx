@@ -5,6 +5,7 @@ import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { shareToWhatsApp } from '../lib/whatsapp.js'
 import { cn } from '../lib/utils'
+import Icon from '../components/Icon.jsx'
 
 // --------------------------------------------------------------
 // Display‑ready ceremony types (from File 1)
@@ -401,21 +402,21 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             onClick={saveAsTemplate}
             className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
           >
-            <span className="text-xl">📑</span>
+            <Icon name="template" color="#c45c26" />
             <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Save as Template</span>
           </button>
           <button
             onClick={() => onViewBudget?.(activePlan.id, activePlan.title)}
             className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
           >
-            <span className="text-xl">💰</span>
+            <Icon name="coins" color="#c1922f" />
             <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Budget</span>
           </button>
           <button
             onClick={() => onViewTimeline?.(activePlan.ceremonyType)}
             className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
           >
-            <span className="text-xl">🕐</span>
+            <Icon name="clock" color="#4a7a4a" />
             <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Timeline</span>
           </button>
           {activePlan.ceremonyId && (
@@ -423,7 +424,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
               onClick={() => onBookEkoyini?.(activePlan.ceremonyId, activePlan.title)}
               className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
             >
-              <span className="text-xl">🍸</span>
+              <Icon name="cocktail" color="#2b2620" />
               <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Ekoyini Bar</span>
             </button>
           )}
@@ -432,15 +433,15 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           <div className="flex gap-2 mt-2">
           <button
             onClick={shareChecklist}
-            className={`flex-1 border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+            className={`flex-1 border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm flex items-center justify-center gap-1.5 ${pressable}`}
           >
-            📤 Share
+            <Icon name="share" size={14} /> Share
           </button>
           <button
             onClick={() => shareToWhatsApp(`${activePlan.title} checklist — planning this on iCamagu 🌾`)}
             className={`flex-1 bg-[#25D366] text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
           >
-            💬 WhatsApp
+            WhatsApp
           </button>
           </div>
 
@@ -448,7 +449,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             onClick={() => setConfirmDelete(activePlan.id)}
             className={`w-full text-center text-terracotta text-xs font-bold mt-3 py-1 ${pressable}`}
           >
-            🗑️ Delete this plan
+            Delete this plan
           </button>
         </div>
 

@@ -48,6 +48,7 @@ import BottomNav from './components/BottomNav.jsx'
 import DidYouKnow from './components/DidYouKnow.jsx'
 import PatternStrip from './components/PatternStrip.jsx'
 import ActionCard from './components/ActionCard.jsx'
+import Icon from './components/Icon.jsx'
 import NotificationBell from './components/NotificationBell.jsx'  // ✅ NEW
 import PinReminder from './components/PinReminder.jsx'
 
@@ -148,22 +149,22 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
 
       {/* Primary Grid Action Cards (same order as first file) */}
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <ActionCard icon="📿" onClick={() => onNavigate('ceremonyhub')}>
+        <ActionCard icon={<Icon name="calendar" color="#c45c26" />} onClick={() => onNavigate('ceremonyhub')}>
           <span className="font-extrabold text-sm text-brand-black block">Ceremonies</span>
           <span className="text-[10px] text-brand-black/50 font-medium block">Plan & Execute</span>
         </ActionCard>
 
-        <ActionCard icon="🛒" badge={basketCount} onClick={() => onNavigate('store')}>
+        <ActionCard icon={<Icon name="cart" color="#c1922f" />} badge={basketCount} onClick={() => onNavigate('store')}>
           <span className="font-extrabold text-sm text-brand-black block">Store</span>
           <span className="text-[10px] text-brand-black/50 font-medium block">Wholesale Bulk</span>
         </ActionCard>
 
-        <ActionCard icon="🏘️" onClick={() => onNavigate('stokvels')}>
+        <ActionCard icon={<Icon name="users" color="#4a7a4a" />} onClick={() => onNavigate('stokvels')}>
           <span className="font-extrabold text-sm text-brand-black block">Stokvels</span>
           <span className="text-[10px] text-brand-black/50 font-medium block">Group Savings</span>
         </ActionCard>
 
-        <ActionCard icon="🎁" onClick={() => onNavigate('ukugida')}>
+        <ActionCard icon={<Icon name="check" color="#2b2620" />} onClick={() => onNavigate('ukugida')}>
           <span className="font-extrabold text-sm text-brand-black block">Ukugida</span>
           <span className="text-[10px] text-brand-black/50 font-medium block">Reciprocity Ledger</span>
         </ActionCard>

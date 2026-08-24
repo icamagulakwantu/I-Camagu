@@ -1,10 +1,12 @@
+import Icon from './Icon.jsx'
+
 function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals = 0 }) {
   const tabs = [
-    { id: 'home', label: 'Home', icon: '🏠' },
-    { id: 'ceremonyhub', label: 'Ceremonies', icon: '📿' },
-    { id: 'store', label: 'Store', icon: '🛒', isCenter: true },
-    { id: 'stokvels', label: 'Stokvels', icon: '🏘️', badge: pendingApprovals },
-    { id: 'more', label: 'More', icon: '☰' },
+    { id: 'home', label: 'Home', icon: 'home' },
+    { id: 'ceremonyhub', label: 'Ceremonies', icon: 'calendar' },
+    { id: 'store', label: 'Store', icon: 'cart', isCenter: true },
+    { id: 'stokvels', label: 'Stokvels', icon: 'users', badge: pendingApprovals },
+    { id: 'more', label: 'More', icon: 'menu' },
   ]
 
   return (
@@ -14,7 +16,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
           {tabs.filter(t => !t.isCenter).slice(0, 2).map((tab) => (
             <button key={tab.id} onClick={() => onNavigate(tab.id)}
               className={`flex-1 flex flex-col items-center py-2 transition-colors relative ${activeScreen === tab.id ? 'text-brand-blue' : 'text-brand-black/40'}`}>
-              <span className="text-xl mb-0.5">{tab.icon}</span>
+              <Icon name={tab.icon} size={20} className="mb-0.5" />
               <span className="text-[10px] font-bold uppercase tracking-wide">{tab.label}</span>
             </button>
           ))}
@@ -22,7 +24,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
           {tabs.filter(t => !t.isCenter).slice(2).map((tab) => (
             <button key={tab.id} onClick={() => onNavigate(tab.id)}
               className={`flex-1 flex flex-col items-center py-2 transition-colors relative ${activeScreen === tab.id ? 'text-brand-blue' : 'text-brand-black/40'}`}>
-              <span className="text-xl mb-0.5">{tab.icon}</span>
+              <Icon name={tab.icon} size={20} className="mb-0.5" />
               {tab.badge > 0 && (
                 <span className="absolute top-0 right-4 bg-terracotta text-white text-[9px] font-black w-4 h-4 rounded-pill flex items-center justify-center">{tab.badge}</span>
               )}
@@ -33,7 +35,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
 
         <button onClick={() => onNavigate('store')} aria-label="Store"
           className="absolute left-1/2 -translate-x-1/2 -top-6 w-16 h-16 rounded-pill bg-brand-ochre shadow-[0_4px_14px_rgba(193,98,47,0.4)] flex items-center justify-center border-4 border-brand-cream">
-          <span className="text-2xl">🛒</span>
+          <Icon name="cart" size={26} color="#fff" strokeWidth={1.6} />
           {basketCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-brand-blue text-white text-[10px] font-black w-5 h-5 rounded-pill flex items-center justify-center">{basketCount}</span>
           )}

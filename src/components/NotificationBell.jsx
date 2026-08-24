@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import Icon from './Icon.jsx'
 
 function NotificationBell({ onOpen }) {
       const { accessToken } = useAuth()
@@ -19,7 +20,7 @@ function NotificationBell({ onOpen }) {
 
             return (
                     <button onClick={onOpen} className="relative w-10 h-10 rounded-full bg-white shadow-soft flex items-center justify-center">
-                          🔔
+                          <Icon name="bell" size={18} color="#2b2620" />
                                 {count > 0 && (
                                             <span className="absolute -top-1 -right-1 bg-terracotta text-white text-[10px] font-black w-5 h-5 rounded-pill flex items-center justify-center">
                                                       {count > 9 ? '9+' : count}

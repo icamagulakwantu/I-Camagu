@@ -7,7 +7,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Complete shade scales
+        // Canonical scales — the single source of truth for iCamagu's palette.
+        // `brand.*` and `success` below are kept only as aliases onto these same
+        // values, so every existing bg-brand-*/text-brand-* class site keeps
+        // working without a rewrite, instead of carrying its own near-duplicate hex.
         sage: {
           50: '#f4f7f4',
           100: '#e3ebe3',
@@ -28,21 +31,29 @@ export default {
           DEFAULT: '#c45c26',
           dark: '#a3471a',
         },
+        ochre: {
+          light: '#e0a94e',
+          DEFAULT: '#c1922f',
+          dark: '#96721f',
+        },
         ink: {
-          DEFAULT: '#2d2a26',
+          DEFAULT: '#2b2620',
           light: '#5c564e',
           muted: '#8a8278',
         },
-        // Semantic & Brand additions from second config
+        // Aliases — each points at one of the canonical values above.
+        // brand.blue was never actually blue; it was a stray sage. brand.gold
+        // and the old brand.ochre were both near-duplicates of terracotta —
+        // both now alias the same, more golden ochre scale above.
         brand: {
-          blue: '#5F7A5A',
-          cream: '#F5F1E8',
-          black: '#2B2620',
-          ochre: '#C1622F',
-          gold: '#D9A441',
-          sageLight: '#A8C0A0',
+          blue: '#4a7a4a',
+          cream: '#f5f3ee',
+          black: '#2b2620',
+          ochre: '#c1922f',
+          gold: '#c1922f',
+          sageLight: '#9bb89b',
         },
-        success: '#4E7A4A',
+        success: '#3d623d',
       },
       fontFamily: {
         display: ['Playfair Display', 'Georgia', 'serif'],
