@@ -18,7 +18,7 @@ const cardActive = "active:scale-[0.98] active:shadow-none"
 const pressable = "transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none"
 const inputStyle = "w-full border border-ink/30 rounded-soft px-3 py-2 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
 
-function Stokvels({ onBack }) {
+function Stokvels({ onBack, onOpenShrineFund }) {
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
 
@@ -811,6 +811,21 @@ function Stokvels({ onBack }) {
         ← Back
       </button>
       <h2 className="font-display font-bold text-2xl text-ink mb-4">Stokvels</h2>
+
+      {onOpenShrineFund && (
+        <button
+          type="button"
+          onClick={onOpenShrineFund}
+          className={`w-full bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 text-left flex items-center justify-between ${pressable}`}
+        >
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-white/80">Ubuhlanti bakwa Xhosa</p>
+            <p className="font-display font-bold text-base">Shrine Fund — see it growing</p>
+          </div>
+          <span className="text-xl">→</span>
+        </button>
+      )}
+
       <div className="flex gap-2 mb-4">
         <button
           type="button"

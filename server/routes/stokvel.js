@@ -18,9 +18,10 @@ import {
   recordInterest,
 } from '../controllers/contributionController.js';
 import { postAnnouncement, getAnnouncements } from '../controllers/announcementController.js';
-import { 
-  requestPayout, 
-  approvePayout 
+import {
+  requestPayout,
+  approvePayout,
+  getShrineFundTotal
 } from '../controllers/payoutController.js';
 
 const router = express.Router();
@@ -30,6 +31,7 @@ router.post('/join', requireAuth, joinStokvel);
 router.post('/interest/record', requireAuth, recordInterest);
 router.get('/pending-approvals/count', requireAuth, getPendingApprovalCount);
 router.get('/my', requireAuth, getMyStokvels);
+router.get('/shrine-fund/total', requireAuth, getShrineFundTotal);
 router.get('/:stokvelId', requireAuth, getStokvel);
 router.patch('/:stokvelId', requireAuth, updateStokvel);
 router.get('/id/:stokvelId', requireAuth, getStokvelsById);

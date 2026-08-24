@@ -5,6 +5,25 @@ import prisma from '../config/db.js';
 // of the full 13% qualifying spread is still pending (Section 8 open item).
 const SHRINE_TITHE_RATE = 0.03;
 
+export async function getShrineFundTotal(req, res) {
+  try {
+    const [aggregate, earliest] = await Promise.all([
+      prisma.shrineTithe.aggregate({ _sum: { amount: true }, _count: true }),
+      prisma.shrineTithe.findFirst({ orderBy: { createdAt: 'asc' }, select: { createdAt: true } }),
+    ]);
+    res.json({
+      totalAmount: aggregate._sum.amount || 0,
+      contributionCount: aggregate._count,
+      sinceDate: earliest?.createdAt || null,
+      rate: SHRINE_TITHE_RATE,
+      note: 'Ubuhlanti bakwa Xhosa Shrine Fund — rate pending final confirmation',
+    });
+  } catch (error) {
+    console.error('Get shrine fund total error:', error.message);
+    res.status(500).json({ error: 'Could not fetch Shrine Fund total' });
+  }
+}
+
 export async function requestPayout(req, res) {
       const userId = req.userId;
         const { stokvelId, amount, recipientId } = req.body;

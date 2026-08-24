@@ -23,6 +23,7 @@ const SECTIONS = [
       { id: 'myorders', emoji: '📦', label: 'My Orders' },
       { id: 'expenditure', emoji: '💰', label: 'My Spending' },
       { id: 'supplier', emoji: '🏪', label: 'Supplier Dashboard' },
+      { id: 'shrinefund', emoji: '🔥', label: 'Shrine Fund' },
     ],
   },
   {

@@ -26,6 +26,7 @@ import EkoyiniAdmin from './pages/EkoyiniAdmin.jsx'
 import Hierarchy from './pages/Hierarchy.jsx'
 import MyOrders from './pages/MyOrders.jsx'
 import Expenditure from './pages/Expenditure.jsx'
+import ShrineFund from './pages/ShrineFund.jsx'
 import LegendsExplore from './pages/LegendsExplore.jsx'
 import Directory from './pages/Directory.jsx'
 import UmqombothiCalculator from './pages/UmqombothiCalculator.jsx'
@@ -72,6 +73,7 @@ const MORE_SCREENS = [
   'hierarchy',
   'myorders',
   'expenditure',
+  'shrinefund',
   'legends',
   'directory',
   'umqombothi',
@@ -405,6 +407,8 @@ function MainApp() {
         return <MyOrders onBack={goMore} />
       case 'expenditure':
         return <Expenditure onBack={goMore} />
+      case 'shrinefund':
+        return <ShrineFund onBack={goMore} />
       case 'legends':
         return <LegendsExplore onBack={goMore} />
       case 'directory':
@@ -414,7 +418,7 @@ function MainApp() {
       case 'pin':
         return <PinSetup onBack={goMore} />
       case 'stokvels':
-        return <Stokvels onBack={goHome} />
+        return <Stokvels onBack={goHome} onOpenShrineFund={() => setScreen('shrinefund')} />
       case 'notifications':                                 // ✅ NEW
         return <Notifications onBack={goHome} onNavigate={setScreen} />
       case 'activity':
