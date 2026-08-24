@@ -1,48 +1,49 @@
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { cn } from '../lib/utils'
+import Icon from '../components/Icon.jsx'
 
 const SECTIONS = [
   {
     title: 'Ceremony & Culture',
     items: [
-      { id: 'ceremony', emoji: '📋', label: 'Ceremony Preparation' },
-      { id: 'templates', emoji: '📑', label: 'Ceremony Templates' },
-      { id: 'family', emoji: '👨‍👩‍👧', label: 'Family Contributions' },
-      { id: 'hierarchy', emoji: '👥', label: 'Umgidi Hierarchy' },
-      { id: 'legends', emoji: '🏛️', label: 'House of AmaXhosa' },
-      { id: 'ukusoka', emoji: '🎁', label: 'Ukusoka' },
-      { id: 'umqombothi', emoji: '🍺', label: 'Umqombothi Brewing' },
-      { id: 'iziduko', emoji: '🤝', label: 'Iziduko Network' },
+      { id: 'ceremony', icon: 'clipboard', label: 'Ceremony Preparation' },
+      { id: 'templates', icon: 'template', label: 'Ceremony Templates' },
+      { id: 'family', icon: 'heart', label: 'Family Contributions' },
+      { id: 'hierarchy', icon: 'users', label: 'Umgidi Hierarchy' },
+      { id: 'legends', icon: 'landmark', label: 'House of AmaXhosa' },
+      { id: 'ukusoka', icon: 'gift', label: 'Ukusoka' },
+      { id: 'umqombothi', icon: 'beer', label: 'Umqombothi Brewing' },
+      { id: 'iziduko', icon: 'link', label: 'Iziduko Network' },
     ],
   },
   {
     title: 'Money & Community',
     items: [
-      { id: 'ukugida', emoji: '📤', label: 'Ukugida' },
-      { id: 'myorders', emoji: '📦', label: 'My Orders' },
-      { id: 'expenditure', emoji: '💰', label: 'My Spending' },
-      { id: 'supplier', emoji: '🏪', label: 'Supplier Dashboard' },
-      { id: 'shrinefund', emoji: '🔥', label: 'Shrine Fund' },
+      { id: 'ukugida', icon: 'send', label: 'Ukugida' },
+      { id: 'myorders', icon: 'package', label: 'My Orders' },
+      { id: 'expenditure', icon: 'coins', label: 'My Spending' },
+      { id: 'supplier', icon: 'store', label: 'Supplier Dashboard' },
+      { id: 'shrinefund', icon: 'flame', label: 'Shrine Fund' },
     ],
   },
   {
     title: 'Services',
     items: [
-      { id: 'ekoyini', emoji: '🍸', label: 'Ekoyini Mobile Bar' },
-      { id: 'ekoyiniadmin', emoji: '⚙️', label: 'Ekoyini Admin' },
-      { id: 'portal', emoji: '🖼️', label: 'Digital Portal' },
-      { id: 'directory', emoji: '📖', label: 'Directory' },
+      { id: 'ekoyini', icon: 'cocktail', label: 'Ekoyini Mobile Bar' },
+      { id: 'ekoyiniadmin', icon: 'settings', label: 'Ekoyini Admin' },
+      { id: 'portal', icon: 'image', label: 'Digital Portal' },
+      { id: 'directory', icon: 'book', label: 'Directory' },
     ],
   },
   {
     title: 'Account',
     items: [
-      { id: 'profile', emoji: '👤', label: 'Profile' },
-      { id: 'activity', emoji: '📜', label: 'My Activity' },
-      { id: 'pin', emoji: '🔐', label: 'Security PIN' },
-      { id: 'account', emoji: '🔒', label: 'Account & Privacy' },
-      { id: 'help', emoji: '❓', label: 'Help & Support' },
+      { id: 'profile', icon: 'user', label: 'Profile' },
+      { id: 'activity', icon: 'activity', label: 'My Activity' },
+      { id: 'pin', icon: 'key', label: 'Security PIN' },
+      { id: 'account', icon: 'lock', label: 'Account & Privacy' },
+      { id: 'help', icon: 'help', label: 'Help & Support' },
     ],
   },
 ]
@@ -87,9 +88,11 @@ export default function More({ onNavigate }) {
                   pressable
                 )}
               >
-                <span className="text-xl flex-shrink-0">{item.emoji}</span>
+                <div className="w-9 h-9 rounded-soft bg-cream flex items-center justify-center flex-shrink-0">
+                  <Icon name={item.icon} size={18} color="#c45c26" />
+                </div>
                 <span className="font-bold text-sm text-ink flex-1">{item.label}</span>
-                <span className="text-ink-muted text-sm">→</span>
+                <Icon name="arrowRight" size={16} color="#8a8278" />
               </button>
             ))}
           </div>
@@ -101,12 +104,12 @@ export default function More({ onNavigate }) {
           type="button"
           onClick={handleLogout}
           className={cn(
-            'w-full bg-white border-2 border-ink text-ink font-bold py-3.5 rounded-pill',
+            'w-full bg-white border-2 border-ink text-ink font-bold py-3.5 rounded-pill flex items-center justify-center gap-2',
             'hover:bg-ink hover:text-white transition-colors duration-200',
             pressable
           )}
         >
-          🚪 Log Out
+          <Icon name="logout" size={18} /> Log Out
         </button>
       </div>
     </div>
