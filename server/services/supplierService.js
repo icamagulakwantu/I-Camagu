@@ -72,6 +72,114 @@ export async function confirmPoolPayment(userId, paymentId) {
   });
 }
 
+/**
+ * Supplier processes a member's refund request — money already moved
+ * outside the app (manual EFT), so this just records that it's been paid
+ * back, optionally minus a processing fee.
+ */
+export async function processRefund(userId, paymentId, feeZAR) {
+  const payment = await prisma.poolPayment.findUnique({
+    where: { id: paymentId },
+    include: { pool: { include: { partner: true } }, user: true },
+  });
+  if (!payment) {
+    const err = new Error('Payment not found');
+    err.status = 404;
+    throw err;
+  }
+  if (payment.pool.partner.userId !== userId) {
+    const err = new Error('Not your pool');
+    err.status = 403;
+    throw err;
+  }
+  if (!payment.refundRequestedAt) {
+    const err = new Error('No refund has been requested for this payment');
+    err.status = 409;
+    throw err;
+  }
+  if (payment.status === 'REFUNDED') {
+    const err = new Error('This payment has already been refunded');
+    err.status = 409;
+    throw err;
+  }
+
+  const updated = await prisma.poolPayment.update({
+    where: { id: paymentId },
+    data: { status: 'REFUNDED', refundFeeZAR: feeZAR ? parseFloat(feeZAR) : 0 },
+  });
+
+  const { createNotification } = await import('./notificationDbService.js');
+  await createNotification(
+    payment.userId,
+    'REFUND_PROCESSED',
+    `Your refund of R${parseFloat(payment.amountZAR).toFixed(2)} has been processed by ${payment.pool.partner.name}.`,
+    'myorders'
+  );
+
+  return updated;
+}
+
+/**
+ * Supplier marks a matched pool's order as fulfilled (collected/delivered).
+ * Requires every non-cancelled member basket's payment to be settled first
+ * (cleared or refunded) — an order shouldn't close out with money still owed.
+ */
+export async function markPoolFulfilled(userId, poolId) {
+  const pool = await prisma.bulkPool.findUnique({
+    where: { id: poolId },
+    include: { partner: true, payments: true, baskets: true, orderDocument: true },
+  });
+  if (!pool) {
+    const err = new Error('Pool not found');
+    err.status = 404;
+    throw err;
+  }
+  if (pool.partner.userId !== userId) {
+    const err = new Error('Not your pool');
+    err.status = 403;
+    throw err;
+  }
+  if (pool.status !== 'MATCHED') {
+    const err = new Error(`Only a matched pool can be marked fulfilled (this one is ${pool.status})`);
+    err.status = 409;
+    throw err;
+  }
+  const unsettled = pool.payments.some((p) => p.status !== 'CLEARED' && p.status !== 'REFUNDED');
+  if (unsettled) {
+    const err = new Error('All member payments must be cleared or refunded before marking the order fulfilled');
+    err.status = 409;
+    throw err;
+  }
+
+  // A refunded member isn't taking their portion of the order — exclude
+  // their basket from "fulfilled" the same as a cancelled one.
+  const refundedUserIds = new Set(pool.payments.filter((p) => p.status === 'REFUNDED').map((p) => p.userId));
+  const activeBaskets = pool.baskets.filter((b) => b.status !== 'CANCELLED' && !refundedUserIds.has(b.userId));
+
+  await prisma.$transaction([
+    prisma.bulkPool.update({ where: { id: pool.id }, data: { status: 'FULFILLED' } }),
+    ...(pool.orderDocument
+      ? [prisma.orderConfirmationDocument.update({ where: { id: pool.orderDocument.id }, data: { status: 'FULFILLED' } })]
+      : []),
+    prisma.basket.updateMany({
+      where: { id: { in: activeBaskets.map((b) => b.id) } },
+      data: { status: 'FULFILLED' },
+    }),
+  ]);
+
+  const { createNotification } = await import('./notificationDbService.js');
+  for (const basket of activeBaskets) {
+    await createNotification(
+      basket.userId,
+      'ORDER_FULFILLED',
+      `Your bulk order from ${pool.partner.name} has been marked as fulfilled.`,
+      'myorders'
+    );
+  }
+
+  return { fulfilled: true, memberCount: activeBaskets.length };
+}
+
 export async function getSupplierPools(userId) {
   const partner = await prisma.partner.findUnique({ where: { userId } });
   if (!partner) {
@@ -121,7 +229,9 @@ export async function getSupplierPools(userId) {
         amountZAR: p.amountZAR,
         status: p.status,
         providerReference: p.providerReference,
+        refundRequestedAt: p.refundRequestedAt,
       })),
+      canFulfill: pool.status === 'MATCHED' && pool.payments.every((p) => p.status === 'CLEARED' || p.status === 'REFUNDED'),
       orderDocument: pool.orderDocument
         ? {
             groupCode: pool.orderDocument.groupCode,

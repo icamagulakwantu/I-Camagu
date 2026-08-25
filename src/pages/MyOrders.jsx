@@ -50,6 +50,26 @@ function MyOrders({ onBack }) {
     }
   }
 
+  const [requestingRefundId, setRequestingRefundId] = useState(null)
+  const requestRefund = async (paymentId) => {
+    setRequestingRefundId(paymentId)
+    try {
+      const res = await fetch('/api/basket/pool-payments/refund-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ paymentId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not request refund')
+      showToast(data.message || 'Refund requested', 'success')
+      fetchAll()
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setRequestingRefundId(null)
+    }
+  }
+
   const submitReference = async (paymentId) => {
     const providerReference = (referenceDrafts[paymentId] || '').trim()
     if (!providerReference) return showToast('Enter your EFT reference first', 'error')
@@ -106,30 +126,47 @@ function MyOrders({ onBack }) {
                 {payment && (
                   <div className="mt-3 pt-3 border-t border-brand-black/10">
                     <p className="text-xs font-black uppercase text-brand-black/50 mb-1">Your share: {money(payment.amountZAR)}</p>
-                    {payment.status === 'CLEARED' ? (
-                      <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Payment confirmed by supplier</p>
+                    {payment.status === 'REFUNDED' ? (
+                      <p className="text-xs font-bold text-terracotta">Refunded{payment.refundFeeZAR > 0 ? ` (${money(payment.refundFeeZAR)} processing fee deducted)` : ''}</p>
                     ) : (
-                      <div>
-                        <p className="text-[11px] text-brand-black/50 mb-2">
-                          Pay {money(payment.amountZAR)} via EFT to {doc.groupCode ? `reference "${doc.groupCode}"` : 'the supplier'}, then enter your reference below so they can confirm receipt.
-                        </p>
-                        <div className="flex gap-2">
-                          <input
-                            type="text" placeholder={payment.providerReference || 'EFT reference'}
-                            value={referenceDrafts[payment.id] ?? payment.providerReference ?? ''}
-                            onChange={(e) => setReferenceDrafts((prev) => ({ ...prev, [payment.id]: e.target.value }))}
-                            className="flex-1 border border-brand-black/30 rounded-soft px-3 py-2 text-sm"
-                          />
+                      <>
+                        {payment.status === 'CLEARED' ? (
+                          <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Payment confirmed by supplier</p>
+                        ) : (
+                          <div>
+                            <p className="text-[11px] text-brand-black/50 mb-2">
+                              Pay {money(payment.amountZAR)} via EFT to {doc.groupCode ? `reference "${doc.groupCode}"` : 'the supplier'}, then enter your reference below so they can confirm receipt.
+                            </p>
+                            <div className="flex gap-2">
+                              <input
+                                type="text" placeholder={payment.providerReference || 'EFT reference'}
+                                value={referenceDrafts[payment.id] ?? payment.providerReference ?? ''}
+                                onChange={(e) => setReferenceDrafts((prev) => ({ ...prev, [payment.id]: e.target.value }))}
+                                className="flex-1 border border-brand-black/30 rounded-soft px-3 py-2 text-sm"
+                              />
+                              <button
+                                onClick={() => submitReference(payment.id)}
+                                disabled={submittingId === payment.id}
+                                className={`bg-sage-500 text-white font-bold px-4 rounded-pill text-sm ${pressable}`}
+                              >
+                                {submittingId === payment.id ? '...' : 'Save'}
+                              </button>
+                            </div>
+                            <p className="text-[10px] text-brand-black/40 mt-1">Awaiting supplier confirmation.</p>
+                          </div>
+                        )}
+                        {payment.refundRequestedAt ? (
+                          <p className="text-[11px] text-terracotta font-bold mt-2">Refund requested — awaiting supplier</p>
+                        ) : (
                           <button
-                            onClick={() => submitReference(payment.id)}
-                            disabled={submittingId === payment.id}
-                            className={`bg-sage-500 text-white font-bold px-4 rounded-pill text-sm ${pressable}`}
+                            onClick={() => requestRefund(payment.id)}
+                            disabled={requestingRefundId === payment.id}
+                            className="text-[11px] text-terracotta font-bold underline mt-2"
                           >
-                            {submittingId === payment.id ? '...' : 'Save'}
+                            {requestingRefundId === payment.id ? 'Requesting...' : 'Request a refund'}
                           </button>
-                        </div>
-                        <p className="text-[10px] text-brand-black/40 mt-1">Awaiting supplier confirmation.</p>
-                      </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}

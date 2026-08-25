@@ -22,6 +22,77 @@ export async function submitToPool(req, res) {
 }
 
 /**
+ * A member withdraws a basket that's parked in a pool but hasn't matched
+ * yet — no money has moved at this point, so this is a plain cancellation.
+ * Matched baskets can't be withdrawn this way; use a refund request instead.
+ */
+export async function cancelParkedBasket(req, res) {
+  const { basketId } = req.body;
+  if (!basketId) return res.status(400).json({ error: 'basketId is required' });
+
+  try {
+    const basket = await prisma.basket.findUnique({ where: { id: basketId } });
+    if (!basket || basket.userId !== req.userId) {
+      return res.status(404).json({ error: 'Basket not found' });
+    }
+    if (basket.status !== 'PARKED') {
+      return res.status(409).json({ error: `Only a parked basket can be withdrawn this way (this one is ${basket.status})` });
+    }
+
+    const updated = await prisma.basket.update({
+      where: { id: basketId },
+      data: { status: 'CANCELLED' },
+    });
+
+    res.json({ basket: updated, message: 'Basket withdrawn from the pool.' });
+  } catch (error) {
+    console.error('Cancel parked basket error:', error.message);
+    res.status(500).json({ error: 'Could not withdraw basket' });
+  }
+}
+
+/**
+ * A member asks for their pool payment back — e.g. the order fell through
+ * after they already paid, or they want out before the supplier confirms
+ * receipt. The supplier reviews and processes it from their dashboard,
+ * mirroring the existing manual-EFT confirmation flow.
+ */
+export async function requestPoolPaymentRefund(req, res) {
+  const { paymentId } = req.body;
+  if (!paymentId) return res.status(400).json({ error: 'paymentId is required' });
+
+  try {
+    const payment = await prisma.poolPayment.findUnique({
+      where: { id: paymentId },
+      include: { pool: { include: { partner: true } } },
+    });
+    if (!payment || payment.userId !== req.userId) return res.status(404).json({ error: 'Payment not found' });
+    if (payment.status === 'REFUNDED') return res.status(409).json({ error: 'This payment has already been refunded' });
+    if (payment.refundRequestedAt) return res.status(409).json({ error: 'A refund has already been requested for this payment' });
+
+    const updated = await prisma.poolPayment.update({
+      where: { id: paymentId },
+      data: { refundRequestedAt: new Date() },
+    });
+
+    if (payment.pool.partner.userId) {
+      const { createNotification } = await import('../services/notificationDbService.js');
+      await createNotification(
+        payment.pool.partner.userId,
+        'REFUND_REQUESTED',
+        `A member requested a refund of R${parseFloat(payment.amountZAR).toFixed(2)} on a pool order.`,
+        'supplier'
+      );
+    }
+
+    res.json({ payment: updated, message: 'Refund requested — the supplier will process it from their dashboard.' });
+  } catch (error) {
+    console.error('Request pool payment refund error:', error.message);
+    res.status(500).json({ error: 'Could not request refund' });
+  }
+}
+
+/**
  * The requesting user's most recent parked/matched basket, with live Smart
  * Match progress — how many combined cases the pool has reached toward its
  * bulk-pricing minimum. Baskets in a pool aren't the "current" draft basket
@@ -37,12 +108,12 @@ export async function getMyPoolStatus(req, res) {
     });
     if (!basket || !basket.pool) return res.json(null);
 
-    const currentCases = basket.pool.baskets.reduce(
-      (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0),
-      0
-    );
+    const currentCases = basket.pool.baskets
+      .filter((b) => b.status !== 'CANCELLED')
+      .reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
 
     res.json({
+      basketId: basket.id,
       basketStatus: basket.status,
       partnerName: basket.pool.partner.name,
       area: basket.pool.area,

@@ -173,6 +173,45 @@ function SupplierDashboard({ onBack }) {
     }
   }
 
+  const [refundingId, setRefundingId] = useState(null)
+  const processRefund = async (paymentId) => {
+    setRefundingId(paymentId)
+    try {
+      const res = await fetch(`/api/supplier/pool-payments/${paymentId}/refund`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({}),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not process refund')
+      showToast('Refund marked as processed', 'success')
+      load()
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setRefundingId(null)
+    }
+  }
+
+  const [fulfillingId, setFulfillingId] = useState(null)
+  const fulfillPool = async (poolId) => {
+    setFulfillingId(poolId)
+    try {
+      const res = await fetch(`/api/supplier/pools/${poolId}/fulfill`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not mark order fulfilled')
+      showToast(data.message || 'Order marked fulfilled', 'success')
+      load()
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setFulfillingId(null)
+    }
+  }
+
   return (
     <div className="min-h-screen pb-24 bg-cream">
       <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
@@ -194,8 +233,10 @@ function SupplierDashboard({ onBack }) {
               {pools.map((pool) => (
                 <div key={pool.id} className="bg-white border-2 border-ink rounded-soft p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-pill ${pool.status === 'MATCHED' ? 'bg-sage-500 text-white' : 'bg-terracotta/20 text-terracotta'}`}>
-                      {pool.status === 'MATCHED' ? 'Matched' : 'Open'}
+                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-pill ${
+                      pool.status === 'FULFILLED' ? 'bg-ink text-white' : pool.status === 'MATCHED' ? 'bg-sage-500 text-white' : 'bg-terracotta/20 text-terracotta'
+                    }`}>
+                      {pool.status === 'FULFILLED' ? 'Fulfilled' : pool.status === 'MATCHED' ? 'Matched' : 'Open'}
                     </span>
                     <span className="text-[10px] text-ink-muted">{pool.participantCount} member{pool.participantCount === 1 ? '' : 's'}</span>
                   </div>
@@ -228,27 +269,55 @@ function SupplierDashboard({ onBack }) {
                       <p className="text-[10px] font-black uppercase text-ink-muted mb-2">Member Payments</p>
                       <div className="space-y-2">
                         {pool.payments.map((p) => (
-                          <div key={p.id} className="flex items-center justify-between bg-cream rounded-soft p-2.5">
-                            <div className="min-w-0">
-                              <p className="text-xs font-bold text-ink truncate">{p.memberName}</p>
-                              <p className="text-[10px] text-ink-muted">
-                                {money(p.amountZAR)}{p.providerReference ? ` · ref: ${p.providerReference}` : ' · no reference yet'}
-                              </p>
+                          <div key={p.id} className="bg-cream rounded-soft p-2.5">
+                            <div className="flex items-center justify-between">
+                              <div className="min-w-0">
+                                <p className="text-xs font-bold text-ink truncate">{p.memberName}</p>
+                                <p className="text-[10px] text-ink-muted">
+                                  {money(p.amountZAR)}{p.providerReference ? ` · ref: ${p.providerReference}` : ' · no reference yet'}
+                                </p>
+                              </div>
+                              {p.status === 'REFUNDED' ? (
+                                <span className="text-[10px] font-bold text-terracotta flex-shrink-0">Refunded</span>
+                              ) : p.status === 'PENDING' ? (
+                                <button
+                                  onClick={() => confirmPayment(p.id)}
+                                  disabled={confirmingId === p.id}
+                                  className={`text-[11px] font-bold text-white bg-sage-500 px-3 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
+                                >
+                                  {confirmingId === p.id ? '...' : 'Confirm received'}
+                                </button>
+                              ) : (
+                                <span className="text-[10px] font-bold text-sage-600 flex-shrink-0 flex items-center gap-1"><Icon name="check" size={11} color="#4a7a4a" /> Cleared</span>
+                              )}
                             </div>
-                            {p.status === 'PENDING' ? (
-                              <button
-                                onClick={() => confirmPayment(p.id)}
-                                disabled={confirmingId === p.id}
-                                className={`text-[11px] font-bold text-white bg-sage-500 px-3 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
-                              >
-                                {confirmingId === p.id ? '...' : 'Confirm received'}
-                              </button>
-                            ) : (
-                              <span className="text-[10px] font-bold text-sage-600 flex-shrink-0 flex items-center gap-1"><Icon name="check" size={11} color="#4a7a4a" /> Cleared</span>
+                            {p.refundRequestedAt && p.status !== 'REFUNDED' && (
+                              <div className="flex items-center justify-between mt-2 pt-2 border-t border-ink/10">
+                                <span className="text-[10px] font-bold text-terracotta">Refund requested</span>
+                                <button
+                                  onClick={() => processRefund(p.id)}
+                                  disabled={refundingId === p.id}
+                                  className={`text-[11px] font-bold text-white bg-terracotta px-3 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
+                                >
+                                  {refundingId === p.id ? '...' : 'Process refund'}
+                                </button>
+                              </div>
                             )}
                           </div>
                         ))}
                       </div>
+                    </div>
+                  )}
+
+                  {pool.status === 'MATCHED' && (
+                    <div className="mt-3 pt-3 border-t border-ink/10">
+                      <button
+                        onClick={() => fulfillPool(pool.id)}
+                        disabled={!pool.canFulfill || fulfillingId === pool.id}
+                        className={`w-full text-xs font-bold py-2 rounded-pill ${pool.canFulfill ? 'bg-ink text-white' : 'bg-cream-dark text-ink-muted'} ${pressable}`}
+                      >
+                        {fulfillingId === pool.id ? 'Marking fulfilled...' : pool.canFulfill ? 'Mark order fulfilled' : 'Awaiting all payments to clear'}
+                      </button>
                     </div>
                   )}
                 </div>

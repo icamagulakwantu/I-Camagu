@@ -44,7 +44,8 @@ export async function checkAndMatchPool(poolId) {
     include: { baskets: { include: { items: true } }, partner: true },
   });
 
-  const currentCases = pool.baskets.reduce(
+  const activeBaskets = pool.baskets.filter((b) => b.status !== 'CANCELLED');
+  const currentCases = activeBaskets.reduce(
     (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0),
     0
   );
@@ -55,7 +56,7 @@ export async function checkAndMatchPool(poolId) {
 
   // MOQ reached — generate the Order Confirmation Document
   const lineItemsBySku = {};
-  for (const basket of pool.baskets) {
+  for (const basket of activeBaskets) {
     for (const item of basket.items) {
       const key = item.skuId;
       if (!lineItemsBySku[key]) lineItemsBySku[key] = { quantity: 0, memberContributions: [] };
@@ -84,7 +85,7 @@ export async function checkAndMatchPool(poolId) {
     },
   });
 
-  for (const basket of pool.baskets) {
+  for (const basket of activeBaskets) {
     let memberAmountZAR = 0;
     for (const item of basket.items) {
       const sku = skuMap[item.skuId];

@@ -136,6 +136,27 @@ export default function Basket({ onBack, onBasketChanged }) {
     }
   }
 
+  const [cancellingPool, setCancellingPool] = useState(false)
+  const cancelParkedBasket = async () => {
+    if (!poolStatus?.basketId) return
+    setCancellingPool(true)
+    try {
+      const res = await fetch('/api/basket/pool/cancel-basket', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ basketId: poolStatus.basketId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not withdraw basket')
+      showToast(data.message || 'Withdrawn from pool', 'info')
+      setPoolStatus(null)
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setCancellingPool(false)
+    }
+  }
+
   const shareBasket = () => {
     if (!basketData.items || basketData.items.length === 0) return
     const text = basketData.items
@@ -204,9 +225,17 @@ export default function Basket({ onBack, onBasketChanged }) {
                   style={{ width: `${Math.min(100, Math.round((poolStatus.currentCases / poolStatus.moqTarget) * 100))}%` }}
                 />
               </div>
-              <p className="text-xs text-white/90">
+              <p className="text-xs text-white/90 mb-2">
                 {poolStatus.currentCases}/{poolStatus.moqTarget} cases pooled — {Math.max(0, poolStatus.moqTarget - poolStatus.currentCases)} more to unlock bulk pricing
               </p>
+              <button
+                type="button"
+                onClick={cancelParkedBasket}
+                disabled={cancellingPool}
+                className="text-xs font-bold text-white/90 underline disabled:opacity-50"
+              >
+                {cancellingPool ? 'Withdrawing...' : 'Withdraw from this pool'}
+              </button>
             </>
           )}
         </div>
