@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
+import Icon from '../components/Icon.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50'
 const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
@@ -87,12 +88,12 @@ function MyOrders({ onBack }) {
                   <p className="font-mono text-xs font-bold text-brand-blue">{doc.groupCode}</p>
                   <span className="text-xs font-black uppercase text-brand-ochre">{doc.status.replace(/_/g, ' ')}</span>
                 </div>
-                <p className="text-xs text-brand-black/50 mb-2">📍 {doc.deliveryLocation}</p>
+                <p className="text-xs text-brand-black/50 mb-2 flex items-center gap-1"><Icon name="mapPin" size={12} /> {doc.deliveryLocation}</p>
                 {doc.lineItems.map((li) => (
                   <div key={li.id} className="flex justify-between items-center py-1">
                     <p className="text-sm text-brand-black/70">{li.quantity} {li.unitType.toLowerCase()}(s) — {li.itemDescription}</p>
                     {li.confirmedAt ? (
-                      <span className="text-xs text-brand-blue font-bold">✅ Confirmed</span>
+                      <span className="text-xs text-brand-blue font-bold flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Confirmed</span>
                     ) : (
                       <button onClick={() => confirmLine(li.id)} className="text-xs bg-brand-blue text-brand-cream font-bold px-3 py-1 rounded-pill">
                         Confirm this is correct
@@ -106,7 +107,7 @@ function MyOrders({ onBack }) {
                   <div className="mt-3 pt-3 border-t border-brand-black/10">
                     <p className="text-xs font-black uppercase text-brand-black/50 mb-1">Your share: {money(payment.amountZAR)}</p>
                     {payment.status === 'CLEARED' ? (
-                      <p className="text-xs font-bold text-sage-600">✅ Payment confirmed by supplier</p>
+                      <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Payment confirmed by supplier</p>
                     ) : (
                       <div>
                         <p className="text-[11px] text-brand-black/50 mb-2">

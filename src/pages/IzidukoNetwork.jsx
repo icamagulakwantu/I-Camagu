@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
+import Icon from '../components/Icon.jsx'
 
 const TIER_COLOR = { 1: 'bg-terracotta text-white', 2: 'bg-terracotta/20 text-terracotta', 3: 'bg-sage-500 text-white', 4: 'bg-sage-100 text-sage-700', 5: 'bg-cream-dark text-ink-muted' }
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50'
@@ -10,7 +11,7 @@ const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96
 function Avatar({ src, size = 'w-12 h-12' }) {
   return (
     <div className={`${size} rounded-full bg-sage-50 flex items-center justify-center text-xl overflow-hidden flex-shrink-0`}>
-      {src ? <img src={src} alt="" className="w-full h-full object-cover" /> : '👤'}
+      {src ? <img src={src} alt="" className="w-full h-full object-cover" /> : <Icon name="user" size={18} color="#4a7a4a" />}
     </div>
   )
 }
@@ -165,7 +166,7 @@ function IzidukoNetwork({ onBack }) {
 
                       <div className="mt-3">
                         {m.connectionStatus === 'connected' && (
-                          <span className="text-xs font-bold text-sage-600">✓ Connected</span>
+                          <span className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Connected</span>
                         )}
                         {m.connectionStatus === 'pending_sent' && (
                           <span className="text-xs font-bold text-ink-muted">Request sent — awaiting reply</span>
@@ -178,9 +179,9 @@ function IzidukoNetwork({ onBack }) {
                         {m.connectionStatus === 'none' && composerFor !== m.id && (
                           <button
                             onClick={() => { setComposerFor(m.id); setComposerText('') }}
-                            className={`text-xs font-bold text-white bg-terracotta px-4 py-2 rounded-pill ${pressable}`}
+                            className={`text-xs font-bold text-white bg-terracotta px-4 py-2 rounded-pill flex items-center gap-1.5 ${pressable}`}
                           >
-                            🤝 Connect
+                            <Icon name="link" size={13} color="#fff" /> Connect
                           </button>
                         )}
                         {m.connectionStatus === 'none' && composerFor === m.id && (
@@ -291,7 +292,7 @@ function IzidukoNetwork({ onBack }) {
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-sm text-ink">{c.firstName} {c.lastName}</p>
                         <p className="text-xs text-ink-muted">{c.paternalIziduko} · {c.maternalIziduko}</p>
-                        {c.phoneNumber && <p className="text-xs text-sage-600 font-bold mt-1">📞 {c.phoneNumber}</p>}
+                        {c.phoneNumber && <p className="text-xs text-sage-600 font-bold mt-1 flex items-center gap-1"><Icon name="phone" size={11} color="#4a7a4a" /> {c.phoneNumber}</p>}
                       </div>
                     </div>
                   ))}

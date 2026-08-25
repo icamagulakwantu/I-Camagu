@@ -533,7 +533,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
             }}
             className={`text-xs text-white/80 mt-1.5 flex items-center gap-1 ${pressable}`}
           >
-            📋 Copy Stokvel ID to invite members
+<Icon name="copy" size={13} color="#fff" /> Copy Stokvel ID to invite members
           </button>
           <p className="font-display font-bold text-3xl mt-2">R{balance.toFixed(2)}</p>
           {isOfficial && <p className="text-xs text-white/90 font-bold mt-2 bg-white/20 inline-block px-2.5 py-1 rounded-pill">You are an official</p>}
@@ -764,9 +764,9 @@ function Stokvels({ onBack, onOpenShrineFund }) {
               <button
                 type="button"
                 onClick={() => setConfirmDelete(true)}
-                className={`w-full border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+                className={`w-full border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm flex items-center justify-center gap-1.5 ${pressable}`}
               >
-                🗑️ Delete this stokvel
+                <Icon name="trash" size={14} /> Delete this stokvel
               </button>
 
               {confirmDelete && (

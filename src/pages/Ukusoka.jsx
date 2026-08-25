@@ -66,7 +66,7 @@ function Ukusoka({ onBack }) {
 
         <button onClick={() => setShowForm(!showForm)} disabled={!initiateName}
           className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill mb-4 disabled:opacity-40">
-          {showForm ? '✕ Cancel' : '+ Record a Gift'}
+          {showForm ? 'Cancel' : '+ Record a Gift'}
         </button>
 
         {showForm && (

@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
+import Icon from '../components/Icon.jsx'
 
-const TYPE_ICON = { CONTRIBUTION: '💰', PAYOUT: '💸', CEREMONY: '📋', ORDER: '📦' }
+const TYPE_ICON = { CONTRIBUTION: 'coins', PAYOUT: 'send', CEREMONY: 'clipboard', ORDER: 'package' }
 const STATUS_COLOR = { PENDING: 'text-ink-muted', CONFIRMED: 'text-sage-600', PENDING_APPROVAL: 'text-terracotta', CLEARED: 'text-sage-600' }
 
 function Activity({ onBack }) {
@@ -36,7 +37,7 @@ function Activity({ onBack }) {
                                                           <div className="space-y-2">
                                                                     {feed.map((item, idx) => (
                                                                                     <div key={idx} className="bg-white border border-ink/15 rounded-soft p-3 flex items-center gap-3">
-                                                                                                  <span className="text-xl">{TYPE_ICON[item.type]}</span>
+                                                                                                  <Icon name={TYPE_ICON[item.type] || 'clipboard'} size={18} color="#c45c26" />
                                                                                                                 <div className="flex-1">
                                                                                                                                 <p className="text-sm text-ink">{item.text}</p>
                                                                                                                                                 <p className="text-xs text-ink-muted">{new Date(item.date).toLocaleDateString()}</p>

@@ -120,7 +120,7 @@ export default function FamilyContributions({ onBack }) {
             onClick={() => setShowForm(!showForm)}
             className={`w-full bg-sage-500 text-white font-bold py-3 rounded-pill shadow-glow mb-4 ${pressable}`}
           >
-            {showForm ? '✕ Cancel' : '+ Add Pledge'}
+            {showForm ? 'Cancel' : '+ Add Pledge'}
           </button>
 
           {showForm && (

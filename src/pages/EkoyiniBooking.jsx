@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
+import Icon from '../components/Icon.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50'
 const BOOKING_STATUS_COLOR = { REQUESTED: 'bg-cream-dark text-ink-muted', CONFIRMED: 'bg-sage-500 text-white', COMPLETED: 'bg-sage-100 text-sage-700', CANCELLED: 'bg-terracotta/20 text-terracotta' }
@@ -197,9 +198,9 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
                 <p className="text-xs text-ink-muted mb-3">Book Ekoyini Mobile Bar for this ceremony — we handle the bar, you enjoy the moment.</p>
                 <button
                   onClick={requestBooking} disabled={requesting}
-                  className={`w-full bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+                  className={`w-full bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm flex items-center justify-center gap-1.5 ${pressable}`}
                 >
-                  {requesting ? 'Requesting...' : '🍸 Request Bar Service'}
+                  {requesting ? 'Requesting...' : <><Icon name="cocktail" size={14} color="#fff" /> Request Bar Service</>}
                 </button>
               </div>
             ) : (

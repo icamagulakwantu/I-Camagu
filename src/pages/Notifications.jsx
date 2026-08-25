@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
+import Icon from '../components/Icon.jsx'
 
-const TYPE_ICON = { PAYOUT_APPROVAL_NEEDED: '💸', POOL_CHANGED: '🛒', CONTRIBUTION_CONFIRMED: '✅', QUOTE_STATUS: '🍸', ORDER_MATCHED: '📦' }
+const TYPE_ICON = { PAYOUT_APPROVAL_NEEDED: 'send', POOL_CHANGED: 'cart', CONTRIBUTION_CONFIRMED: 'check', QUOTE_STATUS: 'cocktail', ORDER_MATCHED: 'package' }
 
 function Notifications({ onBack, onNavigate }) {
       const { accessToken } = useAuth()
@@ -46,7 +47,7 @@ function Notifications({ onBack, onNavigate }) {
                                                                                         {notifications.map((n) => (
                                                                                                         <button key={n.id} onClick={() => handleTap(n)}
                                                                                                                       className={`w-full text-left border-2 rounded-soft p-3 flex items-start gap-3 ${n.isRead ? 'bg-white border-ink/10' : 'bg-sage-50 border-sage-300'}`}>
-                                                                                                                                    <span className="text-xl">{TYPE_ICON[n.type] || '🔔'}</span>
+                                                                                                                                    <Icon name={TYPE_ICON[n.type] || 'bell'} size={18} color="#c45c26" />
                                                                                                                                                   <div className="flex-1">
                                                                                                                                                                   <p className="text-sm text-ink">{n.message}</p>
                                                                                                                                                                                   <p className="text-xs text-ink-muted mt-0.5">{new Date(n.createdAt).toLocaleDateString()}</p>

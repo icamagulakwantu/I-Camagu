@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Icon from '../components/Icon.jsx'
 
 function PublicPlanView({ token }) {
       const [plan, setPlan] = useState(null)
@@ -52,7 +53,7 @@ function PublicPlanView({ token }) {
                                                                                                                                                                         {plan.checklistItems.filter(i => i.phase === phase).map((item) => (
                                                                                                                                                                                             <div key={item.id} className="flex items-center gap-3 bg-white border border-ink/15 rounded-soft p-3">
                                                                                                                                                                                                               <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 ${item.isChecked ? 'bg-sage-500 border-sage-500' : 'border-cream-dark'}`}>
-                                                                                                                                                                                                                                  {item.isChecked && <span className="text-white text-xs">✓</span>}
+                                                                                                                                                                                                                                  {item.isChecked && <Icon name="check" size={12} color="#fff" strokeWidth={2.5} />}
                                                                                                                                                                                                                                                     </div>
                                                                                                                                                                                                                                                                       <span className={`text-sm ${item.isChecked ? 'line-through text-ink-muted' : 'text-ink'}`}>{item.label}</span>
                                                                                                                                                                                                                                                                                       </div>

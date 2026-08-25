@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
+import Icon from '../components/Icon.jsx'
 
 function Store({ onGoToBasket, basketCount }) {
   const { accessToken } = useAuth()
@@ -133,7 +134,7 @@ function Store({ onGoToBasket, basketCount }) {
                   disabled={addingId === sku.id}
                   className="bg-terracotta text-white text-xs font-bold px-4 py-2 rounded-pill active:scale-90 transition-transform disabled:opacity-50"
                 >
-                  {addingId === sku.id ? '✓' : 'Add case'}
+                  {addingId === sku.id ? <Icon name="check" size={13} color="#fff" strokeWidth={2.5} /> : 'Add case'}
                 </button>
               </div>
             ))}

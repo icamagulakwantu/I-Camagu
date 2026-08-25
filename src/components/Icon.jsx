@@ -33,6 +33,17 @@ const PATHS = {
   lock: <><rect x="5" y="11" width="14" height="9" rx="1.5" /><path d="M8 11V8a4 4 0 018 0v3" /></>,
   help: <><circle cx="12" cy="12" r="8.5" /><path d="M9.5 9.3a2.5 2.5 0 114 2c-.8.6-1.5 1.1-1.5 2.2" /><path d="M12 17.2v.1" /></>,
   logout: <><path d="M9 4H6a1 1 0 00-1 1v14a1 1 0 001 1h3" /><path d="M14 8l5 4-5 4M19 12H9" /></>,
+
+  close: <path d="M6 6l12 12M18 6L6 18" />,
+  mapPin: <><path d="M12 21s-7-6.1-7-11.5A7 7 0 0112 2.5a7 7 0 017 7C19 14.9 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.3" /></>,
+  phone: <path d="M6 3h3l1.5 5-2 1.5a11 11 0 005 5l1.5-2 5 1.5v3a1.5 1.5 0 01-1.6 1.5A16 16 0 014.5 4.6 1.5 1.5 0 016 3z" />,
+  copy: <><rect x="9" y="9" width="11" height="12" rx="1.5" /><path d="M6 15H5a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 015 3h9A1.5 1.5 0 0115.5 4.5V6" /></>,
+  arrowDown: <path d="M12 5v14M6 13l6 6 6-6" />,
+  arrowUp: <path d="M12 19V5M6 11l6-6 6 6" />,
+  camera: <><path d="M4 8h3l1.5-2h7L17 8h3v11H4z" /><circle cx="12" cy="13" r="3.3" /></>,
+  video: <><rect x="3" y="6" width="12" height="12" rx="1.5" /><path d="M15 10l6-3v10l-6-3z" /></>,
+  file: <><path d="M6 3.5h8l4 4v13H6z" /><path d="M14 3.5v4h4" /></>,
+  info: <><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5.5" /><path d="M12 8v.1" /></>,
 }
 
 function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.75, className = '' }) {

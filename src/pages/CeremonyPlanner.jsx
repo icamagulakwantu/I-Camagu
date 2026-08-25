@@ -494,7 +494,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
                         : 'border-cream-dark group-hover:border-sage-300'
                     )}
                   >
-                    {(item.isCompleted || item.isChecked) && <span className="text-white text-xs font-bold">✓</span>}
+                    {(item.isCompleted || item.isChecked) && <Icon name="check" size={13} color="#fff" strokeWidth={2.5} />}
                   </div>
                   <span
                     className={cn(
@@ -610,7 +610,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
                       className={`text-xs text-rose-500 bg-rose-50 hover:bg-rose-100 p-1.5 rounded-pill ${pressable}`}
                       title="Delete pledge"
                     >
-                      🗑️
+                      <Icon name="trash" size={14} color="#f43f5e" />
                     </button>
                   </div>
                 </div>

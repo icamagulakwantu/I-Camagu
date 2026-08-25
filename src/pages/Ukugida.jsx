@@ -5,6 +5,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { cn } from '../lib/utils'
+import Icon from '../components/Icon.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
@@ -117,7 +118,7 @@ export default function Ukugida({ onBack }) {
           onClick={() => setShowForm(!showForm)}
           className={`w-full bg-sage-500 text-white font-bold py-3 rounded-pill shadow-glow ${pressable}`}
         >
-          {showForm ? '✕ Cancel' : '+ Record Gift'}
+          {showForm ? 'Cancel' : '+ Record Gift'}
         </button>
       </div>
 
@@ -209,7 +210,7 @@ export default function Ukugida({ onBack }) {
           }}
           className="w-full bg-[#25D366] text-white font-bold py-2.5 rounded-pill text-sm mb-4"
         >
-          💬 Share on WhatsApp
+          Share on WhatsApp
         </button>
       </div>
 
@@ -242,10 +243,10 @@ export default function Ukugida({ onBack }) {
                 )}
               >
                 <div className={cn(
-                  'w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0',
+                  'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
                   entry.direction === 'RECEIVED' ? 'bg-sage-50' : 'bg-cream-dark'
                 )}>
-                  {entry.direction === 'RECEIVED' ? '📥' : '📤'}
+                  <Icon name={entry.direction === 'RECEIVED' ? 'arrowDown' : 'arrowUp'} size={18} color={entry.direction === 'RECEIVED' ? '#4a7a4a' : '#8a8278'} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">
@@ -265,10 +266,10 @@ export default function Ukugida({ onBack }) {
                 </div>
                 <button
                   onClick={() => deleteEntry(entry.id)}
-                  className="text-ink-muted text-xs flex-shrink-0"
+                  className="text-ink-muted flex-shrink-0"
                   aria-label="Delete entry"
                 >
-                  🗑️
+                  <Icon name="trash" size={15} />
                 </button>
               </div>
             ))}

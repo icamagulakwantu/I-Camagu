@@ -4,6 +4,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { captureLocation } from '../lib/geolocation.js'
+import Icon from '../components/Icon.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50'
 const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
@@ -242,7 +243,7 @@ function SupplierDashboard({ onBack }) {
                                 {confirmingId === p.id ? '...' : 'Confirm received'}
                               </button>
                             ) : (
-                              <span className="text-[10px] font-bold text-sage-600 flex-shrink-0">✓ Cleared</span>
+                              <span className="text-[10px] font-bold text-sage-600 flex-shrink-0 flex items-center gap-1"><Icon name="check" size={11} color="#4a7a4a" /> Cleared</span>
                             )}
                           </div>
                         ))}

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useCallback, useState, useEffect } from 'react';
 import { cn } from '../../lib/utils';
+import Icon from '../Icon.jsx';
 
 const ToastContext = createContext(null);
 
@@ -46,10 +47,16 @@ function ToastItem({ toast, onDismiss }) {
     return () => clearTimeout(timer);
   }, [toast.duration, handleDismiss, isPaused]);
 
-  const icons = {
-    success: '✅',
-    error: '❌',
-    info: 'ℹ️',
+  const iconNames = {
+    success: 'check',
+    error: 'close',
+    info: 'info',
+  };
+
+  const iconColors = {
+    success: '#4a7a4a',
+    error: '#c45c26',
+    info: '#c1922f',
   };
 
   const barColors = {
@@ -67,18 +74,18 @@ function ToastItem({ toast, onDismiss }) {
         exiting ? '-translate-y-4 opacity-0 scale-95' : 'translate-y-0 opacity-100 animate-slide-down'
       )}
     >
-      <div className="w-9 h-9 rounded-pill bg-sage-50 flex items-center justify-center text-lg flex-shrink-0">
-        {icons[toast.type] || icons.info}
+      <div className="w-9 h-9 rounded-pill bg-sage-50 flex items-center justify-center flex-shrink-0">
+        <Icon name={iconNames[toast.type] || iconNames.info} size={18} color={iconColors[toast.type] || iconColors.info} />
       </div>
 
       <p className="text-sm font-bold text-ink flex-1">{toast.message}</p>
 
       <button
         onClick={handleDismiss}
-        className="text-ink-muted hover:text-ink text-xs font-bold p-1 rounded-pill transition-colors"
+        className="text-ink-muted hover:text-ink p-1 rounded-pill transition-colors"
         aria-label="Close toast"
       >
-        ✕
+        <Icon name="close" size={14} />
       </button>
 
       {/* Pure CSS Progress Bar (Smooth 60FPS animation with hover-pause support) */}

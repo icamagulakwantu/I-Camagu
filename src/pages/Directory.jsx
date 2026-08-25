@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
+import Icon from '../components/Icon.jsx'
 
 const PRACTITIONER_ROLES = ['INGCIBI', 'IKHANKATHA', 'CULTURAL_ADVISOR']
 const VENDOR_CATEGORIES = ['ATTIRE', 'CATERING', 'EQUIPMENT_HIRE', 'COOKWARE', 'LIVESTOCK_FARM', 'LIQUOR_SUPPLIER', 'IKRWALA_CLOTHING', 'FORMALWEAR']
@@ -203,7 +204,7 @@ function Directory({ onBack }) {
           onClick={() => setShowForm(!showForm)} 
           className="w-full border-2 border-ink text-ink font-bold py-2.5 rounded-pill text-sm mb-4 bg-white hover:bg-cream-dark transition-colors"
         >
-          {showForm ? '✕ Cancel' : `+ List a ${tab === 'practitioners' ? 'Practitioner' : 'Vendor / Farm'}`}
+          {showForm ? 'Cancel' : `+ List a ${tab === 'practitioners' ? 'Practitioner' : 'Vendor / Farm'}`}
         </button>
 
         {/* Form: Practitioner */}
@@ -239,16 +240,18 @@ function Directory({ onBack }) {
               className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm focus:outline-none focus:border-sage-500" 
             />
             
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full border-2 border-dashed border-ink/30 rounded-soft py-3 text-xs font-bold text-ink-muted hover:border-sage-500 transition-colors"
+              className="w-full border-2 border-dashed border-ink/30 rounded-soft py-3 text-xs font-bold text-ink-muted hover:border-sage-500 transition-colors flex items-center justify-center gap-1.5"
             >
-              {uploadingDoc 
-                ? 'Uploading document...' 
-                : idDocUrl 
-                  ? '✅ ID/FICA document attached' 
-                  : '📄 Upload ID/FICA document (optional, speeds up verification)'}
+              {uploadingDoc ? (
+                'Uploading document...'
+              ) : idDocUrl ? (
+                <><Icon name="check" size={13} color="#4a7a4a" /> ID/FICA document attached</>
+              ) : (
+                <><Icon name="file" size={13} /> Upload ID/FICA document (optional, speeds up verification)</>
+              )}
             </button>
             <input 
               ref={fileInputRef} 
@@ -326,8 +329,8 @@ function Directory({ onBack }) {
                   <div className="flex justify-between items-start">
                     <p className="font-bold text-sm text-ink">{p.name}</p>
                     {p.isVerified ? (
-                      <span className="text-[10px] font-black text-white bg-sage-500 px-2 py-0.5 rounded-pill">
-                        ✅ Verified
+                      <span className="text-[10px] font-black text-white bg-sage-500 px-2 py-0.5 rounded-pill flex items-center gap-1">
+                        <Icon name="check" size={10} color="#fff" /> Verified
                       </span>
                     ) : (
                       <span className="text-[10px] font-black text-ink-muted bg-cream-dark px-2 py-0.5 rounded-pill">
@@ -343,7 +346,7 @@ function Directory({ onBack }) {
                       href={/^\d/.test(p.contactInfo) ? `https://wa.me/${p.contactInfo.replace(/\D/g, '')}` : `mailto:${p.contactInfo}`}
                       className="inline-block mt-2 text-xs bg-[#25D366] text-white font-bold px-3 py-1.5 rounded-pill"
                     >
-                      💬 Contact
+                      Contact
                     </a>
                   )}
                   {isAdmin && !p.isVerified && (

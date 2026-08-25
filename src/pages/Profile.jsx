@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { cn } from '../lib/utils'
 import { captureLocation } from '../lib/geolocation.js'
+import Icon from '../components/Icon.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96]'
 
@@ -125,7 +126,7 @@ export default function Profile() {
           >
             {user?.profileImage ? (
               <img src={user.profileImage} alt="Profile" className="w-full h-full object-cover" />
-            ) : '👤'}
+            ) : <Icon name="user" size={32} color="#fff" />}
             {uploading && (
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-xs font-bold">...</div>
             )}
@@ -203,11 +204,11 @@ export default function Profile() {
               <p className="font-bold text-ink">{user?.maternalGrandmotherIziduko || '—'}</p>
             </div>
             {user?.address && (
-              <p className="col-span-2 text-sm text-ink-muted">
-                📍 {user.address}{user?.latitude != null && <span className="text-sage-600 font-bold"> · located</span>}
+              <p className="col-span-2 text-sm text-ink-muted flex items-center gap-1">
+                <Icon name="mapPin" size={13} /> {user.address}{user?.latitude != null && <span className="text-sage-600 font-bold"> · located</span>}
               </p>
             )}
-            {user?.phoneNumber && <p className="col-span-2 text-sm text-ink-muted">📞 {user.phoneNumber}</p>}
+            {user?.phoneNumber && <p className="col-span-2 text-sm text-ink-muted flex items-center gap-1"><Icon name="phone" size={13} /> {user.phoneNumber}</p>}
           </div>
         )}
       </div>
@@ -217,12 +218,12 @@ export default function Profile() {
           type="button"
           onClick={handleLogout}
           className={cn(
-            'w-full bg-white border-2 border-ink text-ink font-bold py-3.5 rounded-pill',
+            'w-full bg-white border-2 border-ink text-ink font-bold py-3.5 rounded-pill flex items-center justify-center gap-2',
             'hover:bg-ink hover:text-white transition-colors duration-200',
             pressable
           )}
         >
-          🚪 Log Out
+          <Icon name="logout" size={16} /> Log Out
         </button>
       </div>
     </div>
