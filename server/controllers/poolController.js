@@ -21,6 +21,41 @@ export async function submitToPool(req, res) {
   }
 }
 
+/**
+ * The requesting user's most recent parked/matched basket, with live Smart
+ * Match progress — how many combined cases the pool has reached toward its
+ * bulk-pricing minimum. Baskets in a pool aren't the "current" draft basket
+ * anymore (getMyBasket only ever returns the active DRAFT), so this is the
+ * only place that surfaces ongoing pool status back to the member.
+ */
+export async function getMyPoolStatus(req, res) {
+  try {
+    const basket = await prisma.basket.findFirst({
+      where: { userId: req.userId, status: { in: ['PARKED', 'MATCHED'] } },
+      orderBy: { updatedAt: 'desc' },
+      include: { pool: { include: { partner: true, baskets: { include: { items: true } } } } },
+    });
+    if (!basket || !basket.pool) return res.json(null);
+
+    const currentCases = basket.pool.baskets.reduce(
+      (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0),
+      0
+    );
+
+    res.json({
+      basketStatus: basket.status,
+      partnerName: basket.pool.partner.name,
+      area: basket.pool.area,
+      currentCases,
+      moqTarget: basket.pool.moqTarget,
+      poolStatus: basket.pool.status,
+    });
+  } catch (error) {
+    console.error('Get my pool status error:', error.message);
+    res.status(500).json({ error: 'Could not fetch pool status' });
+  }
+}
+
 export async function getPartners(req, res) {
   try {
     const partners = await prisma.partner.findMany({ orderBy: { name: 'asc' } });

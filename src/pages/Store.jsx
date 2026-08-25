@@ -78,6 +78,14 @@ function Store({ onGoToBasket, basketCount }) {
         </div>
       </div>
 
+      {/* Smart Match Explainer */}
+      <div className="mx-4 mt-4 bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 shadow-soft">
+        <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">Smart Match — Bulk Buying</p>
+        <p className="text-sm font-bold leading-snug">
+          Add cases to your basket and iCamagu pools your order with other members — even from other stokvels — buying alcohol or livestock/meat from the same tavern or butchery. Once the group hits the minimum, everyone unlocks bulk pricing.
+        </p>
+      </div>
+
       {/* Category Pills */}
       <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-2">
         <button

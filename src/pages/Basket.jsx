@@ -31,6 +31,19 @@ export default function Basket({ onBack, onBasketChanged }) {
   const [partners, setPartners] = useState([])
   const [selectedPartner, setSelectedPartner] = useState('')
   const [copied, setCopied] = useState(false)
+  const [poolStatus, setPoolStatus] = useState(null)
+
+  const fetchPoolStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/basket/pool-status/my', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      const data = await res.json()
+      setPoolStatus(res.ok ? data : null)
+    } catch {
+      setPoolStatus(null)
+    }
+  }, [accessToken])
 
   const fetchBasket = useCallback(async () => {
     setLoading(true)
@@ -59,6 +72,7 @@ export default function Basket({ onBack, onBasketChanged }) {
 
   useEffect(() => {
     fetchBasket()
+    fetchPoolStatus()
     const geoQuery = user?.latitude != null && user?.longitude != null
       ? `?lat=${user.latitude}&lng=${user.longitude}`
       : ''
@@ -68,7 +82,7 @@ export default function Basket({ onBack, onBasketChanged }) {
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setPartners(Array.isArray(data) ? data : []))
       .catch(() => setPartners([]))
-  }, [accessToken, fetchBasket, user?.latitude, user?.longitude])
+  }, [accessToken, fetchBasket, fetchPoolStatus, user?.latitude, user?.longitude])
 
   const updateQuantity = async (itemId, newQuantity) => {
     if (newQuantity < 1) return removeItem(itemId)
@@ -116,6 +130,7 @@ export default function Basket({ onBack, onBasketChanged }) {
       if (!res.ok) throw new Error(data.error || 'Failed to submit basket.')
       showToast(data.message || 'Basket submitted successfully!', 'success')
       fetchBasket()
+      fetchPoolStatus()
     } catch (err) {
       showToast(err.message, 'error')
     }
@@ -172,6 +187,30 @@ export default function Basket({ onBack, onBasketChanged }) {
       </div>
 
       <h2 className="font-display font-bold text-2xl text-ink mb-4">My Basket 🧺</h2>
+
+      {poolStatus && (
+        <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
+          <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">Smart Match</p>
+          <p className="text-sm font-bold mb-2">
+            {poolStatus.poolStatus === 'MATCHED'
+              ? `Matched! Your order pooled with other members via ${poolStatus.partnerName}.`
+              : `Pooling with other members near ${poolStatus.area} via ${poolStatus.partnerName} — the more members join, the bigger the discount.`}
+          </p>
+          {poolStatus.poolStatus !== 'MATCHED' && (
+            <>
+              <div className="h-1.5 w-full bg-white/25 rounded-pill overflow-hidden mb-1.5">
+                <div
+                  className="h-full bg-white rounded-pill transition-all"
+                  style={{ width: `${Math.min(100, Math.round((poolStatus.currentCases / poolStatus.moqTarget) * 100))}%` }}
+                />
+              </div>
+              <p className="text-xs text-white/90">
+                {poolStatus.currentCases}/{poolStatus.moqTarget} cases pooled — {Math.max(0, poolStatus.moqTarget - poolStatus.currentCases)} more to unlock bulk pricing
+              </p>
+            </>
+          )}
+        </div>
+      )}
 
       {itemsList.length === 0 ? (
         <EmptyState 
@@ -246,7 +285,10 @@ export default function Basket({ onBack, onBasketChanged }) {
 
           {/* Partner Bulk Pool Section */}
           <div className="bg-white border border-cream-dark rounded-soft p-4 shadow-soft">
-            <p className="text-xs font-black uppercase text-ink-muted mb-2">Join a Bulk Order</p>
+            <p className="text-xs font-black uppercase text-ink-muted mb-1">Smart Match — Join a Bulk Order</p>
+            <p className="text-xs text-ink-muted mb-2">
+              iCamagu pools your basket with other members buying alcohol or livestock/meat from the same partner, so everyone unlocks bulk pricing sooner — even across different stokvels.
+            </p>
             <select
               value={selectedPartner}
               onChange={(e) => setSelectedPartner(e.target.value)}
