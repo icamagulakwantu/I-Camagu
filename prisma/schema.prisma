@@ -154,6 +154,7 @@ model User {
   receivedClanConnections ClanConnection[]      @relation("ClanConnectionRecipient")
   partner                 Partner?
   createdVendors          Vendor[]
+  directoryVotes          DirectoryVote[]
 }
 
 model ClanConnection {
@@ -185,28 +186,60 @@ model UkusokaEntry {
 }
 
 model Practitioner {
-  id          String    @id @default(cuid())
-  userId      String?
-  name        String
-  role        String
-  area        String
-  isVerified  Boolean   @default(false)
-  verifiedAt  DateTime?
-  idDocUrl    String?   @db.Text
-  contactInfo String?
-  createdAt   DateTime  @default(now())
+  id           String    @id @default(cuid())
+  userId       String?
+  name         String
+  role         String
+  area         String
+  isVerified   Boolean   @default(false)
+  verifiedAt   DateTime?
+  idDocUrl     String?   @db.Text
+  contactInfo  String?
+  confirmCount Int       @default(0)
+  disputeCount Int       @default(0)
+  createdAt    DateTime  @default(now())
 }
 
 model Vendor {
-  id          String   @id @default(cuid())
-  createdById String?
-  createdBy   User?    @relation(fields: [createdById], references: [id])
-  name        String
-  category    String
-  area        String
-  contactInfo String?
-  description String?
-  createdAt   DateTime @default(now())
+  id           String   @id @default(cuid())
+  createdById  String?
+  createdBy    User?    @relation(fields: [createdById], references: [id])
+  name         String
+  category     String
+  area         String
+  contactInfo  String?
+  description  String?
+  confirmCount Int      @default(0)
+  disputeCount Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+enum DirectoryTargetType {
+  PRACTITIONER
+  VENDOR
+}
+
+enum DirectoryVoteType {
+  CONFIRM
+  DISPUTE
+}
+
+// Community trust signal, distinct from admin verification: enough CONFIRM
+// votes (and few enough DISPUTEs) earns a "Community Trusted" badge without
+// needing an admin, while the existing isVerified/verificationStatus fields
+// stay the higher, ID-document-backed tier. One vote per user per listing —
+// re-voting the same way removes it, voting the other way switches it.
+model DirectoryVote {
+  id         String              @id @default(cuid())
+  targetType DirectoryTargetType
+  targetId   String
+  userId     String
+  user       User                @relation(fields: [userId], references: [id])
+  voteType   DirectoryVoteType
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  @@unique([targetType, targetId, userId])
 }
 
 model OtpCode {

@@ -7,6 +7,8 @@ import {
   getVendors,
   addVendor,
   deleteVendor,
+  castDirectoryVote,
+  getMyDirectoryVotes,
 } from '../controllers/directoryController.js';
 
 const router = express.Router();
@@ -25,5 +27,9 @@ router
   .get(getVendors)
   .post(requireAuth, addVendor);
 router.delete('/vendors/:vendorId', requireAuth, deleteVendor);
+
+// --- Community verification (Confirm/Dispute) ---
+router.post('/vote', requireAuth, castDirectoryVote);
+router.get('/my-votes', requireAuth, getMyDirectoryVotes);
 
 export default router;

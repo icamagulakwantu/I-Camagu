@@ -21,8 +21,9 @@ export async function getPractitioners(req, res) {
         { name: 'asc' },
       ],
       select: {
-        id: true, name: true, role: true, area: true,
+        id: true, name: true, role: true, area: true, userId: true,
         isVerified: true, verifiedAt: true, contactInfo: true, createdAt: true,
+        confirmCount: true, disputeCount: true,
         // idDocUrl deliberately excluded — this endpoint is public and unauthenticated,
         // a practitioner's uploaded ID document must never be returned here.
       },
@@ -160,5 +161,83 @@ export async function deleteVendor(req, res) {
   } catch (error) {
     console.error('Delete vendor error:', error.message);
     res.status(500).json({ error: 'Could not remove vendor listing' });
+  }
+}
+
+const DIRECTORY_MODEL = { PRACTITIONER: 'practitioner', VENDOR: 'vendor' };
+const COUNT_FIELD = { CONFIRM: 'confirmCount', DISPUTE: 'disputeCount' };
+
+/**
+ * Cast, switch, or withdraw a community confirm/dispute vote on a
+ * practitioner or vendor listing. One vote per user per listing — voting
+ * the same way again withdraws it, voting the other way switches it.
+ */
+export async function castDirectoryVote(req, res) {
+  const { targetType, targetId, voteType } = req.body;
+
+  if (!DIRECTORY_MODEL[targetType]) return res.status(400).json({ error: 'Invalid targetType' });
+  if (!COUNT_FIELD[voteType]) return res.status(400).json({ error: 'Invalid voteType' });
+
+  try {
+    const model = prisma[DIRECTORY_MODEL[targetType]];
+    const target = await model.findUnique({ where: { id: targetId } });
+    if (!target) return res.status(404).json({ error: 'Listing not found' });
+
+    const ownerId = targetType === 'PRACTITIONER' ? target.userId : target.createdById;
+    if (ownerId === req.userId) return res.status(403).json({ error: "You can't vote on your own listing" });
+
+    const existing = await prisma.directoryVote.findUnique({
+      where: { targetType_targetId_userId: { targetType, targetId, userId: req.userId } },
+    });
+
+    let updated;
+    let myVote;
+    if (!existing) {
+      [, updated] = await prisma.$transaction([
+        prisma.directoryVote.create({ data: { targetType, targetId, userId: req.userId, voteType } }),
+        model.update({ where: { id: targetId }, data: { [COUNT_FIELD[voteType]]: { increment: 1 } } }),
+      ]);
+      myVote = voteType;
+    } else if (existing.voteType === voteType) {
+      [, updated] = await prisma.$transaction([
+        prisma.directoryVote.delete({ where: { id: existing.id } }),
+        model.update({ where: { id: targetId }, data: { [COUNT_FIELD[voteType]]: { decrement: 1 } } }),
+      ]);
+      myVote = null;
+    } else {
+      [, updated] = await prisma.$transaction([
+        prisma.directoryVote.update({ where: { id: existing.id }, data: { voteType } }),
+        model.update({
+          where: { id: targetId },
+          data: {
+            [COUNT_FIELD[existing.voteType]]: { decrement: 1 },
+            [COUNT_FIELD[voteType]]: { increment: 1 },
+          },
+        }),
+      ]);
+      myVote = voteType;
+    }
+
+    res.json({ confirmCount: updated.confirmCount, disputeCount: updated.disputeCount, myVote });
+  } catch (error) {
+    console.error('Cast directory vote error:', error.message);
+    res.status(500).json({ error: 'Could not record your vote' });
+  }
+}
+
+/**
+ * The requesting user's own votes across all listings, so the UI can show
+ * which button they've already pressed without exposing anyone else's vote.
+ */
+export async function getMyDirectoryVotes(req, res) {
+  try {
+    const votes = await prisma.directoryVote.findMany({
+      where: { userId: req.userId },
+      select: { targetType: true, targetId: true, voteType: true },
+    });
+    res.json(votes);
+  } catch (error) {
+    console.error('Get my directory votes error:', error.message);
+    res.status(500).json({ error: 'Could not fetch your votes' });
   }
 }

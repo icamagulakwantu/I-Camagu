@@ -5,6 +5,7 @@ import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 import { isAdminEmail } from '../lib/admin.js'
+import CommunityVerification from '../components/CommunityVerification.jsx'
 
 const PRACTITIONER_ROLES = ['INGCIBI', 'IKHANKATHA', 'CULTURAL_ADVISOR']
 const VENDOR_CATEGORIES = ['ATTIRE', 'CATERING', 'EQUIPMENT_HIRE', 'COOKWARE', 'LIVESTOCK_FARM', 'LIQUOR_SUPPLIER', 'IKRWALA_CLOTHING', 'FORMALWEAR']
@@ -19,6 +20,7 @@ function Directory({ onBack }) {
   const [vendors, setVendors] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [myVotes, setMyVotes] = useState({})
 
   // Form states
   const [name, setName] = useState('')
@@ -53,6 +55,40 @@ function Directory({ onBack }) {
   useEffect(() => {
     fetchAll()
   }, [])
+
+  useEffect(() => {
+    if (!accessToken) return
+    fetch('/api/directory/my-votes', { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then((res) => res.json())
+      .then((votes) => {
+        if (!Array.isArray(votes)) return
+        const map = {}
+        votes.forEach((v) => { map[`${v.targetType}:${v.targetId}`] = v.voteType })
+        setMyVotes(map)
+      })
+      .catch(() => {})
+  }, [accessToken])
+
+  const castVote = async (targetType, targetId, voteType) => {
+    try {
+      const res = await fetch('/api/directory/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ targetType, targetId, voteType }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not record your vote')
+
+      setMyVotes((prev) => ({ ...prev, [`${targetType}:${targetId}`]: data.myVote }))
+      const applyCounts = (item) => item.id === targetId
+        ? { ...item, confirmCount: data.confirmCount, disputeCount: data.disputeCount }
+        : item
+      if (targetType === 'PRACTITIONER') setPractitioners((prev) => prev.map(applyCounts))
+      else setVendors((prev) => prev.map(applyCounts))
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
 
   const resetFormFields = () => {
     setName('')
@@ -351,12 +387,24 @@ function Directory({ onBack }) {
                     </a>
                   )}
                   {isAdmin && !p.isVerified && (
-                    <button 
-                      onClick={() => verifyPractitioner(p.id)} 
+                    <button
+                      onClick={() => verifyPractitioner(p.id)}
                       className="mt-3 text-xs bg-sage-500 hover:bg-sage-600 text-white font-bold px-3 py-1.5 rounded-pill transition-colors"
                     >
                       Verify (Admin Action)
                     </button>
+                  )}
+                  {!p.isVerified && (
+                    <CommunityVerification
+                      targetType="PRACTITIONER"
+                      targetId={p.id}
+                      confirmCount={p.confirmCount}
+                      disputeCount={p.disputeCount}
+                      myVote={myVotes[`PRACTITIONER:${p.id}`]}
+                      isOwner={p.userId === user?.id}
+                      canVote={!!accessToken}
+                      onVote={castVote}
+                    />
                   )}
                 </div>
               ))}
@@ -381,6 +429,16 @@ function Directory({ onBack }) {
                       <span className="font-semibold">Contact:</span> {v.contactInfo}
                     </p>
                   )}
+                  <CommunityVerification
+                    targetType="VENDOR"
+                    targetId={v.id}
+                    confirmCount={v.confirmCount}
+                    disputeCount={v.disputeCount}
+                    myVote={myVotes[`VENDOR:${v.id}`]}
+                    isOwner={v.createdById === user?.id}
+                    canVote={!!accessToken}
+                    onVote={castVote}
+                  />
                   {v.createdById === user?.id && (
                     <button
                       type="button"
