@@ -26,8 +26,11 @@ import directoryRoutes from './routes/directory.js';
 import accountRoutes from './routes/account.js';
 import supplierRoutes from './routes/supplier.js';
 import identityRoutes from './routes/identity.js';
+import { checkRequiredEnvVars, envStatus } from './config/envCheck.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+checkRequiredEnvVars();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -50,6 +53,12 @@ app.get('/api/health', async (req, res) => {
     console.error('Database health check failed:', error.message);
     res.status(500).json({ status: 'error', message: 'Server running, but database connection failed' });
   }
+});
+
+// Which env vars are set — true/false only, never values. Deliberately
+// unauthenticated: login itself may be the thing broken when this is needed.
+app.get('/api/health/env', (req, res) => {
+  res.json(envStatus());
 });
 
 app.use('/api/auth', authRoutes);
