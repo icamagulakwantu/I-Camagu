@@ -225,6 +225,45 @@ export async function getStokvel(req, res) {
   }
 }
 
+/**
+ * Officials set (or reset) the payout rotation order for an UMGALELO_ROTATING
+ * stokvel — must include every current member exactly once. Saving a new
+ * order always restarts the rotation at position 0, since a partial reorder
+ * mid-cycle would be ambiguous about who's already had their turn.
+ */
+export async function setRotationOrder(req, res) {
+  const { stokvelId } = req.params;
+  const { order } = req.body;
+  const userId = req.userId;
+
+  if (!Array.isArray(order) || order.length === 0) {
+    return res.status(400).json({ error: 'order must be a non-empty list of member user IDs' });
+  }
+
+  try {
+    const official = await prisma.stokvelOfficial.findFirst({ where: { stokvelId, userId } });
+    if (!official) return res.status(403).json({ error: 'Only stokvel officials can set the rotation order' });
+
+    const members = await prisma.stokvelMember.findMany({ where: { stokvelId } });
+    const memberIds = new Set(members.map((m) => m.userId));
+    const uniqueOrder = new Set(order);
+
+    if (order.length !== memberIds.size || uniqueOrder.size !== order.length || !order.every((id) => memberIds.has(id))) {
+      return res.status(400).json({ error: 'The rotation order must include every current member exactly once' });
+    }
+
+    const stokvel = await prisma.stokvel.update({
+      where: { id: stokvelId },
+      data: { rotationOrder: order, currentRotationIndex: 0 },
+    });
+
+    res.json({ stokvel, message: 'Rotation order saved' });
+  } catch (error) {
+    console.error('Set rotation order error:', error.message);
+    res.status(500).json({ error: 'Could not save rotation order' });
+  }
+}
+
 // Additional handlers required for complete route balance
 
 export async function getStokvelsById(req, res) {

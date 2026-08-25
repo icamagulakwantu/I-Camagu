@@ -37,19 +37,40 @@ export async function requestPayout(req, res) {
                         const membership = await prisma.stokvelMember.findFirst({ where: { stokvelId, userId } });
                             if (!membership) return res.status(403).json({ error: 'You are not a member of this stokvel' });
 
+                                const stokvel = await prisma.stokvel.findUnique({ where: { id: stokvelId } });
+                                if (!stokvel) return res.status(404).json({ error: 'Stokvel not found' });
+
                                 const requestedAmount = parseFloat(amount);
 
-                                    // Check balance
-                                        const ledger = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
-                                            if (ledger && parseFloat(ledger.totalBalance) < requestedAmount) {
-                                                      return res.status(400).json({ error: 'Requested amount exceeds the group balance' });
-                                            }
+                                    let finalRecipientId = recipientId || userId;
+
+                                                // Rotating stokvels (umgalelo) must pay out strictly in turn — the
+                                                // recipient is always whoever is next in rotationOrder, regardless
+                                                // of who submits the request. Checked before the balance so a
+                                                // misconfigured rotation surfaces before an amount complaint.
+                                                if (stokvel.type === 'UMGALELO_ROTATING') {
+                                                  const order = Array.isArray(stokvel.rotationOrder) ? stokvel.rotationOrder : null;
+                                                  if (!order || order.length === 0) {
+                                                    return res.status(400).json({ error: 'This rotating stokvel has no rotation order set yet — ask an official to set one first.' });
+                                                  }
+                                                  const currentTurnUserId = order[stokvel.currentRotationIndex % order.length];
+                                                  if (recipientId && recipientId !== currentTurnUserId) {
+                                                    return res.status(400).json({ error: "It's not this member's turn in the rotation yet" });
+                                                  }
+                                                  finalRecipientId = currentTurnUserId;
+                                                }
+
+                                                // Check balance
+                                                const ledger = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
+                                                if (ledger && parseFloat(ledger.totalBalance) < requestedAmount) {
+                                                  return res.status(400).json({ error: 'Requested amount exceeds the group balance' });
+                                                }
 
                                                 // Create ONE payout
                                                     const payout = await prisma.payout.create({
                                                               data: {
                                                                           stokvelId,
-                                                                                  recipientId: recipientId || userId,
+                                                                                  recipientId: finalRecipientId,
                                                                                           amount: requestedAmount,
                                                                                                   status: 'PENDING_APPROVAL',
                                                               },
@@ -130,6 +151,21 @@ export async function approvePayout(req, res) {
                                                                                                         await tx.shrineTithe.create({
                                                                                                                       data: { payoutId, amount: titheAmount },
                                                                                                         });
+
+                                                                                                        // Advance the umgalelo rotation once this recipient's payout has
+                                                                                                        // actually cleared, so the next request defaults to the next person.
+                                                                                                        if (
+                                                                                                          payout.stokvel.type === 'UMGALELO_ROTATING' &&
+                                                                                                          Array.isArray(payout.stokvel.rotationOrder) &&
+                                                                                                          payout.stokvel.rotationOrder.length > 0
+                                                                                                        ) {
+                                                                                                          const order = payout.stokvel.rotationOrder;
+                                                                                                          const nextIndex = (payout.stokvel.currentRotationIndex + 1) % order.length;
+                                                                                                          await tx.stokvel.update({
+                                                                                                            where: { id: payout.stokvelId },
+                                                                                                            data: { currentRotationIndex: nextIndex },
+                                                                                                          });
+                                                                                                        }
                                                                             });
 
                                                                                   const recipient = await prisma.user.findUnique({ where: { id: payout.recipientId } });

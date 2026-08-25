@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useToast } from '../components/ui/Toast.jsx'
 
 function Login() {
   const [step, setStep] = useState('email')
@@ -16,6 +17,7 @@ function Login() {
   const googleBtnRef = useRef(null)
 
   const { login, updateUser, accessToken } = useAuth()
+  const { showToast } = useToast()
 
   useEffect(() => {
     const renderGoogleButton = () => {
@@ -239,7 +241,7 @@ function Login() {
                   })
                   const data = await res.json()
                   if (!res.ok) throw new Error(data.error || 'Could not process request')
-                  alert(data.message)
+                  showToast(data.message, 'info')
                   setStep('email')
                 } catch (err) {
                   setError(err.message)

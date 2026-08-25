@@ -58,6 +58,9 @@ function Stokvels({ onBack, onOpenShrineFund }) {
   const [editTargetAmount, setEditTargetAmount] = useState('')
   const [editTargetDate, setEditTargetDate] = useState('')
   const [savingDetails, setSavingDetails] = useState(false)
+  const [editingRotation, setEditingRotation] = useState(false)
+  const [rotationDraft, setRotationDraft] = useState([])
+  const [savingRotation, setSavingRotation] = useState(false)
 
   const fetchMyStokvels = async () => {
     try {
@@ -361,6 +364,48 @@ function Stokvels({ onBack, onOpenShrineFund }) {
     }
   }
 
+  const startEditingRotation = () => {
+    const existing = Array.isArray(detail.stokvel.rotationOrder) ? detail.stokvel.rotationOrder : []
+    const memberIds = detail.stokvel.members.map(m => m.userId)
+    // Start from the saved order (filtered to current members), then append
+    // any members not yet in it, so adding a new member doesn't lose the order.
+    const ordered = existing.filter(id => memberIds.includes(id))
+    const missing = memberIds.filter(id => !ordered.includes(id))
+    setRotationDraft([...ordered, ...missing])
+    setEditingRotation(true)
+  }
+
+  const moveInRotation = (index, direction) => {
+    setRotationDraft((prev) => {
+      const next = [...prev]
+      const target = index + direction
+      if (target < 0 || target >= next.length) return prev
+      ;[next[index], next[target]] = [next[target], next[index]]
+      return next
+    })
+  }
+
+  const saveRotationOrder = async () => {
+    setSavingRotation(true)
+    try {
+      const res = await fetch(`/api/stokvels/${detail.stokvel.id}/rotation-order`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ order: rotationDraft }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not save rotation order')
+
+      showToast('Rotation order saved', 'success')
+      setEditingRotation(false)
+      await fetchDetail(detail.stokvel.id)
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setSavingRotation(false)
+    }
+  }
+
   const approvePayout = async (payoutId) => {
     const pin = prompt('Enter your security PIN to approve this payout:')
     if (pin === null) return
@@ -614,9 +659,81 @@ function Stokvels({ onBack, onOpenShrineFund }) {
             </div>
           )}
 
+          {/* Rotation Order (umgalelo stokvels only) */}
+          {stokvel.type === 'UMGALELO_ROTATING' && (
+            <div className="bg-white border-2 border-ink rounded-soft p-4">
+              <div className="flex justify-between items-center mb-2">
+                <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Rotation Order</p>
+                {isOfficial && !editingRotation && (
+                  <button type="button" onClick={startEditingRotation} className="text-xs text-sage-600 font-bold underline">
+                    {Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0 ? 'Edit' : 'Set order'}
+                  </button>
+                )}
+              </div>
+
+              {editingRotation ? (
+                <div className="space-y-2">
+                  {rotationDraft.map((mUserId, idx) => {
+                    const member = stokvel.members.find(m => m.userId === mUserId)
+                    const name = member ? `${member.user.firstName} ${member.user.lastName}` : 'Unknown member'
+                    return (
+                      <div key={mUserId} className="flex items-center justify-between bg-cream rounded-soft px-3 py-2">
+                        <span className="text-sm font-bold text-ink">{idx + 1}. {name}</span>
+                        <div className="flex gap-1">
+                          <button type="button" onClick={() => moveInRotation(idx, -1)} disabled={idx === 0}
+                            className="w-7 h-7 rounded-pill bg-white border border-ink/20 disabled:opacity-30 flex items-center justify-center">
+                            <Icon name="arrowUp" size={12} />
+                          </button>
+                          <button type="button" onClick={() => moveInRotation(idx, 1)} disabled={idx === rotationDraft.length - 1}
+                            className="w-7 h-7 rounded-pill bg-white border border-ink/20 disabled:opacity-30 flex items-center justify-center">
+                            <Icon name="arrowDown" size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                  <div className="flex gap-2 pt-1">
+                    <button type="button" onClick={saveRotationOrder} disabled={savingRotation}
+                      className={`flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
+                      {savingRotation ? 'Saving...' : 'Save order'}
+                    </button>
+                    <button type="button" onClick={() => setEditingRotation(false)} className="flex-1 border-2 border-ink font-bold py-2 rounded-pill text-sm">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0 ? (
+                <div className="space-y-1.5">
+                  {stokvel.rotationOrder.map((mUserId, idx) => {
+                    const member = stokvel.members.find(m => m.userId === mUserId)
+                    const name = member ? `${member.user.firstName} ${member.user.lastName}` : 'Unknown member'
+                    const isNext = idx === (stokvel.currentRotationIndex % stokvel.rotationOrder.length)
+                    return (
+                      <div key={mUserId} className={`flex items-center justify-between px-3 py-2 rounded-soft ${isNext ? 'bg-sage-50 border-2 border-sage-500' : 'bg-cream'}`}>
+                        <span className="text-sm font-bold text-ink">{idx + 1}. {name}</span>
+                        {isNext && <span className="text-[10px] font-black text-sage-600 uppercase">Next</span>}
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="text-xs text-ink-muted">
+                  {isOfficial ? 'Set the payout order so everyone gets a fair turn.' : 'An official still needs to set the rotation order.'}
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Request Payout Form */}
           <form onSubmit={requestPayout} className="bg-white border-2 border-ink rounded-soft p-4 space-y-2">
             <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Request a payout</p>
+            {stokvel.type === 'UMGALELO_ROTATING' && (
+              <p className="text-xs text-ink-muted">
+                {Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0
+                  ? "This pays out to whoever's next in the rotation, whoever submits it."
+                  : 'Set a rotation order above before requesting a payout.'}
+              </p>
+            )}
             <input
               type="number"
               placeholder="Amount (ZAR)"
@@ -629,7 +746,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
             />
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || (stokvel.type === 'UMGALELO_ROTATING' && !(Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0))}
               className={`w-full bg-ink text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
             >
               {isSubmitting ? 'Requesting...' : 'Request'}

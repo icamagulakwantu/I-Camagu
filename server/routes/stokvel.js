@@ -9,7 +9,8 @@ import {
   deleteStokvel,
   getPendingApprovalCount,
   toggleBereavementProtocol,
-  updateStokvel
+  updateStokvel,
+  setRotationOrder
 } from '../controllers/stokvelController.js';
 import {
   submitContribution,
@@ -34,6 +35,7 @@ router.get('/my', requireAuth, getMyStokvels);
 router.get('/shrine-fund/total', requireAuth, getShrineFundTotal);
 router.get('/:stokvelId', requireAuth, getStokvel);
 router.patch('/:stokvelId', requireAuth, updateStokvel);
+router.patch('/:stokvelId/rotation-order', requireAuth, setRotationOrder);
 router.get('/id/:stokvelId', requireAuth, getStokvelsById);
 router.post('/bereavement/toggle', requireAuth, toggleBereavementProtocol);
 router.post('/announcements', requireAuth, postAnnouncement);
