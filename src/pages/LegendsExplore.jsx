@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
+import { isAdminEmail } from '../lib/admin.js'
 
 const STATUS_LABEL = {
   VERIFIED: 'Verified',
@@ -14,7 +15,7 @@ function LegendsExplore({ onBack }) {
   const [legends, setLegends] = useState([])
   const [activeCategory, setActiveCategory] = useState('')
 
-  const isAdmin = user?.email === 'icamagulakwantu@gmail.com'
+  const isAdmin = isAdminEmail(user?.email)
 
   const fetchLegends = () => {
     fetch('/api/legends')

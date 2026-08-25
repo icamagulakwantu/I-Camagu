@@ -16,7 +16,7 @@ function Help({ onBack }) {
 
       <div className="bg-sage-500 text-white rounded-soft p-4 mb-6">
         <p className="font-bold text-sm mb-1">Need to reach us directly?</p>
-        <a href="mailto:icamagulakwantu@gmail.com" className="text-sm underline block">icamagulakwantu@gmail.com</a>
+        <a href="mailto:info@i-camagu.co.za" className="text-sm underline block">info@i-camagu.co.za</a>
       </div>
 
       <p className="text-xs font-black uppercase text-ink-muted mb-2">Frequently Asked Questions</p>

@@ -21,7 +21,7 @@ function PrivacyPolicy({ onBack }) {
           This policy explains how iCamagu ("we", "us", the "Platform") collects, uses, stores,
           and protects your personal information when you use the app. iCamagu is the
           Responsible Party for this processing under POPIA. If you need to reach us about
-          your data, email <a href="mailto:icamagulakwantu@gmail.com" className="text-sage-600 underline">icamagulakwantu@gmail.com</a>.
+          your data, email <a href="mailto:info@i-camagu.co.za" className="text-sage-600 underline">info@i-camagu.co.za</a>.
         </p>
       </Section>
 

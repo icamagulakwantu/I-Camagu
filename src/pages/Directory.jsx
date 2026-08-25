@@ -4,6 +4,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
+import { isAdminEmail } from '../lib/admin.js'
 
 const PRACTITIONER_ROLES = ['INGCIBI', 'IKHANKATHA', 'CULTURAL_ADVISOR']
 const VENDOR_CATEGORIES = ['ATTIRE', 'CATERING', 'EQUIPMENT_HIRE', 'COOKWARE', 'LIVESTOCK_FARM', 'LIQUOR_SUPPLIER', 'IKRWALA_CLOTHING', 'FORMALWEAR']
@@ -29,7 +30,7 @@ function Directory({ onBack }) {
   const [idDocUrl, setIdDocUrl] = useState(null)
   const [uploadingDoc, setUploadingDoc] = useState(false)
 
-  const isAdmin = user?.email === 'icamagulakwantu@gmail.com'
+  const isAdmin = isAdminEmail(user?.email)
 
   const fetchAll = async () => {
     setLoading(true)
