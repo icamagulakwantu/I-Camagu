@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 
-function AccountSettings({ onBack }) {
+function AccountSettings({ onBack, onOpenPrivacy }) {
   const { accessToken, logout } = useAuth()
   const { showToast } = useToast()
   const [showDeleteForm, setShowDeleteForm] = useState(false)
@@ -48,6 +48,13 @@ function AccountSettings({ onBack }) {
     <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
       <button onClick={onBack} className="text-sm text-ink-muted mb-4">← Back</button>
       <h2 className="font-display font-bold text-2xl text-ink mb-4">Account & Privacy</h2>
+
+      {onOpenPrivacy && (
+        <button onClick={onOpenPrivacy} className="w-full bg-white border-2 border-ink rounded-soft p-4 mb-4 text-left">
+          <p className="font-bold text-sm text-ink mb-1">Privacy Policy</p>
+          <p className="text-xs text-ink-muted">How iCamagu collects, uses, and protects your information, including your ID number if you verify your identity.</p>
+        </button>
+      )}
 
       <div className="bg-white border-2 border-ink rounded-soft p-4 mb-4">
         <p className="font-bold text-sm text-ink mb-1">Export your data</p>

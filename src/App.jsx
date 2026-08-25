@@ -24,6 +24,7 @@ import Portal from './pages/Portal.jsx'
 import Ekoyini from './pages/Ekoyini.jsx'
 import EkoyiniAdmin from './pages/EkoyiniAdmin.jsx'
 import IdentityAdmin from './pages/IdentityAdmin.jsx'
+import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import Hierarchy from './pages/Hierarchy.jsx'
 import MyOrders from './pages/MyOrders.jsx'
 import Expenditure from './pages/Expenditure.jsx'
@@ -73,6 +74,7 @@ const MORE_SCREENS = [
   'ekoyini',
   'ekoyiniadmin',
   'identityadmin',
+  'privacy',
   'hierarchy',
   'myorders',
   'expenditure',
@@ -429,9 +431,11 @@ function MainApp() {
       case 'activity':
         return <Activity onBack={goMore} />
       case 'account':
-        return <AccountSettings onBack={goMore} />
+        return <AccountSettings onBack={goMore} onOpenPrivacy={() => setScreen('privacy')} />
       case 'help':
         return <Help onBack={goMore} />
+      case 'privacy':
+        return <PrivacyPolicy onBack={goMore} />
       case 'more':
         return <More onNavigate={setScreen} onBack={goHome} />
       case 'profile':

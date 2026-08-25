@@ -14,7 +14,7 @@ const IDENTITY_STATUS_META = {
   REJECTED: { label: 'Not approved', bg: 'bg-terracotta/10', border: 'border-terracotta', text: 'text-terracotta', icon: 'close' },
 }
 
-export default function Profile() {
+export default function Profile({ onNavigate }) {
   const { user, logout, accessToken, updateUser } = useAuth()
   const { showToast } = useToast()
   const fileInputRef = useRef(null)
@@ -30,6 +30,7 @@ export default function Profile() {
   const [idNumber, setIdNumber] = useState('')
   const [idDocumentUrl, setIdDocumentUrl] = useState(null)
   const [submittingId, setSubmittingId] = useState(false)
+  const [consented, setConsented] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -58,6 +59,10 @@ export default function Profile() {
       showToast('Please attach a photo of your ID document', 'error')
       return
     }
+    if (!consented) {
+      showToast('Please agree to the Privacy Policy terms to continue', 'error')
+      return
+    }
     setSubmittingId(true)
     try {
       const res = await fetch('/api/identity/submit', {
@@ -71,6 +76,7 @@ export default function Profile() {
       setIdentityForm(false)
       setIdNumber('')
       setIdDocumentUrl(null)
+      setConsented(false)
       showToast('Submitted — an admin will review your ID shortly', 'success')
     } catch (err) {
       showToast(err.message || 'Could not submit identity verification', 'error')
@@ -343,8 +349,26 @@ export default function Profile() {
                 <><Icon name="camera" size={14} /> Attach a photo of your ID</>
               )}
             </button>
+            <label className="flex items-start gap-2 pt-1 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={consented}
+                onChange={(e) => setConsented(e.target.checked)}
+                className="mt-0.5 flex-shrink-0"
+              />
+              <span className="text-xs text-ink-muted leading-snug">
+                I agree that iCamagu can collect and encrypt my ID number and ID document photo to verify my identity, as described in the{' '}
+                <button
+                  type="button"
+                  onClick={() => onNavigate?.('privacy')}
+                  className="text-sage-600 underline font-bold"
+                >
+                  Privacy Policy
+                </button>.
+              </span>
+            </label>
             <div className="flex gap-2 pt-2">
-              <button type="submit" disabled={submittingId} className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm disabled:opacity-60">
+              <button type="submit" disabled={submittingId || !consented} className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm disabled:opacity-60">
                 {submittingId ? 'Submitting...' : 'Submit for review'}
               </button>
               <button type="button" onClick={() => setIdentityForm(false)} className="flex-1 border-2 border-ink font-bold py-2 rounded-pill text-sm">Cancel</button>

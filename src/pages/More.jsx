@@ -44,6 +44,7 @@ const SECTIONS = [
       { id: 'activity', icon: 'activity', label: 'My Activity' },
       { id: 'pin', icon: 'key', label: 'Security PIN' },
       { id: 'account', icon: 'lock', label: 'Account & Privacy' },
+      { id: 'privacy', icon: 'file', label: 'Privacy Policy' },
       { id: 'help', icon: 'help', label: 'Help & Support' },
     ],
   },
