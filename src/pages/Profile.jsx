@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { cn } from '../lib/utils'
@@ -7,15 +7,77 @@ import Icon from '../components/Icon.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96]'
 
+const IDENTITY_STATUS_META = {
+  UNVERIFIED: { label: 'Not verified', bg: 'bg-cream', border: 'border-cream-dark', text: 'text-ink-muted', icon: 'key' },
+  PENDING: { label: 'Pending review', bg: 'bg-ochre/10', border: 'border-ochre', text: 'text-ochre-dark', icon: 'clock' },
+  VERIFIED: { label: 'Verified', bg: 'bg-sage-50', border: 'border-sage-500', text: 'text-sage-600', icon: 'check' },
+  REJECTED: { label: 'Not approved', bg: 'bg-terracotta/10', border: 'border-terracotta', text: 'text-terracotta', icon: 'close' },
+}
+
 export default function Profile() {
   const { user, logout, accessToken, updateUser } = useAuth()
   const { showToast } = useToast()
   const fileInputRef = useRef(null)
+  const idDocInputRef = useRef(null)
 
   const [editing, setEditing] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [locating, setLocating] = useState(false)
   const [coords, setCoords] = useState(null)
+
+  const [identity, setIdentity] = useState(null)
+  const [identityForm, setIdentityForm] = useState(false)
+  const [idNumber, setIdNumber] = useState('')
+  const [idDocumentUrl, setIdDocumentUrl] = useState(null)
+  const [submittingId, setSubmittingId] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/identity/my-status', { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then((res) => res.json())
+      .then((data) => { if (!cancelled) setIdentity(data) })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [accessToken])
+
+  const handleIdDocSelect = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 1_800_000) {
+      showToast('Photo too large — please choose an image under 1.8MB', 'error')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => setIdDocumentUrl(reader.result)
+    reader.readAsDataURL(file)
+  }
+
+  const submitIdentity = async (e) => {
+    e.preventDefault()
+    if (!idDocumentUrl) {
+      showToast('Please attach a photo of your ID document', 'error')
+      return
+    }
+    setSubmittingId(true)
+    try {
+      const res = await fetch('/api/identity/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ idNumber, idDocumentUrl }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to submit')
+      setIdentity({ status: data.status, last4: data.last4, submittedAt: data.submittedAt, verifiedAt: null, rejectionReason: null })
+      setIdentityForm(false)
+      setIdNumber('')
+      setIdDocumentUrl(null)
+      showToast('Submitted — an admin will review your ID shortly', 'success')
+    } catch (err) {
+      showToast(err.message || 'Could not submit identity verification', 'error')
+    } finally {
+      setSubmittingId(false)
+    }
+  }
 
   const useMyLocation = async () => {
     setLocating(true)
@@ -211,6 +273,83 @@ export default function Profile() {
             )}
             {user?.phoneNumber && <p className="col-span-2 text-sm text-ink-muted flex items-center gap-1"><Icon name="phone" size={13} /> {user.phoneNumber}</p>}
           </div>
+        )}
+      </div>
+
+      <div className="mx-4 mt-4 bg-white border-2 border-ink rounded-soft p-5 shadow-elevated">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Identity Verification</h3>
+          {identity && (
+            <span className={cn(
+              'text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-pill border flex items-center gap-1',
+              IDENTITY_STATUS_META[identity.status]?.bg, IDENTITY_STATUS_META[identity.status]?.border, IDENTITY_STATUS_META[identity.status]?.text
+            )}>
+              <Icon name={IDENTITY_STATUS_META[identity.status]?.icon} size={11} />
+              {IDENTITY_STATUS_META[identity.status]?.label}
+            </span>
+          )}
+        </div>
+
+        <p className="text-xs text-ink-muted mb-3">
+          Verify your ID to unlock stokvel roles and future biometric features. Your ID number is encrypted — only admins reviewing your submission can see it.
+        </p>
+
+        {identity?.status === 'VERIFIED' && (
+          <p className="text-sm text-sage-600 font-bold flex items-center gap-1">
+            <Icon name="check" size={14} /> ID ending in {identity.last4} verified
+          </p>
+        )}
+
+        {identity?.status === 'PENDING' && (
+          <p className="text-sm text-ochre-dark font-bold flex items-center gap-1">
+            <Icon name="clock" size={14} /> ID ending in {identity.last4} is awaiting review
+          </p>
+        )}
+
+        {(identity?.status === 'UNVERIFIED' || identity?.status === 'REJECTED') && !identityForm && (
+          <>
+            {identity?.status === 'REJECTED' && identity?.rejectionReason && (
+              <p className="text-sm text-terracotta font-bold mb-2">Not approved: {identity.rejectionReason}</p>
+            )}
+            <button
+              type="button"
+              onClick={() => setIdentityForm(true)}
+              className="w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm flex items-center justify-center gap-2"
+            >
+              <Icon name="key" size={14} color="#fff" /> {identity?.status === 'REJECTED' ? 'Resubmit ID' : 'Verify my ID'}
+            </button>
+          </>
+        )}
+
+        {identityForm && (
+          <form onSubmit={submitIdentity} className="space-y-2">
+            <input
+              placeholder="13-digit South African ID number"
+              value={idNumber}
+              onChange={(e) => setIdNumber(e.target.value.replace(/\D/g, '').slice(0, 13))}
+              inputMode="numeric"
+              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm tracking-wider"
+              required
+            />
+            <input ref={idDocInputRef} type="file" accept="image/*" onChange={handleIdDocSelect} className="hidden" />
+            <button
+              type="button"
+              onClick={() => idDocInputRef.current?.click()}
+              className="w-full border-2 border-dashed border-ink/30 rounded-soft py-3 text-sm font-bold text-ink-muted flex items-center justify-center gap-2"
+            >
+              {idDocumentUrl ? (
+                <><Icon name="check" size={14} color="#4a7a4a" /> ID photo attached</>
+              ) : (
+                <><Icon name="camera" size={14} /> Attach a photo of your ID</>
+              )}
+            </button>
+            <div className="flex gap-2 pt-2">
+              <button type="submit" disabled={submittingId} className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm disabled:opacity-60">
+                {submittingId ? 'Submitting...' : 'Submit for review'}
+              </button>
+              <button type="button" onClick={() => setIdentityForm(false)} className="flex-1 border-2 border-ink font-bold py-2 rounded-pill text-sm">Cancel</button>
+            </div>
+          </form>
         )}
       </div>
 

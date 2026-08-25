@@ -23,6 +23,7 @@ import Stokvels from './pages/Stokvels.jsx'
 import Portal from './pages/Portal.jsx'
 import Ekoyini from './pages/Ekoyini.jsx'
 import EkoyiniAdmin from './pages/EkoyiniAdmin.jsx'
+import IdentityAdmin from './pages/IdentityAdmin.jsx'
 import Hierarchy from './pages/Hierarchy.jsx'
 import MyOrders from './pages/MyOrders.jsx'
 import Expenditure from './pages/Expenditure.jsx'
@@ -71,6 +72,7 @@ const MORE_SCREENS = [
   'portal',
   'ekoyini',
   'ekoyiniadmin',
+  'identityadmin',
   'hierarchy',
   'myorders',
   'expenditure',
@@ -402,6 +404,8 @@ function MainApp() {
         return <Ekoyini onBack={goMore} />
       case 'ekoyiniadmin':
         return <EkoyiniAdmin onBack={goMore} />
+      case 'identityadmin':
+        return <IdentityAdmin onBack={goMore} />
       case 'hierarchy':
         return <Hierarchy onBack={goMore} />
       case 'myorders':

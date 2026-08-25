@@ -81,6 +81,13 @@ enum OfficialRole {
   SECRETARY
 }
 
+enum IdentityVerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
 // ---------- CORE MODELS ----------
 
 model User {
@@ -105,6 +112,24 @@ model User {
   paternalGrandmotherIziduko String?
   maternalGrandmotherIziduko String?
   pinHash                String?
+
+  // Identity verification — the ID number is encrypted at rest (AES-256-GCM,
+  // see server/services/encryptionService.js), never stored or returned in
+  // plaintext. idNumberLast4 is kept unencrypted purely so the owner and
+  // reviewers can reference "the ID ending in 1234" without decrypting.
+  // idDocumentUrl mirrors the existing Directory practitioner idDocUrl
+  // pattern (base64 inline, size-capped). profileImage doubles as the face
+  // reference photo for this purpose — a future biometric/liveness provider
+  // slots in against these same fields rather than needing new ones.
+  idNumberEncrypted          String?                     @db.Text
+  idNumberLast4              String?
+  idDocumentUrl               String?                    @db.Text
+  identityVerificationStatus IdentityVerificationStatus @default(UNVERIFIED)
+  identitySubmittedAt         DateTime?
+  identityVerifiedAt          DateTime?
+  identityVerifiedById         String?
+  identityRejectionReason      String?
+
   createdAt              DateTime             @default(now())
   updatedAt              DateTime             @updatedAt
 
