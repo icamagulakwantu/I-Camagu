@@ -95,9 +95,10 @@ function RegisterForm({ onRegistered }) {
           />
           <button
             type="button" onClick={useMyLocation} disabled={locating}
-            className="text-xs font-bold text-sage-600"
+            className="text-xs font-bold text-sage-600 flex items-center gap-1"
           >
-            📍 {locating ? 'Locating...' : coords ? 'Location captured ✓' : 'Pin exact location (recommended)'}
+            <Icon name="mapPin" size={12} />
+            {locating ? 'Locating...' : coords ? <>Location captured <Icon name="check" size={12} /></> : 'Pin exact location (recommended)'}
           </button>
           <p className="text-[10px] text-ink-muted -mt-1">Lets members find you as the nearest supplier and helps us plan delivery logistics.</p>
           <input

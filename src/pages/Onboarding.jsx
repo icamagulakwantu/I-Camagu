@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { captureLocation } from '../lib/geolocation.js'
+import Icon from '../components/Icon.jsx'
 
 const STEPS = ['welcome', 'ancestry', 'details']
 
@@ -258,7 +259,8 @@ function Onboarding({ onDone }) {
                 type="button" onClick={useMyLocation} disabled={locating}
                 className="text-xs font-bold text-sage-600 flex items-center gap-1"
               >
-                📍 {locating ? 'Locating...' : coords ? 'Location captured ✓' : 'Use my current location'}
+                <Icon name="mapPin" size={12} />
+                {locating ? 'Locating...' : coords ? <>Location captured <Icon name="check" size={12} /></> : 'Use my current location'}
               </button>
               <p className="text-[10px] text-ink-muted -mt-1">Helps us match you with the nearest suppliers and pools — not shared with other members.</p>
               <input

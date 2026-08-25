@@ -170,9 +170,10 @@ export default function Profile() {
               className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
             <button
               type="button" onClick={useMyLocation} disabled={locating}
-              className="text-xs font-bold text-sage-600"
+              className="text-xs font-bold text-sage-600 flex items-center gap-1"
             >
-              📍 {locating ? 'Locating...' : coords ? 'Location captured ✓' : 'Use my current location'}
+              <Icon name="mapPin" size={12} />
+              {locating ? 'Locating...' : coords ? <>Location captured <Icon name="check" size={12} /></> : 'Use my current location'}
             </button>
             <input type="number" placeholder="Age" value={form.age}
               onChange={(e) => setForm({ ...form, age: e.target.value })}
