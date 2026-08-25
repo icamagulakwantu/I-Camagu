@@ -48,7 +48,6 @@ import EkoyiniBooking from './pages/EkoyiniBooking.jsx'
 // Components
 import BottomNav from './components/BottomNav.jsx'
 import DidYouKnow from './components/DidYouKnow.jsx'
-import PatternStrip from './components/PatternStrip.jsx'
 import ActionCard from './components/ActionCard.jsx'
 import Icon from './components/Icon.jsx'
 import NotificationBell from './components/NotificationBell.jsx'  // ✅ NEW
@@ -133,7 +132,6 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
     <div className="px-5 pt-6 pb-28 max-w-md mx-auto">
       {/* Heritage Header Banner */}
       <div className="mb-5 rounded-soft overflow-hidden shadow-sm border border-brand-black/10 bg-white/80 backdrop-blur-md">
-        <PatternStrip height="6px" variant="glow" />
         <div className="p-4">
           <DidYouKnow />
         </div>
