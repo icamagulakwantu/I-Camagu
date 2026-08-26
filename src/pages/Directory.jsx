@@ -219,7 +219,7 @@ function Directory({ onBack }) {
             className={`flex-1 py-2.5 rounded-pill text-sm font-bold transition-colors ${
               tab === 'practitioners' 
                 ? 'bg-sage-500 text-white shadow-sm' 
-                : 'bg-white border-2 border-ink/20 text-ink-muted'
+                : 'bg-white border-2 border-terracotta/20 text-ink-muted'
             }`}
           >
             Practitioners
@@ -229,7 +229,7 @@ function Directory({ onBack }) {
             className={`flex-1 py-2.5 rounded-pill text-sm font-bold transition-colors ${
               tab === 'vendors' 
                 ? 'bg-sage-500 text-white shadow-sm' 
-                : 'bg-white border-2 border-ink/20 text-ink-muted'
+                : 'bg-white border-2 border-terracotta/20 text-ink-muted'
             }`}
           >
             Vendors & Farms
@@ -239,14 +239,14 @@ function Directory({ onBack }) {
         {/* Form Toggle Button */}
         <button 
           onClick={() => setShowForm(!showForm)} 
-          className="w-full border-2 border-ink text-ink font-bold py-2.5 rounded-pill text-sm mb-4 bg-white hover:bg-cream-dark transition-colors"
+          className="w-full border-2 border-terracotta/25 text-ink font-bold py-2.5 rounded-pill text-sm mb-4 bg-white hover:bg-cream-dark transition-colors"
         >
           {showForm ? 'Cancel' : `+ List a ${tab === 'practitioners' ? 'Practitioner' : 'Vendor / Farm'}`}
         </button>
 
         {/* Form: Practitioner */}
         {showForm && tab === 'practitioners' && (
-          <form onSubmit={submitPractitioner} className="bg-white border-2 border-ink rounded-soft p-4 mb-4 space-y-3 shadow-sm">
+          <form onSubmit={submitPractitioner} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 space-y-3 shadow-sm">
             <input 
               placeholder="Full Name" 
               value={name} 
@@ -306,7 +306,7 @@ function Directory({ onBack }) {
 
         {/* Form: Vendor */}
         {showForm && tab === 'vendors' && (
-          <form onSubmit={submitVendor} className="bg-white border-2 border-ink rounded-soft p-4 mb-4 space-y-3 shadow-sm">
+          <form onSubmit={submitVendor} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 space-y-3 shadow-sm">
             <input 
               placeholder="Business or Vendor Name" 
               value={name} 
@@ -362,7 +362,7 @@ function Directory({ onBack }) {
           ) : (
             <div className="space-y-3">
               {practitioners.map((p) => (
-                <div key={p.id} className="bg-white border-2 border-ink rounded-soft p-4 shadow-sm">
+                <div key={p.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 shadow-sm">
                   <div className="flex justify-between items-start">
                     <p className="font-bold text-sm text-ink">{p.name}</p>
                     {p.isVerified ? (
@@ -416,13 +416,13 @@ function Directory({ onBack }) {
           ) : (
             <div className="space-y-3">
               {vendors.map((v) => (
-                <div key={v.id} className="bg-white border-2 border-ink rounded-soft p-4 shadow-sm">
+                <div key={v.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 shadow-sm">
                   <p className="font-bold text-sm text-ink">{v.name}</p>
                   <p className="text-xs text-ink-muted font-medium mt-0.5">
                     {v.category.replace(/_/g, ' ')} • {v.area}
                   </p>
                   {v.description && (
-                    <p className="text-xs text-ink-muted mt-2 border-t border-ink/10 pt-2">{v.description}</p>
+                    <p className="text-xs text-ink-muted mt-2 border-t border-terracotta/10 pt-2">{v.description}</p>
                   )}
                   {v.contactInfo && (
                     <p className="text-xs text-ink mt-2">

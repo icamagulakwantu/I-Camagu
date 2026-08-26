@@ -14,7 +14,7 @@ export function Skeleton({ className, circle = false }) {
 
 export function StokvelCardSkeleton() {
   return (
-    <div className="bg-white border-2 border-ink rounded-soft p-4 flex items-center gap-3 mb-2">
+    <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 flex items-center gap-3 mb-2">
       <Skeleton circle className="h-10 w-10" />
       <div className="flex-1 space-y-2">
         <Skeleton className="h-4 w-2/3" />
@@ -27,12 +27,12 @@ export function StokvelCardSkeleton() {
 export function StokvelDetailSkeleton() {
   return (
     <div className="space-y-4">
-      <div className="bg-white border-2 border-ink rounded-soft p-4 space-y-3">
+      <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
         <Skeleton className="h-6 w-3/4" />
         <Skeleton className="h-4 w-1/2" />
         <Skeleton className="h-4 w-1/3" />
       </div>
-      <div className="bg-white border border-ink/20 rounded-soft p-4 space-y-2">
+      <div className="bg-white border border-terracotta/20 rounded-soft p-4 space-y-2">
         <Skeleton className="h-8 w-full" />
         <Skeleton className="h-8 w-full" />
       </div>

@@ -57,7 +57,7 @@ function Expenditure({ onBack }) {
         <p className="text-2xl font-extrabold text-brand-blue">R{total.toFixed(2)}</p>
       </div>
 
-      <form onSubmit={addEntry} className="bg-white border-2 border-brand-black rounded-soft p-4 mb-4 space-y-2">
+      <form onSubmit={addEntry} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 space-y-2">
         <input type="text" placeholder="What did you buy?" value={itemName} onChange={(e) => setItemName(e.target.value)}
           className="w-full border border-brand-black/30 rounded-soft px-3 py-2 text-sm" required />
         <input type="number" placeholder="Price (ZAR)" value={price} onChange={(e) => setPrice(e.target.value)}
@@ -71,7 +71,7 @@ function Expenditure({ onBack }) {
 
       <div className="space-y-2">
         {entries.map((e) => (
-          <div key={e.id} className="bg-white border border-brand-black/20 rounded-soft p-3 flex justify-between">
+          <div key={e.id} className="bg-white border border-terracotta/20 rounded-soft p-3 flex justify-between">
             <div>
               <p className="font-bold text-sm">{e.itemName}</p>
               <p className="text-xs text-brand-black/50">{e.category || 'Uncategorised'} • {new Date(e.purchasedAt).toLocaleDateString()}</p>

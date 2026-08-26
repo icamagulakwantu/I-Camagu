@@ -40,7 +40,7 @@ function ResetPassword({ token }) {
 
   return (
     <div className="min-h-screen bg-cream flex flex-col items-center justify-center px-6 py-10">
-      <div className="w-full max-w-sm bg-white border-2 border-ink rounded-soft p-8">
+      <div className="w-full max-w-sm bg-white border-2 border-terracotta/25 rounded-soft p-8">
         <h1 className="font-display font-bold text-2xl text-ink mb-4">Reset Password</h1>
         <form onSubmit={handleSubmit} className="space-y-3">
           <input type="password" placeholder="New password (min 8 characters)" value={newPassword}

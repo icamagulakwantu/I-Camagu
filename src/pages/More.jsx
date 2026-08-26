@@ -79,7 +79,7 @@ export default function More({ onNavigate }) {
       {SECTIONS.map((section) => (
         <div key={section.title} className="mb-6">
           <p className="text-xs font-black uppercase text-ink-muted mb-2 px-1">{section.title}</p>
-          <div className="bg-white border-2 border-ink rounded-soft divide-y divide-ink/10 overflow-hidden shadow-sm">
+          <div className="bg-white border-2 border-terracotta/25 rounded-soft divide-y divide-terracotta/10 overflow-hidden shadow-sm">
             {section.items.map((item) => (
               <button
                 key={item.id}
@@ -106,7 +106,7 @@ export default function More({ onNavigate }) {
           type="button"
           onClick={handleLogout}
           className={cn(
-            'w-full bg-white border-2 border-ink text-ink font-bold py-3.5 rounded-pill flex items-center justify-center gap-2',
+            'w-full bg-white border-2 border-terracotta/25 text-ink font-bold py-3.5 rounded-pill flex items-center justify-center gap-2',
             'hover:bg-ink hover:text-white transition-colors duration-200',
             pressable
           )}

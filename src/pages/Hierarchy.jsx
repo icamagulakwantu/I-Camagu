@@ -94,7 +94,7 @@ function Hierarchy({ onBack }) {
       <h2 className="text-2xl font-extrabold text-brand-black mb-1">Umgidi Hierarchy</h2>
       <p className="text-xs text-brand-black/50 mb-4">The 14 traditional groups, and what each one needs.</p>
 
-      <div className="bg-white border-2 border-brand-black rounded-soft p-4 mb-4 space-y-2">
+      <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 space-y-2">
         {ceremonies.length === 0 ? (
           <p className="text-xs text-brand-black/50">You don't have any ceremonies yet — create one in Ceremony Preparation first.</p>
         ) : (
@@ -116,7 +116,7 @@ function Hierarchy({ onBack }) {
 
       {groups.length > 0 && (
         <>
-          <div className="bg-white border border-brand-black/20 rounded-soft p-4 mb-4">
+          <div className="bg-white border border-terracotta/20 rounded-soft p-4 mb-4">
             <p className="text-xs font-black uppercase text-brand-black/40 mb-2">Set an allocation</p>
             <form onSubmit={addAllocation} className="space-y-2">
               <select value={activeGroupId} onChange={(e) => setActiveGroupId(e.target.value)}
@@ -143,7 +143,7 @@ function Hierarchy({ onBack }) {
 
           <div className="space-y-2">
             {groups.map((g) => (
-              <div key={g.id} className="bg-white border-2 border-brand-black rounded-soft p-3">
+              <div key={g.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-3">
                 <p className="font-bold text-sm">{g.groupLabel}</p>
                 {(g.allocations || []).length === 0 ? (
                   <p className="text-xs text-brand-black/40">No allocation set</p>
@@ -165,7 +165,7 @@ function Hierarchy({ onBack }) {
             <div className="bg-white border-2 border-terracotta rounded-soft p-4 mb-4">
               <p className="text-xs font-black uppercase text-terracotta mb-2">Total Needed — {alcoholSummary.groupCount} groups</p>
               {(alcoholSummary.summary || []).map((s, idx) => (
-                <div key={idx} className="flex justify-between text-sm py-1 border-b border-ink/10 last:border-0">
+                <div key={idx} className="flex justify-between text-sm py-1 border-b border-terracotta/10 last:border-0">
                   <span>{s.itemDescription}</span>
                   <span className="font-bold">{s.totalQuantity} {s.unitType.toLowerCase()}(s)</span>
                 </div>

@@ -69,7 +69,7 @@ function LegendsExplore({ onBack }) {
 
       <div className="space-y-3">
         {filtered.map((legend) => (
-          <div key={legend.id} className="bg-white border-2 border-brand-black rounded-soft p-4">
+          <div key={legend.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
             <div className="flex items-center justify-between gap-2 mb-1">
               <p className="text-xs font-black uppercase text-brand-ochre">{legend.category}</p>
               <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-pill bg-cream-dark text-brand-black/60">

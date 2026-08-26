@@ -354,7 +354,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           <form onSubmit={addChecklistItem} className="space-y-2">
             <div className="flex gap-2">
               <select value={newChecklistItem.phase} onChange={(e) => setNewChecklistItem({ ...newChecklistItem, phase: e.target.value })}
-                className="w-1/3 border border-ink/20 rounded-soft px-2 py-2 text-xs">
+                className="w-1/3 border border-terracotta/20 rounded-soft px-2 py-2 text-xs">
                 <option value="CUSTOM">Custom</option>
                 <option value="FOOD">Food</option>
                 <option value="FAMILY">Family</option>
@@ -364,7 +364,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
               </select>
               <input placeholder="e.g. Add chicken for kitchen meal" value={newChecklistItem.label}
                 onChange={(e) => setNewChecklistItem({ ...newChecklistItem, label: e.target.value })}
-                className="flex-1 border border-ink/20 rounded-soft px-3 py-2 text-sm" required />
+                className="flex-1 border border-terracotta/20 rounded-soft px-3 py-2 text-sm" required />
             </div>
             <label className="flex items-center gap-2 text-xs text-ink-muted">
               <input type="checkbox" checked={newChecklistItem.isOptional}
@@ -376,7 +376,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         </div>
 
         {/* Progress Card (File 1 style) */}
-        <div className="mx-4 mt-5 bg-white border-2 border-ink rounded-soft p-5 shadow-soft">
+        <div className="mx-4 mt-5 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-display font-bold text-lg text-ink">Planning Progress</h3>
             <span className="font-display font-bold text-2xl text-terracotta">{progress}%</span>
@@ -400,21 +400,21 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           <div className={`grid ${activePlan.ceremonyId ? 'grid-cols-4' : 'grid-cols-3'} gap-2`}>
           <button
             onClick={saveAsTemplate}
-            className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
+            className={`flex flex-col items-center gap-1 bg-white border border-terracotta/15 rounded-soft py-3 px-1 ${pressable}`}
           >
             <Icon name="template" color="#c45c26" />
             <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Save as Template</span>
           </button>
           <button
             onClick={() => onViewBudget?.(activePlan.id, activePlan.title)}
-            className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
+            className={`flex flex-col items-center gap-1 bg-white border border-terracotta/15 rounded-soft py-3 px-1 ${pressable}`}
           >
             <Icon name="coins" color="#c1922f" />
             <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Budget</span>
           </button>
           <button
             onClick={() => onViewTimeline?.(activePlan.ceremonyType)}
-            className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
+            className={`flex flex-col items-center gap-1 bg-white border border-terracotta/15 rounded-soft py-3 px-1 ${pressable}`}
           >
             <Icon name="clock" color="#4a7a4a" />
             <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Timeline</span>
@@ -422,7 +422,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           {activePlan.ceremonyId && (
             <button
               onClick={() => onBookEkoyini?.(activePlan.ceremonyId, activePlan.title)}
-              className={`flex flex-col items-center gap-1 bg-white border border-ink/15 rounded-soft py-3 px-1 ${pressable}`}
+              className={`flex flex-col items-center gap-1 bg-white border border-terracotta/15 rounded-soft py-3 px-1 ${pressable}`}
             >
               <Icon name="cocktail" color="#2b2620" />
               <span className="text-[10px] font-bold text-ink-muted text-center leading-tight">Ekoyini Bar</span>
@@ -466,7 +466,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
               </button>
               <button
                 onClick={() => setConfirmDelete(null)}
-                className={`flex-1 border-2 border-ink font-bold py-2 rounded-pill text-sm ${pressable}`}
+                className={`flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm ${pressable}`}
               >
                 Cancel
               </button>
@@ -475,7 +475,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         )}
 
         {/* Checklist (File 1 UI, using File 2 data) */}
-        <div className="mx-4 mt-4 bg-white border-2 border-ink rounded-soft p-5 shadow-soft">
+        <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Checklist</h3>
           </div>
@@ -544,7 +544,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           {showPledgeForm && (
             <form
               onSubmit={addPledge}
-              className="bg-white border-2 border-ink rounded-soft p-4 mb-3 shadow-soft space-y-2 animate-fade-in"
+              className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-3 shadow-soft space-y-2 animate-fade-in"
             >
               <input
                 type="text"
@@ -585,14 +585,14 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
               description="Assign roles and pledges to family members for this ceremony."
               primaryLabel="Add First Pledge"
               onPrimary={() => setShowPledgeForm(true)}
-              className="border-2 border-ink"
+              className="border-2 border-terracotta/25"
             />
           ) : (
             <div className="space-y-2">
               {pledges.map((p) => (
                 <div
                   key={p.id}
-                  className="bg-white border-2 border-ink rounded-soft p-4 flex justify-between items-center shadow-soft"
+                  className="bg-white border-2 border-terracotta/25 rounded-soft p-4 flex justify-between items-center shadow-soft"
                 >
                   <div>
                     <p className="font-bold text-sm text-ink">{p.contributorName}</p>
@@ -680,7 +680,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
       </div>
 
       {/* Create Plan Form (styled like File 1) */}
-      <div className="mx-4 mt-4 bg-white border-2 border-ink rounded-soft p-5 shadow-soft">
+      <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft">
         <h3 className="font-display font-bold text-lg text-ink mb-3">Create New Plan</h3>
         <form onSubmit={createPlan} className="space-y-3">
           <select
@@ -735,7 +735,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
                 <button
                   key={plan.id}
                   onClick={() => setActivePlan(plan)}
-                  className="w-full text-left bg-white border-2 border-ink rounded-soft p-4 shadow-soft hover:shadow-md transition-shadow"
+                  className="w-full text-left bg-white border-2 border-terracotta/25 rounded-soft p-4 shadow-soft hover:shadow-md transition-shadow"
                 >
                   <p className="font-bold text-sm text-ink">{plan.title}</p>
                   <p className="text-xs text-ink-muted">{done}/{total} done</p>

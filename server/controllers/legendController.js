@@ -4,11 +4,12 @@ import { isAdminEmail } from '../config/admin.js';
 export async function getFeaturedLegend(req, res) {
       try {
               const where = { isFeatured: true, verificationStatus: { in: ['VERIFIED', 'TRADITIONAL_ATTRIBUTION'] } };
-                  const count = await prisma.legendEntry.count({ where });
-                  if (count === 0) return res.json(null);
-                      const skip = Math.floor(Math.random() * count);
-                          const [entry] = await prisma.legendEntry.findMany({ where, skip, take: 1 });
-                              res.json(entry);
+                  const entries = await prisma.legendEntry.findMany({ where });
+                  for (let i = entries.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [entries[i], entries[j]] = [entries[j], entries[i]];
+                  }
+                  res.json(entries);
       } catch (error) {
               console.error('Get featured legend error:', error.message);
                   res.status(500).json({ error: 'Could not fetch legend' });

@@ -8,7 +8,7 @@ const HEAR_OPTIONS = ['Instagram', 'Facebook', 'Referral', 'Word of Mouth', 'Pre
 
 function Section({ title, children }) {
   return (
-    <div className="bg-white border-2 border-brand-black rounded-soft p-4 mb-4">
+    <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4">
       <p className="text-xs font-black uppercase text-brand-ochre mb-3">{title}</p>
       <div className="space-y-3">{children}</div>
     </div>
@@ -259,7 +259,7 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
 
       {step < 6 && (
         <div className="flex gap-2 mt-2">
-          {step > 1 && <button onClick={() => setStep(step - 1)} className="flex-1 border-2 border-brand-black text-brand-black font-bold py-2 rounded-pill text-sm">Back</button>}
+          {step > 1 && <button onClick={() => setStep(step - 1)} className="flex-1 border-2 border-terracotta/25 text-brand-black font-bold py-2 rounded-pill text-sm">Back</button>}
           <button onClick={() => setStep(step + 1)} className="flex-1 bg-brand-blue text-brand-cream font-bold py-2 rounded-pill text-sm">Next</button>
         </div>
       )}

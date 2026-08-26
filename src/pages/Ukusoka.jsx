@@ -62,7 +62,7 @@ function Ukusoka({ onBack }) {
 
       <div className="px-4 mt-4">
         <input placeholder="Who is being gifted? (initiate's name)" value={initiateName} onChange={(e) => setInitiateName(e.target.value)}
-          className="w-full border-2 border-ink/20 rounded-soft px-3 py-2.5 text-sm mb-3 bg-white" />
+          className="w-full border-2 border-terracotta/20 rounded-soft px-3 py-2.5 text-sm mb-3 bg-white" />
 
         <button onClick={() => setShowForm(!showForm)} disabled={!initiateName}
           className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill mb-4 disabled:opacity-40">
@@ -70,7 +70,7 @@ function Ukusoka({ onBack }) {
         </button>
 
         {showForm && (
-          <form onSubmit={addEntry} className="bg-white border-2 border-ink rounded-soft p-4 mb-4 space-y-2">
+          <form onSubmit={addEntry} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 space-y-2">
             <input placeholder="Giver's name (e.g. Aunt Nomsa)" value={giverName} onChange={(e) => setGiverName(e.target.value)}
               className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
             <input placeholder="Relationship (e.g. Aunt, Uncle, Sibling)" value={relationship} onChange={(e) => setRelationship(e.target.value)}
@@ -93,7 +93,7 @@ function Ukusoka({ onBack }) {
         ) : (
           <div className="space-y-2">
             {entries.filter(e => !initiateName || e.initiateName === initiateName).map((entry) => (
-              <div key={entry.id} className="bg-white border-2 border-ink rounded-soft p-3">
+              <div key={entry.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-3">
                 <div className="flex justify-between">
                   <p className="font-bold text-sm">{entry.giverName}</p>
                   <span className="text-xs font-black text-sage-600 bg-sage-50 px-2 py-0.5 rounded-pill">{entry.category}</span>

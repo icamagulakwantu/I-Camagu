@@ -12,7 +12,7 @@ function CommunityVerification({ targetType, targetId, confirmCount = 0, dispute
   const progressPct = Math.min(100, Math.round((confirmCount / CONFIRMS_NEEDED) * 100))
 
   return (
-    <div className="mt-3 pt-3 border-t border-ink/10">
+    <div className="mt-3 pt-3 border-t border-terracotta/10">
       <div className="flex items-center justify-between mb-1.5">
         <p className="text-[10px] font-black uppercase text-ink-muted tracking-wider">Community Verification</p>
         {trusted && (

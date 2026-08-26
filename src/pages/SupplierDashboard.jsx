@@ -72,7 +72,7 @@ function RegisterForm({ onRegistered }) {
 
   return (
     <div className="px-4 mt-4">
-      <div className="bg-white border-2 border-ink rounded-soft p-5">
+      <div className="bg-white border-2 border-terracotta/25 rounded-soft p-5">
         <h2 className="font-display font-bold text-lg text-ink mb-1">Become a Supplier</h2>
         <p className="text-xs text-ink-muted mb-4">Register your tavern or butchery to receive bulk pool orders from iCamagu members in your area.</p>
         <form onSubmit={submit} className="space-y-3">
@@ -231,7 +231,7 @@ function SupplierDashboard({ onBack }) {
           ) : (
             <div className="space-y-3">
               {pools.map((pool) => (
-                <div key={pool.id} className="bg-white border-2 border-ink rounded-soft p-4">
+                <div key={pool.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-pill ${
                       pool.status === 'FULFILLED' ? 'bg-ink text-white' : pool.status === 'MATCHED' ? 'bg-sage-500 text-white' : 'bg-terracotta/20 text-terracotta'
@@ -255,7 +255,7 @@ function SupplierDashboard({ onBack }) {
                   </div>
 
                   {pool.orderDocument && (
-                    <div className="mt-3 pt-3 border-t border-ink/10">
+                    <div className="mt-3 pt-3 border-t border-terracotta/10">
                       <p className="text-xs font-bold text-ink">Order {pool.orderDocument.groupCode}</p>
                       <p className="text-[10px] text-ink-muted">{pool.orderDocument.deliveryLocation}</p>
                       <p className="text-[10px] text-ink-muted mt-1">
@@ -265,7 +265,7 @@ function SupplierDashboard({ onBack }) {
                   )}
 
                   {(pool.payments || []).length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-ink/10">
+                    <div className="mt-3 pt-3 border-t border-terracotta/10">
                       <p className="text-[10px] font-black uppercase text-ink-muted mb-2">Member Payments</p>
                       <div className="space-y-2">
                         {pool.payments.map((p) => (
@@ -292,7 +292,7 @@ function SupplierDashboard({ onBack }) {
                               )}
                             </div>
                             {p.refundRequestedAt && p.status !== 'REFUNDED' && (
-                              <div className="flex items-center justify-between mt-2 pt-2 border-t border-ink/10">
+                              <div className="flex items-center justify-between mt-2 pt-2 border-t border-terracotta/10">
                                 <span className="text-[10px] font-bold text-terracotta">Refund requested</span>
                                 <button
                                   onClick={() => processRefund(p.id)}
@@ -310,7 +310,7 @@ function SupplierDashboard({ onBack }) {
                   )}
 
                   {pool.status === 'MATCHED' && (
-                    <div className="mt-3 pt-3 border-t border-ink/10">
+                    <div className="mt-3 pt-3 border-t border-terracotta/10">
                       <button
                         onClick={() => fulfillPool(pool.id)}
                         disabled={!pool.canFulfill || fulfillingId === pool.id}

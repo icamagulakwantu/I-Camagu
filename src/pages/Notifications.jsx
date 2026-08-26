@@ -46,7 +46,7 @@ function Notifications({ onBack, onNavigate }) {
                                                                               <div className="space-y-2">
                                                                                         {notifications.map((n) => (
                                                                                                         <button key={n.id} onClick={() => handleTap(n)}
-                                                                                                                      className={`w-full text-left border-2 rounded-soft p-3 flex items-start gap-3 ${n.isRead ? 'bg-white border-ink/10' : 'bg-sage-50 border-sage-300'}`}>
+                                                                                                                      className={`w-full text-left border-2 rounded-soft p-3 flex items-start gap-3 ${n.isRead ? 'bg-white border-terracotta/10' : 'bg-sage-50 border-sage-300'}`}>
                                                                                                                                     <Icon name={TYPE_ICON[n.type] || 'bell'} size={18} color="#c45c26" />
                                                                                                                                                   <div className="flex-1">
                                                                                                                                                                   <p className="text-sm text-ink">{n.message}</p>

@@ -13,7 +13,7 @@ const STOKVEL_TYPES = [
   'RECIPROCAL_GIFTING'
 ]
 
-const cardBase = "bg-white border-2 border-ink rounded-soft p-4 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+const cardBase = "bg-white border-2 border-terracotta/25 rounded-soft p-4 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
 const cardHover = "hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] hover:border-sage-400/30"
 const cardActive = "active:scale-[0.98] active:shadow-none"
 const pressable = "transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none"
@@ -618,7 +618,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
         </div>
 
         <div className="px-4 mt-4 space-y-4">
-          <div className="bg-white border-2 border-ink rounded-soft p-4">
+          <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
             <p className="text-xs font-black uppercase text-ink-muted mb-2">Announcements</p>
             {isOfficial && (
               <form onSubmit={postAnnouncement} className="flex gap-2 mb-3">
@@ -644,7 +644,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
           </div>
 
           {/* Submit Contribution Form */}
-          <form onSubmit={submitContribution} className="bg-white border-2 border-ink rounded-soft p-4 space-y-2">
+          <form onSubmit={submitContribution} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-2">
             <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Submit a contribution</p>
             <input
               type="number"
@@ -694,7 +694,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
 
           {/* Rotation Order (umgalelo stokvels only) */}
           {stokvel.type === 'UMGALELO_ROTATING' && (
-            <div className="bg-white border-2 border-ink rounded-soft p-4">
+            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
               <div className="flex justify-between items-center mb-2">
                 <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Rotation Order</p>
                 {isOfficial && !editingRotation && (
@@ -714,11 +714,11 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                         <span className="text-sm font-bold text-ink">{idx + 1}. {name}</span>
                         <div className="flex gap-1">
                           <button type="button" onClick={() => moveInRotation(idx, -1)} disabled={idx === 0}
-                            className="w-7 h-7 rounded-pill bg-white border border-ink/20 disabled:opacity-30 flex items-center justify-center">
+                            className="w-7 h-7 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center">
                             <Icon name="arrowUp" size={12} />
                           </button>
                           <button type="button" onClick={() => moveInRotation(idx, 1)} disabled={idx === rotationDraft.length - 1}
-                            className="w-7 h-7 rounded-pill bg-white border border-ink/20 disabled:opacity-30 flex items-center justify-center">
+                            className="w-7 h-7 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center">
                             <Icon name="arrowDown" size={12} />
                           </button>
                         </div>
@@ -730,7 +730,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                       className={`flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
                       {savingRotation ? 'Saving...' : 'Save order'}
                     </button>
-                    <button type="button" onClick={() => setEditingRotation(false)} className="flex-1 border-2 border-ink font-bold py-2 rounded-pill text-sm">
+                    <button type="button" onClick={() => setEditingRotation(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">
                       Cancel
                     </button>
                   </div>
@@ -758,7 +758,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
           )}
 
           {/* Request Payout Form */}
-          <form onSubmit={requestPayout} className="bg-white border-2 border-ink rounded-soft p-4 space-y-2">
+          <form onSubmit={requestPayout} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-2">
             <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Request a payout</p>
             {stokvel.type === 'UMGALELO_ROTATING' && (
               <p className="text-xs text-ink-muted">
@@ -812,7 +812,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
 
           {/* Organiser-only: edit stokvel details */}
           {stokvel.organiserId === user?.id && (
-            <div className="bg-white border-2 border-ink rounded-soft p-4 space-y-3">
+            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Stokvel Details</p>
                 <button
@@ -866,7 +866,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
 
           {/* Officials-only group settings */}
           {isOfficial && (
-            <div className="bg-white border-2 border-ink rounded-soft p-4 space-y-4">
+            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-4">
               <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Group Settings</p>
 
               <form onSubmit={recordInterest} className="space-y-2">
@@ -887,7 +887,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                 <p className="text-[10px] text-ink-muted">Adds to the group balance, e.g. bank/savings interest received this cycle.</p>
               </form>
 
-              <form onSubmit={recordExpense} className="space-y-2 pt-2 border-t border-ink/10">
+              <form onSubmit={recordExpense} className="space-y-2 pt-2 border-t border-terracotta/10">
                 <p className="text-xs font-bold text-ink">Record a group expense</p>
                 <div className="flex gap-2">
                   <input
@@ -910,7 +910,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                 <p className="text-[10px] text-ink-muted">Deducts from the group balance — money spent directly by the group, not paid out to a member.</p>
               </form>
 
-              <div className="pt-2 border-t border-ink/10">
+              <div className="pt-2 border-t border-terracotta/10">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold text-ink">Bereavement mode</p>
@@ -922,7 +922,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                     type="button"
                     onClick={toggleBereavement}
                     disabled={togglingBereavement}
-                    className={`text-xs font-bold px-3 py-1.5 rounded-pill flex-shrink-0 ${stokvel.bereavementActive ? 'bg-terracotta text-white' : 'border-2 border-ink/20 text-ink-muted'} ${pressable}`}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-pill flex-shrink-0 ${stokvel.bereavementActive ? 'bg-terracotta text-white' : 'border-2 border-terracotta/20 text-ink-muted'} ${pressable}`}
                   >
                     {stokvel.bereavementActive ? 'Deactivate' : 'Activate'}
                   </button>
@@ -960,7 +960,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                       type="button"
                       onClick={() => setConfirmDelete(false)}
                       disabled={isDeleting}
-                      className={`flex-1 border-2 border-ink font-bold py-2 rounded-pill text-sm ${pressable}`}
+                      className={`flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm ${pressable}`}
                     >
                       Cancel
                     </button>
@@ -1014,7 +1014,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
         <button
           type="button"
           onClick={() => { setError(''); setView('join'); }}
-          className={`flex-1 border-2 border-ink text-ink font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+          className={`flex-1 border-2 border-terracotta/25 text-ink font-bold py-2.5 rounded-pill text-sm ${pressable}`}
         >
           Join
         </button>

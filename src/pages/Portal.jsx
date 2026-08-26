@@ -198,12 +198,12 @@ export default function Portal({ onBack }) {
               description="Upload the first photo or video to preserve this ceremony for future generations."
               primaryLabel="Upload First Memory"
               onPrimary={() => fileInputRef.current?.click()}
-              className="border-2 border-ink"
+              className="border-2 border-terracotta/25"
             />
           ) : (
             <div className="grid grid-cols-3 gap-2">
               {filteredMedia.map((m) => (
-                <div key={m.id} className="relative aspect-square bg-cream-dark border-2 border-ink rounded-soft overflow-hidden group">
+                <div key={m.id} className="relative aspect-square bg-cream-dark border-2 border-terracotta/25 rounded-soft overflow-hidden group">
                   {m.mediaType === 'VIDEO' ? (
                     <video src={m.url} controls className="w-full h-full object-cover" />
                   ) : (
@@ -241,7 +241,7 @@ export default function Portal({ onBack }) {
 
       <div className="px-4 mt-5">
         {/* Create Portal Form */}
-        <form onSubmit={createPortal} className="bg-white border-2 border-ink rounded-soft p-4 mb-4 shadow-soft space-y-3">
+        <form onSubmit={createPortal} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 shadow-soft space-y-3">
           <p className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Create New Portal</p>
           <input
             type="text"
@@ -267,7 +267,7 @@ export default function Portal({ onBack }) {
             emoji="🖼️"
             title="No portals created yet"
             description="Create a portal above to archive family photos, videos, and ceremony memories."
-            className="border-2 border-ink"
+            className="border-2 border-terracotta/25"
           />
         ) : (
           <div className="space-y-2">
@@ -276,7 +276,7 @@ export default function Portal({ onBack }) {
                 key={p.id}
                 type="button"
                 onClick={() => setActivePortal(p)}
-                className={`w-full text-left bg-white border-2 border-ink rounded-soft p-4 shadow-soft flex justify-between items-center ${pressable}`}
+                className={`w-full text-left bg-white border-2 border-terracotta/25 rounded-soft p-4 shadow-soft flex justify-between items-center ${pressable}`}
               >
                 <div>
                   <p className="font-bold text-base text-ink">{p.title}</p>

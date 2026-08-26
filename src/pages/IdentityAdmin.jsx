@@ -65,7 +65,7 @@ function IdentityAdmin({ onBack }) {
       ) : (
         <div className="space-y-3">
           {pending.map((p) => (
-            <div key={p.id} className="bg-white border-2 border-ink rounded-soft p-4">
+            <div key={p.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <p className="font-bold text-sm">{p.firstName} {p.lastName}</p>
@@ -100,7 +100,7 @@ function IdentityAdmin({ onBack }) {
                   />
                   <div className="flex gap-2">
                     <button onClick={() => review(p.id, false, rejectionReason)} className="flex-1 bg-terracotta text-white font-bold py-2 rounded-pill text-sm">Confirm rejection</button>
-                    <button onClick={() => { setRejecting(null); setRejectionReason('') }} className="flex-1 border-2 border-ink font-bold py-2 rounded-pill text-sm">Cancel</button>
+                    <button onClick={() => { setRejecting(null); setRejectionReason('') }} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">Cancel</button>
                   </div>
                 </div>
               ) : (

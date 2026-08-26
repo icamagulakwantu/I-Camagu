@@ -73,18 +73,18 @@ export default function PinSetup({ onBack }) {
       {loading ? (
         <p className="text-sm text-ink-muted">Checking...</p>
       ) : hasPinSet && !changing ? (
-        <div className="bg-white border-2 border-ink rounded-soft p-5">
+        <div className="bg-white border-2 border-terracotta/25 rounded-soft p-5">
           <p className="text-sm font-bold text-sage-600 mb-1">🔐 PIN is active</p>
           <p className="text-xs text-ink-muted mb-4">Your account has a security PIN set.</p>
           <button
             onClick={() => setChanging(true)}
-            className={`w-full border-2 border-ink font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+            className={`w-full border-2 border-terracotta/25 font-bold py-2.5 rounded-pill text-sm ${pressable}`}
           >
             Change PIN
           </button>
         </div>
       ) : (
-        <form onSubmit={submit} className="bg-white border-2 border-ink rounded-soft p-5 space-y-3">
+        <form onSubmit={submit} className="bg-white border-2 border-terracotta/25 rounded-soft p-5 space-y-3">
           <input
             type="password" inputMode="numeric" placeholder="New PIN (4-6 digits)" value={pin}
             onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}

@@ -103,7 +103,7 @@ function MyOrders({ onBack }) {
           {documents.map((doc) => {
             const payment = payments.find((p) => p.poolId === doc.poolId)
             return (
-              <div key={doc.id} className="bg-white border-2 border-brand-black rounded-soft p-4">
+              <div key={doc.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
                 <div className="flex justify-between items-start mb-2">
                   <p className="font-mono text-xs font-bold text-brand-blue">{doc.groupCode}</p>
                   <span className="text-xs font-black uppercase text-brand-ochre">{doc.status.replace(/_/g, ' ')}</span>
@@ -124,7 +124,7 @@ function MyOrders({ onBack }) {
                 <p className="text-sm font-bold text-brand-black mt-2">Group total: R{parseFloat(doc.totalAmountZAR).toFixed(2)}</p>
 
                 {payment && (
-                  <div className="mt-3 pt-3 border-t border-brand-black/10">
+                  <div className="mt-3 pt-3 border-t border-terracotta/15">
                     <p className="text-xs font-black uppercase text-brand-black/50 mb-1">Your share: {money(payment.amountZAR)}</p>
                     {payment.status === 'REFUNDED' ? (
                       <p className="text-xs font-bold text-terracotta">Refunded{payment.refundFeeZAR > 0 ? ` (${money(payment.refundFeeZAR)} processing fee deducted)` : ''}</p>

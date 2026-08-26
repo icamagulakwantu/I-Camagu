@@ -137,7 +137,7 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
       </div>
 
       {/* Heritage Header Banner */}
-      <div className="mb-5 rounded-soft overflow-hidden shadow-sm border border-brand-black/10 bg-white/80 backdrop-blur-md">
+      <div className="mb-5 rounded-soft overflow-hidden shadow-sm border border-terracotta/15 bg-white/80 backdrop-blur-md">
         <div className="p-4">
           <DidYouKnow />
         </div>
@@ -204,7 +204,7 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
                 key={c?.id || idx}
                 type="button"
                 onClick={() => c?.id ? onSelectCeremony?.(c.id) : onNavigate('ceremonyhub')}
-                className={`w-full text-left bg-white/90 backdrop-blur-md border-2 border-brand-black/10 rounded-soft p-3.5 shadow-sm ${pressable}`}
+                className={`w-full text-left bg-white/90 backdrop-blur-md border-2 border-terracotta/15 rounded-soft p-3.5 shadow-sm ${pressable}`}
               >
                 <p className="font-extrabold text-sm text-brand-black">{c?.title || 'Untitled Ceremony'}</p>
                 <p className="text-xs text-brand-black/50 capitalize mt-0.5">
@@ -244,7 +244,7 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
                 key={m?.id || idx}
                 type="button"
                 onClick={() => onNavigate('stokvels')}
-                className={`w-full text-left bg-white/90 backdrop-blur-md border-2 border-brand-black/10 rounded-soft p-3.5 shadow-sm ${pressable}`}
+                className={`w-full text-left bg-white/90 backdrop-blur-md border-2 border-terracotta/15 rounded-soft p-3.5 shadow-sm ${pressable}`}
               >
                 <div className="flex justify-between items-center">
                   <div>

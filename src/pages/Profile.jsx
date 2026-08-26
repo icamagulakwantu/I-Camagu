@@ -211,7 +211,7 @@ export default function Profile({ onNavigate }) {
         </div>
       </div>
 
-      <div className="mx-4 -mt-6 bg-white border-2 border-ink rounded-soft p-5 shadow-elevated relative z-10">
+      <div className="mx-4 -mt-6 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-elevated relative z-10">
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Iziduko & Details</h3>
           {!editing && (
@@ -251,7 +251,7 @@ export default function Profile({ onNavigate }) {
               className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
             <div className="flex gap-2 pt-2">
               <button type="submit" className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm">Save</button>
-              <button type="button" onClick={() => setEditing(false)} className="flex-1 border-2 border-ink font-bold py-2 rounded-pill text-sm">Cancel</button>
+              <button type="button" onClick={() => setEditing(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">Cancel</button>
             </div>
           </form>
         ) : (
@@ -282,7 +282,7 @@ export default function Profile({ onNavigate }) {
         )}
       </div>
 
-      <div className="mx-4 mt-4 bg-white border-2 border-ink rounded-soft p-5 shadow-elevated">
+      <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-elevated">
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Identity Verification</h3>
           {identity && (
@@ -371,7 +371,7 @@ export default function Profile({ onNavigate }) {
               <button type="submit" disabled={submittingId || !consented} className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm disabled:opacity-60">
                 {submittingId ? 'Submitting...' : 'Submit for review'}
               </button>
-              <button type="button" onClick={() => setIdentityForm(false)} className="flex-1 border-2 border-ink font-bold py-2 rounded-pill text-sm">Cancel</button>
+              <button type="button" onClick={() => setIdentityForm(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">Cancel</button>
             </div>
           </form>
         )}
@@ -382,7 +382,7 @@ export default function Profile({ onNavigate }) {
           type="button"
           onClick={handleLogout}
           className={cn(
-            'w-full bg-white border-2 border-ink text-ink font-bold py-3.5 rounded-pill flex items-center justify-center gap-2',
+            'w-full bg-white border-2 border-terracotta/25 text-ink font-bold py-3.5 rounded-pill flex items-center justify-center gap-2',
             'hover:bg-ink hover:text-white transition-colors duration-200',
             pressable
           )}

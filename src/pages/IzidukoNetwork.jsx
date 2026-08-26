@@ -126,7 +126,7 @@ function IzidukoNetwork({ onBack }) {
       </div>
 
       <div className="px-4 mt-4">
-        <div className="flex bg-white border-2 border-ink rounded-pill p-1 mb-4">
+        <div className="flex bg-white border-2 border-terracotta/25 rounded-pill p-1 mb-4">
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -153,7 +153,7 @@ function IzidukoNetwork({ onBack }) {
               ) : (
                 <div className="space-y-2">
                   {matches.map((m) => (
-                    <div key={m.id} className="bg-white border-2 border-ink rounded-soft p-4">
+                    <div key={m.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
                       <div className="flex items-center gap-3">
                         <Avatar src={m.profileImage} />
                         <div className="flex-1 min-w-0">
@@ -225,7 +225,7 @@ function IzidukoNetwork({ onBack }) {
                   ) : (
                     <div className="space-y-2">
                       {requests.incoming.map((r) => (
-                        <div key={r.id} className="bg-white border-2 border-ink rounded-soft p-4">
+                        <div key={r.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
                           <div className="flex items-center gap-3">
                             <Avatar src={r.requester.profileImage} />
                             <div className="flex-1 min-w-0">
@@ -243,7 +243,7 @@ function IzidukoNetwork({ onBack }) {
                             </button>
                             <button
                               onClick={() => respond(r.id, false)} disabled={busyId === r.id}
-                              className={`flex-1 text-xs font-bold text-ink-muted border-2 border-ink/20 py-2 rounded-pill ${pressable}`}
+                              className={`flex-1 text-xs font-bold text-ink-muted border-2 border-terracotta/20 py-2 rounded-pill ${pressable}`}
                             >
                               Decline
                             </button>
@@ -261,7 +261,7 @@ function IzidukoNetwork({ onBack }) {
                   ) : (
                     <div className="space-y-2">
                       {requests.outgoing.map((r) => (
-                        <div key={r.id} className="bg-white border-2 border-ink rounded-soft p-4 flex items-center gap-3">
+                        <div key={r.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 flex items-center gap-3">
                           <Avatar src={r.recipient.profileImage} size="w-10 h-10" />
                           <div className="flex-1 min-w-0">
                             <p className="font-bold text-sm text-ink">{r.recipient.firstName} {r.recipient.lastName}</p>
@@ -287,7 +287,7 @@ function IzidukoNetwork({ onBack }) {
               ) : (
                 <div className="space-y-2">
                   {connections.map((c) => (
-                    <div key={c.id} className="bg-white border-2 border-ink rounded-soft p-4 flex items-center gap-3">
+                    <div key={c.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 flex items-center gap-3">
                       <Avatar src={c.profileImage} />
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-sm text-ink">{c.firstName} {c.lastName}</p>

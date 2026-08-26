@@ -17,7 +17,7 @@ function CeremonyTimeline({ ceremonyType, onBack }) {
 
                                           <div className="space-y-5">
                                                 {timeline.phases.map((phase) => (
-                                                      <div key={phase.key} className="bg-white border-2 border-ink rounded-soft p-4">
+                                                      <div key={phase.key} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
                                                             <p className="text-xs font-black uppercase tracking-wider text-sage-600 mb-3">{phase.label}</p>
                                                             <div className="space-y-3">
                                                                   {phase.checklist.map((step, idx) => (

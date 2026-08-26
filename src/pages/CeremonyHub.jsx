@@ -61,8 +61,8 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
           const meta = CEREMONY_META[type] || {}
           return (
           <button key={type} onClick={() => onOpenType(type)}
-            className="w-full bg-white border-2 border-ink rounded-soft p-4 flex items-center gap-4 text-left active:scale-[0.98] transition-transform">
-            <span className="text-3xl">{meta.emoji || '🎉'}</span>
+            className="w-full bg-white border-2 border-terracotta/25 rounded-soft p-4 flex items-center gap-4 text-left active:scale-[0.98] transition-transform">
+            <span className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-2xl flex-shrink-0">{meta.emoji || '🎉'}</span>
             <div>
               <p className="font-bold text-ink">{meta.label || type.replace(/_/g, ' ')}</p>
               <p className="text-xs text-ink-muted">{meta.desc || 'Ceremony planning'}</p>
@@ -81,7 +81,7 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
             <div
               key={c.id}
               onClick={() => onSelectCeremony && onSelectCeremony(c.id)}
-              className="bg-white border border-ink/15 rounded-soft p-3 mb-2 flex items-center justify-between cursor-pointer hover:border-sage-400 transition"
+              className="bg-white border border-terracotta/15 rounded-soft p-3 mb-2 flex items-center justify-between cursor-pointer hover:border-sage-400 transition"
             >
               <div>
                 <p className="font-bold text-sm">{c.title}</p>

@@ -38,7 +38,7 @@ function ShrineFund({ onBack }) {
       </div>
 
       <div className="px-4 -mt-6">
-        <div className="bg-white border-2 border-ink rounded-soft p-6 shadow-card text-center">
+        <div className="bg-white border-2 border-terracotta/25 rounded-soft p-6 shadow-card text-center">
           {loading ? (
             <Skeleton className="h-12 w-48 mx-auto" />
           ) : (
@@ -51,18 +51,18 @@ function ShrineFund({ onBack }) {
 
         {!loading && (
           <div className="grid grid-cols-2 gap-3 mt-4">
-            <div className="bg-white border border-ink/15 rounded-soft p-4 text-center">
+            <div className="bg-white border border-terracotta/15 rounded-soft p-4 text-center">
               <p className="font-display font-bold text-xl text-ink">{data?.contributionCount || 0}</p>
               <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wide mt-0.5">Payouts contributed</p>
             </div>
-            <div className="bg-white border border-ink/15 rounded-soft p-4 text-center">
+            <div className="bg-white border border-terracotta/15 rounded-soft p-4 text-center">
               <p className="font-display font-bold text-xl text-ink">{data?.rate ? `${(data.rate * 100).toFixed(0)}%` : '—'}</p>
               <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wide mt-0.5">Current tithe rate</p>
             </div>
           </div>
         )}
 
-        <div className="bg-white border border-ink/15 rounded-soft p-4 mt-4">
+        <div className="bg-white border border-terracotta/15 rounded-soft p-4 mt-4">
           <p className="text-xs font-black uppercase text-ink-muted mb-2">What this is</p>
           <p className="text-sm text-ink leading-relaxed">
             Every time a stokvel payout clears, a small, itemised tithe is set aside into this shared fund —

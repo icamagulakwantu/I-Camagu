@@ -36,7 +36,7 @@ function Activity({ onBack }) {
                                               ) : (
                                                           <div className="space-y-2">
                                                                     {feed.map((item, idx) => (
-                                                                                    <div key={idx} className="bg-white border border-ink/15 rounded-soft p-3 flex items-center gap-3">
+                                                                                    <div key={idx} className="bg-white border border-terracotta/15 rounded-soft p-3 flex items-center gap-3">
                                                                                                   <Icon name={TYPE_ICON[item.type] || 'clipboard'} size={18} color="#c45c26" />
                                                                                                                 <div className="flex-1">
                                                                                                                                 <p className="text-sm text-ink">{item.text}</p>

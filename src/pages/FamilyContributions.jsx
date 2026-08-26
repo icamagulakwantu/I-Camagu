@@ -124,7 +124,7 @@ export default function FamilyContributions({ onBack }) {
           </button>
 
           {showForm && (
-            <form onSubmit={addPledge} className="bg-white border-2 border-ink rounded-soft p-5 shadow-soft mb-4 space-y-3">
+            <form onSubmit={addPledge} className="bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft mb-4 space-y-3">
               <input
                 type="text"
                 placeholder="Name (e.g. Uncle Sipho)"
@@ -172,12 +172,12 @@ export default function FamilyContributions({ onBack }) {
               description="Assign roles and pledges to family members for this ceremony."
               primaryLabel="Add First Pledge"
               onPrimary={() => setShowForm(true)}
-              className="border-2 border-ink"
+              className="border-2 border-terracotta/25"
             />
           ) : (
             <div className="space-y-2">
               {activePlan.pledges.map((pledge) => (
-                <div key={pledge.id} className="bg-white border-2 border-ink rounded-soft p-4 flex justify-between items-center shadow-soft">
+                <div key={pledge.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 flex justify-between items-center shadow-soft">
                   <div>
                     <div className="flex items-center space-x-2">
                       <p className="font-bold text-sm text-ink">{pledge.pledgerName}</p>
@@ -234,7 +234,7 @@ export default function FamilyContributions({ onBack }) {
             emoji="📋"
             title="No ceremony plans yet"
             description="Create a plan in Ceremony Preparation first to start tracking family pledges."
-            className="border-2 border-ink"
+            className="border-2 border-terracotta/25"
           />
         ) : (
           <div className="space-y-2">
@@ -243,7 +243,7 @@ export default function FamilyContributions({ onBack }) {
                 key={plan.id}
                 type="button"
                 onClick={() => setActivePlan(plan)}
-                className={`w-full text-left bg-white border-2 border-ink rounded-soft p-4 shadow-soft flex justify-between items-center ${pressable}`}
+                className={`w-full text-left bg-white border-2 border-terracotta/25 rounded-soft p-4 shadow-soft flex justify-between items-center ${pressable}`}
               >
                 <div>
                   <p className="font-bold text-sm text-ink">{plan.title}</p>

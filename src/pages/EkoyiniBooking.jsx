@@ -191,7 +191,7 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
       ) : (
         <div className="px-4 mt-4 space-y-4">
           {/* Bar booking */}
-          <div className="bg-white border-2 border-ink rounded-soft p-4">
+          <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
             <p className="text-xs font-black uppercase text-ink-muted mb-2">Bar Service</p>
             {!booking ? (
               <div>
@@ -245,7 +245,7 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
                     />
                     <button
                       type="submit" disabled={addingTier}
-                      className={`w-full border-2 border-ink text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}
+                      className={`w-full border-2 border-terracotta/25 text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}
                     >
                       {addingTier ? 'Adding...' : '+ Add Tier'}
                     </button>
@@ -256,13 +256,13 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
           </div>
 
           {/* Tourism package */}
-          <div className="bg-white border-2 border-ink rounded-soft p-4">
+          <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-black uppercase text-ink-muted">Cultural Tourism Add-on</p>
               {tourism && (
                 <button
                   onClick={toggleTourism}
-                  className={`text-[11px] font-bold px-3 py-1 rounded-pill ${tourism.isEnabled ? 'bg-sage-500 text-white' : 'border-2 border-ink/20 text-ink-muted'} ${pressable}`}
+                  className={`text-[11px] font-bold px-3 py-1 rounded-pill ${tourism.isEnabled ? 'bg-sage-500 text-white' : 'border-2 border-terracotta/20 text-ink-muted'} ${pressable}`}
                 >
                   {tourism.isEnabled ? 'Enabled' : 'Disabled'}
                 </button>
@@ -294,7 +294,7 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
             </form>
 
             {tourism && (
-              <div className="mt-4 pt-4 border-t border-ink/10">
+              <div className="mt-4 pt-4 border-t border-terracotta/10">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-xs font-bold text-ink">Bookings log</p>
                   <button
@@ -326,7 +326,7 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
                     </div>
                     <button
                       type="submit" disabled={loggingBooking}
-                      className={`w-full border-2 border-ink text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}
+                      className={`w-full border-2 border-terracotta/25 text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}
                     >
                       {loggingBooking ? 'Saving...' : 'Log Booking'}
                     </button>

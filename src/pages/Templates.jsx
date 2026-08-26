@@ -42,7 +42,7 @@ function Templates({ onBack }) {
       <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
         <button onClick={() => setActiveTemplate(null)} className="text-sm text-ink-muted mb-4">← All templates</button>
         <h2 className="font-display font-bold text-2xl text-ink mb-4">{activeTemplate.title}</h2>
-        <form onSubmit={createFromTemplate} className="bg-white border-2 border-ink rounded-soft p-4 space-y-2">
+        <form onSubmit={createFromTemplate} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-2">
           <input placeholder="Title for the new ceremony plan" value={newTitle} onChange={(e) => setNewTitle(e.target.value)}
             className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
           <button type="submit" className="w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm">Create Plan From This Template</button>
@@ -63,7 +63,7 @@ function Templates({ onBack }) {
       ) : (
         <div className="space-y-2">
           {templates.map((t) => (
-            <button key={t.id} onClick={() => setActiveTemplate(t)} className="w-full text-left bg-white border-2 border-ink rounded-soft p-3">
+            <button key={t.id} onClick={() => setActiveTemplate(t)} className="w-full text-left bg-white border-2 border-terracotta/25 rounded-soft p-3">
               <p className="font-bold text-sm">{t.title}</p>
               <p className="text-xs text-ink-muted">{t.ceremonyType.replace(/_/g, ' ')} • {t.checklistItems.length} items</p>
             </button>

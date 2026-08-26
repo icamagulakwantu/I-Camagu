@@ -12,7 +12,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 print:hidden">
       <div className="max-w-md mx-auto relative">
-        <div className="bg-white rounded-t-[28px] shadow-[0_-4px_20px_rgba(43,38,32,0.12)] border-t border-brand-black/10 flex pt-2 pb-2 px-2">
+        <div className="bg-white rounded-t-[28px] shadow-[0_-4px_20px_rgba(43,38,32,0.12)] border-t border-terracotta/15 flex pt-2 pb-2 px-2">
           {tabs.filter(t => !t.isCenter).slice(0, 2).map((tab) => (
             <button key={tab.id} onClick={() => onNavigate(tab.id)}
               className={`flex-1 flex flex-col items-center py-2 transition-colors relative ${activeScreen === tab.id ? 'text-brand-blue' : 'text-brand-black/40'}`}>

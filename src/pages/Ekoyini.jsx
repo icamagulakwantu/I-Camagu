@@ -54,7 +54,7 @@ export default function Ekoyini({ onBack }) {
             type="button"
             onClick={() => setSelectedPackage(pkg.id)}
             className={cn(
-              'w-full bg-white border-2 rounded-soft p-4 flex items-center gap-4 text-left transition-all duration-200 border-ink hover:border-sage-300 hover:-translate-y-0.5 hover:shadow-card',
+              'w-full bg-white border-2 rounded-soft p-4 flex items-center gap-4 text-left transition-all duration-200 border-terracotta/25 hover:border-sage-300 hover:-translate-y-0.5 hover:shadow-card',
               pressable
             )}
           >

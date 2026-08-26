@@ -22,7 +22,7 @@ function Help({ onBack }) {
       <p className="text-xs font-black uppercase text-ink-muted mb-2">Frequently Asked Questions</p>
       <div className="space-y-2">
         {faqs.map((faq, idx) => (
-          <details key={idx} className="bg-white border-2 border-ink/15 rounded-soft p-3">
+          <details key={idx} className="bg-white border-2 border-terracotta/15 rounded-soft p-3">
             <summary className="font-bold text-sm text-ink cursor-pointer">{faq.q}</summary>
             <p className="text-xs text-ink-muted mt-2 leading-relaxed">{faq.a}</p>
           </details>

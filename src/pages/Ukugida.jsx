@@ -124,7 +124,7 @@ export default function Ukugida({ onBack }) {
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={addEntry} className="px-4 mt-4 bg-white border-2 border-ink rounded-soft p-5 shadow-soft space-y-3 animate-fade-in">
+        <form onSubmit={addEntry} className="px-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft space-y-3 animate-fade-in">
           <div className="flex gap-2">
             {[['GIVEN', 'Given'], ['RECEIVED', 'Received']].map(([value, label]) => (
               <button
@@ -230,7 +230,7 @@ export default function Ukugida({ onBack }) {
             description="Track what your family gives and receives. Build reciprocity for generations."
             primaryLabel="Record First Gift"
             onPrimary={() => setShowForm(true)}
-            className="border-2 border-ink"
+            className="border-2 border-terracotta/25"
           />
         ) : (
           <div className="space-y-2">
@@ -239,7 +239,7 @@ export default function Ukugida({ onBack }) {
                 key={entry.id}
                 className={cn(
                   'bg-white border-2 rounded-soft p-4 shadow-soft flex items-start gap-3',
-                  entry.direction === 'RECEIVED' ? 'border-sage-300' : 'border-ink/10'
+                  entry.direction === 'RECEIVED' ? 'border-sage-300' : 'border-terracotta/10'
                 )}
               >
                 <div className={cn(

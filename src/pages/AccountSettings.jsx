@@ -50,13 +50,13 @@ function AccountSettings({ onBack, onOpenPrivacy }) {
       <h2 className="font-display font-bold text-2xl text-ink mb-4">Account & Privacy</h2>
 
       {onOpenPrivacy && (
-        <button onClick={onOpenPrivacy} className="w-full bg-white border-2 border-ink rounded-soft p-4 mb-4 text-left">
+        <button onClick={onOpenPrivacy} className="w-full bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 text-left">
           <p className="font-bold text-sm text-ink mb-1">Privacy Policy</p>
           <p className="text-xs text-ink-muted">How iCamagu collects, uses, and protects your information, including your ID number if you verify your identity.</p>
         </button>
       )}
 
-      <div className="bg-white border-2 border-ink rounded-soft p-4 mb-4">
+      <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4">
         <p className="font-bold text-sm text-ink mb-1">Export your data</p>
         <p className="text-xs text-ink-muted mb-3">Download everything iCamagu holds about you, as a file.</p>
         <button onClick={exportData} className="w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm">

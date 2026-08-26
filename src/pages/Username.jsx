@@ -33,7 +33,7 @@ function Username() {
 
                 return (
                         <div className="icamagu-bg flex flex-col items-center justify-center px-6 py-10">
-                              <div className="w-full max-w-sm bg-white border-3 border-brand-black rounded-soft p-8">
+                              <div className="w-full max-w-sm bg-white border-3 border-terracotta/25 rounded-soft p-8">
                                       <div className="h-1.5 w-16 bg-brand-ochre rounded-pill mb-6"></div>
                                               <h2 className="text-2xl font-extrabold text-brand-black mb-2">
                                                         One last thing
