@@ -108,7 +108,7 @@ export default function Basket({ onBack, onBasketChanged }) {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${accessToken}` },
       })
-      showToast('Item removed from basket', 'info')
+      showToast('Item removed from cart', 'info')
       fetchBasket()
     } catch {
       showToast('Could not remove item', 'error')
@@ -127,8 +127,8 @@ export default function Basket({ onBack, onBasketChanged }) {
         body: JSON.stringify({ basketId: basketData.basket?.id, partnerId: selectedPartner }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to submit basket.')
-      showToast(data.message || 'Basket submitted successfully!', 'success')
+      if (!res.ok) throw new Error(data.error || 'Failed to submit cart.')
+      showToast(data.message || 'Cart submitted successfully!', 'success')
       fetchBasket()
       fetchPoolStatus()
     } catch (err) {
@@ -147,7 +147,7 @@ export default function Basket({ onBack, onBasketChanged }) {
         body: JSON.stringify({ basketId: poolStatus.basketId }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not withdraw basket')
+      if (!res.ok) throw new Error(data.error || 'Could not withdraw cart')
       showToast(data.message || 'Withdrawn from pool', 'info')
       setPoolStatus(null)
     } catch (err) {
@@ -162,14 +162,14 @@ export default function Basket({ onBack, onBasketChanged }) {
     const text = basketData.items
       .map((i) => `${i.sku?.name || 'Item'} x${i.quantity} case(s)`)
       .join('\n')
-    const summary = `My Wholesale Basket:\n\n${text}\n\nTotal Cases: ${basketData.totalCases}\nTotal: R${basketData.totalZAR.toFixed(2)}`
+    const summary = `My Wholesale Cart:\n\n${text}\n\nTotal Cases: ${basketData.totalCases}\nTotal: R${basketData.totalZAR.toFixed(2)}`
 
     if (navigator.share) {
-      navigator.share({ title: 'My Wholesale Basket', text: summary }).catch(() => {})
+      navigator.share({ title: 'My Wholesale Cart', text: summary }).catch(() => {})
     } else {
       navigator.clipboard.writeText(summary)
       setCopied(true)
-      showToast('Basket copied to clipboard', 'info')
+      showToast('Cart copied to clipboard', 'info')
       setTimeout(() => setCopied(false), 2000)
     }
   }
@@ -202,12 +202,12 @@ export default function Basket({ onBack, onBasketChanged }) {
             onClick={shareBasket}
             className="bg-terracotta text-cream text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform"
           >
-            {copied ? 'Copied!' : 'Share Basket 🔗'}
+            {copied ? 'Copied!' : 'Share Cart 🔗'}
           </button>
         )}
       </div>
 
-      <h2 className="font-display font-bold text-2xl text-ink mb-4">My Basket 🧺</h2>
+      <h2 className="font-display font-bold text-2xl text-ink mb-4">My Cart 🛒</h2>
 
       {poolStatus && (
         <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
@@ -242,16 +242,16 @@ export default function Basket({ onBack, onBasketChanged }) {
       )}
 
       {itemsList.length === 0 ? (
-        <EmptyState 
-          emoji="🧺" 
-          title="Your basket is empty" 
-          description="Browse the Store to add cases toward a collective order." 
-          primaryLabel="Go to Store" 
-          onPrimary={onBack} 
+        <EmptyState
+          emoji="🛒"
+          title="Your cart is empty"
+          description="Browse the Store to add cases toward a collective order."
+          primaryLabel="Go to Store"
+          onPrimary={onBack}
         />
       ) : (
         <>
-          {/* Basket Items List */}
+          {/* Cart Items List */}
           <div className="space-y-3 mb-4">
             {itemsList.map((item) => {
               const imgSrc = getItemImage(item)
@@ -316,7 +316,7 @@ export default function Basket({ onBack, onBasketChanged }) {
           <div className="bg-white border border-cream-dark rounded-soft p-4 shadow-soft">
             <p className="text-xs font-black uppercase text-ink-muted mb-1">Smart Match — Join a Bulk Order</p>
             <p className="text-xs text-ink-muted mb-2">
-              iCamagu pools your basket with other members buying alcohol or livestock/meat from the same partner, so everyone unlocks bulk pricing sooner — even across different stokvels.
+              iCamagu pools your cart with other members buying alcohol or livestock/meat from the same partner, so everyone unlocks bulk pricing sooner — even across different stokvels.
             </p>
             <select
               value={selectedPartner}
@@ -336,7 +336,7 @@ export default function Basket({ onBack, onBasketChanged }) {
               onClick={submitToPool}
               className="w-full bg-sage-500 hover:bg-sage-600 text-white font-bold py-3 rounded-pill shadow-glow active:scale-[0.96] transition-transform text-sm"
             >
-              Submit Basket to Bulk Pool
+              Submit Cart to Bulk Pool
             </button>
           </div>
         </>

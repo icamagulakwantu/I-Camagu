@@ -97,7 +97,7 @@ function MyOrders({ onBack }) {
       <h2 className="text-2xl font-extrabold text-brand-black mb-4">My Orders</h2>
 
       {documents.length === 0 ? (
-        <p className="text-brand-black/50 text-sm">No matched bulk orders yet — submit a basket to a pool from the Store.</p>
+        <p className="text-brand-black/50 text-sm">No matched bulk orders yet — submit a cart to a pool from the Store.</p>
       ) : (
         <div className="space-y-3">
           {documents.map((doc) => {

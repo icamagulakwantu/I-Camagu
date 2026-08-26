@@ -48,8 +48,8 @@ function Store({ onGoToBasket, basketCount }) {
         body: JSON.stringify({ skuId: sku.id, quantity: 1 }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not add item to basket')
-      showToast(`${sku.name} added to basket`, 'success')
+      if (!res.ok) throw new Error(data.error || 'Could not add item to cart')
+      showToast(`${sku.name} added to cart`, 'success')
       if (navigator.vibrate) navigator.vibrate(10)
     } catch (err) {
       showToast(err.message, 'error')
@@ -66,9 +66,10 @@ function Store({ onGoToBasket, basketCount }) {
           <h1 className="font-display font-bold text-2xl text-ink">Store</h1>
           <button
             onClick={onGoToBasket}
-            className="relative w-11 h-11 rounded-2xl bg-white shadow-soft flex items-center justify-center text-xl active:scale-90 transition-transform"
+            aria-label="Cart"
+            className="relative w-11 h-11 rounded-2xl bg-white shadow-soft flex items-center justify-center active:scale-90 transition-transform"
           >
-            🧺
+            <Icon name="cart" size={20} color="#2b2620" />
             {basketCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-terracotta text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center">
                 {basketCount}
@@ -82,7 +83,7 @@ function Store({ onGoToBasket, basketCount }) {
       <div className="mx-4 mt-4 bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 shadow-soft">
         <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">Smart Match — Bulk Buying</p>
         <p className="text-sm font-bold leading-snug">
-          Add cases to your basket and iCamagu pools your order with other members — even from other stokvels — buying alcohol or livestock/meat from the same tavern or butchery. Once the group hits the minimum, everyone unlocks bulk pricing.
+          Add cases to your cart and iCamagu pools your order with other members — even from other stokvels — buying alcohol or livestock/meat from the same tavern or butchery. Once the group hits the minimum, everyone unlocks bulk pricing.
         </p>
       </div>
 

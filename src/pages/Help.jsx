@@ -4,7 +4,7 @@ function Help({ onBack }) {
     { q: 'Why do I need a PIN?', a: 'Your security PIN is required before approving payouts or confirming contributions — an extra layer of protection for real money, separate from your login.' },
     { q: 'What is the Shrine Fund tithe?', a: 'A transparent, itemised contribution that is shown clearly on any qualifying payout. The commercial rate remains subject to final confirmation.' },
     { q: 'Can I delete my ceremony plan or stokvel?', a: 'Yes. Stokvels can only be deleted once their balance is zero, to protect real funds. Ceremony plans can be deleted from the plan detail screen.' },
-    { q: 'How does bulk buying work?', a: 'Add items to your basket, submit it to a partner pool, and once enough community volume is reached the group can receive the negotiated bulk price.' },
+    { q: 'How does bulk buying work?', a: 'Add items to your cart, submit it to a partner pool, and once enough community volume is reached the group can receive the negotiated bulk price.' },
     { q: 'Is my data safe?', a: 'iCamagu keeps access tokens out of browser storage, financial actions can require PIN confirmation, and you can export or delete your account from Account & Privacy.' },
   ]
 

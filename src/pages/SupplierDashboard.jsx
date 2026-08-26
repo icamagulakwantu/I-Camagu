@@ -227,7 +227,7 @@ function SupplierDashboard({ onBack }) {
       ) : (
         <div className="px-4 mt-4">
           {pools.length === 0 ? (
-            <EmptyState emoji="📦" title="No pools yet" description="Once members start adding your area to their baskets, bulk pools will appear here." />
+            <EmptyState emoji="📦" title="No pools yet" description="Once members start adding your area to their carts, bulk pools will appear here." />
           ) : (
             <div className="space-y-3">
               {pools.map((pool) => (
