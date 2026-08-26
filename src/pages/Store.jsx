@@ -123,7 +123,7 @@ function Store({ onGoToBasket, basketCount }) {
         ) : (
           <div className="space-y-3">
             {skus.map((sku) => (
-              <div key={sku.id} className="bg-white border-2 border-ink rounded-soft p-3 flex justify-between items-center shadow-soft">
+              <div key={sku.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-3 flex justify-between items-center shadow-soft">
                 <div className="flex items-center gap-3">
                   {sku.imageUrl && (
                     <img src={sku.imageUrl} alt={sku.name} className="w-12 h-12 rounded-soft object-cover flex-shrink-0" />
