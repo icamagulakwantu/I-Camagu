@@ -16,11 +16,16 @@ workbox: {
         name: 'iCamagu',
         short_name: 'iCamagu',
         description: 'Ceremony planning, stokvel savings, and bulk purchasing for Xhosa communities',
-        theme_color: '#0B3C95',
-        background_color: '#FAF8F5',
+        theme_color: '#c45c26',
+        background_color: '#f5f3ee',
         display: 'standalone',
         start_url: '/',
-        icons: []
+        icons: [
+          { src: '/icons/android-chrome-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: '/icons/android-chrome-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: '/icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png', purpose: 'any' }
+        ]
       }
     })
   ],
