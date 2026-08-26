@@ -34,7 +34,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
         </div>
 
         <button onClick={() => onNavigate('store')} aria-label="Store"
-          className="absolute left-1/2 -translate-x-1/2 -top-6 w-16 h-16 rounded-pill bg-brand-ochre shadow-[0_4px_14px_rgba(193,98,47,0.4)] flex items-center justify-center border-4 border-brand-cream">
+          className="absolute left-1/2 -translate-x-1/2 -top-6 w-16 h-16 rounded-pill bg-terracotta shadow-[0_4px_14px_rgba(196,92,38,0.4)] flex items-center justify-center border-4 border-brand-cream">
           <Icon name="cart" size={26} color="#fff" strokeWidth={1.6} />
           {basketCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-brand-blue text-white text-[10px] font-black w-5 h-5 rounded-pill flex items-center justify-center">{basketCount}</span>

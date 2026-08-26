@@ -166,8 +166,10 @@ function Login() {
   return (
     <div className="min-h-screen icamagu-bg flex flex-col items-center justify-center px-6 py-10">
       <div className="w-full max-w-sm bg-white/90 backdrop-blur-md border-2 border-ink rounded-soft p-8 shadow-elevated">
-        <div className="h-1.5 w-16 bg-gradient-to-r from-terracotta to-brand-gold rounded-pill mb-6" />
-        <h1 className="font-display font-bold text-3xl text-ink mb-1">iCamagu</h1>
+        <div className="flex items-center gap-3 mb-1">
+          <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-10 h-10 flex-shrink-0" />
+          <h1 className="font-display font-bold text-3xl text-ink">iCamagu</h1>
+        </div>
         <p className="text-ink-muted text-xs mb-6">Culture before capital.</p>
 
         {step === 'email' && (
