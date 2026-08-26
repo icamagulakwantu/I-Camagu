@@ -130,6 +130,12 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
 
   return (
     <div className="px-5 pt-6 pb-28 max-w-md mx-auto">
+      {/* Brand mark */}
+      <div className="flex items-center gap-2 mb-4">
+        <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-6 h-6" />
+        <span className="font-display font-bold text-sm text-brand-black">iCamagu</span>
+      </div>
+
       {/* Heritage Header Banner */}
       <div className="mb-5 rounded-soft overflow-hidden shadow-sm border border-brand-black/10 bg-white/80 backdrop-blur-md">
         <div className="p-4">
