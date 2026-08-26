@@ -17,6 +17,7 @@ import {
   confirmContribution,
   getPendingContributions,
   recordInterest,
+  recordGroupExpense,
 } from '../controllers/contributionController.js';
 import { postAnnouncement, getAnnouncements } from '../controllers/announcementController.js';
 import {
@@ -30,6 +31,7 @@ const router = express.Router();
 router.post('/', requireAuth, createStokvel);
 router.post('/join', requireAuth, joinStokvel);
 router.post('/interest/record', requireAuth, recordInterest);
+router.post('/expense/record', requireAuth, recordGroupExpense);
 router.get('/pending-approvals/count', requireAuth, getPendingApprovalCount);
 router.get('/my', requireAuth, getMyStokvels);
 router.get('/shrine-fund/total', requireAuth, getShrineFundTotal);

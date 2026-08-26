@@ -50,6 +50,9 @@ function Stokvels({ onBack, onOpenShrineFund }) {
   const [newAnnouncement, setNewAnnouncement] = useState('')
   const [interestAmount, setInterestAmount] = useState('')
   const [recordingInterest, setRecordingInterest] = useState(false)
+  const [expenseAmount, setExpenseAmount] = useState('')
+  const [expenseNote, setExpenseNote] = useState('')
+  const [recordingExpense, setRecordingExpense] = useState(false)
   const [togglingBereavement, setTogglingBereavement] = useState(false)
   const [editingDetails, setEditingDetails] = useState(false)
   const [editName, setEditName] = useState('')
@@ -150,6 +153,29 @@ function Stokvels({ onBack, onOpenShrineFund }) {
       showToast(err.message, 'error')
     } finally {
       setRecordingInterest(false)
+    }
+  }
+
+  const recordExpense = async (e) => {
+    e.preventDefault()
+    if (!detail?.stokvel?.id || !expenseAmount) return
+    setRecordingExpense(true)
+    try {
+      const res = await fetch('/api/stokvels/expense/record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ stokvelId: detail.stokvel.id, amount: expenseAmount, note: expenseNote }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not record expense')
+      setExpenseAmount('')
+      setExpenseNote('')
+      showToast(data.message || 'Expense recorded', 'success')
+      await fetchDetail(detail.stokvel.id)
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setRecordingExpense(false)
     }
   }
 
@@ -581,6 +607,13 @@ function Stokvels({ onBack, onOpenShrineFund }) {
 <Icon name="copy" size={13} color="#fff" /> Copy Stokvel ID to invite members
           </button>
           <p className="font-display font-bold text-3xl mt-2">R{balance.toFixed(2)}</p>
+          {(Number(stokvel.groupLedger?.interestEarned || 0) > 0 || Number(stokvel.groupLedger?.groupExpenses || 0) > 0) && (
+            <p className="text-xs text-white/70 mt-1">
+              {Number(stokvel.groupLedger?.interestEarned || 0) > 0 && <>+R{Number(stokvel.groupLedger.interestEarned).toFixed(2)} interest</>}
+              {Number(stokvel.groupLedger?.interestEarned || 0) > 0 && Number(stokvel.groupLedger?.groupExpenses || 0) > 0 && ' · '}
+              {Number(stokvel.groupLedger?.groupExpenses || 0) > 0 && <>−R{Number(stokvel.groupLedger.groupExpenses).toFixed(2)} group expenses</>}
+            </p>
+          )}
           {isOfficial && <p className="text-xs text-white/90 font-bold mt-2 bg-white/20 inline-block px-2.5 py-1 rounded-pill">You are an official</p>}
         </div>
 
@@ -852,6 +885,29 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                   </button>
                 </div>
                 <p className="text-[10px] text-ink-muted">Adds to the group balance, e.g. bank/savings interest received this cycle.</p>
+              </form>
+
+              <form onSubmit={recordExpense} className="space-y-2 pt-2 border-t border-ink/10">
+                <p className="text-xs font-bold text-ink">Record a group expense</p>
+                <div className="flex gap-2">
+                  <input
+                    type="number" placeholder="Amount (ZAR)" value={expenseAmount}
+                    onChange={(e) => setExpenseAmount(e.target.value)}
+                    className={`${inputStyle} flex-1`} min="0.01" step="any" required
+                  />
+                  <button
+                    type="submit" disabled={recordingExpense}
+                    className={`bg-terracotta text-white font-bold px-4 rounded-pill text-sm ${pressable}`}
+                  >
+                    {recordingExpense ? '...' : 'Deduct'}
+                  </button>
+                </div>
+                <input
+                  type="text" placeholder="What was it for? (e.g. bank fee, venue deposit)" value={expenseNote}
+                  onChange={(e) => setExpenseNote(e.target.value)}
+                  className={inputStyle}
+                />
+                <p className="text-[10px] text-ink-muted">Deducts from the group balance — money spent directly by the group, not paid out to a member.</p>
               </form>
 
               <div className="pt-2 border-t border-ink/10">

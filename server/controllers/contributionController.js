@@ -112,6 +112,46 @@ export async function getPendingContributions(req, res) {
                             }
 }
 
+export async function recordGroupExpense(req, res) {
+  const userId = req.userId;
+  const { stokvelId, amount, note } = req.body;
+
+  if (!stokvelId || !amount) return res.status(400).json({ error: 'stokvelId and amount are required' });
+
+  try {
+    const official = await prisma.stokvelOfficial.findFirst({ where: { stokvelId, userId } });
+    if (!official) return res.status(403).json({ error: 'Only stokvel officials can record a group expense' });
+
+    const ledger = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
+    const requestedAmount = parseFloat(amount);
+    if (ledger && parseFloat(ledger.totalBalance) < requestedAmount) {
+      return res.status(400).json({ error: 'Expense amount exceeds the group balance' });
+    }
+
+    const updated = await prisma.stokvelGroupLedger.update({
+      where: { stokvelId },
+      data: {
+        totalBalance: { decrement: requestedAmount },
+        groupExpenses: { increment: requestedAmount },
+      },
+    });
+
+    const { notifyMany } = await import('../services/notificationDbService.js');
+    const members = await prisma.stokvelMember.findMany({ where: { stokvelId }, select: { userId: true } });
+    await notifyMany(
+      members.map((m) => m.userId),
+      'GROUP_EXPENSE_RECORDED',
+      `A group expense of R${requestedAmount.toFixed(2)} was recorded${note ? `: ${note}` : ''}.`,
+      'stokvels'
+    );
+
+    res.json({ ledger: updated, message: 'Expense recorded and deducted from the group balance.' });
+  } catch (error) {
+    console.error('Record group expense error:', error.message);
+    res.status(500).json({ error: 'Could not record group expense' });
+  }
+}
+
 export async function recordInterest(req, res) {
           const userId = req.userId;
                   const { stokvelId, amount, note, proofNote } = req.body;

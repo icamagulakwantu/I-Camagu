@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import Icon from '../components/Icon.jsx'
 
-const TYPE_ICON = { PAYOUT_APPROVAL_NEEDED: 'send', POOL_CHANGED: 'cart', CONTRIBUTION_CONFIRMED: 'check', QUOTE_STATUS: 'cocktail', ORDER_MATCHED: 'package' }
+const TYPE_ICON = { PAYOUT_APPROVAL_NEEDED: 'send', POOL_CHANGED: 'cart', CONTRIBUTION_CONFIRMED: 'check', QUOTE_STATUS: 'cocktail', ORDER_MATCHED: 'package', GROUP_EXPENSE_RECORDED: 'coins', REFUND_REQUESTED: 'send', REFUND_PROCESSED: 'check', ORDER_FULFILLED: 'package' }
 
 function Notifications({ onBack, onNavigate }) {
       const { accessToken } = useAuth()
