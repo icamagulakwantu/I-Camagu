@@ -4,42 +4,44 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
   const tabs = [
     { id: 'home', label: 'Home', icon: 'home' },
     { id: 'ceremonyhub', label: 'Ceremonies', icon: 'calendar' },
-    { id: 'store', label: 'Store', icon: 'cart', isCenter: true },
+    { id: 'store', label: 'Store', icon: 'cart', badge: basketCount },
     { id: 'stokvels', label: 'Stokvels', icon: 'users', badge: pendingApprovals },
     { id: 'more', label: 'More', icon: 'menu' },
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 print:hidden">
-      <div className="max-w-md mx-auto relative">
-        <div className="bg-white rounded-t-[28px] shadow-[0_-4px_20px_rgba(43,38,32,0.12)] border-t border-terracotta/15 flex pt-2 pb-2 px-2">
-          {tabs.filter(t => !t.isCenter).slice(0, 2).map((tab) => (
-            <button key={tab.id} onClick={() => onNavigate(tab.id)}
-              className={`flex-1 flex flex-col items-center py-2 transition-colors relative ${activeScreen === tab.id ? 'text-brand-blue' : 'text-brand-black/40'}`}>
-              <Icon name={tab.icon} size={20} className="mb-0.5" />
-              <span className="text-[10px] font-bold uppercase tracking-wide">{tab.label}</span>
-            </button>
-          ))}
-          <div className="w-16" />
-          {tabs.filter(t => !t.isCenter).slice(2).map((tab) => (
-            <button key={tab.id} onClick={() => onNavigate(tab.id)}
-              className={`flex-1 flex flex-col items-center py-2 transition-colors relative ${activeScreen === tab.id ? 'text-brand-blue' : 'text-brand-black/40'}`}>
-              <Icon name={tab.icon} size={20} className="mb-0.5" />
-              {tab.badge > 0 && (
-                <span className="absolute top-0 right-4 bg-terracotta text-white text-[9px] font-black w-4 h-4 rounded-pill flex items-center justify-center">{tab.badge}</span>
-              )}
-              <span className="text-[10px] font-bold uppercase tracking-wide">{tab.label}</span>
-            </button>
-          ))}
+    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center print:hidden">
+      <div className="pointer-events-auto safe-bottom mb-3 w-[min(100%-1.5rem,406px)]">
+        <div className="grain relative overflow-hidden rounded-[26px] bg-brand-black px-1.5 py-1.5 shadow-[0_22px_44px_-22px_rgba(43,38,32,0.55)]">
+          <div className="motif-thresholds absolute inset-x-0 top-0 h-px opacity-60" />
+          <ul className="relative flex items-stretch">
+            {tabs.map((tab) => {
+              const active = activeScreen === tab.id
+              return (
+                <li key={tab.id} className="flex-1">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate(tab.id)}
+                    aria-label={tab.label}
+                    aria-current={active ? 'page' : undefined}
+                    className="pressable flex h-[58px] w-full flex-col items-center justify-center gap-1 rounded-[20px]"
+                  >
+                    <span className={`relative flex h-8 w-8 items-center justify-center rounded-full transition-colors ${active ? 'bg-terracotta' : ''}`}>
+                      {active && <span className="absolute inset-[-4px] rounded-full border border-brand-ochre/45" />}
+                      <Icon name={tab.icon} size={18} color={active ? '#fff' : 'rgba(245,243,238,0.6)'} strokeWidth={active ? 2 : 1.6} />
+                      {tab.badge > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 bg-brand-ochre text-white text-[9px] font-black w-4 h-4 rounded-pill flex items-center justify-center">{tab.badge}</span>
+                      )}
+                    </span>
+                    <span className={`text-[10px] leading-none tracking-wide ${active ? 'font-bold text-cream' : 'text-cream/55'}`}>
+                      {tab.label}
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
         </div>
-
-        <button onClick={() => onNavigate('store')} aria-label="Store"
-          className="absolute left-1/2 -translate-x-1/2 -top-6 w-16 h-16 rounded-pill bg-terracotta shadow-[0_4px_14px_rgba(196,92,38,0.4)] flex items-center justify-center border-4 border-brand-cream">
-          <Icon name="cart" size={26} color="#fff" strokeWidth={1.6} />
-          {basketCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-brand-blue text-white text-[10px] font-black w-5 h-5 rounded-pill flex items-center justify-center">{basketCount}</span>
-          )}
-        </button>
       </div>
     </nav>
   )

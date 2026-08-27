@@ -131,31 +131,33 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
   return (
     <div className="px-5 pt-6 pb-28 max-w-md mx-auto">
       {/* Brand mark */}
-      <div className="flex items-center gap-2 mb-4">
-        <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-6 h-6" />
-        <span className="font-display font-bold text-sm text-brand-black">iCamagu</span>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-6 h-6" />
+          <span className="font-display font-bold text-sm text-brand-black">iCamagu</span>
+        </div>
+        <NotificationBell onOpen={() => onNavigate('notifications')} />
       </div>
 
-      {/* Heritage Header Banner */}
-      <div className="mb-5 rounded-soft overflow-hidden shadow-sm border border-terracotta/15 bg-white/80 backdrop-blur-md">
+      {/* Greeting hero — wash-ember stands in for a homestead photo */}
+      <div className="wash-ember grain relative overflow-hidden rounded-soft p-5 mb-4 shadow-soft">
+        <p className="eyebrow text-cream/75">Molo, {user?.firstName || 'friend'} 🌾</p>
+        <h1 className="mt-1 font-display text-2xl leading-tight text-cream">
+          {ceremonies.length > 0 ? <>The homestead is<br />preparing for {ceremonies[0]?.title || 'a ceremony'}.</> : 'Culture before capital.'}
+        </h1>
+      </div>
+
+      {/* Did You Know */}
+      <div className="card-paper grain wash-clay overflow-hidden mb-5">
         <div className="p-4">
           <DidYouKnow />
         </div>
       </div>
 
-      {/* Greeting with Notification Bell */}
-      <div className="flex items-center justify-between mb-0.5">
-        <h1 className="text-2xl font-black text-brand-black">
-          Molo, {user?.firstName || ''} 🌾
-        </h1>
-        <NotificationBell onOpen={() => onNavigate('notifications')} />  {/* ✅ NEW */}
-      </div>
-      <p className="text-brand-black/50 text-xs font-bold uppercase tracking-wider mb-6">
-        Culture before capital.
-      </p>
       <PinReminder onNavigate={onNavigate} />
 
-      {/* Primary Grid Action Cards (same order as first file) */}
+      {/* Primary Grid Action Cards */}
+      <p className="eyebrow mb-2">Where to today?</p>
       <div className="grid grid-cols-2 gap-3 mb-6">
         <ActionCard icon={<Icon name="calendar" color="#c45c26" />} onClick={() => onNavigate('ceremonyhub')}>
           <span className="font-extrabold text-sm text-brand-black block">Ceremonies</span>

@@ -2,22 +2,29 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 
 const CEREMONY_META = {
-  ULWALUKO: { label: 'Ulwaluko', desc: 'Initiation planning and preparation', emoji: '⛰️' },
-  UMGIDI: { label: 'Umgidi', desc: 'Homecoming celebration and preparation', emoji: '🎉' },
-  INTAMBO_ENKULU: { label: 'Intambo Enkulu', desc: 'Ceremony planning and preparation', emoji: '🔗' },
-  UKUKHAPHA: { label: 'Ukukhapha', desc: 'Ceremony planning and preparation', emoji: '🕊️' },
-  INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', desc: 'Ceremony planning and preparation', emoji: '🌾' },
-  UKUBUYISA: { label: 'Ukubuyisa', desc: 'Ceremony planning and preparation', emoji: '🏠' },
-  UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', desc: 'Ceremony planning and preparation', emoji: '🌿' },
-  WEDDING: { label: 'Wedding', desc: 'Marriage celebration planning', emoji: '💍' },
-  GENERAL_EVENT: { label: 'General Event', desc: 'Custom ceremony or event planning', emoji: '📅' },
+  ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', emoji: '⛰️' },
+  UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', emoji: '🎉' },
+  INTAMBO_ENKULU: { label: 'Intambo Enkulu', english: 'The great bond', desc: 'The ceremony that binds two families together.', emoji: '🔗' },
+  UKUKHAPHA: { label: 'Ukukhapha', english: 'Accompanying the departed', desc: 'The rite that walks a loved one to the ancestors.', emoji: '🕊️' },
+  INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: 'A thanksgiving rite honouring a mother\'s provision.', emoji: '🌾' },
+  UKUBUYISA: { label: 'Ukubuyisa', english: 'Bringing the spirit home', desc: 'A year on, the departed is called back to the homestead.', emoji: '🏠' },
+  UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', english: "Healer's ritual", desc: 'A ceremony marking a traditional healer\'s calling.', emoji: '🌿' },
+  WEDDING: { label: 'Wedding', english: 'Umtshato', desc: "Lobola talks, the handing over, and the two families' feast.", emoji: '💍' },
+  GENERAL_EVENT: { label: 'General Event', english: 'Any occasion', desc: 'A gathering the family must mark, on your own terms.', emoji: '📅' },
+}
+
+const STATUS_STYLE = {
+  PLANNING: 'bg-brand-ochre/15 text-brand-ochre',
+  IN_PROGRESS: 'bg-terracotta/15 text-terracotta',
+  COMPLETED: 'bg-sage-100 text-sage-700',
 }
 
 function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
   const { accessToken } = useAuth()
   const [ceremonies, setCeremonies] = useState([])
   const [ceremonyTypes, setCeremonyTypes] = useState([])
-  const [loading, setLoading] = useState(true) // NEW: loading state
+  const [loading, setLoading] = useState(true)
+  const [tab, setTab] = useState('types')
 
   useEffect(() => {
     setLoading(true)
@@ -34,69 +41,87 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
       })
       .catch(err => console.error('Error fetching ceremonies:', err))
       .finally(() => setLoading(false))
-  }, [accessToken]) // added dependency
+  }, [accessToken])
 
-  // Helper to get status badge colour
-  const getStatusColor = (status) => {
-    switch (status?.toUpperCase()) {
-      case 'PLANNING': return 'bg-yellow-100 text-yellow-800'
-      case 'IN_PROGRESS': return 'bg-blue-100 text-blue-800'
-      case 'COMPLETED': return 'bg-green-100 text-green-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
+  const getStatusStyle = (status) => STATUS_STYLE[status?.toUpperCase()] || 'bg-ink/10 text-ink-muted'
+
+  const [leadType, ...restTypes] = ceremonyTypes
+  const leadMeta = leadType ? (CEREMONY_META[leadType] || {}) : null
 
   return (
-    <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
-        <button onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
-        <div>
-          <h1 className="font-display font-bold text-2xl">Ceremonies</h1>
-          <p className="text-white/70 text-sm mt-1">Plan, save, and execute — from first checklist to final day.</p>
-        </div>
+    <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
+      <button onClick={onBack} className="text-sm text-ink-muted mb-4 block">← Back</button>
+      <p className="eyebrow mb-1">Imisebenzi</p>
+      <h1 className="font-display font-bold text-3xl text-ink">Ceremonies</h1>
+      <p className="text-ink-muted text-sm mt-2 mb-4">Every rite has its own rhythm — start from the one you're holding.</p>
+
+      <div className="flex rounded-pill border-2 border-terracotta/20 bg-white p-1 mb-5">
+        <button type="button" onClick={() => setTab('types')}
+          className={`flex-1 rounded-pill py-2 text-[13px] font-bold transition-colors ${tab === 'types' ? 'bg-terracotta text-white' : 'text-ink-muted'}`}>
+          All rites
+        </button>
+        <button type="button" onClick={() => setTab('mine')}
+          className={`flex-1 rounded-pill py-2 text-[13px] font-bold transition-colors ${tab === 'mine' ? 'bg-terracotta text-white' : 'text-ink-muted'}`}>
+          Mine ({ceremonies.length})
+        </button>
       </div>
 
-      <div className="px-4 mt-4 space-y-3">
-        {ceremonyTypes.map((type) => {
-          const meta = CEREMONY_META[type] || {}
-          return (
-          <button key={type} onClick={() => onOpenType(type)}
-            className="w-full bg-white border-2 border-terracotta/25 rounded-soft p-4 flex items-center gap-4 text-left active:scale-[0.98] transition-transform">
-            <span className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-2xl flex-shrink-0">{meta.emoji || '🎉'}</span>
-            <div>
-              <p className="font-bold text-ink">{meta.label || type.replace(/_/g, ' ')}</p>
-              <p className="text-xs text-ink-muted">{meta.desc || 'Ceremony planning'}</p>
-            </div>
-          </button>
-          )
-        })}
-      </div>
+      {tab === 'types' ? (
+        <>
+          {leadMeta && (
+            <button onClick={() => onOpenType(leadType)}
+              className="wash-ember grain card-paper w-full text-left overflow-hidden mb-3 p-5 relative">
+              <span className="eyebrow text-cream/75">{leadMeta.english}</span>
+              <h3 className="mt-1 font-display text-2xl text-cream flex items-center gap-2">
+                <span className="text-3xl">{leadMeta.emoji}</span> {leadMeta.label}
+              </h3>
+              <p className="mt-2 text-[13px] leading-relaxed text-cream/85 max-w-[85%]">{leadMeta.desc}</p>
+              <span className="mt-4 inline-block rounded-pill bg-white/15 px-4 py-2 text-[13px] font-bold text-white">
+                Start planning {leadMeta.label} →
+              </span>
+            </button>
+          )}
 
-      {loading ? (
-        <div className="px-4 mt-6 text-center text-ink-muted">Loading your ceremonies...</div>
+          <div className="space-y-2.5">
+            {restTypes.map((type) => {
+              const meta = CEREMONY_META[type] || {}
+              return (
+                <button key={type} onClick={() => onOpenType(type)}
+                  className="card-paper grain w-full text-left overflow-hidden p-4 flex items-center gap-4 active:scale-[0.98] transition-transform">
+                  <span className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-2xl flex-shrink-0">{meta.emoji || '🎉'}</span>
+                  <div className="min-w-0">
+                    <p className="font-display font-bold text-ink">{meta.label || type.replace(/_/g, ' ')}</p>
+                    {meta.english && <p className="text-[10px] uppercase tracking-[0.1em] text-brand-ochre font-bold mt-0.5">{meta.english}</p>}
+                    <p className="text-xs text-ink-muted mt-1 line-clamp-1">{meta.desc || 'Ceremony planning and preparation'}</p>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </>
+      ) : loading ? (
+        <div className="text-center text-ink-muted py-8">Loading your ceremonies...</div>
       ) : ceremonies.length > 0 ? (
-        <div className="px-4 mt-6">
-          <p className="text-xs font-black uppercase text-ink-muted mb-2">Your Active Ceremonies</p>
+        <div className="space-y-2.5">
           {ceremonies.map((c) => (
-            <div
+            <button
               key={c.id}
               onClick={() => onSelectCeremony && onSelectCeremony(c.id)}
-              className="bg-white border border-terracotta/15 rounded-soft p-3 mb-2 flex items-center justify-between cursor-pointer hover:border-sage-400 transition"
+              className="card-paper grain w-full text-left overflow-hidden p-4 flex items-center justify-between gap-3"
             >
-              <div>
-                <p className="font-bold text-sm">{c.title}</p>
-                <p className="text-xs text-ink-muted">{c.type.replace(/_/g, ' ')}</p>
+              <div className="min-w-0">
+                <p className="font-display font-bold text-sm text-ink">{c.title}</p>
+                <p className="text-xs text-ink-muted mt-0.5">{c.type.replace(/_/g, ' ')}</p>
               </div>
-              {/* NEW: Status badge */}
-              <span className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(c.status)}`}>
+              <span className={`text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-pill flex-shrink-0 ${getStatusStyle(c.status)}`}>
                 {c.status || 'PLANNING'}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       ) : (
-        <div className="px-4 mt-6 text-center text-ink-muted">
-          No ceremonies yet. Tap a ceremony type above to start planning.
+        <div className="text-center text-ink-muted py-8">
+          No ceremonies yet. Switch to "All rites" to start planning one.
         </div>
       )}
     </div>

@@ -60,3 +60,64 @@
   0%, 100% { transform: rotate(-5deg); }
   50% { transform: rotate(5deg); }
 }
+
+/* ---- Editorial surface system ---- */
+
+/* Editorial card: cream paper, hairline, soft lift */
+.card-paper {
+  background-color: #fffdfb;
+  border: 1px solid rgba(196, 92, 38, 0.18);
+  border-radius: 20px;
+  box-shadow: 0 1px 2px rgba(43, 38, 32, 0.06), 0 12px 28px -18px rgba(43, 38, 32, 0.35);
+}
+
+/* Fine paper tooth over cream/card surfaces */
+.grain {
+  position: relative;
+}
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    radial-gradient(rgba(43, 38, 32, 0.05) 0.5px, transparent 0.5px),
+    radial-gradient(rgba(196, 92, 38, 0.04) 0.5px, transparent 0.5px);
+  background-size: 3px 3px, 7px 7px;
+  background-position: 0 0, 2px 3px;
+  mix-blend-mode: multiply;
+  border-radius: inherit;
+}
+
+/* Warm ember gradient — hero + finance surfaces standing in for a photo */
+.wash-ember {
+  background-image: linear-gradient(155deg, #c45c26 0%, #a34a20 55%, #4a2d18 100%);
+}
+
+.wash-clay {
+  background-image: linear-gradient(160deg, #f5f3ee 0%, #ecdcc4 100%);
+}
+
+/* Section eyebrow: small caps label */
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8a8278;
+}
+
+/* Repeating threshold motif — abstracted gateway arcs, never tribal print */
+.motif-thresholds {
+  background-image: repeating-linear-gradient(
+      90deg,
+      rgba(196, 92, 38, 0.14) 0 1px,
+      transparent 1px 14px
+    ),
+    radial-gradient(circle at 50% 120%, rgba(193, 146, 47, 0.18) 0 38%, transparent 39%);
+}
+
+.safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+}
