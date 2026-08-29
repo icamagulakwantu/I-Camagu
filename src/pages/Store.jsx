@@ -4,6 +4,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import Icon from '../components/Icon.jsx'
+import fallbackProductImg from '../assets/products/product-beer.jpg'
 
 function Store({ onGoToBasket, basketCount }) {
   const { accessToken } = useAuth()
@@ -80,9 +81,9 @@ function Store({ onGoToBasket, basketCount }) {
       </div>
 
       {/* Smart Match Explainer */}
-      <div className="mx-4 mt-4 bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 shadow-soft">
-        <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">Smart Match — Bulk Buying</p>
-        <p className="text-sm font-bold leading-snug">
+      <div className="wash-ember grain card-paper mx-4 mt-4 p-4">
+        <p className="eyebrow text-cream/75 mb-1">Smart Match — Bulk Buying</p>
+        <p className="text-sm font-bold leading-snug text-cream">
           Add cases to your cart and iCamagu pools your order with other members — even from other stokvels — buying alcohol or livestock/meat from the same tavern or butchery. Once the group hits the minimum, everyone unlocks bulk pricing.
         </p>
       </div>
@@ -92,7 +93,7 @@ function Store({ onGoToBasket, basketCount }) {
         <button
           onClick={() => setActiveCategory('')}
           className={`flex-shrink-0 px-4 py-2 rounded-pill text-xs font-bold transition-colors ${
-            !activeCategory ? 'bg-sage-500 text-white' : 'bg-white border-2 border-cream-dark text-ink-muted'
+            !activeCategory ? 'bg-terracotta text-white' : 'bg-white border-2 border-terracotta/20 text-ink-muted'
           }`}
         >
           ALL
@@ -102,7 +103,7 @@ function Store({ onGoToBasket, basketCount }) {
             key={cat}
             onClick={() => setActiveCategory(cat)}
             className={`flex-shrink-0 px-4 py-2 rounded-pill text-xs font-bold transition-colors ${
-              activeCategory === cat ? 'bg-sage-500 text-white' : 'bg-white border-2 border-cream-dark text-ink-muted'
+              activeCategory === cat ? 'bg-terracotta text-white' : 'bg-white border-2 border-terracotta/20 text-ink-muted'
             }`}
           >
             {cat}
@@ -123,13 +124,11 @@ function Store({ onGoToBasket, basketCount }) {
         ) : (
           <div className="space-y-3">
             {skus.map((sku) => (
-              <div key={sku.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-3 flex justify-between items-center shadow-soft">
-                <div className="flex items-center gap-3">
-                  {sku.imageUrl && (
-                    <img src={sku.imageUrl} alt={sku.name} className="w-12 h-12 rounded-soft object-cover flex-shrink-0" />
-                  )}
-                  <div>
-                    <h3 className="font-bold text-sm text-ink">{sku.name}</h3>
+              <div key={sku.id} className="card-paper flex justify-between items-center overflow-hidden">
+                <div className="flex items-center gap-3 min-w-0">
+                  <img src={sku.imageUrl || fallbackProductImg} alt={sku.name} className="w-16 h-16 object-cover flex-shrink-0" />
+                  <div className="min-w-0 py-1">
+                    <h3 className="font-display font-bold text-sm text-ink truncate">{sku.name}</h3>
                     <p className="text-xs text-ink-muted">
                       {sku.bottleFormat ? `${sku.bottleFormat} • ` : ''}{sku.unitsPerCase} per case
                     </p>
@@ -141,7 +140,7 @@ function Store({ onGoToBasket, basketCount }) {
                 <button
                   onClick={() => addToBasket(sku)}
                   disabled={addingId === sku.id}
-                  className="bg-terracotta text-white text-xs font-bold px-4 py-2 rounded-pill active:scale-90 transition-transform disabled:opacity-50"
+                  className="bg-terracotta text-white text-xs font-bold px-4 py-2 rounded-pill active:scale-90 transition-transform disabled:opacity-50 mr-3 flex-shrink-0"
                 >
                   {addingId === sku.id ? <Icon name="check" size={13} color="#fff" strokeWidth={2.5} /> : 'Add case'}
                 </button>

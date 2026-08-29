@@ -79,7 +79,7 @@ export default function More({ onNavigate }) {
       {SECTIONS.map((section) => (
         <div key={section.title} className="mb-6">
           <p className="text-xs font-black uppercase text-ink-muted mb-2 px-1">{section.title}</p>
-          <div className="bg-white border-2 border-terracotta/25 rounded-soft divide-y divide-terracotta/10 overflow-hidden shadow-sm">
+          <div className="card-paper divide-y divide-terracotta/10 overflow-hidden">
             {section.items.map((item) => (
               <button
                 key={item.id}

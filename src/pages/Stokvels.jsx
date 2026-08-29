@@ -13,7 +13,7 @@ const STOKVEL_TYPES = [
   'RECIPROCAL_GIFTING'
 ]
 
-const cardBase = "bg-white border-2 border-terracotta/25 rounded-soft p-4 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+const cardBase = "card-paper p-4 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
 const cardHover = "hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] hover:border-sage-400/30"
 const cardActive = "active:scale-[0.98] active:shadow-none"
 const pressable = "transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none"
