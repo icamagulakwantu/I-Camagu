@@ -1,21 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
-import imgUlwaluko from '../assets/ceremonies/ceremony-ulwaluko.jpg'
-import imgUmgidi from '../assets/ceremonies/ceremony-umgidi.jpg'
-import imgUkukhapha from '../assets/ceremonies/ceremony-ukukhapha.jpg'
-import imgWedding from '../assets/ceremonies/ceremony-wedding.jpg'
-import imgImbeleko from '../assets/ceremonies/ceremony-imbeleko.jpg'
-import imgUnveiling from '../assets/ceremonies/ceremony-unveiling.jpg'
 
 const CEREMONY_META = {
-  ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', emoji: '⛰️', image: imgUlwaluko },
-  UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', emoji: '🎉', image: imgUmgidi },
+  ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', emoji: '⛰️' },
+  UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', emoji: '🎉' },
   INTAMBO_ENKULU: { label: 'Intambo Enkulu', english: 'The great bond', desc: 'The ceremony that binds two families together.', emoji: '🔗' },
-  UKUKHAPHA: { label: 'Ukukhapha', english: 'Accompanying the departed', desc: 'The rite that walks a loved one to the ancestors.', emoji: '🕊️', image: imgUkukhapha },
-  INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: 'A thanksgiving rite honouring a mother\'s provision.', emoji: '🌾', image: imgImbeleko },
-  UKUBUYISA: { label: 'Ukubuyisa', english: 'Bringing the spirit home', desc: 'A year on, the departed is called back to the homestead.', emoji: '🏠', image: imgUnveiling },
+  UKUKHAPHA: { label: 'Ukukhapha', english: 'Accompanying the departed', desc: 'The rite that walks a loved one to the ancestors.', emoji: '🕊️' },
+  INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: 'A thanksgiving rite honouring a mother\'s provision.', emoji: '🌾' },
+  UKUBUYISA: { label: 'Ukubuyisa', english: 'Bringing the spirit home', desc: 'A year on, the departed is called back to the homestead.', emoji: '🏠' },
   UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', english: "Healer's ritual", desc: 'A ceremony marking a traditional healer\'s calling.', emoji: '🌿' },
-  WEDDING: { label: 'Wedding', english: 'Umtshato', desc: "Lobola talks, the handing over, and the two families' feast.", emoji: '💍', image: imgWedding },
+  WEDDING: { label: 'Wedding', english: 'Umtshato', desc: "Lobola talks, the handing over, and the two families' feast.", emoji: '💍' },
   GENERAL_EVENT: { label: 'General Event', english: 'Any occasion', desc: 'A gathering the family must mark, on your own terms.', emoji: '📅' },
 }
 
@@ -51,8 +45,7 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
 
   const getStatusStyle = (status) => STATUS_STYLE[status?.toUpperCase()] || 'bg-ink/10 text-ink-muted'
 
-  const leadType = ceremonyTypes.find((t) => CEREMONY_META[t]?.image) || ceremonyTypes[0]
-  const restTypes = ceremonyTypes.filter((t) => t !== leadType)
+  const [leadType, ...restTypes] = ceremonyTypes
   const leadMeta = leadType ? (CEREMONY_META[leadType] || {}) : null
 
   return (
@@ -77,30 +70,15 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
         <>
           {leadMeta && (
             <button onClick={() => onOpenType(leadType)}
-              className={`card-paper w-full text-left overflow-hidden mb-3 relative ${leadMeta.image ? '' : 'wash-ember grain p-5'}`}>
-              {leadMeta.image ? (
-                <div className="relative h-44 w-full">
-                  <img src={leadMeta.image} alt="" className="h-44 w-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/10 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-5">
-                    <span className="eyebrow text-cream/75">{leadMeta.english}</span>
-                    <h3 className="mt-1 font-display text-2xl text-cream">{leadMeta.label}</h3>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <span className="eyebrow text-cream/75">{leadMeta.english}</span>
-                  <h3 className="mt-1 font-display text-2xl text-cream flex items-center gap-2">
-                    <span className="text-3xl">{leadMeta.emoji}</span> {leadMeta.label}
-                  </h3>
-                </>
-              )}
-              <div className={leadMeta.image ? 'p-5 pt-4' : ''}>
-                <p className={`text-[13px] leading-relaxed max-w-[85%] ${leadMeta.image ? 'text-ink-muted' : 'mt-2 text-cream/85'}`}>{leadMeta.desc}</p>
-                <span className={`mt-4 inline-block rounded-pill px-4 py-2 text-[13px] font-bold ${leadMeta.image ? 'bg-terracotta text-white' : 'bg-white/15 text-white'}`}>
-                  Start planning {leadMeta.label} →
-                </span>
-              </div>
+              className="wash-ember grain card-paper w-full text-left overflow-hidden mb-3 p-5 relative">
+              <span className="eyebrow text-cream/75">{leadMeta.english}</span>
+              <h3 className="mt-1 font-display text-2xl text-cream flex items-center gap-2">
+                <span className="text-3xl">{leadMeta.emoji}</span> {leadMeta.label}
+              </h3>
+              <p className="mt-2 text-[13px] leading-relaxed text-cream/85 max-w-[85%]">{leadMeta.desc}</p>
+              <span className="mt-4 inline-block rounded-pill bg-white/15 px-4 py-2 text-[13px] font-bold text-white">
+                Start planning {leadMeta.label} →
+              </span>
             </button>
           )}
 
@@ -109,13 +87,9 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
               const meta = CEREMONY_META[type] || {}
               return (
                 <button key={type} onClick={() => onOpenType(type)}
-                  className="card-paper w-full text-left overflow-hidden flex items-stretch gap-4 active:scale-[0.98] transition-transform">
-                  {meta.image ? (
-                    <img src={meta.image} alt="" className="w-20 flex-shrink-0 object-cover" />
-                  ) : (
-                    <span className="w-20 flex-shrink-0 flex items-center justify-center text-2xl bg-cream">{meta.emoji || '🎉'}</span>
-                  )}
-                  <div className="min-w-0 py-3 pr-4">
+                  className="card-paper grain w-full text-left overflow-hidden p-4 flex items-center gap-4 active:scale-[0.98] transition-transform">
+                  <span className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-2xl flex-shrink-0">{meta.emoji || '🎉'}</span>
+                  <div className="min-w-0">
                     <p className="font-display font-bold text-ink">{meta.label || type.replace(/_/g, ' ')}</p>
                     {meta.english && <p className="text-[10px] uppercase tracking-[0.1em] text-brand-ochre font-bold mt-0.5">{meta.english}</p>}
                     <p className="text-xs text-ink-muted mt-1 line-clamp-1">{meta.desc || 'Ceremony planning and preparation'}</p>

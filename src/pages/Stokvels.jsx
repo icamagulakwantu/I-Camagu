@@ -986,6 +986,21 @@ function Stokvels({ onBack, onOpenShrineFund }) {
       </button>
       <h2 className="font-display font-bold text-2xl text-ink mb-4">Stokvels</h2>
 
+      {!loading && myStokvels.length > 0 && (
+        <div className="card-ink relative mb-4 overflow-hidden rounded-soft px-5 py-5">
+          <div className="relative flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow text-cream/50">Combined balance</p>
+              <p className="tabular mt-2 font-display text-3xl text-cream">
+                R{myStokvels.reduce((sum, m) => sum + Number(m.stokvel?.groupLedger?.totalBalance || 0), 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <p className="mt-1 text-xs text-cream/55">Across {myStokvels.length} group{myStokvels.length === 1 ? '' : 's'}</p>
+            </div>
+            <Icon name="coins" size={32} color="#c45c26" />
+          </div>
+        </div>
+      )}
+
       {onOpenShrineFund && (
         <button
           type="button"
@@ -1042,11 +1057,19 @@ function Stokvels({ onBack, onOpenShrineFund }) {
               key={m.id || m.stokvelId}
               type="button"
               onClick={() => fetchDetail(m.stokvelId)}
-              className={`w-full text-left ${cardBase} ${cardHover} ${cardActive}`}
+              className={`w-full text-left flex items-center gap-3 ${cardBase} ${cardHover} ${cardActive}`}
             >
-              <p className="font-bold text-sm text-ink">{m.stokvel?.name || 'Unnamed Stokvel'}</p>
-              <p className="text-xs text-ink-muted mt-0.5">
-                {(m.stokvel?.type || 'UNKNOWN').replace(/_/g, ' ')} • {m.stokvel?._count?.members || 0} members
+              <span className="w-9 h-9 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
+                <Icon name="landmark" size={16} color="#c45c26" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-sm text-ink">{m.stokvel?.name || 'Unnamed Stokvel'}</p>
+                <p className="text-xs text-ink-muted mt-0.5">
+                  {(m.stokvel?.type || 'UNKNOWN').replace(/_/g, ' ')} • {m.stokvel?._count?.members || 0} members
+                </p>
+              </div>
+              <p className="tabular text-sm font-bold text-terracotta flex-shrink-0">
+                R{Number(m.stokvel?.groupLedger?.totalBalance || 0).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
               </p>
             </button>
           ))}

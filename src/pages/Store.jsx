@@ -4,7 +4,6 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import Icon from '../components/Icon.jsx'
-import fallbackProductImg from '../assets/products/product-beer.jpg'
 
 function Store({ onGoToBasket, basketCount }) {
   const { accessToken } = useAuth()
@@ -126,7 +125,13 @@ function Store({ onGoToBasket, basketCount }) {
             {skus.map((sku) => (
               <div key={sku.id} className="card-paper flex justify-between items-center overflow-hidden">
                 <div className="flex items-center gap-3 min-w-0">
-                  <img src={sku.imageUrl || fallbackProductImg} alt={sku.name} className="w-16 h-16 object-cover flex-shrink-0" />
+                  {sku.imageUrl ? (
+                    <img src={sku.imageUrl} alt={sku.name} className="w-16 h-16 object-cover flex-shrink-0" />
+                  ) : (
+                    <span className="w-16 h-16 bg-terracotta/10 flex items-center justify-center flex-shrink-0">
+                      <Icon name="cocktail" size={22} color="#c45c26" />
+                    </span>
+                  )}
                   <div className="min-w-0 py-1">
                     <h3 className="font-display font-bold text-sm text-ink truncate">{sku.name}</h3>
                     <p className="text-xs text-ink-muted">

@@ -53,7 +53,7 @@ const SECTIONS = [
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.98]'
 
 export default function More({ onNavigate }) {
-  const { logout } = useAuth()
+  const { user, logout } = useAuth()
   const { showToast } = useToast()
 
   const handleNav = (screen) => {
@@ -76,30 +76,48 @@ export default function More({ onNavigate }) {
         <p className="text-xs font-bold text-ink-muted uppercase tracking-wider">All features & settings</p>
       </div>
 
-      {SECTIONS.map((section) => (
-        <div key={section.title} className="mb-6">
-          <p className="text-xs font-black uppercase text-ink-muted mb-2 px-1">{section.title}</p>
-          <div className="card-paper divide-y divide-terracotta/10 overflow-hidden">
-            {section.items.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => handleNav(item.id)}
-                className={cn(
-                  'w-full flex items-center gap-3.5 p-4 text-left bg-white hover:bg-sage-50/50 active:bg-sage-50 transition-colors',
-                  pressable
-                )}
-              >
-                <div className="w-9 h-9 rounded-soft bg-cream flex items-center justify-center flex-shrink-0">
-                  <Icon name={item.icon} size={18} color="#c45c26" />
-                </div>
-                <span className="font-bold text-sm text-ink flex-1">{item.label}</span>
-                <Icon name="arrowRight" size={16} color="#8a8278" />
-              </button>
-            ))}
+      {user && (
+        <div className="card-ink mb-6 flex items-center gap-4 rounded-soft px-5 py-5">
+          <span className="w-12 h-12 rounded-full bg-terracotta/20 flex items-center justify-center flex-shrink-0">
+            <Icon name="user" size={22} color="#c45c26" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-display font-bold text-lg text-cream truncate">{user.firstName} {user.lastName}</p>
+            {user.paternalIziduko && <p className="text-xs text-cream/55 mt-0.5">{user.paternalIziduko}</p>}
           </div>
         </div>
-      ))}
+      )}
+
+      {SECTIONS.map((section, sectionIndex) => {
+        const alt = sectionIndex % 2 === 1
+        return (
+          <div key={section.title} className="mb-6">
+            <div className="flex items-center gap-3 mb-2 px-1">
+              <p className={`text-xs font-black uppercase ${alt ? 'text-brand-ochre' : 'text-terracotta'}`}>{section.title}</p>
+              <span className="h-px flex-1 bg-terracotta/10" />
+            </div>
+            <div className={cn('card-paper divide-y divide-terracotta/10 overflow-hidden', alt && 'wash-clay')}>
+              {section.items.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleNav(item.id)}
+                  className={cn(
+                    'w-full flex items-center gap-3.5 p-4 text-left hover:bg-sage-50/50 active:bg-sage-50 transition-colors',
+                    pressable
+                  )}
+                >
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${alt ? 'bg-brand-ochre/12' : 'bg-terracotta/10'}`}>
+                    <Icon name={item.icon} size={18} color={alt ? '#c1922f' : '#c45c26'} />
+                  </div>
+                  <span className="font-bold text-sm text-ink flex-1">{item.label}</span>
+                  <Icon name="arrowRight" size={16} color="#8a8278" />
+                </button>
+              ))}
+            </div>
+          </div>
+        )
+      })}
 
       <div className="mt-8 mb-8">
         <button

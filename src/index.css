@@ -61,7 +61,12 @@
   50% { transform: rotate(5deg); }
 }
 
-/* ---- Editorial surface system ---- */
+/* ---- Editorial surface system ----
+   wash-ember, wash-clay, rings, motif-thresholds, and card-ink each set the
+   full background (or background-image) on their own — they're alternative
+   treatments, not stackable layers. Combining two of them on one element
+   means whichever rule appears later in this file silently wins outright,
+   not a blend. Pick exactly one per element. */
 
 /* Editorial card: cream paper, hairline, soft lift */
 .card-paper {
@@ -120,4 +125,44 @@
 
 .safe-bottom {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+}
+
+/* Faint concentric gateway rings — decorative placeholder texture, echoes the mark itself */
+.rings {
+  background-image: radial-gradient(
+    circle at 82% 18%,
+    transparent 0 26px,
+    rgba(255, 255, 255, 0.08) 26px 27px,
+    transparent 27px 52px,
+    rgba(255, 255, 255, 0.06) 52px 53px,
+    transparent 53px 84px,
+    rgba(255, 255, 255, 0.04) 84px 85px,
+    transparent 85px
+  );
+}
+
+/* Dark ink surface — for a hero/summary card that should feel weightier than card-paper */
+.card-ink {
+  background: linear-gradient(160deg, #3a332a, #241f19);
+  color: #f5f3ee;
+  border-radius: 20px;
+  box-shadow: 0 14px 32px -16px rgba(43, 38, 32, 0.5);
+}
+
+/* Card with an ochre spine on the leading edge, like a bound ledger */
+.card-spine {
+  position: relative;
+  overflow: hidden;
+}
+.card-spine::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #c45c26, #c1922f);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
