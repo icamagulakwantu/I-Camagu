@@ -139,8 +139,14 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
         <NotificationBell onOpen={() => onNavigate('notifications')} />
       </div>
 
+      {/* Homestead photo — the emotional opener */}
+      <div className="relative overflow-hidden rounded-soft mb-3 h-32 shadow-soft">
+        <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/15 to-transparent" />
+      </div>
+
       {/* Greeting hero — wash-ember stands in for a homestead photo */}
-      <div className="wash-ember grain relative overflow-hidden rounded-soft p-5 mb-4 shadow-soft">
+      <div className="wash-ember grain relative overflow-hidden rounded-soft p-5 mb-5 shadow-soft">
         <p className="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide text-cream">
           <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-4 h-4" style={{ filter: 'brightness(0) invert(1)' }} />
           Molo, {user?.firstName || 'friend'}
@@ -148,6 +154,54 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
         <h1 className="mt-1.5 font-display text-2xl leading-tight text-cream">
           {ceremonies.length > 0 ? <>The homestead is<br />preparing for {ceremonies[0]?.title || 'a ceremony'}.</> : 'uMntu ngumntu ngabantu.'}
         </h1>
+      </div>
+
+      {/* Three reasons — the core pitch */}
+      <div className="space-y-2.5 mb-6">
+        <button
+          type="button"
+          onClick={() => onNavigate('ceremonyhub')}
+          className={`w-full text-left card-paper grain p-4 flex items-center gap-4 ${pressable}`}
+        >
+          <span className="w-11 h-11 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
+            <Icon name="flame" color="#c45c26" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-display font-bold text-base text-brand-black">Plan an Umgidi, properly</p>
+            <p className="text-xs text-brand-black/55 mt-0.5">Every rite, its own checklist and budget — click an item, it's paid for.</p>
+          </div>
+          <Icon name="arrowRight" size={16} color="#8a8278" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onNavigate('store')}
+          className={`w-full text-left card-paper grain p-4 flex items-center gap-4 ${pressable}`}
+        >
+          <span className="w-11 h-11 rounded-full bg-brand-ochre/12 flex items-center justify-center flex-shrink-0">
+            <Icon name="package" color="#c1922f" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-display font-bold text-base text-brand-black">Smart Match bulk buying</p>
+            <p className="text-xs text-brand-black/55 mt-0.5">Your stokvel's order pools with others until the pallet price unlocks.</p>
+          </div>
+          <Icon name="arrowRight" size={16} color="#8a8278" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onNavigate('iziduko')}
+          className={`w-full text-left card-paper grain p-4 flex items-center gap-4 ${pressable}`}
+        >
+          <span className="w-11 h-11 rounded-full bg-sage-100 flex items-center justify-center flex-shrink-0">
+            <Icon name="link" color="#4a7a4a" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-display font-bold text-base text-brand-black">Find your clan, ClanMatch</p>
+            <p className="text-xs text-brand-black/55 mt-0.5">Match paternal, maternal and both grandmothers' iziduko to find unknown family.</p>
+          </div>
+          <Icon name="arrowRight" size={16} color="#8a8278" />
+        </button>
       </div>
 
       {/* Did You Know */}
