@@ -423,7 +423,7 @@ export const getPublicPlan = async (req, res) => {
 // POST /auto - create ceremony with auto‑generated checklist & cost items
 export const createAutoCeremony = async (req, res) => {
       try {
-              const { title, type, eventDate, notes, budgetZAR } = req.body;
+              const { title, type, eventDate, notes, budgetZAR, guestCount } = req.body;
                   const hostId = req.user.id;
 
                       if (!title || !type || !hostId) {
@@ -432,6 +432,7 @@ export const createAutoCeremony = async (req, res) => {
 
                           const defaultItems = getDefaultItemsForType(type);
                               const costProfile = CEREMONY_COST_PROFILES[type];
+                              const parsedGuestCount = guestCount !== undefined && guestCount !== '' ? parseInt(guestCount, 10) : null;
 
                                   const ceremony = await prisma.$transaction(async (tx) => {
                                             const newCeremony = await tx.ceremony.create({
@@ -443,6 +444,7 @@ export const createAutoCeremony = async (req, res) => {
                                                                                                               hostId,
                                                                                                                         status: 'PLANNING',
                                                                                                                                   budgetZAR: budgetZAR !== undefined && budgetZAR !== '' ? budgetZAR : null,
+                                                                                                                                  guestCount: parsedGuestCount,
                                                         },
                                             });
 
@@ -468,14 +470,20 @@ export const createAutoCeremony = async (req, res) => {
                                                                             const costItems = [];
                                                                             for (const [phase, items] of Object.entries(costProfile)) {
                                                                                           for (const item of items) {
-                                                                                                          costItems.push({
+                                                                                                          // perGuestUnitFraction items (catering groceries): scale quantity
+                                                                                          // to guest count when given, falling back to a 150-guest baseline
+                                                                                          // (a typical Umgidi size) so estimates stay sensible either way.
+                                                                                          const scaledQuantity = item.perGuestUnitFraction
+                                                                                                ? Math.max(1, Math.ceil((parsedGuestCount || 150) * item.perGuestUnitFraction))
+                                                                                                : item.quantity;
+                                                                                          costItems.push({
                                                                                                                             ceremonyId: newCeremony.id,
                                                                                                                                           phase,
                                                                                                                                                         label: item.label,
                                                                                                                                                                       category: item.category,
                                                                                                                                                                                     unit: item.unit,
                                                                                                                                                                                                   unitCost: item.unitCost,
-                                                                                                                                                                                                                quantity: item.quantity,
+                                                                                                                                                                                                                quantity: scaledQuantity,
                                                                                                                                                                                                                               isInputField: item.isInputField || false,
                                                                                                                                                                                                                                             inputType: item.inputType || 'number',
                                                                                                                                                                                                                                                           suggestedAmount: item.suggestedAmount || null,
@@ -541,7 +549,7 @@ export const getCeremonyById = async (req, res) => {
 export const updateCeremony = async (req, res) => {
       try {
               const { id } = req.params;
-                  const { title, eventDate, status, notes, budgetZAR } = req.body;
+                  const { title, eventDate, status, notes, budgetZAR, guestCount } = req.body;
 
                       const ceremony = await prisma.ceremony.findUnique({ where: { id } });
 
@@ -556,6 +564,7 @@ export const updateCeremony = async (req, res) => {
                                                                               status: status || undefined,
                                                                                       notes: notes !== undefined ? notes : undefined,
                                                                                               budgetZAR: budgetZAR !== undefined ? (budgetZAR === '' || budgetZAR === null ? null : budgetZAR) : undefined,
+                                                                                              guestCount: guestCount !== undefined ? (guestCount === '' || guestCount === null ? null : parseInt(guestCount, 10)) : undefined,
                                                   },
                                   });
                                       res.json(updated);

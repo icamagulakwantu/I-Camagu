@@ -140,6 +140,12 @@ const UMGIDI_DEFAULT_ITEMS = [
   { phase: 'COOKING_EBUHLANTI', label: '9+ large enamel dishes, 6 cast iron pots' },
   { phase: 'COOKING_EBUHLANTI', label: '10+ bhekile for umqombothi' },
   { phase: 'COOKING_KITCHEN', label: 'Arrange women for kitchen station (general food)' },
+  { phase: 'COOKING_KITCHEN', label: 'Maize meal for pap' },
+  { phase: 'COOKING_KITCHEN', label: 'Potatoes' },
+  { phase: 'COOKING_KITCHEN', label: 'Cabbage' },
+  { phase: 'COOKING_KITCHEN', label: 'Spinach' },
+  { phase: 'COOKING_KITCHEN', label: 'Cooking oil' },
+  { phase: 'COOKING_KITCHEN', label: 'Sugar (for tea/drinks)' },
   { phase: 'COOKING_KITCHEN', label: 'Plastic plates and spoons for guests' },
   { phase: 'HIERARCHY_ALLOCATION', label: 'Set up the 14-group hierarchy allocations (see Hierarchy tool)' },
   { phase: 'ALCOHOL_DISTRIBUTION', label: 'Main distribution supplies (5-8 bottles, 1-2 cases per group)' },
@@ -344,7 +350,18 @@ const UMGIDI_COST_PROFILE = {
   ],
   'COOKING_KITCHEN': [
     { label: 'Arrange women for kitchen station (general food)', category: 'services', unit: 'person', unitCost: 0, quantity: 6, isInputField: true, inputType: 'number', suggestedAmount: '6-10 women' },
-    { label: 'Plastic plates and spoons for guests', category: 'supplies', unit: 'guest_pack', unitCost: COST_RATES.supplies.plastic_plate_pack_50 + COST_RATES.supplies.plastic_spoon_pack_50, quantity: 4, isInputField: true, inputType: 'number', suggestedAmount: '200 plates + 200 spoons' },
+    // Catering line items scale with guestCount (see scaleCateringItem in
+    // createAutoCeremony) — perGuestUnitFraction is "how many of this
+    // item's bulk unit one guest needs" (e.g. 0.003 = a 50kg maize meal
+    // bag covers ~333 guests). Ratios from general SA function-catering
+    // guidance (~150-200g starch/veg per guest), apportioned across items.
+    { label: 'Maize meal for pap', category: 'food', unit: '50kg bag', unitCost: COST_RATES.food.maize_meal_50kg, quantity: 1, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.003, suggestedAmount: '~0.15kg/guest', skuName: 'Maize Meal 50kg' },
+    { label: 'Potatoes', category: 'food', unit: '10kg bag', unitCost: COST_RATES.food.potatoes_10kg, quantity: 1, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.01, suggestedAmount: '~0.1kg/guest', skuName: 'Potatoes 10kg' },
+    { label: 'Cabbage', category: 'food', unit: 'head', unitCost: COST_RATES.food.cabbage_head, quantity: 6, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.056, suggestedAmount: '~1 head per 18 guests', skuName: 'Cabbage Head' },
+    { label: 'Spinach', category: 'food', unit: 'bundle', unitCost: COST_RATES.food.spinach_bundle, quantity: 8, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.067, suggestedAmount: '~1 bundle per 15 guests', skuName: 'Spinach Bundle' },
+    { label: 'Cooking oil', category: 'food', unit: '5L', unitCost: COST_RATES.food.cooking_oil_5l, quantity: 1, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.003, suggestedAmount: '~15ml/guest', skuName: 'Cooking Oil 5L' },
+    { label: 'Sugar (for tea/drinks)', category: 'food', unit: '10kg bag', unitCost: COST_RATES.food.sugar_10kg, quantity: 1, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.002, suggestedAmount: '~20g/guest', skuName: 'Sugar 10kg' },
+    { label: 'Plastic plates and spoons for guests', category: 'supplies', unit: 'guest_pack', unitCost: COST_RATES.supplies.plastic_plate_pack_50 + COST_RATES.supplies.plastic_spoon_pack_50, quantity: 4, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.02, suggestedAmount: '1 pack (50) per 50 guests' },
   ],
   'HIERARCHY_ALLOCATION': [
     { label: 'Set up the 14-group hierarchy allocations (see Hierarchy tool)', category: 'alcohol', unit: 'allocation', unitCost: 0, quantity: 14, isInputField: true, inputType: 'number', suggestedAmount: 'See alcohol distribution calculator' },

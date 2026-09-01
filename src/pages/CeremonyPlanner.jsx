@@ -37,6 +37,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   const [loading, setLoading] = useState(true)
   const [newTitle, setNewTitle] = useState('')
   const [newBudget, setNewBudget] = useState('')
+  const [newGuestCount, setNewGuestCount] = useState('')
   const [newType, setNewType] = useState(defaultType || 'ULWALUKO')
   const [ceremonyTypes, setCeremonyTypes] = useState([])
   const [confirmDelete, setConfirmDelete] = useState(null)
@@ -100,6 +101,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           title: newTitle,
           eventDate: new Date().toISOString(),
           budgetZAR: newBudget ? parseFloat(newBudget) : undefined,
+          guestCount: newGuestCount ? parseInt(newGuestCount, 10) : undefined,
         }),
       })
       const ceremony = await ceremonyRes.json()
@@ -129,6 +131,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
       setPlans(prev => [newPlan, ...prev])
       setNewTitle('')
       setNewBudget('')
+      setNewGuestCount('')
       setActivePlan(newPlan)
       showToast(`Ceremony created with ${newPlan.checklistItems.length} planning items`, 'success')
     } catch (err) {
@@ -876,6 +879,16 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             step="any"
             className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
           />
+          <input
+            type="number"
+            placeholder="Number of guests (optional — e.g. 200)"
+            value={newGuestCount}
+            onChange={(e) => setNewGuestCount(e.target.value)}
+            min="1"
+            step="1"
+            className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
+          />
+          <p className="text-[11px] text-ink-muted -mt-1">For Umgidi, this scales the catering quantities (maize meal, potatoes, veg) automatically.</p>
           <button
             type="submit"
             className={`w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill ${pressable}`}
