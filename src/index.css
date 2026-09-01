@@ -62,11 +62,11 @@
 }
 
 /* ---- Editorial surface system ----
-   wash-ember, wash-clay, rings, and motif-thresholds each set the full
-   background (or background-image) on their own — they're alternative
-   treatments, not stackable layers. Combining two of them on one element
-   means whichever rule appears later in this file silently wins outright,
-   not a blend. Pick exactly one per element. */
+   wash-ember, wash-clay, wash-sage, rings, and motif-thresholds each set
+   the full background (or background-image) on their own — they're
+   alternative treatments, not stackable layers. Combining two of them on
+   one element means whichever rule appears later in this file silently
+   wins outright, not a blend. Pick exactly one per element. */
 
 /* Editorial card: cream paper, hairline, soft lift */
 .card-paper {
@@ -102,6 +102,12 @@
 
 .wash-clay {
   background-image: linear-gradient(160deg, #f5f3ee 0%, #ecdcc4 100%);
+}
+
+/* Deep sage gradient — the terracotta wash-ember's cool counterpart, so
+   money/savings surfaces don't read as the same red-clay everything else. */
+.wash-sage {
+  background-image: linear-gradient(155deg, #4a7a4a 0%, #3d623d 55%, #1e301e 100%);
 }
 
 /* Section eyebrow: small caps label. Wrapped in :where() so its default

@@ -132,18 +132,21 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
     <div className="px-5 pt-6 pb-28 max-w-md mx-auto">
       {/* Brand mark */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-9 h-9" />
-          <span className="font-display font-bold text-xl text-brand-black">iCamagu</span>
+        <div className="flex items-center gap-2.5">
+          <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-12 h-12" />
+          <span className="font-display font-bold text-2xl text-brand-black">iCamagu</span>
         </div>
         <NotificationBell onOpen={() => onNavigate('notifications')} />
       </div>
 
       {/* Greeting hero — wash-ember stands in for a homestead photo */}
       <div className="wash-ember grain relative overflow-hidden rounded-soft p-5 mb-4 shadow-soft">
-        <p className="eyebrow text-cream">Molo, {user?.firstName || 'friend'} 🌾</p>
-        <h1 className="mt-1 font-display text-2xl leading-tight text-cream">
-          {ceremonies.length > 0 ? <>The homestead is<br />preparing for {ceremonies[0]?.title || 'a ceremony'}.</> : 'Culture before capital.'}
+        <p className="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide text-cream">
+          <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-4 h-4" style={{ filter: 'brightness(0) invert(1)' }} />
+          Molo, {user?.firstName || 'friend'}
+        </p>
+        <h1 className="mt-1.5 font-display text-2xl leading-tight text-cream">
+          {ceremonies.length > 0 ? <>The homestead is<br />preparing for {ceremonies[0]?.title || 'a ceremony'}.</> : 'uMntu ngumntu ngabantu.'}
         </h1>
       </div>
 

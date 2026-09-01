@@ -987,7 +987,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
       <h2 className="font-display font-bold text-2xl text-ink mb-4">Stokvels</h2>
 
       {!loading && myStokvels.length > 0 && (
-        <div className="wash-ember grain relative mb-4 overflow-hidden rounded-soft px-5 py-5">
+        <div className="wash-sage grain relative mb-4 overflow-hidden rounded-soft px-5 py-5">
           <div className="relative flex items-start justify-between gap-4">
             <div>
               <p className="eyebrow text-cream/70">Combined balance</p>
