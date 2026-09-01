@@ -14,6 +14,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import prisma from './config/db.js';
 import { backfillBrandImages } from './scripts/backfill-brand-images.js';
+import { backfillSpiritPricing } from './scripts/backfill-spirit-pricing.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -105,5 +106,8 @@ ensureCeremonyBudgetColumns()
     // values that may not have been backfilled since the columns were added.
     backfillBrandImages().catch((err) => {
       console.error('Brand image backfill failed:', err.message);
+    });
+    backfillSpiritPricing().catch((err) => {
+      console.error('Spirit pricing backfill failed:', err.message);
     });
   });
