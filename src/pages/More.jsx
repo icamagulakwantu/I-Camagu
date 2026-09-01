@@ -77,13 +77,13 @@ export default function More({ onNavigate }) {
       </div>
 
       {user && (
-        <div className="card-ink mb-6 flex items-center gap-4 rounded-soft px-5 py-5">
-          <span className="w-12 h-12 rounded-full bg-terracotta/20 flex items-center justify-center flex-shrink-0">
-            <Icon name="user" size={22} color="#c45c26" />
+        <div className="wash-ember grain mb-6 flex items-center gap-4 rounded-soft px-5 py-5">
+          <span className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
+            <Icon name="user" size={22} color="#ffffff" />
           </span>
           <div className="min-w-0">
             <p className="font-display font-bold text-lg text-cream truncate">{user.firstName} {user.lastName}</p>
-            {user.paternalIziduko && <p className="text-xs text-cream/55 mt-0.5">{user.paternalIziduko}</p>}
+            {user.paternalIziduko && <p className="text-xs text-cream/80 mt-0.5">{user.paternalIziduko}</p>}
           </div>
         </div>
       )}

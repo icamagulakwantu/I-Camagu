@@ -62,8 +62,8 @@
 }
 
 /* ---- Editorial surface system ----
-   wash-ember, wash-clay, rings, motif-thresholds, and card-ink each set the
-   full background (or background-image) on their own — they're alternative
+   wash-ember, wash-clay, rings, and motif-thresholds each set the full
+   background (or background-image) on their own — they're alternative
    treatments, not stackable layers. Combining two of them on one element
    means whichever rule appears later in this file silently wins outright,
    not a blend. Pick exactly one per element. */
@@ -139,14 +139,6 @@
     rgba(255, 255, 255, 0.04) 84px 85px,
     transparent 85px
   );
-}
-
-/* Dark ink surface — for a hero/summary card that should feel weightier than card-paper */
-.card-ink {
-  background: linear-gradient(160deg, #3a332a, #241f19);
-  color: #f5f3ee;
-  border-radius: 20px;
-  box-shadow: 0 14px 32px -16px rgba(43, 38, 32, 0.5);
 }
 
 /* Card with an ochre spine on the leading edge, like a bound ledger */
