@@ -160,29 +160,29 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
       <p className="eyebrow mb-2">Where to today?</p>
       <div className="grid grid-cols-2 gap-3 mb-6">
         <ActionCard icon={<Icon name="calendar" color="#c45c26" />} onClick={() => onNavigate('ceremonyhub')}>
-          <span className="font-extrabold text-sm text-brand-black block">Ceremonies</span>
-          <span className="text-[10px] text-brand-black/50 font-medium block">Plan & Execute</span>
+          <span className="font-display font-semibold text-base text-brand-black block">Ceremonies</span>
+          <span className="text-xs text-brand-black/50 block">Plan & Execute</span>
         </ActionCard>
 
         <ActionCard icon={<Icon name="cart" color="#c1922f" />} badge={basketCount} onClick={() => onNavigate('store')}>
-          <span className="font-extrabold text-sm text-brand-black block">Store</span>
-          <span className="text-[10px] text-brand-black/50 font-medium block">Wholesale Bulk</span>
+          <span className="font-display font-semibold text-base text-brand-black block">Store</span>
+          <span className="text-xs text-brand-black/50 block">Wholesale Bulk</span>
         </ActionCard>
 
         <ActionCard icon={<Icon name="users" color="#4a7a4a" />} onClick={() => onNavigate('stokvels')}>
-          <span className="font-extrabold text-sm text-brand-black block">Stokvels</span>
-          <span className="text-[10px] text-brand-black/50 font-medium block">Group Savings</span>
+          <span className="font-display font-semibold text-base text-brand-black block">Stokvels</span>
+          <span className="text-xs text-brand-black/50 block">Group Savings</span>
         </ActionCard>
 
         <ActionCard icon={<Icon name="check" color="#2b2620" />} onClick={() => onNavigate('ukugida')}>
-          <span className="font-extrabold text-sm text-brand-black block">Ukugida</span>
-          <span className="text-[10px] text-brand-black/50 font-medium block">Reciprocity Ledger</span>
+          <span className="font-display font-semibold text-base text-brand-black block">Ukugida</span>
+          <span className="text-xs text-brand-black/50 block">Reciprocity Ledger</span>
         </ActionCard>
       </div>
 
       {/* Your Ceremonies */}
       <div className="mb-6">
-        <p className="text-xs font-black uppercase tracking-wider text-brand-black/40 mb-2">
+        <p className="eyebrow mb-2">
           Your Ceremonies
         </p>
 
@@ -208,7 +208,7 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
                 onClick={() => c?.id ? onSelectCeremony?.(c.id) : onNavigate('ceremonyhub')}
                 className={`w-full text-left bg-white/90 backdrop-blur-md border-2 border-terracotta/15 rounded-soft p-3.5 shadow-sm ${pressable}`}
               >
-                <p className="font-extrabold text-sm text-brand-black">{c?.title || 'Untitled Ceremony'}</p>
+                <p className="font-display font-semibold text-base text-brand-black">{c?.title || 'Untitled Ceremony'}</p>
                 <p className="text-xs text-brand-black/50 capitalize mt-0.5">
                   {c?.type ? c.type.replace(/_/g, ' ') : 'General'} • {c?.preparationPlans?.length || 0} plan(s)
                 </p>
@@ -220,7 +220,7 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
 
       {/* Your Stokvels */}
       <div>
-        <p className="text-xs font-black uppercase tracking-wider text-brand-black/40 mb-2">
+        <p className="eyebrow mb-2">
           Your Stokvels
         </p>
 
@@ -250,12 +250,12 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
               >
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="font-extrabold text-sm text-brand-black">{m?.stokvel?.name || 'Stokvel'}</p>
+                    <p className="font-display font-semibold text-base text-brand-black">{m?.stokvel?.name || 'Stokvel'}</p>
                     <p className="text-xs text-brand-black/50">
                       {m?.stokvel?.type ? m.stokvel.type.replace(/_/g, ' ') : ''}
                     </p>
                   </div>
-                  <span className="font-black text-xs text-brand-ochre bg-brand-ochre/10 px-2.5 py-1 rounded-pill">
+                  <span className="tabular font-bold text-xs text-brand-ochre bg-brand-ochre/10 px-2.5 py-1 rounded-pill">
                     R{parseFloat(m?.stokvel?.groupLedger?.totalBalance || 0).toFixed(2)}
                   </span>
                 </div>
