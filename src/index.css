@@ -104,8 +104,11 @@
   background-image: linear-gradient(160deg, #f5f3ee 0%, #ecdcc4 100%);
 }
 
-/* Section eyebrow: small caps label */
-.eyebrow {
+/* Section eyebrow: small caps label. Wrapped in :where() so its default
+   grey has zero specificity — a text-color utility on the same element
+   (e.g. "eyebrow text-cream/75") always wins, instead of silently losing
+   to this rule just because it's declared later in the file. */
+:where(.eyebrow) {
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.16em;

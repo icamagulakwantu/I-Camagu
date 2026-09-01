@@ -141,7 +141,7 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
 
       {/* Greeting hero — wash-ember stands in for a homestead photo */}
       <div className="wash-ember grain relative overflow-hidden rounded-soft p-5 mb-4 shadow-soft">
-        <p className="eyebrow text-cream/75">Molo, {user?.firstName || 'friend'} 🌾</p>
+        <p className="eyebrow text-cream">Molo, {user?.firstName || 'friend'} 🌾</p>
         <h1 className="mt-1 font-display text-2xl leading-tight text-cream">
           {ceremonies.length > 0 ? <>The homestead is<br />preparing for {ceremonies[0]?.title || 'a ceremony'}.</> : 'Culture before capital.'}
         </h1>
