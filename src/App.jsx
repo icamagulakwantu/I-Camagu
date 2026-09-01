@@ -157,11 +157,13 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
       </div>
 
       {/* Three reasons — the core pitch */}
+      <p className="eyebrow mb-1">Three ways iCamagu carries you</p>
+      <h2 className="font-display font-bold text-xl text-brand-black mb-3">Built around what families do</h2>
       <div className="space-y-2.5 mb-6">
         <button
           type="button"
           onClick={() => onNavigate('ceremonyhub')}
-          className={`w-full text-left card-paper grain p-4 flex items-center gap-4 ${pressable}`}
+          className={`w-full text-left card-paper p-4 flex items-center gap-4 ${pressable}`}
         >
           <span className="w-11 h-11 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
             <Icon name="flame" color="#c45c26" />
@@ -176,7 +178,7 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
         <button
           type="button"
           onClick={() => onNavigate('store')}
-          className={`w-full text-left card-paper grain p-4 flex items-center gap-4 ${pressable}`}
+          className={`w-full text-left card-paper p-4 flex items-center gap-4 ${pressable}`}
         >
           <span className="w-11 h-11 rounded-full bg-brand-ochre/12 flex items-center justify-center flex-shrink-0">
             <Icon name="package" color="#c1922f" />
@@ -191,7 +193,7 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
         <button
           type="button"
           onClick={() => onNavigate('iziduko')}
-          className={`w-full text-left card-paper grain p-4 flex items-center gap-4 ${pressable}`}
+          className={`w-full text-left card-paper p-4 flex items-center gap-4 ${pressable}`}
         >
           <span className="w-11 h-11 rounded-full bg-sage-100 flex items-center justify-center flex-shrink-0">
             <Icon name="link" color="#4a7a4a" />
