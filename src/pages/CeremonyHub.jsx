@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 
 const CEREMONY_META = {
-  ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', emoji: '⛰️' },
-  UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', emoji: '🎉' },
-  INTAMBO_ENKULU: { label: 'Intambo Enkulu', english: 'The great bond', desc: 'The ceremony that binds two families together.', emoji: '🔗' },
-  UKUKHAPHA: { label: 'Ukukhapha', english: 'Accompanying the departed', desc: 'The rite that walks a loved one to the ancestors.', emoji: '🕊️' },
-  INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: 'A thanksgiving rite honouring a mother\'s provision.', emoji: '🌾' },
-  UKUBUYISA: { label: 'Ukubuyisa', english: 'Bringing the spirit home', desc: 'A year on, the departed is called back to the homestead.', emoji: '🏠' },
-  UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', english: "Healer's ritual", desc: 'A ceremony marking a traditional healer\'s calling.', emoji: '🌿' },
-  WEDDING: { label: 'Wedding', english: 'Umtshato', desc: "Lobola talks, the handing over, and the two families' feast.", emoji: '💍' },
+  ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', emoji: '⛰️', image: '/images/ceremonies/ulwaluko.jpg' },
+  UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', emoji: '🎉', image: '/images/ceremonies/umgidi.jpg' },
+  INTAMBO_ENKULU: { label: 'Intambo Enkulu', english: 'The great bond', desc: 'The ceremony that binds two families together.', emoji: '🔗', image: '/images/ceremonies/intambo-enkulu.jpg' },
+  UKUKHAPHA: { label: 'Ukukhapha', english: 'Accompanying the departed', desc: 'The rite that walks a loved one to the ancestors.', emoji: '🕊️', image: '/images/ceremonies/ukukhapha.jpg' },
+  INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: 'A thanksgiving rite honouring a mother\'s provision.', emoji: '🌾', image: '/images/ceremonies/inkobe-zika-mama.jpg' },
+  UKUBUYISA: { label: 'Ukubuyisa', english: 'Bringing the spirit home', desc: 'A year on, the departed is called back to the homestead.', emoji: '🏠', image: '/images/ceremonies/ukubuyisa.jpg' },
+  UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', english: "Healer's ritual", desc: 'A ceremony marking a traditional healer\'s calling.', emoji: '🌿', image: '/images/ceremonies/umsebenzi.jpg' },
+  WEDDING: { label: 'Wedding', english: 'Umtshato', desc: "Lobola talks, the handing over, and the two families' feast.", emoji: '💍', image: '/images/ceremonies/wedding.jpg' },
   GENERAL_EVENT: { label: 'General Event', english: 'Any occasion', desc: 'A gathering the family must mark, on your own terms.', emoji: '📅' },
 }
 
@@ -70,15 +70,23 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
         <>
           {leadMeta && (
             <button onClick={() => onOpenType(leadType)}
-              className="wash-ember grain card-paper w-full text-left overflow-hidden mb-3 p-5 relative">
-              <span className="eyebrow text-cream/75">{leadMeta.english}</span>
-              <h3 className="mt-1 font-display text-2xl text-cream flex items-center gap-2">
-                <span className="text-3xl">{leadMeta.emoji}</span> {leadMeta.label}
-              </h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-cream/85 max-w-[85%]">{leadMeta.desc}</p>
-              <span className="mt-4 inline-block rounded-pill bg-white/15 px-4 py-2 text-[13px] font-bold text-white">
-                Start planning {leadMeta.label} →
-              </span>
+              className={`${leadMeta.image ? '' : 'wash-ember grain'} card-paper w-full text-left overflow-hidden mb-3 p-5 relative min-h-[220px] flex flex-col justify-end`}>
+              {leadMeta.image && (
+                <>
+                  <img src={leadMeta.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/35 to-transparent" />
+                </>
+              )}
+              <div className="relative">
+                <span className="eyebrow text-cream/75">{leadMeta.english}</span>
+                <h3 className="mt-1 font-display text-2xl text-cream flex items-center gap-2">
+                  <span className="text-3xl">{leadMeta.emoji}</span> {leadMeta.label}
+                </h3>
+                <p className="mt-2 text-[13px] leading-relaxed text-cream/85 max-w-[85%]">{leadMeta.desc}</p>
+                <span className="mt-4 inline-block rounded-pill bg-white/15 px-4 py-2 text-[13px] font-bold text-white">
+                  Start planning {leadMeta.label} →
+                </span>
+              </div>
             </button>
           )}
 
@@ -88,7 +96,11 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
               return (
                 <button key={type} onClick={() => onOpenType(type)}
                   className="card-paper grain w-full text-left overflow-hidden p-4 flex items-center gap-4 active:scale-[0.98] transition-transform">
-                  <span className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-2xl flex-shrink-0">{meta.emoji || '🎉'}</span>
+                  {meta.image ? (
+                    <img src={meta.image} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <span className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-2xl flex-shrink-0">{meta.emoji || '🎉'}</span>
+                  )}
                   <div className="min-w-0">
                     <p className="font-display font-bold text-ink">{meta.label || type.replace(/_/g, ' ')}</p>
                     {meta.english && <p className="text-[10px] uppercase tracking-[0.1em] text-brand-ochre font-bold mt-0.5">{meta.english}</p>}
