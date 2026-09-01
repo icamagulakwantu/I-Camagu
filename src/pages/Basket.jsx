@@ -3,24 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
-
-const DEFAULT_IMAGES = {
-  glassware: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=400&q=80',
-  beverage: 'https://images.unsplash.com/photo-1527281400683-1aae777175f8?auto=format&fit=crop&w=400&q=80',
-  catering: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=400&q=80',
-  default: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80',
-}
-
-function getItemImage(item) {
-  if (item?.sku?.imageUrl && item.sku.imageUrl.startsWith('http')) {
-    return item.sku.imageUrl
-  }
-  const name = (item?.sku?.name || '').toLowerCase()
-  if (name.includes('glass') || name.includes('jar') || name.includes('bottle')) return DEFAULT_IMAGES.glassware
-  if (name.includes('drink') || name.includes('beverage') || name.includes('cider') || name.includes('beer')) return DEFAULT_IMAGES.beverage
-  if (name.includes('food') || name.includes('meat') || name.includes('bulk')) return DEFAULT_IMAGES.catering
-  return DEFAULT_IMAGES.default
-}
+import Icon from '../components/Icon.jsx'
 
 export default function Basket({ onBack, onBasketChanged }) {
   const { accessToken, user } = useAuth()
@@ -254,20 +237,24 @@ export default function Basket({ onBack, onBasketChanged }) {
           {/* Cart Items List */}
           <div className="space-y-3 mb-4">
             {itemsList.map((item) => {
-              const imgSrc = getItemImage(item)
+              const imgSrc = item?.sku?.imageUrl || null
               return (
                 <div
                   key={item.id}
-                  className="bg-white border-2 border-cream-dark rounded-soft p-3 flex items-center gap-3 shadow-soft"
+                  className="card-paper flex items-center gap-3 p-3"
                 >
-                  <img
-                    src={imgSrc}
-                    alt={item.sku?.name || 'Item'}
-                    className="w-14 h-14 object-cover rounded-soft border border-cream-dark shrink-0"
-                    onError={(e) => {
-                      e.target.src = DEFAULT_IMAGES.default
-                    }}
-                  />
+                  {imgSrc ? (
+                    <img
+                      src={imgSrc}
+                      alt={item.sku?.name || 'Item'}
+                      className="w-14 h-14 object-cover rounded-soft shrink-0"
+                      onError={(e) => { e.target.style.display = 'none' }}
+                    />
+                  ) : (
+                    <span className="w-14 h-14 rounded-soft bg-terracotta/10 flex items-center justify-center shrink-0">
+                      <Icon name="cocktail" size={20} color="#c45c26" />
+                    </span>
+                  )}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-sm text-ink truncate">{item.sku?.name || 'Item'}</h3>
                     <p className="text-xs text-ink-muted">{item.sku?.bottleFormat || 'Standard Wholesale'}</p>
