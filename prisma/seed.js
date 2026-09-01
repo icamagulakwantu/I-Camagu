@@ -264,6 +264,22 @@ const skuItems = [
   { name: 'Robertson Winery Smooth Red', category: 'WINE_BOX', productType: 'ALCOHOL', bottleFormat: '3 Litre Box', unitsPerCase: 4, casePriceZAR: 518.40, palletPackQty: 75, palletPriceZAR: 37260.00, supplierPortfolio: 'Robertson Winery' },
   { name: 'Drostdy-Hof Claret Select', category: 'WINE_BOX', productType: 'ALCOHOL', bottleFormat: '5 Litre Box', unitsPerCase: 4, casePriceZAR: 729.60, palletPackQty: 75, palletPriceZAR: 52440.00, supplierPortfolio: 'Heineken SA' },
   { name: 'Paarl Perle White', category: 'WINE_BOX', productType: 'ALCOHOL', bottleFormat: '2 Litre Co-Pack', unitsPerCase: 4, casePriceZAR: 326.40, palletPackQty: 75, palletPriceZAR: 23460.00, supplierPortfolio: 'Distell Portfolio' },
+
+  // ---- Ceremony provisioning: real, purchasable versions of the
+  // physical items in ceremonyCostProfiles.js, so "buy this" on a
+  // ceremony checklist adds a real product to the basket, not just an
+  // estimate. bottleFormat is always null here (not alcohol), and
+  // unitsPerCase is 1 — for these, one "case" is one unit.
+  { name: 'Ikoto (Bentonite Clay)', category: 'RITUAL_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 65.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Traditional Supplier' },
+  { name: 'Imphepho Bundle', category: 'RITUAL_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 45.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Traditional Supplier' },
+  { name: 'Plain Grey Blanket', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 280.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Retail' },
+  { name: 'White Blanket with Black Stripes', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 350.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Retail' },
+  { name: 'Tarpaulin Sail', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 280.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Hardware' },
+  { name: 'Ibhoma Pole Bundle', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 350.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Hardware' },
+  { name: '25L Water Container', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 180.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Retail' },
+  { name: 'Green Apples (per kg)', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 35.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Butter 500g', category: 'GROCERY', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 85.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Sheep with Horns', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 2800.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
 ];
 
 const samplePartners = [

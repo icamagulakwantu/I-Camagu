@@ -15,6 +15,7 @@ import { fileURLToPath } from 'url';
 import prisma from './config/db.js';
 import { backfillBrandImages } from './scripts/backfill-brand-images.js';
 import { backfillSpiritPricing } from './scripts/backfill-spirit-pricing.js';
+import { backfillCeremonySkus } from './scripts/backfill-ceremony-skus.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -109,5 +110,8 @@ ensureCeremonyBudgetColumns()
     });
     backfillSpiritPricing().catch((err) => {
       console.error('Spirit pricing backfill failed:', err.message);
+    });
+    backfillCeremonySkus().catch((err) => {
+      console.error('Ceremony SKU backfill failed:', err.message);
     });
   });

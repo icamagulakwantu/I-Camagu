@@ -458,7 +458,14 @@ export const createAutoCeremony = async (req, res) => {
                                                   }
 
                                                         if (costProfile) {
-                                                                    const costItems = [];
+                                                                    const allProfileItems = Object.values(costProfile).flat();
+                                                                            const skuNames = [...new Set(allProfileItems.filter(i => i.skuName).map(i => i.skuName))];
+                                                                            const matchedSkus = skuNames.length > 0
+                                                                                  ? await tx.sku.findMany({ where: { name: { in: skuNames } } })
+                                                                                  : [];
+                                                                            const skuIdByName = Object.fromEntries(matchedSkus.map(s => [s.name, s.id]));
+
+                                                                            const costItems = [];
                                                                             for (const [phase, items] of Object.entries(costProfile)) {
                                                                                           for (const item of items) {
                                                                                                           costItems.push({
@@ -472,6 +479,7 @@ export const createAutoCeremony = async (req, res) => {
                                                                                                                                                                                                                               isInputField: item.isInputField || false,
                                                                                                                                                                                                                                             inputType: item.inputType || 'number',
                                                                                                                                                                                                                                                           suggestedAmount: item.suggestedAmount || null,
+                                                                                                                                                                                                                                                          skuId: item.skuName ? (skuIdByName[item.skuName] || null) : null,
                                                                                                           });
                                                                                           }
                                                                             }

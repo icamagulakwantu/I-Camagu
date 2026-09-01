@@ -479,6 +479,7 @@ model Sku {
   createdAt         DateTime @default(now())
 
   basketItems BasketItem[]
+  costItems   CeremonyCostItem[]
 
   @@unique([name, bottleFormat])
 }
@@ -890,6 +891,8 @@ model CeremonyCostItem {
   isInputField    Boolean  @default(false)
   inputType       String?
   suggestedAmount String?
+  skuId           String?
+  sku             Sku?     @relation(fields: [skuId], references: [id])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

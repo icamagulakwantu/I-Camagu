@@ -184,6 +184,22 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     }
   }
 
+  const buyItem = async (item) => {
+    if (!item.skuId) return
+    try {
+      const res = await fetch('/api/basket/items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ skuId: item.skuId, quantity: Math.max(1, Math.ceil(item.quantity || 1)) }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not add to basket')
+      showToast(data.message || 'Added to basket', 'success')
+    } catch (err) {
+      showToast(err.message || 'Could not add to basket', 'error')
+    }
+  }
+
   const editBudget = async () => {
     if (!activePlan?.ceremonyId) return
     const current = activePlan.ceremony?.budgetZAR
@@ -457,29 +473,39 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
               {costItems.map((item) => {
                 const lineTotal = (item.quantity || 0) * (item.unitCost || 0)
                 return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => toggleCostItem(item.id)}
-                    className="w-full flex items-center gap-3 py-3 text-left group"
-                  >
-                    <div
-                      className={cn(
-                        'w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all',
-                        item.isPurchased ? 'bg-sage-500 border-sage-500' : 'border-cream-dark group-hover:border-sage-300'
-                      )}
+                  <div key={item.id} className="flex items-center gap-3 py-3">
+                    <button
+                      type="button"
+                      onClick={() => toggleCostItem(item.id)}
+                      className="flex-1 min-w-0 flex items-center gap-3 text-left group"
                     >
-                      {item.isPurchased && <Icon name="check" size={13} color="#fff" strokeWidth={2.5} />}
-                    </div>
-                    <span className={cn('flex-1 min-w-0 text-sm font-medium truncate', item.isPurchased ? 'text-ink-muted line-through' : 'text-ink')}>
-                      {item.label}
-                    </span>
+                      <div
+                        className={cn(
+                          'w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all',
+                          item.isPurchased ? 'bg-sage-500 border-sage-500' : 'border-cream-dark group-hover:border-sage-300'
+                        )}
+                      >
+                        {item.isPurchased && <Icon name="check" size={13} color="#fff" strokeWidth={2.5} />}
+                      </div>
+                      <span className={cn('flex-1 min-w-0 text-sm font-medium truncate', item.isPurchased ? 'text-ink-muted line-through' : 'text-ink')}>
+                        {item.label}
+                      </span>
+                    </button>
                     {lineTotal > 0 && (
                       <span className={cn('tabular text-sm font-bold flex-shrink-0', item.isPurchased ? 'text-sage-600' : 'text-ink-muted')}>
                         R{lineTotal.toLocaleString('en-ZA', { maximumFractionDigits: 0 })}
                       </span>
                     )}
-                  </button>
+                    {item.skuId && !item.isPurchased && (
+                      <button
+                        type="button"
+                        onClick={() => buyItem(item)}
+                        className={`text-[11px] font-bold text-white bg-terracotta px-2.5 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
+                      >
+                        Buy
+                      </button>
+                    )}
+                  </div>
                 )
               })}
             </div>

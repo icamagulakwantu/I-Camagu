@@ -11,4 +11,11 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "CeremonyCostItem" ADD COLUMN IF NOT EXISTS "isPurchased" BOOLEAN NOT NULL DEFAULT false;'
   );
+  // Links a provisioning cost item to a real, purchasable Sku. No DB-level
+  // FK constraint (this project has no migration history to add one
+  // safely/idempotently) — Prisma's relation still works via app-level
+  // joins, just without DB-enforced referential integrity.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "CeremonyCostItem" ADD COLUMN IF NOT EXISTS "skuId" TEXT;'
+  );
 }
