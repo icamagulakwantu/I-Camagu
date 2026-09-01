@@ -128,6 +128,12 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
       .finally(() => setLoadingCeremonies(false))
   }, [accessToken, showToast])
 
+  const leadCeremony = ceremonies[0] || null
+  const leadCeremonyItems = leadCeremony?.checklistItems || []
+  const leadCeremonyProgress = leadCeremonyItems.length
+    ? Math.round((leadCeremonyItems.filter((i) => i.isCompleted || i.isChecked).length / leadCeremonyItems.length) * 100)
+    : null
+
   return (
     <div className="px-5 pt-6 pb-28 max-w-md mx-auto">
       {/* Brand mark */}
@@ -156,54 +162,102 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
         </h1>
       </div>
 
-      {/* Three reasons — the core pitch */}
-      <p className="eyebrow mb-1">Three ways iCamagu carries you</p>
-      <h2 className="font-display font-bold text-xl text-brand-black mb-3">Built around what families do</h2>
-      <div className="space-y-2.5 mb-6">
-        <button
-          type="button"
-          onClick={() => onNavigate('ceremonyhub')}
-          className={`w-full text-left card-paper p-4 flex items-center gap-4 ${pressable}`}
-        >
-          <span className="w-11 h-11 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
-            <Icon name="flame" color="#c45c26" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="font-display font-bold text-base text-brand-black">Plan an Umgidi, properly</p>
-            <p className="text-xs text-brand-black/55 mt-0.5">Every rite, its own checklist and budget — click an item, it's paid for.</p>
-          </div>
-          <Icon name="arrowRight" size={16} color="#8a8278" />
-        </button>
+      {/* Three ways — the core pitch, each its own product story */}
+      <p className="eyebrow text-terracotta mb-1">Three ways iCamagu carries you</p>
+      <h2 className="font-display font-bold text-2xl leading-tight text-brand-black mb-4">Built around what families do together.</h2>
 
-        <button
-          type="button"
-          onClick={() => onNavigate('store')}
-          className={`w-full text-left card-paper p-4 flex items-center gap-4 ${pressable}`}
-        >
-          <span className="w-11 h-11 rounded-full bg-brand-ochre/12 flex items-center justify-center flex-shrink-0">
-            <Icon name="package" color="#c1922f" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="font-display font-bold text-base text-brand-black">Smart Match bulk buying</p>
-            <p className="text-xs text-brand-black/55 mt-0.5">Your stokvel's order pools with others until the pallet price unlocks.</p>
+      {/* 01 · Ceremonies */}
+      <button
+        type="button"
+        onClick={() => onNavigate('ceremonyhub')}
+        className={`w-full text-left card-paper overflow-hidden mb-4 ${pressable}`}
+      >
+        <div className="wash-ember relative p-5">
+          <div className="flex items-start justify-between">
+            <span className="eyebrow text-cream/75">01 · Ceremonies</span>
+            <span className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
+              <Icon name="calendar" size={18} color="#ffffff" />
+            </span>
           </div>
-          <Icon name="arrowRight" size={16} color="#8a8278" />
-        </button>
+          <h3 className="mt-6 font-display text-2xl text-cream leading-tight">Plan an uMgidi, properly.</h3>
+        </div>
+        <div className="p-5">
+          <p className="text-sm leading-relaxed text-brand-black/60">
+            Create the plan, budget the day, assign family roles and track every contribution through execution.
+          </p>
+          <div className="mt-4 flex items-center justify-between border-t border-terracotta/10 pt-4">
+            <div className="min-w-0">
+              {leadCeremony ? (
+                <>
+                  <p className="text-xs text-brand-black/50 truncate">{leadCeremony.title}</p>
+                  <p className="tabular mt-0.5 text-sm font-bold text-brand-black">
+                    {leadCeremonyProgress != null ? `${leadCeremonyProgress}% prepared` : 'In progress'}
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm font-bold text-brand-black">Start your first plan</p>
+              )}
+            </div>
+            <span className="w-11 h-11 rounded-full bg-terracotta flex items-center justify-center flex-shrink-0">
+              <Icon name="arrowRight" size={18} color="#ffffff" />
+            </span>
+          </div>
+        </div>
+      </button>
 
-        <button
-          type="button"
-          onClick={() => onNavigate('iziduko')}
-          className={`w-full text-left card-paper p-4 flex items-center gap-4 ${pressable}`}
-        >
-          <span className="w-11 h-11 rounded-full bg-sage-100 flex items-center justify-center flex-shrink-0">
-            <Icon name="link" color="#4a7a4a" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="font-display font-bold text-base text-brand-black">Find your clan, ClanMatch</p>
-            <p className="text-xs text-brand-black/55 mt-0.5">Match paternal, maternal and both grandmothers' iziduko to find unknown family.</p>
+      {/* 02 · Smart Match */}
+      <button
+        type="button"
+        onClick={() => onNavigate('store')}
+        className={`w-full text-left wash-sage rounded-soft p-5 mb-4 shadow-soft ${pressable}`}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="eyebrow text-cream/70">02 · Smart Match</p>
+            <h3 className="mt-1.5 font-display text-2xl leading-tight text-cream max-w-[12ch]">One pallet. Many households.</h3>
           </div>
-          <Icon name="arrowRight" size={16} color="#8a8278" />
-        </button>
+          <Icon name="package" size={26} color="#ffffff" />
+        </div>
+        <p className="mt-3 text-sm leading-relaxed text-cream/80">
+          Your order pools with members across stokvels. Once the pool reaches the supplier's minimum, everyone unlocks the pallet price.
+        </p>
+        <div className="mt-4 flex items-center justify-between border-t border-cream/15 pt-4 text-sm font-bold text-cream">
+          Find a buying pool
+          <Icon name="arrowRight" size={18} color="#ffffff" />
+        </div>
+      </button>
+
+      {/* 03 · ClanMatch */}
+      <button
+        type="button"
+        onClick={() => onNavigate('iziduko')}
+        className={`w-full text-left card-paper overflow-hidden px-5 py-6 mb-3 ${pressable}`}
+      >
+        <div className="flex items-center justify-between">
+          <p className="eyebrow text-terracotta">03 · ClanMatch</p>
+          <Icon name="link" size={20} color="#c45c26" />
+        </div>
+        <h3 className="mt-3 font-display text-2xl leading-tight text-brand-black max-w-[14ch]">Find the family name between you.</h3>
+        <p className="mt-3 text-sm leading-relaxed text-brand-black/60">
+          Match paternal and maternal clan names — including both grandmothers — to reveal possible family relationships, even among cousins you haven't met.
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-soft border border-terracotta/15 bg-terracotta/15">
+          {['Paternal', 'Maternal', 'Paternal grandmother', 'Maternal grandmother'].map((branch) => (
+            <div key={branch} className="flex items-center gap-2 bg-white px-3 py-2.5">
+              <Icon name="users" size={14} color="#c45c26" />
+              <span className="text-[11px] leading-tight text-brand-black/60">{branch}</span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex items-center justify-between border-t border-terracotta/10 pt-4 text-sm font-bold text-brand-black">
+          Explore ClanMatch
+          <Icon name="arrowRight" size={18} color="#c45c26" />
+        </div>
+      </button>
+
+      <div className="text-center mb-6 mt-2">
+        <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-6 h-6 mx-auto opacity-40" />
+        <p className="mt-2 font-display italic text-sm text-brand-black/50">What the family carries, no one carries alone.</p>
       </div>
 
       {/* Did You Know */}
