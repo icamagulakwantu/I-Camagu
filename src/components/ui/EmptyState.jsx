@@ -3,14 +3,10 @@ import { cn } from '../../lib/utils'
 export function EmptyState({ emoji = '📦', proverb, title, description, primaryLabel, onPrimary, secondaryLabel, onSecondary, className }) {
   return (
     <div className={cn('card-paper grain wash-clay overflow-hidden animate-fade-in', className)}>
-      <div className="motif-thresholds h-10 w-full opacity-70" />
-      <div className="flex flex-col items-center px-6 pb-8 pt-2 text-center">
-        <div className="relative -mt-9 flex h-20 w-20 items-center justify-center flex-shrink-0">
-          <img src="/icons/source/gateway-mark-1024.png" alt="" className="absolute inset-0 w-20 h-20 object-contain opacity-40" />
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-2xl shadow-soft">
-            {emoji}
-          </span>
-        </div>
+      <div className="flex flex-col items-center px-6 py-8 text-center">
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-3xl shadow-soft flex-shrink-0">
+          {emoji}
+        </span>
 
         {proverb && (
           <>

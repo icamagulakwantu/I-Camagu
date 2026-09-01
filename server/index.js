@@ -13,6 +13,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import prisma from './config/db.js';
+import { backfillBrandImages } from './scripts/backfill-brand-images.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -89,4 +90,10 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`iCamagu server listening on port ${PORT}`);
+});
+
+// Idempotent — safe to run on every boot. Sets known Sku.imageUrl values
+// that may not have been backfilled since the columns were added.
+backfillBrandImages().catch((err) => {
+  console.error('Brand image backfill failed:', err.message);
 });

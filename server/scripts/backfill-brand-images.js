@@ -3,7 +3,9 @@
 // these were added) pick them up without a full re-seed.
 // Safe to re-run — it only ever sets these specific known names.
 //
-// Usage: node server/scripts/backfill-brand-images.js
+// Exported as backfillBrandImages() so it can run on server boot
+// (server/index.js) in addition to standalone via:
+//   node server/scripts/backfill-brand-images.js
 import prisma from '../config/db.js';
 
 const BRAND_IMAGES = {
@@ -22,22 +24,28 @@ const BRAND_IMAGES = {
   "Redd's MXD Pine/Guarana": 'mxd',
 };
 
-async function main() {
+export async function backfillBrandImages() {
   let totalUpdated = 0;
   for (const [name, slug] of Object.entries(BRAND_IMAGES)) {
     const { count } = await prisma.sku.updateMany({
       where: { name },
       data: { imageUrl: `/images/brands/${slug}.png` },
     });
-    console.log(`${name}: updated ${count} row(s)`);
     totalUpdated += count;
   }
-  console.log(`Done. ${totalUpdated} row(s) updated.`);
+  if (totalUpdated > 0) {
+    console.log(`Brand image backfill: ${totalUpdated} row(s) updated.`);
+  }
+  return totalUpdated;
 }
 
-main()
-  .catch((err) => {
-    console.error(err);
-    process.exitCode = 1;
-  })
-  .finally(() => prisma.$disconnect());
+const isMain = process.argv[1] && import.meta.url === `file://${process.argv[1]}`;
+if (isMain) {
+  backfillBrandImages()
+    .then((count) => console.log(`Done. ${count} row(s) updated.`))
+    .catch((err) => {
+      console.error(err);
+      process.exitCode = 1;
+    })
+    .finally(() => prisma.$disconnect());
+}
