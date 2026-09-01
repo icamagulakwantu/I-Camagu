@@ -133,8 +133,8 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
       {/* Brand mark */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-6 h-6" />
-          <span className="font-display font-bold text-sm text-brand-black">iCamagu</span>
+          <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-9 h-9" />
+          <span className="font-display font-bold text-xl text-brand-black">iCamagu</span>
         </div>
         <NotificationBell onOpen={() => onNavigate('notifications')} />
       </div>
