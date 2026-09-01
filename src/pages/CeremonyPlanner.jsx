@@ -36,6 +36,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   const [activePlan, setActivePlan] = useState(null)
   const [loading, setLoading] = useState(true)
   const [newTitle, setNewTitle] = useState('')
+  const [newBudget, setNewBudget] = useState('')
   const [newType, setNewType] = useState(defaultType || 'ULWALUKO')
   const [ceremonyTypes, setCeremonyTypes] = useState([])
   const [confirmDelete, setConfirmDelete] = useState(null)
@@ -94,7 +95,12 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ type: newType, title: newTitle, eventDate: new Date().toISOString() }),
+        body: JSON.stringify({
+          type: newType,
+          title: newTitle,
+          eventDate: new Date().toISOString(),
+          budgetZAR: newBudget ? parseFloat(newBudget) : undefined,
+        }),
       })
       const ceremony = await ceremonyRes.json()
       if (!ceremonyRes.ok) throw new Error(ceremony.error || 'Could not create ceremony')
@@ -122,6 +128,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
       }
       setPlans(prev => [newPlan, ...prev])
       setNewTitle('')
+      setNewBudget('')
       setActivePlan(newPlan)
       showToast(`Ceremony created with ${newPlan.checklistItems.length} planning items`, 'success')
     } catch (err) {
@@ -150,6 +157,55 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
       showToast(data.isCompleted || data.isChecked ? 'Task completed! 🎉' : 'Task unchecked', data.isCompleted || data.isChecked ? 'success' : 'info')
     } catch (err) {
       showToast(err.message || 'Could not toggle item', 'error')
+    }
+  }
+
+  const toggleCostItem = async (itemId) => {
+    try {
+      const item = (activePlan.ceremony?.costItems || []).find(i => i.id === itemId)
+      if (!item) return
+      const res = await fetch(`/api/ceremonies/cost/${itemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ isPurchased: !item.isPurchased }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not update item')
+
+      setActivePlan(prev => ({
+        ...prev,
+        ceremony: {
+          ...prev.ceremony,
+          costItems: prev.ceremony.costItems.map(i => i.id === itemId ? data : i),
+        },
+      }))
+    } catch (err) {
+      showToast(err.message || 'Could not update item', 'error')
+    }
+  }
+
+  const editBudget = async () => {
+    if (!activePlan?.ceremonyId) return
+    const current = activePlan.ceremony?.budgetZAR
+    const input = prompt('Set your budget for this ceremony (ZAR):', current != null ? String(current) : '')
+    if (input === null) return
+    const parsed = input.trim() === '' ? null : parseFloat(input)
+    if (parsed !== null && (isNaN(parsed) || parsed < 0)) {
+      showToast('Please enter a valid amount', 'error')
+      return
+    }
+    try {
+      const res = await fetch(`/api/ceremonies/${activePlan.ceremonyId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ budgetZAR: parsed }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not save budget')
+      setActivePlan(prev => ({ ...prev, ceremony: { ...prev.ceremony, budgetZAR: data.budgetZAR } }))
+      showToast('Budget updated', 'success')
+    } catch (err) {
+      showToast(err.message || 'Could not save budget', 'error')
     }
   }
 
@@ -329,6 +385,14 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     const total = items.length
     const progress = total ? Math.round((doneCount / total) * 100) : 0
 
+    const costItems = activePlan.ceremony?.costItems || []
+    const estimatedTotal = costItems.reduce((sum, i) => sum + (i.quantity || 0) * (i.unitCost || 0), 0)
+    const spent = costItems.filter(i => i.isPurchased).reduce((sum, i) => sum + (i.quantity || 0) * (i.unitCost || 0), 0)
+    const budgetZAR = activePlan.ceremony?.budgetZAR != null ? parseFloat(activePlan.ceremony.budgetZAR) : null
+    const remaining = budgetZAR != null ? budgetZAR - spent : null
+    const spentPercent = budgetZAR ? Math.min(100, Math.round((spent / budgetZAR) * 100)) : (estimatedTotal ? Math.min(100, Math.round((spent / estimatedTotal) * 100)) : 0)
+    const overBudget = budgetZAR != null && spent > budgetZAR
+
     return (
       <div className="min-h-screen pb-24 bg-cream">
         {/* Header (File 1 style) */}
@@ -348,6 +412,79 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             </p>
           </div>
         </div>
+
+        {costItems.length > 0 && (
+          <div className={cn('mx-4 mt-4 card-paper p-4', overBudget && 'border-2 border-terracotta')}>
+            <div className="flex justify-between items-start mb-2">
+              <div>
+                <p className="text-xs font-black uppercase text-ink-muted">
+                  {budgetZAR != null ? 'Spent of your budget' : 'Spent so far'}
+                </p>
+                <p className="font-display font-bold text-2xl text-ink mt-0.5 tabular">
+                  R{spent.toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  {budgetZAR != null && (
+                    <span className="text-sm font-normal text-ink-muted"> of R{budgetZAR.toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                  )}
+                </p>
+              </div>
+              <button type="button" onClick={editBudget} className={`text-xs font-bold text-sage-600 ${pressable}`}>
+                {budgetZAR != null ? 'Edit budget' : 'Set budget'}
+              </button>
+            </div>
+            <div className="w-full h-2.5 bg-cream-dark rounded-full overflow-hidden">
+              <div
+                className={cn('h-full rounded-full transition-all duration-500', overBudget ? 'bg-terracotta' : 'bg-sage-500')}
+                style={{ width: `${spentPercent}%` }}
+              />
+            </div>
+            <div className="flex justify-between mt-2 text-xs text-ink-muted font-medium">
+              {budgetZAR != null ? (
+                <span className={overBudget ? 'text-terracotta font-bold' : ''}>
+                  {overBudget ? `R${Math.abs(remaining).toLocaleString('en-ZA', { maximumFractionDigits: 0 })} over budget` : `R${remaining.toLocaleString('en-ZA', { maximumFractionDigits: 0 })} remaining`}
+                </span>
+              ) : (
+                <span>Estimated total: R{estimatedTotal.toLocaleString('en-ZA', { maximumFractionDigits: 0 })}</span>
+              )}
+              <span>{costItems.filter(i => i.isPurchased).length}/{costItems.length} bought</span>
+            </div>
+          </div>
+        )}
+
+        {costItems.length > 0 && (
+          <div className="mx-4 mt-4 card-paper p-4">
+            <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider mb-3">Provisioning &amp; Costs</h3>
+            <div className="divide-y divide-cream-dark/50">
+              {costItems.map((item) => {
+                const lineTotal = (item.quantity || 0) * (item.unitCost || 0)
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => toggleCostItem(item.id)}
+                    className="w-full flex items-center gap-3 py-3 text-left group"
+                  >
+                    <div
+                      className={cn(
+                        'w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all',
+                        item.isPurchased ? 'bg-sage-500 border-sage-500' : 'border-cream-dark group-hover:border-sage-300'
+                      )}
+                    >
+                      {item.isPurchased && <Icon name="check" size={13} color="#fff" strokeWidth={2.5} />}
+                    </div>
+                    <span className={cn('flex-1 min-w-0 text-sm font-medium truncate', item.isPurchased ? 'text-ink-muted line-through' : 'text-ink')}>
+                      {item.label}
+                    </span>
+                    {lineTotal > 0 && (
+                      <span className={cn('tabular text-sm font-bold flex-shrink-0', item.isPurchased ? 'text-sage-600' : 'text-ink-muted')}>
+                        R{lineTotal.toLocaleString('en-ZA', { maximumFractionDigits: 0 })}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="mx-4 mt-4 bg-white border-2 border-sage-200 rounded-soft p-4">
           <p className="text-xs font-black uppercase text-ink-muted mb-2">Add to this ceremony</p>
@@ -703,6 +840,15 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             onChange={(e) => setNewTitle(e.target.value)}
             className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
             required
+          />
+          <input
+            type="number"
+            placeholder="Your budget (ZAR, optional — e.g. 50000)"
+            value={newBudget}
+            onChange={(e) => setNewBudget(e.target.value)}
+            min="0"
+            step="any"
+            className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
           />
           <button
             type="submit"

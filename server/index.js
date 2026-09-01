@@ -14,6 +14,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import prisma from './config/db.js';
 import { backfillBrandImages } from './scripts/backfill-brand-images.js';
+import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -88,12 +89,21 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`iCamagu server listening on port ${PORT}`);
-});
+// budgetZAR/isPurchased are new columns the Prisma client's default SELECT
+// now expects on every Ceremony/CeremonyCostItem query — must exist before
+// the app accepts traffic, not just before the routes that use them.
+ensureCeremonyBudgetColumns()
+  .catch((err) => {
+    console.error('Ceremony budget schema check failed:', err.message);
+  })
+  .finally(() => {
+    app.listen(PORT, () => {
+      console.log(`iCamagu server listening on port ${PORT}`);
+    });
 
-// Idempotent — safe to run on every boot. Sets known Sku.imageUrl values
-// that may not have been backfilled since the columns were added.
-backfillBrandImages().catch((err) => {
-  console.error('Brand image backfill failed:', err.message);
-});
+    // Idempotent — safe to run on every boot. Sets known Sku.imageUrl
+    // values that may not have been backfilled since the columns were added.
+    backfillBrandImages().catch((err) => {
+      console.error('Brand image backfill failed:', err.message);
+    });
+  });

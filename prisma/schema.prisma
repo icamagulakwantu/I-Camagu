@@ -847,6 +847,7 @@ model Ceremony {
   eventDate DateTime?
   status    String       @default("PLANNING")
   notes     String?
+  budgetZAR Decimal?     @db.Decimal(10, 2)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 
@@ -885,6 +886,7 @@ model CeremonyCostItem {
   unit            String
   unitCost        Float
   quantity        Float
+  isPurchased     Boolean  @default(false)
   isInputField    Boolean  @default(false)
   inputType       String?
   suggestedAmount String?

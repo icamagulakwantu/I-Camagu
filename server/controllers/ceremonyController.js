@@ -80,7 +80,7 @@ export const getMyCeremonies = async (req, res) => {
 // POST / - create a ceremony
 export const createCeremony = async (req, res) => {
       try {
-              const { title, type, eventDate, notes } = req.body;
+              const { title, type, eventDate, notes, budgetZAR } = req.body;
                   const hostId = req.user.id;
 
                       if (!title || !type || !hostId) {
@@ -95,6 +95,7 @@ export const createCeremony = async (req, res) => {
                                                                         notes: notes || '',
                                                                                 hostId,
                                                                                         status: 'PLANNING',
+                                                                                                budgetZAR: budgetZAR !== undefined && budgetZAR !== '' ? budgetZAR : null,
                                     },
                           });
                               res.status(201).json(ceremony);
@@ -422,7 +423,7 @@ export const getPublicPlan = async (req, res) => {
 // POST /auto - create ceremony with auto‑generated checklist & cost items
 export const createAutoCeremony = async (req, res) => {
       try {
-              const { title, type, eventDate, notes } = req.body;
+              const { title, type, eventDate, notes, budgetZAR } = req.body;
                   const hostId = req.user.id;
 
                       if (!title || !type || !hostId) {
@@ -441,6 +442,7 @@ export const createAutoCeremony = async (req, res) => {
                                                                                                     notes: notes || '',
                                                                                                               hostId,
                                                                                                                         status: 'PLANNING',
+                                                                                                                                  budgetZAR: budgetZAR !== undefined && budgetZAR !== '' ? budgetZAR : null,
                                                         },
                                             });
 
@@ -531,7 +533,7 @@ export const getCeremonyById = async (req, res) => {
 export const updateCeremony = async (req, res) => {
       try {
               const { id } = req.params;
-                  const { title, eventDate, status, notes } = req.body;
+                  const { title, eventDate, status, notes, budgetZAR } = req.body;
 
                       const ceremony = await prisma.ceremony.findUnique({ where: { id } });
 
@@ -545,6 +547,7 @@ export const updateCeremony = async (req, res) => {
                                                                       eventDate: eventDate ? new Date(eventDate) : undefined,
                                                                               status: status || undefined,
                                                                                       notes: notes !== undefined ? notes : undefined,
+                                                                                              budgetZAR: budgetZAR !== undefined ? (budgetZAR === '' || budgetZAR === null ? null : budgetZAR) : undefined,
                                                   },
                                   });
                                       res.json(updated);
@@ -583,7 +586,7 @@ export const updateChecklistItem = async (req, res) => {
 export const updateCostItem = async (req, res) => {
       try {
               const { id } = req.params;
-                  const { quantity, unitCost, isInputField, inputType, suggestedAmount } = req.body;
+                  const { quantity, unitCost, isInputField, inputType, suggestedAmount, isPurchased } = req.body;
 
                       const item = await prisma.ceremonyCostItem.findUnique({
                                 where: { id },
@@ -601,6 +604,7 @@ export const updateCostItem = async (req, res) => {
                                                                               isInputField: isInputField !== undefined ? isInputField : undefined,
                                                                                       inputType: inputType || undefined,
                                                                                               suggestedAmount: suggestedAmount !== undefined ? suggestedAmount : undefined,
+                                                                                                      isPurchased: isPurchased !== undefined ? !!isPurchased : undefined,
                                                   },
                                   });
                                       res.json(updated);
@@ -616,7 +620,7 @@ export const getCostEstimate = async (req, res) => {
               const { id } = req.params;
                   const ceremony = await prisma.ceremony.findUnique({
                             where: { id },
-                                  select: { id: true, hostId: true },
+                                  select: { id: true, hostId: true, budgetZAR: true },
                   });
 
                       if (!ceremony) return res.status(404).json({ error: 'Ceremony not found' });
@@ -627,16 +631,23 @@ export const getCostEstimate = async (req, res) => {
                               });
 
                                   let total = 0;
+                                      let spent = 0;
                                       const itemsWithTotal = costItems.map((item) => {
                                                 const itemTotal = item.quantity * item.unitCost;
                                                       total += itemTotal;
+                                                            if (item.isPurchased) spent += itemTotal;
                                                             return { ...item, itemTotal };
                                       });
+
+                                          const budgetZAR = ceremony.budgetZAR !== null ? parseFloat(ceremony.budgetZAR) : null;
 
                                           res.json({
                                                     ceremonyId: id,
                                                           items: itemsWithTotal,
                                                                 total,
+                                                                spent,
+                                                                budgetZAR,
+                                                                remaining: budgetZAR !== null ? budgetZAR - spent : null,
                                           });
       } catch (error) {
               console.error('Error calculating cost estimate:', error);
