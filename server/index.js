@@ -99,7 +99,26 @@ function logBackfillError(label, err) {
   console.error(`${label} failed — name=${err?.name} code=${err?.code} message=${err?.message}`);
 }
 
-ensureCeremonyBudgetColumns()
+// The very first DB query of a freshly booted process reliably gets a
+// spurious "authentication failed" PrismaClientInitializationError from
+// Supabase's PgBouncer pooler on cold start — every boot-time DB call
+// (schema check, all four backfills) failed with this identically, while
+// ordinary requests made once the process is warm succeed fine. Retrying
+// after a short delay works around it instead of losing the boot-time
+// writes on every single deploy.
+async function withRetry(fn, label, delaysMs = [3000, 8000]) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (attempt >= delaysMs.length) throw err;
+      logBackfillError(`${label} (attempt ${attempt + 1}, retrying)`, err);
+      await new Promise((resolve) => setTimeout(resolve, delaysMs[attempt]));
+    }
+  }
+}
+
+withRetry(ensureCeremonyBudgetColumns, 'Ceremony budget schema check')
   .catch((err) => {
     logBackfillError('Ceremony budget schema check', err);
   })
@@ -108,22 +127,20 @@ ensureCeremonyBudgetColumns()
       console.log(`iCamagu server listening on port ${PORT}`);
     });
 
-    // Idempotent — safe to run on every boot. Run one at a time, not
-    // concurrently: firing all four at once each opens a fresh DB
-    // connection in the same instant, which was overwhelming Supabase's
-    // pooler and surfacing as a (misleading) "authentication failed"
-    // PrismaClientInitializationError on every single one, every boot.
+    // Idempotent — safe to run on every boot. Sequential, each with its
+    // own retry, so one slow/failed step doesn't take the others down
+    // with it.
     (async () => {
-      await backfillBrandImages().catch((err) => {
+      await withRetry(backfillBrandImages, 'Brand image backfill').catch((err) => {
         logBackfillError('Brand image backfill', err);
       });
-      await backfillSpiritPricing().catch((err) => {
+      await withRetry(backfillSpiritPricing, 'Spirit pricing backfill').catch((err) => {
         logBackfillError('Spirit pricing backfill', err);
       });
-      await backfillCeremonySkus().catch((err) => {
+      await withRetry(backfillCeremonySkus, 'Ceremony SKU backfill').catch((err) => {
         logBackfillError('Ceremony SKU backfill', err);
       });
-      await backfillCatalogueExpansion().catch((err) => {
+      await withRetry(backfillCatalogueExpansion, 'Catalogue expansion SKU backfill').catch((err) => {
         logBackfillError('Catalogue expansion SKU backfill', err);
       });
     })();
