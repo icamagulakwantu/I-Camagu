@@ -1,32 +1,78 @@
 // src/controllers/payoutController.js
 import prisma from '../config/db.js';
 
-// Placeholder tithe rate — 3% is confirmed, but the exact commercial breakdown
-// of the full 13% qualifying spread is still pending (Section 8 open item).
-const SHRINE_TITHE_RATE = 0.03;
+// Suggested contribution rate, shown to a stokvel member when they request
+// a payout — never forced. 3% is confirmed as the suggested figure; the
+// exact commercial breakdown is still pending (Section 8 open item).
+const SUGGESTED_CONTRIBUTION_RATE = 0.03;
+const MIN_DONATION_ZAR = 1;
 
 export async function getShrineFundTotal(req, res) {
   try {
-    const [aggregate, earliest] = await Promise.all([
-      prisma.shrineTithe.aggregate({ _sum: { amount: true }, _count: true }),
-      prisma.shrineTithe.findFirst({ orderBy: { createdAt: 'asc' }, select: { createdAt: true } }),
+    const confirmedWhere = { status: 'CONFIRMED' };
+    const [aggregate, earliest, payoutCount, donationCount] = await Promise.all([
+      prisma.shrineContribution.aggregate({ where: confirmedWhere, _sum: { amount: true }, _count: true }),
+      prisma.shrineContribution.findFirst({ where: confirmedWhere, orderBy: { createdAt: 'asc' }, select: { createdAt: true } }),
+      prisma.shrineContribution.count({ where: { ...confirmedWhere, source: 'PAYOUT_CONTRIBUTION' } }),
+      prisma.shrineContribution.count({ where: { ...confirmedWhere, source: 'PUBLIC_DONATION' } }),
     ]);
     res.json({
       totalAmount: aggregate._sum.amount || 0,
       contributionCount: aggregate._count,
+      payoutContributionCount: payoutCount,
+      donationCount,
       sinceDate: earliest?.createdAt || null,
-      rate: SHRINE_TITHE_RATE,
-      note: 'Ubuhlanti bakwa Xhosa Shrine Fund — rate pending final confirmation',
+      suggestedRate: SUGGESTED_CONTRIBUTION_RATE,
+      minDonation: MIN_DONATION_ZAR,
+      note: 'Ubuhlanti bakwa Xhosa — every contribution here is voluntary.',
     });
   } catch (error) {
     console.error('Get shrine fund total error:', error.message);
-    res.status(500).json({ error: 'Could not fetch Shrine Fund total' });
+    res.status(500).json({ error: 'Could not fetch Ubuhlanti bakwa Xhosa fund total' });
+  }
+}
+
+// A stokvel payout contributing its opt-in share, OR a direct public
+// donation of any amount from R1 up — both land in the same voluntary
+// ledger. Public donations start PENDING: there's no live payment gateway
+// or bank details on file yet, so a real person follows up to confirm the
+// actual transfer rather than the app claiming money it hasn't received.
+export async function donateToShrineFund(req, res) {
+  const { amount, donorName, donorEmail } = req.body;
+  const numericAmount = parseFloat(amount);
+
+  if (!numericAmount || isNaN(numericAmount) || numericAmount < MIN_DONATION_ZAR) {
+    return res.status(400).json({ error: `Donations start from R${MIN_DONATION_ZAR}` });
+  }
+
+  try {
+    const donation = await prisma.shrineContribution.create({
+      data: {
+        amount: numericAmount,
+        source: 'PUBLIC_DONATION',
+        status: 'PENDING',
+        donorName: donorName || null,
+        donorEmail: donorEmail || null,
+      },
+    });
+
+    const donor = await prisma.user.findUnique({ where: { id: req.userId }, select: { firstName: true, lastName: true, email: true } });
+    const { notifyAdminOfShrineDonationPledge } = await import('../services/notificationService.js');
+    await notifyAdminOfShrineDonationPledge(donation, donor);
+
+    res.status(201).json({
+      donation,
+      message: "Thank you — we've recorded your pledge. Someone from iCamagu will follow up with you directly to complete the transfer.",
+    });
+  } catch (error) {
+    console.error('Donate to shrine fund error:', error.message);
+    res.status(500).json({ error: 'Could not record donation' });
   }
 }
 
 export async function requestPayout(req, res) {
       const userId = req.userId;
-        const { stokvelId, amount, recipientId } = req.body;
+        const { stokvelId, amount, recipientId, contributeOptIn } = req.body;
 
           if (!stokvelId || !amount) {
                   return res.status(400).json({ error: 'stokvelId and amount are required' });
@@ -73,6 +119,7 @@ export async function requestPayout(req, res) {
                                                                                   recipientId: finalRecipientId,
                                                                                           amount: requestedAmount,
                                                                                                   status: 'PENDING_APPROVAL',
+                                                                                                  contributionOptIn: contributeOptIn === true,
                                                               },
                                                     });
 
@@ -135,7 +182,11 @@ export async function approvePayout(req, res) {
                                                         const requiredApprovals = payout.stokvel.requiredApprovals;
 
                                                             if (approvalCount >= requiredApprovals) {
-                                                                      const titheAmount = parseFloat(payout.amount) * SHRINE_TITHE_RATE;
+                                                                      // Only ever computed/recorded if the recipient opted in when they
+                                                                      // requested this payout — never a forced deduction.
+                                                                      const contributionAmount = payout.contributionOptIn
+                                                                        ? parseFloat(payout.amount) * SUGGESTED_CONTRIBUTION_RATE
+                                                                        : null;
 
                                                                             await prisma.$transaction(async (tx) => {
                                                                                         await tx.payout.update({
@@ -148,9 +199,11 @@ export async function approvePayout(req, res) {
                                                                                                                         data: { totalBalance: { decrement: payout.amount } },
                                                                                                 });
 
-                                                                                                        await tx.shrineTithe.create({
-                                                                                                                      data: { payoutId, amount: titheAmount },
-                                                                                                        });
+                                                                                                        if (contributionAmount) {
+                                                                                                          await tx.shrineContribution.create({
+                                                                                                                        data: { payoutId, amount: contributionAmount, source: 'PAYOUT_CONTRIBUTION', status: 'CONFIRMED' },
+                                                                                                          });
+                                                                                                        }
 
                                                                                                         // Advance the umgalelo rotation once this recipient's payout has
                                                                                                         // actually cleared, so the next request defaults to the next person.
@@ -176,7 +229,7 @@ export async function approvePayout(req, res) {
                                                                                                   recipient.firstName,
                                                                                                   parseFloat(payout.amount),
                                                                                                   payout.stokvel.name,
-                                                                                                  titheAmount
+                                                                                                  contributionAmount
                                                                                         );
                                                                                   }
 
@@ -191,8 +244,10 @@ export async function approvePayout(req, res) {
                                                                                   return res.json({
                                                                                               status: 'CLEARED',
                                                                                                       message: 'Payout approved and cleared.',
-                                                                                                              titheAmount,
-                                                                                                                      titheNote: 'Ubuhlanti bakwa Xhosa Shrine Fund contribution (rate pending final confirmation)',
+                                                                                                              contributionAmount,
+                                                                                                                      contributionNote: contributionAmount
+                                                                                                                        ? 'Includes a voluntary Ubuhlanti bakwa Xhosa contribution, as chosen when this payout was requested.'
+                                                                                                                        : null,
                                                                                   });
                                                             }
 

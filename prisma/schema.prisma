@@ -375,9 +375,13 @@ model Payout {
   rawBankLog   RawBankLog?       @relation(fields: [rawBankLogId], references: [id])
   createdAt    DateTime          @default(now())
   clearedAt    DateTime?
+  // Whether the recipient chose, at request time, to contribute a suggested
+  // share of this payout to Ubuhlanti bakwa Xhosa — always opt-in, never a
+  // forced deduction.
+  contributionOptIn Boolean @default(false)
 
   approvals PayoutApproval[]
-  tithe     ShrineTithe?
+  contribution ShrineContribution?
 }
 
 model PayoutApproval {
@@ -402,12 +406,30 @@ model Notification {
   createdAt   DateTime @default(now())
 }
 
-model ShrineTithe {
-  id        String   @id @default(cuid())
-  payoutId  String   @unique
-  payout    Payout   @relation(fields: [payoutId], references: [id], onDelete: Cascade)
-  amount    Decimal
+// Ubuhlanti bakwa Xhosa — the sovereign Xhosa cultural wealth & development
+// fund. A contribution here is always voluntary: either a stokvel member's
+// opt-in share of their own cleared payout, or a direct public donation.
+// Kept on the existing physical "ShrineTithe" table (no data migration
+// needed) — only the model name and vocabulary moved away from "tithe".
+model ShrineContribution {
+  id       String  @id @default(cuid())
+  payoutId String? @unique
+  payout   Payout? @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  amount   Decimal
+  // 'PAYOUT_CONTRIBUTION' (opt-in share of a cleared stokvel payout) or
+  // 'PUBLIC_DONATION' (anyone, R1 and up, via the Donate flow).
+  source String @default("PAYOUT_CONTRIBUTION")
+  // Only ever set for PUBLIC_DONATION — optional, the donor may stay anonymous.
+  donorName  String?
+  donorEmail String?
+  // Payout contributions are confirmed the moment the payout clears (real
+  // internal ledger entry, no separate payment step). Public donations start
+  // PENDING until a real person follows up and confirms the actual transfer
+  // — there is no live payment gateway or bank details on file yet.
+  status    String   @default("CONFIRMED")
   createdAt DateTime @default(now())
+
+  @@map("ShrineTithe")
 }
 
 // ---------- BANK RECONCILIATION LAYERS ----------

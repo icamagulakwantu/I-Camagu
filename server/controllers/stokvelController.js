@@ -126,7 +126,7 @@ export async function deleteStokvel(req, res) {
       return res.status(400).json({ error: 'Cannot delete a stokvel with real funds in its ledger — this protects real money. Contact support if this stokvel genuinely needs to close.' });
     }
 
-    // Payout -> PayoutApproval/ShrineTithe cascade in schema; delete Payout/Contribution
+    // Payout -> PayoutApproval/ShrineContribution cascade in schema; delete Payout/Contribution
     // before RawBankLog since they hold an optional FK to it.
     await prisma.payout.deleteMany({ where: { stokvelId } });
     await prisma.contribution.deleteMany({ where: { stokvelId } });

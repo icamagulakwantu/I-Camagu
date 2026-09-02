@@ -46,6 +46,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
   const [contribAmount, setContribAmount] = useState('')
   const [contribNote, setContribNote] = useState('')
   const [payoutAmount, setPayoutAmount] = useState('')
+  const [contributeOptIn, setContributeOptIn] = useState(false)
   const [announcements, setAnnouncements] = useState([])
   const [newAnnouncement, setNewAnnouncement] = useState('')
   const [interestAmount, setInterestAmount] = useState('')
@@ -373,13 +374,15 @@ function Stokvels({ onBack, onOpenShrineFund }) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({
           stokvelId: detail.stokvel.id,
-          amount: numericAmount
+          amount: numericAmount,
+          contributeOptIn
         }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Payout request failed')
 
       setPayoutAmount('')
+      setContributeOptIn(false)
       showToast('Payout requested', 'success')
       await fetchDetail(detail.stokvel.id)
     } catch (err) {
@@ -777,6 +780,17 @@ function Stokvels({ onBack, onOpenShrineFund }) {
               step="any"
               required
             />
+            <label className="flex items-start gap-2.5 py-1 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={contributeOptIn}
+                onChange={(e) => setContributeOptIn(e.target.checked)}
+                className="mt-0.5 w-4 h-4 accent-terracotta flex-shrink-0"
+              />
+              <span className="text-xs text-ink-muted leading-snug">
+                Contribute a suggested 3% of this payout to <strong className="text-ink">Ubuhlanti bakwa Xhosa</strong> — completely optional.
+              </span>
+            </label>
             <button
               type="submit"
               disabled={isSubmitting || (stokvel.type === 'UMGALELO_ROTATING' && !(Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0))}
@@ -1010,8 +1024,8 @@ function Stokvels({ onBack, onOpenShrineFund }) {
           <div className="flex items-center gap-3">
             <Icon name="flame" size={22} color="#ffffff" strokeWidth={1.5} />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/80">Ubuhlanti bakwa Xhosa</p>
-              <p className="font-display font-bold text-base">Shrine Fund — see it growing</p>
+              <p className="font-display font-bold text-base leading-tight">Ubuhlanti bakwa Xhosa</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/80 mt-0.5">Shrine &amp; Development Fund — see it growing</p>
             </div>
           </div>
           <Icon name="arrowRight" size={18} color="#ffffff" />

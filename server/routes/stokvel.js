@@ -23,7 +23,8 @@ import { postAnnouncement, getAnnouncements } from '../controllers/announcementC
 import {
   requestPayout,
   approvePayout,
-  getShrineFundTotal
+  getShrineFundTotal,
+  donateToShrineFund
 } from '../controllers/payoutController.js';
 
 const router = express.Router();
@@ -35,6 +36,7 @@ router.post('/expense/record', requireAuth, recordGroupExpense);
 router.get('/pending-approvals/count', requireAuth, getPendingApprovalCount);
 router.get('/my', requireAuth, getMyStokvels);
 router.get('/shrine-fund/total', requireAuth, getShrineFundTotal);
+router.post('/shrine-fund/donate', requireAuth, donateToShrineFund);
 router.get('/:stokvelId', requireAuth, getStokvel);
 router.patch('/:stokvelId', requireAuth, updateStokvel);
 router.patch('/:stokvelId/rotation-order', requireAuth, setRotationOrder);

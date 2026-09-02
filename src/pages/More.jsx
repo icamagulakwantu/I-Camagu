@@ -24,7 +24,7 @@ const SECTIONS = [
       { id: 'myorders', icon: 'package', label: 'My Orders' },
       { id: 'expenditure', icon: 'coins', label: 'My Spending' },
       { id: 'supplier', icon: 'store', label: 'Supplier Dashboard' },
-      { id: 'shrinefund', icon: 'flame', label: 'Shrine Fund' },
+      { id: 'shrinefund', icon: 'flame', label: 'Ubuhlanti' },
     ],
   },
   {

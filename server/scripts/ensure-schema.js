@@ -30,4 +30,29 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "lastTierNotified" INTEGER NOT NULL DEFAULT 0;'
   );
+  // Ubuhlanti bakwa Xhosa: ShrineTithe -> ShrineContribution (model renamed
+  // via @@map, same physical table, no data migration needed). Contributions
+  // are always voluntary now — payoutId becomes optional (public donations
+  // aren't tied to any payout), plus source/donor/status for a general
+  // contribution ledger instead of a forced per-payout tithe.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "ShrineTithe" ALTER COLUMN "payoutId" DROP NOT NULL;'
+  );
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "ShrineTithe" ADD COLUMN IF NOT EXISTS "source" TEXT NOT NULL DEFAULT 'PAYOUT_CONTRIBUTION';`
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "ShrineTithe" ADD COLUMN IF NOT EXISTS "donorName" TEXT;'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "ShrineTithe" ADD COLUMN IF NOT EXISTS "donorEmail" TEXT;'
+  );
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "ShrineTithe" ADD COLUMN IF NOT EXISTS "status" TEXT NOT NULL DEFAULT 'CONFIRMED';`
+  );
+  // A stokvel member opts in when requesting their payout — never a forced
+  // deduction.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Payout" ADD COLUMN IF NOT EXISTS "contributionOptIn" BOOLEAN NOT NULL DEFAULT false;'
+  );
 }

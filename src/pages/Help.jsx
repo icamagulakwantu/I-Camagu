@@ -2,7 +2,7 @@ function Help({ onBack }) {
   const faqs = [
     { q: 'How do I contribute to a stokvel?', a: 'Open the stokvel from the Stokvels tab, tap "Submit a contribution," enter the amount, and wait for an official to confirm it against the real bank payment.' },
     { q: 'Why do I need a PIN?', a: 'Your security PIN is required before approving payouts or confirming contributions — an extra layer of protection for real money, separate from your login.' },
-    { q: 'What is the Shrine Fund tithe?', a: 'A transparent, itemised contribution that is shown clearly on any qualifying payout. The commercial rate remains subject to final confirmation.' },
+    { q: 'What is Ubuhlanti bakwa Xhosa?', a: "The Sovereign Xhosa Shrine & Development Fund — built entirely from voluntary contributions, never a forced deduction. You can opt in to add a suggested share when you request a stokvel payout, or donate directly from R1 upward. See the Ubuhlanti page under More for the full total and how it's governed." },
     { q: 'Can I delete my ceremony plan or stokvel?', a: 'Yes. Stokvels can only be deleted once their balance is zero, to protect real funds. Ceremony plans can be deleted from the plan detail screen.' },
     { q: 'How does bulk buying work?', a: 'Add items to your cart, submit it to a partner pool, and once enough community volume is reached the group can receive the negotiated bulk price.' },
     { q: 'Is my data safe?', a: 'iCamagu keeps access tokens out of browser storage, financial actions can require PIN confirmation, and you can export or delete your account from Account & Privacy.' },

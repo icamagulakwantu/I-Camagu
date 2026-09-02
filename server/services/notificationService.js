@@ -151,7 +151,7 @@ export async function notifyAdminOfSmartMatchTier(pool, tier, currentCases) {
   }
 }
 
-export async function notifyPayoutCleared(recipientEmail, recipientName, amount, stokvelName, titheAmount) {
+export async function notifyPayoutCleared(recipientEmail, recipientName, amount, stokvelName, contributionAmount) {
   try {
     await resend.emails.send({
       from: 'onboarding@resend.dev',
@@ -161,12 +161,37 @@ export async function notifyPayoutCleared(recipientEmail, recipientName, amount,
         <p>Camagu ${recipientName},</p>
         <p>Your payout from <strong>${stokvelName}</strong> has been approved and cleared.</p>
         <p><strong>Amount: R${amount.toFixed(2)}</strong></p>
-        ${titheAmount ? `<p style="color:#888;font-size:13px;">Includes a R${titheAmount.toFixed(2)} Ubuhlanti bakwa Xhosa Shrine Fund contribution, itemised transparently as always.</p>` : ''}
+        ${contributionAmount ? `<p style="color:#888;font-size:13px;">Includes a R${contributionAmount.toFixed(2)} voluntary Ubuhlanti bakwa Xhosa contribution, as you chose when requesting this payout — itemised transparently as always.</p>` : ''}
         <p>Log in to iCamagu to see your full ledger.</p>
         <p>Culture before capital.<br/>— iCamagu</p>
       `,
     });
   } catch (error) {
     console.error('Payout cleared notification failed:', error.message);
+  }
+}
+
+// Public donation pledge to Ubuhlanti bakwa Xhosa — admin-only alert (never
+// sent to any external party). There's no live payment gateway or bank
+// details on file yet, so this is the founder's cue to follow up personally
+// and confirm the real transfer.
+export async function notifyAdminOfShrineDonationPledge(donation, donor) {
+  try {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: ADMIN_EMAILS,
+      subject: `Ubuhlanti bakwa Xhosa: new donation pledge — R${parseFloat(donation.amount).toFixed(2)}`,
+      html: `
+        <h2>New Ubuhlanti bakwa Xhosa donation pledge</h2>
+        ${row('Amount', `R${parseFloat(donation.amount).toFixed(2)}`)}
+        ${row('Donor name (given)', donation.donorName)}
+        ${row('Donor email (given)', donation.donorEmail)}
+        ${row('Logged-in account', donor ? `${donor.firstName || ''} ${donor.lastName || ''} (${donor.email || 'no email'})`.trim() : null)}
+        ${row('Pledge ID', donation.id)}
+        <p style="color:#888;font-size:12px;">Status is PENDING — follow up directly to confirm the real transfer and mark it CONFIRMED.</p>
+      `,
+    });
+  } catch (error) {
+    console.error('Shrine donation pledge admin notification failed:', error.message);
   }
 }
