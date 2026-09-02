@@ -95,9 +95,18 @@ app.get('*', (req, res) => {
 // budgetZAR/isPurchased are new columns the Prisma client's default SELECT
 // now expects on every Ceremony/CeremonyCostItem query — must exist before
 // the app accepts traffic, not just before the routes that use them.
+// TEMP diagnostic: the normal `err.message`-only logging below was showing
+// up empty for every backfill on every boot, which isn't enough to root-
+// cause the failure. This prints name/code/message/meta/stack so the next
+// deploy's logs reveal what's actually being thrown. Revert once diagnosed.
+function logBackfillError(label, err) {
+  console.error(`${label} failed — name=${err?.name} code=${err?.code} message=${err?.message} meta=${JSON.stringify(err?.meta)} str=${String(err)}`);
+  if (err?.stack) console.error(err.stack.split('\n').slice(0, 6).join('\n'));
+}
+
 ensureCeremonyBudgetColumns()
   .catch((err) => {
-    console.error('Ceremony budget schema check failed:', err.message);
+    logBackfillError('Ceremony budget schema check', err);
   })
   .finally(() => {
     app.listen(PORT, () => {
@@ -107,15 +116,15 @@ ensureCeremonyBudgetColumns()
     // Idempotent — safe to run on every boot. Sets known Sku.imageUrl
     // values that may not have been backfilled since the columns were added.
     backfillBrandImages().catch((err) => {
-      console.error('Brand image backfill failed:', err.message);
+      logBackfillError('Brand image backfill', err);
     });
     backfillSpiritPricing().catch((err) => {
-      console.error('Spirit pricing backfill failed:', err.message);
+      logBackfillError('Spirit pricing backfill', err);
     });
     backfillCeremonySkus().catch((err) => {
-      console.error('Ceremony SKU backfill failed:', err.message);
+      logBackfillError('Ceremony SKU backfill', err);
     });
     backfillCatalogueExpansion().catch((err) => {
-      console.error('Catalogue expansion SKU backfill failed:', err.message);
+      logBackfillError('Catalogue expansion SKU backfill', err);
     });
   });
