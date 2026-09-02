@@ -36,6 +36,15 @@ const BRAND_IMAGES = {
   'Jose Cuervo Especial Reposado': 'jose-cuervo-especial-reposado',
   'Cointreau Orange Liqueur': 'cointreau',
   'Viceroy 5 Year Old': 'viceroy',
+  'Budweiser': 'budweiser',
+  'Amstel Lager': 'amstel',
+  'Guinness Foreign Extra': 'guinness',
+  '4th Street Sweet Red/White': '4th-street',
+  '4th Street Sweet Red/Rose': '4th-street',
+  'Amarula Original Cream': 'amarula',
+  'Amarula Ethiopian Coffee': 'amarula',
+  'Bernini Classic/Blush/Ruby': 'bernini',
+  'Count Pushkin Vodka': 'count-pushkin',
 };
 
 export async function backfillBrandImages() {
