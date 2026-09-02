@@ -7,10 +7,11 @@ import Icon from '../components/Icon.jsx'
 
 // Same grouping as Store.jsx — Instacart-style cart segmentation, derived
 // from the real productType/category on each Sku.
-const GROUP_ORDER = ['MEAT_LIVESTOCK', 'ALCOHOL', 'BEVERAGE', 'STAPLES']
+const GROUP_ORDER = ['ALCOHOL', 'MEAT_LIVESTOCK', 'VEGGIES', 'BEVERAGE', 'STAPLES']
 const GROUP_LABELS = {
-  MEAT_LIVESTOCK: 'Meat & Livestock',
   ALCOHOL: 'Alcohol',
+  MEAT_LIVESTOCK: 'Meat & Livestock',
+  VEGGIES: 'Veggies',
   BEVERAGE: 'Soft Drinks & Water',
   STAPLES: 'Staples & Dry Goods',
 }
@@ -18,6 +19,7 @@ function groupOf(sku = {}) {
   if (sku.productType === 'LIVESTOCK' || sku.category === 'MEAT') return 'MEAT_LIVESTOCK'
   if (sku.productType === 'ALCOHOL') return 'ALCOHOL'
   if (sku.productType === 'BEVERAGE') return 'BEVERAGE'
+  if (sku.category === 'FRESH_PRODUCE' || sku.category === 'CANNED_GOODS') return 'VEGGIES'
   return 'STAPLES'
 }
 

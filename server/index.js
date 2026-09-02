@@ -95,13 +95,8 @@ app.get('*', (req, res) => {
 // budgetZAR/isPurchased are new columns the Prisma client's default SELECT
 // now expects on every Ceremony/CeremonyCostItem query — must exist before
 // the app accepts traffic, not just before the routes that use them.
-// TEMP diagnostic: the normal `err.message`-only logging below was showing
-// up empty for every backfill on every boot, which isn't enough to root-
-// cause the failure. This prints name/code/message/meta/stack so the next
-// deploy's logs reveal what's actually being thrown. Revert once diagnosed.
 function logBackfillError(label, err) {
-  console.error(`${label} failed — name=${err?.name} code=${err?.code} message=${err?.message} meta=${JSON.stringify(err?.meta)} str=${String(err)}`);
-  if (err?.stack) console.error(err.stack.split('\n').slice(0, 6).join('\n'));
+  console.error(`${label} failed — name=${err?.name} code=${err?.code} message=${err?.message}`);
 }
 
 ensureCeremonyBudgetColumns()
@@ -113,18 +108,23 @@ ensureCeremonyBudgetColumns()
       console.log(`iCamagu server listening on port ${PORT}`);
     });
 
-    // Idempotent — safe to run on every boot. Sets known Sku.imageUrl
-    // values that may not have been backfilled since the columns were added.
-    backfillBrandImages().catch((err) => {
-      logBackfillError('Brand image backfill', err);
-    });
-    backfillSpiritPricing().catch((err) => {
-      logBackfillError('Spirit pricing backfill', err);
-    });
-    backfillCeremonySkus().catch((err) => {
-      logBackfillError('Ceremony SKU backfill', err);
-    });
-    backfillCatalogueExpansion().catch((err) => {
-      logBackfillError('Catalogue expansion SKU backfill', err);
-    });
+    // Idempotent — safe to run on every boot. Run one at a time, not
+    // concurrently: firing all four at once each opens a fresh DB
+    // connection in the same instant, which was overwhelming Supabase's
+    // pooler and surfacing as a (misleading) "authentication failed"
+    // PrismaClientInitializationError on every single one, every boot.
+    (async () => {
+      await backfillBrandImages().catch((err) => {
+        logBackfillError('Brand image backfill', err);
+      });
+      await backfillSpiritPricing().catch((err) => {
+        logBackfillError('Spirit pricing backfill', err);
+      });
+      await backfillCeremonySkus().catch((err) => {
+        logBackfillError('Ceremony SKU backfill', err);
+      });
+      await backfillCatalogueExpansion().catch((err) => {
+        logBackfillError('Catalogue expansion SKU backfill', err);
+      });
+    })();
   });

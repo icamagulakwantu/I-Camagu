@@ -7,11 +7,13 @@ import Icon from '../components/Icon.jsx'
 
 // Top-level groups, Instacart-style — not everybody drinks alcohol, and not
 // every bulk-buying pool is for alcohol. Derived from the real productType
-// on each Sku, no new schema needed.
+// on each Sku, no new schema needed. Alcohol leads the list, Veggies sits
+// next to Meat & Livestock.
 const GROUPS = [
   { id: 'ALL', label: 'All' },
-  { id: 'MEAT_LIVESTOCK', label: 'Meat & Livestock' },
   { id: 'ALCOHOL', label: 'Alcohol' },
+  { id: 'MEAT_LIVESTOCK', label: 'Meat & Livestock' },
+  { id: 'VEGGIES', label: 'Veggies' },
   { id: 'BEVERAGE', label: 'Soft Drinks & Water' },
   { id: 'STAPLES', label: 'Staples & Dry Goods' },
 ]
@@ -20,6 +22,7 @@ function groupOf(sku) {
   if (sku.productType === 'LIVESTOCK' || sku.category === 'MEAT') return 'MEAT_LIVESTOCK'
   if (sku.productType === 'ALCOHOL') return 'ALCOHOL'
   if (sku.productType === 'BEVERAGE') return 'BEVERAGE'
+  if (sku.category === 'FRESH_PRODUCE' || sku.category === 'CANNED_GOODS') return 'VEGGIES'
   return 'STAPLES'
 }
 
