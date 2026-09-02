@@ -22,6 +22,20 @@ const BRAND_IMAGES = {
   'Brutal Fruit Ruby/Litchi': 'brutal-fruit',
   "Redd's Berry/Orig/Green": 'redds',
   "Redd's MXD Pine/Guarana": 'mxd',
+  'Hennessy VS': 'hennessy-vs',
+  'Hennessy VSOP': 'hennessy-vsop',
+  'Glenfiddich 12 Year': 'glenfiddich-12',
+  'Three Ships 5 Year Old': 'three-ships',
+  'Strettons London Dry': 'strettons-london-dry',
+  'Strettons Wild Berry': 'strettons-wild-berry',
+  'Russian Bear Standard': 'russian-bear-standard',
+  'Russian Bear Flavours': 'russian-bear-flavours',
+  'Remy Martin VSOP': 'remy-martin-vsop',
+  'Remy Martin 1738 Accord Royal': 'remy-martin-1738',
+  'Jose Cuervo Especial Silver': 'jose-cuervo-especial-silver',
+  'Jose Cuervo Especial Reposado': 'jose-cuervo-especial-reposado',
+  'Cointreau Orange Liqueur': 'cointreau',
+  'Viceroy 5 Year Old': 'viceroy',
 };
 
 export async function backfillBrandImages() {
