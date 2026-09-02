@@ -95,30 +95,20 @@ app.get('*', (req, res) => {
 // budgetZAR/isPurchased are new columns the Prisma client's default SELECT
 // now expects on every Ceremony/CeremonyCostItem query — must exist before
 // the app accepts traffic, not just before the routes that use them.
+//
+// NOT a retry loop, deliberately: every boot-time DB call has been failing
+// with "Authentication failed... the provided database credentials for
+// `postgres` are not valid" against Supabase's pooler — a real bad-
+// credentials error, not a transient cold-start blip. Retrying it hammers
+// the pooler and trips its circuit breaker ("too many authentication
+// failures, new connections are temporarily blocked"), which risks taking
+// down ordinary request traffic too. This needs DATABASE_URL fixed at the
+// source (Render env var / Supabase DB password), not client-side retries.
 function logBackfillError(label, err) {
   console.error(`${label} failed — name=${err?.name} code=${err?.code} message=${err?.message}`);
 }
 
-// The very first DB query of a freshly booted process reliably gets a
-// spurious "authentication failed" PrismaClientInitializationError from
-// Supabase's PgBouncer pooler on cold start — every boot-time DB call
-// (schema check, all four backfills) failed with this identically, while
-// ordinary requests made once the process is warm succeed fine. Retrying
-// after a short delay works around it instead of losing the boot-time
-// writes on every single deploy.
-async function withRetry(fn, label, delaysMs = [3000, 8000]) {
-  for (let attempt = 0; ; attempt++) {
-    try {
-      return await fn();
-    } catch (err) {
-      if (attempt >= delaysMs.length) throw err;
-      logBackfillError(`${label} (attempt ${attempt + 1}, retrying)`, err);
-      await new Promise((resolve) => setTimeout(resolve, delaysMs[attempt]));
-    }
-  }
-}
-
-withRetry(ensureCeremonyBudgetColumns, 'Ceremony budget schema check')
+ensureCeremonyBudgetColumns()
   .catch((err) => {
     logBackfillError('Ceremony budget schema check', err);
   })
@@ -127,20 +117,19 @@ withRetry(ensureCeremonyBudgetColumns, 'Ceremony budget schema check')
       console.log(`iCamagu server listening on port ${PORT}`);
     });
 
-    // Idempotent — safe to run on every boot. Sequential, each with its
-    // own retry, so one slow/failed step doesn't take the others down
-    // with it.
+    // Idempotent — safe to run on every boot, once DATABASE_URL is fixed.
+    // Sequential, not concurrent, so they don't pile onto the pooler at once.
     (async () => {
-      await withRetry(backfillBrandImages, 'Brand image backfill').catch((err) => {
+      await backfillBrandImages().catch((err) => {
         logBackfillError('Brand image backfill', err);
       });
-      await withRetry(backfillSpiritPricing, 'Spirit pricing backfill').catch((err) => {
+      await backfillSpiritPricing().catch((err) => {
         logBackfillError('Spirit pricing backfill', err);
       });
-      await withRetry(backfillCeremonySkus, 'Ceremony SKU backfill').catch((err) => {
+      await backfillCeremonySkus().catch((err) => {
         logBackfillError('Ceremony SKU backfill', err);
       });
-      await withRetry(backfillCatalogueExpansion, 'Catalogue expansion SKU backfill').catch((err) => {
+      await backfillCatalogueExpansion().catch((err) => {
         logBackfillError('Catalogue expansion SKU backfill', err);
       });
     })();
