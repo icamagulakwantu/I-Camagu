@@ -44,6 +44,7 @@ const PATHS = {
   video: <><rect x="3" y="6" width="12" height="12" rx="1.5" /><path d="M15 10l6-3v10l-6-3z" /></>,
   file: <><path d="M6 3.5h8l4 4v13H6z" /><path d="M14 3.5v4h4" /></>,
   info: <><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5.5" /><path d="M12 8v.1" /></>,
+  search: <><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></>,
 }
 
 function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.75, className = '' }) {

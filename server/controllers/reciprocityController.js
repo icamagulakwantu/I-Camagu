@@ -32,6 +32,50 @@ export async function addReciprocityEntry(req, res) {
             }
 }
 
+// One gift often includes several items at once (e.g. 3 bottles of brandy
+// and a case of beer from the same person, on the same day) — this saves
+// them as multiple ReciprocityEntry rows sharing the same counterparty/
+// occasion/date/direction, in one request, instead of forcing one row per
+// item description.
+export async function addReciprocityEntriesBatch(req, res) {
+  const { direction, counterpartyName, ceremonyType, ceremonyLabel, location, eventDate, items } = req.body;
+
+  if (!direction || !counterpartyName || !eventDate) {
+    return res.status(400).json({ error: 'direction, counterpartyName, and eventDate are required' });
+  }
+  if (!['GIVEN', 'RECEIVED'].includes(direction)) {
+    return res.status(400).json({ error: "direction must be 'GIVEN' or 'RECEIVED'" });
+  }
+  if (!Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: 'At least one item is required' });
+  }
+  const cleanItems = items
+    .filter((i) => i && i.itemDescription && i.itemDescription.trim())
+    .map((i) => ({
+      userId: req.userId,
+      direction,
+      counterpartyName,
+      itemDescription: i.itemDescription.trim(),
+      quantity: i.quantity ? parseInt(i.quantity) : null,
+      unitType: i.unitType || null,
+      ceremonyType: ceremonyType || null,
+      ceremonyLabel: ceremonyLabel || null,
+      location: location || null,
+      eventDate: new Date(eventDate),
+    }));
+  if (cleanItems.length === 0) {
+    return res.status(400).json({ error: 'At least one item with a description is required' });
+  }
+
+  try {
+    const result = await prisma.reciprocityEntry.createMany({ data: cleanItems });
+    res.status(201).json({ count: result.count });
+  } catch (error) {
+    console.error('Add reciprocity entries batch error:', error.message);
+    res.status(500).json({ error: 'Could not add entries' });
+  }
+}
+
 export async function getMyReciprocityEntries(req, res) {
       const { direction, counterpartyName } = req.query;
 

@@ -14,6 +14,8 @@ function Store({ onGoToBasket, basketCount }) {
   const [activeAisle, setActiveAisle] = useState('all')
   const [loading, setLoading] = useState(true)
   const [addingId, setAddingId] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchOpen, setSearchOpen] = useState(false)
 
   useEffect(() => {
     fetch('/api/basket/catalogue')
@@ -34,14 +36,19 @@ function Store({ onGoToBasket, basketCount }) {
   }
 
   const activeDepartment = DEPARTMENTS.find((d) => d.id === activeDept)
+  const isSearching = searchQuery.trim().length > 0
 
   const skus = useMemo(() => {
+    if (isSearching) {
+      const q = searchQuery.trim().toLowerCase()
+      return allSkus.filter((s) => s.name.toLowerCase().includes(q))
+    }
     return allSkus.filter((s) => {
       if (activeDept !== 'all' && departmentOf(s).id !== activeDept) return false
       if (activeDept !== 'all' && activeAisle !== 'all' && aisleOf(s).id !== activeAisle) return false
       return true
     })
-  }, [allSkus, activeDept, activeAisle])
+  }, [allSkus, activeDept, activeAisle, isSearching, searchQuery])
 
   const addToBasket = async (sku) => {
     setAddingId(sku.id)
@@ -69,21 +76,43 @@ function Store({ onGoToBasket, basketCount }) {
     <div className="min-h-screen pb-24 bg-cream">
       {/* Sticky Header */}
       <div className="sticky top-0 z-30 bg-cream/95 backdrop-blur-xl border-b border-cream-dark px-5 py-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <h1 className="font-display font-bold text-2xl text-ink">Store</h1>
-          <button
-            onClick={onGoToBasket}
-            aria-label="Cart"
-            className="relative w-11 h-11 rounded-2xl bg-white shadow-soft flex items-center justify-center active:scale-90 transition-transform"
-          >
-            <Icon name="cart" size={20} color="#2b2620" />
-            {basketCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-terracotta text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center">
-                {basketCount}
-              </span>
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                setSearchOpen((v) => !v)
+                if (searchOpen) setSearchQuery('')
+              }}
+              aria-label="Search"
+              className={`w-11 h-11 rounded-2xl shadow-soft flex items-center justify-center active:scale-90 transition-transform ${searchOpen ? 'bg-terracotta' : 'bg-white'}`}
+            >
+              <Icon name="search" size={19} color={searchOpen ? '#fff' : '#2b2620'} />
+            </button>
+            <button
+              onClick={onGoToBasket}
+              aria-label="Cart"
+              className="relative w-11 h-11 rounded-2xl bg-white shadow-soft flex items-center justify-center active:scale-90 transition-transform"
+            >
+              <Icon name="cart" size={20} color="#2b2620" />
+              {basketCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-terracotta text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center">
+                  {basketCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
+        {searchOpen && (
+          <input
+            type="text"
+            autoFocus
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search all items — e.g. Commando, Maize Meal..."
+            className="w-full mt-3 h-11 border-2 border-cream-dark rounded-pill px-4 text-sm bg-white focus:outline-none focus:border-terracotta"
+          />
+        )}
       </div>
 
       {/* Smart Match Explainer */}
@@ -94,37 +123,47 @@ function Store({ onGoToBasket, basketCount }) {
         </p>
       </div>
 
-      {/* Level 1 — departments */}
-      <div className="grid grid-cols-4 gap-2 px-4 mt-4">
-        <DeptTile label="All" xhosa="Konke" active={activeDept === 'all'} onClick={() => pickDept('all')} />
-        {DEPARTMENTS.map((d) => (
-          <DeptTile key={d.id} label={d.short} xhosa={d.xhosa} active={activeDept === d.id} onClick={() => pickDept(d.id)} />
-        ))}
-      </div>
+      {!isSearching && (
+        <>
+          {/* Level 1 — departments, in order: Drinks, Meat/Livestock, Staples/Dry Goods, Vegetables */}
+          <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-1">
+            <DeptTile label="All" xhosa="Konke" active={activeDept === 'all'} onClick={() => pickDept('all')} />
+            {DEPARTMENTS.map((d) => (
+              <DeptTile key={d.id} label={d.short} xhosa={d.xhosa} active={activeDept === d.id} onClick={() => pickDept(d.id)} />
+            ))}
+          </div>
 
-      {/* Level 2 — aisles, scoped to the selected department only */}
-      {activeDepartment && (
-        <div className="flex gap-2 px-4 mt-3 overflow-x-auto pb-1">
-          <button
-            onClick={() => setActiveAisle('all')}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
-              activeAisle === 'all' ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
-            }`}
-          >
-            All {activeDepartment.short.toLowerCase()}
-          </button>
-          {activeDepartment.aisles.map((a) => (
-            <button
-              key={a.id}
-              onClick={() => setActiveAisle(a.id)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
-                activeAisle === a.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
-              }`}
-            >
-              {a.name}
-            </button>
-          ))}
-        </div>
+          {/* Level 2 — aisles, scoped to the selected department only */}
+          {activeDepartment && (
+            <div className="flex gap-2 px-4 mt-3 overflow-x-auto pb-1">
+              <button
+                onClick={() => setActiveAisle('all')}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
+                  activeAisle === 'all' ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
+                }`}
+              >
+                All {activeDepartment.short.toLowerCase()}
+              </button>
+              {activeDepartment.aisles.map((a) => (
+                <button
+                  key={a.id}
+                  onClick={() => setActiveAisle(a.id)}
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
+                    activeAisle === a.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
+                  }`}
+                >
+                  {a.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {isSearching && (
+        <p className="px-5 mt-4 text-xs text-ink-muted">
+          {skus.length} result{skus.length === 1 ? '' : 's'} for "{searchQuery.trim()}"
+        </p>
       )}
 
       {/* Product List */}
@@ -192,7 +231,7 @@ function DeptTile({ label, xhosa, active, onClick }) {
     <button
       onClick={onClick}
       aria-pressed={active}
-      className={`flex min-h-16 flex-col items-start justify-center rounded-2xl px-3 py-2 text-left transition-colors active:scale-[0.97] ${
+      className={`flex-shrink-0 w-24 min-h-16 flex flex-col items-start justify-center rounded-2xl px-3 py-2 text-left transition-colors active:scale-[0.97] ${
         active ? 'bg-terracotta' : 'bg-white border border-cream-dark'
       }`}
     >

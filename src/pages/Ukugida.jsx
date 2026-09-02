@@ -9,15 +9,15 @@ import Icon from '../components/Icon.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
-const emptyForm = {
+const emptyItem = () => ({ key: Math.random().toString(36).slice(2), itemDescription: '', quantity: '', unitType: 'bottle' })
+
+const makeEmptyForm = () => ({
   direction: 'GIVEN',
-  itemDescription: '',
-  quantity: '',
-  unitType: 'bottle',
   counterpartyName: '',
   ceremonyLabel: '',
   eventDate: new Date().toISOString().slice(0, 10),
-}
+  items: [emptyItem()],
+})
 
 export default function Ukugida({ onBack }) {
   const { accessToken } = useAuth()
@@ -25,7 +25,28 @@ export default function Ukugida({ onBack }) {
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState(emptyForm)
+  const [form, setForm] = useState(makeEmptyForm)
+  const [catalogue, setCatalogue] = useState([])
+  const [suggestFor, setSuggestFor] = useState(null)
+
+  useEffect(() => {
+    fetch('/api/basket/catalogue')
+      .then((res) => res.json())
+      .then((data) => setCatalogue(Array.isArray(data) ? data : []))
+      .catch(() => setCatalogue([]))
+  }, [])
+
+  const updateItem = (key, patch) => {
+    setForm((p) => ({ ...p, items: p.items.map((it) => (it.key === key ? { ...it, ...patch } : it)) }))
+  }
+  const addItemRow = () => setForm((p) => ({ ...p, items: [...p.items, emptyItem()] }))
+  const removeItemRow = (key) => setForm((p) => ({ ...p, items: p.items.filter((it) => it.key !== key) }))
+
+  const suggestionsFor = (query) => {
+    const q = query.trim().toLowerCase()
+    if (q.length < 2) return []
+    return catalogue.filter((s) => s.name.toLowerCase().includes(q)).slice(0, 6)
+  }
 
   const fetchEntries = useCallback(async () => {
     setLoading(true)
@@ -50,21 +71,27 @@ export default function Ukugida({ onBack }) {
 
   const addEntry = async (e) => {
     e.preventDefault()
+    const validItems = form.items.filter((it) => it.itemDescription.trim())
+    if (validItems.length === 0) {
+      showToast('Add at least one item', 'error')
+      return
+    }
     try {
-      const res = await fetch('/api/reciprocity', {
+      const res = await fetch('/api/reciprocity/batch', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`
         },
-        body: JSON.stringify(form)
+        body: JSON.stringify({ ...form, items: validItems })
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to save')
       fetchEntries()
       setShowForm(false)
-      setForm(emptyForm)
-      showToast('Entry recorded', 'success')
+      setForm(makeEmptyForm())
+      setSuggestFor(null)
+      showToast(validItems.length > 1 ? `${validItems.length} items recorded` : 'Entry recorded', 'success')
     } catch (err) {
       showToast(err.message, 'error')
     }
@@ -141,33 +168,84 @@ export default function Ukugida({ onBack }) {
             ))}
           </div>
 
-          <input
-            type="text"
-            placeholder="Item (e.g. Whiskey, Beer)"
-            value={form.itemDescription}
-            onChange={(e) => setForm(p => ({ ...p, itemDescription: e.target.value }))}
-            className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
-            required
-          />
-
-          <div className="flex gap-2">
-            <input
-              type="number"
-              placeholder="Qty"
-              value={form.quantity}
-              onChange={(e) => setForm(p => ({ ...p, quantity: e.target.value }))}
-              className="w-24 h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
-            />
-            <select
-              value={form.unitType}
-              onChange={(e) => setForm(p => ({ ...p, unitType: e.target.value }))}
-              className="flex-1 h-12 border-2 border-cream-dark rounded-soft px-4 text-sm bg-white focus:outline-none focus:border-sage-500"
-            >
-              <option value="bottle">Bottle</option>
-              <option value="case">Case</option>
-              <option value="crate">Crate</option>
-            </select>
+          <div className="space-y-2">
+            {form.items.map((item, idx) => (
+              <div key={item.key} className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      placeholder="Item (e.g. Commando Brandy, Beer)"
+                      value={item.itemDescription}
+                      onChange={(e) => {
+                        updateItem(item.key, { itemDescription: e.target.value })
+                        setSuggestFor(item.key)
+                      }}
+                      onFocus={() => setSuggestFor(item.key)}
+                      onBlur={() => setTimeout(() => setSuggestFor((cur) => (cur === item.key ? null : cur)), 150)}
+                      className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
+                      required
+                    />
+                    {suggestFor === item.key && suggestionsFor(item.itemDescription).length > 0 && (
+                      <div className="absolute z-20 left-0 right-0 mt-1 bg-white border-2 border-sage-200 rounded-soft shadow-soft overflow-hidden">
+                        {suggestionsFor(item.itemDescription).map((sku) => (
+                          <button
+                            key={sku.id}
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
+                              updateItem(item.key, { itemDescription: sku.name })
+                              setSuggestFor(null)
+                            }}
+                            className="w-full text-left px-4 py-2.5 text-sm text-ink hover:bg-sage-50 border-b border-cream-dark last:border-0 truncate"
+                          >
+                            {sku.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {form.items.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeItemRow(item.key)}
+                      aria-label="Remove item"
+                      className={`w-9 h-9 flex-shrink-0 rounded-full bg-cream-dark flex items-center justify-center text-ink-muted ${pressable}`}
+                    >
+                      <Icon name="close" size={14} />
+                    </button>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="Qty"
+                    value={item.quantity}
+                    onChange={(e) => updateItem(item.key, { quantity: e.target.value })}
+                    className="w-24 h-11 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
+                  />
+                  <select
+                    value={item.unitType}
+                    onChange={(e) => updateItem(item.key, { unitType: e.target.value })}
+                    className="flex-1 h-11 border-2 border-cream-dark rounded-soft px-4 text-sm bg-white focus:outline-none focus:border-sage-500"
+                  >
+                    <option value="bottle">Bottle</option>
+                    <option value="case">Case</option>
+                    <option value="crate">Crate</option>
+                  </select>
+                </div>
+                {idx < form.items.length - 1 && <div className="border-t border-cream-dark pt-1" />}
+              </div>
+            ))}
           </div>
+
+          <button
+            type="button"
+            onClick={addItemRow}
+            className={`w-full py-2.5 rounded-soft text-xs font-bold text-sage-700 border-2 border-dashed border-sage-300 ${pressable}`}
+          >
+            + Add another item
+          </button>
 
           <input
             type="text"
