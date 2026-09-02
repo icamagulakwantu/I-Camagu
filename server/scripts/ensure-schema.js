@@ -27,4 +27,7 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "Sku" ADD COLUMN IF NOT EXISTS "retailPriceZAR" DECIMAL(10,2);'
   );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "lastTierNotified" INTEGER NOT NULL DEFAULT 0;'
+  );
 }

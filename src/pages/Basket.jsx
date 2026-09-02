@@ -5,6 +5,7 @@ import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf } from '../data/storeTaxonomy.js'
+import { getTierForCases, palletsForCases } from '../data/smartMatchTiers.js'
 
 export default function Basket({ onBack, onBasketChanged }) {
   const { accessToken, user } = useAuth()
@@ -217,6 +218,11 @@ export default function Basket({ onBack, onBasketChanged }) {
           </p>
           {poolStatus.poolStatus !== 'MATCHED' && (
             <>
+              {getTierForCases(poolStatus.currentCases) && (
+                <p className="text-[11px] font-black uppercase tracking-wide text-white bg-white/20 inline-block px-2 py-1 rounded-pill mb-2">
+                  🌟 {getTierForCases(poolStatus.currentCases).name} unlocked — {palletsForCases(poolStatus.currentCases).toFixed(1)} pallets
+                </p>
+              )}
               <div className="h-1.5 w-full bg-white/25 rounded-pill overflow-hidden mb-1.5">
                 <div
                   className="h-full bg-white rounded-pill transition-all"

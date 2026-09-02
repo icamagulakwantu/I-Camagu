@@ -1,4 +1,6 @@
 import prisma from '../config/db.js';
+import { getTierForCases } from '../utils/smartMatchTiers.js';
+import { notifyAdminOfSmartMatchTier } from './notificationService.js';
 
 // Honest simplification, noted here for future reference: MOQ matching here
 // is by TOTAL CASE COUNT in the pool, not per-SKU. A true per-SKU MOQ engine
@@ -7,6 +9,21 @@ import prisma from '../config/db.js';
 
 function generateGroupCode() {
   return 'GRP-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+// Continuous pallet-tier milestones (1 pallet = 56 cases), applied to the
+// pool's real case count. Emails the admin (never an external supplier or
+// manufacturer) the first time a pool reaches a new tier, so the founder
+// knows when there's genuinely enough volume to go negotiate.
+async function notifySmartMatchTierIfCrossed(pool, currentCases) {
+  const tier = getTierForCases(currentCases);
+  if (!tier || tier.id <= pool.lastTierNotified) return;
+
+  await prisma.bulkPool.update({
+    where: { id: pool.id },
+    data: { lastTierNotified: tier.id },
+  });
+  await notifyAdminOfSmartMatchTier(pool, tier, currentCases);
 }
 
 export async function submitBasketToPool(userId, basketId, partnerId) {
@@ -49,6 +66,8 @@ export async function checkAndMatchPool(poolId) {
     (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0),
     0
   );
+
+  await notifySmartMatchTierIfCrossed(pool, currentCases);
 
   if (currentCases < pool.moqTarget) {
     return { matched: false, currentCases };

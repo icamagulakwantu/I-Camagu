@@ -1,4 +1,6 @@
 import resend from '../config/email.js';
+import { ADMIN_EMAILS } from '../config/admin.js';
+import { PALLET_CASES } from '../utils/smartMatchTiers.js';
 
 const EKOYINI_BUSINESS_EMAIL = 'ekoyinimobilebar@gmail.com';
 
@@ -118,6 +120,35 @@ export async function confirmQuoteToClient(q) {
       } catch (error) {
               console.error('Client quote confirmation email failed:', error.message);
       }
+}
+
+// Internal-only alert: tells the founder a real SmartMatch pool crossed a
+// real pallet-volume tier, so they know it's time to go negotiate with a
+// wholesaler/distributor. Never sent to any external company — that pitch
+// stays a manual, founder-reviewed step until real committed volume and a
+// real trade relationship exist.
+export async function notifyAdminOfSmartMatchTier(pool, tier, currentCases) {
+  try {
+    const pallets = (currentCases / PALLET_CASES).toFixed(2);
+    await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: ADMIN_EMAILS,
+      subject: `SmartMatch: ${pool.partner?.name || 'A pool'} hit ${tier.name} (${pallets} pallets)`,
+      html: `
+        <h2>SmartMatch pool crossed a tier</h2>
+        <p><strong>${tier.name}</strong> unlocked (Tier ${tier.id}).</p>
+        ${row('Partner', pool.partner?.name)}
+        ${row('Area', pool.area)}
+        ${row('Total cases', currentCases)}
+        ${row('Pallets', pallets)}
+        ${row('MOQ target', pool.moqTarget)}
+        ${row('Pool ID', pool.id)}
+        <p style="color:#888;font-size:12px;">This is an internal alert only — no email has been sent to any supplier or manufacturer. Review the real numbers before reaching out to anyone.</p>
+      `,
+    });
+  } catch (error) {
+    console.error('SmartMatch tier admin notification failed:', error.message);
+  }
 }
 
 export async function notifyPayoutCleared(recipientEmail, recipientName, amount, stokvelName, titheAmount) {
