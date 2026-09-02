@@ -184,6 +184,14 @@ export default function Basket({ onBack, onBasketChanged }) {
   }
 
   const itemsList = basketData.items || []
+  // Only counts items with a real, researched retailPriceZAR comparable —
+  // never a fabricated "you saved" figure.
+  const totalSavings = itemsList.reduce((sum, item) => {
+    const retail = item.sku?.retailPriceZAR ? parseFloat(item.sku.retailPriceZAR) : null
+    const casePrice = parseFloat(item.sku?.casePriceZAR || 0)
+    if (!retail || retail <= casePrice) return sum
+    return sum + (retail - casePrice) * item.quantity
+  }, 0)
   const groupedItems = itemsList.reduce((map, item) => {
     const g = groupOf(item.sku)
     if (!map[g]) map[g] = []
@@ -336,6 +344,12 @@ export default function Basket({ onBack, onBasketChanged }) {
                 R{basketData.totalZAR.toFixed(2)}
               </span>
             </div>
+            {totalSavings > 0 && (
+              <div className="flex justify-between items-center mt-1 pt-1 border-t border-sage-200">
+                <span className="text-xs font-bold text-sage-700">vs. retail price</span>
+                <span className="text-sm font-black text-sage-700">You're saving R{totalSavings.toFixed(2)}</span>
+              </div>
+            )}
           </div>
 
           {/* Partner Bulk Pool Section */}
