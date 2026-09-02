@@ -5,6 +5,7 @@
 // ceremonies would generate cost items with no linked SKU and no "Buy"
 // action. Upsert on [name, bottleFormat] — safe to re-run.
 import prisma from '../config/db.js';
+import { upsertSkuByNameAndBottleFormat } from '../utils/upsertSku.js';
 
 const CEREMONY_SKUS = [
   { name: 'Ikoto (Bentonite Clay)', category: 'RITUAL_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 65.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Traditional Supplier' },
@@ -28,11 +29,7 @@ const CEREMONY_SKUS = [
 export async function backfillCeremonySkus() {
   let upserted = 0;
   for (const sku of CEREMONY_SKUS) {
-    await prisma.sku.upsert({
-      where: { name_bottleFormat: { name: sku.name, bottleFormat: sku.bottleFormat } },
-      update: { casePriceZAR: sku.casePriceZAR },
-      create: sku,
-    });
+    await upsertSkuByNameAndBottleFormat(prisma, sku, { casePriceZAR: sku.casePriceZAR });
     upserted += 1;
   }
   if (upserted > 0) {

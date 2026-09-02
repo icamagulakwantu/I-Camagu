@@ -5,6 +5,7 @@
 // command — see instructions below this file.
 
 import { PrismaClient } from '@prisma/client';
+import { upsertSkuByNameAndBottleFormat } from '../server/utils/upsertSku.js';
 const prisma = new PrismaClient();
 
 const skuItems = [
@@ -467,13 +468,10 @@ const clanSeeds = [
 async function main() {
   console.log(`Seeding ${skuItems.length} SKUs...`);
   for (const item of skuItems) {
-    await prisma.sku.upsert({
-      where: { name_bottleFormat: { name: item.name, bottleFormat: item.bottleFormat } },
-      update: {
-        casePriceZAR: item.casePriceZAR,
-        palletPriceZAR: item.palletPriceZAR,
-      },
-      create: item,
+    await upsertSkuByNameAndBottleFormat(prisma, item, {
+      casePriceZAR: item.casePriceZAR,
+      palletPriceZAR: item.palletPriceZAR,
+      retailPriceZAR: item.retailPriceZAR ?? null,
     });
   }
   console.log('SKU catalogue seeded.');

@@ -6,6 +6,7 @@
 // households and pools that aren't buying alcohol.
 // Upsert on [name, bottleFormat] — safe to re-run.
 import prisma from '../config/db.js';
+import { upsertSkuByNameAndBottleFormat } from '../utils/upsertSku.js';
 
 const CATALOGUE_EXPANSION_SKUS = [
   { name: 'Coca-Cola 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
@@ -34,10 +35,9 @@ const CATALOGUE_EXPANSION_SKUS = [
 export async function backfillCatalogueExpansion() {
   let upserted = 0;
   for (const sku of CATALOGUE_EXPANSION_SKUS) {
-    await prisma.sku.upsert({
-      where: { name_bottleFormat: { name: sku.name, bottleFormat: sku.bottleFormat } },
-      update: { casePriceZAR: sku.casePriceZAR, retailPriceZAR: sku.retailPriceZAR ?? null },
-      create: sku,
+    await upsertSkuByNameAndBottleFormat(prisma, sku, {
+      casePriceZAR: sku.casePriceZAR,
+      retailPriceZAR: sku.retailPriceZAR ?? null,
     });
     upserted += 1;
   }
