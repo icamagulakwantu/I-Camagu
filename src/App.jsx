@@ -254,20 +254,29 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
         </div>
       </button>
 
-      {/* Ukugida — the one utility not already covered by the bottom nav or the three cards above */}
+      {/* 04 · Ukugida — the fourth pillar, not a smaller utility. Prevents
+          the loss families feel today: physical reciprocity books lost or
+          gone when the person who kept them dies, so nobody knows what
+          was given or is still owed. */}
       <button
         type="button"
         onClick={() => onNavigate('ukugida')}
-        className={`w-full text-left card-paper p-4 flex items-center gap-4 mb-6 ${pressable}`}
+        className={`w-full text-left card-paper overflow-hidden px-5 py-6 mb-6 ${pressable}`}
       >
-        <span className="w-11 h-11 rounded-full bg-ink/8 flex items-center justify-center flex-shrink-0">
-          <Icon name="check" color="#2b2620" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="font-display font-bold text-base text-brand-black">Ukugida</p>
-          <p className="text-xs text-brand-black/55 mt-0.5">Reciprocity ledger — who gave what, and what's still owed back.</p>
+        <div className="flex items-center justify-between">
+          <p className="eyebrow text-terracotta">04 · Ukugida</p>
+          <span className="w-10 h-10 rounded-full bg-ink/8 flex items-center justify-center flex-shrink-0">
+            <Icon name="book" size={18} color="#2b2620" />
+          </span>
         </div>
-        <Icon name="arrowRight" size={16} color="#8a8278" />
+        <h3 className="mt-3 font-display text-2xl leading-tight text-brand-black max-w-[15ch]">Never lose the record again.</h3>
+        <p className="mt-3 text-sm leading-relaxed text-brand-black/60">
+          A living reciprocity ledger — who gave what, and what's still owed back — so it doesn't disappear with a lost book, or with the person who kept it.
+        </p>
+        <div className="mt-4 flex items-center justify-between border-t border-terracotta/10 pt-4 text-sm font-bold text-brand-black">
+          Open Ukugida
+          <Icon name="arrowRight" size={18} color="#c45c26" />
+        </div>
       </button>
 
       <div className="text-center mb-6">
