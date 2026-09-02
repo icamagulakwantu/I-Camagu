@@ -4,34 +4,14 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import Icon from '../components/Icon.jsx'
-
-// Top-level groups, Instacart-style — not everybody drinks alcohol, and not
-// every bulk-buying pool is for alcohol. Derived from the real productType
-// on each Sku, no new schema needed. Alcohol leads the list, Veggies sits
-// next to Meat & Livestock.
-const GROUPS = [
-  { id: 'ALL', label: 'All' },
-  { id: 'ALCOHOL', label: 'Alcohol' },
-  { id: 'MEAT_LIVESTOCK', label: 'Meat & Livestock' },
-  { id: 'VEGGIES', label: 'Veggies' },
-  { id: 'BEVERAGE', label: 'Soft Drinks & Water' },
-  { id: 'STAPLES', label: 'Staples & Dry Goods' },
-]
-
-function groupOf(sku) {
-  if (sku.productType === 'LIVESTOCK' || sku.category === 'MEAT') return 'MEAT_LIVESTOCK'
-  if (sku.productType === 'ALCOHOL') return 'ALCOHOL'
-  if (sku.productType === 'BEVERAGE') return 'BEVERAGE'
-  if (sku.category === 'FRESH_PRODUCE' || sku.category === 'CANNED_GOODS') return 'VEGGIES'
-  return 'STAPLES'
-}
+import { DEPARTMENTS, departmentOf, aisleOf } from '../data/storeTaxonomy.js'
 
 function Store({ onGoToBasket, basketCount }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   const [allSkus, setAllSkus] = useState([])
-  const [activeGroup, setActiveGroup] = useState('ALL')
-  const [activeCategory, setActiveCategory] = useState('')
+  const [activeDept, setActiveDept] = useState('all')
+  const [activeAisle, setActiveAisle] = useState('all')
   const [loading, setLoading] = useState(true)
   const [addingId, setAddingId] = useState(null)
 
@@ -48,22 +28,20 @@ function Store({ onGoToBasket, basketCount }) {
       })
   }, [])
 
-  useEffect(() => {
-    setActiveCategory('')
-  }, [activeGroup])
+  const pickDept = (id) => {
+    setActiveDept(id)
+    setActiveAisle('all')
+  }
 
-  const categoriesInGroup = useMemo(() => {
-    const scoped = activeGroup === 'ALL' ? allSkus : allSkus.filter((s) => groupOf(s) === activeGroup)
-    return [...new Set(scoped.map((s) => s.category))].sort()
-  }, [allSkus, activeGroup])
+  const activeDepartment = DEPARTMENTS.find((d) => d.id === activeDept)
 
   const skus = useMemo(() => {
     return allSkus.filter((s) => {
-      if (activeGroup !== 'ALL' && groupOf(s) !== activeGroup) return false
-      if (activeCategory && s.category !== activeCategory) return false
+      if (activeDept !== 'all' && departmentOf(s).id !== activeDept) return false
+      if (activeDept !== 'all' && activeAisle !== 'all' && aisleOf(s).id !== activeAisle) return false
       return true
     })
-  }, [allSkus, activeGroup, activeCategory])
+  }, [allSkus, activeDept, activeAisle])
 
   const addToBasket = async (sku) => {
     setAddingId(sku.id)
@@ -116,41 +94,34 @@ function Store({ onGoToBasket, basketCount }) {
         </p>
       </div>
 
-      {/* Top-level group tabs */}
-      <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-2">
-        {GROUPS.map((g) => (
-          <button
-            key={g.id}
-            onClick={() => setActiveGroup(g.id)}
-            className={`flex-shrink-0 px-4 py-2 rounded-pill text-xs font-bold transition-colors ${
-              activeGroup === g.id ? 'bg-terracotta text-white' : 'bg-white border-2 border-terracotta/20 text-ink-muted'
-            }`}
-          >
-            {g.label}
-          </button>
+      {/* Level 1 — departments */}
+      <div className="grid grid-cols-4 gap-2 px-4 mt-4">
+        <DeptTile label="All" xhosa="Konke" active={activeDept === 'all'} onClick={() => pickDept('all')} />
+        {DEPARTMENTS.map((d) => (
+          <DeptTile key={d.id} label={d.short} xhosa={d.xhosa} active={activeDept === d.id} onClick={() => pickDept(d.id)} />
         ))}
       </div>
 
-      {/* Category sub-pills, scoped to the active group */}
-      {categoriesInGroup.length > 1 && (
-        <div className="flex gap-2 px-4 mt-2 overflow-x-auto pb-2">
+      {/* Level 2 — aisles, scoped to the selected department only */}
+      {activeDepartment && (
+        <div className="flex gap-2 px-4 mt-3 overflow-x-auto pb-1">
           <button
-            onClick={() => setActiveCategory('')}
+            onClick={() => setActiveAisle('all')}
             className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
-              !activeCategory ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
+              activeAisle === 'all' ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
             }`}
           >
-            All
+            All {activeDepartment.short.toLowerCase()}
           </button>
-          {categoriesInGroup.map((cat) => (
+          {activeDepartment.aisles.map((a) => (
             <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
+              key={a.id}
+              onClick={() => setActiveAisle(a.id)}
               className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
-                activeCategory === cat ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
+                activeAisle === a.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
               }`}
             >
-              {cat}
+              {a.name}
             </button>
           ))}
         </div>
@@ -165,13 +136,14 @@ function Store({ onGoToBasket, basketCount }) {
             <Skeleton className="h-20 w-full" />
           </div>
         ) : skus.length === 0 ? (
-          <EmptyState emoji="📦" title="No items found" description="Try selecting a different category." />
+          <EmptyState emoji="📦" title="No items found" description="Try selecting a different department." />
         ) : (
           <div className="space-y-3">
             {skus.map((sku) => {
               const retail = sku.retailPriceZAR ? parseFloat(sku.retailPriceZAR) : null
               const casePrice = parseFloat(sku.casePriceZAR)
               const savings = retail && retail > casePrice ? retail - casePrice : null
+              const dept = departmentOf(sku)
               return (
                 <div key={sku.id} className="card-paper flex justify-between items-center overflow-hidden">
                   <div className="flex items-center gap-3 min-w-0">
@@ -179,10 +151,11 @@ function Store({ onGoToBasket, basketCount }) {
                       <img src={sku.imageUrl} alt={sku.name} className="w-16 h-16 object-cover flex-shrink-0" />
                     ) : (
                       <span className="w-16 h-16 bg-terracotta/10 flex items-center justify-center flex-shrink-0">
-                        <Icon name={sku.productType === 'LIVESTOCK' ? 'users' : sku.productType === 'ALCOHOL' ? 'cocktail' : 'package'} size={22} color="#c45c26" />
+                        <Icon name={dept.id === 'meat' ? 'users' : dept.id === 'beverages' ? 'cocktail' : 'package'} size={22} color="#c45c26" />
                       </span>
                     )}
                     <div className="min-w-0 py-1">
+                      <p className="eyebrow text-terracotta/70">{dept.short}</p>
                       <h3 className="font-display font-bold text-sm text-ink truncate">{sku.name}</h3>
                       <p className="text-xs text-ink-muted">
                         {sku.bottleFormat ? `${sku.bottleFormat} • ` : ''}{sku.unitsPerCase} per case
@@ -211,6 +184,21 @@ function Store({ onGoToBasket, basketCount }) {
         )}
       </div>
     </div>
+  )
+}
+
+function DeptTile({ label, xhosa, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-pressed={active}
+      className={`flex min-h-16 flex-col items-start justify-center rounded-2xl px-3 py-2 text-left transition-colors active:scale-[0.97] ${
+        active ? 'bg-terracotta' : 'bg-white border border-cream-dark'
+      }`}
+    >
+      <span className={`text-[13px] font-bold leading-tight ${active ? 'text-white' : 'text-ink'}`}>{label}</span>
+      <span className={`text-[10px] ${active ? 'text-white/70' : 'text-ink-muted'}`}>{xhosa}</span>
+    </button>
   )
 }
 

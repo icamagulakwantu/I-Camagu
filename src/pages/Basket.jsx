@@ -4,24 +4,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
-
-// Same grouping as Store.jsx — Instacart-style cart segmentation, derived
-// from the real productType/category on each Sku.
-const GROUP_ORDER = ['ALCOHOL', 'MEAT_LIVESTOCK', 'VEGGIES', 'BEVERAGE', 'STAPLES']
-const GROUP_LABELS = {
-  ALCOHOL: 'Alcohol',
-  MEAT_LIVESTOCK: 'Meat & Livestock',
-  VEGGIES: 'Veggies',
-  BEVERAGE: 'Soft Drinks & Water',
-  STAPLES: 'Staples & Dry Goods',
-}
-function groupOf(sku = {}) {
-  if (sku.productType === 'LIVESTOCK' || sku.category === 'MEAT') return 'MEAT_LIVESTOCK'
-  if (sku.productType === 'ALCOHOL') return 'ALCOHOL'
-  if (sku.productType === 'BEVERAGE') return 'BEVERAGE'
-  if (sku.category === 'FRESH_PRODUCE' || sku.category === 'CANNED_GOODS') return 'VEGGIES'
-  return 'STAPLES'
-}
+import { DEPARTMENTS, departmentOf } from '../data/storeTaxonomy.js'
 
 export default function Basket({ onBack, onBasketChanged }) {
   const { accessToken, user } = useAuth()
@@ -195,7 +178,7 @@ export default function Basket({ onBack, onBasketChanged }) {
     return sum + (retail - casePrice) * item.quantity
   }, 0)
   const groupedItems = itemsList.reduce((map, item) => {
-    const g = groupOf(item.sku)
+    const g = departmentOf(item.sku).id
     if (!map[g]) map[g] = []
     map[g].push(item)
     return map
@@ -268,7 +251,8 @@ export default function Basket({ onBack, onBasketChanged }) {
         <>
           {/* Cart Items, segmented by group like the Store */}
           <div className="space-y-5 mb-4">
-            {GROUP_ORDER.filter((g) => groupedItems[g]?.length).map((g) => {
+            {DEPARTMENTS.filter((d) => groupedItems[d.id]?.length).map((d) => {
+              const g = d.id
               const groupItems = groupedItems[g]
               const groupSubtotal = groupItems.reduce(
                 (sum, item) => sum + item.quantity * parseFloat(item.sku?.casePriceZAR || 0),
@@ -277,7 +261,7 @@ export default function Basket({ onBack, onBasketChanged }) {
               return (
                 <div key={g}>
                   <div className="flex items-center justify-between mb-2 px-1">
-                    <p className="eyebrow text-terracotta">{GROUP_LABELS[g]}</p>
+                    <p className="eyebrow text-terracotta">{d.name}</p>
                     <p className="text-xs font-bold text-ink-muted">R{groupSubtotal.toFixed(2)}</p>
                   </div>
                   <div className="space-y-3">
@@ -297,7 +281,7 @@ export default function Basket({ onBack, onBasketChanged }) {
                             />
                           ) : (
                             <span className="w-14 h-14 rounded-soft bg-terracotta/10 flex items-center justify-center shrink-0">
-                              <Icon name={g === 'MEAT_LIVESTOCK' ? 'users' : g === 'ALCOHOL' ? 'cocktail' : 'package'} size={20} color="#c45c26" />
+                              <Icon name={g === 'meat' ? 'users' : g === 'beverages' ? 'cocktail' : 'package'} size={20} color="#c45c26" />
                             </span>
                           )}
                           <div className="flex-1 min-w-0">
