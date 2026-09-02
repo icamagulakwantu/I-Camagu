@@ -1,0 +1,47 @@
+// One-off backfill: creates the catalogue-expansion SKUs (see prisma/seed.js,
+// same block) directly against production, since seed.js is not run
+// automatically on deploy. These are general Store SKUs, not tied to any
+// ceremony checklist — real non-alcoholic beverages, real meat cuts, and
+// general livestock, for households and pools that aren't buying alcohol.
+// Upsert on [name, bottleFormat] — safe to re-run.
+import prisma from '../config/db.js';
+
+const CATALOGUE_EXPANSION_SKUS = [
+  { name: 'Coca-Cola 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
+  { name: 'Sprite 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
+  { name: 'Fanta Orange 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
+  { name: 'Stoney Ginger Beer 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
+  { name: 'Valpre Still Water 500ml', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: 246.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 383.76 },
+  { name: 'Beef Mince 5kg', category: 'MEAT', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 574.95, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher', retailPriceZAR: 699.95 },
+  { name: 'Whole Chicken (~1.8kg)', category: 'MEAT', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 99.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher', retailPriceZAR: 116.98 },
+  { name: 'Boerewors 5kg', category: 'MEAT', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 474.95, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher', retailPriceZAR: 554.95 },
+  { name: 'Goat (Standard)', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 2200.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
+  { name: 'Cow / Ox (Inkunzi)', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 22000.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
+];
+
+export async function backfillCatalogueExpansion() {
+  let upserted = 0;
+  for (const sku of CATALOGUE_EXPANSION_SKUS) {
+    await prisma.sku.upsert({
+      where: { name_bottleFormat: { name: sku.name, bottleFormat: sku.bottleFormat } },
+      update: { casePriceZAR: sku.casePriceZAR, retailPriceZAR: sku.retailPriceZAR ?? null },
+      create: sku,
+    });
+    upserted += 1;
+  }
+  if (upserted > 0) {
+    console.log(`Catalogue expansion SKU backfill: ${upserted} row(s) upserted.`);
+  }
+  return upserted;
+}
+
+const isMain = process.argv[1] && import.meta.url === `file://${process.argv[1]}`;
+if (isMain) {
+  backfillCatalogueExpansion()
+    .then((count) => console.log(`Done. ${count} row(s) upserted.`))
+    .catch((err) => {
+      console.error(err);
+      process.exitCode = 1;
+    })
+    .finally(() => prisma.$disconnect());
+}

@@ -476,6 +476,7 @@ model Sku {
   palletPriceZAR    Decimal? @db.Decimal(10, 2)
   supplierPortfolio String?
   imageUrl          String?
+  retailPriceZAR    Decimal? @db.Decimal(10, 2)
   createdAt         DateTime @default(now())
 
   basketItems BasketItem[]

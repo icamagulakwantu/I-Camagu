@@ -5,6 +5,22 @@ import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 
+// Same grouping as Store.jsx — Instacart-style cart segmentation, derived
+// from the real productType/category on each Sku.
+const GROUP_ORDER = ['MEAT_LIVESTOCK', 'ALCOHOL', 'BEVERAGE', 'STAPLES']
+const GROUP_LABELS = {
+  MEAT_LIVESTOCK: 'Meat & Livestock',
+  ALCOHOL: 'Alcohol',
+  BEVERAGE: 'Soft Drinks & Water',
+  STAPLES: 'Staples & Dry Goods',
+}
+function groupOf(sku = {}) {
+  if (sku.productType === 'LIVESTOCK' || sku.category === 'MEAT') return 'MEAT_LIVESTOCK'
+  if (sku.productType === 'ALCOHOL') return 'ALCOHOL'
+  if (sku.productType === 'BEVERAGE') return 'BEVERAGE'
+  return 'STAPLES'
+}
+
 export default function Basket({ onBack, onBasketChanged }) {
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
@@ -168,6 +184,12 @@ export default function Basket({ onBack, onBasketChanged }) {
   }
 
   const itemsList = basketData.items || []
+  const groupedItems = itemsList.reduce((map, item) => {
+    const g = groupOf(item.sku)
+    if (!map[g]) map[g] = []
+    map[g].push(item)
+    return map
+  }, {})
 
   return (
     <div className="min-h-screen pb-24 bg-cream px-4 pt-6 max-w-md mx-auto">
@@ -234,51 +256,68 @@ export default function Basket({ onBack, onBasketChanged }) {
         />
       ) : (
         <>
-          {/* Cart Items List */}
-          <div className="space-y-3 mb-4">
-            {itemsList.map((item) => {
-              const imgSrc = item?.sku?.imageUrl || null
+          {/* Cart Items, segmented by group like the Store */}
+          <div className="space-y-5 mb-4">
+            {GROUP_ORDER.filter((g) => groupedItems[g]?.length).map((g) => {
+              const groupItems = groupedItems[g]
+              const groupSubtotal = groupItems.reduce(
+                (sum, item) => sum + item.quantity * parseFloat(item.sku?.casePriceZAR || 0),
+                0
+              )
               return (
-                <div
-                  key={item.id}
-                  className="card-paper flex items-center gap-3 p-3"
-                >
-                  {imgSrc ? (
-                    <img
-                      src={imgSrc}
-                      alt={item.sku?.name || 'Item'}
-                      className="w-14 h-14 object-cover rounded-soft shrink-0"
-                      onError={(e) => { e.target.style.display = 'none' }}
-                    />
-                  ) : (
-                    <span className="w-14 h-14 rounded-soft bg-terracotta/10 flex items-center justify-center shrink-0">
-                      <Icon name="cocktail" size={20} color="#c45c26" />
-                    </span>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-sm text-ink truncate">{item.sku?.name || 'Item'}</h3>
-                    <p className="text-xs text-ink-muted">{item.sku?.bottleFormat || 'Standard Wholesale'}</p>
-                    <p className="text-sm font-bold text-sage-600">
-                      R{parseFloat(item.sku?.casePriceZAR || 0).toFixed(2)} / case
-                    </p>
+                <div key={g}>
+                  <div className="flex items-center justify-between mb-2 px-1">
+                    <p className="eyebrow text-terracotta">{GROUP_LABELS[g]}</p>
+                    <p className="text-xs font-bold text-ink-muted">R{groupSubtotal.toFixed(2)}</p>
                   </div>
+                  <div className="space-y-3">
+                    {groupItems.map((item) => {
+                      const imgSrc = item?.sku?.imageUrl || null
+                      return (
+                        <div
+                          key={item.id}
+                          className="card-paper flex items-center gap-3 p-3"
+                        >
+                          {imgSrc ? (
+                            <img
+                              src={imgSrc}
+                              alt={item.sku?.name || 'Item'}
+                              className="w-14 h-14 object-cover rounded-soft shrink-0"
+                              onError={(e) => { e.target.style.display = 'none' }}
+                            />
+                          ) : (
+                            <span className="w-14 h-14 rounded-soft bg-terracotta/10 flex items-center justify-center shrink-0">
+                              <Icon name={g === 'MEAT_LIVESTOCK' ? 'users' : g === 'ALCOHOL' ? 'cocktail' : 'package'} size={20} color="#c45c26" />
+                            </span>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-sm text-ink truncate">{item.sku?.name || 'Item'}</h3>
+                            <p className="text-xs text-ink-muted">{item.sku?.bottleFormat || 'Standard Wholesale'}</p>
+                            <p className="text-sm font-bold text-sage-600">
+                              R{parseFloat(item.sku?.casePriceZAR || 0).toFixed(2)} / case
+                            </p>
+                          </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="w-8 h-8 rounded-pill bg-cream-dark text-ink font-bold active:scale-90 transition-transform"
-                    >
-                      −
-                    </button>
-                    <span className="font-bold text-sm w-5 text-center text-ink">{item.quantity}</span>
-                    <button
-                      type="button"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="w-8 h-8 rounded-pill bg-sage-500 text-white font-bold active:scale-90 transition-transform"
-                    >
-                      +
-                    </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="w-8 h-8 rounded-pill bg-cream-dark text-ink font-bold active:scale-90 transition-transform"
+                            >
+                              −
+                            </button>
+                            <span className="font-bold text-sm w-5 text-center text-ink">{item.quantity}</span>
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="w-8 h-8 rounded-pill bg-sage-500 text-white font-bold active:scale-90 transition-transform"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               )

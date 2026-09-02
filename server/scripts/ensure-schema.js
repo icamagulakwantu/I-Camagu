@@ -21,4 +21,10 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "Ceremony" ADD COLUMN IF NOT EXISTS "guestCount" INTEGER;'
   );
+  // Real, researched supermarket-equivalent retail price for a Sku, used to
+  // show a genuine "save vs retail" comparison. Left null for products with
+  // no honest retail comparable (e.g. live animals) — never fabricated.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Sku" ADD COLUMN IF NOT EXISTS "retailPriceZAR" DECIMAL(10,2);'
+  );
 }
