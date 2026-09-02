@@ -48,7 +48,6 @@ import EkoyiniBooking from './pages/EkoyiniBooking.jsx'
 // Components
 import BottomNav from './components/BottomNav.jsx'
 import DidYouKnow from './components/DidYouKnow.jsx'
-import ActionCard from './components/ActionCard.jsx'
 import Icon from './components/Icon.jsx'
 import NotificationBell from './components/NotificationBell.jsx'  // ✅ NEW
 import PinReminder from './components/PinReminder.jsx'
@@ -255,7 +254,23 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
         </div>
       </button>
 
-      <div className="text-center mb-6 mt-2">
+      {/* Ukugida — the one utility not already covered by the bottom nav or the three cards above */}
+      <button
+        type="button"
+        onClick={() => onNavigate('ukugida')}
+        className={`w-full text-left card-paper p-4 flex items-center gap-4 mb-6 ${pressable}`}
+      >
+        <span className="w-11 h-11 rounded-full bg-ink/8 flex items-center justify-center flex-shrink-0">
+          <Icon name="check" color="#2b2620" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-display font-bold text-base text-brand-black">Ukugida</p>
+          <p className="text-xs text-brand-black/55 mt-0.5">Reciprocity ledger — who gave what, and what's still owed back.</p>
+        </div>
+        <Icon name="arrowRight" size={16} color="#8a8278" />
+      </button>
+
+      <div className="text-center mb-6">
         <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-6 h-6 mx-auto opacity-40" />
         <p className="mt-2 font-display italic text-sm text-brand-black/50">What the family carries, no one carries alone.</p>
       </div>
@@ -268,30 +283,6 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
       </div>
 
       <PinReminder onNavigate={onNavigate} />
-
-      {/* Primary Grid Action Cards */}
-      <p className="eyebrow mb-2">Where to today?</p>
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <ActionCard icon={<Icon name="calendar" color="#c45c26" />} onClick={() => onNavigate('ceremonyhub')}>
-          <span className="font-display font-semibold text-base text-brand-black block">Ceremonies</span>
-          <span className="text-xs text-brand-black/50 block">Plan & Execute</span>
-        </ActionCard>
-
-        <ActionCard icon={<Icon name="cart" color="#c1922f" />} badge={basketCount} onClick={() => onNavigate('store')}>
-          <span className="font-display font-semibold text-base text-brand-black block">Store</span>
-          <span className="text-xs text-brand-black/50 block">Wholesale Bulk</span>
-        </ActionCard>
-
-        <ActionCard icon={<Icon name="users" color="#4a7a4a" />} onClick={() => onNavigate('stokvels')}>
-          <span className="font-display font-semibold text-base text-brand-black block">Stokvels</span>
-          <span className="text-xs text-brand-black/50 block">Group Savings</span>
-        </ActionCard>
-
-        <ActionCard icon={<Icon name="check" color="#2b2620" />} onClick={() => onNavigate('ukugida')}>
-          <span className="font-display font-semibold text-base text-brand-black block">Ukugida</span>
-          <span className="text-xs text-brand-black/50 block">Reciprocity Ledger</span>
-        </ActionCard>
-      </div>
 
       {/* Your Ceremonies */}
       <div className="mb-6">
