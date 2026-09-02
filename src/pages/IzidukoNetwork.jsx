@@ -6,7 +6,12 @@ import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 
 const TIER_COLOR = { 1: 'bg-terracotta text-white', 2: 'bg-terracotta/20 text-terracotta', 3: 'bg-sage-500 text-white', 4: 'bg-sage-100 text-sage-700', 5: 'bg-cream-dark text-ink-muted' }
+// Short badge text for the feed card overlay — the full explanatory label
+// (e.g. "Strong ancestral connection — shared four Isiduko lines &
+// surname") still renders in full underneath, this is just the at-a-glance tag.
+const TIER_BADGE = { 1: 'Strong match', 2: 'Strong match', 3: 'Good match', 4: 'Possible match', 5: 'Possible match' }
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50'
+const LINE_LABEL = { paternal: 'Paternal', maternal: 'Maternal', 'paternal grandmother': "Paternal grandmother", 'maternal grandmother': 'Maternal grandmother' }
 
 function Avatar({ src, size = 'w-12 h-12' }) {
   return (
@@ -151,58 +156,70 @@ function IzidukoNetwork({ onBack }) {
               matches.length === 0 ? (
                 <EmptyState emoji="🤝" title="No matches yet" description="As more people join with your clan names, they'll show up here." />
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-5">
                   {matches.map((m) => (
-                    <div key={m.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-                      <div className="flex items-center gap-3">
-                        <Avatar src={m.profileImage} />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold text-sm text-ink">{m.firstName} {m.lastName}</p>
-                          <p className="text-xs text-ink-muted">{m.paternalIziduko} · {m.maternalIziduko}</p>
-                          <p className="text-[10px] text-ink-muted mt-1">{m.matchedLines?.join(' · ')}</p>
-                          <span className={`inline-block mt-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-pill ${TIER_COLOR[m.tier]}`}>{m.label}</span>
+                    <div key={m.id} className="rounded-soft overflow-hidden shadow-soft bg-white">
+                      <div className="relative aspect-[4/5]">
+                        <img src={m.profileImage} alt={`${m.firstName} ${m.lastName}`} className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/10 to-transparent" />
+                        <span className={`absolute top-3 left-3 text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-pill ${TIER_COLOR[m.tier]}`}>
+                          {TIER_BADGE[m.tier]}
+                        </span>
+                        <span className="absolute top-3 right-3 text-[10px] font-bold text-white bg-black/30 backdrop-blur px-2.5 py-1 rounded-pill">
+                          {m.matchedLines.length} of 4 lines
+                        </span>
+                        <div className="absolute bottom-0 left-0 right-0 p-4">
+                          <p className="font-display font-bold text-2xl text-white leading-tight">{m.firstName} {m.lastName}</p>
+                          <p className="text-xs text-white/80 mt-1">{m.label}</p>
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            {m.matchedLines.map((line) => (
+                              <span key={line} className="text-[10px] font-bold text-white bg-white/20 backdrop-blur px-2 py-1 rounded-pill">
+                                {LINE_LABEL[line] || line}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
 
-                      <div className="mt-3">
+                      <div className="p-4">
                         {m.connectionStatus === 'connected' && (
-                          <span className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Connected</span>
+                          <span className="text-xs font-bold text-sage-600 flex items-center gap-1 justify-center py-2"><Icon name="check" size={12} color="#4a7a4a" /> Connected</span>
                         )}
                         {m.connectionStatus === 'pending_sent' && (
-                          <span className="text-xs font-bold text-ink-muted">Request sent — awaiting reply</span>
+                          <span className="block text-xs font-bold text-ink-muted text-center py-2">Request sent — awaiting reply</span>
                         )}
                         {m.connectionStatus === 'pending_received' && (
-                          <button onClick={() => setTab('requests')} className={`text-xs font-bold text-terracotta underline ${pressable}`}>
-                            They want to connect — respond in Requests
+                          <button onClick={() => setTab('requests')} className={`w-full text-sm font-bold text-white bg-terracotta py-3 rounded-pill ${pressable}`}>
+                            They want to connect — respond
                           </button>
                         )}
                         {m.connectionStatus === 'none' && composerFor !== m.id && (
                           <button
                             onClick={() => { setComposerFor(m.id); setComposerText('') }}
-                            className={`text-xs font-bold text-white bg-terracotta px-4 py-2 rounded-pill flex items-center gap-1.5 ${pressable}`}
+                            className={`w-full text-sm font-bold text-white bg-terracotta py-3 rounded-pill flex items-center justify-center gap-1.5 ${pressable}`}
                           >
-                            <Icon name="link" size={13} color="#fff" /> Connect
+                            <Icon name="link" size={15} color="#fff" /> Connect
                           </button>
                         )}
                         {m.connectionStatus === 'none' && composerFor === m.id && (
-                          <div className="space-y-2 mt-2">
+                          <div className="space-y-2">
                             <input
                               type="text" placeholder="Say hello (optional)" value={composerText}
                               onChange={(e) => setComposerText(e.target.value)}
-                              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-xs"
+                              className="w-full border border-ink/30 rounded-soft px-3 py-2.5 text-sm"
                               maxLength={200}
                             />
                             <div className="flex gap-2">
                               <button
                                 onClick={() => sendConnect(m.id)}
                                 disabled={busyId === m.id}
-                                className={`flex-1 text-xs font-bold text-white bg-terracotta py-2 rounded-pill ${pressable}`}
+                                className={`flex-1 text-sm font-bold text-white bg-terracotta py-2.5 rounded-pill ${pressable}`}
                               >
                                 {busyId === m.id ? 'Sending...' : 'Send request'}
                               </button>
                               <button
                                 onClick={() => setComposerFor(null)}
-                                className={`text-xs font-bold text-ink-muted px-3 ${pressable}`}
+                                className={`text-sm font-bold text-ink-muted px-3 ${pressable}`}
                               >
                                 Cancel
                               </button>
