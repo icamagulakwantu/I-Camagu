@@ -218,6 +218,7 @@ export async function getSupplierPools(userId) {
       area: pool.area,
       status: pool.status,
       deadline: pool.deadline,
+      capCases: pool.capCases,
       moqTarget: pool.moqTarget,
       currentCases,
       participantCount: pool.baskets.length,

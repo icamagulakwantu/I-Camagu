@@ -7,6 +7,18 @@ import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf } from '../data/storeTaxonomy.js'
 import { getTierForCases, palletsForCases } from '../data/smartMatchTiers.js'
 
+// This pool's rolling window closes on windowDeadline — after that, new
+// baskets join a fresh pool instead of piling onto this one. Real data
+// from BulkPool.deadline, no fabricated countdown.
+function windowClosesLabel(windowDeadline) {
+  const msLeft = new Date(windowDeadline).getTime() - Date.now()
+  if (msLeft <= 0) return 'This window has closed — new members are joining a fresh pool.'
+  const hoursLeft = Math.ceil(msLeft / (60 * 60 * 1000))
+  if (hoursLeft <= 1) return 'This pooling window closes in under an hour.'
+  if (hoursLeft < 24) return `This pooling window closes in ${hoursLeft}h.`
+  return `This pooling window closes in ${Math.round(hoursLeft / 24)} day${Math.round(hoursLeft / 24) === 1 ? '' : 's'}.`
+}
+
 export default function Basket({ onBack, onBasketChanged }) {
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
@@ -232,6 +244,9 @@ export default function Basket({ onBack, onBasketChanged }) {
               <p className="text-xs text-white/90 mb-2">
                 {poolStatus.currentCases}/{poolStatus.moqTarget} cases pooled — {Math.max(0, poolStatus.moqTarget - poolStatus.currentCases)} more to unlock bulk pricing
               </p>
+              {poolStatus.windowDeadline && (
+                <p className="text-[11px] text-white/75 mb-2">{windowClosesLabel(poolStatus.windowDeadline)}</p>
+              )}
               <button
                 type="button"
                 onClick={cancelParkedBasket}

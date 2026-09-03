@@ -520,6 +520,12 @@ model BulkPool {
   // 2=Clan Tier, 3=Eastern Cape Tier) already emailed to admin for this pool
   // — prevents re-notifying on every basket submission once a tier is hit.
   lastTierNotified Int @default(0)
+  // Rolling-window demand cap: once a pool's real case count reaches this,
+  // it stops accepting new baskets — further signups open a fresh pool
+  // instead of piling onto one unbounded batch. Set from moqTarget at
+  // creation time (see poolWindow.js); null on pools created before this
+  // existed, which stay uncapped rather than being retroactively closed.
+  capCases Int?
 
   baskets       Basket[]
   payments      PoolPayment[]

@@ -9,6 +9,17 @@ import Icon from '../components/Icon.jsx'
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50'
 const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
 
+// Real BulkPool.deadline/capCases — the rolling window that keeps one pool
+// from growing into a single unmanageable batch. No countdown shown once
+// the pool has already matched or closed.
+function windowLabel(deadline, capCases, currentCases) {
+  if (!deadline) return null
+  const msLeft = new Date(deadline).getTime() - Date.now()
+  const closesIn = msLeft <= 0 ? 'window closed' : `closes in ${Math.max(1, Math.ceil(msLeft / (60 * 60 * 1000)))}h`
+  const capPart = capCases ? ` · capped at ${capCases} cases${currentCases >= capCases ? ' (full)' : ''}` : ''
+  return `${closesIn}${capPart}`
+}
+
 function ProgressBar({ current, target }) {
   const pct = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0
   return (
@@ -242,6 +253,9 @@ function SupplierDashboard({ onBack }) {
                   </div>
 
                   <ProgressBar current={pool.currentCases} target={pool.moqTarget} />
+                  {pool.status === 'OPEN' && windowLabel(pool.deadline, pool.capCases, pool.currentCases) && (
+                    <p className="text-[10px] text-ink-muted mt-1">{windowLabel(pool.deadline, pool.capCases, pool.currentCases)}</p>
+                  )}
 
                   <div className="flex gap-4 mt-3 text-xs">
                     <div>

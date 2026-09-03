@@ -120,6 +120,8 @@ export async function getMyPoolStatus(req, res) {
       currentCases,
       moqTarget: basket.pool.moqTarget,
       poolStatus: basket.pool.status,
+      windowDeadline: basket.pool.deadline,
+      capCases: basket.pool.capCases,
     });
   } catch (error) {
     console.error('Get my pool status error:', error.message);

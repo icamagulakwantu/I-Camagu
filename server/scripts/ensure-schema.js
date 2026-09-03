@@ -55,4 +55,20 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "Payout" ADD COLUMN IF NOT EXISTS "contributionOptIn" BOOLEAN NOT NULL DEFAULT false;'
   );
+  // Rolling-window pool cap (see server/utils/poolWindow.js): bounds how
+  // large a single SmartMatch pool can grow before new baskets are routed
+  // to a fresh pool instead.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "capCases" INTEGER;'
+  );
+  // Backfill only — never overwrites a value that's already set. Existing
+  // OPEN pools predate the rolling window, so give them a real 72-hour
+  // window and a real cap off their own moqTarget instead of leaving them
+  // permanently uncapped.
+  await prisma.$executeRawUnsafe(
+    `UPDATE "BulkPool" SET "deadline" = NOW() + INTERVAL '72 hours' WHERE status = 'OPEN' AND "deadline" IS NULL;`
+  );
+  await prisma.$executeRawUnsafe(
+    `UPDATE "BulkPool" SET "capCases" = "moqTarget" * 4 WHERE status = 'OPEN' AND "capCases" IS NULL;`
+  );
 }

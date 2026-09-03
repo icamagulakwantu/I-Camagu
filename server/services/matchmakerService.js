@@ -1,6 +1,7 @@
 import prisma from '../config/db.js';
 import { getTierForCases } from '../utils/smartMatchTiers.js';
 import { notifyAdminOfSmartMatchTier } from './notificationService.js';
+import { newPoolWindow, isPoolWindowClosed } from '../utils/poolWindow.js';
 
 // Honest simplification, noted here for future reference: MOQ matching here
 // is by TOTAL CASE COUNT in the pool, not per-SKU. A true per-SKU MOQ engine
@@ -39,10 +40,22 @@ export async function submitBasketToPool(userId, basketId, partnerId) {
 
   let pool = await prisma.bulkPool.findFirst({
     where: { partnerId, area: partner.area, status: 'OPEN' },
+    include: { baskets: { include: { items: true } } },
+    orderBy: { createdAt: 'desc' },
   });
+  if (pool) {
+    const currentCases = pool.baskets
+      .filter((b) => b.status !== 'CANCELLED')
+      .reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
+    // This window is full or has run its 72-hour course — don't pile a new
+    // basket onto it, open a fresh pool instead so the batch stays a
+    // predictable size for the supplier to actually fulfil.
+    if (isPoolWindowClosed(pool, currentCases)) pool = null;
+  }
   if (!pool) {
+    const moqTarget = partner.moq || 50;
     pool = await prisma.bulkPool.create({
-      data: { partnerId, area: partner.area, moqTarget: partner.moq || 50, status: 'OPEN' },
+      data: { partnerId, area: partner.area, moqTarget, status: 'OPEN', ...newPoolWindow(moqTarget) },
     });
   }
 
