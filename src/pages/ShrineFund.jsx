@@ -156,10 +156,10 @@ function ShrineFund({ onBack }) {
         <div className="bg-white border border-terracotta/15 rounded-soft p-4 mt-4">
           <p className="text-xs font-black uppercase text-ink-muted mb-2">What this is</p>
           <p className="text-sm text-ink leading-relaxed">
-            Ubuhlanti bakwa Xhosa is the seed of a sovereign Xhosa cultural wealth and development fund — a
-            sacred sanctuary in the spirit of a homestead kraal, and long-term investment in agricultural
-            research, fisheries, and livestock economies of scale that no single family or stokvel could build
-            alone.
+            This is not a fee — it is the sovereign seed capital of the Xhosa nation, a sacred sanctuary in the
+            spirit of a homestead kraal, and long-term investment in agricultural research, fisheries, and
+            livestock economies of scale across the Eastern Cape's arable land and coastline that no single
+            family or stokvel could build alone.
           </p>
           <p className="text-sm text-ink leading-relaxed mt-2">
             Every contribution is voluntary: a stokvel member may choose to add a suggested share when they
@@ -168,8 +168,12 @@ function ShrineFund({ onBack }) {
           </p>
           <p className="text-sm text-ink leading-relaxed mt-2">
             What the fund builds next is decided by the community, not by iCamagu alone — put to a majority
-            vote, with a standing committee drawn from churches, traditional healers, and community leaders,
-            visionaries, thinkers, and academics weighing each opportunity.
+            vote, with a standing committee drawn from churches, Amaqhirha and Amaxhwele (traditional healers),
+            and community leaders, visionaries, thinkers, and academics weighing each opportunity.
+          </p>
+          <p className="text-sm text-ink font-bold leading-relaxed mt-2">
+            A fund built by the people, protected by the cloud, and dedicated to the advancement of the Xhosa
+            nation for generations to come.
           </p>
           <p className="text-[11px] text-ink-muted mt-3 italic">
             The exact governance process and how the fund is eventually deployed are still being finalised —
