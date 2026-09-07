@@ -55,6 +55,21 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "Payout" ADD COLUMN IF NOT EXISTS "contributionOptIn" BOOLEAN NOT NULL DEFAULT false;'
   );
+  // Ubuhlanti fund ledger: the same table now records money OUT (allocations
+  // to real projects) as well as money in, so the fund keeps one source of
+  // truth. Existing rows are all contributions, which the default covers.
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "ShrineTithe" ADD COLUMN IF NOT EXISTS "entryType" TEXT NOT NULL DEFAULT 'CONTRIBUTION';`
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "ShrineTithe" ADD COLUMN IF NOT EXISTS "sector" TEXT;'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "ShrineTithe" ADD COLUMN IF NOT EXISTS "description" TEXT;'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "ShrineTithe" ADD COLUMN IF NOT EXISTS "referenceUrl" TEXT;'
+  );
   // Rolling-window pool cap (see server/utils/poolWindow.js): bounds how
   // large a single SmartMatch pool can grow before new baskets are routed
   // to a fresh pool instead.

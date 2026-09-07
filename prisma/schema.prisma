@@ -427,6 +427,16 @@ model ShrineContribution {
   // PENDING until a real person follows up and confirms the actual transfer
   // — there is no live payment gateway or bank details on file yet.
   status    String   @default("CONFIRMED")
+  // 'CONTRIBUTION' (money into the fund) or 'ALLOCATION' (money committed
+  // out of it to a real project). Both live on this one ledger so the fund
+  // has a single source of truth rather than a second, forkable table.
+  entryType String @default("CONTRIBUTION")
+  // ALLOCATION rows only: which development sector the money went to, what
+  // it was for, and a link to the receipt/title/grant document backing it.
+  // Left null on contributions.
+  sector       String?
+  description  String?
+  referenceUrl String?
   createdAt DateTime @default(now())
 
   @@map("ShrineTithe")

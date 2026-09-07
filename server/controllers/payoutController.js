@@ -7,28 +7,125 @@ import prisma from '../config/db.js';
 const SUGGESTED_CONTRIBUTION_RATE = 0.03;
 const MIN_DONATION_ZAR = 1;
 
+// Real development sectors the fund can commit money to. Labels are shown
+// as-is on the public page — no sector appears there until real money has
+// actually been allocated to it.
+export const ALLOCATION_SECTORS = {
+  SANCTUARY_LAND: 'Sacred sanctuary — land',
+  SANCTUARY_BUILDING: 'Sacred sanctuary — building',
+  AGRI_RND: 'Agricultural research & development',
+  FISHERIES: 'Fisheries',
+  LIVESTOCK: 'Livestock',
+  WINE_ESTATES: 'Xhosa-owned wine estates',
+  ADMIN_OPERATIONS: 'Administration & operations',
+};
+
 export async function getShrineFundTotal(req, res) {
   try {
-    const confirmedWhere = { status: 'CONFIRMED' };
-    const [aggregate, earliest, payoutCount, donationCount] = await Promise.all([
-      prisma.shrineContribution.aggregate({ where: confirmedWhere, _sum: { amount: true }, _count: true }),
-      prisma.shrineContribution.findFirst({ where: confirmedWhere, orderBy: { createdAt: 'asc' }, select: { createdAt: true } }),
-      prisma.shrineContribution.count({ where: { ...confirmedWhere, source: 'PAYOUT_CONTRIBUTION' } }),
-      prisma.shrineContribution.count({ where: { ...confirmedWhere, source: 'PUBLIC_DONATION' } }),
-    ]);
+    // Money in and money out share one ledger, so every total here is scoped
+    // by entryType — otherwise an allocation would inflate "total raised".
+    const contributionWhere = { status: 'CONFIRMED', entryType: 'CONTRIBUTION' };
+    const allocationWhere = { status: 'CONFIRMED', entryType: 'ALLOCATION' };
+    const [aggregate, earliest, payoutCount, donationCount, allocAggregate, allocBySector] =
+      await Promise.all([
+        prisma.shrineContribution.aggregate({ where: contributionWhere, _sum: { amount: true }, _count: true }),
+        prisma.shrineContribution.findFirst({ where: contributionWhere, orderBy: { createdAt: 'asc' }, select: { createdAt: true } }),
+        prisma.shrineContribution.count({ where: { ...contributionWhere, source: 'PAYOUT_CONTRIBUTION' } }),
+        prisma.shrineContribution.count({ where: { ...contributionWhere, source: 'PUBLIC_DONATION' } }),
+        prisma.shrineContribution.aggregate({ where: allocationWhere, _sum: { amount: true } }),
+        prisma.shrineContribution.groupBy({
+          by: ['sector'],
+          where: allocationWhere,
+          _sum: { amount: true },
+          _count: true,
+        }),
+      ]);
+
+    const totalRaised = parseFloat(aggregate._sum.amount || 0);
+    const totalAllocated = parseFloat(allocAggregate._sum.amount || 0);
+
     res.json({
-      totalAmount: aggregate._sum.amount || 0,
+      totalAmount: totalRaised,
       contributionCount: aggregate._count,
       payoutContributionCount: payoutCount,
       donationCount,
       sinceDate: earliest?.createdAt || null,
       suggestedRate: SUGGESTED_CONTRIBUTION_RATE,
       minDonation: MIN_DONATION_ZAR,
+      totalAllocated,
+      liquidReserve: totalRaised - totalAllocated,
+      // Only sectors with real allocations appear — an empty array genuinely
+      // means nothing has been committed yet, not that data is missing.
+      allocationsBySector: allocBySector
+        .filter((row) => row.sector)
+        .map((row) => ({
+          sector: row.sector,
+          label: ALLOCATION_SECTORS[row.sector] || row.sector,
+          amount: parseFloat(row._sum.amount || 0),
+          count: row._count,
+        }))
+        .sort((a, b) => b.amount - a.amount),
       note: 'Ubuhlanti bakwa Xhosa — every contribution here is voluntary.',
     });
   } catch (error) {
     console.error('Get shrine fund total error:', error.message);
     res.status(500).json({ error: 'Could not fetch Ubuhlanti bakwa Xhosa fund total' });
+  }
+}
+
+// Admin-only: records that real money has been committed out of the fund to
+// a real project. Nothing here moves money — it's a transparency record of a
+// decision already taken, entered by hand with a reference document, the
+// same manual-review posture as every other money flow in this app.
+export async function recordShrineAllocation(req, res) {
+  const { amount, sector, description, referenceUrl } = req.body;
+  const numericAmount = parseFloat(amount);
+
+  try {
+    const admin = await prisma.user.findUnique({ where: { id: req.userId }, select: { email: true } });
+    const { isAdminEmail } = await import('../config/admin.js');
+    if (!admin || !isAdminEmail(admin.email)) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    if (!numericAmount || isNaN(numericAmount) || numericAmount <= 0) {
+      return res.status(400).json({ error: 'A positive amount is required' });
+    }
+    if (!sector || !ALLOCATION_SECTORS[sector]) {
+      return res.status(400).json({ error: `sector must be one of: ${Object.keys(ALLOCATION_SECTORS).join(', ')}` });
+    }
+    if (!description || !description.trim()) {
+      return res.status(400).json({ error: 'A description of what this funds is required' });
+    }
+
+    // Can't commit more than the fund actually holds.
+    const [raised, allocated] = await Promise.all([
+      prisma.shrineContribution.aggregate({ where: { status: 'CONFIRMED', entryType: 'CONTRIBUTION' }, _sum: { amount: true } }),
+      prisma.shrineContribution.aggregate({ where: { status: 'CONFIRMED', entryType: 'ALLOCATION' }, _sum: { amount: true } }),
+    ]);
+    const reserve = parseFloat(raised._sum.amount || 0) - parseFloat(allocated._sum.amount || 0);
+    if (numericAmount > reserve) {
+      return res.status(400).json({
+        error: `The fund's uncommitted reserve is R${reserve.toFixed(2)} — cannot allocate R${numericAmount.toFixed(2)}.`,
+      });
+    }
+
+    const allocation = await prisma.shrineContribution.create({
+      data: {
+        amount: numericAmount,
+        entryType: 'ALLOCATION',
+        sector,
+        description: description.trim(),
+        referenceUrl: referenceUrl?.trim() || null,
+        source: 'FUND_ALLOCATION',
+        status: 'CONFIRMED',
+      },
+    });
+
+    res.status(201).json({ allocation, message: 'Allocation recorded on the public fund ledger.' });
+  } catch (error) {
+    console.error('Record shrine allocation error:', error.message);
+    res.status(500).json({ error: 'Could not record allocation' });
   }
 }
 
@@ -56,7 +153,14 @@ export async function donateToShrineFund(req, res) {
       },
     });
 
-    const donor = await prisma.user.findUnique({ where: { id: req.userId }, select: { firstName: true, lastName: true, email: true } });
+    // Anyone may donate, signed in or not — only look up an account when
+    // there actually is one, so an anonymous public donation doesn't fail.
+    const donor = req.userId
+      ? await prisma.user.findUnique({
+          where: { id: req.userId },
+          select: { firstName: true, lastName: true, email: true },
+        })
+      : null;
     const { notifyAdminOfShrineDonationPledge } = await import('../services/notificationService.js');
     await notifyAdminOfShrineDonationPledge(donation, donor);
 

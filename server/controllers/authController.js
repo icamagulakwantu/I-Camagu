@@ -6,9 +6,15 @@ import { generateTokenPair, rotateToken } from '../services/tokenService.js';
 import { hashPassword, verifyPassword } from '../services/passwordService.js';
 import { verifyGoogleToken } from '../services/googleAuthService.js';
 
+// Render does not set NODE_ENV for Node services unless you add it yourself,
+// so keying `secure` off NODE_ENV alone silently ships the refresh cookie
+// without the Secure flag in production. RENDER is set by the platform on
+// every Render instance, so treat either signal as "we are deployed".
+const IS_DEPLOYED = process.env.NODE_ENV === 'production' || !!process.env.RENDER;
+
 const REFRESH_COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
+  secure: IS_DEPLOYED,
   sameSite: 'strict',
   path: '/api/auth',
   maxAge: 30 * 24 * 60 * 60 * 1000,

@@ -1,5 +1,6 @@
 import express from 'express';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth, optionalAuth } from '../middleware/auth.js';
+import { rateLimit } from '../middleware/rateLimiter.js';
 import {
   createStokvel,
   joinStokvel,
@@ -24,7 +25,8 @@ import {
   requestPayout,
   approvePayout,
   getShrineFundTotal,
-  donateToShrineFund
+  donateToShrineFund,
+  recordShrineAllocation
 } from '../controllers/payoutController.js';
 
 const router = express.Router();
@@ -35,8 +37,18 @@ router.post('/interest/record', requireAuth, recordInterest);
 router.post('/expense/record', requireAuth, recordGroupExpense);
 router.get('/pending-approvals/count', requireAuth, getPendingApprovalCount);
 router.get('/my', requireAuth, getMyStokvels);
-router.get('/shrine-fund/total', requireAuth, getShrineFundTotal);
-router.post('/shrine-fund/donate', requireAuth, donateToShrineFund);
+// Ubuhlanti bakwa Xhosa is a public fund: anyone may see what it has raised
+// and pledge a donation, with or without an iCamagu account. Rate-limited
+// because it's unauthenticated and writes a row + sends an admin email.
+router.get('/shrine-fund/total', optionalAuth, getShrineFundTotal);
+router.post(
+  '/shrine-fund/donate',
+  rateLimit({ windowMs: 15 * 60 * 1000, max: 5 }),
+  optionalAuth,
+  donateToShrineFund
+);
+// Admin-only: record money committed out of the fund to a real project.
+router.post('/shrine-fund/allocate', requireAuth, recordShrineAllocation);
 router.get('/:stokvelId', requireAuth, getStokvel);
 router.patch('/:stokvelId', requireAuth, updateStokvel);
 router.patch('/:stokvelId/rotation-order', requireAuth, setRotationOrder);

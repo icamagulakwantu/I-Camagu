@@ -1,5 +1,18 @@
 const attempts = new Map();
 
+// Without this, every distinct IP+path ever seen stays in the Map for the
+// life of the process — a slow leak that grows with traffic. Expired records
+// are useless once their window has passed, so drop them periodically.
+const SWEEP_INTERVAL_MS = 10 * 60 * 1000;
+const sweep = setInterval(() => {
+  const now = Date.now();
+  for (const [key, record] of attempts) {
+    if (now > record.resetAt) attempts.delete(key);
+  }
+}, SWEEP_INTERVAL_MS);
+// Don't hold the event loop open on shutdown.
+sweep.unref?.();
+
 export function rateLimit({ windowMs = 15 * 60 * 1000, max = 10 } = {}) {
   return (req, res, next) => {
     const key = `${req.ip}:${req.path}`;

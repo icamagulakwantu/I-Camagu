@@ -35,6 +35,7 @@ import UmqombothiCalculator from './pages/UmqombothiCalculator.jsx'
 import Profile from './pages/Profile.jsx'
 import PinSetup from './pages/PinSetup.jsx'
 import PublicPlanView from './pages/PublicPlanView.jsx'
+import PublicUbuhlanti from './pages/PublicUbuhlanti.jsx'
 import More from './pages/More.jsx'
 import Activity from './pages/Activity.jsx'
 import Notifications from './pages/Notifications.jsx'           // ✅ NEW
@@ -636,6 +637,12 @@ export default function App() {
 
   if (resetMatch) {
     return <ResetPassword token={resetMatch[1]} />
+  }
+
+  // Ubuhlanti bakwa Xhosa is a public fund — anyone can see what it has
+  // raised and pledge a donation without an iCamagu account.
+  if (path === '/ubuhlanti' || path === '/ubuhlanti/') {
+    return <PublicUbuhlanti />
   }
 
   return (

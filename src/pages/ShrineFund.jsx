@@ -105,6 +105,38 @@ function ShrineFund({ onBack }) {
           </div>
         )}
 
+        {/* Where the fund's money has actually gone. Only real, recorded
+            allocations appear — until then this says so plainly rather than
+            showing a row of zeros that looks like activity. */}
+        {!loading && (
+          <div className="bg-white border border-terracotta/15 rounded-soft p-4 mt-4">
+            <p className="text-[11px] font-black uppercase tracking-widest text-ink-muted mb-2">
+              Where the fund has been invested
+            </p>
+            {data?.allocationsBySector?.length ? (
+              <>
+                <div className="space-y-2">
+                  {data.allocationsBySector.map((row) => (
+                    <div key={row.sector} className="flex items-center justify-between gap-3">
+                      <p className="text-sm text-ink">{row.label}</p>
+                      <p className="font-display font-bold text-sm text-ink whitespace-nowrap">{money(row.amount)}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-terracotta/10">
+                  <p className="text-xs font-bold text-ink-muted">Still uncommitted</p>
+                  <p className="font-display font-bold text-sm text-terracotta">{money(data.liquidReserve || 0)}</p>
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-ink-muted leading-relaxed">
+                Nothing has been committed out of the fund yet. Every allocation will be listed here
+                with what it funded, as it happens.
+              </p>
+            )}
+          </div>
+        )}
+
         <button
           type="button"
           onClick={() => setDonateOpen((v) => !v)}

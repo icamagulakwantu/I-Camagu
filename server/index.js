@@ -40,8 +40,24 @@ checkRequiredEnvVars();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// The frontend is served by this same Express process, so ordinary app
+// traffic is same-origin and sends no Origin header at all — those requests
+// (and native/webview clients) must keep working. Anything that DOES send an
+// Origin is a real cross-site caller and has to be on the allowlist, rather
+// than reflecting whatever origin asked, which is what `origin: true` did.
+const ALLOWED_ORIGINS = [
+  'https://i-camagu-1.onrender.com',
+  'https://i-camagu.onrender.com',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  ...(process.env.ALLOWED_ORIGINS || '').split(',').map((o) => o.trim()).filter(Boolean),
+];
+
 app.use(cors({
-  origin: true,
+  origin(origin, callback) {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+    return callback(new Error(`Origin not allowed by CORS: ${origin}`));
+  },
   credentials: true,
 }));
 app.use(express.json({ limit: '5mb' }));
@@ -90,6 +106,26 @@ app.use('/api/identity', identityRoutes);
 app.use(express.static(path.join(__dirname, '..', 'dist')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
+});
+
+// Last-resort handler. Express 4 doesn't catch errors thrown from async
+// handlers, but a synchronous throw or a next(err) would otherwise fall
+// through to Express's default handler, which leaks a stack trace to the
+// client in non-production. Log the detail, return a generic message.
+app.use((err, req, res, next) => {
+  console.error(`Unhandled error on ${req.method} ${req.path}:`, err?.message, err?.stack);
+  if (res.headersSent) return next(err);
+  res.status(500).json({ error: 'Something went wrong on our side. Please try again.' });
+});
+
+// A rejected promise nobody caught would otherwise terminate the process on
+// modern Node — taking the whole app down for every user over one bad
+// request. Log it and stay up; Render restarts on a real crash anyway.
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled promise rejection:', reason?.message || reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err?.message, err?.stack);
 });
 
 // budgetZAR/isPurchased are new columns the Prisma client's default SELECT
