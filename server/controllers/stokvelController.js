@@ -175,7 +175,26 @@ export async function getMyStokvels(req, res) {
       },
       orderBy: { joinedAt: 'desc' },
     });
-    res.json(memberships);
+
+    // groupLedger.totalBalance is what the whole group holds — it is NOT this
+    // member's money, and showing it under "your balance" would overstate what
+    // a person actually has in the group. Their own balance is the sum of
+    // their own confirmed contributions, so compute it properly.
+    const memberIds = memberships.map((m) => m.id);
+    const sums = memberIds.length
+      ? await prisma.contribution.groupBy({
+          by: ['memberId'],
+          where: { memberId: { in: memberIds }, status: 'CONFIRMED' },
+          _sum: { amount: true },
+        })
+      : [];
+    const byMember = Object.fromEntries(
+      sums.map((s) => [s.memberId, parseFloat(s._sum.amount || 0)])
+    );
+
+    res.json(
+      memberships.map((m) => ({ ...m, myBalance: byMember[m.id] || 0 }))
+    );
   } catch (error) {
     console.error('Get my stokvels error:', error.message);
     res.status(500).json({ error: 'Could not fetch stokvels' });

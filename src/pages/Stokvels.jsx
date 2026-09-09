@@ -1065,30 +1065,62 @@ function Stokvels({ onBack, onOpenShrineFund }) {
           onSecondary={() => setView('join')}
         />
       ) : (
-        <div className="space-y-2">
-          {myStokvels.map((m) => (
-            <button
-              key={m.id || m.stokvelId}
-              type="button"
-              onClick={() => fetchDetail(m.stokvelId)}
-              className={`w-full text-left flex items-center gap-3 ${cardBase} ${cardHover} ${cardActive}`}
-            >
-              <span className="w-9 h-9 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
-                <Icon name="landmark" size={16} color="#c45c26" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="font-bold text-sm text-ink">{m.stokvel?.name || 'Unnamed Stokvel'}</p>
-                <p className="text-xs text-ink-muted mt-0.5">
-                  {(m.stokvel?.type || 'UNKNOWN').replace(/_/g, ' ')} • {m.stokvel?._count?.members || 0} members
-                </p>
-              </div>
-              <p className="tabular text-sm font-bold text-terracotta flex-shrink-0">
-                R{Number(m.stokvel?.groupLedger?.totalBalance || 0).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-              </p>
-            </button>
-          ))}
-        </div>
+        <>
+          <SectionRule label="Member balances" trailing={new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })} />
+          <div className="space-y-3">
+            {myStokvels.map((m) => (
+              <button
+                key={m.id || m.stokvelId}
+                type="button"
+                onClick={() => fetchDetail(m.stokvelId)}
+                className={`w-full text-left bg-white border border-terracotta/15 rounded-soft overflow-hidden shadow-soft ${pressable}`}
+              >
+                <div className="flex items-center gap-3 p-4">
+                  <span className="w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
+                    <Icon name="landmark" size={18} color="#c45c26" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-display font-bold text-base text-ink leading-tight">{m.stokvel?.name || 'Unnamed Stokvel'}</p>
+                    <p className="text-xs text-ink-muted mt-0.5">
+                      {m.stokvel?._count?.members || 0} member{(m.stokvel?._count?.members || 0) === 1 ? '' : 's'}
+                    </p>
+                  </div>
+                  <Icon name="arrowRight" size={16} color="#8a8278" />
+                </div>
+                <div className="border-t border-cream-dark/70 px-4 py-3 flex items-end justify-between gap-3">
+                  <div>
+                    {/* This member's own confirmed contributions — not the
+                        group total, which is a different (larger) number. */}
+                    <p className="text-[10px] font-black uppercase tracking-widest text-ink-muted">Your balance</p>
+                    <p className="tabular font-display font-bold text-2xl text-ink mt-0.5">
+                      R{Number(m.myBalance || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <p className="text-[11px] text-ink-muted text-right leading-snug">
+                    Group holds<br />
+                    <span className="font-bold text-ink tabular">
+                      R{Number(m.stokvel?.groupLedger?.totalBalance || 0).toLocaleString('en-ZA', { maximumFractionDigits: 0 })}
+                    </span>
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </>
       )}
+    </div>
+  )
+}
+
+// Section header with a rule running to the edge — the device that gives the
+// Lovable layout its structure, and the reason it reads as sections rather
+// than a flat list of cards.
+function SectionRule({ label, trailing }) {
+  return (
+    <div className="flex items-center gap-3 mt-5 mb-3">
+      <p className="eyebrow text-ink-muted whitespace-nowrap">{label}</p>
+      <span className="h-px flex-1 bg-terracotta/25" />
+      {trailing && <p className="text-[11px] text-ink-muted whitespace-nowrap">{trailing}</p>}
     </div>
   )
 }
