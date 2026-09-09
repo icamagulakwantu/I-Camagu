@@ -7,20 +7,21 @@ import { shareToWhatsApp } from '../lib/whatsapp.js'
 import { cn } from '../lib/utils'
 import Icon from '../components/Icon.jsx'
 import ScrollableLabel from '../components/ScrollableLabel.jsx'
+import CeremonyIcon from '../components/CeremonyIcon.jsx'
 
 // --------------------------------------------------------------
 // Display‑ready ceremony types (from File 1)
 // --------------------------------------------------------------
 const CEREMONY_META = {
-  ULWALUKO: { name: 'Ulwaluko', emoji: '✂️', desc: 'Initiation & manhood' },
-  UMGIDI: { name: 'Umgidi', emoji: '🎉', desc: 'Homecoming celebration' },
-  INTAMBO_ENKULU: { name: 'Intambo Enkulu', emoji: '🔗', desc: 'Ceremony planning' },
-  UKUKHAPHA: { name: 'Ukukhapha', emoji: '🕊️', desc: 'Ceremony planning' },
-  INKOBE_ZIKA_MAMA: { name: 'Inkobe zikaMama', emoji: '🌾', desc: 'Ceremony planning' },
-  UKUBUYISA: { name: 'Ukubuyisa', emoji: '🏠', desc: 'Ceremony planning' },
-  UMSEBENZI_WEGQIRHA: { name: 'Umsebenzi weGqirha', emoji: '🌿', desc: 'Ceremony planning' },
-  WEDDING: { name: 'Wedding', emoji: '💍', desc: 'Marriage celebration' },
-  GENERAL_EVENT: { name: 'General Event', emoji: '📅', desc: 'Custom event' },
+  ULWALUKO: { name: 'Ulwaluko', desc: 'Initiation & manhood' },
+  UMGIDI: { name: 'Umgidi', desc: 'Homecoming celebration' },
+  INTAMBO_ENKULU: { name: 'Intambo Enkulu', desc: 'Ceremony planning' },
+  UKUKHAPHA: { name: 'Ukukhapha', desc: 'Ceremony planning' },
+  INKOBE_ZIKA_MAMA: { name: 'Inkobe zikaMama', desc: 'Ceremony planning' },
+  UKUBUYISA: { name: 'Ukubuyisa', desc: 'Ceremony planning' },
+  UMSEBENZI_WEGQIRHA: { name: 'Umsebenzi weGqirha', desc: 'Ceremony planning' },
+  WEDDING: { name: 'Wedding', desc: 'Marriage celebration' },
+  GENERAL_EVENT: { name: 'General Event', desc: 'Custom event' },
 }
 
 const mapDisplayTypeToBackend = (displayId) => displayId.toUpperCase()
@@ -836,7 +837,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
               'bg-white text-ink border-2 border-cream-dark hover:border-sage-300'
             )}
           >
-            <span className="text-lg">{type.emoji || '🎉'}</span>
+            <CeremonyIcon type={typeId} size={34} />
             <div className="text-left">
               <div className="text-xs leading-tight">{type.name || typeId.replace(/_/g, ' ')}</div>
               <div className="text-[10px] font-medium leading-tight text-ink-muted">{type.desc || 'Ceremony planning'}</div>
@@ -859,7 +860,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
               const t = CEREMONY_META[typeId] || {}
               return (
               <option key={typeId} value={mapDisplayTypeToBackend(typeId)}>
-                {t.emoji || '🎉'} {t.name || typeId.replace(/_/g, ' ')}
+                {t.name || typeId.replace(/_/g, ' ')}
               </option>
             )})}
           </select>

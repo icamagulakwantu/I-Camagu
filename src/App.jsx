@@ -147,9 +147,14 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
         <NotificationBell onOpen={() => onNavigate('notifications')} />
       </div>
 
-      {/* Homestead photo — the emotional opener */}
-      <div className="relative overflow-hidden rounded-soft mb-3 h-32 shadow-soft">
-        <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+      {/* Homestead photo — the emotional opener. Taller than a banner strip so
+          the whole scene reads: the cloth being laid, the family, the rondavel. */}
+      <div className="relative overflow-hidden rounded-soft mb-3 h-44 shadow-soft">
+        <img
+          src="/images/home-hero.jpg"
+          alt="A family preparing the homestead for a ceremony"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/15 to-transparent" />
       </div>
 

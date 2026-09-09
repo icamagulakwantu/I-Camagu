@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import CeremonyIcon from '../components/CeremonyIcon.jsx'
 
 const CEREMONY_META = {
-  ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', emoji: '⛰️', image: '/images/ceremonies/ulwaluko.jpg' },
-  UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', emoji: '🎉', image: '/images/ceremonies/umgidi.jpg' },
-  INTAMBO_ENKULU: { label: 'Intambo Enkulu', english: 'The great bond', desc: 'The ceremony that binds two families together.', emoji: '🔗', image: '/images/ceremonies/intambo-enkulu.jpg' },
-  UKUKHAPHA: { label: 'Ukukhapha', english: 'Accompanying the departed', desc: 'The rite that walks a loved one to the ancestors.', emoji: '🕊️', image: '/images/ceremonies/ukukhapha.jpg' },
-  INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: 'A thanksgiving rite honouring a mother\'s provision.', emoji: '🌾', image: '/images/ceremonies/inkobe-zika-mama.jpg' },
-  UKUBUYISA: { label: 'Ukubuyisa', english: 'Bringing the spirit home', desc: 'A year on, the departed is called back to the homestead.', emoji: '🏠', image: '/images/ceremonies/ukubuyisa.jpg' },
-  UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', english: "Healer's ritual", desc: 'A ceremony marking a traditional healer\'s calling.', emoji: '🌿', image: '/images/ceremonies/umsebenzi.jpg' },
-  WEDDING: { label: 'Wedding', english: 'Umtshato', desc: "Lobola talks, the handing over, and the two families' feast.", emoji: '💍', image: '/images/ceremonies/wedding.jpg' },
-  GENERAL_EVENT: { label: 'General Event', english: 'Any occasion', desc: 'A gathering the family must mark, on your own terms.', emoji: '📅' },
+  ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', image: '/images/ceremonies/ulwaluko.jpg' },
+  UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', image: '/images/ceremonies/umgidi.jpg' },
+  INTAMBO_ENKULU: { label: 'Intambo Enkulu', english: 'The great bond', desc: 'The ceremony that binds two families together.', image: '/images/ceremonies/intambo-enkulu.jpg' },
+  UKUKHAPHA: { label: 'Ukukhapha', english: 'Accompanying the departed', desc: 'The rite that walks a loved one to the ancestors.', image: '/images/ceremonies/ukukhapha.jpg' },
+  INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: 'A thanksgiving rite honouring a mother\'s provision.', image: '/images/ceremonies/inkobe-zika-mama.jpg' },
+  UKUBUYISA: { label: 'Ukubuyisa', english: 'Bringing the spirit home', desc: 'A year on, the departed is called back to the homestead.', image: '/images/ceremonies/ukubuyisa.jpg' },
+  UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', english: "Healer's ritual", desc: 'A ceremony marking a traditional healer\'s calling.', image: '/images/ceremonies/umsebenzi.jpg' },
+  WEDDING: { label: 'Wedding', english: 'Umtshato', desc: "Lobola talks, the handing over, and the two families' feast.", image: '/images/ceremonies/wedding.jpg' },
+  GENERAL_EVENT: { label: 'General Event', english: 'Any occasion', desc: 'A gathering the family must mark, on your own terms.' },
 }
 
 const STATUS_STYLE = {
@@ -79,8 +80,8 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
               )}
               <div className="relative">
                 <span className="eyebrow text-cream/75">{leadMeta.english}</span>
-                <h3 className="mt-1 font-display text-2xl text-cream flex items-center gap-2">
-                  <span className="text-3xl">{leadMeta.emoji}</span> {leadMeta.label}
+                <h3 className="mt-1 font-display text-2xl text-cream flex items-center gap-2.5">
+                  <CeremonyIcon type={leadType} tone="light" size={40} /> {leadMeta.label}
                 </h3>
                 <p className="mt-2 text-[13px] leading-relaxed text-cream/85 max-w-[85%]">{leadMeta.desc}</p>
                 <span className="mt-4 inline-block rounded-pill bg-white/15 px-4 py-2 text-[13px] font-bold text-white">
@@ -96,11 +97,7 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
               return (
                 <button key={type} onClick={() => onOpenType(type)}
                   className="card-paper grain w-full text-left overflow-hidden p-4 flex items-center gap-4 active:scale-[0.98] transition-transform">
-                  {meta.image ? (
-                    <img src={meta.image} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
-                  ) : (
-                    <span className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-2xl flex-shrink-0">{meta.emoji || '🎉'}</span>
-                  )}
+                  <CeremonyIcon type={type} size={48} />
                   <div className="min-w-0">
                     <p className="font-display font-bold text-ink">{meta.label || type.replace(/_/g, ' ')}</p>
                     {meta.english && <p className="text-[10px] uppercase tracking-[0.1em] text-brand-ochre font-bold mt-0.5">{meta.english}</p>}
