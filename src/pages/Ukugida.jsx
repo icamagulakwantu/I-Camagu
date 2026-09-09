@@ -6,6 +6,7 @@ import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { cn } from '../lib/utils'
 import Icon from '../components/Icon.jsx'
+import ScrollableLabel from '../components/ScrollableLabel.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
@@ -328,7 +329,7 @@ export default function Ukugida({ onBack }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">
-                    <p className="font-bold text-sm text-ink truncate">{entry.itemDescription}</p>
+                    <ScrollableLabel className="flex-1 min-w-0 font-bold text-sm text-ink">{entry.itemDescription}</ScrollableLabel>
                     <span className={cn(
                       'text-xs font-bold px-2 py-0.5 rounded-pill flex-shrink-0',
                       entry.direction === 'RECEIVED' ? 'bg-sage-50 text-sage-700' : 'bg-cream-dark text-ink-muted'

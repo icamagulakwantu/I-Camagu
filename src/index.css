@@ -167,3 +167,28 @@
 .tabular {
   font-variant-numeric: tabular-nums;
 }
+
+/* Long checklist labels ("Axe, knife, wire/cable ties, firewood...") used to
+   be cut off with an ellipsis, so the user could never read the rest. Now the
+   label itself swipes sideways under the user's finger. The scrollbar is
+   hidden (it would sit under every row on desktop), and overscroll-behavior
+   stops a swipe that reaches the end from dragging the page with it. */
+.scroll-x-text {
+  display: block;
+  white-space: nowrap;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-x-text::-webkit-scrollbar {
+  display: none;
+}
+
+/* Applied only while there is still text off to the right, so it reads as
+   "keep going" — and disappears once the user reaches the end, leaving the
+   final words fully legible rather than permanently faded. */
+.scroll-x-text--more {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent 100%);
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent 100%);
+}

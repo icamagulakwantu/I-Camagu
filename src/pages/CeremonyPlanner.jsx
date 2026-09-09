@@ -6,6 +6,7 @@ import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { shareToWhatsApp } from '../lib/whatsapp.js'
 import { cn } from '../lib/utils'
 import Icon from '../components/Icon.jsx'
+import ScrollableLabel from '../components/ScrollableLabel.jsx'
 
 // --------------------------------------------------------------
 // Display‑ready ceremony types (from File 1)
@@ -490,9 +491,9 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
                       >
                         {item.isPurchased && <Icon name="check" size={13} color="#fff" strokeWidth={2.5} />}
                       </div>
-                      <span className={cn('flex-1 min-w-0 text-sm font-medium truncate', item.isPurchased ? 'text-ink-muted line-through' : 'text-ink')}>
+                      <ScrollableLabel className={cn('flex-1 min-w-0 text-sm font-medium', item.isPurchased ? 'text-ink-muted line-through' : 'text-ink')}>
                         {item.label}
-                      </span>
+                      </ScrollableLabel>
                     </button>
                     {lineTotal > 0 && (
                       <span className={cn('tabular text-sm font-bold flex-shrink-0', item.isPurchased ? 'text-sage-600' : 'text-ink-muted')}>
@@ -662,14 +663,14 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
                   >
                     {(item.isCompleted || item.isChecked) && <Icon name="check" size={13} color="#fff" strokeWidth={2.5} />}
                   </div>
-                  <span
+                  <ScrollableLabel
                     className={cn(
-                      'text-sm font-medium transition-all duration-200 truncate',
+                      'flex-1 min-w-0 text-sm font-medium transition-all duration-200',
                       (item.isCompleted || item.isChecked) ? 'text-ink-muted line-through' : 'text-ink'
                     )}
                   >
                     {item.label}
-                  </span>
+                  </ScrollableLabel>
                 </button>
                 {!item.ceremonyId && (
                   <div className="flex-shrink-0 text-right">
