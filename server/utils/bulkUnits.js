@@ -30,6 +30,16 @@ export const UNITS = {
   each: ['item', 'items'],
 };
 
+// Drinks always come in cases, whatever the product happens to be called.
+// Checked before any name rule so a beer like "Castle Milk Stout" can't be
+// caught by the rule meant for a 2L bottle of milk — which is exactly what
+// happened the first time this ran.
+const CASE_CATEGORIES = new Set([
+  'BEER', 'BRANDY', 'CHAMPAGNE', 'CIDER_RTD', 'COGNAC', 'GIN', 'LIQUEUR',
+  'SPARKLING', 'TEQUILA', 'TEQUILA_PREMIUM', 'VODKA', 'VODKA_PREMIUM',
+  'WHISKY', 'WINE', 'WINE_BOX', 'MIXER', 'SOFT_DRINKS', 'WATER',
+]);
+
 // Matched in order — the first rule that fits wins, so specific product
 // names beat broad category rules.
 const RULES = [
@@ -74,6 +84,7 @@ const RULES = [
 // Everything else — all the alcohol categories, mixers, soft drinks — really
 // does come in cases, which is the default.
 export function resolveBulkUnit(sku) {
+  if (CASE_CATEGORIES.has(sku.category)) return 'case';
   for (const rule of RULES) {
     if (rule.category && sku.category !== rule.category) continue;
     if (rule.name && !rule.name.test(sku.name || '')) continue;
