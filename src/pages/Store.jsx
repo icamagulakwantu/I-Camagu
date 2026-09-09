@@ -5,7 +5,7 @@ import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf, aisleOf } from '../data/storeTaxonomy.js'
-import { unitOf } from '../data/bulkUnits.js'
+import { unitOf, collectiveNoun } from '../data/bulkUnits.js'
 
 function Store({ onGoToBasket, basketCount }) {
   const { accessToken } = useAuth()
@@ -120,7 +120,7 @@ function Store({ onGoToBasket, basketCount }) {
       <div className="wash-ember grain card-paper mx-4 mt-4 p-4">
         <p className="eyebrow text-cream/75 mb-1">Smart Match — Bulk Buying</p>
         <p className="text-sm font-bold leading-snug text-cream">
-          Add cases to your cart and iCamagu pools your order with other members — even from other stokvels — buying meat, livestock, alcohol, drinks or dry goods from the same supplier. Once the group hits the minimum, everyone unlocks bulk pricing.
+          Add items to your cart and iCamagu pools your order with other members — even from other stokvels — buying meat, livestock, alcohol, drinks or dry goods from the same supplier. Once the group hits the minimum, everyone unlocks bulk pricing.
         </p>
       </div>
 
@@ -207,6 +207,11 @@ function Store({ onGoToBasket, basketCount }) {
                       {savings !== null && (
                         <p className="text-[11px] font-bold text-sage-700">
                           Save R{savings.toFixed(2)} vs retail
+                        </p>
+                      )}
+                      {collectiveNoun(sku) && (
+                        <p className="text-[11px] text-ink-muted">
+                          Bought per head — pooled together they make a {collectiveNoun(sku)}
                         </p>
                       )}
                     </div>

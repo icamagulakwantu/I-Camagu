@@ -14,3 +14,15 @@ export function unitOfPlural(sku, quantity) {
 export function quantityLabel(sku, quantity) {
   return `${quantity} ${unitOfPlural(sku, quantity)}`
 }
+
+// You buy livestock per head, but a group of them has its own name — and the
+// names differ by animal. Cattle and goats form a HERD; sheep form a FLOCK.
+// Returns null for anything that isn't a live animal, so nothing else picks
+// up an animal word by accident.
+export function collectiveNoun(sku) {
+  if (unitOf(sku) !== 'head') return null
+  const name = (sku?.name || '').toLowerCase()
+  if (sku?.category !== 'LIVESTOCK_ANIMAL') return null // cabbage is also sold per head
+  if (/sheep|gusha|hlama/.test(name)) return 'flock'
+  return 'herd' // cattle, oxen, goats
+}
