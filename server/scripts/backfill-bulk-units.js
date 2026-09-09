@@ -4,16 +4,26 @@ import { resolveBulkUnit, labelsFor } from '../utils/bulkUnits.js';
 // Classifies every Sku with the unit it is actually bought in. Idempotent:
 // re-running only writes rows whose unit has changed, so a normal boot is a
 // no-op once the catalogue is classified.
+// Deliberately raw SQL rather than the Prisma client. This runs immediately
+// after ensure-schema adds the columns, and a generated client that predates
+// them makes `select: { bulkUnit: true }` throw PrismaClientValidationError
+// — which is exactly how this silently failed the first time. Raw SQL talks
+// to the columns that actually exist right now.
 export async function backfillBulkUnits() {
-  const skus = await prisma.sku.findMany({
-    select: { id: true, name: true, category: true, bulkUnit: true },
-  });
+  const skus = await prisma.$queryRawUnsafe(
+    'SELECT id, name, category, "bulkUnit" FROM "Sku"'
+  );
 
   let updated = 0;
   for (const sku of skus) {
     const labels = labelsFor(resolveBulkUnit(sku));
     if (sku.bulkUnit === labels.bulkUnit) continue;
-    await prisma.sku.update({ where: { id: sku.id }, data: labels });
+    await prisma.$executeRawUnsafe(
+      'UPDATE "Sku" SET "bulkUnit" = $1, "bulkUnitPlural" = $2 WHERE id = $3',
+      labels.bulkUnit,
+      labels.bulkUnitPlural,
+      sku.id
+    );
     updated++;
   }
 
