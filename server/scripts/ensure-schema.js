@@ -70,6 +70,11 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "ShrineTithe" ADD COLUMN IF NOT EXISTS "referenceUrl" TEXT;'
   );
+  // What iCamagu pays a supplier per case — admin-only, never exposed on the
+  // public catalogue. Nullable: unknown cost is honest, a guessed one is not.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Sku" ADD COLUMN IF NOT EXISTS "costPriceZAR" DECIMAL(10,2);'
+  );
   // What one buying unit is actually called — only alcohol and tinned goods
   // come in "cases". See server/utils/bulkUnits.js.
   await prisma.$executeRawUnsafe(

@@ -11,6 +11,17 @@ export async function getCatalogue(req, res) {
     const skus = await prisma.sku.findMany({
       where,
       orderBy: [{ category: 'asc' }, { name: 'asc' }],
+      // Explicit field list, not the whole row: costPriceZAR is what we pay a
+      // supplier and must never reach a member. Selecting everything by
+      // default would have shipped it to the browser the moment the column
+      // was added. Any new sensitive column is excluded here by default.
+      select: {
+        id: true, name: true, category: true, productType: true,
+        bottleFormat: true, unitsPerCase: true, casePriceZAR: true,
+        palletPackQty: true, palletPriceZAR: true, supplierPortfolio: true,
+        imageUrl: true, retailPriceZAR: true,
+        bulkUnit: true, bulkUnitPlural: true, createdAt: true,
+      },
     });
 
     res.json(skus);

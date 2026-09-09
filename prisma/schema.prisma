@@ -509,6 +509,11 @@ model Sku {
   supplierPortfolio String?
   imageUrl          String?
   retailPriceZAR    Decimal? @db.Decimal(10, 2)
+  // What iCamagu actually pays a supplier for one case. Admin-only — never
+  // returned by the public catalogue endpoint. Without it the app cannot
+  // report a margin, and nothing stops a price being listed below cost,
+  // which is exactly how Hennessy came to sit R22 under its own cost.
+  costPriceZAR      Decimal? @db.Decimal(10, 2)
   // What a single buying unit of this product is actually called. Only
   // alcohol and tinned goods come in "cases" — onions come in pockets,
   // maize meal in bags, live animals are counted per head. Defaults keep

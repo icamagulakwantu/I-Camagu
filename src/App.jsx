@@ -24,6 +24,7 @@ import Portal from './pages/Portal.jsx'
 import Ekoyini from './pages/Ekoyini.jsx'
 import EkoyiniAdmin from './pages/EkoyiniAdmin.jsx'
 import IdentityAdmin from './pages/IdentityAdmin.jsx'
+import MarginAdmin from './pages/MarginAdmin.jsx'
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import Hierarchy from './pages/Hierarchy.jsx'
 import MyOrders from './pages/MyOrders.jsx'
@@ -73,6 +74,7 @@ const MORE_SCREENS = [
   'ekoyini',
   'ekoyiniadmin',
   'identityadmin',
+  'marginadmin',
   'privacy',
   'hierarchy',
   'myorders',
@@ -528,6 +530,8 @@ function MainApp() {
         return <EkoyiniAdmin onBack={goMore} />
       case 'identityadmin':
         return <IdentityAdmin onBack={goMore} />
+      case 'marginadmin':
+        return <MarginAdmin onBack={goMore} />
       case 'hierarchy':
         return <Hierarchy onBack={goMore} />
       case 'myorders':

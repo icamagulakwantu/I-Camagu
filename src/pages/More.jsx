@@ -33,6 +33,7 @@ const SECTIONS = [
       { id: 'ekoyini', icon: 'cocktail', label: 'Ekoyini Mobile Bar' },
       { id: 'ekoyiniadmin', icon: 'settings', label: 'Ekoyini Admin' },
       { id: 'identityadmin', icon: 'key', label: 'Identity Admin' },
+      { id: 'marginadmin', icon: 'chart', label: 'Cost & Margin' },
       { id: 'portal', icon: 'image', label: 'Digital Portal' },
       { id: 'directory', icon: 'book', label: 'Directory' },
     ],

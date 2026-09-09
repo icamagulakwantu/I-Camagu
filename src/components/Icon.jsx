@@ -29,6 +29,7 @@ const PATHS = {
   book: <><path d="M5 5.5A2.5 2.5 0 017.5 4H19v15H7.5A2.5 2.5 0 005 16.5z" /><path d="M19 19H7.5A2.5 2.5 0 015 16.5" /></>,
   user: <><circle cx="12" cy="8" r="3.5" /><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" /></>,
   activity: <path d="M4 12h4l2-7 4 14 2-7h4" />,
+  chart: <><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></>,
   key: <><circle cx="8" cy="15" r="3.5" /><path d="M10.5 12.5L19 4M15.5 8L18 10.5M12.5 11L15 13.5" /></>,
   lock: <><rect x="5" y="11" width="14" height="9" rx="1.5" /><path d="M8 11V8a4 4 0 018 0v3" /></>,
   help: <><circle cx="12" cy="12" r="8.5" /><path d="M9.5 9.3a2.5 2.5 0 114 2c-.8.6-1.5 1.1-1.5 2.2" /><path d="M12 17.2v.1" /></>,
