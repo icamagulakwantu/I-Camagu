@@ -17,6 +17,7 @@ import { backfillBrandImages } from './scripts/backfill-brand-images.js';
 import { backfillSpiritPricing } from './scripts/backfill-spirit-pricing.js';
 import { backfillCeremonySkus } from './scripts/backfill-ceremony-skus.js';
 import { backfillCatalogueExpansion } from './scripts/backfill-catalogue-expansion.js';
+import { backfillBulkUnits, backfillVerifiedRetailPrices } from './scripts/backfill-bulk-units.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -167,6 +168,12 @@ ensureCeremonyBudgetColumns()
       });
       await backfillCatalogueExpansion().catch((err) => {
         logBackfillError('Catalogue expansion SKU backfill', err);
+      });
+      await backfillBulkUnits().catch((err) => {
+        logBackfillError('Bulk unit backfill', err);
+      });
+      await backfillVerifiedRetailPrices().catch((err) => {
+        logBackfillError('Verified retail price backfill', err);
       });
     })();
   });

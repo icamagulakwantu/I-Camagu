@@ -70,6 +70,14 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "ShrineTithe" ADD COLUMN IF NOT EXISTS "referenceUrl" TEXT;'
   );
+  // What one buying unit is actually called — only alcohol and tinned goods
+  // come in "cases". See server/utils/bulkUnits.js.
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "Sku" ADD COLUMN IF NOT EXISTS "bulkUnit" TEXT NOT NULL DEFAULT 'case';`
+  );
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "Sku" ADD COLUMN IF NOT EXISTS "bulkUnitPlural" TEXT NOT NULL DEFAULT 'cases';`
+  );
   // Rolling-window pool cap (see server/utils/poolWindow.js): bounds how
   // large a single SmartMatch pool can grow before new baskets are routed
   // to a fresh pool instead.

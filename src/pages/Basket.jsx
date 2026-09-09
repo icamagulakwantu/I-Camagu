@@ -6,6 +6,7 @@ import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf } from '../data/storeTaxonomy.js'
 import { getTierForCases, palletsForCases } from '../data/smartMatchTiers.js'
+import { unitOf, quantityLabel } from '../data/bulkUnits.js'
 
 // This pool's rolling window closes on windowDeadline — after that, new
 // baskets join a fresh pool instead of piling onto this one. Real data
@@ -157,9 +158,9 @@ export default function Basket({ onBack, onBasketChanged }) {
   const shareBasket = () => {
     if (!basketData.items || basketData.items.length === 0) return
     const text = basketData.items
-      .map((i) => `${i.sku?.name || 'Item'} x${i.quantity} case(s)`)
+      .map((i) => `${i.sku?.name || 'Item'} x${quantityLabel(i.sku, i.quantity)}`)
       .join('\n')
-    const summary = `My Wholesale Cart:\n\n${text}\n\nTotal Cases: ${basketData.totalCases}\nTotal: R${basketData.totalZAR.toFixed(2)}`
+    const summary = `My Wholesale Cart:\n\n${text}\n\nTotal units: ${basketData.totalCases}\nTotal: R${basketData.totalZAR.toFixed(2)}`
 
     if (navigator.share) {
       navigator.share({ title: 'My Wholesale Cart', text: summary }).catch(() => {})
@@ -242,7 +243,7 @@ export default function Basket({ onBack, onBasketChanged }) {
                 />
               </div>
               <p className="text-xs text-white/90 mb-2">
-                {poolStatus.currentCases}/{poolStatus.moqTarget} cases pooled — {Math.max(0, poolStatus.moqTarget - poolStatus.currentCases)} more to unlock bulk pricing
+                {poolStatus.currentCases}/{poolStatus.moqTarget} units pooled — {Math.max(0, poolStatus.moqTarget - poolStatus.currentCases)} more to unlock bulk pricing
               </p>
               {poolStatus.windowDeadline && (
                 <p className="text-[11px] text-white/75 mb-2">{windowClosesLabel(poolStatus.windowDeadline)}</p>
@@ -264,7 +265,7 @@ export default function Basket({ onBack, onBasketChanged }) {
         <EmptyState
           emoji="🛒"
           title="Your cart is empty"
-          description="Browse the Store to add cases toward a collective order."
+          description="Browse the Store to add items toward a collective order."
           primaryLabel="Go to Store"
           onPrimary={onBack}
         />
@@ -309,7 +310,7 @@ export default function Basket({ onBack, onBasketChanged }) {
                             <h3 className="font-bold text-sm text-ink truncate">{item.sku?.name || 'Item'}</h3>
                             <p className="text-xs text-ink-muted">{item.sku?.bottleFormat || 'Standard Wholesale'}</p>
                             <p className="text-sm font-bold text-sage-600">
-                              R{parseFloat(item.sku?.casePriceZAR || 0).toFixed(2)} / case
+                              R{parseFloat(item.sku?.casePriceZAR || 0).toFixed(2)} / {unitOf(item.sku)}
                             </p>
                           </div>
 
@@ -342,7 +343,7 @@ export default function Basket({ onBack, onBasketChanged }) {
           {/* Totals Summary */}
           <div className="bg-sage-50 border-2 border-sage-500 rounded-soft p-4 mb-4">
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-ink-light">Total cases</span>
+              <span className="text-ink-light">Total units</span>
               <span className="font-bold text-ink">{basketData.totalCases}</span>
             </div>
             <div className="flex justify-between items-center">

@@ -509,6 +509,12 @@ model Sku {
   supplierPortfolio String?
   imageUrl          String?
   retailPriceZAR    Decimal? @db.Decimal(10, 2)
+  // What a single buying unit of this product is actually called. Only
+  // alcohol and tinned goods come in "cases" — onions come in pockets,
+  // maize meal in bags, live animals are counted per head. Defaults keep
+  // the old wording for anything not yet classified.
+  bulkUnit          String   @default("case")
+  bulkUnitPlural    String   @default("cases")
   createdAt         DateTime @default(now())
 
   basketItems BasketItem[]

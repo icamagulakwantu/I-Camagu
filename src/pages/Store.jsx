@@ -5,6 +5,7 @@ import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf, aisleOf } from '../data/storeTaxonomy.js'
+import { unitOf } from '../data/bulkUnits.js'
 
 function Store({ onGoToBasket, basketCount }) {
   const { accessToken } = useAuth()
@@ -197,10 +198,11 @@ function Store({ onGoToBasket, basketCount }) {
                       <p className="eyebrow text-terracotta/70">{dept.short}</p>
                       <h3 className="font-display font-bold text-sm text-ink truncate">{sku.name}</h3>
                       <p className="text-xs text-ink-muted">
-                        {sku.bottleFormat ? `${sku.bottleFormat} • ` : ''}{sku.unitsPerCase} per case
+                        {sku.bottleFormat ? `${sku.bottleFormat} • ` : ''}
+                        {sku.unitsPerCase > 1 ? `${sku.unitsPerCase} per ${unitOf(sku)}` : `per ${unitOf(sku)}`}
                       </p>
                       <p className="text-sm font-bold text-terracotta">
-                        R{casePrice.toFixed(2)} / case
+                        R{casePrice.toFixed(2)} / {unitOf(sku)}
                       </p>
                       {savings !== null && (
                         <p className="text-[11px] font-bold text-sage-700">
@@ -214,7 +216,7 @@ function Store({ onGoToBasket, basketCount }) {
                     disabled={addingId === sku.id}
                     className="bg-terracotta text-white text-xs font-bold px-4 py-2 rounded-pill active:scale-90 transition-transform disabled:opacity-50 mr-3 flex-shrink-0"
                   >
-                    {addingId === sku.id ? <Icon name="check" size={13} color="#fff" strokeWidth={2.5} /> : 'Add case'}
+                    {addingId === sku.id ? <Icon name="check" size={13} color="#fff" strokeWidth={2.5} /> : `Add ${unitOf(sku)}`}
                   </button>
                 </div>
               )
