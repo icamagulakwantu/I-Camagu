@@ -3,12 +3,24 @@
 // automatically on deploy. These are general Store SKUs, not tied to any
 // ceremony checklist — real non-alcoholic beverages, real meat cuts,
 // general livestock, ceremony vegetables/sides, and dry goods, for
-// households and pools that aren't buying alcohol.
+// households and pools that aren't buying alcohol — plus any ceremony-staple
+// alcohol added after the original seed.
 // Upsert on [name, bottleFormat] — safe to re-run.
 import prisma from '../config/db.js';
 import { upsertSkuByNameAndBottleFormat } from '../utils/upsertSku.js';
 
 const CATALOGUE_EXPANSION_SKUS = [
+  // Commando is the brandy most likely to appear at a Xhosa ceremony, and it
+  // was missing from the catalogue entirely. Prices below are the real
+  // figures found published in September 2026 — Ultra Liquors listed the
+  // 12 x 750ml case at R2 349.00, and Checkers/Shoprite the single bottle at
+  // R229.99 (x12 = R2 759.88 for the retail comparable).
+  //
+  // TREAT THE CASE PRICE AS A PLACEHOLDER. It is an outlet's published case
+  // price, not a negotiated trade price, so buying at it leaves no margin —
+  // exactly the problem flagged in the pricing review. Replace it with a real
+  // quote once the Gqeberha price sheet comes back.
+  { name: 'Commando Brandy', category: 'BRANDY', productType: 'ALCOHOL', bottleFormat: '750ml Bottle', unitsPerCase: 12, casePriceZAR: 2349.00, palletPackQty: 60, palletPriceZAR: 135067.50, supplierPortfolio: 'Heineken (Distell)', retailPriceZAR: 2759.88 },
   { name: 'Coca-Cola 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
   { name: 'Sprite 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
   { name: 'Fanta Orange 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
