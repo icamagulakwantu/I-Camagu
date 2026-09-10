@@ -44,7 +44,11 @@ const COST_RATES = {
     goat_white: 3000.00,  // No separate source. Held level with the standard goat rather than below it - a white goat is specifically sought and may carry a premium; worth checking
     goat_standard: 3000.00,  // Ceremonial inkabi goat. SamMeatsNeeds pkg 1 implies R3000; Digikraal does-with-kids R3044 agrees
     sheep: 3000.00,  // Ceremonial inkabi. SamMeatsNeeds pkg 1 implies R3000
-    sheep_with_horns: 3000.00,  // Ceremonial inkabi (wether). SamMeatsNeeds pkg 1 implies R3000
+    sheep_with_horns: 3000.00,
+    // Sybok — a goat/sheep cross, and the animal customarily used for
+    // uMojiso at entabeni during ulwaluko. It is its own beast, not a
+    // substitute for a sheep or a goat, so it gets its own rate.
+    sybok: 3000.00,  // Ceremonial inkabi (wether). SamMeatsNeeds pkg 1 implies R3000
     fowl: 150.00,
   },
   food: {
@@ -148,7 +152,7 @@ const ULWALUKO_DEFAULT_ITEMS = [
   { phase: 'DAILY_ESSENTIALS', label: 'A book' },
   { phase: 'DIET_EARLY_STAGE', label: 'No-salt food, steamed bread, spinach/cabbage' },
   { phase: 'DIET_EARLY_STAGE', label: 'Green apples and low-water-content fruit' },
-  { phase: 'UMOJISO', label: 'Sheep (preferably with horns) or goat for uMojiso' },
+  { phase: 'UMOJISO', label: 'Sybok for uMojiso (sheep or goat if no sybok is available)' },
   { phase: 'UMOJISO', label: 'Minimum 4 bottles of brandy, 2 cases of beer (1 bottle for peers)' },
   { phase: 'EXIT_PREPARATION', label: 'Fresh white blanket with black stripes' },
   { phase: 'EXIT_PREPARATION', label: 'Correct type of butter (confirm with family)' },
@@ -342,7 +346,7 @@ const ULWALUKO_COST_PROFILE = {
     { label: 'Green apples and low-water-content fruit', category: 'food', unit: 'kg', unitCost: COST_RATES.food.green_apples_kg, quantity: 5, isInputField: true, inputType: 'number', suggestedAmount: '5 kg apples', skuName: 'Green Apples (per kg)' },
   ],
   'UMOJISO': [
-    { label: 'Sheep (preferably with horns) or goat for uMojiso', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.sheep_with_horns, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Sheep ~R3,000', skuName: 'Sheep' },
+    { label: 'Sybok for uMojiso (sheep or goat if no sybok is available)', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.sybok, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Sybok ~R3,000', skuName: 'Sybok' },
     { label: 'Minimum 4 bottles of brandy, 2 cases of beer (1 bottle for peers)', category: 'alcohol', unit: 'mixed', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '4 brandy + 2 beer cases' },
   ],
   'EXIT_PREPARATION': [
