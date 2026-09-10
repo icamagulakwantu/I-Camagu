@@ -1,23 +1,38 @@
 // ============================================================================
-// COST ESTIMATION CONSTANTS — Market rates (ZAR), updated periodically
+// COST ESTIMATION CONSTANTS — Market rates (ZAR)
+//
+// These drive the budget a family sees when planning a ceremony. Nothing here
+// filters through the VERIFIED/ESTIMATE flag that guards Sku.retailPriceZAR,
+// so a wrong number lands straight in someone's plan and they under-budget for
+// a ceremony they cannot afford to get wrong.
+//
+// Rule: a rate only changes when the change can name a shop and a date. Lines
+// carrying a trailing comment were checked against a real listing on that
+// date. Lines without one are still the original estimates — treat them as
+// unverified and do not adjust them by "inflation" or a general benchmark.
 // ============================================================================
 
 const COST_RATES = {
   alcohol: {
-    brandy_750ml: 210.00,
-    gin_750ml: 240.00,
-    whisky_750ml: 320.00,
-    beer_case_24: 380.00,
+    brandy_750ml: 195.00,  // Ultra Liquors 10 Sep 2026: Commando R196.99, KWV 3yr R179.99, Klipdrift Export R174.91/btl in case
+    gin_750ml: 160.00,  // Ultra Liquors 10 Sep 2026: Old Buck R154.99, Gordon's R169.99, Strettons R145.75
+    whisky_750ml: 200.00,  // Ultra Liquors 10 Sep 2026: Three Ships R179.99, Bell's/J&B R199.99, Harrier R159.99
+    beer_case_24: 330.00,  // Ultra + Prestons 10 Sep 2026: Castle Lager 24x500ml R299.99, Black Label R329.99, Castle Lite R364.99
     beer_bottle: 20.00,
     umqombothi_bhekile: 35.00,
     umqombothi_50l_drum: 850.00,
-    wine_750ml: 120.00,
-    cognac_750ml: 600.00,
+    wine_750ml: 80.00,  // Ultra Liquors 10 Sep 2026: Graca R59.99, Van Loveren R69.99, Alto Rouge R114.99
+    cognac_750ml: 500.00,  // Ultra Liquors 10 Sep 2026: Hennessy VS R499.99, Honor VS R499.99
     vodka_750ml: 200.00,
   },
   livestock: {
+    // UNVERIFIED. This key names an animal we cannot identify: "inkunzi" is a
+    // bull, but the catalogue SKU says "Cow / Ox". Digikraal 10 Sep 2026 has
+    // Bulls avg R31,751, Cows R14,612, Oxen R12,722 — so R22,000 is either a
+    // third under the market or nearly double it, depending which beast we
+    // actually supply. Decide bull vs ox before repricing this line.
     male_ox_inkunzi: 22000.00,
-    female_cow_inkomo: 18000.00,
+    female_cow_inkomo: 14612.00,  // Digikraal 10 Sep 2026: Cows avg R14,612 (R8,500-20,000, n=38) - cleanest cattle row
     goat_white: 2800.00,
     goat_standard: 2200.00,
     sheep: 2500.00,
@@ -28,10 +43,10 @@ const COST_RATES = {
     maize_meal_50kg: 520.00,
     maize_meal_12_5kg: 145.00,
     rice_10kg: 195.00,
-    cooking_oil_5l: 190.00,
+    cooking_oil_5l: 158.95,  // Makro 10 Sep 2026: Great Value 5L R158.95 (SunStar R152.95, Econo R147.99 at Game)
     spinach_bundle: 25.00,
     cabbage_head: 22.00,
-    potatoes_10kg: 110.00,
+    potatoes_10kg: 113.99,  // Pick n Pay 10 Sep 2026: PnP Potatoes 10kg R113.99
     onions_10kg: 95.00,
     carrots_10kg: 95.00,
     green_pepper_kg: 32.00,
@@ -40,13 +55,13 @@ const COST_RATES = {
     green_apples_kg: 38.00,
     butter_500g: 85.00,
     salt_1kg: 18.00,
-    sugar_10kg: 245.00,
+    sugar_10kg: 232.25,  // Makro 10 Sep 2026: Selati Pure White 10kg R232.25 (Huletts R239.95)
     inkobe_white_maize_kg: 22.00,
     brown_bread_loaf: 20.00,
     milk_2l: 35.00,
     instant_coffee_750g: 165.00,
     peanut_butter_400g: 50.00,
-    flour_2_5kg: 40.00,
+    flour_2_5kg: 34.99,  // Food Lover's Market William Moffett 10 Sep 2026: Snowflake cake flour 2.5kg R34.99
     tea_100bags: 60.00,
   },
   supplies: {
@@ -55,13 +70,13 @@ const COST_RATES = {
     bhekile_can: 35.00,
     plastic_plate_pack_50: 95.00,
     plastic_spoon_pack_50: 45.00,
-    blanket_white_striped: 450.00,
-    blanket_plain: 350.00,
+    blanket_white_striped: 425.00,  // Aranda 10 Sep 2026: Ingcawe Xhosa white/black R425 (Blankets of Africa poly R349)
+    blanket_plain: 189.00,  // Makro 10 Sep 2026: Aranda 150x200 rewool grey R189 (Aranda Boxer grey/white R229)
     grass_mat_ikhukho: 150.00,
-    tarpaulin_sail: 350.00,
+    tarpaulin_sail: 375.00,  // Leroy Merlin 10 Sep 2026: 70gr 5x8m with eyelets R375 (140gr R679)
     poles_bundle: 450.00,
     firewood_bundle: 95.00,
-    water_container_25l: 180.00,
+    water_container_25l: 129.99,  // Mambo's 10 Sep 2026: 25L canister with tap R129.99 (25L polycan drum R55 at Foamy)
     matches_box: 15.00,
     candles_pack: 35.00,
     lamp_paraffin: 120.00,
