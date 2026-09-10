@@ -11,7 +11,12 @@ export async function upsertSkuByNameAndBottleFormat(prisma, item, updateData) {
   const bottleFormat = item.bottleFormat ?? null;
   const existing = await prisma.sku.findFirst({ where: { name: item.name, bottleFormat } });
   if (existing) {
-    await prisma.sku.update({ where: { id: existing.id }, data: updateData });
+    // No updateData means create-only: the row exists, so leave it exactly as
+    // the business last set it. Passing {} is how a caller says "fill the gap
+    // if it is missing, otherwise keep your hands off".
+    if (updateData && Object.keys(updateData).length > 0) {
+      await prisma.sku.update({ where: { id: existing.id }, data: updateData });
+    }
   } else {
     await prisma.sku.create({ data: item });
   }
