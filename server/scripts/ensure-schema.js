@@ -83,6 +83,26 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     `ALTER TABLE "Sku" ADD COLUMN IF NOT EXISTS "bulkUnitPlural" TEXT NOT NULL DEFAULT 'cases';`
   );
+  // Provenance for retailPriceZAR. Without this the catalogue cannot tell a
+  // price somebody checked from a price something guessed, and a "you save
+  // R80" claim could be built on the guess. The public endpoint withholds
+  // the price unless the source is VERIFIED.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Sku" ADD COLUMN IF NOT EXISTS "retailPriceSource" TEXT;'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Sku" ADD COLUMN IF NOT EXISTS "retailPriceCheckedAt" TIMESTAMP(3);'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Sku" ADD COLUMN IF NOT EXISTS "retailPriceNote" TEXT;'
+  );
+  // The retail prices that predate this column were each checked by hand
+  // against a named shop before being entered, so they start VERIFIED. Rows
+  // without a price stay null on all three.
+  await prisma.$executeRawUnsafe(
+    `UPDATE "Sku" SET "retailPriceSource" = 'VERIFIED'
+      WHERE "retailPriceZAR" IS NOT NULL AND "retailPriceSource" IS NULL;`
+  );
   // Rolling-window pool cap (see server/utils/poolWindow.js): bounds how
   // large a single SmartMatch pool can grow before new baskets are routed
   // to a fresh pool instead.

@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import { PUBLIC_SKU_SELECT, toPublicItem } from '../utils/skuVisibility.js';
 
 async function getOrCreateDraftBasket(userId) {
       let basket = await prisma.basket.findFirst({ where: { userId, status: 'DRAFT' } });
@@ -13,13 +14,13 @@ export async function getMyBasket(req, res) {
               const basket = await getOrCreateDraftBasket(req.userId);
                   const items = await prisma.basketItem.findMany({
                             where: { basketId: basket.id },
-                                  include: { sku: true },
+                                  include: { sku: { select: PUBLIC_SKU_SELECT } },
                   });
 
                       const totalCases = items.reduce((sum, i) => sum + i.quantity, 0);
                           const totalZAR = items.reduce((sum, i) => sum + (i.quantity * parseFloat(i.sku.casePriceZAR)), 0);
 
-                              res.json({ basket, items, totalCases, totalZAR });
+                              res.json({ basket, items: items.map(toPublicItem), totalCases, totalZAR });
       } catch (error) {
               console.error('Get basket error:', error.message);
                   res.status(500).json({ error: 'Could not fetch basket' });
@@ -45,11 +46,11 @@ export async function addItem(req, res) {
                                         ? await prisma.basketItem.update({
                                                       where: { id: existing.id },
                                                                 data: { quantity: existing.quantity + parseInt(quantity) },
-                                                                          include: { sku: true },
+                                                                          include: { sku: { select: PUBLIC_SKU_SELECT } },
                                         })
                                               : await prisma.basketItem.create({
                                                             data: { basketId: basket.id, skuId, quantity: parseInt(quantity) },
-                                                                      include: { sku: true },
+                                                                      include: { sku: { select: PUBLIC_SKU_SELECT } },
                                               });
 
                                                   res.status(201).json({ item, message: `${item.quantity} case(s) of ${sku.name} in your basket.` });
@@ -71,17 +72,17 @@ export async function updateItem(req, res) {
   try {
     const item = await prisma.basketItem.findFirst({
       where: { id: itemId, basket: { userId: req.userId, status: 'DRAFT' } },
-      include: { sku: true },
+      include: { sku: { select: PUBLIC_SKU_SELECT } },
     });
     if (!item) return res.status(404).json({ error: 'Item not found in your basket' });
 
     const updated = await prisma.basketItem.update({
       where: { id: itemId },
       data: { quantity: parseInt(quantity) },
-      include: { sku: true },
+      include: { sku: { select: PUBLIC_SKU_SELECT } },
     });
 
-    res.json({ item: updated, message: `${updated.quantity} case(s) of ${item.sku.name} in your basket.` });
+    res.json({ item: toPublicItem(updated), message: `${updated.quantity} case(s) of ${item.sku.name} in your basket.` });
   } catch (error) {
     console.error('Update item error:', error.message);
     res.status(500).json({ error: 'Could not update item' });

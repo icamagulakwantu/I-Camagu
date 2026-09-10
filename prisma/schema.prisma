@@ -520,6 +520,15 @@ model Sku {
   // the old wording for anything not yet classified.
   bulkUnit          String   @default("case")
   bulkUnitPlural    String   @default("cases")
+  // Where retailPriceZAR came from. VERIFIED means somebody read it off a
+  // shelf or a retailer's own page and wrote down where and when. ESTIMATE
+  // means it was modelled — useful for margin work, never shown to a member
+  // as a saving. Null alongside a null price. The public catalogue withholds
+  // the price entirely unless this says VERIFIED, so a savings claim cannot
+  // be built on a number nobody checked.
+  retailPriceSource    String?
+  retailPriceCheckedAt DateTime?
+  retailPriceNote      String?
   createdAt         DateTime @default(now())
 
   basketItems BasketItem[]

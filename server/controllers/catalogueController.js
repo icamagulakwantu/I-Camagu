@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import { toPublicSku, PUBLIC_SKU_SELECT } from '../utils/skuVisibility.js';
 
 export async function getCatalogue(req, res) {
   const { category, search } = req.query;
@@ -15,16 +16,13 @@ export async function getCatalogue(req, res) {
       // supplier and must never reach a member. Selecting everything by
       // default would have shipped it to the browser the moment the column
       // was added. Any new sensitive column is excluded here by default.
-      select: {
-        id: true, name: true, category: true, productType: true,
-        bottleFormat: true, unitsPerCase: true, casePriceZAR: true,
-        palletPackQty: true, palletPriceZAR: true, supplierPortfolio: true,
-        imageUrl: true, retailPriceZAR: true,
-        bulkUnit: true, bulkUnitPlural: true, createdAt: true,
-      },
+      select: PUBLIC_SKU_SELECT,
     });
 
-    res.json(skus);
+    // A retail price only ships if somebody checked it. toPublicSku drops an
+    // unverified one, which is what stops the Store and the basket total from
+    // building a savings claim on an estimate.
+    res.json(skus.map(toPublicSku));
   } catch (error) {
     console.error('Get catalogue error:', error.message);
     res.status(500).json({ error: 'Could not fetch catalogue' });
