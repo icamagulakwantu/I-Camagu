@@ -1,0 +1,62 @@
+[
+ {
+  "id": "32987a32-a178-4022-8162-fcac50bc490b",
+  "name": "Corona",
+  "fmt": "Dumpy (355ml)",
+  "ours": 465.6,
+  "theirs": 429.99,
+  "shop": "Prestons Liquors",
+  "note": "Corona NRB 24x355ml",
+  "delta": 8.281587943905677
+ },
+ {
+  "id": "e9f6f934-8a4b-40b3-9e12-1f806d9fe18e",
+  "name": "Windhoek Draught",
+  "fmt": "Can (440ml)",
+  "ours": 465.6,
+  "theirs": 419.99,
+  "shop": "Prestons Liquors",
+  "note": "Windhoek Draught NRB 24x440ml (bottle, same volume/pack)",
+  "delta": 10.859782375770855
+ },
+ {
+  "id": "cmtjzlm6d0004yt0bk1nc470m",
+  "name": "Tarpaulin Sail",
+  "fmt": "item",
+  "ours": 350.0,
+  "theirs": 375.0,
+  "shop": "Leroy Merlin",
+  "note": "Tarpaulin 70gr 5x8m with eyelets; 140gr R679",
+  "delta": -6.666666666666665
+ },
+ {
+  "id": "cmtjzlmk00006yt0bx7s5pj10",
+  "name": "25L Water Container",
+  "fmt": "item",
+  "ours": 180.0,
+  "theirs": 129.99,
+  "shop": "Mambo's",
+  "note": "Water canister 25L square with tap; 25L Polycan drum R55 at Foamy",
+  "delta": 38.4721901684745
+ },
+ {
+  "id": "cmtjzls8y000vyt0bwtzoxc5z",
+  "name": "Flour 2.5kg",
+  "fmt": "bag",
+  "ours": 40.0,
+  "theirs": 34.99,
+  "shop": "Food Lover's Market",
+  "note": "Snowflake cake wheat flour 2.5kg, William Moffett, 7-13 Sep",
+  "delta": 14.318376679051159
+ },
+ {
+  "id": "cmtjzlq5k000kyt0b7r3hj8tl",
+  "name": "Cow / Ox (Inkunzi)",
+  "fmt": "head",
+  "ours": 22000.0,
+  "theirs": 8500.0,
+  "shop": "Kwabotha livestock",
+  "note": "Oxen from R8500; heifers R7500, cows R9000, bull R13000",
+  "delta": 158.82352941176472
+ }
+]

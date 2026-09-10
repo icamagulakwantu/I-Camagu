@@ -1,0 +1,295 @@
+rn	id	name	format	unitsPerCase	bulkUnit	category	ourCasePrice	knownRetail
+1	f9e99470-281b-42af-948b-d699858285c3	Amstel Lager	Can (330ml)	24	case	BEER	372.48	
+2	a0e7ce30-eca4-477e-8988-a64a8a20de0f	Amstel Lager	Dumpy (340ml)	24	case	BEER	325.92	
+3	299a339d-5077-489f-8995-5b32f9d467bb	Amstel Lager	Quart (750ml)	12	case	BEER	291.00	
+4	313338af-3015-472a-a99b-7605a2add544	Black Label	Can (330ml)	24	case	BEER	349.20	
+5	666f9578-66e2-45d8-8d31-16c4a234c812	Black Label	Quart (750ml)	12	case	BEER	279.36	
+6	b4bd53de-6c51-48be-9a5a-0de8a70857d0	Budweiser	Can (330ml)	24	case	BEER	395.76	
+7	cd735af7-66b8-4745-b3fb-400b3c7632de	Budweiser	Dumpy (340ml)	24	case	BEER	349.20	
+8	1859ee75-3b54-4eff-9040-4f9da07aef68	Castle Lager	Can (330ml)	24	case	BEER	349.20	
+9	c14654bf-06c9-4af4-9a3c-92dced6ac411	Castle Lager	Dumpy (340ml)	24	case	BEER	325.92	
+10	6c3ec1c5-328e-4617-a81f-50667b8e0b99	Castle Lager	Quart (750ml)	12	case	BEER	279.36	
+11	2c1842e8-1373-480d-afea-b904d3f066d5	Castle Lite	Can (330ml)	24	case	BEER	349.20	
+12	8b129049-cc02-4cdf-8450-08cf6318b977	Castle Lite	Dumpy (340ml)	24	case	BEER	325.92	
+13	e582f9d7-84f3-49ad-82ef-51b4a7f2d954	Castle Lite	Quart (750ml)	12	case	BEER	279.36	
+14	a1c0e53b-770e-438d-a759-9b5d6c71fdeb	Castle Milk Stout	Can (330ml)	24	case	BEER	395.76	
+15	6b0ae88d-8f3f-4f1e-8633-6f5bd4aebf4a	Castle Milk Stout	Dumpy (340ml)	24	case	BEER	372.48	
+16	1eb8d00f-79f1-4817-849e-755884895acc	Castle Milk Stout	Quart (750ml)	12	case	BEER	325.92	
+17	5256f1e1-55e7-4655-9aec-33db0d2c2a57	Corona	Can (330ml)	24	case	BEER	512.16	
+18	32987a32-a178-4022-8162-fcac50bc490b	Corona	Dumpy (355ml)	24	case	BEER	465.60	
+19	c1a02fef-f7c9-4494-a2c1-0a7999e0d721	Flying Fish Lemon/Apple	Can (330ml)	24	case	BEER	372.48	
+20	5a534fa7-3a46-47b5-ac42-735d9abd601a	Flying Fish Lemon/Apple	Dumpy (340ml)	24	case	BEER	325.92	
+21	134b46b6-0823-4037-aa81-94a0d19e4ae8	Guinness Foreign Extra	Can (440ml)	24	case	BEER	605.28	
+22	d8cd5347-21ed-4d69-b21d-21d4f7d2e82f	Guinness Foreign Extra	Dumpy (340ml)	24	case	BEER	558.72	
+23	b906e450-8384-474b-8371-2eeb1195fc23	Hansa Pilsener	Can (330ml)	24	case	BEER	325.92	
+24	4cb907da-bb13-4c37-b0b7-db002c118948	Hansa Pilsener	Dumpy (340ml)	24	case	BEER	302.64	
+25	91e5d769-2faa-4c28-8429-4ef0ab8b723e	Hansa Pilsener	Quart (750ml)	12	case	BEER	267.72	
+26	6c172a81-bb76-4f7b-80fa-e24b30f2a95e	Heineken	Can (330ml)	24	case	BEER	419.04	
+27	1a6b59ef-5655-42ac-b7bb-fc8532e8cb39	Heineken	Dumpy (340ml)	24	case	BEER	372.48	
+28	33d2acd6-a4a3-4833-a150-de7ff158415a	Heineken	Quart (500ml)	12	case	BEER	325.92	
+29	c911e4ee-f928-414a-ac0a-a17e6db20a81	Lion Lager	Can (330ml)	24	case	BEER	302.64	
+30	dd37681f-5715-4d53-b810-a0bdcfa05d25	Lion Lager	Quart (750ml)	12	case	BEER	244.44	
+31	fa2e6832-edef-4902-8e74-54ff30298c16	Sol	Can (330ml)	24	case	BEER	419.04	
+32	d4fbddd5-4a0e-4130-a9e5-59c0ff2b0cdd	Sol	Dumpy (340ml)	24	case	BEER	372.48	
+33	4c20661e-39bb-4e46-b02c-7cd8b94f465f	Stella Artois	Can (330ml)	24	case	BEER	442.32	
+34	59fea14e-9ef2-4f0d-acb7-e3e954129c58	Stella Artois	Dumpy (340ml)	24	case	BEER	419.04	
+35	e9f6f934-8a4b-40b3-9e12-1f806d9fe18e	Windhoek Draught	Can (440ml)	24	case	BEER	465.60	
+36	9b64a135-d791-494b-b1a6-4bd7f93f4bce	Windhoek Draught	Quart (440ml)	12	case	BEER	337.56	
+37	f1737236-11f9-4404-a358-0c678fc35d96	Windhoek Lager/Light	Can (330ml)	24	case	BEER	419.04	
+38	307135e6-7f87-4ee4-9a30-ade50590c7a7	Windhoek Lager/Light	Dumpy (340ml)	24	case	BEER	372.48	
+39	31a3f491-b4a6-46d4-947a-f660561ead71	Windhoek Lager/Light	Quart (500ml)	12	case	BEER	302.64	
+40	cmtukeoai0000cny3mggtzkzf	Commando Brandy	750ml Bottle	12	case	BRANDY	2349.00	2759.88
+41	33dddfd7-7ed9-4fda-9ee0-9f8dedf410a9	Klipdrift Export	750ml Bottle	12	case	BRANDY	2188.80	2279.88
+42	3413c00c-d249-4cf5-aaa2-c45deed0e371	Viceroy 5 Year Old	750ml Bottle	12	case	BRANDY	1843.20	
+43	d6ddf137-219e-4433-a70c-f7f29e09074c	Wellington VO	750ml Bottle	12	case	BRANDY	1900.80	
+44	cmtjzlr3l000pyt0bh5vn467r	Baked Beans 410g Tin		1	tin	CANNED_GOODS	15.00	
+45	88c3203f-fb17-4c9a-b37b-afe4f61b09b2	Moet & Chandon Imperial Brut	750ml Bottle	6	case	CHAMPAGNE	3942.00	
+46	ac2547d2-8d67-4b11-bbbd-e3e89c1f69c0	Veuve Clicquot Yellow Label	750ml Bottle	6	case	CHAMPAGNE	4590.00	
+47	1c16862b-89e8-4063-9ffc-4d6ae120f9c3	Belgravia G&T (Asstd)	Can (440ml)	24	case	CIDER_RTD	488.88	
+48	e415ef76-4de8-49df-b899-5b704f97c246	Belgravia G&T (Asstd)	Dumpy (275ml)	24	case	CIDER_RTD	442.32	
+49	9ba305b0-d471-4aae-aee0-98ca43846855	Bernini Classic/Blush/Ruby	Can (330ml)	24	case	CIDER_RTD	372.48	
+50	910d937e-3e64-41f3-b475-227748a1d35d	Bernini Classic/Blush/Ruby	Dumpy (275ml)	24	case	CIDER_RTD	325.92	
+51	30cfa3ee-071e-47ca-8ee4-a159a7dc0391	Breezer (Red/Watermelon)	Dumpy (275ml)	24	case	CIDER_RTD	465.60	
+52	3e8cea01-1dca-45f8-a6ec-63436760999d	Brutal Fruit Ruby/Litchi	Can (330ml)	24	case	CIDER_RTD	419.04	
+53	a20f1973-8e0a-49ef-9ea5-1d133ba9425b	Brutal Fruit Ruby/Litchi	Dumpy (340ml)	24	case	CIDER_RTD	372.48	
+54	686cc27e-aae5-4064-a0b7-ca6d16607518	Brutal Fruit Ruby/Litchi	Quart (750ml)	12	case	CIDER_RTD	407.40	
+55	5637e105-4c73-47c1-a767-f113635502c5	Chillers Punch	Can (500ml)	24	case	CIDER_RTD	372.48	
+56	10fcab7a-45ca-43c7-9821-83e8cb50ffa7	Chillers Punch	Dumpy (500ml)	24	case	CIDER_RTD	325.92	
+57	d1d9495d-ce8f-4274-83e9-dc3cba6402ff	Extreme Energy	Can (500ml)	24	case	CIDER_RTD	395.76	
+58	bedb84be-1a22-4432-a11b-871f3247ba5b	Extreme Energy	Dumpy (500ml)	24	case	CIDER_RTD	349.20	
+59	f958344d-eb96-4633-8b2a-8184cd3d6176	Flying Fish Chill	Can (330ml)	24	case	CIDER_RTD	395.76	
+60	19a01115-cf2c-4183-bc35-3bcf0e3b4212	Flying Fish Chill	Dumpy (340ml)	24	case	CIDER_RTD	349.20	
+61	2159ebf2-c56c-4a32-ae93-938da146a701	Hunter's Chilled	Can (330ml)	24	case	CIDER_RTD	442.32	
+62	8f541c44-6fec-4557-a96a-724e41f46447	Hunter's Chilled	Dumpy (340ml)	24	case	CIDER_RTD	395.76	
+63	96f18eb6-a870-433c-9d5e-1fb5c4ca08b8	Hunter's Dry/Gold	Can (330ml)	24	case	CIDER_RTD	419.04	
+64	1a87cf2d-7b20-4756-a542-061912defe1f	Hunter's Dry/Gold	Dumpy (340ml)	24	case	CIDER_RTD	372.48	
+65	dfae53ea-7e41-4a44-918f-8adb2296d9ab	Hunter's Dry/Gold	Quart (750ml)	12	case	CIDER_RTD	419.04	
+66	d6ecb41b-b567-43e0-94da-c5ce27c74747	Kopparberg Strawberry/Lime	Can (500ml)	24	case	CIDER_RTD	582.00	
+67	ce7bbd8e-f5af-4ed8-9fb9-ef8333059f1e	Kopparberg Strawberry/Lime	Dumpy (500ml)	24	case	CIDER_RTD	512.16	
+68	808c90a0-eb12-4d2b-8235-1fd04be6830d	Redd's Berry/Orig/Green	Can (330ml)	24	case	CIDER_RTD	419.04	
+69	bbe67935-430e-41b2-8c12-e4d598bd9b74	Redd's Berry/Orig/Green	Dumpy (340ml)	24	case	CIDER_RTD	372.48	
+70	52798310-4ad1-4b90-9856-25a70f2b54e8	Redd's MXD Pine/Guarana	Can (330ml)	24	case	CIDER_RTD	419.04	
+71	7b42ca62-a0af-42e5-8a80-92ada6b0fcac	Redd's MXD Pine/Guarana	Dumpy (340ml)	24	case	CIDER_RTD	372.48	
+72	341eaf00-b87b-418f-9296-cf502f544dc8	Savanna Angry Lemon	Can (330ml)	24	case	CIDER_RTD	465.60	
+73	8e54f668-ce9d-41aa-adb3-4f416db307ec	Savanna Angry Lemon	Dumpy (340ml)	24	case	CIDER_RTD	419.04	
+74	3f0875ae-7a7a-4f67-a1b5-91632f419801	Savanna Dry/Light	Can (330ml)	24	case	CIDER_RTD	442.32	
+75	64b20b19-99fe-40cf-a82f-daf5ddb31383	Savanna Dry/Light	Dumpy (340ml)	24	case	CIDER_RTD	395.76	
+76	9d3aaf50-2f43-45c1-916f-7ebfd36ddb26	Savanna Dry/Light	Quart (750ml)	12	case	CIDER_RTD	407.40	
+77	8091cab1-7d24-42d5-8554-94d03088bac2	Smirnoff Spin/Storm	Can (440ml)	24	case	CIDER_RTD	442.32	
+78	996346c0-2e94-46ad-95ae-65356e8ac75d	Smirnoff Spin/Storm	Dumpy (250ml)	24	case	CIDER_RTD	395.76	
+79	71865af7-c04f-46fd-9766-4ea0829a0ef6	Strongbow Gold/Apple	Can (330ml)	24	case	CIDER_RTD	419.04	
+80	3b663b3d-e67f-4fb7-ba91-496434fa0617	Strongbow Gold/Apple	Dumpy (340ml)	24	case	CIDER_RTD	372.48	
+81	2234b6d4-b9b9-4f9d-817e-8bb8b9789942	Strongbow Gold/Apple	Quart (750ml)	12	case	CIDER_RTD	395.76	
+82	a6a38115-c3e3-4a22-b53a-5e1250e21786	Bisquit & Dubouche VS	750ml Bottle	12	case	COGNAC	5644.80	
+83	b676d958-1adf-4cf6-9888-333370fc2ffa	Bisquit & Dubouche VSOP	750ml Bottle	12	case	COGNAC	9676.80	
+84	5b856a12-cf80-469f-9ca1-2756ee1d9fed	Courvoisier VS	750ml Bottle	12	case	COGNAC	5990.40	
+85	a5e276bc-a1dc-4c91-8135-4086cd7d3579	Courvoisier VSOP	750ml Bottle	12	case	COGNAC	9446.40	
+86	f3ecdee8-f2df-4008-b2a4-572808f00e6c	D'USSE VSOP	750ml Bottle	12	case	COGNAC	9504.00	
+87	2fec4aa4-a0b9-45ea-9aeb-4acb344aa0da	Hennessy VS	375ml Bottle	12	case	COGNAC	3916.80	
+88	68b77494-6429-43fc-87c4-8b64a6fd73ec	Hennessy VS	750ml Bottle	12	case	COGNAC	6336.00	7068.00
+89	a4f230ff-5274-44ff-ae8b-6e010c41815d	Hennessy VSOP	750ml Bottle	12	case	COGNAC	10260.00	11868.00
+90	89425dcb-3d7d-4328-8556-2d9f019a4373	Hennessy XO	750ml Bottle	12	case	COGNAC	33480.00	
+91	4b3ef8a3-a655-466e-9efe-085bf5e0358f	Honor VS	375ml Bottle	12	case	COGNAC	2880.00	
+92	dba1b7d2-db6c-4a03-b2b5-4565f09033bf	Honor VS	750ml Bottle	12	case	COGNAC	5184.00	
+93	e842a3a5-e7e8-4fc5-a670-5593be7a6dee	Martell Blue Swift VSOP	750ml Bottle	12	case	COGNAC	10800.00	
+94	2b528374-6c4a-481c-94c9-aa2536ed4563	Martell VS	750ml Bottle	12	case	COGNAC	6102.00	
+95	3d927343-9c40-4378-89ec-1de1780a2c5a	Remy Martin 1738 Accord Royal	750ml Bottle	12	case	COGNAC	13824.00	
+96	8d73dc9e-caf3-4780-93db-b805bf305936	Remy Martin VSOP	750ml Bottle	12	case	COGNAC	9792.00	
+97	cmtjzlrvd000tyt0bwu3c5i58	Brown Bread Loaf		1	loaf	DRY_GOODS	20.00	
+98	cmtjzls8y000vyt0bwtzoxc5z	Flour 2.5kg		1	bag	DRY_GOODS	40.00	
+99	cmtjzlray000qyt0buxav2b6d	Instant Coffee 750g		1	tin	DRY_GOODS	165.00	
+100	cmtjzls26000uyt0b8gh9gofb	Milk 2L		1	bottle	DRY_GOODS	35.00	
+101	cmtjzlrok000syt0bn27ktobv	Peanut Butter 400g		1	jar	DRY_GOODS	50.00	
+102	cmtjzlrhr000ryt0bxn9gu6yy	Tea 100 Bags		1	box	DRY_GOODS	60.00	
+103	cmtjzlnp1000cyt0bi7tkqsh6	Cabbage Head		1	head	FRESH_PRODUCE	22.00	
+104	cmtjzlqj6000myt0bc5rt01if	Carrots 10kg		1	pocket	FRESH_PRODUCE	95.00	
+105	cmtjzlmqt0007yt0bahhm0j2l	Green Apples (per kg)		1	kg	FRESH_PRODUCE	38.00	
+106	cmtjzlqpz000nyt0bis6579x1	Green Peppers (per kg)		1	kg	FRESH_PRODUCE	32.00	
+107	cmtjzlqcd000lyt0bl7fd2cb5	Onions 10kg		1	pocket	FRESH_PRODUCE	95.00	
+108	cmtjzlni8000byt0b5ltludaf	Potatoes 10kg		1	pocket	FRESH_PRODUCE	110.00	
+109	cmtjzlqwt000oyt0br6rpnt1r	Red Peppers (per kg)		1	kg	FRESH_PRODUCE	48.00	
+110	cmtjzlnvt000dyt0b1h7dqi8d	Spinach Bundle		1	bundle	FRESH_PRODUCE	25.00	
+111	c01837d4-595a-4008-84f4-ea83cb0b68d3	Bombay Sapphire	375ml Bottle	12	case	GIN	1958.40	
+112	b434dab9-f59a-4d9e-ad56-b88747f2e85e	Bombay Sapphire	750ml Bottle	12	case	GIN	3571.20	
+113	fbe82544-1a96-47e1-a4b6-51f7ab212661	Cruxland Gin	750ml Bottle	12	case	GIN	3686.40	
+114	eb1a5ab3-36ca-496a-88de-4dfe33273919	Flowstone African Bush Botanical	750ml Bottle	12	case	GIN	3571.20	
+115	4d203717-fce4-4160-bcda-d16fa8ee6712	Gordons London Dry	375ml Bottle	12	case	GIN	1094.40	
+116	d5f0bd73-d77c-4c72-8d97-82863f9192a9	Gordons London Dry	750ml Bottle	12	case	GIN	1958.40	
+117	4d9827d7-648e-4b9e-9edb-344e69416a3b	Gordons Premium Pink	375ml Bottle	12	case	GIN	1152.00	
+118	f8e4576e-c562-48b0-8a0d-a4b4b1f49e52	Gordons Premium Pink	750ml Bottle	12	case	GIN	2073.60	
+119	fee0264f-d369-49cf-b083-746696ec99cf	Hendrick's Original	375ml Bottle	12	case	GIN	2880.00	
+120	bb85c70e-765d-4bc0-b6df-d7a7037e3da4	Hendrick's Original	750ml Bottle	12	case	GIN	5184.00	
+121	5b7bf040-cdbe-47c6-a9e6-752e9106284d	Inverroche Amber/Verdant	750ml Bottle	12	case	GIN	4492.80	
+122	ba5ea82d-3717-479a-bdbb-263ae0b445e6	Inverroche Classic	750ml Bottle	12	case	GIN	4147.20	
+123	d1c9aad0-0559-4acd-82dc-38cda4803f44	KEM Gin	750ml Bottle	12	case	GIN	2880.00	
+124	30d15804-75ad-4044-921c-dbea1aba3f4b	Kwande Gin	750ml Bottle	12	case	GIN	3225.60	
+125	857ed5e3-efc9-4543-939a-cebd742e147b	Musgrave Pink	750ml Bottle	12	case	GIN	3340.80	
+126	796757ca-9685-4439-a930-950429a63eb5	Old Buck Gin	375ml Bottle	12	case	GIN	1036.80	
+127	171bbbc0-1090-4348-bbaf-f35de5e5f275	Old Buck Gin	750ml Bottle	12	case	GIN	1843.20	
+128	deea893e-7261-4a77-847c-9728a2388062	Royal Flush Premium	375ml Bottle	12	case	GIN	1267.20	
+129	58e2495b-1c97-4885-b27f-c2786d461821	Royal Flush Premium	750ml Bottle	12	case	GIN	2304.00	
+130	b21593f9-f7eb-4836-b35d-247713b2b057	Strettons London Dry	375ml Bottle	12	case	GIN	1094.40	
+131	7cf5f3f5-b892-4d0d-925c-b54f52d3b5d7	Strettons London Dry	750ml Bottle	12	case	GIN	1958.40	
+132	fcd244ec-40e2-4561-8f07-8bf93a465a70	Strettons Wild Berry	375ml Bottle	12	case	GIN	1094.40	
+133	b2b1584f-cffc-4627-b847-818267e4b013	Strettons Wild Berry	750ml Bottle	12	case	GIN	1958.40	
+134	4f440c0c-fba7-4234-84ce-e70f1328dc42	Tanqueray Flor de Sevilla	750ml Bottle	12	case	GIN	4147.20	
+135	33a6df80-21aa-4302-87c4-76be9f49c08f	Tanqueray London Dry Export	375ml Bottle	12	case	GIN	2246.40	
+136	81d803f9-d1d2-427c-9698-3ea162a54413	Tanqueray London Dry Export	750ml Bottle	12	case	GIN	4147.20	
+137	39d3385e-b480-4157-84b6-657844e7c2b9	Tanqueray No. TEN	750ml Bottle	12	case	GIN	5551.20	
+138	573e0bae-0d57-4b2c-98d6-02e596b11073	Wixworth Gin	750ml Bottle	12	case	GIN	3225.60	
+139	cmtjzlmxl0008yt0bcbiugk7y	Butter 500g		1	item	GROCERY	85.00	
+140	cmtjzlo2k000eyt0blxi2fhwu	Cooking Oil 5L		1	bottle	GROCERY_BULK	190.00	
+141	cmtjzlnbg000ayt0b2z2ut1r8	Maize Meal 50kg		1	bag	GROCERY_BULK	520.00	
+142	cmtjzlo9d000fyt0biz85kmnw	Sugar 10kg		1	bag	GROCERY_BULK	245.00	
+143	895546e8-7559-4d78-98e7-d22e59914b94	Amarula Ethiopian Coffee	750ml Bottle	12	case	LIQUEUR	2188.80	
+144	2e88ac17-528e-476c-b80f-25c7dab9f3e0	Amarula Original Cream	750ml Bottle	12	case	LIQUEUR	2073.60	
+145	d5b45a0b-9f87-44d6-86e0-1b043afacb32	Baileys Original Irish Cream	750ml Bottle	12	case	LIQUEUR	2880.00	
+146	2ecf7c42-0093-440e-bc45-0c1425580f60	Banana Liqueur (Butlers)	750ml Bottle	12	case	LIQUEUR	2188.80	
+147	4bf8e2a1-4448-415f-96de-cfd3e7ba58cf	Blue Curacao (Butlers)	750ml Bottle	12	case	LIQUEUR	2534.40	
+148	85ec6c22-661c-4d12-8d9f-c42206299f23	Blue Curacao (Peddler's)	750ml Bottle	12	case	LIQUEUR	2764.80	
+149	6473969b-cb27-4baa-a63f-a8924a819e6c	Blue Curacao Generic	750ml Bottle	12	case	LIQUEUR	979.20	
+150	8f19c3ab-6459-4bf8-9e99-3009160b2db7	Cape Velvet Cream	750ml Bottle	12	case	LIQUEUR	1497.60	
+151	867d1be8-139e-45e2-9679-81e96c39ec1f	Chambord Black Raspberry	500ml Bottle	12	case	LIQUEUR	4377.60	
+152	ce16ecff-5b24-48b0-95bd-0242b9e7393b	Cherry Kirsch Liqueur (Butlers)	750ml Bottle	12	case	LIQUEUR	2419.20	
+153	e9e69c1f-4c7e-429d-8ec1-8f3a9820504e	Cointreau Orange Liqueur	750ml Bottle	12	case	LIQUEUR	3686.40	
+154	a2fc9c45-f235-44c8-8446-fe62add7c575	Disaronno Amaretto Liqueur	750ml Bottle	12	case	LIQUEUR	3456.00	
+155	f58ee7b5-db23-45ab-985f-bb3cbd6cb96a	Drambuie Honey/Scotch	750ml Bottle	12	case	LIQUEUR	3686.40	
+156	26236783-e528-4c1f-8b5e-689746af0261	Espresso/Coffee Liqueur (Butlers)	750ml Bottle	12	case	LIQUEUR	2188.80	
+157	f79ba556-e354-4a36-84a8-241cd449480d	Frangelico Hazelnut Liqueur	750ml Bottle	12	case	LIQUEUR	2995.20	
+158	7667828a-af49-44bd-9549-797b0019f0e7	Ginger Liqueur (Butlers)	750ml Bottle	12	case	LIQUEUR	2188.80	
+159	52c452ad-3118-420f-90d2-e728d85087e0	Grand Marnier Cordon Rouge	750ml Bottle	12	case	LIQUEUR	4492.80	
+160	1de4dba8-0ac2-4087-b12d-ab58b36c769e	Jagermeister Herbal Liqueur	750ml Bottle	12	case	LIQUEUR	3686.40	
+161	7ba4c546-60a0-4003-8529-580d5a871c31	Kahlua Coffee Liqueur	750ml Bottle	12	case	LIQUEUR	2880.00	
+162	b657f80c-4a31-4972-8863-183a4f893972	Malibu Coconut Rum Liqueur	750ml Bottle	12	case	LIQUEUR	2073.60	
+163	98f8111e-490e-4f96-8548-cf6b706801f0	Nachtmusik Chocolate Liqueur	750ml Bottle	12	case	LIQUEUR	1497.60	
+164	c3cf9be4-6823-4405-945b-8e4f5b1e8394	Peach Schnapps (Butlers)	750ml Bottle	12	case	LIQUEUR	2073.60	
+165	02a23538-0db3-48bd-a47b-d3c6b84a2c12	Peach Schnapps (Relic)	750ml Bottle	12	case	LIQUEUR	2361.60	
+166	ac8b2351-868b-45ac-bd1d-3a28e87dccbe	Peach Schnapps Generic	750ml Bottle	12	case	LIQUEUR	1036.80	
+167	c0c73243-42b9-433a-99e1-0fe8ad28081c	Peppermint Liqueur (Butlers)	750ml Bottle	12	case	LIQUEUR	2188.80	
+168	d06b7490-46ee-4d7e-b54e-410ef993034e	Sambuca Generic Blue/White	750ml Bottle	12	case	LIQUEUR	1612.80	
+169	f97029f9-4663-4583-b780-89c3cac3e752	Sambuca Lupini Black/Gold	750ml Bottle	12	case	LIQUEUR	1958.40	
+170	536b0772-3159-47b7-be0c-0065efc5451b	Strawberry Lips	750ml Bottle	12	case	LIQUEUR	1612.80	
+171	682804a5-3043-4b03-8509-1cfe5ba0231e	Strawberry Liqueur (Butlers)	750ml Bottle	12	case	LIQUEUR	2073.60	
+172	52bd942e-a7d1-4380-bac2-d3658f95cb64	Strawberry Liqueur Generic	750ml Bottle	12	case	LIQUEUR	1152.00	
+173	9937d447-f42e-4175-940a-e7decd6a1b6c	Tequila Rose Cream Liqueur	750ml Bottle	12	case	LIQUEUR	2304.00	
+174	cb7565a7-342d-43df-ba93-bf0d66d0be30	Tia Maria Coffee Liqueur	750ml Bottle	12	case	LIQUEUR	2534.40	
+175	4a9ce70a-ea20-4dd0-9fd7-c0f87df4b358	Triple Sec (Butlers)	750ml Bottle	12	case	LIQUEUR	2361.60	
+176	51066c2a-5af0-4e2a-8c5f-89327abea8d5	Triple Sec (Peddler's)	750ml Bottle	12	case	LIQUEUR	2764.80	
+177	4f8c9cbe-69bd-42f0-b34c-a4f1b0100139	Triple Sec Premium (San Basile)	750ml Bottle	12	case	LIQUEUR	5529.60	
+178	4977eea0-1622-4ed8-a1e9-507e4eee8308	Van Der Hum Tangerine (Butlers)	750ml Bottle	12	case	LIQUEUR	2188.80	
+179	38f0aaf3-5a1e-438c-8a1f-a49905f3b9f6	Wild Africa Cream Liqueur	750ml Bottle	12	case	LIQUEUR	1382.40	
+180	cmtjzlq5k000kyt0b7r3hj8tl	Cow / Ox (Inkunzi)		1	head	LIVESTOCK_ANIMAL	22000.00	
+181	cmtjzlpys000jyt0bvi0w1iro	Goat (Standard)		1	head	LIVESTOCK_ANIMAL	2200.00	
+182	cmtjzln4e0009yt0bxv04xhdx	Sheep with Horns		1	head	LIVESTOCK_ANIMAL	3200.00	
+183	cmtjzlpea000gyt0bylh6lko4	Beef Mince 5kg		1	pack	MEAT	574.95	699.95
+184	cmtjzlprx000iyt0bls3u655l	Boerewors 5kg		1	pack	MEAT	474.95	554.95
+185	cmtjzlpl4000hyt0bv9lvyrbj	Whole Chicken (~1.8kg)		1	bird	MEAT	99.00	116.98
+186	69a07f0b-d645-4060-8b74-9d0caaf65439	Angostura Aromatic Bitters	200ml Bottle	12	case	MIXER	1058.40	
+187	e708d9ac-b624-487c-911c-87ae2cb14920	Grenadine Syrup Cordial	1 Litre Jug	12	case	MIXER	823.20	
+188	856aeda7-a736-4d90-a189-e1a0989404d9	Kola Tonic Cordial	750ml Bottle	12	case	MIXER	529.20	
+189	f2304bb0-5000-48d0-be39-87f4e7eb581c	Lime/Passion Fruit Cordial	750ml Bottle	12	case	MIXER	529.20	
+190	95584294-b113-49b3-8fb0-7b6a068fa6c1	Maraschino Cherries (Syrup)	350ml Jar	12	case	MIXER	705.60	
+191	cmtjzllbb0000yt0bhuvdqdwg	Ikoto (Bentonite Clay)		1	item	RITUAL_SUPPLIES	65.00	
+192	cmtjzlljg0001yt0bd6jd3ujk	Imphepho Bundle		1	bundle	RITUAL_SUPPLIES	45.00	
+193	cmtjuscov0000ultqa5atyha1	Coca-Cola 300ml Can	Can (300ml)	24	case	SOFT_DRINKS	143.00	359.76
+194	cmtjuscs90003ultqyc8765z1	Fanta Orange 300ml Can	Can (300ml)	24	case	SOFT_DRINKS	143.00	359.76
+195	cmtjuscrj0002ultqun9fpz2w	Sprite 300ml Can	Can (300ml)	24	case	SOFT_DRINKS	143.00	359.76
+196	cmtjusct00004ultq9uyppiew	Stoney Ginger Beer 300ml Can	Can (300ml)	24	case	SOFT_DRINKS	143.00	359.76
+197	1ef41427-a544-4924-896b-a6d4b342aa61	JC Le Roux La Fleurette	750ml Bottle	6	case	SPARKLING	570.00	
+198	deead9a8-3d17-419b-962c-31bb5831bfff	JC Le Roux Le Domaine	750ml Bottle	6	case	SPARKLING	570.00	
+199	335258be-4668-4f7b-84ca-6e0ba79821e8	Krone Borealis Brut (MCC)	750ml Bottle	6	case	SPARKLING	1197.00	
+200	f2d34460-5ccd-4418-b582-964f65237303	Pongracz Brut	750ml Bottle	6	case	SPARKLING	1083.00	
+201	4358d4ce-dfd0-40b2-87a6-c464d09de14b	Aljimardo Silver	375ml Bottle	12	case	TEQUILA	1267.20	
+202	1cb57969-92b5-4e1a-8b5b-60529a150475	Aljimardo Silver	750ml Bottle	12	case	TEQUILA	2304.00	
+203	4981d04b-e0f3-4a40-a196-f0e83434972d	El Jimador Blanco/Reposado	750ml Bottle	12	case	TEQUILA	2764.80	
+204	f321a8b2-15f5-4e80-85a0-66ddcf262bc3	Jose Cuervo Especial Reposado	375ml Bottle	12	case	TEQUILA	1670.40	
+205	a4203e57-aa86-4ce4-a5f1-d8af8a23c23c	Jose Cuervo Especial Reposado	750ml Bottle	12	case	TEQUILA	2995.20	
+206	c3fdc1c2-72e6-4111-8df2-7fc8a3be41c1	Jose Cuervo Especial Silver	375ml Bottle	12	case	TEQUILA	1612.80	
+207	65306382-aba7-4cda-931c-06e31e650421	Jose Cuervo Especial Silver	750ml Bottle	12	case	TEQUILA	2880.00	
+208	935556eb-bcc3-4b72-957c-d3f8a477eb81	Olmeca Plata	375ml Bottle	12	case	TEQUILA	1843.20	
+209	65f3c5b3-3ad0-4129-9f76-9c51687d36e6	Olmeca Plata	750ml Bottle	12	case	TEQUILA	3225.60	
+210	7e8b689a-1ff8-435d-84cb-d0b8e438f51c	Olmeca Reposado	375ml Bottle	12	case	TEQUILA	1900.80	
+211	c963988a-176a-4244-a6ff-5bb663493aee	Olmeca Reposado	750ml Bottle	12	case	TEQUILA	3340.80	
+212	acbc6b1f-39a8-4920-8f17-43da2f1e975d	Ponchos Blanco/Caramel Tequila	375ml Bottle	12	case	TEQUILA	1152.00	
+213	a8e462c9-62f9-4eb4-a447-f61ad046eb42	Ponchos Blanco/Caramel Tequila	750ml Bottle	12	case	TEQUILA	2073.60	
+214	8bced4e3-faf4-4b07-b9d7-de920085e12f	Casamigos Blanco	750ml Bottle	12	case	TEQUILA_PREMIUM	8294.40	
+215	d939df33-3758-4af8-9f16-40c9dbb18cdf	Casamigos Reposado	750ml Bottle	12	case	TEQUILA_PREMIUM	9792.00	
+216	009fade2-02cf-49ae-a106-ceeec4856406	Clase Azul Plata	750ml Bottle	12	case	TEQUILA_PREMIUM	32292.00	
+217	b4b29a22-7167-4cee-80d5-ea240f5b6536	Clase Azul Reposado	750ml Bottle	12	case	TEQUILA_PREMIUM	48600.00	
+218	92baa903-e367-4b0a-908e-fff2a0e9c83c	Don Julio Blanco	750ml Bottle	12	case	TEQUILA_PREMIUM	7142.40	
+219	015a9d9e-fa4a-45f0-8099-934d95e8060b	Don Julio Reposado	750ml Bottle	12	case	TEQUILA_PREMIUM	8524.80	
+220	ab7ed8c6-0100-4308-8923-bc88e925f4fb	Patron Reposado	750ml Bottle	12	case	TEQUILA_PREMIUM	11289.60	
+221	2684ee69-0f21-46e2-9f7c-673f4218b5ac	Patron Silver Luxury	750ml Bottle	12	case	TEQUILA_PREMIUM	9792.00	
+222	cmtjzlmk00006yt0bx7s5pj10	25L Water Container		1	item	ULWALUKO_SUPPLIES	180.00	
+223	cmtjzlmd60005yt0b6s4evoa3	Ibhoma Pole Bundle		1	bundle	ULWALUKO_SUPPLIES	450.00	
+224	cmtjzllqb0002yt0bh1leotps	Plain Grey Blanket		1	item	ULWALUKO_SUPPLIES	350.00	
+225	cmtjzlm6d0004yt0bk1nc470m	Tarpaulin Sail		1	item	ULWALUKO_SUPPLIES	350.00	
+226	cmtjzllzi0003yt0b4ugvk5ts	White Blanket with Black Stripes		1	item	ULWALUKO_SUPPLIES	450.00	
+227	61aa8a43-f856-46c6-945c-18fc484f4d39	Absolut (Watermelon/Lime/Citron)	750ml Bottle	12	case	VODKA	2764.80	
+228	a32b830d-7a0c-4c27-9afc-60d2d2b94a67	Absolut Original Blue	375ml Bottle	12	case	VODKA	1440.00	
+229	f1a3521b-17fe-451b-8bda-949bd990c5d3	Absolut Original Blue	750ml Bottle	12	case	VODKA	2649.60	
+230	2fb42ce5-d0cd-45fe-abc1-027f2af7b2c9	Count Pushkin Vodka	375ml Bottle	12	case	VODKA	864.00	
+231	511f6e09-d1db-4892-9d76-ac0ae12fdba7	Count Pushkin Vodka	750ml Bottle	12	case	VODKA	1497.60	
+232	12b1f8c1-cdbd-45e4-ba9d-40316c5377ec	Cruz Vintage Black Vodka	375ml Bottle	12	case	VODKA	1382.40	
+233	8f77cfa9-e09f-4da9-a0f1-d9ee980a37a4	Cruz Vintage Black Vodka	750ml Bottle	12	case	VODKA	2534.40	
+234	871a848a-5b45-4510-b978-b62c45b451b4	Russian Bear Flavours	750ml Bottle	12	case	VODKA	1612.80	
+235	d8e0cebc-daf7-4877-ac1f-6ed2c4aa9e18	Russian Bear Standard	375ml Bottle	12	case	VODKA	921.60	
+236	564652bd-f4b1-4f84-be01-898ce7c79986	Russian Bear Standard	750ml Bottle	12	case	VODKA	1612.80	
+237	76879636-7a77-4984-8b56-88de1c494819	Skyy Vodka Original	375ml Bottle	12	case	VODKA	1324.80	
+238	f81f6d5e-a59a-4949-8276-6a4dc9871d89	Skyy Vodka Original	750ml Bottle	12	case	VODKA	2419.20	
+239	1756a6ac-de4c-4eb3-b769-362e9ccf092f	Smirnoff Infusions	750ml Bottle	12	case	VODKA	1958.40	
+240	23050c4b-5362-47d4-bea5-a944f1aa5937	Smirnoff Red No. 21	375ml Bottle	12	case	VODKA	1036.80	
+241	1408ddd8-a09c-47ff-b14c-ff373a26a3bb	Smirnoff Red No. 21	750ml Bottle	12	case	VODKA	1843.20	
+242	50a0d351-3abd-4355-93f3-9d0670cfbba4	Wyborowa Vodka	375ml Bottle	12	case	VODKA	1152.00	
+243	b2110256-e005-4b85-ad7d-4b6fc64e7457	Wyborowa Vodka	750ml Bottle	12	case	VODKA	2073.60	
+244	7c78fead-3109-4a91-97f2-0b01060df1ac	Belvedere Pure Vodka	375ml Bottle	12	case	VODKA_PREMIUM	2995.20	
+245	3f3f758f-cf03-4a57-8107-f14fca016795	Belvedere Pure Vodka	750ml Bottle	12	case	VODKA_PREMIUM	5529.60	
+246	9e42335f-694c-431b-b3c5-71d8ebf59581	Ciroc (Apple/Mango/Pineapple)	750ml Bottle	12	case	VODKA_PREMIUM	5068.80	
+247	e6f5d5a6-f6cf-4ce6-b623-7130a4db9129	Ciroc Original Premium	375ml Bottle	12	case	VODKA_PREMIUM	2649.60	
+248	834b4c99-271f-4b69-b0d1-b72575b0a94c	Ciroc Original Premium	750ml Bottle	12	case	VODKA_PREMIUM	4838.40	
+249	4f3e4fd3-d4dd-4279-8f97-381af2b2c769	Grey Goose Luxury	375ml Bottle	12	case	VODKA_PREMIUM	3456.00	
+250	1f832ded-723d-4070-ae71-3df68147daa5	Grey Goose Luxury	750ml Bottle	12	case	VODKA_PREMIUM	6336.00	
+251	cmtjusctq0005ultqgqbkrala	Valpre Still Water 500ml	Bottle (500ml)	24	case	WATER	246.00	383.76
+252	624a0311-04c5-407b-96c8-314c4ba5c7eb	Bain's Cape Mountain	375ml Bottle	12	case	WHISKY	1497.60	
+253	a8af920a-55ae-447b-b169-1eafeb7ff254	Bain's Cape Mountain	750ml Bottle	12	case	WHISKY	2764.80	
+254	a3734968-f0a2-4fb3-9898-cf0d958e78d3	Bells Extra Special	375ml Bottle	12	case	WHISKY	1324.80	
+255	b8e0830a-2e91-4e22-9793-a98df24fde29	Bells Extra Special	750ml Bottle	12	case	WHISKY	2419.20	
+256	ff212d0d-4be4-4d80-9d57-9317c4be16c8	Chivas Regal 12 Year Old	375ml Bottle	12	case	WHISKY	2534.40	
+257	66543674-183d-4fca-9478-18606c0f2b0b	Chivas Regal 12 Year Old	750ml Bottle	12	case	WHISKY	4838.40	
+258	c2037ff2-3597-4f73-8632-98359eaf65e3	Chivas Regal 15 Year Old	750ml Bottle	12	case	WHISKY	7833.60	
+259	3d688417-b03c-4702-9535-82b94f4f936c	Firstwatch Whisky	750ml Bottle	12	case	WHISKY	2016.00	
+260	41f9596a-2f8a-4363-aa7f-6f9135423b42	Glenfiddich 12 Year	750ml Bottle	12	case	WHISKY	7550.40	
+261	8250f1e2-e8c9-40c8-815d-fbd285aa962f	J&B Rare	375ml Bottle	12	case	WHISKY	1267.20	
+262	6481173c-565a-4e63-ba85-cc309d221b30	J&B Rare	750ml Bottle	12	case	WHISKY	2304.00	
+263	a5702cfd-4f4f-430c-86a7-4cfe11e83900	Jack Daniel's Old No.7	375ml Bottle	12	case	WHISKY	2188.80	
+264	fd76b3d7-db31-4d00-8d73-78aa969bcf25	Jack Daniel's Old No.7	750ml Bottle	12	case	WHISKY	4147.20	
+265	56d64e24-1216-4e59-ab11-e0653bbec3dd	Jack Daniel's Tennessee Honey	375ml Bottle	12	case	WHISKY	2188.80	
+266	d82033a3-7ca9-418b-b7f2-288041c0668d	Jack Daniel's Tennessee Honey	750ml Bottle	12	case	WHISKY	4147.20	
+267	04696748-6830-44a3-b0ea-92aa745704de	Jameson Caskmates	750ml Bottle	12	case	WHISKY	4377.60	
+268	548181c6-6b78-4ccb-b9c7-5991c0d9af63	Jameson Original Irish	375ml Bottle	12	case	WHISKY	1728.00	
+269	f4ae7b5f-2389-464b-9aab-15f2b5fe987d	Jameson Original Irish	750ml Bottle	12	case	WHISKY	3225.60	
+270	258073d1-643f-45c1-aa1b-d1cf67748c82	Jameson Select Reserve	750ml Bottle	12	case	WHISKY	4838.40	
+271	5b02d280-81f6-4ff5-90eb-9f96f6de1ded	Johnnie Walker Black Label	375ml Bottle	12	case	WHISKY	2304.00	
+272	065b77a1-acaa-4682-8b65-a1dbab268017	Johnnie Walker Black Label	750ml Bottle	12	case	WHISKY	4377.60	
+273	84a519c1-535f-4fa8-81e9-f4d9689c8a7f	Johnnie Walker Double Black	750ml Bottle	12	case	WHISKY	5529.60	
+274	4152630e-5863-4144-9e3d-543c0275abba	Johnnie Walker Gold Label Reserve	750ml Bottle	12	case	WHISKY	8640.00	
+275	ed36fa8b-b108-4860-be39-38013ecdb17d	Johnnie Walker Red Label	375ml Bottle	12	case	WHISKY	1555.20	
+276	f29d16c1-6915-4c5e-a235-71aec025887d	Johnnie Walker Red Label	750ml Bottle	12	case	WHISKY	2880.00	
+277	a3f9f7b3-e82f-4c56-87fa-1aeab1de33f7	Scottish Leader Original	375ml Bottle	12	case	WHISKY	1152.00	
+278	d3a8636e-f576-4fe3-bfd9-3da4c9c04bd1	Scottish Leader Original	750ml Bottle	12	case	WHISKY	2073.60	
+279	6b98f661-a54b-424c-907f-da7a6e3bf1bf	The Glenlivet 12 Year	750ml Bottle	12	case	WHISKY	7833.60	
+280	bbede00b-1869-4b52-9fa9-c948eb2c9401	Three Ships 5 Year Old	375ml Bottle	12	case	WHISKY	1209.60	
+281	6c3d533d-a171-4914-8ac7-f753ea1820a2	Three Ships 5 Year Old	750ml Bottle	12	case	WHISKY	2188.80	
+282	6114d889-b9a4-46ac-961b-f8841871c634	4th Street Sweet Red/White	750ml Bottle	6	case	WINE	285.00	
+283	f2aac112-97a3-4ade-aafd-322f87186558	Beyerskloof Pinotage	750ml Bottle	6	case	WINE	627.00	
+284	4a3cb4e4-73e2-453e-a925-fe3b94e1b9fa	Castillo de Liria Sweet Red	750ml Bottle	6	case	WINE	427.50	
+285	16cd9136-8ca1-4829-a4a5-3863a0f67f8c	Drostdy-Hof Adelpracht Sweet	750ml Bottle	6	case	WINE	342.00	
+286	7d7a7abb-70f0-48a1-88b3-8e293e575e1c	Kanonkop Kadette Cabernet	750ml Bottle	6	case	WINE	798.00	
+287	e915d8a0-c0c2-4a20-920a-384c4cdd3c08	Nederburg Baronne	750ml Bottle	6	case	WINE	484.50	
+288	4deea093-d1ae-4400-96c4-cd3a51e06c24	Nederburg Sauvignon Blanc	750ml Bottle	6	case	WINE	456.00	
+289	9c53ff63-e6eb-45c4-9b45-fc01b7117eca	Robertson Winery Sweet Merlot	750ml Bottle	6	case	WINE	370.50	
+290	d09a542b-a43d-4dbc-a9d1-97eaa4e20c31	Saint Raphael Sweet Red	750ml Bottle	6	case	WINE	313.50	
+291	dfa81f7f-839e-42c2-8950-f376912aec9a	4th Street Sweet Red/Rose	5 Litre Box	4	case	WINE_BOX	652.80	
+292	28403e39-2704-4f9d-bc51-37096e1e2955	Drostdy-Hof Claret Select	5 Litre Box	4	case	WINE_BOX	729.60	
+293	8b2dd1ca-acd7-4be8-a2f9-963ffb4d6e1e	Paarl Perle White	2 Litre Co-Pack	4	case	WINE_BOX	326.40	
+294	40611d9a-e21a-4585-a712-eab607c89bca	Robertson Winery Smooth Red	3 Litre Box	4	case	WINE_BOX	518.40	
