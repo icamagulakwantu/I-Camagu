@@ -26,17 +26,25 @@ const COST_RATES = {
     vodka_750ml: 200.00,
   },
   livestock: {
-    // UNVERIFIED. This key names an animal we cannot identify: "inkunzi" is a
-    // bull, but the catalogue SKU says "Cow / Ox". Digikraal 10 Sep 2026 has
-    // Bulls avg R31,751, Cows R14,612, Oxen R12,722 — so R22,000 is either a
-    // third under the market or nearly double it, depending which beast we
-    // actually supply. Decide bull vs ox before repricing this line.
-    male_ox_inkunzi: 22000.00,
-    female_cow_inkomo: 14612.00,  // Digikraal 10 Sep 2026: Cows avg R14,612 (R8,500-20,000, n=38) - cleanest cattle row
-    goat_white: 2800.00,
-    goat_standard: 2200.00,
-    sheep: 2500.00,
-    sheep_with_horns: 3200.00,
+    // Ceremonial livestock is a different market from commercial livestock,
+    // and mixing them up is the mistake to avoid here. Digikraal's national
+    // figures — bulls R31,751, cows R14,612, oxen R12,722 — are breeding and
+    // slaughter stock. A breeding bull is not a ceremony animal; a family
+    // buying one for umgidi is not the family this app serves. The beast an
+    // ordinary household buys for a rite is a Nguni at R17-19k, and
+    // SamMeatsNeeds' published Mgidi Stokvel package prices it at R18,000
+    // alongside a sheep and a goat at R3,000 each. Those are the rates below.
+    //
+    // Trade vocabulary, which the catalogue SKUs should also adopt: inkabi is
+    // the castrated male (the ceremonial animal), inkomo the cow, inkunzi the
+    // bull. Sellers advertise "inkabi goat" and "inkabi sheep"; buyers ask for
+    // them that way.
+    male_ox_inkunzi: 18000.00,  // Ceremonial Nguni beast, R17-19k band. SamMeatsNeeds Mgidi Stokvel pkg 1 implies R18000
+    female_cow_inkomo: 18000.00,  // Ceremonial Nguni beast, R17-19k band. Was briefly set to Digikraal R14,612 - wrong market, that is commercial/breeding stock
+    goat_white: 3000.00,  // No separate source. Held level with the standard goat rather than below it - a white goat is specifically sought and may carry a premium; worth checking
+    goat_standard: 3000.00,  // Ceremonial inkabi goat. SamMeatsNeeds pkg 1 implies R3000; Digikraal does-with-kids R3044 agrees
+    sheep: 3000.00,  // Ceremonial inkabi. SamMeatsNeeds pkg 1 implies R3000
+    sheep_with_horns: 3000.00,  // Ceremonial inkabi (wether). SamMeatsNeeds pkg 1 implies R3000
     fowl: 150.00,
   },
   food: {
