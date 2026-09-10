@@ -342,7 +342,7 @@ const ULWALUKO_COST_PROFILE = {
     { label: 'Green apples and low-water-content fruit', category: 'food', unit: 'kg', unitCost: COST_RATES.food.green_apples_kg, quantity: 5, isInputField: true, inputType: 'number', suggestedAmount: '5 kg apples', skuName: 'Green Apples (per kg)' },
   ],
   'UMOJISO': [
-    { label: 'Sheep (preferably with horns) or goat for uMojiso', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.sheep_with_horns, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Sheep w/ horns ~R3,200', skuName: 'Sheep with Horns' },
+    { label: 'Sheep (preferably with horns) or goat for uMojiso', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.sheep_with_horns, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Sheep ~R3,000', skuName: 'Sheep' },
     { label: 'Minimum 4 bottles of brandy, 2 cases of beer (1 bottle for peers)', category: 'alcohol', unit: 'mixed', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '4 brandy + 2 beer cases' },
   ],
   'EXIT_PREPARATION': [
