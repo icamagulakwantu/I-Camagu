@@ -78,6 +78,7 @@ minutes than all three models managed across the whole catalogue.
 
 | file | what it is |
 |---|---|
+| `alcohol.psv` | all 252 alcohol SKUs — case price, pallet pack and price, our shelf reference and its flag. Pipe-delimited; checksums to the DB at R694,700.76 |
 | `consensus.csv` / `.json` | all 294: our unit price, three-source blend, spread, confidence class A/B/C |
 | `ref-map.json` | `P001`–`P294` → SKU id. The survey prompts used these refs |
 | `factors.json` | measured bias correction per source |
@@ -89,8 +90,35 @@ minutes than all three models managed across the whole catalogue.
 
 `score.py` and `ultra.py` expect to run from this directory.
 
+## The alcohol board
+
+`alcohol.psv` is the snapshot behind the Gqeberha Liquor Board — all 252 alcohol
+SKUs set against nine shops, split by what they are to us:
+
+| | shops | what they are |
+|---|---|---|
+| wholesale | Ultra, Prestons, Jumbo Cash & Carry, Makro | we would buy here |
+| retail | Boxer, Shoprite, Checkers, Pick n Pay, Spar Tops | we are judged here |
+
+Enter a shop price and the board works backwards to the buy price we need:
+sell at 93% of the cheapest shelf, buy at 85% of it. Those two percentages are
+generalised from **one** worked example — Hennessy VS at about R589 on the
+shelf, sold at R530–580, bought at R499–510 — so they are a working assumption,
+not a measurement, and they are editable on the page.
+
+**Core list: 163 of 252.** Two rules, because price alone was not enough. A line
+is core when it is not a 375 ml bottle and a unit costs under R400 (R600 cognac,
+R350 liqueur, R150–200 wine); beer and cider are core throughout. The second
+rule drops house-brand mixing stock — Butlers, Peddler's, Relic, San Basile and
+the generics — which is bar service, not a stokvel case buy.
+
+Only six cells are filled from a named source: four Ultra broadsheet promos
+(1–15 Sep 2026) and two Prestons prices (10 Sep 2026). Everything else in a shop
+column has to be walked in and read off a shelf.
+
 ## Live pages
 
+- Gqeberha Liquor Board — https://claude.ai/code/artifact/1a041bb6-fd4b-45fc-971f-3010738f043a
 - Shelf Price Survey — https://claude.ai/code/artifact/debdab02-2ceb-4920-bda3-36ac66516c54
 - Gqeberha Price Check (35 remaining, print-ready) — https://claude.ai/code/artifact/2d05bfcd-fceb-40ec-9365-b9eb6035418f
 

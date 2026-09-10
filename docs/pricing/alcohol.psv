@@ -1,0 +1,253 @@
+sid|category|name|format|unitsPerCase|casePriceZAR|palletPackQty|palletPriceZAR|retailPriceZAR|src
+f9e99470|BEER|Amstel Lager|Can (330ml)|24|372.48|84|29998.08|515.66|E
+a0e7ce30|BEER|Amstel Lager|Dumpy (340ml)|24|325.92|84|26248.32|553.63|E
+299a339d|BEER|Amstel Lager|Quart (750ml)|12|291.00|60|16740.00|419.72|E
+313338af|BEER|Black Label|Can (330ml)|24|349.20|84|28123.20|515.66|E
+666f9578|BEER|Black Label|Quart (750ml)|12|279.36|60|16070.40|259.99|VP
+b4bd53de|BEER|Budweiser|Can (330ml)|24|395.76|84|31872.96|567.47|E
+cd735af7|BEER|Budweiser|Dumpy (340ml)|24|349.20|84|28123.20|595.17|E
+1859ee75|BEER|Castle Lager|Can (330ml)|24|349.20|84|28123.20|515.66|E
+c14654bf|BEER|Castle Lager|Dumpy (340ml)|24|325.92|84|26248.32|553.63|E
+6c3ec1c5|BEER|Castle Lager|Quart (750ml)|12|279.36|60|16070.40|229.99|VP
+2c1842e8|BEER|Castle Lite|Can (330ml)|24|349.20|84|28123.20|567.47|E
+8b129049|BEER|Castle Lite|Dumpy (340ml)|24|325.92|84|26248.32|595.17|E
+e582f9d7|BEER|Castle Lite|Quart (750ml)|12|279.36|60|16070.40|443.70|E
+a1c0e53b|BEER|Castle Milk Stout|Can (330ml)|24|395.76|84|31872.96|581.32|E
+6b0ae88d|BEER|Castle Milk Stout|Dumpy (340ml)|24|372.48|84|29998.08|622.86|E
+1eb8d00f|BEER|Castle Milk Stout|Quart (750ml)|12|325.92|60|18748.80|463.76|E
+5256f1e1|BEER|Corona|Can (330ml)|24|512.16|84|41247.36|733.64|E
+32987a32|BEER|Corona|Dumpy (355ml)|24|465.60|84|37497.60|429.99|V
+c1a02fef|BEER|Flying Fish Lemon/Apple|Can (330ml)|24|372.48|84|29998.08|529.57|E
+5a534fa7|BEER|Flying Fish Lemon/Apple|Dumpy (340ml)|24|325.92|84|26248.32|575.62|E
+134b46b6|BEER|Guinness Foreign Extra|Can (440ml)|24|605.28|84|48746.88|791.47|E
+d8cd5347|BEER|Guinness Foreign Extra|Dumpy (340ml)|24|558.72|84|44997.12|682.94|E
+b906e450|BEER|Hansa Pilsener|Can (330ml)|24|325.92|84|26248.32|498.24|E
+4cb907da|BEER|Hansa Pilsener|Dumpy (340ml)|24|302.64|84|24373.44|525.93|E
+91e5d769|BEER|Hansa Pilsener|Quart (750ml)|12|267.72|60|15400.80|419.72|E
+6c172a81|BEER|Heineken|Can (330ml)|24|419.04|84|33747.84|622.86|E
+1a6b59ef|BEER|Heineken|Dumpy (340ml)|24|372.48|84|29998.08|650.56|E
+33d2acd6|BEER|Heineken|Quart (500ml)|12|325.92|60|18748.80|419.72|E
+c911e4ee|BEER|Lion Lager|Can (330ml)|24|302.64|84|24373.44|498.24|E
+dd37681f|BEER|Lion Lager|Quart (750ml)|12|244.44|60|14061.60|419.72|E
+fa2e6832|BEER|Sol|Can (330ml)|24|419.04|84|33747.84|622.86|E
+d4fbddd5|BEER|Sol|Dumpy (340ml)|24|372.48|84|29998.08|650.56|E
+4c20661e|BEER|Stella Artois|Can (330ml)|24|442.32|84|35622.72|622.86|E
+59fea14e|BEER|Stella Artois|Dumpy (340ml)|24|419.04|84|33747.84|650.56|E
+e9f6f934|BEER|Windhoek Draught|Can (440ml)|24|465.60|84|37497.60|419.99|V
+9b64a135|BEER|Windhoek Draught|Quart (440ml)|12|337.56|60|19418.40|373.75|E
+f1737236|BEER|Windhoek Lager/Light|Can (330ml)|24|419.04|84|33747.84|595.17|E
+307135e6|BEER|Windhoek Lager/Light|Dumpy (340ml)|24|372.48|84|29998.08|622.86|E
+31a3f491|BEER|Windhoek Lager/Light|Quart (500ml)|12|302.64|60|17409.60|419.72|E
+1c16862b|CIDER_RTD|Belgravia G&T (Asstd)|Can (440ml)|24|488.88|84|39372.48|479.99|VP
+e415ef76|CIDER_RTD|Belgravia G&T (Asstd)|Dumpy (275ml)|24|442.32|84|35622.72|599.28|E
+9ba305b0|CIDER_RTD|Bernini Classic/Blush/Ruby|Can (330ml)|24|372.48|84|29998.08|575.62|E
+910d937e|CIDER_RTD|Bernini Classic/Blush/Ruby|Dumpy (275ml)|24|325.92|84|26248.32|501.68|E
+30cfa3ee|CIDER_RTD|Breezer (Red/Watermelon)|Dumpy (275ml)|24|465.60|84|37497.60|599.28|E
+3e8cea01|CIDER_RTD|Brutal Fruit Ruby/Litchi|Can (330ml)|24|419.04|84|33747.84|622.86|E
+a20f1973|CIDER_RTD|Brutal Fruit Ruby/Litchi|Dumpy (340ml)|24|372.48|84|29998.08|650.56|E
+686cc27e|CIDER_RTD|Brutal Fruit Ruby/Litchi|Quart (750ml)|12|407.40|60|23436.00|479.68|E
+5637e105|CIDER_RTD|Chillers Punch|Can (500ml)|24|372.48|84|29998.08|575.62|E
+10fcab7a|CIDER_RTD|Chillers Punch|Dumpy (500ml)|24|325.92|84|26248.32|623.58|E
+d1d9495d|CIDER_RTD|Extreme Energy|Can (500ml)|24|395.76|84|31872.96|515.66|E
+bedb84be|CIDER_RTD|Extreme Energy|Dumpy (500ml)|24|349.20|84|28123.20|575.62|E
+f958344d|CIDER_RTD|Flying Fish Chill|Can (330ml)|24|395.76|84|31872.96|515.66|E
+19a01115|CIDER_RTD|Flying Fish Chill|Dumpy (340ml)|24|349.20|84|28123.20|575.62|E
+2159ebf2|CIDER_RTD|Hunter's Chilled|Can (330ml)|24|442.32|84|35622.72|529.57|E
+8f541c44|CIDER_RTD|Hunter's Chilled|Dumpy (340ml)|24|395.76|84|31872.96|575.62|E
+96f18eb6|CIDER_RTD|Hunter's Dry/Gold|Can (330ml)|24|419.04|84|33747.84|529.57|E
+1a87cf2d|CIDER_RTD|Hunter's Dry/Gold|Dumpy (340ml)|24|372.48|84|29998.08|575.62|E
+dfae53ea|CIDER_RTD|Hunter's Dry/Gold|Quart (750ml)|12|419.04|60|24105.60|419.72|E
+d6ecb41b|CIDER_RTD|Kopparberg Strawberry/Lime|Can (500ml)|24|582.00|84|46872.00|906.03|E
+ce7bbd8e|CIDER_RTD|Kopparberg Strawberry/Lime|Dumpy (500ml)|24|512.16|84|41247.36|906.03|E
+808c90a0|CIDER_RTD|Redd's Berry/Orig/Green|Can (330ml)|24|419.04|84|33747.84|575.62|E
+bbe67935|CIDER_RTD|Redd's Berry/Orig/Green|Dumpy (340ml)|24|372.48|84|29998.08|622.86|E
+52798310|CIDER_RTD|Redd's MXD Pine/Guarana|Can (330ml)|24|419.04|84|33747.84|575.62|E
+7b42ca62|CIDER_RTD|Redd's MXD Pine/Guarana|Dumpy (340ml)|24|372.48|84|29998.08|622.86|E
+341eaf00|CIDER_RTD|Savanna Angry Lemon|Can (330ml)|24|465.60|84|37497.60|623.58|E
+8e54f668|CIDER_RTD|Savanna Angry Lemon|Dumpy (340ml)|24|419.04|84|33747.84|678.25|E
+3f0875ae|CIDER_RTD|Savanna Dry/Light|Can (330ml)|24|442.32|84|35622.72|623.58|E
+64b20b19|CIDER_RTD|Savanna Dry/Light|Dumpy (340ml)|24|395.76|84|31872.96|678.25|E
+9d3aaf50|CIDER_RTD|Savanna Dry/Light|Quart (750ml)|12|407.40|60|23436.00|479.68|E
+8091cab1|CIDER_RTD|Smirnoff Spin/Storm|Can (440ml)|24|442.32|84|35622.72|439.99|VP
+996346c0|CIDER_RTD|Smirnoff Spin/Storm|Dumpy (250ml)|24|395.76|84|31872.96|571.40|E
+71865af7|CIDER_RTD|Strongbow Gold/Apple|Can (330ml)|24|419.04|84|33747.84|575.62|E
+3b663b3d|CIDER_RTD|Strongbow Gold/Apple|Dumpy (340ml)|24|372.48|84|29998.08|623.58|E
+2234b6d4|CIDER_RTD|Strongbow Gold/Apple|Quart (750ml)|12|395.76|60|22766.40|443.70|E
+cmtukeoa|BRANDY|Commando Brandy|750ml Bottle|12|2349.00|60|135067.50|2759.88|V
+33dddfd7|BRANDY|Klipdrift Export|750ml Bottle|12|2188.80|60|125856.00|2279.88|V
+3413c00c|BRANDY|Viceroy 5 Year Old|750ml Bottle|12|1843.20|60|105984.00|2278.48|E
+d6ddf137|BRANDY|Wellington VO|750ml Bottle|12|1900.80|60|109296.00|2458.36|E
+c01837d4|GIN|Bombay Sapphire|375ml Bottle|12|1958.40|60|112608.00||
+b434dab9|GIN|Bombay Sapphire|750ml Bottle|12|3571.20|60|205344.00|6231.27|E
+fbe82544|GIN|Cruxland Gin|750ml Bottle|12|3686.40|60|211968.00|4846.51|E
+eb1a5ab3|GIN|Flowstone African Bush Botanical|750ml Bottle|12|3571.20|60|205344.00|5702.81|E
+4d203717|GIN|Gordons London Dry|375ml Bottle|12|1094.40|60|62928.00||
+d5f0bd73|GIN|Gordons London Dry|750ml Bottle|12|1958.40|60|112608.00|2039.88|V
+4d9827d7|GIN|Gordons Premium Pink|375ml Bottle|12|1152.00|60|66240.00||
+f8e4576e|GIN|Gordons Premium Pink|750ml Bottle|12|2073.60|60|119232.00||
+fee0264f|GIN|Hendrick's Original|375ml Bottle|12|2880.00|60|165600.00||
+bb85c70e|GIN|Hendrick's Original|750ml Bottle|12|5184.00|60|298080.00||
+5b7bf040|GIN|Inverroche Amber/Verdant|750ml Bottle|12|4492.80|60|258336.00|6577.46|E
+ba5ea82d|GIN|Inverroche Classic|750ml Bottle|12|4147.20|60|238464.00|6577.46|E
+d1c9aad0|GIN|KEM Gin|750ml Bottle|12|2880.00|60|165600.00|4322.42|E
+30d15804|GIN|Kwande Gin|750ml Bottle|12|3225.60|60|185472.00|4317.12|E
+857ed5e3|GIN|Musgrave Pink|750ml Bottle|12|3340.80|60|192096.00|4846.51|E
+796757ca|GIN|Old Buck Gin|375ml Bottle|12|1036.80|60|59616.00||
+171bbbc0|GIN|Old Buck Gin|750ml Bottle|12|1843.20|60|105984.00|1799.00|V
+deea893e|GIN|Royal Flush Premium|375ml Bottle|12|1267.20|60|72864.00|2565.57|E
+58e2495b|GIN|Royal Flush Premium|750ml Bottle|12|2304.00|60|132480.00|4317.12|E
+b21593f9|GIN|Strettons London Dry|375ml Bottle|12|1094.40|60|62928.00||
+7cf5f3f5|GIN|Strettons London Dry|750ml Bottle|12|1958.40|60|112608.00|1749.00|V
+fcd244ec|GIN|Strettons Wild Berry|375ml Bottle|12|1094.40|60|62928.00||
+b2b1584f|GIN|Strettons Wild Berry|750ml Bottle|12|1958.40|60|112608.00||
+4f440c0c|GIN|Tanqueray Flor de Sevilla|750ml Bottle|12|4147.20|60|238464.00||
+33a6df80|GIN|Tanqueray London Dry Export|375ml Bottle|12|2246.40|60|129168.00||
+81d803f9|GIN|Tanqueray London Dry Export|750ml Bottle|12|4147.20|60|238464.00||
+39d3385e|GIN|Tanqueray No. TEN|750ml Bottle|12|5551.20|60|319194.00|7962.22|E
+573e0bae|GIN|Wixworth Gin|750ml Bottle|12|3225.60|60|185472.00|3959.89|E
+61aa8a43|VODKA|Absolut (Watermelon/Lime/Citron)|750ml Bottle|12|2764.80|60|158976.00|3959.89|E
+a32b830d|VODKA|Absolut Original Blue|375ml Bottle|12|1440.00|60|82800.00|2769.38|E
+f1a3521b|VODKA|Absolut Original Blue|750ml Bottle|12|2649.60|60|152352.00|4361.85|E
+2fb42ce5|VODKA|Count Pushkin Vodka|375ml Bottle|12|864.00|60|49680.00|1798.80|E
+511f6e09|VODKA|Count Pushkin Vodka|750ml Bottle|12|1497.60|60|86112.00|2638.24|E
+12b1f8c1|VODKA|Cruz Vintage Black Vodka|375ml Bottle|12|1382.40|60|79488.00|2216.98|E
+8f77cfa9|VODKA|Cruz Vintage Black Vodka|750ml Bottle|12|2534.40|60|145728.00|3959.89|E
+871a848a|VODKA|Russian Bear Flavours|750ml Bottle|12|1612.80|60|92736.00|2218.52|E
+d8e0cebc|VODKA|Russian Bear Standard|375ml Bottle|12|921.60|60|52992.00||
+564652bd|VODKA|Russian Bear Standard|750ml Bottle|12|1612.80|60|92736.00|2638.24|E
+76879636|VODKA|Skyy Vodka Original|375ml Bottle|12|1324.80|60|76176.00|2638.24|E
+f81f6d5e|VODKA|Skyy Vodka Original|750ml Bottle|12|2419.20|60|139104.00|2799.00|V
+1756a6ac|VODKA|Smirnoff Infusions|750ml Bottle|12|1958.40|60|112608.00|3323.28|E
+23050c4b|VODKA|Smirnoff Red No. 21|375ml Bottle|12|1036.80|60|59616.00|2007.76|E
+1408ddd8|VODKA|Smirnoff Red No. 21|750ml Bottle|12|1843.20|60|105984.00|3323.28|E
+50a0d351|VODKA|Wyborowa Vodka|375ml Bottle|12|1152.00|60|66240.00|2218.52|E
+b2110256|VODKA|Wyborowa Vodka|750ml Bottle|12|2073.60|60|119232.00|3597.60|E
+7c78fead|VODKA_PREMIUM|Belvedere Pure Vodka|375ml Bottle|12|2995.20|60|172224.00|4846.51|E
+3f3f758f|VODKA_PREMIUM|Belvedere Pure Vodka|750ml Bottle|12|5529.60|60|317952.00|8308.41|E
+9e42335f|VODKA_PREMIUM|Ciroc (Apple/Mango/Pineapple)|750ml Bottle|12|5068.80|60|291456.00|7075.28|E
+e6f5d5a6|VODKA_PREMIUM|Ciroc Original Premium|375ml Bottle|12|2649.60|60|152352.00|4015.66|E
+834b4c99|VODKA_PREMIUM|Ciroc Original Premium|750ml Bottle|12|4838.40|60|278208.00|3499.00|V
+4f3e4fd3|VODKA_PREMIUM|Grey Goose Luxury|375ml Bottle|12|3456.00|60|198720.00|4846.51|E
+1f832ded|VODKA_PREMIUM|Grey Goose Luxury|750ml Bottle|12|6336.00|60|364320.00|9693.16|E
+624a0311|WHISKY|Bain's Cape Mountain|375ml Bottle|12|1497.60|60|86112.00||
+a8af920a|WHISKY|Bain's Cape Mountain|750ml Bottle|12|2764.80|60|158976.00|4216.52|E
+a3734968|WHISKY|Bells Extra Special|375ml Bottle|12|1324.80|60|76176.00|2218.52|E
+b8e0830a|WHISKY|Bells Extra Special|750ml Bottle|12|2419.20|60|139104.00|3597.60|E
+ff212d0d|WHISKY|Chivas Regal 12 Year Old|375ml Bottle|12|2534.40|60|145728.00||
+66543674|WHISKY|Chivas Regal 12 Year Old|750ml Bottle|12|4838.40|60|278208.00|6609.12|E
+c2037ff2|WHISKY|Chivas Regal 15 Year Old|750ml Bottle|12|7833.60|60|450432.00|9606.93|E
+3d688417|WHISKY|Firstwatch Whisky|750ml Bottle|12|2016.00|60|115920.00|2638.24|E
+41f9596a|WHISKY|Glenfiddich 12 Year|750ml Bottle|12|7550.40|60|434148.00|9893.40|E
+8250f1e2|WHISKY|J&B Rare|375ml Bottle|12|1267.20|60|72864.00|2077.00|E
+6481173c|WHISKY|J&B Rare|750ml Bottle|12|2304.00|60|132480.00|2299.00|V
+a5702cfd|WHISKY|Jack Daniel's Old No.7|375ml Bottle|12|2188.80|60|125856.00|3115.57|E
+fd76b3d7|WHISKY|Jack Daniel's Old No.7|750ml Bottle|12|4147.20|60|238464.00|5075.36|E
+56d64e24|WHISKY|Jack Daniel's Tennessee Honey|375ml Bottle|12|2188.80|60|125856.00|2844.43|E
+d82033a3|WHISKY|Jack Daniel's Tennessee Honey|750ml Bottle|12|4147.20|60|238464.00|5075.36|E
+04696748|WHISKY|Jameson Caskmates|750ml Bottle|12|4377.60|60|251712.00|6231.27|E
+548181c6|WHISKY|Jameson Original Irish|375ml Bottle|12|1728.00|60|99360.00|3123.30|E
+f4ae7b5f|WHISKY|Jameson Original Irish|750ml Bottle|12|3225.60|60|185472.00|4099.00|V
+258073d1|WHISKY|Jameson Select Reserve|750ml Bottle|12|4838.40|60|278208.00|5748.00|V
+5b02d280|WHISKY|Johnnie Walker Black Label|375ml Bottle|12|2304.00|60|132480.00|3402.16|E
+065b77a1|WHISKY|Johnnie Walker Black Label|750ml Bottle|12|4377.60|60|251712.00|5696.20|E
+84a519c1|WHISKY|Johnnie Walker Double Black|750ml Bottle|12|5529.60|60|317952.00|7236.57|E
+4152630e|WHISKY|Johnnie Walker Gold Label Reserve|750ml Bottle|12|8640.00|60|496800.00|6840.00|V
+ed36fa8b|WHISKY|Johnnie Walker Red Label|375ml Bottle|12|1555.20|60|89424.00|2146.24|E
+f29d16c1|WHISKY|Johnnie Walker Red Label|750ml Bottle|12|2880.00|60|165600.00|2748.00|V
+a3f9f7b3|WHISKY|Scottish Leader Original|375ml Bottle|12|1152.00|60|66240.00|2007.76|E
+d3a8636e|WHISKY|Scottish Leader Original|750ml Bottle|12|2073.60|60|119232.00|3254.04|E
+6b98f661|WHISKY|The Glenlivet 12 Year|750ml Bottle|12|7833.60|60|450432.00|8394.40|E
+bbede00b|WHISKY|Three Ships 5 Year Old|375ml Bottle|12|1209.60|60|69552.00|2146.24|E
+6c3d533d|WHISKY|Three Ships 5 Year Old|750ml Bottle|12|2188.80|60|125856.00|2100.00|V
+2fec4aa4|COGNAC|Hennessy VS|375ml Bottle|12|3916.80|60|225216.00|4796.80|E
+68b77494|COGNAC|Hennessy VS|750ml Bottle|12|6336.00|60|364320.00|7068.00|V
+a4f230ff|COGNAC|Hennessy VSOP|750ml Bottle|12|10260.00|60|589950.00|11868.00|V
+89425dcb|COGNAC|Hennessy XO|750ml Bottle|12|33480.00|60|1925100.00|39724.43|E
+4b3ef8a3|COGNAC|Honor VS|375ml Bottle|12|2880.00|60|165600.00||
+dba1b7d2|COGNAC|Honor VS|750ml Bottle|12|5184.00|60|298080.00|5880.00|V
+a6a38115|COGNAC|Bisquit & Dubouche VS|750ml Bottle|12|5644.80|60|324576.00||
+b676d958|COGNAC|Bisquit & Dubouche VSOP|750ml Bottle|12|9676.80|60|556416.00||
+5b856a12|COGNAC|Courvoisier VS|750ml Bottle|12|5990.40|60|344448.00|6887.99|E
+a5e276bc|COGNAC|Courvoisier VSOP|750ml Bottle|12|9446.40|60|543168.00||
+f3ecdee8|COGNAC|D'USSE VSOP|750ml Bottle|12|9504.00|60|546480.00|12591.60|E
+e842a3a5|COGNAC|Martell Blue Swift VSOP|750ml Bottle|12|10800.00|60|621000.00|9893.40|E
+2b528374|COGNAC|Martell VS|750ml Bottle|12|6102.00|60|350865.00|6609.12|E
+3d927343|COGNAC|Remy Martin 1738 Accord Royal|750ml Bottle|12|13824.00|60|794880.00|13191.20|E
+8d73dc9e|COGNAC|Remy Martin VSOP|750ml Bottle|12|9792.00|60|563040.00|11077.92|E
+4358d4ce|TEQUILA|Aljimardo Silver|375ml Bottle|12|1267.20|60|72864.00||
+1cb57969|TEQUILA|Aljimardo Silver|750ml Bottle|12|2304.00|60|132480.00||
+4981d04b|TEQUILA|El Jimador Blanco/Reposado|750ml Bottle|12|2764.80|60|158976.00||
+f321a8b2|TEQUILA|Jose Cuervo Especial Reposado|375ml Bottle|12|1670.40|60|96048.00|3323.28|E
+a4203e57|TEQUILA|Jose Cuervo Especial Reposado|750ml Bottle|12|2995.20|60|172224.00|6231.27|E
+c3fdc1c2|TEQUILA|Jose Cuervo Especial Silver|375ml Bottle|12|1612.80|60|92736.00|3323.28|E
+65306382|TEQUILA|Jose Cuervo Especial Silver|750ml Bottle|12|2880.00|60|165600.00|6231.27|E
+935556eb|TEQUILA|Olmeca Plata|375ml Bottle|12|1843.20|60|105984.00|3461.76|E
+65f3c5b3|TEQUILA|Olmeca Plata|750ml Bottle|12|3225.60|60|185472.00||
+7e8b689a|TEQUILA|Olmeca Reposado|375ml Bottle|12|1900.80|60|109296.00||
+c963988a|TEQUILA|Olmeca Reposado|750ml Bottle|12|3340.80|60|192096.00||
+acbc6b1f|TEQUILA|Ponchos Blanco/Caramel Tequila|375ml Bottle|12|1152.00|60|66240.00|2700.14|E
+a8e462c9|TEQUILA|Ponchos Blanco/Caramel Tequila|750ml Bottle|12|2073.60|60|119232.00|4846.51|E
+8bced4e3|TEQUILA_PREMIUM|Casamigos Blanco|750ml Bottle|12|8294.40|60|474336.00|10443.52|E
+d939df33|TEQUILA_PREMIUM|Casamigos Reposado|750ml Bottle|12|9792.00|60|559980.00|15589.60|E
+009fade2|TEQUILA_PREMIUM|Clase Azul Plata|750ml Bottle|12|32292.00|60|1846698.75|28569.80|E
+b4b29a22|TEQUILA_PREMIUM|Clase Azul Reposado|750ml Bottle|12|48600.00|60|2779312.50|44582.20|E
+92baa903|TEQUILA_PREMIUM|Don Julio Blanco|750ml Bottle|12|7142.40|60|408456.00|10373.81|E
+015a9d9e|TEQUILA_PREMIUM|Don Julio Reposado|750ml Bottle|12|8524.80|60|487512.00|8997.96|V
+ab7ed8c6|TEQUILA_PREMIUM|Patron Reposado|750ml Bottle|12|11289.60|60|645624.00|12591.60|E
+2684ee69|TEQUILA_PREMIUM|Patron Silver Luxury|750ml Bottle|12|9792.00|60|559980.00|12535.02|E
+895546e8|LIQUEUR|Amarula Ethiopian Coffee|750ml Bottle|12|2188.80|60|125856.00|3957.36|E
+2e88ac17|LIQUEUR|Amarula Original Cream|750ml Bottle|12|2073.60|60|119232.00|1728.00|V
+d5b45a0b|LIQUEUR|Baileys Original Irish Cream|750ml Bottle|12|2880.00|60|165600.00|3597.60|E
+2ecf7c42|LIQUEUR|Banana Liqueur (Butlers)|750ml Bottle|12|2188.80|60|125856.00|2284.71|E
+4bf8e2a1|LIQUEUR|Blue Curacao (Butlers)|750ml Bottle|12|2534.40|60|145728.00|2284.71|E
+85ec6c22|LIQUEUR|Blue Curacao (Peddler's)|750ml Bottle|12|2764.80|60|158976.00||
+6473969b|LIQUEUR|Blue Curacao Generic|750ml Bottle|12|979.20|60|56304.00||
+8f19c3ab|LIQUEUR|Cape Velvet Cream|750ml Bottle|12|1497.60|60|86112.00|2630.90|E
+867d1be8|LIQUEUR|Chambord Black Raspberry|500ml Bottle|12|4377.60|60|251712.00|4976.68|E
+ce16ecff|LIQUEUR|Cherry Kirsch Liqueur (Butlers)|750ml Bottle|12|2419.20|60|139104.00|2284.71|E
+e9e69c1f|LIQUEUR|Cointreau Orange Liqueur|750ml Bottle|12|3686.40|60|211968.00|6295.80|E
+a2fc9c45|LIQUEUR|Disaronno Amaretto Liqueur|750ml Bottle|12|3456.00|60|198720.00|4976.68|E
+f58ee7b5|LIQUEUR|Drambuie Honey/Scotch|750ml Bottle|12|3686.40|60|211968.00|6678.84|E
+26236783|LIQUEUR|Espresso/Coffee Liqueur (Butlers)|750ml Bottle|12|2188.80|60|125856.00|2146.24|E
+f79ba556|LIQUEUR|Frangelico Hazelnut Liqueur|750ml Bottle|12|2995.20|60|172224.00||
+7667828a|LIQUEUR|Ginger Liqueur (Butlers)|750ml Bottle|12|2188.80|60|125856.00|2284.71|E
+52c452ad|LIQUEUR|Grand Marnier Cordon Rouge|750ml Bottle|12|4492.80|60|258336.00|8308.41|E
+1de4dba8|LIQUEUR|Jagermeister Herbal Liqueur|750ml Bottle|12|3686.40|60|211968.00|3540.00|V
+7ba4c546|LIQUEUR|Kahlua Coffee Liqueur|750ml Bottle|12|2880.00|60|165600.00|3957.36|E
+b657f80c|LIQUEUR|Malibu Coconut Rum Liqueur|750ml Bottle|12|2073.60|60|119232.00|3597.60|E
+98f8111e|LIQUEUR|Nachtmusik Chocolate Liqueur|750ml Bottle|12|1497.60|60|86112.00|2630.90|E
+c3cf9be4|LIQUEUR|Peach Schnapps (Butlers)|750ml Bottle|12|2073.60|60|119232.00|2007.76|E
+02a23538|LIQUEUR|Peach Schnapps (Relic)|750ml Bottle|12|2361.60|60|135792.00||
+ac8b2351|LIQUEUR|Peach Schnapps Generic|750ml Bottle|12|1036.80|60|59616.00||
+c0c73243|LIQUEUR|Peppermint Liqueur (Butlers)|750ml Bottle|12|2188.80|60|125856.00|2146.24|E
+d06b7490|LIQUEUR|Sambuca Generic Blue/White|750ml Bottle|12|1612.80|60|92736.00||
+f97029f9|LIQUEUR|Sambuca Lupini Black/Gold|750ml Bottle|12|1958.40|60|112608.00|3262.73|E
+536b0772|LIQUEUR|Strawberry Lips|750ml Bottle|12|1612.80|60|92736.00|2356.42|E
+682804a5|LIQUEUR|Strawberry Liqueur (Butlers)|750ml Bottle|12|2073.60|60|119232.00|2284.71|E
+52bd942e|LIQUEUR|Strawberry Liqueur Generic|750ml Bottle|12|1152.00|60|66240.00||
+9937d447|LIQUEUR|Tequila Rose Cream Liqueur|750ml Bottle|12|2304.00|60|132480.00|3957.36|E
+cb7565a7|LIQUEUR|Tia Maria Coffee Liqueur|750ml Bottle|12|2534.40|60|145728.00|4308.48|E
+4a9ce70a|LIQUEUR|Triple Sec (Butlers)|750ml Bottle|12|2361.60|60|135792.00|2340.00|V
+51066c2a|LIQUEUR|Triple Sec (Peddler's)|750ml Bottle|12|2764.80|60|158976.00||
+4f8c9cbe|LIQUEUR|Triple Sec Premium (San Basile)|750ml Bottle|12|5529.60|60|317952.00|3053.58|E
+4977eea0|LIQUEUR|Van Der Hum Tangerine (Butlers)|750ml Bottle|12|2188.80|60|125856.00|2630.90|E
+38f0aaf3|LIQUEUR|Wild Africa Cream Liqueur|750ml Bottle|12|1382.40|60|79488.00|1488.00|V
+6114d889|WINE|4th Street Sweet Red/White|750ml Bottle|6|285.00|100|27000.00|383.37|E
+f2aac112|WINE|Beyerskloof Pinotage|750ml Bottle|6|627.00|100|59400.00|899.40|E
+4a3cb4e4|WINE|Castillo de Liria Sweet Red|750ml Bottle|6|427.50|100|40500.00|509.66|E
+16cd9136|WINE|Drostdy-Hof Adelpracht Sweet|750ml Bottle|6|342.00|100|32400.00|509.66|E
+7d7a7abb|WINE|Kanonkop Kadette Cabernet|750ml Bottle|6|798.00|100|75600.00|1142.36|E
+e915d8a0|WINE|Nederburg Baronne|750ml Bottle|6|484.50|100|45900.00|657.69|E
+4deea093|WINE|Nederburg Sauvignon Blanc|750ml Bottle|6|456.00|100|43200.00|599.60|E
+9c53ff63|WINE|Robertson Winery Sweet Merlot|750ml Bottle|6|370.50|100|35100.00|509.66|E
+d09a542b|WINE|Saint Raphael Sweet Red|750ml Bottle|6|313.50|100|29700.00|509.66|E
+dfa81f7f|WINE_BOX|4th Street Sweet Red/Rose|5 Litre Box|4|652.80|75|46920.00|879.41|E
+28403e39|WINE_BOX|Drostdy-Hof Claret Select|5 Litre Box|4|729.60|75|52440.00|670.00|V
+8b2dd1ca|WINE_BOX|Paarl Perle White|2 Litre Co-Pack|4|326.40|75|23460.00|438.46|E
+40611d9a|WINE_BOX|Robertson Winery Smooth Red|3 Litre Box|4|518.40|75|37260.00|650.64|E
+1ef41427|SPARKLING|JC Le Roux La Fleurette|750ml Bottle|6|570.00|100|54000.00|657.69|E
+deead9a8|SPARKLING|JC Le Roux Le Domaine|750ml Bottle|6|570.00|100|54000.00|657.69|E
+335258be|SPARKLING|Krone Borealis Brut (MCC)|750ml Bottle|6|1197.00|100|113400.00|1050.00|V
+f2d34460|SPARKLING|Pongracz Brut|750ml Bottle|6|1083.00|100|102600.00|1282.78|E
+88c3203f|CHAMPAGNE|Moet & Chandon Imperial Brut|750ml Bottle|6|3942.00|100|373452.63|3570.00|V
+ac2547d2|CHAMPAGNE|Veuve Clicquot Yellow Label|750ml Bottle|6|4590.00|100|434842.11||
