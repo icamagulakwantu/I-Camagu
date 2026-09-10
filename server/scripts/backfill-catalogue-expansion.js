@@ -47,10 +47,17 @@ const CATALOGUE_EXPANSION_SKUS = [
 export async function backfillCatalogueExpansion() {
   let upserted = 0;
   for (const sku of CATALOGUE_EXPANSION_SKUS) {
-    await upsertSkuByNameAndBottleFormat(prisma, sku, {
-      casePriceZAR: sku.casePriceZAR,
-      retailPriceZAR: sku.retailPriceZAR ?? null,
-    });
+    // Only write a retail price where this file actually has one. Writing
+    // `?? null` re-ran on every deploy and wiped any shop price recorded
+    // since — it silently blanked eight of them, leaving rows flagged with
+    // a source but no price. A backfill exists to fill gaps, not to reset
+    // what the business has learned since.
+    const data = { casePriceZAR: sku.casePriceZAR };
+    if (sku.retailPriceZAR != null) {
+      data.retailPriceZAR = sku.retailPriceZAR;
+      data.retailPriceSource = 'VERIFIED';
+    }
+    await upsertSkuByNameAndBottleFormat(prisma, sku, data);
     upserted += 1;
   }
   if (upserted > 0) {
