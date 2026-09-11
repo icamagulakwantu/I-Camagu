@@ -32,8 +32,7 @@ const COST_RATES = {
     // slaughter stock. A breeding bull is not a ceremony animal; a family
     // buying one for umgidi is not the family this app serves. The beast an
     // ordinary household buys for a rite is a Nguni at R17-19k, and
-    // SamMeatsNeeds' published Mgidi Stokvel package prices it at R18,000
-    // alongside a sheep and a goat at R3,000 each. Those are the rates below.
+    // SamMeatsNeeds' published Mgidi Stokvel package prices it at R18,000.
     //
     // Trade vocabulary, which the catalogue SKUs should also adopt: inkabi is
     // the castrated male (the ceremonial animal), inkomo the cow, inkunzi the
@@ -41,14 +40,22 @@ const COST_RATES = {
     // them that way.
     male_ox_inkunzi: 18000.00,  // Ceremonial Nguni beast, R17-19k band. SamMeatsNeeds Mgidi Stokvel pkg 1 implies R18000
     female_cow_inkomo: 18000.00,  // Ceremonial Nguni beast, R17-19k band. Was briefly set to Digikraal R14,612 - wrong market, that is commercial/breeding stock
-    goat_white: 3000.00,  // No separate source. Held level with the standard goat rather than below it - a white goat is specifically sought and may carry a premium; worth checking
-    goat_standard: 3000.00,  // Ceremonial inkabi goat. SamMeatsNeeds pkg 1 implies R3000; Digikraal does-with-kids R3044 agrees
-    sheep: 3000.00,  // Ceremonial inkabi. SamMeatsNeeds pkg 1 implies R3000
-    sheep_with_horns: 3000.00,
+    //
+    // Sheep, goat and sybok are three different animals, each with its own
+    // rate below — none of the three stands in for another, and a fix to
+    // one is never a reason to touch the others. Founder's own price ceiling
+    // for our platform: none of the three sells for more than R2,700, which
+    // is why these read R2,700 rather than the R3,000 SamMeatsNeeds/Digikraal
+    // market reference that priced them before — that figure was what the
+    // open market charges, this is our capped sell price.
+    goat_white: 2700.00,  // Founder's platform ceiling: sheep/goat/sybok all capped at R2,700
+    goat_standard: 2700.00,  // Founder's platform ceiling: sheep/goat/sybok all capped at R2,700
+    sheep: 2700.00,  // Founder's platform ceiling: sheep/goat/sybok all capped at R2,700
+    sheep_with_horns: 2700.00,  // Founder's platform ceiling: sheep/goat/sybok all capped at R2,700
     // Sybok — a goat/sheep cross, and the animal customarily used for
     // uMojiso at entabeni during ulwaluko. It is its own beast, not a
     // substitute for a sheep or a goat, so it gets its own rate.
-    sybok: 3000.00,  // Ceremonial inkabi (wether). SamMeatsNeeds pkg 1 implies R3000
+    sybok: 2700.00,  // Founder's platform ceiling: sheep/goat/sybok all capped at R2,700
     fowl: 150.00,
   },
   food: {
@@ -346,7 +353,7 @@ const ULWALUKO_COST_PROFILE = {
     { label: 'Green apples and low-water-content fruit', category: 'food', unit: 'kg', unitCost: COST_RATES.food.green_apples_kg, quantity: 5, isInputField: true, inputType: 'number', suggestedAmount: '5 kg apples', skuName: 'Green Apples (per kg)' },
   ],
   'UMOJISO': [
-    { label: 'Sybok for uMojiso (sheep or goat if no sybok is available)', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.sybok, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Sybok ~R3,000', skuName: 'Sybok' },
+    { label: 'Sybok for uMojiso (sheep or goat if no sybok is available)', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.sybok, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Sybok ~R2,700', skuName: 'Sybok' },
     { label: 'Minimum 4 bottles of brandy, 2 cases of beer (1 bottle for peers)', category: 'alcohol', unit: 'mixed', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '4 brandy + 2 beer cases' },
   ],
   'EXIT_PREPARATION': [
@@ -375,7 +382,7 @@ const UMGIDI_COST_PROFILE = {
     { label: 'Courtesy: bottle and beers for the elders', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '1 brandy + 6 beers' },
   ],
   'COOKING_EBUHLANTI': [
-    { label: 'Livestock for slaughter (sheep/cow)', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.sheep, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Sheep ~R3,000 or Cow ~R18,000' },
+    { label: 'Livestock for slaughter (sheep/cow)', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.sheep, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Sheep ~R2,700 or Cow ~R18,000' },
     { label: '9+ large enamel dishes, 6 cast iron pots', category: 'supplies', unit: 'kit', unitCost: (COST_RATES.supplies.enamel_dish_large * 9) + (COST_RATES.supplies.cast_iron_pot * 6), quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Borrow or buy ~R6,720' },
     { label: '10+ bhekile for umqombothi', category: 'supplies', unit: 'can', unitCost: COST_RATES.supplies.bhekile_can, quantity: 12, isInputField: true, inputType: 'number', suggestedAmount: '12 cans' },
   ],
@@ -422,7 +429,7 @@ const INTAMBO_ENKULU_COST_PROFILE = {
     { label: 'Set taboos (IzipALO) for the initiate during the binding period', category: 'services', unit: 'session', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'SUPPLIES_SACRED': [
-    { label: 'Secure a white goat without blemish for the recognition slaughter', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'White goat ~R3,000' },
+    { label: 'Secure a white goat without blemish for the recognition slaughter', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'White goat ~R2,700' },
     { label: 'Gather white beads (Amaphondo) for the protective cord ceremony', category: 'supplies', unit: 'strand', unitCost: COST_RATES.supplies.amaphondo_beads_strand, quantity: 4, isInputField: true, inputType: 'number', suggestedAmount: '4-6 strands' },
     { label: 'Procure protective binding cords (Iintambo) from organic fibre as directed by elders', category: 'supplies', unit: 'set', unitCost: COST_RATES.supplies.iintambo_cord_set, quantity: 1, isInputField: true, inputType: 'number' },
     { label: 'Prepare white clay (Ifutha) — NOT red ochre (Imbula) — for ritual marking', category: 'supplies', unit: 'pack', unitCost: COST_RATES.supplies.ifutha_white_clay_pack, quantity: 2, isInputField: true, inputType: 'number' },
@@ -460,7 +467,7 @@ const UKUKHAPHA_COST_PROFILE = {
     { label: 'Brief family on strict behavioural taboos (IzipALO) — no loud celebrations, no fermented drink', category: 'services', unit: 'briefing', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'KRAAL_SACRIFICE': [
-    { label: 'Select male cow (Inkunzi) for the head of household, or white goat for ordinary male ancestor', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.male_ox_inkunzi, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Inkunzi ~R18,000 or goat ~R3,000' },
+    { label: 'Select male cow (Inkunzi) for the head of household, or white goat for ordinary male ancestor', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.male_ox_inkunzi, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Inkunzi ~R18,000 or goat ~R2,700' },
     { label: 'NEVER use a female cow (Inkomo yomfazi) for a male ancestor — strictly forbidden', category: 'livestock', unit: 'warning', unitCost: 0, quantity: 0, isInputField: false },
     { label: 'Cleanse the centre of the kraal (Intshonalanga yebuhlanti) for beast processing', category: 'services', unit: 'task', unitCost: 0, quantity: 1, isInputField: false },
     { label: 'Lay grass mats (Ikhukho) inside the kraal for officiating elders', category: 'supplies', unit: 'mat', unitCost: COST_RATES.supplies.grass_mat_ikhukho, quantity: 4, isInputField: true, inputType: 'number', suggestedAmount: '4-6 mats' },
@@ -477,7 +484,7 @@ const UKUKHAPHA_COST_PROFILE = {
     { label: 'Collect blood and Intlabathi for ancestral offering', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'CLOSURE_RITUAL': [
-    { label: 'Perform Ukuxukuxa cleansing with goat, sheep, or fowl before family disperses', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_standard, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Goat ~R3,000 or fowl ~R150' },
+    { label: 'Perform Ukuxukuxa cleansing with goat, sheep, or fowl before family disperses', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_standard, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Goat ~R2,700 or fowl ~R150' },
     { label: 'Brew Umqombothi (50L to 75L) for the ceremony', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number', suggestedAmount: '50-75 litres' },
     { label: 'Brandy and gin for elders and participants', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
   ],
@@ -568,7 +575,7 @@ const UMSEBENZI_WEGQIRHA_COST_PROFILE = {
     { label: 'Destroy Ibhuma after seclusion is complete', category: 'services', unit: 'task', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'SUPPLIES_SACRED': [
-    { label: 'Secure white goat without blemish as directed by the ancestral dream', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'White goat ~R3,000' },
+    { label: 'Secure white goat without blemish as directed by the ancestral dream', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'White goat ~R2,700' },
     { label: 'Prepare white clay (Ifutha) for healer markings — NOT red ochre (Imbula)', category: 'supplies', unit: 'pack', unitCost: COST_RATES.supplies.ifutha_white_clay_pack, quantity: 2, isInputField: true, inputType: 'number' },
     { label: 'Procure snuff (Isidlo / Isemfu) for spiritual protocols', category: 'supplies', unit: 'tin', unitCost: COST_RATES.supplies.isidlo_snuff_tin, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 tins' },
     { label: 'Secure traditional leather drums (Ingqongqo / Amagomana) in working condition', category: 'supplies', unit: 'set', unitCost: 0, quantity: 1, isInputField: true, inputType: 'text', suggestedAmount: 'Borrow or hire from community' },
