@@ -86,7 +86,7 @@ const COST_RATES = {
     blanket_plain: 189.00,  // Makro 10 Sep 2026: Aranda 150x200 rewool grey R189 (Aranda Boxer grey/white R229)
     grass_mat_ikhukho: 150.00,
     tarpaulin_sail: 375.00,  // Leroy Merlin 10 Sep 2026: 70gr 5x8m with eyelets R375 (140gr R679)
-    poles_bundle: 450.00,
+    poles_bundle: 450.00,  // Corrected from founder's own knowledge of what a pole bundle for ibhoma actually costs (not a shop listing)
     firewood_bundle: 95.00,
     water_container_25l: 129.99,  // Mambo's 10 Sep 2026: 25L canister with tap R129.99 (25L polycan drum R55 at Foamy)
     matches_box: 15.00,
@@ -375,7 +375,7 @@ const UMGIDI_COST_PROFILE = {
     { label: 'Courtesy: bottle and beers for the elders', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '1 brandy + 6 beers' },
   ],
   'COOKING_EBUHLANTI': [
-    { label: 'Livestock for slaughter (sheep/cow)', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.sheep, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Sheep ~R2,500 or Cow ~R18,000' },
+    { label: 'Livestock for slaughter (sheep/cow)', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.sheep, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Sheep ~R3,000 or Cow ~R18,000' },
     { label: '9+ large enamel dishes, 6 cast iron pots', category: 'supplies', unit: 'kit', unitCost: (COST_RATES.supplies.enamel_dish_large * 9) + (COST_RATES.supplies.cast_iron_pot * 6), quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Borrow or buy ~R6,720' },
     { label: '10+ bhekile for umqombothi', category: 'supplies', unit: 'can', unitCost: COST_RATES.supplies.bhekile_can, quantity: 12, isInputField: true, inputType: 'number', suggestedAmount: '12 cans' },
   ],
@@ -422,7 +422,7 @@ const INTAMBO_ENKULU_COST_PROFILE = {
     { label: 'Set taboos (IzipALO) for the initiate during the binding period', category: 'services', unit: 'session', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'SUPPLIES_SACRED': [
-    { label: 'Secure a white goat without blemish for the recognition slaughter', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'White goat ~R2,800' },
+    { label: 'Secure a white goat without blemish for the recognition slaughter', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'White goat ~R3,000' },
     { label: 'Gather white beads (Amaphondo) for the protective cord ceremony', category: 'supplies', unit: 'strand', unitCost: COST_RATES.supplies.amaphondo_beads_strand, quantity: 4, isInputField: true, inputType: 'number', suggestedAmount: '4-6 strands' },
     { label: 'Procure protective binding cords (Iintambo) from organic fibre as directed by elders', category: 'supplies', unit: 'set', unitCost: COST_RATES.supplies.iintambo_cord_set, quantity: 1, isInputField: true, inputType: 'number' },
     { label: 'Prepare white clay (Ifutha) — NOT red ochre (Imbula) — for ritual marking', category: 'supplies', unit: 'pack', unitCost: COST_RATES.supplies.ifutha_white_clay_pack, quantity: 2, isInputField: true, inputType: 'number' },
@@ -460,7 +460,7 @@ const UKUKHAPHA_COST_PROFILE = {
     { label: 'Brief family on strict behavioural taboos (IzipALO) — no loud celebrations, no fermented drink', category: 'services', unit: 'briefing', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'KRAAL_SACRIFICE': [
-    { label: 'Select male cow (Inkunzi) for the head of household, or white goat for ordinary male ancestor', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.male_ox_inkunzi, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Inkunzi ~R22,000 or goat ~R2,800' },
+    { label: 'Select male cow (Inkunzi) for the head of household, or white goat for ordinary male ancestor', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.male_ox_inkunzi, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Inkunzi ~R18,000 or goat ~R3,000' },
     { label: 'NEVER use a female cow (Inkomo yomfazi) for a male ancestor — strictly forbidden', category: 'livestock', unit: 'warning', unitCost: 0, quantity: 0, isInputField: false },
     { label: 'Cleanse the centre of the kraal (Intshonalanga yebuhlanti) for beast processing', category: 'services', unit: 'task', unitCost: 0, quantity: 1, isInputField: false },
     { label: 'Lay grass mats (Ikhukho) inside the kraal for officiating elders', category: 'supplies', unit: 'mat', unitCost: COST_RATES.supplies.grass_mat_ikhukho, quantity: 4, isInputField: true, inputType: 'number', suggestedAmount: '4-6 mats' },
@@ -477,7 +477,7 @@ const UKUKHAPHA_COST_PROFILE = {
     { label: 'Collect blood and Intlabathi for ancestral offering', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'CLOSURE_RITUAL': [
-    { label: 'Perform Ukuxukuxa cleansing with goat, sheep, or fowl before family disperses', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_standard, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Goat ~R2,200 or fowl ~R150' },
+    { label: 'Perform Ukuxukuxa cleansing with goat, sheep, or fowl before family disperses', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_standard, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Goat ~R3,000 or fowl ~R150' },
     { label: 'Brew Umqombothi (50L to 75L) for the ceremony', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number', suggestedAmount: '50-75 litres' },
     { label: 'Brandy and gin for elders and participants', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
   ],
@@ -527,7 +527,7 @@ const UKUBUYISA_COST_PROFILE = {
     { label: 'Prepare Ukunqula invocation prayers to welcome the ancestor back to the kraal', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'SUPPLIES_LIVESTOCK': [
-    { label: 'Procure male ox (Inkunzi) — male animal for male ancestor', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.male_ox_inkunzi, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Inkunzi ~R22,000' },
+    { label: 'Procure male ox (Inkunzi) — male animal for male ancestor', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.male_ox_inkunzi, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Inkunzi ~R18,000' },
     { label: 'NEVER use a female cow for Ukubuyisa — strictly forbidden', category: 'livestock', unit: 'warning', unitCost: 0, quantity: 0, isInputField: false },
   ],
   'KRAAL_WELCOME': [
@@ -568,7 +568,7 @@ const UMSEBENZI_WEGQIRHA_COST_PROFILE = {
     { label: 'Destroy Ibhuma after seclusion is complete', category: 'services', unit: 'task', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'SUPPLIES_SACRED': [
-    { label: 'Secure white goat without blemish as directed by the ancestral dream', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'White goat ~R2,800' },
+    { label: 'Secure white goat without blemish as directed by the ancestral dream', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'White goat ~R3,000' },
     { label: 'Prepare white clay (Ifutha) for healer markings — NOT red ochre (Imbula)', category: 'supplies', unit: 'pack', unitCost: COST_RATES.supplies.ifutha_white_clay_pack, quantity: 2, isInputField: true, inputType: 'number' },
     { label: 'Procure snuff (Isidlo / Isemfu) for spiritual protocols', category: 'supplies', unit: 'tin', unitCost: COST_RATES.supplies.isidlo_snuff_tin, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 tins' },
     { label: 'Secure traditional leather drums (Ingqongqo / Amagomana) in working condition', category: 'supplies', unit: 'set', unitCost: 0, quantity: 1, isInputField: true, inputType: 'text', suggestedAmount: 'Borrow or hire from community' },
