@@ -557,6 +557,14 @@ model BulkPool {
   // existed, which stay uncapped rather than being retroactively closed.
   capCases Int?
 
+  // Real, negotiated case price per SmartMatch tier — { "1": 3400.00,
+  // "2": 3250.00, ... }, keyed by tier id. Set by hand once the founder has
+  // an actual wholesaler quote for this pool's product; null (or missing a
+  // key) until then. Never a placeholder or estimated figure — the tier
+  // panel shows "to be confirmed" for any tier without a real entry here,
+  // exactly like Sku.retailPriceZAR staying null rather than guessed.
+  tierCasePricing Json?
+
   baskets       Basket[]
   payments      PoolPayment[]
   orderDocument OrderConfirmationDocument?

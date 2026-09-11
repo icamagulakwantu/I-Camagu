@@ -1,6 +1,7 @@
 import prisma from '../config/db.js';
 import { submitBasketToPool } from '../services/matchmakerService.js';
 import { sortByDistance } from '../utils/geo.js';
+import { getTierForCases, getNextTier, casesToReachTier, palletsForCases } from '../utils/smartMatchTiers.js';
 
 export async function submitToPool(req, res) {
   const { basketId, partnerId } = req.body;
@@ -112,6 +113,14 @@ export async function getMyPoolStatus(req, res) {
       .filter((b) => b.status !== 'CANCELLED')
       .reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
 
+    // SmartMatch tier standing — real pallet math only (smartMatchTiers.js).
+    // tierPricing stays out of the response for any tier with no real quote
+    // entered yet, so the app never shows a discount nobody has agreed to.
+    const currentTier = getTierForCases(currentCases);
+    const nextTier = getNextTier(currentCases);
+    const pricing = basket.pool.tierCasePricing || {};
+    const withPrice = (tier) => tier && { ...tier, casePriceZAR: pricing[String(tier.id)] ?? null };
+
     res.json({
       basketId: basket.id,
       basketStatus: basket.status,
@@ -122,6 +131,16 @@ export async function getMyPoolStatus(req, res) {
       poolStatus: basket.pool.status,
       windowDeadline: basket.pool.deadline,
       capCases: basket.pool.capCases,
+      smartMatch: {
+        pallets: palletsForCases(currentCases),
+        currentTier: withPrice(currentTier),
+        nextTier: withPrice(nextTier),
+        casesToNextTier: casesToReachTier(currentCases, nextTier),
+        // Every tier's real negotiated price, keyed by tier id — null for
+        // any tier with no quote entered yet. Lets the app show the whole
+        // 4-tier ladder, not just where the pool currently sits.
+        tierCasePricing: pricing,
+      },
     });
   } catch (error) {
     console.error('Get my pool status error:', error.message);

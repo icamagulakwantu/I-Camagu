@@ -5,7 +5,7 @@ import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf } from '../data/storeTaxonomy.js'
-import { getTierForCases, palletsForCases } from '../data/smartMatchTiers.js'
+import { TIERS } from '../data/smartMatchTiers.js'
 import { unitOf, quantityLabel } from '../data/bulkUnits.js'
 
 // This pool's rolling window closes on windowDeadline — after that, new
@@ -172,6 +172,36 @@ export default function Basket({ onBack, onBasketChanged }) {
     }
   }
 
+  // Recruits more people into this SmartMatch pool — the whole point of
+  // showing tiers at all. Every number here is real (real cases, real
+  // pallets, real partner/area); the price line only appears when a real
+  // negotiated case price exists for that tier, never a guessed discount.
+  const [invited, setInvited] = useState(false)
+  const inviteToSmartMatch = () => {
+    if (!poolStatus) return
+    const sm = poolStatus.smartMatch
+    const pallets = sm.pallets.toFixed(1)
+    const lines = [
+      `Pooling a bulk order with ${poolStatus.partnerName} near ${poolStatus.area} on iCamagu SmartMatch.`,
+      sm.currentTier
+        ? `We're at ${sm.currentTier.name} — ${pallets} pallets so far${sm.currentTier.casePriceZAR ? ` (R${Number(sm.currentTier.casePriceZAR).toFixed(2)}/case)` : ''}.`
+        : `We're at ${pallets} pallets so far, working toward our first tier.`,
+      sm.nextTier &&
+        `${sm.casesToNextTier} more cases unlocks ${sm.nextTier.name}${sm.nextTier.casePriceZAR ? ` at R${Number(sm.nextTier.casePriceZAR).toFixed(2)}/case` : ''} for everyone in the pool.`,
+      `Join and add your order:`,
+    ].filter(Boolean)
+    const text = lines.join('\n\n')
+
+    if (navigator.share) {
+      navigator.share({ title: 'Join our SmartMatch pool', text }).catch(() => {})
+    } else {
+      navigator.clipboard.writeText(text)
+      setInvited(true)
+      showToast('Invite copied — paste it into WhatsApp', 'info')
+      setTimeout(() => setInvited(false), 2000)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen pb-24 bg-cream px-4 pt-6 space-y-3 max-w-md mx-auto">
@@ -229,33 +259,75 @@ export default function Basket({ onBack, onBasketChanged }) {
               ? `Matched! Your order pooled with other members via ${poolStatus.partnerName}.`
               : `Pooling with other members near ${poolStatus.area} via ${poolStatus.partnerName} — the more members join, the bigger the discount.`}
           </p>
-          {poolStatus.poolStatus !== 'MATCHED' && (
+          {poolStatus.poolStatus !== 'MATCHED' && poolStatus.smartMatch && (
             <>
-              {getTierForCases(poolStatus.currentCases) && (
+              {poolStatus.smartMatch.currentTier && (
                 <p className="text-[11px] font-black uppercase tracking-wide text-white bg-white/20 inline-block px-2 py-1 rounded-pill mb-2">
-                  🌟 {getTierForCases(poolStatus.currentCases).name} unlocked — {palletsForCases(poolStatus.currentCases).toFixed(1)} pallets
+                  🌟 {poolStatus.smartMatch.currentTier.name} unlocked — {poolStatus.smartMatch.pallets.toFixed(1)} pallets
+                  {poolStatus.smartMatch.currentTier.casePriceZAR ? ` · R${Number(poolStatus.smartMatch.currentTier.casePriceZAR).toFixed(2)}/case` : ''}
                 </p>
               )}
-              <div className="h-1.5 w-full bg-white/25 rounded-pill overflow-hidden mb-1.5">
-                <div
-                  className="h-full bg-white rounded-pill transition-all"
-                  style={{ width: `${Math.min(100, Math.round((poolStatus.currentCases / poolStatus.moqTarget) * 100))}%` }}
-                />
+
+              {/* 4-tier ladder: one segment per pallet band. Filled tiers are
+                  behind us, the current tier fills to how far through its own
+                  band we are, tiers ahead sit empty. Price shows only when a
+                  real quote has been entered for that tier — otherwise "TBC",
+                  never a guessed number. */}
+              <div className="grid grid-cols-4 gap-1 mb-1.5">
+                {TIERS.map((tier) => {
+                  const pallets = poolStatus.smartMatch.pallets
+                  const isCurrent = poolStatus.smartMatch.currentTier?.id === tier.id
+                  // A band spans from its own minimum to the next tier's minimum
+                  // (the open-ended top tier gets a nominal 4-pallet span just
+                  // so its bar has something to fill toward).
+                  const span = (tier.maxPallets === Infinity ? tier.minPallets + 4 : tier.maxPallets + 1) - tier.minPallets
+                  const withinBand = Math.min(1, Math.max(0, (pallets - tier.minPallets) / span))
+                  const fillFraction = pallets < tier.minPallets ? 0 : isCurrent ? withinBand : 1
+                  const price = poolStatus.smartMatch.tierCasePricing?.[String(tier.id)]
+                  return (
+                    <div key={tier.id} className="min-w-0">
+                      <div className="h-1.5 w-full bg-white/25 rounded-pill overflow-hidden">
+                        <div
+                          className="h-full bg-white rounded-pill transition-all"
+                          style={{ width: `${Math.round(fillFraction * 100)}%` }}
+                        />
+                      </div>
+                      <p className="text-[9px] text-white/80 mt-0.5 truncate">{tier.minPallets}{tier.maxPallets === Infinity ? '+' : `-${tier.maxPallets}`}P</p>
+                      <p className="text-[9px] font-bold text-white truncate">{price ? `R${Number(price).toFixed(0)}` : 'TBC'}</p>
+                    </div>
+                  )
+                })}
               </div>
-              <p className="text-xs text-white/90 mb-2">
-                {poolStatus.currentCases}/{poolStatus.moqTarget} units pooled — {Math.max(0, poolStatus.moqTarget - poolStatus.currentCases)} more to unlock bulk pricing
+
+              <p className="text-xs text-white/90 mb-1">
+                {poolStatus.currentCases} cases pooled ({poolStatus.smartMatch.pallets.toFixed(1)} pallets)
+                {poolStatus.smartMatch.nextTier && (
+                  <> — {poolStatus.smartMatch.casesToNextTier} more cases unlocks {poolStatus.smartMatch.nextTier.name}</>
+                )}
               </p>
+              {!poolStatus.smartMatch.nextTier && (
+                <p className="text-xs text-white/90 mb-1">Top tier reached — thank the people who joined you.</p>
+              )}
               {poolStatus.windowDeadline && (
                 <p className="text-[11px] text-white/75 mb-2">{windowClosesLabel(poolStatus.windowDeadline)}</p>
               )}
-              <button
-                type="button"
-                onClick={cancelParkedBasket}
-                disabled={cancellingPool}
-                className="text-xs font-bold text-white/90 underline disabled:opacity-50"
-              >
-                {cancellingPool ? 'Withdrawing...' : 'Withdraw from this pool'}
-              </button>
+              <div className="flex items-center gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={inviteToSmartMatch}
+                  className="bg-white text-terracotta text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform"
+                >
+                  {invited ? 'Copied!' : 'Invite on WhatsApp 📲'}
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelParkedBasket}
+                  disabled={cancellingPool}
+                  className="text-xs font-bold text-white/90 underline disabled:opacity-50"
+                >
+                  {cancellingPool ? 'Withdrawing...' : 'Withdraw from this pool'}
+                </button>
+              </div>
             </>
           )}
         </div>
