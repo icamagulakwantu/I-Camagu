@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import { getTierForCases } from '../utils/smartMatchTiers.js';
+import { resolveTierLadder, getTierForMetric, palletsForCases } from '../utils/smartMatchTiers.js';
 import { notifyAdminOfSmartMatchTier } from './notificationService.js';
 import { newPoolWindow, isPoolWindowClosed } from '../utils/poolWindow.js';
 
@@ -12,19 +12,22 @@ function generateGroupCode() {
   return 'GRP-' + Math.random().toString(36).slice(2, 8).toUpperCase();
 }
 
-// Continuous pallet-tier milestones (1 pallet = 56 cases), applied to the
-// pool's real case count. Emails the admin (never an external supplier or
+// Real tier milestones — pallets for an alcohol pool, Rand pooled for a
+// groceries/livestock one (see smartMatchTiers.js) — applied to the pool's
+// real numbers. Emails the admin (never an external supplier or
 // manufacturer) the first time a pool reaches a new tier, so the founder
 // knows when there's genuinely enough volume to go negotiate.
-async function notifySmartMatchTierIfCrossed(pool, currentCases) {
-  const tier = getTierForCases(currentCases);
+async function notifySmartMatchTierIfCrossed(pool, currentCases, currentAmountZAR) {
+  const ladder = resolveTierLadder(pool);
+  const metric = (pool.tierBasis || 'PALLETS') === 'AMOUNT' ? currentAmountZAR : palletsForCases(currentCases);
+  const tier = getTierForMetric(metric, ladder);
   if (!tier || tier.id <= pool.lastTierNotified) return;
 
   await prisma.bulkPool.update({
     where: { id: pool.id },
     data: { lastTierNotified: tier.id },
   });
-  await notifyAdminOfSmartMatchTier(pool, tier, currentCases);
+  await notifyAdminOfSmartMatchTier(pool, tier, currentCases, currentAmountZAR);
 }
 
 export async function submitBasketToPool(userId, basketId, partnerId) {
@@ -71,7 +74,7 @@ export async function submitBasketToPool(userId, basketId, partnerId) {
 export async function checkAndMatchPool(poolId) {
   const pool = await prisma.bulkPool.findUnique({
     where: { id: poolId },
-    include: { baskets: { include: { items: true } }, partner: true },
+    include: { baskets: { include: { items: { include: { sku: true } } } }, partner: true },
   });
 
   const activeBaskets = pool.baskets.filter((b) => b.status !== 'CANCELLED');
@@ -79,8 +82,14 @@ export async function checkAndMatchPool(poolId) {
     (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0),
     0
   );
+  // Real Rand pooled so far — only used by AMOUNT-basis pools (groceries,
+  // livestock), computed off each item's real casePriceZAR, never guessed.
+  const currentAmountZAR = activeBaskets.reduce(
+    (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity * parseFloat(i.sku?.casePriceZAR || 0), 0),
+    0
+  );
 
-  await notifySmartMatchTierIfCrossed(pool, currentCases);
+  await notifySmartMatchTierIfCrossed(pool, currentCases, currentAmountZAR);
 
   if (currentCases < pool.moqTarget) {
     return { matched: false, currentCases };

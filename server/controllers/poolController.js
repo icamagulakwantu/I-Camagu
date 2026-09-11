@@ -1,7 +1,7 @@
 import prisma from '../config/db.js';
 import { submitBasketToPool } from '../services/matchmakerService.js';
 import { sortByDistance } from '../utils/geo.js';
-import { getTierForCases, getNextTier, casesToReachTier, palletsForCases } from '../utils/smartMatchTiers.js';
+import { PALLET_CASES, palletsForCases, resolveTierLadder, getTierForMetric, getNextTierForMetric, amountToReachTier } from '../utils/smartMatchTiers.js';
 
 export async function submitToPool(req, res) {
   const { basketId, partnerId } = req.body;
@@ -105,21 +105,30 @@ export async function getMyPoolStatus(req, res) {
     const basket = await prisma.basket.findFirst({
       where: { userId: req.userId, status: { in: ['PARKED', 'MATCHED'] } },
       orderBy: { updatedAt: 'desc' },
-      include: { pool: { include: { partner: true, baskets: { include: { items: true } } } } },
+      include: { pool: { include: { partner: true, baskets: { include: { items: { include: { sku: true } } } } } } },
     });
     if (!basket || !basket.pool) return res.json(null);
 
-    const currentCases = basket.pool.baskets
-      .filter((b) => b.status !== 'CANCELLED')
-      .reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
+    const activeBaskets = basket.pool.baskets.filter((b) => b.status !== 'CANCELLED');
+    const currentCases = activeBaskets.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
+    // Real Rand pooled so far — only meaningful for an AMOUNT-basis pool,
+    // computed off each item's real casePriceZAR, never guessed.
+    const currentAmountZAR = activeBaskets.reduce(
+      (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity * parseFloat(i.sku?.casePriceZAR || 0), 0),
+      0
+    );
 
-    // SmartMatch tier standing — real pallet math only (smartMatchTiers.js).
-    // tierPricing stays out of the response for any tier with no real quote
-    // entered yet, so the app never shows a discount nobody has agreed to.
-    const currentTier = getTierForCases(currentCases);
-    const nextTier = getNextTier(currentCases);
-    const pricing = basket.pool.tierCasePricing || {};
-    const withPrice = (tier) => tier && { ...tier, casePriceZAR: pricing[String(tier.id)] ?? null };
+    // SmartMatch tier standing — pallets for an alcohol pool, Rand pooled
+    // for a groceries/livestock one (see smartMatchTiers.js). The ladder
+    // itself carries each tier's real value (or null, "TBC") — nothing
+    // here is fabricated.
+    const basis = basket.pool.tierBasis || 'PALLETS';
+    const isAmount = basis === 'AMOUNT';
+    const metric = isAmount ? currentAmountZAR : palletsForCases(currentCases);
+    const ladder = resolveTierLadder(basket.pool);
+    const currentTier = getTierForMetric(metric, ladder);
+    const nextTier = getNextTierForMetric(metric, ladder);
+    const remaining = amountToReachTier(metric, nextTier);
 
     res.json({
       basketId: basket.id,
@@ -132,14 +141,15 @@ export async function getMyPoolStatus(req, res) {
       windowDeadline: basket.pool.deadline,
       capCases: basket.pool.capCases,
       smartMatch: {
+        basis,
         pallets: palletsForCases(currentCases),
-        currentTier: withPrice(currentTier),
-        nextTier: withPrice(nextTier),
-        casesToNextTier: casesToReachTier(currentCases, nextTier),
-        // Every tier's real negotiated price, keyed by tier id — null for
-        // any tier with no quote entered yet. Lets the app show the whole
-        // 4-tier ladder, not just where the pool currently sits.
-        tierCasePricing: pricing,
+        currentAmountZAR,
+        ladder,
+        currentTier,
+        nextTier,
+        // Still needed to reach nextTier, in whatever unit members act on:
+        // whole cases for a pallet pool, Rand for an amount pool.
+        toNextTier: isAmount ? Math.ceil(remaining) : Math.ceil(remaining * PALLET_CASES),
       },
     });
   } catch (error) {

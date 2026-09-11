@@ -119,10 +119,20 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     `UPDATE "BulkPool" SET "capCases" = "moqTarget" * 4 WHERE status = 'OPEN' AND "capCases" IS NULL;`
   );
-  // Real, negotiated case price per SmartMatch pallet tier (see
-  // smartMatchTiers.js) — set by hand once a real wholesaler quote exists
-  // for that pool's product. Null until then; never a placeholder.
+  // Replaced by tierBasis + tierLadder below, in the same deploy this
+  // column shipped in — never held real data (every pool was still null),
+  // so dropped rather than carried forward with the wrong shape.
   await prisma.$executeRawUnsafe(
-    'ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "tierCasePricing" JSONB;'
+    'ALTER TABLE "BulkPool" DROP COLUMN IF EXISTS "tierCasePricing";'
+  );
+  // How this pool's SmartMatch tiers are measured (pallets for alcohol,
+  // Rand amount for groceries/livestock — see smartMatchTiers.js) and its
+  // real negotiated ladder, set by hand once a wholesaler quote exists.
+  // Null until then; never a placeholder.
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "tierBasis" TEXT NOT NULL DEFAULT 'PALLETS';`
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "tierLadder" JSONB;'
   );
 }

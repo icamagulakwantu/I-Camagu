@@ -123,24 +123,27 @@ export async function confirmQuoteToClient(q) {
 }
 
 // Internal-only alert: tells the founder a real SmartMatch pool crossed a
-// real pallet-volume tier, so they know it's time to go negotiate with a
+// real tier — pallet-volume for an alcohol pool, Rand pooled for a
+// groceries/livestock one — so they know it's time to go negotiate with a
 // wholesaler/distributor. Never sent to any external company — that pitch
 // stays a manual, founder-reviewed step until real committed volume and a
 // real trade relationship exist.
-export async function notifyAdminOfSmartMatchTier(pool, tier, currentCases) {
+export async function notifyAdminOfSmartMatchTier(pool, tier, currentCases, currentAmountZAR) {
   try {
+    const isAmount = (pool.tierBasis || 'PALLETS') === 'AMOUNT';
     const pallets = (currentCases / PALLET_CASES).toFixed(2);
+    const metricLabel = isAmount ? `R${Number(currentAmountZAR || 0).toFixed(2)} pooled` : `${pallets} pallets`;
     await resend.emails.send({
       from: 'onboarding@resend.dev',
       to: ADMIN_EMAILS,
-      subject: `SmartMatch: ${pool.partner?.name || 'A pool'} hit ${tier.name} (${pallets} pallets)`,
+      subject: `SmartMatch: ${pool.partner?.name || 'A pool'} hit ${tier.name} (${metricLabel})`,
       html: `
         <h2>SmartMatch pool crossed a tier</h2>
-        <p><strong>${tier.name}</strong> unlocked (Tier ${tier.id}).</p>
+        <p><strong>${tier.name}</strong> unlocked (Tier ${tier.id}, ${isAmount ? 'amount' : 'pallet'} basis).</p>
         ${row('Partner', pool.partner?.name)}
         ${row('Area', pool.area)}
         ${row('Total cases', currentCases)}
-        ${row('Pallets', pallets)}
+        ${isAmount ? row('Total pooled', `R${Number(currentAmountZAR || 0).toFixed(2)}`) : row('Pallets', pallets)}
         ${row('MOQ target', pool.moqTarget)}
         ${row('Pool ID', pool.id)}
         <p style="color:#888;font-size:12px;">This is an internal alert only — no email has been sent to any supplier or manufacturer. Review the real numbers before reaching out to anyone.</p>

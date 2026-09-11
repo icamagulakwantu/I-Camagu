@@ -5,7 +5,6 @@ import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf } from '../data/storeTaxonomy.js'
-import { TIERS } from '../data/smartMatchTiers.js'
 import { unitOf, quantityLabel } from '../data/bulkUnits.js'
 
 // This pool's rolling window closes on windowDeadline — after that, new
@@ -172,22 +171,34 @@ export default function Basket({ onBack, onBasketChanged }) {
     }
   }
 
+  // A tier's real value, worded for whichever basis this pool uses — a
+  // case price for a pallet pool, a discount percentage for an amount
+  // pool. Null (no real quote entered yet) renders as nothing, never a
+  // guessed number.
+  const tierValueLabel = (tier, basis) => {
+    if (!tier || tier.value == null) return ''
+    return basis === 'AMOUNT' ? `${Number(tier.value)}% off` : `R${Number(tier.value).toFixed(2)}/case`
+  }
+
   // Recruits more people into this SmartMatch pool — the whole point of
-  // showing tiers at all. Every number here is real (real cases, real
-  // pallets, real partner/area); the price line only appears when a real
-  // negotiated case price exists for that tier, never a guessed discount.
+  // showing tiers at all. Every number here is real (real cases or Rand,
+  // real partner/area); a tier's value only appears when a real negotiated
+  // figure exists for it, never a guessed discount.
   const [invited, setInvited] = useState(false)
   const inviteToSmartMatch = () => {
     if (!poolStatus) return
     const sm = poolStatus.smartMatch
-    const pallets = sm.pallets.toFixed(1)
+    const isAmount = sm.basis === 'AMOUNT'
+    const standing = isAmount
+      ? `R${sm.currentAmountZAR.toFixed(2)} pooled so far`
+      : `${sm.pallets.toFixed(1)} pallets pooled so far`
     const lines = [
       `Pooling a bulk order with ${poolStatus.partnerName} near ${poolStatus.area} on iCamagu SmartMatch.`,
       sm.currentTier
-        ? `We're at ${sm.currentTier.name} — ${pallets} pallets so far${sm.currentTier.casePriceZAR ? ` (R${Number(sm.currentTier.casePriceZAR).toFixed(2)}/case)` : ''}.`
-        : `We're at ${pallets} pallets so far, working toward our first tier.`,
+        ? `We're at ${sm.currentTier.name} — ${standing}${tierValueLabel(sm.currentTier, sm.basis) ? ` (${tierValueLabel(sm.currentTier, sm.basis)})` : ''}.`
+        : `We're at ${standing}${sm.nextTier ? ', working toward our first tier' : ''}.`,
       sm.nextTier &&
-        `${sm.casesToNextTier} more cases unlocks ${sm.nextTier.name}${sm.nextTier.casePriceZAR ? ` at R${Number(sm.nextTier.casePriceZAR).toFixed(2)}/case` : ''} for everyone in the pool.`,
+        `${isAmount ? `R${sm.toNextTier}` : `${sm.toNextTier} more cases`} unlocks ${sm.nextTier.name}${tierValueLabel(sm.nextTier, sm.basis) ? ` at ${tierValueLabel(sm.nextTier, sm.basis)}` : ''} for everyone in the pool.`,
       `Join and add your order:`,
     ].filter(Boolean)
     const text = lines.join('\n\n')
@@ -259,77 +270,101 @@ export default function Basket({ onBack, onBasketChanged }) {
               ? `Matched! Your order pooled with other members via ${poolStatus.partnerName}.`
               : `Pooling with other members near ${poolStatus.area} via ${poolStatus.partnerName} — the more members join, the bigger the discount.`}
           </p>
-          {poolStatus.poolStatus !== 'MATCHED' && poolStatus.smartMatch && (
-            <>
-              {poolStatus.smartMatch.currentTier && (
-                <p className="text-[11px] font-black uppercase tracking-wide text-white bg-white/20 inline-block px-2 py-1 rounded-pill mb-2">
-                  🌟 {poolStatus.smartMatch.currentTier.name} unlocked — {poolStatus.smartMatch.pallets.toFixed(1)} pallets
-                  {poolStatus.smartMatch.currentTier.casePriceZAR ? ` · R${Number(poolStatus.smartMatch.currentTier.casePriceZAR).toFixed(2)}/case` : ''}
-                </p>
-              )}
-
-              {/* 4-tier ladder: one segment per pallet band. Filled tiers are
-                  behind us, the current tier fills to how far through its own
-                  band we are, tiers ahead sit empty. Price shows only when a
-                  real quote has been entered for that tier — otherwise "TBC",
-                  never a guessed number. */}
-              <div className="grid grid-cols-4 gap-1 mb-1.5">
-                {TIERS.map((tier) => {
-                  const pallets = poolStatus.smartMatch.pallets
-                  const isCurrent = poolStatus.smartMatch.currentTier?.id === tier.id
-                  // A band spans from its own minimum to the next tier's minimum
-                  // (the open-ended top tier gets a nominal 4-pallet span just
-                  // so its bar has something to fill toward).
-                  const span = (tier.maxPallets === Infinity ? tier.minPallets + 4 : tier.maxPallets + 1) - tier.minPallets
-                  const withinBand = Math.min(1, Math.max(0, (pallets - tier.minPallets) / span))
-                  const fillFraction = pallets < tier.minPallets ? 0 : isCurrent ? withinBand : 1
-                  const price = poolStatus.smartMatch.tierCasePricing?.[String(tier.id)]
-                  return (
-                    <div key={tier.id} className="min-w-0">
-                      <div className="h-1.5 w-full bg-white/25 rounded-pill overflow-hidden">
-                        <div
-                          className="h-full bg-white rounded-pill transition-all"
-                          style={{ width: `${Math.round(fillFraction * 100)}%` }}
-                        />
-                      </div>
-                      <p className="text-[9px] text-white/80 mt-0.5 truncate">{tier.minPallets}{tier.maxPallets === Infinity ? '+' : `-${tier.maxPallets}`}P</p>
-                      <p className="text-[9px] font-bold text-white truncate">{price ? `R${Number(price).toFixed(0)}` : 'TBC'}</p>
-                    </div>
-                  )
-                })}
-              </div>
-
-              <p className="text-xs text-white/90 mb-1">
-                {poolStatus.currentCases} cases pooled ({poolStatus.smartMatch.pallets.toFixed(1)} pallets)
-                {poolStatus.smartMatch.nextTier && (
-                  <> — {poolStatus.smartMatch.casesToNextTier} more cases unlocks {poolStatus.smartMatch.nextTier.name}</>
+          {poolStatus.poolStatus !== 'MATCHED' && poolStatus.smartMatch && (() => {
+            const sm = poolStatus.smartMatch
+            const isAmount = sm.basis === 'AMOUNT'
+            // A band's own label — pallets read as "1-3P"; Rand thresholds
+            // read as a plain "R" figure, since there's no universal unit
+            // to abbreviate them to.
+            const bandLabel = (tier, i, ladder) => {
+              if (!isAmount) return `${tier.min}${i === ladder.length - 1 ? '+' : `-${ladder[i + 1].min - 1}`}P`
+              return `R${tier.min.toLocaleString('en-ZA')}+`
+            }
+            return (
+              <>
+                {sm.currentTier && (
+                  <p className="text-[11px] font-black uppercase tracking-wide text-white bg-white/20 inline-block px-2 py-1 rounded-pill mb-2">
+                    🌟 {sm.currentTier.name} unlocked
+                    {tierValueLabel(sm.currentTier, sm.basis) && ` · ${tierValueLabel(sm.currentTier, sm.basis)}`}
+                  </p>
                 )}
-              </p>
-              {!poolStatus.smartMatch.nextTier && (
-                <p className="text-xs text-white/90 mb-1">Top tier reached — thank the people who joined you.</p>
-              )}
-              {poolStatus.windowDeadline && (
-                <p className="text-[11px] text-white/75 mb-2">{windowClosesLabel(poolStatus.windowDeadline)}</p>
-              )}
-              <div className="flex items-center gap-3 flex-wrap">
-                <button
-                  type="button"
-                  onClick={inviteToSmartMatch}
-                  className="bg-white text-terracotta text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform"
-                >
-                  {invited ? 'Copied!' : 'Invite on WhatsApp 📲'}
-                </button>
-                <button
-                  type="button"
-                  onClick={cancelParkedBasket}
-                  disabled={cancellingPool}
-                  className="text-xs font-bold text-white/90 underline disabled:opacity-50"
-                >
-                  {cancellingPool ? 'Withdrawing...' : 'Withdraw from this pool'}
-                </button>
-              </div>
-            </>
-          )}
+
+                {/* The tier ladder: one segment per band, in whichever unit
+                    this pool is measured — pallets (alcohol) or Rand pooled
+                    (groceries, livestock). Filled tiers are behind us, the
+                    current tier fills to how far through its own band we
+                    are, tiers ahead sit empty. A tier's value shows only
+                    when a real quote has been entered for it — otherwise
+                    "TBC", never a guessed number. An AMOUNT pool with no
+                    ladder at all shows a plain running total instead, since
+                    there's no honest default band structure to draw. */}
+                {sm.ladder ? (
+                  <div className="grid gap-1 mb-1.5" style={{ gridTemplateColumns: `repeat(${sm.ladder.length}, minmax(0, 1fr))` }}>
+                    {sm.ladder.map((tier, i) => {
+                      const metric = isAmount ? sm.currentAmountZAR : sm.pallets
+                      const isCurrent = sm.currentTier?.id === tier.id
+                      // The open-ended top tier has no real ceiling to size its
+                      // band against, so it borrows the previous band's width —
+                      // a visual nicety only, it doesn't affect any real number.
+                      const prevSpan = i > 0 ? tier.min - sm.ladder[i - 1].min : isAmount ? 1000 : 4
+                      const nextMin = i + 1 < sm.ladder.length ? sm.ladder[i + 1].min : tier.min + prevSpan
+                      const span = Math.max(1, nextMin - tier.min)
+                      const withinBand = Math.min(1, Math.max(0, (metric - tier.min) / span))
+                      const fillFraction = metric < tier.min ? 0 : isCurrent ? withinBand : 1
+                      return (
+                        <div key={tier.id} className="min-w-0">
+                          <div className="h-1.5 w-full bg-white/25 rounded-pill overflow-hidden">
+                            <div
+                              className="h-full bg-white rounded-pill transition-all"
+                              style={{ width: `${Math.round(fillFraction * 100)}%` }}
+                            />
+                          </div>
+                          <p className="text-[9px] text-white/80 mt-0.5 truncate">{bandLabel(tier, i, sm.ladder)}</p>
+                          <p className="text-[9px] font-bold text-white truncate">
+                            {tier.value != null ? (isAmount ? `${tier.value}%` : `R${Number(tier.value).toFixed(0)}`) : 'TBC'}
+                          </p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-white/90 mb-1.5">Volume discount tiers aren't set up for this pool yet.</p>
+                )}
+
+                <p className="text-xs text-white/90 mb-1">
+                  {isAmount
+                    ? `R${sm.currentAmountZAR.toFixed(2)} pooled`
+                    : `${poolStatus.currentCases} cases pooled (${sm.pallets.toFixed(1)} pallets)`}
+                  {sm.nextTier && (
+                    <> — {isAmount ? `R${sm.toNextTier}` : `${sm.toNextTier} more cases`} unlocks {sm.nextTier.name}</>
+                  )}
+                </p>
+                {sm.ladder && !sm.nextTier && (
+                  <p className="text-xs text-white/90 mb-1">Top tier reached — thank the people who joined you.</p>
+                )}
+                {poolStatus.windowDeadline && (
+                  <p className="text-[11px] text-white/75 mb-2">{windowClosesLabel(poolStatus.windowDeadline)}</p>
+                )}
+                <div className="flex items-center gap-3 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={inviteToSmartMatch}
+                    className="bg-white text-terracotta text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform"
+                  >
+                    {invited ? 'Copied!' : 'Invite on WhatsApp 📲'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={cancelParkedBasket}
+                    disabled={cancellingPool}
+                    className="text-xs font-bold text-white/90 underline disabled:opacity-50"
+                  >
+                    {cancellingPool ? 'Withdrawing...' : 'Withdraw from this pool'}
+                  </button>
+                </div>
+              </>
+            )
+          })()}
         </div>
       )}
 

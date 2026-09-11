@@ -546,9 +546,9 @@ model BulkPool {
   moqTarget Int
   status    String    @default("OPEN")
   createdAt DateTime  @default(now())
-  // Highest continuous-pallet SmartMatch tier (0=none, 1=Amazibazana Goal,
-  // 2=Clan Tier, 3=Eastern Cape Tier) already emailed to admin for this pool
-  // — prevents re-notifying on every basket submission once a tier is hit.
+  // Highest SmartMatch tier id (see tierBasis/tierLadder below) already
+  // emailed to admin for this pool — prevents re-notifying on every basket
+  // submission once a tier is hit. 0 = none yet.
   lastTierNotified Int @default(0)
   // Rolling-window demand cap: once a pool's real case count reaches this,
   // it stops accepting new baskets — further signups open a fresh pool
@@ -557,13 +557,26 @@ model BulkPool {
   // existed, which stay uncapped rather than being retroactively closed.
   capCases Int?
 
-  // Real, negotiated case price per SmartMatch tier — { "1": 3400.00,
-  // "2": 3250.00, ... }, keyed by tier id. Set by hand once the founder has
-  // an actual wholesaler quote for this pool's product; null (or missing a
-  // key) until then. Never a placeholder or estimated figure — the tier
-  // panel shows "to be confirmed" for any tier without a real entry here,
-  // exactly like Sku.retailPriceZAR staying null rather than guessed.
-  tierCasePricing Json?
+  // How this pool's SmartMatch tiers are measured. Alcohol comes in
+  // pallets; groceries and livestock mostly don't — a produce or livestock
+  // wholesaler is more likely to discount off total Rand spent than off a
+  // pallet count, so a pool needs to say which applies to it.
+  //   PALLETS — tier minimums are in pallets (see smartMatchTiers.js;
+  //             1 pallet = 56 cases), tier value is a case price.
+  //   AMOUNT  — tier minimums are Rand pooled, tier value is a % off.
+  tierBasis String @default("PALLETS")
+
+  // The pool's real, negotiated tier ladder: [{ id, name, min, value }, ...].
+  // `min` is in pallets or Rand depending on tierBasis; `value` is a case
+  // price (PALLETS) or a discount percentage (AMOUNT) — null until a real
+  // wholesaler quote exists for that tier. Left null entirely until the
+  // founder sets one up: a PALLETS pool then falls back to the standard
+  // alcohol bands (see DEFAULT_PALLET_TIERS) with every value unset, so the
+  // shape is visible immediately; an AMOUNT pool has no such universal
+  // default — every wholesaler negotiates its own spend bands — so it shows
+  // nothing until a real ladder is entered. Never a placeholder or guessed
+  // figure, exactly like Sku.retailPriceZAR staying null rather than guessed.
+  tierLadder Json?
 
   baskets       Basket[]
   payments      PoolPayment[]
