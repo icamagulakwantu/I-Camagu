@@ -13,6 +13,19 @@ const STOKVEL_TYPES = [
   'RECIPROCAL_GIFTING'
 ]
 
+// Stokvel detail used to be one long scroll — announcements, a contribution
+// form, rotation order, a payout form, organiser settings and officials-only
+// settings all stacked on top of each other. Splitting it into named
+// sections (per the Lovable review) instead of one 500-line column.
+const DETAIL_TABS = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'members', label: 'Members' },
+  { id: 'contributions', label: 'Contributions' },
+  { id: 'payout', label: 'Payout' },
+  { id: 'announcements', label: 'Announcements' },
+  { id: 'settings', label: 'Settings' },
+]
+
 const cardBase = "card-paper p-4 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
 const cardHover = "hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] hover:border-sage-400/30"
 const cardActive = "active:scale-[0.98] active:shadow-none"
@@ -24,6 +37,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
   const { showToast } = useToast()
 
   const [view, setView] = useState('list')
+  const [detailTab, setDetailTab] = useState('overview')
   const [myStokvels, setMyStokvels] = useState([])
   const [detail, setDetail] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -586,6 +600,20 @@ function Stokvels({ onBack, onOpenShrineFund }) {
     const rawBalance = Number(stokvel.groupLedger?.totalBalance || 0)
     const balance = isNaN(rawBalance) ? 0 : rawBalance
 
+    // Settings only has something to show for an organiser or an official —
+    // hide the tab entirely for a plain member instead of showing an empty page.
+    const showSettingsTab = isOfficial || stokvel.organiserId === user?.id
+    const tabs = DETAIL_TABS.filter((t) => t.id !== 'settings' || showSettingsTab)
+    const nextRotationMember = stokvel.type === 'UMGALELO_ROTATING' && Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0
+      ? stokvel.members.find((m) => m.userId === stokvel.rotationOrder[stokvel.currentRotationIndex % stokvel.rotationOrder.length])
+      : null
+    // A member's own confirmed running total — real numbers from the same
+    // contributions list already being fetched, just not shown anywhere
+    // before now.
+    const memberConfirmedTotal = (userId) => contributions
+      .filter((c) => c.memberId === userId && c.status === 'CONFIRMED')
+      .reduce((sum, c) => sum + Number(c.amount || 0), 0)
+
     return (
       <div className="min-h-screen pb-24 bg-cream">
         <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem] shadow-md">
@@ -620,7 +648,85 @@ function Stokvels({ onBack, onOpenShrineFund }) {
           {isOfficial && <p className="text-xs text-white/90 font-bold mt-2 bg-white/20 inline-block px-2.5 py-1 rounded-pill">You are an official</p>}
         </div>
 
+        <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-1">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setDetailTab(t.id)}
+              className={`flex-shrink-0 px-3.5 py-1.5 rounded-pill text-[12px] font-bold transition-colors ${
+                detailTab === t.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
         <div className="px-4 mt-4 space-y-4">
+          {detailTab === 'overview' && (
+            <div className="space-y-3">
+              <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
+                <p className="text-xs font-black uppercase text-ink-muted mb-2">At a glance</p>
+                <div className="flex justify-between text-sm py-1">
+                  <span className="text-ink-muted">Members</span>
+                  <span className="font-bold text-ink">{stokvel.members.length}</span>
+                </div>
+                {nextRotationMember && (
+                  <div className="flex justify-between text-sm py-1 border-t border-terracotta/10">
+                    <span className="text-ink-muted">Next payout</span>
+                    <span className="font-bold text-ink">{nextRotationMember.user.firstName} {nextRotationMember.user.lastName}</span>
+                  </div>
+                )}
+                {myPending.length > 0 && (
+                  <div className="flex justify-between text-sm py-1 border-t border-terracotta/10">
+                    <span className="text-ink-muted">Awaiting your confirmation</span>
+                    <span className="font-bold text-terracotta">{myPending.length}</span>
+                  </div>
+                )}
+                {payouts.filter((p) => p.status === 'PENDING_APPROVAL').length > 0 && (
+                  <div className="flex justify-between text-sm py-1 border-t border-terracotta/10">
+                    <span className="text-ink-muted">Payouts awaiting approval</span>
+                    <span className="font-bold text-terracotta">{payouts.filter((p) => p.status === 'PENDING_APPROVAL').length}</span>
+                  </div>
+                )}
+              </div>
+
+              {announcements[0] && (
+                <button type="button" onClick={() => setDetailTab('announcements')} className="w-full text-left bg-sage-50 rounded-soft p-3">
+                  <p className="text-[10px] font-black uppercase text-sage-700 mb-1">Latest announcement</p>
+                  <p className="text-sm text-ink line-clamp-2">{announcements[0].message}</p>
+                </button>
+              )}
+            </div>
+          )}
+
+          {detailTab === 'members' && (
+            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
+              <p className="text-xs font-black uppercase text-ink-muted mb-3">Members ({stokvel.members.length})</p>
+              <div className="space-y-2">
+                {stokvel.members.map((m) => {
+                  const official = stokvel.officials?.some((o) => o.userId === m.userId)
+                  return (
+                    <div key={m.userId} className="flex items-center justify-between py-2 border-b border-cream-dark/70 last:border-0">
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm text-ink truncate">{m.user.firstName} {m.user.lastName}</p>
+                        <p className="text-[10px] text-ink-muted">
+                          {official ? 'Official' : 'Member'}
+                          {stokvel.organiserId === m.userId ? ' · Organiser' : ''}
+                        </p>
+                      </div>
+                      <p className="tabular text-sm font-bold text-sage-600 flex-shrink-0">
+                        R{memberConfirmedTotal(m.userId).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {detailTab === 'announcements' && (
           <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
             <p className="text-xs font-black uppercase text-ink-muted mb-2">Announcements</p>
             {isOfficial && (
@@ -645,7 +751,10 @@ function Stokvels({ onBack, onOpenShrineFund }) {
               </div>
             )}
           </div>
+          )}
 
+          {detailTab === 'contributions' && (
+          <>
           {/* Submit Contribution Form */}
           <form onSubmit={submitContribution} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-2">
             <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Submit a contribution</p>
@@ -695,6 +804,37 @@ function Stokvels({ onBack, onOpenShrineFund }) {
             </div>
           )}
 
+          {/* Recent contributions — real history, previously fetched but
+              never shown anywhere in this screen. */}
+          <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
+            <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">Recent contributions</p>
+            {contributions.length === 0 ? (
+              <p className="text-xs text-ink-muted">No contributions recorded yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {contributions.slice(0, 10).map((c) => {
+                  const member = stokvel.members.find((m) => m.userId === c.memberId)
+                  return (
+                    <div key={c.id} className="flex items-center justify-between py-1.5 border-b border-cream-dark/70 last:border-0">
+                      <div className="min-w-0">
+                        <p className="text-sm text-ink truncate">{member ? `${member.user.firstName} ${member.user.lastName}` : 'Member'}</p>
+                        <p className="text-[10px] text-ink-muted">{new Date(c.createdAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="tabular text-sm font-bold text-ink">R{Number(c.amount || 0).toFixed(2)}</p>
+                        <p className={`text-[10px] font-bold ${c.status === 'CONFIRMED' ? 'text-sage-600' : 'text-brand-ochre'}`}>{c.status}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+          </>
+          )}
+
+          {detailTab === 'payout' && (
+          <>
           {/* Rotation Order (umgalelo stokvels only) */}
           {stokvel.type === 'UMGALELO_ROTATING' && (
             <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
@@ -823,7 +963,11 @@ function Stokvels({ onBack, onOpenShrineFund }) {
               ))}
             </div>
           )}
+          </>
+          )}
 
+          {detailTab === 'settings' && showSettingsTab && (
+          <>
           {/* Organiser-only: edit stokvel details */}
           {stokvel.organiserId === user?.id && (
             <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
@@ -983,6 +1127,8 @@ function Stokvels({ onBack, onOpenShrineFund }) {
               )}
             </div>
           )}
+          </>
+          )}
         </div>
       </div>
     )
@@ -1072,7 +1218,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
               <button
                 key={m.id || m.stokvelId}
                 type="button"
-                onClick={() => fetchDetail(m.stokvelId)}
+                onClick={() => { setDetailTab('overview'); fetchDetail(m.stokvelId) }}
                 className={`w-full text-left bg-white border border-terracotta/15 rounded-soft overflow-hidden shadow-soft ${pressable}`}
               >
                 <div className="flex items-center gap-3 p-4">
