@@ -33,7 +33,6 @@ const BRAND_IMAGES = {
   'Jose Cuervo Especial Reposado': 'jose-cuervo-especial-reposado',
   'Cointreau Orange Liqueur': 'cointreau',
   'Viceroy 5 Year Old': 'viceroy',
-  'Budweiser': 'budweiser',
   '4th Street Sweet Red/White': '4th-street',
   '4th Street Sweet Red/Rose': '4th-street',
   'Amarula Original Cream': 'amarula',
