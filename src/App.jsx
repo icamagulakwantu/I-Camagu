@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import { ToastProvider, useToast } from './components/ui/Toast.jsx'
 import { EmptyState } from './components/ui/EmptyState.jsx'
 import { Skeleton } from './components/ui/Skeleton.jsx'
+import OfflineBanner from './components/OfflineBanner.jsx'
 
 // Screen Imports
 import Login from './pages/Login.jsx'
@@ -624,6 +625,7 @@ function ResetPasswordRoute() {
 export default function App() {
   return (
     <BrowserRouter>
+      <OfflineBanner />
       <Routes>
         <Route path="/share/:token" element={<ShareRoute />} />
         <Route path="/reset-password/:token" element={<ResetPasswordRoute />} />
