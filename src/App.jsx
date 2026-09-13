@@ -1,5 +1,6 @@
 // ===================== IMPORTS =====================
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import { ToastProvider, useToast } from './components/ui/Toast.jsx'
 import { EmptyState } from './components/ui/EmptyState.jsx'
@@ -90,6 +91,49 @@ const MORE_SCREENS = [
   'help',
   'activity',
 ]
+
+// Real, addressable URLs for every screen — replaces the old
+// useState('home') + manual pushState/popstate history hack. Each screen
+// now has a bookmarkable, shareable path and the browser/Android back
+// button works via ordinary history, not a hand-rolled listener.
+const SCREEN_TO_PATH = {
+  home: '/home',
+  ceremonyhub: '/ceremonies',
+  store: '/store',
+  basket: '/store/basket',
+  ceremony: '/ceremonies/plan',
+  timeline: '/ceremonies/timeline',
+  budget: '/ceremonies/budget',
+  ekoyinibooking: '/ceremonies/booking',
+  stokvels: '/stokvels',
+  notifications: '/notifications',
+  more: '/more',
+  profile: '/more/profile',
+  templates: '/more/templates',
+  family: '/more/family',
+  ukugida: '/more/ukugida',
+  ukusoka: '/more/ukusoka',
+  iziduko: '/more/iziduko',
+  supplier: '/more/supplier',
+  portal: '/more/portal',
+  ekoyini: '/more/ekoyini',
+  ekoyiniadmin: '/more/ekoyini-admin',
+  identityadmin: '/more/identity-admin',
+  marginadmin: '/more/margin-admin',
+  privacy: '/more/privacy',
+  hierarchy: '/more/hierarchy',
+  myorders: '/more/orders',
+  expenditure: '/more/spending',
+  shrinefund: '/more/ubuhlanti',
+  legends: '/more/legends',
+  directory: '/more/directory',
+  umqombothi: '/more/umqombothi',
+  pin: '/more/pin',
+  account: '/more/account',
+  help: '/more/help',
+  activity: '/more/activity',
+}
+const PATH_TO_SCREEN = Object.fromEntries(Object.entries(SCREEN_TO_PATH).map(([s, p]) => [p, s]))
 
 // ---------- Dashboard (enhanced with loading, errors, empty states) ----------
 function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
@@ -392,7 +436,14 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
 // ---------- MainApp ----------
 function MainApp() {
   const { accessToken, user } = useAuth()
-  const [screen, setScreen] = useState('home')
+  const navigate = useNavigate()
+  const location = useLocation()
+  const screen = PATH_TO_SCREEN[location.pathname] || 'home'
+  // setScreen still takes the same screen-name strings every page/BottomNav
+  // already calls it with — it just now pushes a real URL instead of
+  // flipping a local state variable, so the browser/Android back button
+  // and shareable links come from ordinary history, not a hand-rolled stack.
+  const setScreen = (s) => navigate(SCREEN_TO_PATH[s] || '/home')
   const [basketCount, setBasketCount] = useState(0)
   const [ceremonyHubType, setCeremonyHubType] = useState(null)
   const [timelineType, setTimelineType] = useState(null)
@@ -405,28 +456,12 @@ function MainApp() {
   const goHome = () => setScreen('home')
   const goMore = () => setScreen('more')
 
-  // Sync in-app screen navigation with browser/hardware history so the
-  // Android back button (or a swipe-back gesture) moves between screens
-  // instead of immediately exiting the app.
-  const isPoppingRef = useRef(false)
-
+  // Land on a real /home URL instead of the bare "/" the auth wall opens on.
   useEffect(() => {
-    window.history.replaceState({ screen: 'home' }, '')
-    const onPopState = (e) => {
-      isPoppingRef.current = true
-      setScreen(e.state?.screen || 'home')
+    if (location.pathname === '/' || location.pathname === '') {
+      navigate('/home', { replace: true })
     }
-    window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
-  }, [])
-
-  useEffect(() => {
-    if (isPoppingRef.current) {
-      isPoppingRef.current = false
-      return
-    }
-    window.history.pushState({ screen }, '')
-  }, [screen])
+  }, [location.pathname, navigate])
 
   const refreshBasketCount = () => {
     if (!accessToken) return
@@ -634,31 +669,38 @@ function AuthenticatedApp() {
 }
 
 
+function ShareRoute() {
+  const { token } = useParams()
+  return <PublicPlanView token={token} />
+}
+
+function ResetPasswordRoute() {
+  const { token } = useParams()
+  return <ResetPassword token={token} />
+}
+
 // ---------- App Entry ----------
 export default function App() {
-  const path = window.location.pathname
-  const shareMatch = path.match(/^\/share\/([a-zA-Z0-9]+)$/)
-  const resetMatch = path.match(/^\/reset-password\/([a-zA-Z0-9]+)$/)
-
-  if (shareMatch) {
-    return <PublicPlanView token={shareMatch[1]} />
-  }
-
-  if (resetMatch) {
-    return <ResetPassword token={resetMatch[1]} />
-  }
-
-  // Ubuhlanti bakwa Xhosa is a public fund — anyone can see what it has
-  // raised and pledge a donation without an iCamagu account.
-  if (path === '/ubuhlanti' || path === '/ubuhlanti/') {
-    return <PublicUbuhlanti />
-  }
-
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <AuthenticatedApp />
-      </AuthProvider>
-    </ToastProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/share/:token" element={<ShareRoute />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordRoute />} />
+        {/* Ubuhlanti bakwa Xhosa is a public fund — anyone can see what it
+            has raised and pledge a donation without an iCamagu account. */}
+        <Route path="/ubuhlanti" element={<PublicUbuhlanti />} />
+        <Route path="/ubuhlanti/" element={<PublicUbuhlanti />} />
+        <Route
+          path="/*"
+          element={
+            <ToastProvider>
+              <AuthProvider>
+                <AuthenticatedApp />
+              </AuthProvider>
+            </ToastProvider>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   )
 }
