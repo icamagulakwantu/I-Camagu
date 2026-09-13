@@ -15,18 +15,18 @@ const CEREMONY_SKUS = [
   { name: 'Tarpaulin Sail', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 350.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Hardware' },
   { name: 'Ibhoma Pole Bundle', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 450.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Hardware' },
   { name: '25L Water Container', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 180.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Retail' },
-  { name: 'Green Apples (per kg)', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 38.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Butter 500g', category: 'GROCERY', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 85.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   { name: 'Sheep', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Inkabi (male)', unitsPerCase: 1, casePriceZAR: 2700.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
   { name: 'Sheep', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Imazi (female)', unitsPerCase: 1, casePriceZAR: 2700.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
   { name: 'Sybok', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Inkabi (male)', unitsPerCase: 1, casePriceZAR: 2700.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
   { name: 'Sybok', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Imazi (female)', unitsPerCase: 1, casePriceZAR: 2700.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
-  { name: 'Maize Meal 50kg', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 520.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
-  { name: 'Potatoes 10kg', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 110.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Cabbage Head', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 22.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Spinach Bundle', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 25.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Cooking Oil 5L', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 190.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
-  { name: 'Sugar 10kg', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 245.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  // Green Apples, Butter, Maize Meal, Potatoes, Cabbage, Spinach, Cooking
+  // Oil and Sugar used to be listed here under their pre-bulk-rework names
+  // (e.g. "Cabbage Head", "Maize Meal 50kg"). Removed: matching by name,
+  // this backfill treated the renamed rows as "missing" and silently
+  // recreated 8 duplicate rows under the old names on every deploy since
+  // the rename. Existing CeremonyCostItem.skuId references are by id, not
+  // name, so they still correctly point at the real (renamed) rows —
+  // backfill-grocery-bulk-catalog.js now owns creating/renaming these.
 ];
 
 export async function backfillCeremonySkus() {

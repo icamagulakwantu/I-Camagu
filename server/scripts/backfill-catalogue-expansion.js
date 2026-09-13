@@ -21,29 +21,21 @@ const CATALOGUE_EXPANSION_SKUS = [
   // exactly the problem flagged in the pricing review. Replace it with a real
   // quote once the Gqeberha price sheet comes back.
   { name: 'Commando Brandy', category: 'BRANDY', productType: 'ALCOHOL', bottleFormat: '750ml Bottle', unitsPerCase: 12, casePriceZAR: 2349.00, palletPackQty: 60, palletPriceZAR: 135067.50, supplierPortfolio: 'Heineken (Distell)', retailPriceZAR: 2759.88 },
-  { name: 'Coca-Cola 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
-  { name: 'Sprite 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
-  { name: 'Fanta Orange 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
-  { name: 'Stoney Ginger Beer 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
-  { name: 'Valpre Still Water 500ml', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: 246.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 383.76 },
   { name: 'Beef Mince 5kg', category: 'MEAT', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 574.95, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher', retailPriceZAR: 699.95 },
-  { name: 'Whole Chicken (~1.8kg)', category: 'MEAT', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 99.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher', retailPriceZAR: 116.98 },
   { name: 'Boerewors 5kg', category: 'MEAT', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 474.95, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher', retailPriceZAR: 554.95 },
   { name: 'Goat', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Inkabi (male)', unitsPerCase: 1, casePriceZAR: 2800.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
   { name: 'Goat', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Imazi (female)', unitsPerCase: 1, casePriceZAR: 2800.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
   { name: 'Inkomo / Cow', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Inkabi (male)', unitsPerCase: 1, casePriceZAR: 17000.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
   { name: 'Inkomo / Cow', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Imazi (female)', unitsPerCase: 1, casePriceZAR: 17000.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
-  { name: 'Onions 10kg', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 95.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Carrots 10kg', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 95.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Green Peppers (per kg)', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 32.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Red Peppers (per kg)', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 48.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Baked Beans 410g Tin', category: 'CANNED_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 15.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
-  { name: 'Instant Coffee 750g', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 165.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
-  { name: 'Tea 100 Bags', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 60.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   { name: 'Peanut Butter 400g', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 50.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   { name: 'Brown Bread Loaf', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 20.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
-  { name: 'Milk 2L', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 35.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
-  { name: 'Flour 2.5kg', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 40.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  // Coca-Cola/Sprite/Fanta/Stoney, Valpre Still Water, Whole Chicken, Onions,
+  // Carrots, Green/Red Peppers, Baked Beans, Instant Coffee, Tea, Milk and
+  // Flour used to be listed here under their pre-bulk-rework names (e.g.
+  // "Coca-Cola 300ml Can", "Onions 10kg"). Removed: matching by name, this
+  // backfill treated the renamed rows as "missing" and silently recreated
+  // 15 duplicate rows under the old names on every deploy since the rename.
+  // backfill-grocery-bulk-catalog.js now owns creating/renaming all of these.
 ];
 
 export async function backfillCatalogueExpansion() {
