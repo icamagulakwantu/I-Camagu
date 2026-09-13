@@ -191,144 +191,85 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
         <NotificationBell onOpen={() => onNavigate('notifications')} />
       </div>
 
-      {/* Homestead photo — the emotional opener. Taller than a banner strip so
-          the whole scene reads: the cloth being laid, the family, the rondavel. */}
-      <div className="relative overflow-hidden rounded-soft mb-3 h-44 shadow-soft">
+      {/* Home hero — ONE contextual card instead of a decorative photo, a
+          separate greeting, and a separate "Ceremonies" pitch card. It
+          leads with whatever's actually happening (an in-progress
+          ceremony) rather than a generic photo, since that's the one
+          thing worth a household seeing first when they open the app —
+          Ceremonies and Store already have their own bottom-nav tab, so
+          this screen doesn't need to re-pitch either of them. */}
+      <button
+        type="button"
+        onClick={() => (leadCeremony?.id ? onSelectCeremony?.(leadCeremony.id) : onNavigate('ceremonyhub'))}
+        className={`relative w-full text-left overflow-hidden rounded-soft mb-5 shadow-soft ${pressable}`}
+      >
         <img
           src="/images/home-hero.jpg"
-          alt="A family preparing the homestead for a ceremony"
+          alt=""
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/15 to-transparent" />
-      </div>
-
-      {/* Greeting hero — wash-ember stands in for a homestead photo */}
-      <div className="wash-ember grain relative overflow-hidden rounded-soft p-5 mb-5 shadow-soft">
-        <p className="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide text-cream">
-          <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-4 h-4" style={{ filter: 'brightness(0) invert(1)' }} />
-          Molo, {user?.firstName || 'friend'}
-        </p>
-        <h1 className="mt-1.5 font-display text-2xl leading-tight text-cream">
-          {ceremonies.length > 0 ? <>The homestead is<br />preparing for {ceremonies[0]?.title || 'a ceremony'}.</> : 'uMntu ngumntu ngabantu.'}
-        </h1>
-      </div>
-
-      {/* Three ways — the core pitch, each its own product story */}
-      <p className="eyebrow text-terracotta mb-1">Three ways iCamagu carries you</p>
-      <h2 className="font-display font-bold text-2xl leading-tight text-brand-black mb-4">Built around what families do together.</h2>
-
-      {/* 01 · Ceremonies */}
-      <button
-        type="button"
-        onClick={() => onNavigate('ceremonyhub')}
-        className={`w-full text-left card-paper overflow-hidden mb-4 ${pressable}`}
-      >
-        <div className="wash-ember relative p-5">
-          <div className="flex items-start justify-between">
-            <span className="eyebrow text-cream/75">01 · Ceremonies</span>
-            <span className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
-              <Icon name="calendar" size={18} color="#ffffff" />
-            </span>
-          </div>
-          <h3 className="mt-6 font-display text-2xl text-cream leading-tight">Plan an uMgidi, properly.</h3>
-        </div>
-        <div className="p-5">
-          <p className="text-sm leading-relaxed text-brand-black/60">
-            Create the plan, budget the day, assign family roles and track every contribution through execution.
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/45 to-ink/10" />
+        <div className="relative p-5 pt-16">
+          <p className="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide text-cream">
+            <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-4 h-4" style={{ filter: 'brightness(0) invert(1)' }} />
+            Molo, {user?.firstName || 'friend'}
           </p>
-          <div className="mt-4 flex items-center justify-between border-t border-terracotta/10 pt-4">
-            <div className="min-w-0">
-              {leadCeremony ? (
-                <>
-                  <p className="text-xs text-brand-black/50 truncate">{leadCeremony.title}</p>
-                  <p className="tabular mt-0.5 text-sm font-bold text-brand-black">
-                    {leadCeremonyProgress != null ? `${leadCeremonyProgress}% prepared` : 'In progress'}
-                  </p>
-                </>
-              ) : (
-                <p className="text-sm font-bold text-brand-black">Start your first plan</p>
-              )}
-            </div>
-            <span className="w-11 h-11 rounded-full bg-terracotta flex items-center justify-center flex-shrink-0">
-              <Icon name="arrowRight" size={18} color="#ffffff" />
+          <h1 className="mt-1.5 font-display text-2xl leading-tight text-cream">
+            {leadCeremony ? leadCeremony.title : 'uMntu ngumntu ngabantu.'}
+          </h1>
+          <div className="mt-3 flex items-center justify-between border-t border-cream/20 pt-3">
+            <p className="tabular text-sm font-bold text-cream">
+              {leadCeremony
+                ? (leadCeremonyProgress != null ? `${leadCeremonyProgress}% prepared` : 'In progress')
+                : 'Start planning your first ceremony'}
+            </p>
+            <span className="inline-flex items-center gap-1.5 text-sm font-bold text-cream flex-shrink-0">
+              {leadCeremony ? 'Continue planning' : 'Get started'}
+              <Icon name="arrowRight" size={16} color="#ffffff" />
             </span>
           </div>
         </div>
       </button>
 
-      {/* 02 · Smart Match */}
-      <button
-        type="button"
-        onClick={() => onNavigate('store')}
-        className={`w-full text-left wash-sage rounded-soft p-5 mb-4 shadow-soft ${pressable}`}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="eyebrow text-cream/70">02 · Smart Match</p>
-            <h3 className="mt-1.5 font-display text-2xl leading-tight text-cream max-w-[12ch]">One pallet. Many households.</h3>
-          </div>
-          <Icon name="package" size={26} color="#ffffff" />
-        </div>
-        <p className="mt-3 text-sm leading-relaxed text-cream/80">
-          Your order pools with members across stokvels. Once the pool reaches the supplier's minimum, everyone unlocks the pallet price.
-        </p>
-        <div className="mt-4 flex items-center justify-between border-t border-cream/15 pt-4 text-sm font-bold text-cream">
-          Find a buying pool
-          <Icon name="arrowRight" size={18} color="#ffffff" />
-        </div>
-      </button>
-
-      {/* 03 · ClanMatch */}
-      <button
-        type="button"
-        onClick={() => onNavigate('iziduko')}
-        className={`w-full text-left card-paper overflow-hidden px-5 py-6 mb-3 ${pressable}`}
-      >
-        <div className="flex items-center justify-between">
-          <p className="eyebrow text-terracotta">03 · ClanMatch</p>
-          <Icon name="link" size={20} color="#c45c26" />
-        </div>
-        <h3 className="mt-3 font-display text-2xl leading-tight text-brand-black max-w-[14ch]">Find the family name between you.</h3>
-        <p className="mt-3 text-sm leading-relaxed text-brand-black/60">
-          Match paternal and maternal clan names — including both grandmothers — to reveal possible family relationships, even among cousins you haven't met.
-        </p>
-        <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-soft border border-terracotta/15 bg-terracotta/15">
-          {['Paternal', 'Maternal', 'Paternal grandmother', 'Maternal grandmother'].map((branch) => (
-            <div key={branch} className="flex items-center gap-2 bg-white px-3 py-2.5">
-              <Icon name="users" size={14} color="#c45c26" />
-              <span className="text-[11px] leading-tight text-brand-black/60">{branch}</span>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 flex items-center justify-between border-t border-terracotta/10 pt-4 text-sm font-bold text-brand-black">
-          Explore ClanMatch
-          <Icon name="arrowRight" size={18} color="#c45c26" />
-        </div>
-      </button>
-
-      {/* 04 · Ukugida — the fourth pillar, not a smaller utility. Prevents
-          the loss families feel today: physical reciprocity books lost or
-          gone when the person who kept them dies, so nobody knows what
-          was given or is still owed. */}
+      {/* Ukugida — the featured action on this screen. It has no bottom-nav
+          tab of its own, and it prevents a real loss families feel today:
+          physical reciprocity books lost, or gone with the person who kept
+          them, so nobody knows what was given or is still owed. */}
+      <p className="eyebrow text-terracotta mb-1">Never lose the record again</p>
+      <h2 className="font-display font-bold text-2xl leading-tight text-brand-black mb-4">Ukugida — your family's reciprocity ledger.</h2>
       <button
         type="button"
         onClick={() => onNavigate('ukugida')}
-        className={`w-full text-left card-paper overflow-hidden px-5 py-6 mb-6 ${pressable}`}
+        className={`w-full text-left card-paper overflow-hidden px-5 py-6 mb-4 ${pressable}`}
       >
         <div className="flex items-center justify-between">
-          <p className="eyebrow text-terracotta">04 · Ukugida</p>
-          <span className="w-10 h-10 rounded-full bg-ink/8 flex items-center justify-center flex-shrink-0">
-            <Icon name="book" size={18} color="#2b2620" />
+          <span className="w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
+            <Icon name="book" size={18} color="#c45c26" />
           </span>
-        </div>
-        <h3 className="mt-3 font-display text-2xl leading-tight text-brand-black max-w-[15ch]">Never lose the record again.</h3>
-        <p className="mt-3 text-sm leading-relaxed text-brand-black/60">
-          A living reciprocity ledger — who gave what, and what's still owed back — so it doesn't disappear with a lost book, or with the person who kept it.
-        </p>
-        <div className="mt-4 flex items-center justify-between border-t border-terracotta/10 pt-4 text-sm font-bold text-brand-black">
-          Open Ukugida
           <Icon name="arrowRight" size={18} color="#c45c26" />
         </div>
+        <p className="mt-3 text-sm leading-relaxed text-brand-black/60">
+          Who gave what, and what's still owed back — so it doesn't disappear with a lost book, or with the person who kept it.
+        </p>
+        <span className="mt-3 inline-block text-sm font-bold text-brand-black">Open Ukugida</span>
+      </button>
+
+      {/* ClanMatch — also without a bottom-nav tab, kept visible but lighter
+          weight than Ukugida since it's a discovery feature, not something
+          most people open every day. */}
+      <button
+        type="button"
+        onClick={() => onNavigate('iziduko')}
+        className={`w-full text-left card-paper flex items-center gap-3.5 p-4 mb-6 ${pressable}`}
+      >
+        <span className="w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
+          <Icon name="link" size={18} color="#c45c26" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-bold text-sm text-brand-black">ClanMatch</p>
+          <p className="text-xs text-brand-black/50 truncate">Find the family name between you and someone you haven't met</p>
+        </div>
+        <Icon name="arrowRight" size={16} color="#8a8278" />
       </button>
 
       <div className="text-center mb-6">
