@@ -33,6 +33,18 @@ const CEREMONY_META = {
 
 const mapDisplayTypeToBackend = (displayId) => displayId.toUpperCase()
 
+// An open plan used to be one long scroll — budget summary, provisioning
+// costs, an add-item form, a progress card, action buttons, share/delete,
+// the checklist, then family pledges, all stacked on top of each other.
+// Split into named sections instead, the same pattern used for the
+// Stokvel detail screen.
+const PLAN_TABS = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'checklist', label: 'Checklist' },
+  { id: 'budget', label: 'Budget & Costs' },
+  { id: 'contributions', label: 'Contributions' },
+]
+
 // --------------------------------------------------------------
 // Main component
 // --------------------------------------------------------------
@@ -43,6 +55,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   // ----- State from File 2 (multi‑plan) -----
   const [plans, setPlans] = useState([])
   const [activePlan, setActivePlan] = useState(null)
+  const [planTab, setPlanTab] = useState('overview')
   const [loading, setLoading] = useState(true)
   const [newTitle, setNewTitle] = useState('')
   const [newBudget, setNewBudget] = useState('')
@@ -77,7 +90,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         setPlans(nextPlans)
         if (selectedCeremonyId) {
           const selectedPlan = nextPlans.find(plan => plan.ceremonyId === selectedCeremonyId)
-          if (selectedPlan) setActivePlan(selectedPlan)
+          if (selectedPlan) { setActivePlan(selectedPlan); setPlanTab('overview') }
         }
         setLoading(false)
       })
@@ -142,6 +155,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
       setNewBudget('')
       setNewGuestCount('')
       setActivePlan(newPlan)
+      setPlanTab('overview')
       showToast(`Ceremony created with ${newPlan.checklistItems.length} planning items`, 'success')
     } catch (err) {
       showToast(err.message || 'Could not create plan', 'error')
@@ -441,6 +455,23 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           </div>
         </div>
 
+        <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-1">
+          {PLAN_TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setPlanTab(t.id)}
+              className={`flex-shrink-0 px-3.5 py-1.5 rounded-pill text-[12px] font-bold transition-colors ${
+                planTab === t.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {planTab === 'budget' && (
+        <>
         {costItems.length > 0 && (
           <div className={cn('mx-4 mt-4 card-paper p-4', overBudget && 'border-2 border-terracotta')}>
             <div className="flex justify-between items-start mb-2">
@@ -523,7 +554,11 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             </div>
           </div>
         )}
+        </>
+        )}
 
+        {planTab === 'checklist' && (
+        <>
         <div className="mx-4 mt-4 bg-white border-2 border-sage-200 rounded-soft p-4">
           <p className="text-xs font-black uppercase text-ink-muted mb-2">Add to this ceremony</p>
           <form onSubmit={addChecklistItem} className="space-y-2">
@@ -549,6 +584,11 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             <button type="submit" className="w-full bg-sage-500 text-white font-bold py-2 rounded-pill text-sm">+ Add Item</button>
           </form>
         </div>
+        </>
+        )}
+
+        {planTab === 'overview' && (
+        <>
 
         {/* Progress Card (File 1 style) */}
         <div className="mx-4 mt-5 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft">
@@ -650,6 +690,11 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         )}
 
         {/* Checklist (File 1 UI, using File 2 data) */}
+        </>
+        )}
+
+        {planTab === 'checklist' && (
+        <>
         <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Checklist</h3>
@@ -704,6 +749,11 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         </div>
 
         {/* Family Contributions (Pledges) – from File 1 */}
+        </>
+        )}
+
+        {planTab === 'contributions' && (
+        <>
         <div className="mx-4 mt-6">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Family Contributions</h3>
@@ -793,6 +843,8 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             </div>
           )}
         </div>
+        </>
+        )}
 
         <div className="h-8" />
       </div>
@@ -833,6 +885,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
               const existing = plans.find(p => p.ceremonyType === backendType)
               if (existing) {
                 setActivePlan(existing)
+                setPlanTab('overview')
               } else {
                 setNewType(backendType)
                 setNewTitle(`New ${type.name || typeId.replace(/_/g, ' ')} Plan`)
@@ -928,7 +981,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
               return (
                 <button
                   key={plan.id}
-                  onClick={() => setActivePlan(plan)}
+                  onClick={() => { setActivePlan(plan); setPlanTab('overview') }}
                   className="w-full text-left bg-white border-2 border-terracotta/25 rounded-soft p-4 shadow-soft hover:shadow-md transition-shadow"
                 >
                   <p className="font-bold text-sm text-ink">{plan.title}</p>
