@@ -27,6 +27,7 @@ function IzidukoNetwork({ onBack }) {
 
   const [tab, setTab] = useState('matches')
   const [matches, setMatches] = useState([])
+  const [matchIndex, setMatchIndex] = useState(0)
   const [profileComplete, setProfileComplete] = useState(true)
   const [message, setMessage] = useState('')
   const [requests, setRequests] = useState({ incoming: [], outgoing: [] })
@@ -62,6 +63,13 @@ function IzidukoNetwork({ onBack }) {
   }, [authedFetch, showToast])
 
   useEffect(() => { loadAll() }, [loadAll])
+
+  // Keep the current card in range after a refresh (e.g. a match's status
+  // just changed post-connect) instead of always snapping back to the
+  // first match.
+  useEffect(() => {
+    setMatchIndex((i) => Math.min(i, Math.max(0, matches.length - 1)))
+  }, [matches.length])
 
   const sendConnect = async (recipientId) => {
     setBusyId(recipientId)
@@ -155,9 +163,34 @@ function IzidukoNetwork({ onBack }) {
             {tab === 'matches' && (
               matches.length === 0 ? (
                 <EmptyState emoji="🤝" title="No matches yet" description="As more people join with your clan names, they'll show up here." />
-              ) : (
-                <div className="space-y-5">
-                  {matches.map((m) => (
+              ) : (() => {
+                const m = matches[matchIndex]
+                const goTo = (next) => { setComposerFor(null); setMatchIndex(next) }
+                return (
+                  <div>
+                    {/* One match at a time — this is a family-discovery feed,
+                        not a browsing list, so it gets a person's full
+                        attention instead of competing with a stack of others. */}
+                    <div className="flex items-center justify-between mb-3">
+                      <button
+                        type="button"
+                        onClick={() => goTo(matchIndex - 1)}
+                        disabled={matchIndex === 0}
+                        className="w-9 h-9 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center"
+                      >
+                        <Icon name="arrowLeft" size={15} color="#2b2620" />
+                      </button>
+                      <p className="text-xs font-bold text-ink-muted">Match {matchIndex + 1} of {matches.length}</p>
+                      <button
+                        type="button"
+                        onClick={() => goTo(matchIndex + 1)}
+                        disabled={matchIndex >= matches.length - 1}
+                        className="w-9 h-9 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center"
+                      >
+                        <Icon name="arrowRight" size={15} color="#2b2620" />
+                      </button>
+                    </div>
+
                     <div key={m.id} className="rounded-soft overflow-hidden shadow-soft bg-white">
                       <div className="relative aspect-[4/5]">
                         <img src={m.profileImage} alt={`${m.firstName} ${m.lastName}`} className="absolute inset-0 w-full h-full object-cover" />
@@ -228,9 +261,19 @@ function IzidukoNetwork({ onBack }) {
                         )}
                       </div>
                     </div>
-                  ))}
-                </div>
-              )
+
+                    {matchIndex < matches.length - 1 && (
+                      <button
+                        type="button"
+                        onClick={() => goTo(matchIndex + 1)}
+                        className="w-full text-center text-xs font-bold text-ink-muted mt-3 py-2"
+                      >
+                        Next match →
+                      </button>
+                    )}
+                  </div>
+                )
+              })()
             )}
 
             {tab === 'requests' && (
