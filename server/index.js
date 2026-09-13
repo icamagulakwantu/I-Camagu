@@ -18,6 +18,7 @@ import { backfillSpiritPricing } from './scripts/backfill-spirit-pricing.js';
 import { backfillCeremonySkus } from './scripts/backfill-ceremony-skus.js';
 import { backfillCatalogueExpansion } from './scripts/backfill-catalogue-expansion.js';
 import { backfillGroceryBulkCatalog } from './scripts/backfill-grocery-bulk-catalog.js';
+import { backfillMoninSyrups } from './scripts/backfill-monin-syrups.js';
 import { backfillBulkUnits, backfillVerifiedRetailPrices } from './scripts/backfill-bulk-units.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
@@ -172,6 +173,9 @@ ensureCeremonyBudgetColumns()
       });
       await backfillGroceryBulkCatalog().catch((err) => {
         logBackfillError('Grocery bulk catalogue backfill', err);
+      });
+      await backfillMoninSyrups().catch((err) => {
+        logBackfillError('Monin syrup backfill', err);
       });
       await backfillBulkUnits().catch((err) => {
         logBackfillError('Bulk unit backfill', err);
