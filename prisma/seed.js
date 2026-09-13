@@ -325,6 +325,12 @@ const skuItems = [
   { name: 'Bonaqua Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
   { name: 'Valpre Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
   { name: 'Valpre Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Valpre Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Valpre Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Valpre Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Tsitsikamma Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Tsitsikamma Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Tsitsikamma Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
 
   // ---- Catalogue expansion: not everybody drinks alcohol, and not every
   // bulk-buying pool is for a ceremony. Real non-alcoholic beverages, real

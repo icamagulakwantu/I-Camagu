@@ -99,15 +99,19 @@ const NEW_SKUS = [
   { name: 'Chicken Legs', category: 'MEAT', productType: 'FOOD', bottleFormat: 'Sack (Bulk)', unitsPerCase: 1, casePriceZAR: null },
 
   // --- Water: the founder named three brands, still + sparkling, three
-  // sizes, all as 24-packs. Bonaqua is the one of the three that genuinely
-  // sells both still and sparkling in SA retail — Valpre and Tsitsikamma
-  // are modelled still-only. Flag to the founder to correct if any specific
-  // brand/size combination doesn't actually exist as a 24-pack case. ---
+  // sizes, all as 24-packs. Confirmed with the founder that all three
+  // brands genuinely come in both still and sparkling. ---
   { name: 'Valpre Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null },
   { name: 'Valpre Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null },
+  { name: 'Valpre Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: null },
+  { name: 'Valpre Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null },
+  { name: 'Valpre Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null },
   { name: 'Tsitsikamma Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: null },
   { name: 'Tsitsikamma Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null },
   { name: 'Tsitsikamma Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null },
+  { name: 'Tsitsikamma Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: null },
+  { name: 'Tsitsikamma Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null },
+  { name: 'Tsitsikamma Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null },
   { name: 'Bonaqua Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: null },
   { name: 'Bonaqua Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null },
   { name: 'Bonaqua Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null },
