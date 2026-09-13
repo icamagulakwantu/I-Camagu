@@ -3,6 +3,11 @@
 // backfill-brand-images.js, but the image comes from a live retailer page
 // instead of a file already sitting in the repo.
 //
+// Some entries are marked imageOnly: true — their source is a foreign
+// retailer (bjs.com, target.com, totalwine.com, etc.). Per the founder,
+// that's fine for the photo alone, since no price is ever read from these
+// pages; real cost/retail pricing always comes from Makro/Ultra in person.
+//
 // MUST run outside this repo's Claude Code session: retail domains
 // (checkers.co.za, woolworths.co.za, shoprite.co.za, etc.) are not reachable
 // from that sandbox. Run this on your own machine or a Render job instead,
@@ -67,8 +72,9 @@ async function downloadImage(url) {
 }
 
 async function processEntry(entry) {
-  const { product, slug, sourceUrl, needsReview, note } = entry;
-  console.log(`\n${product}${needsReview ? ' [FLAGGED — will not auto-apply]' : ''}`);
+  const { product, slug, sourceUrl, needsReview, imageOnly, note } = entry;
+  const tag = needsReview ? ' [FLAGGED — will not auto-apply]' : imageOnly ? ' [foreign source — image only, not a price reference]' : '';
+  console.log(`\n${product}${tag}`);
   if (note) console.log(`  note: ${note}`);
 
   if (needsReview && !INCLUDE_FLAGGED) {
