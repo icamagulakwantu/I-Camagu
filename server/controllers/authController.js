@@ -5,6 +5,7 @@ import { createOtp, verifyOtp as checkOtp } from '../services/otpService.js';
 import { generateTokenPair, rotateToken } from '../services/tokenService.js';
 import { hashPassword, verifyPassword } from '../services/passwordService.js';
 import { verifyGoogleToken } from '../services/googleAuthService.js';
+import { isAdminEmail } from '../config/admin.js';
 
 // Render does not set NODE_ENV for Node services unless you add it yourself,
 // so keying `secure` off NODE_ENV alone silently ships the refresh cookie
@@ -29,6 +30,12 @@ function serializeUser(user) {
     username: user.username, profileImage: user.profileImage,
     address: user.address, age: user.age, phoneNumber: user.phoneNumber,
     location: user.location, latitude: user.latitude, longitude: user.longitude,
+    // Real backend routes (identityController, marginController,
+    // quoteController's admin endpoints, etc.) already 403 a non-admin via
+    // isAdminEmail — this just lets the frontend hide the menu items that
+    // lead nowhere for everyone else, instead of shipping the admin email
+    // list itself to the client.
+    isAdmin: isAdminEmail(user.email),
   };
 }
 

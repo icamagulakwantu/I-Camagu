@@ -31,9 +31,9 @@ const SECTIONS = [
     title: 'Services',
     items: [
       { id: 'ekoyini', icon: 'cocktail', label: 'Ekoyini Mobile Bar' },
-      { id: 'ekoyiniadmin', icon: 'settings', label: 'Ekoyini Admin' },
-      { id: 'identityadmin', icon: 'key', label: 'Identity Admin' },
-      { id: 'marginadmin', icon: 'chart', label: 'Cost & Margin' },
+      { id: 'ekoyiniadmin', icon: 'settings', label: 'Ekoyini Admin', adminOnly: true },
+      { id: 'identityadmin', icon: 'key', label: 'Identity Admin', adminOnly: true },
+      { id: 'marginadmin', icon: 'chart', label: 'Cost & Margin', adminOnly: true },
       { id: 'portal', icon: 'image', label: 'Digital Portal' },
       { id: 'directory', icon: 'book', label: 'Directory' },
     ],
@@ -91,6 +91,11 @@ export default function More({ onNavigate }) {
 
       {SECTIONS.map((section, sectionIndex) => {
         const alt = sectionIndex % 2 === 1
+        // adminOnly items (Ekoyini Admin, Identity Admin, Cost & Margin) lead
+        // nowhere for anyone else — the backend already 403s them, this just
+        // stops showing a door with no room behind it.
+        const items = section.items.filter((item) => !item.adminOnly || user?.isAdmin)
+        if (items.length === 0) return null
         return (
           <div key={section.title} className="mb-6">
             <div className="flex items-center gap-3 mb-2 px-1">
@@ -98,7 +103,7 @@ export default function More({ onNavigate }) {
               <span className="h-px flex-1 bg-terracotta/10" />
             </div>
             <div className={cn('card-paper divide-y divide-terracotta/10 overflow-hidden', alt && 'wash-clay')}>
-              {section.items.map((item) => (
+              {items.map((item) => (
                 <button
                   key={item.id}
                   type="button"
