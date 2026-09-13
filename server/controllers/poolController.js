@@ -130,6 +130,17 @@ export async function getMyPoolStatus(req, res) {
     const nextTier = getNextTierForMetric(metric, ladder);
     const remaining = amountToReachTier(metric, nextTier);
 
+    // The member's own payment on this pool, once one exists (created the
+    // moment the pool matches — see matchmakerService). Surfaced here too,
+    // not just on My Orders, so the Basket screen can show real end-to-end
+    // progress (Collecting → MOQ reached → Payment submitted → Payment
+    // confirmed → Ready for delivery) instead of stopping at "Matched!".
+    const payment = await prisma.poolPayment.findFirst({
+      where: { poolId: basket.pool.id, userId: req.userId },
+      orderBy: { createdAt: 'desc' },
+      select: { status: true, providerReference: true, amountZAR: true },
+    });
+
     res.json({
       basketId: basket.id,
       basketStatus: basket.status,
@@ -140,6 +151,9 @@ export async function getMyPoolStatus(req, res) {
       poolStatus: basket.pool.status,
       windowDeadline: basket.pool.deadline,
       capCases: basket.pool.capCases,
+      payment: payment
+        ? { status: payment.status, hasReference: !!payment.providerReference, amountZAR: payment.amountZAR }
+        : null,
       smartMatch: {
         basis,
         pallets: palletsForCases(currentCases),

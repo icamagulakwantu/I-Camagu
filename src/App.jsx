@@ -101,6 +101,7 @@ const SCREEN_TO_PATH = {
   ceremonyhub: '/ceremonies',
   store: '/store',
   basket: '/store/basket',
+  myorders: '/store/orders',
   ceremony: '/ceremonies/plan',
   timeline: '/ceremonies/timeline',
   budget: '/ceremonies/budget',
@@ -122,7 +123,6 @@ const SCREEN_TO_PATH = {
   marginadmin: '/more/margin-admin',
   privacy: '/more/privacy',
   hierarchy: '/more/hierarchy',
-  myorders: '/more/orders',
   expenditure: '/more/spending',
   shrinefund: '/more/ubuhlanti',
   legends: '/more/legends',
@@ -461,7 +461,7 @@ function MainApp() {
       case 'store':
         return <Store onGoToBasket={() => setScreen('basket')} basketCount={basketCount} />
       case 'basket':
-        return <Basket onBack={() => setScreen('store')} onBasketChanged={setBasketCount} />
+        return <Basket onBack={() => setScreen('store')} onBasketChanged={setBasketCount} onGoToOrders={() => setScreen('myorders')} />
       case 'ceremony':
         return (
           <CeremonyPlanner
@@ -516,7 +516,7 @@ function MainApp() {
       case 'hierarchy':
         return <Hierarchy onBack={goMore} />
       case 'myorders':
-        return <MyOrders onBack={goMore} />
+        return <MyOrders onBack={() => setScreen('store')} />
       case 'expenditure':
         return <Expenditure onBack={goMore} />
       case 'shrinefund':

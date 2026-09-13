@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import Icon from '../components/Icon.jsx'
+import { resolveOrderStage } from '../data/orderStages.js'
+import { OrderStageTracker } from '../components/ui/OrderStageTracker.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50'
 const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
@@ -102,11 +104,22 @@ function MyOrders({ onBack }) {
         <div className="space-y-3">
           {documents.map((doc) => {
             const payment = payments.find((p) => p.poolId === doc.poolId)
+            // A document only ever exists once its pool has matched (see
+            // matchmakerService), and it flips to FULFILLED in lockstep
+            // with the pool (see supplierService.markPoolFulfilled) — so
+            // doc.status maps onto the same two pool stages exactly.
+            const poolStage = doc.status === 'FULFILLED' ? 'FULFILLED' : 'MATCHED'
+            const stageIndex = resolveOrderStage(
+              poolStage,
+              payment ? { status: payment.status, hasReference: !!payment.providerReference } : null
+            )
             return (
               <div key={doc.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
                 <div className="flex justify-between items-start mb-2">
                   <p className="font-mono text-xs font-bold text-brand-blue">{doc.groupCode}</p>
-                  <span className="text-xs font-black uppercase text-brand-ochre">{doc.status.replace(/_/g, ' ')}</span>
+                </div>
+                <div className="mb-3">
+                  <OrderStageTracker currentIndex={stageIndex} tone="light" />
                 </div>
                 <p className="text-xs text-brand-black/50 mb-2 flex items-center gap-1"><Icon name="mapPin" size={12} /> {doc.deliveryLocation}</p>
                 {doc.lineItems.map((li) => (

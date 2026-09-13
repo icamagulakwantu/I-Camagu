@@ -6,6 +6,8 @@ import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf } from '../data/storeTaxonomy.js'
 import { unitOf, quantityLabel } from '../data/bulkUnits.js'
+import { resolveOrderStage } from '../data/orderStages.js'
+import { OrderStageTracker } from '../components/ui/OrderStageTracker.jsx'
 
 // This pool's rolling window closes on windowDeadline — after that, new
 // baskets join a fresh pool instead of piling onto this one. Real data
@@ -19,7 +21,7 @@ function windowClosesLabel(windowDeadline) {
   return `This pooling window closes in ${Math.round(hoursLeft / 24)} day${Math.round(hoursLeft / 24) === 1 ? '' : 's'}.`
 }
 
-export default function Basket({ onBack, onBasketChanged }) {
+export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
   
@@ -266,11 +268,43 @@ export default function Basket({ onBack, onBasketChanged }) {
         <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
           <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">Smart Match</p>
           <p className="text-sm font-bold mb-2">
-            {poolStatus.poolStatus === 'MATCHED'
-              ? `Matched! Your order pooled with other members via ${poolStatus.partnerName}.`
-              : `Pooling with other members near ${poolStatus.area} via ${poolStatus.partnerName} — the more members join, the bigger the discount.`}
+            {poolStatus.poolStatus === 'OPEN'
+              ? `Pooling with other members near ${poolStatus.area} via ${poolStatus.partnerName} — the more members join, the bigger the discount.`
+              : poolStatus.poolStatus === 'FULFILLED'
+                ? `Delivered/collected — your order from ${poolStatus.partnerName} is complete.`
+                : `Matched! Your order pooled with other members via ${poolStatus.partnerName}.`}
           </p>
-          {poolStatus.poolStatus !== 'MATCHED' && poolStatus.smartMatch && (() => {
+
+          <div className="mb-3">
+            <OrderStageTracker currentIndex={resolveOrderStage(poolStatus.poolStatus, poolStatus.payment)} tone="dark" />
+          </div>
+
+          {poolStatus.poolStatus !== 'OPEN' && (
+            <div className="mb-3 pt-3 border-t border-white/20">
+              {poolStatus.poolStatus === 'FULFILLED' ? (
+                <p className="text-xs text-white/90 mb-2">This order is done — see the full record any time in My Orders.</p>
+              ) : poolStatus.payment?.status === 'CLEARED' ? (
+                <p className="text-xs text-white/90 mb-2">Your payment is confirmed — waiting on the supplier to fulfil the order.</p>
+              ) : poolStatus.payment?.hasReference ? (
+                <p className="text-xs text-white/90 mb-2">Your EFT reference is in — waiting on the supplier to confirm receipt.</p>
+              ) : (
+                <p className="text-xs text-white/90 mb-2">
+                  MOQ reached — pay your share (R{poolStatus.payment?.amountZAR ? Number(poolStatus.payment.amountZAR).toFixed(2) : '—'}) via EFT and enter your reference in My Orders.
+                </p>
+              )}
+              {onGoToOrders && (
+                <button
+                  type="button"
+                  onClick={onGoToOrders}
+                  className="bg-white text-terracotta text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform"
+                >
+                  Track my order →
+                </button>
+              )}
+            </div>
+          )}
+
+          {poolStatus.poolStatus === 'OPEN' && poolStatus.smartMatch && (() => {
             const sm = poolStatus.smartMatch
             const isAmount = sm.basis === 'AMOUNT'
             // A band's own label — pallets read as "1-3P"; Rand thresholds
