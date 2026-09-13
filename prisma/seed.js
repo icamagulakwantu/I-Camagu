@@ -278,19 +278,53 @@ const skuItems = [
   { name: 'Tarpaulin Sail', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 350.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Hardware' },
   { name: 'Ibhoma Pole Bundle', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 450.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Hardware' },
   { name: '25L Water Container', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 180.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Retail' },
-  { name: 'Green Apples (per kg)', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 38.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Butter 500g', category: 'GROCERY', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 85.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Green Apples', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Butter', category: 'GROCERY', productType: 'FOOD', bottleFormat: '1kg', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   { name: 'Sheep', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Inkabi (male)', unitsPerCase: 1, casePriceZAR: 2700.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
   { name: 'Sheep', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Imazi (female)', unitsPerCase: 1, casePriceZAR: 2700.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
 
   // ---- Umgidi catering: real, purchasable grocery quantities that
   // scale with guest count (see ceremonyCostProfiles.js perGuestUnitFraction).
-  { name: 'Maize Meal 50kg', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 520.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
-  { name: 'Potatoes 10kg', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 110.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Cabbage Head', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 22.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Spinach Bundle', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 25.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Cooking Oil 5L', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 190.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
-  { name: 'Sugar 10kg', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 245.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Maize Meal', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '50kg Bag', unitsPerCase: 1, casePriceZAR: 520.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Maize Meal', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '10kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Maize Meal', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '12.5kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Amazimba', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '10kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Amazimba', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '12.5kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Umbona', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '10kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Umbona', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '12.5kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Samp', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '10kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Samp', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '12.5kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Rice', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '10kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Rice', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '12.5kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Mayonnaise', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '3kg Tub', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Mayonnaise', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '5kg Tub', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Chutney', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '3kg Tub', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Chutney', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '5kg Tub', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Sweet Chilli Sauce', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '3kg Tub', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Sweet Chilli Sauce', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '5kg Tub', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Potatoes', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: '10kg Sack', unitsPerCase: 1, casePriceZAR: 110.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Cabbage', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Spinach', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk Bunches)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Yellow Peppers', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Sweet Corn', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Cooking Oil', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '5L', unitsPerCase: 1, casePriceZAR: 190.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Sugar', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '10kg Bag', unitsPerCase: 1, casePriceZAR: 245.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Sugar', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '12.5kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Beef Stock', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: 'Box', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Salt', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: 'Box', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Chicken Trays', category: 'MEAT', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher' },
+  { name: 'Chicken Legs', category: 'MEAT', productType: 'FOOD', bottleFormat: 'Sack (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher' },
+  { name: 'Tsitsikamma Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Tsitsikamma Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Tsitsikamma Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Bonaqua Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Bonaqua Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Bonaqua Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Bonaqua Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Bonaqua Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Bonaqua Sparkling Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Valpre Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
+  { name: 'Valpre Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (1.5L)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: null },
 
   // ---- Catalogue expansion: not everybody drinks alcohol, and not every
   // bulk-buying pool is for a ceremony. Real non-alcoholic beverages, real
@@ -298,13 +332,13 @@ const skuItems = [
   // retail comparable (retailPriceZAR). Live animals have no honest
   // supermarket comparable, so retailPriceZAR stays null for those —
   // never a fabricated "savings" figure.
-  { name: 'Coca-Cola 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
-  { name: 'Sprite 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
-  { name: 'Fanta Orange 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
-  { name: 'Stoney Ginger Beer 300ml Can', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (300ml)', unitsPerCase: 24, casePriceZAR: 143.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 359.76 },
-  { name: 'Valpre Still Water 500ml', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: 246.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 383.76 },
+  { name: 'Coca-Cola', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (250ml)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA' },
+  { name: 'Sprite', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (250ml)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA' },
+  { name: 'Fanta Orange', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (250ml)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA' },
+  { name: 'Stoney Ginger Beer', category: 'SOFT_DRINKS', productType: 'BEVERAGE', bottleFormat: 'Can (250ml)', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA' },
+  { name: 'Valpre Still Water', category: 'WATER', productType: 'BEVERAGE', bottleFormat: 'Bottle (500ml)', unitsPerCase: 24, casePriceZAR: 246.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Coca-Cola Beverages SA', retailPriceZAR: 383.76 },
   { name: 'Beef Mince 5kg', category: 'MEAT', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 574.95, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher', retailPriceZAR: 699.95 },
-  { name: 'Whole Chicken (~1.8kg)', category: 'MEAT', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 99.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher', retailPriceZAR: 116.98 },
+  { name: 'Whole Chicken', category: 'MEAT', productType: 'FOOD', bottleFormat: 'Box (Bulk, ~1.8kg each bird)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher' },
   { name: 'Boerewors 5kg', category: 'MEAT', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 474.95, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Butcher', retailPriceZAR: 554.95 },
   { name: 'Goat', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Inkabi (male)', unitsPerCase: 1, casePriceZAR: 2700.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
   { name: 'Goat', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Imazi (female)', unitsPerCase: 1, casePriceZAR: 2700.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
@@ -316,21 +350,26 @@ const skuItems = [
   // ---- Veggies: the ceremony vegetables and sides list — matches
   // ceremonyCostProfiles.js COST_RATES.food exactly (same real prices),
   // now actually purchasable in the Store instead of just an estimate.
-  { name: 'Onions 10kg', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 95.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Carrots 10kg', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 95.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Green Peppers (per kg)', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 32.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Red Peppers (per kg)', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 48.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Baked Beans 410g Tin', category: 'CANNED_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 15.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Onions', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: '10kg Sack', unitsPerCase: 1, casePriceZAR: 95.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Carrots', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: '10kg Sack', unitsPerCase: 1, casePriceZAR: 95.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Green Peppers', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Red Peppers', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Baked Beans', category: 'CANNED_GOODS', productType: 'FOOD', bottleFormat: '3kg Tin', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Baked Beans', category: 'CANNED_GOODS', productType: 'FOOD', bottleFormat: 'Pack of 24 x 410g Tins', unitsPerCase: 24, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
 
   // ---- Dry goods / hospitality staples: already-researched prices that
   // were sitting in ceremonyCostProfiles.js but never turned into
   // purchasable Sku rows.
-  { name: 'Instant Coffee 750g', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 165.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
-  { name: 'Tea 100 Bags', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 60.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Instant Coffee', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: '750g Big Tin', unitsPerCase: 1, casePriceZAR: 165.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Tea', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: '1kg Box', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  // Bread and peanut butter stay single-consumer-sized on purpose — the
+  // founder's own exception for anything bought from a local vendor rather
+  // than a bulk wholesaler.
   { name: 'Peanut Butter 400g', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 50.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   { name: 'Brown Bread Loaf', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 20.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
-  { name: 'Milk 2L', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 35.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
-  { name: 'Flour 2.5kg', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 40.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Milk Long Life', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: '1L x 6-Pack', unitsPerCase: 6, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Flour', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '10kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Flour', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '12.5kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
 ];
 
 const samplePartners = [

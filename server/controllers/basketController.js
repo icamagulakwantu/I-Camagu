@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import { PUBLIC_SKU_SELECT, toPublicItem } from '../utils/skuVisibility.js';
+import { PUBLIC_SKU_SELECT, toPublicItem, isOrderable } from '../utils/skuVisibility.js';
 
 async function getOrCreateDraftBasket(userId) {
       let basket = await prisma.basket.findFirst({ where: { userId, status: 'DRAFT' } });
@@ -18,7 +18,7 @@ export async function getMyBasket(req, res) {
                   });
 
                       const totalCases = items.reduce((sum, i) => sum + i.quantity, 0);
-                          const totalZAR = items.reduce((sum, i) => sum + (i.quantity * parseFloat(i.sku.casePriceZAR)), 0);
+                          const totalZAR = items.reduce((sum, i) => sum + (i.quantity * parseFloat(i.sku.casePriceZAR || 0)), 0);
 
                               res.json({ basket, items: items.map(toPublicItem), totalCases, totalZAR });
       } catch (error) {
@@ -37,6 +37,7 @@ export async function addItem(req, res) {
           try {
                   const sku = await prisma.sku.findUnique({ where: { id: skuId } });
                       if (!sku) return res.status(404).json({ error: 'SKU not found' });
+                          if (!isOrderable(sku)) return res.status(409).json({ error: `${sku.name} is in the catalogue but doesn't have a price yet — check back once it's been priced.` });
 
                           const basket = await getOrCreateDraftBasket(req.userId);
 

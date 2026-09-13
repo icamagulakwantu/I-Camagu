@@ -181,8 +181,8 @@ function Store({ onGoToBasket, basketCount }) {
           <div className="space-y-3">
             {skus.map((sku) => {
               const retail = sku.retailPriceZAR ? parseFloat(sku.retailPriceZAR) : null
-              const casePrice = parseFloat(sku.casePriceZAR)
-              const savings = retail && retail > casePrice ? retail - casePrice : null
+              const casePrice = sku.casePriceZAR != null ? parseFloat(sku.casePriceZAR) : null
+              const savings = retail && casePrice != null && retail > casePrice ? retail - casePrice : null
               const dept = departmentOf(sku)
               return (
                 <div key={sku.id} className="card-paper flex justify-between items-center overflow-hidden">
@@ -202,7 +202,7 @@ function Store({ onGoToBasket, basketCount }) {
                         {sku.unitsPerCase > 1 ? `${sku.unitsPerCase} per ${unitOf(sku)}` : `per ${unitOf(sku)}`}
                       </p>
                       <p className="text-sm font-bold text-terracotta">
-                        R{casePrice.toFixed(2)} / {unitOf(sku)}
+                        {casePrice != null ? `R${casePrice.toFixed(2)} / ${unitOf(sku)}` : 'Price coming soon'}
                       </p>
                       {savings !== null && (
                         <p className="text-[11px] font-bold text-sage-700">
@@ -216,13 +216,19 @@ function Store({ onGoToBasket, basketCount }) {
                       )}
                     </div>
                   </div>
-                  <button
-                    onClick={() => addToBasket(sku)}
-                    disabled={addingId === sku.id}
-                    className="bg-terracotta text-white text-xs font-bold px-4 py-2 rounded-pill active:scale-90 transition-transform disabled:opacity-50 mr-3 flex-shrink-0"
-                  >
-                    {addingId === sku.id ? <Icon name="check" size={13} color="#fff" strokeWidth={2.5} /> : `Add ${unitOf(sku)}`}
-                  </button>
+                  {casePrice != null ? (
+                    <button
+                      onClick={() => addToBasket(sku)}
+                      disabled={addingId === sku.id}
+                      className="bg-terracotta text-white text-xs font-bold px-4 py-2 rounded-pill active:scale-90 transition-transform disabled:opacity-50 mr-3 flex-shrink-0"
+                    >
+                      {addingId === sku.id ? <Icon name="check" size={13} color="#fff" strokeWidth={2.5} /> : `Add ${unitOf(sku)}`}
+                    </button>
+                  ) : (
+                    <span className="text-[10px] text-ink-muted/60 font-bold px-3 mr-3 flex-shrink-0 text-right">
+                      Not yet<br />orderable
+                    </span>
+                  )}
                 </div>
               )
             })}

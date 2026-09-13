@@ -503,7 +503,14 @@ model Sku {
   productType       String
   bottleFormat      String?
   unitsPerCase      Int
-  casePriceZAR      Decimal  @db.Decimal(10, 2)
+  // What a member pays iCamagu per bulk unit. Nullable on purpose: a row can
+  // exist — name, pack format, category all real — before anyone has been to
+  // Makro/Food Lover's to price it. Null here means "catalogued, not yet
+  // orderable" everywhere downstream (Store hides the Add button, the basket
+  // endpoint refuses to add it) — the same discipline retailPriceZAR already
+  // applies to an unverified shop price, just one step earlier: no invented
+  // member price ever reaches a screen.
+  casePriceZAR      Decimal? @db.Decimal(10, 2)
   palletPackQty     Int?
   palletPriceZAR    Decimal? @db.Decimal(10, 2)
   supplierPortfolio String?

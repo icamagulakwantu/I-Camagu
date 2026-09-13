@@ -18,6 +18,15 @@ export function isVerifiedRetail(sku) {
   return sku?.retailPriceSource === RETAIL_VERIFIED && sku?.retailPriceZAR != null;
 }
 
+// A SKU can be catalogued — name, pack format, category all real — before
+// anyone has actually been to Makro/Food Lover's to price it. casePriceZAR
+// null means exactly that: real product, no invented member price. Nothing
+// downstream (Store's Add button, the basket-add endpoint) treats it as
+// purchasable until this is true.
+export function isOrderable(sku) {
+  return sku?.casePriceZAR != null;
+}
+
 // Strips the retail price from a catalogue row unless it has been verified,
 // and drops the provenance fields — a member has no use for them. Returns a
 // new object; never mutates the row Prisma handed us.

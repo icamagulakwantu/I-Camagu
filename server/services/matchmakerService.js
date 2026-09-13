@@ -110,7 +110,7 @@ export async function checkAndMatchPool(poolId) {
   const skuMap = Object.fromEntries(skus.map(s => [s.id, s]));
 
   const totalAmountZAR = Object.entries(lineItemsBySku).reduce(
-    (sum, [skuId, data]) => sum + (data.quantity * parseFloat(skuMap[skuId].casePriceZAR)),
+    (sum, [skuId, data]) => sum + (data.quantity * parseFloat(skuMap[skuId].casePriceZAR || 0)),
     0
   );
 
@@ -130,7 +130,7 @@ export async function checkAndMatchPool(poolId) {
     let memberAmountZAR = 0;
     for (const item of basket.items) {
       const sku = skuMap[item.skuId];
-      memberAmountZAR += item.quantity * parseFloat(sku.casePriceZAR);
+      memberAmountZAR += item.quantity * parseFloat(sku.casePriceZAR || 0);
       await prisma.orderLineConfirmation.create({
         data: {
           documentId: document.id,

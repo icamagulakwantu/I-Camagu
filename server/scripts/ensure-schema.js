@@ -135,4 +135,11 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "tierLadder" JSONB;'
   );
+  // A grocery/produce SKU can now exist before it has a real member price —
+  // catalogued from the founder's own list, priced only once someone has
+  // actually been to Makro/Food Lover's. Downstream code treats a null
+  // casePriceZAR as "not yet orderable" (skuVisibility.js, Store, basket add).
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Sku" ALTER COLUMN "casePriceZAR" DROP NOT NULL;'
+  );
 }

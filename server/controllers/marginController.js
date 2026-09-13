@@ -25,14 +25,15 @@ async function requireAdmin(req, res) {
 }
 
 function marginFor(sku) {
-  const price = parseFloat(sku.casePriceZAR);
+  const price = sku.casePriceZAR == null ? null : parseFloat(sku.casePriceZAR);
   const cost = sku.costPriceZAR == null ? null : parseFloat(sku.costPriceZAR);
   const retail = sku.retailPriceZAR == null ? null : parseFloat(sku.retailPriceZAR);
   const units = sku.unitsPerCase || 1;
 
-  // Margin is only real once a cost is recorded. A missing cost stays null
-  // rather than being assumed — an invented margin is worse than none.
-  const marginPerCase = cost == null ? null : price - cost;
+  // Margin is only real once both a price and a cost are recorded. Either
+  // missing stays null rather than being assumed — an invented margin is
+  // worse than none.
+  const marginPerCase = cost == null || price == null ? null : price - cost;
 
   return {
     id: sku.id,

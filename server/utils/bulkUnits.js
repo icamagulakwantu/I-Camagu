@@ -24,6 +24,8 @@ export const UNITS = {
   loaf: ['loaf', 'loaves'],
   carcass: ['carcass', 'carcasses'],
   bird: ['bird', 'birds'],
+  sack: ['sack', 'sacks'],
+  tub: ['tub', 'tubs'],
   kg: ['kg', 'kg'],
   // "each" is how a supplier quotes it, but "Add each" reads badly on a
   // button — "item" says the same thing in the user's language.
@@ -47,26 +49,34 @@ const RULES = [
   { category: 'LIVESTOCK_ANIMAL', unit: 'head' },
 
   // --- Fresh produce: the real market units ---
+  // Onions/potatoes/carrots keep the real fresh-produce-market term for a
+  // 10kg mesh sack. Everything else in this category sells in a box, per
+  // the founder's own instruction ("all vegetables boxes or sacks") — no
+  // more per-head or per-bundle framing for a bulk buyer.
   { name: /\bonions?\b/i, unit: 'pocket' },
   { name: /\bpotato(es)?\b/i, unit: 'pocket' },
   { name: /\bcarrots?\b/i, unit: 'pocket' },
-  { name: /\bcabbage\b/i, unit: 'head' },
-  { name: /\bspinach\b/i, unit: 'bundle' },
-  // Peppers and apples are priced by weight in the catalogue ("per kg").
+  // Peppers and apples were priced by weight in the old catalogue ("per kg").
   { name: /\bper kg\b/i, unit: 'kg' },
-  { category: 'FRESH_PRODUCE', unit: 'crate' },
+  { category: 'FRESH_PRODUCE', unit: 'box' },
 
   // --- Meat ---
+  // Trays and legs are sold as a box/sack, not "N birds" — check these
+  // before the generic chicken rule, which is for the whole-bird row.
+  { name: /chicken (trays?|pieces)/i, unit: 'box' },
+  { name: /chicken legs?/i, unit: 'sack' },
   { name: /\bchicken\b/i, unit: 'bird' },
   { name: /carcass|hindquarter|\bside\b/i, unit: 'carcass' },
   { category: 'MEAT', unit: 'pack' },
 
   // --- Dry goods and groceries ---
-  { name: /maize meal|\bflour\b|\bsugar\b|\brice\b|\bsamp\b|\bbeans? 10kg\b/i, unit: 'bag' },
+  { name: /maize meal|\bflour\b|\bsugar\b|\brice\b|\bsamp\b|\bbeans? 10kg\b|amazimba|umbona/i, unit: 'bag' },
   { name: /\bbread\b/i, unit: 'loaf' },
   { name: /peanut butter|\bjam\b/i, unit: 'jar' },
   { name: /instant coffee/i, unit: 'tin' },
-  { name: /\btea\b.*bags?/i, unit: 'box' },
+  { name: /\btea\b.*bags?|\btea\b.*box/i, unit: 'box' },
+  { name: /mayonnaise|\bchutney\b|chilli sauce|chili sauce/i, unit: 'tub' },
+  { name: /beef stock|\bsalt\b/i, unit: 'box' },
   { name: /\bmilk\b|cooking oil/i, unit: 'bottle' },
   { name: /\bbutter\b/i, unit: 'each' },
   { category: 'CANNED_GOODS', unit: 'tin' },
