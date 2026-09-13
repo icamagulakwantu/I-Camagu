@@ -15,8 +15,8 @@
   { "product": "Samp", "slug": "samp", "sourceUrl": "https://www.shoprite.co.za/product/ace-samp-10kg-67d026e45e542bef3de0c573", "note": "ACE Samp — exact match to our 10kg Bag variant." },
   { "product": "Sugar", "slug": "sugar", "sourceUrl": "https://www.shoprite.co.za/product/selati-pure-white-sugar-10kg-10132687EA", "note": "Selati Pure White Sugar — exact match to our 10kg Bag variant." },
   { "product": "Chutney", "slug": "chutney", "sourceUrl": "https://ndunastores.com/products/Mrs%20Balls%20Chutney%20Mild%20CATERING%20SIZE%206.25kg%20Tub", "imageOnly": true, "note": "Mrs Ball's Original Chutney, foreign (UK African-foods retailer) — image only. 6.25kg catering tub vs our 3kg/5kg tub, closest found." },
-  { "product": "Beef Mince", "slug": "beef-mince", "sourceUrl": "https://www.biltong.co.za/shop/wholesale-catering/meat/5kg-pure-beef-mince-5x1kg/", "note": "Fleisherei Pure Beef Mince, 5kg as 5x1kg packs — matches our 5kg total." },
-  { "product": "Boerewors", "slug": "boerewors", "sourceUrl": "https://brisco.co.za/product/beef-boerewors-5kg/", "note": "Brisco Beef Boerewors — exact 5kg match." },
+  { "product": "Beef Mince 5kg", "slug": "beef-mince", "sourceUrl": "https://www.biltong.co.za/shop/wholesale-catering/meat/5kg-pure-beef-mince-5x1kg/", "note": "Fleisherei Pure Beef Mince, 5kg as 5x1kg packs — matches our 5kg total." },
+  { "product": "Boerewors 5kg", "slug": "boerewors", "sourceUrl": "https://brisco.co.za/product/beef-boerewors-5kg/", "note": "Brisco Beef Boerewors — exact 5kg match." },
   { "product": "Bonaqua Still Water", "slug": "bonaqua-still-water", "sourceUrl": "https://officebox.co.za/products/bonaqua-still-water-bottles-24-x-500ml", "note": "Exact match — 24 x 500ml." },
   { "product": "Valpre Still Water", "slug": "valpre-still-water", "sourceUrl": "https://www.checkers.co.za/product/valpre-still-spring-water-24-x-500ml-10130000PK2", "note": "Exact match — 24 x 500ml." },
 
