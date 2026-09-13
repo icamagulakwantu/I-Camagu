@@ -9,16 +9,13 @@
 import prisma from '../config/db.js';
 
 const BRAND_IMAGES = {
-  'Black Label': 'carling-black-label',
-  'Castle Lager': 'castle-lager',
-  'Castle Milk Stout': 'castle-milk-stout',
-  'Castle Lite': 'castle-lite',
-  'Corona': 'corona',
-  'Flying Fish Lemon/Apple': 'flying-fish',
-  'Flying Fish Chill': 'flying-fish',
-  'Stella Artois': 'stella-artois',
-  'Hansa Pilsener': 'hansa-pilsener',
-  'Lion Lager': 'lion-lager',
+  // Black Label, Castle Lager/Lite/Milk Stout, Corona, Flying Fish (both),
+  // Stella Artois, Hansa Pilsener, Lion Lager, Amstel Lager and Guinness
+  // Foreign Extra used to be here, pointing at generic brand-logo badges —
+  // not real product photos. Superseded by real retailer photos sourced
+  // in alcohol-image-sources.json / backfill-alcohol-photos.js; removed
+  // from here so this boot-time backfill can't overwrite them back to the
+  // deleted logo files on the next deploy.
   'Brutal Fruit Ruby/Litchi': 'brutal-fruit',
   "Redd's Berry/Orig/Green": 'redds',
   "Redd's MXD Pine/Guarana": 'mxd',
@@ -37,8 +34,6 @@ const BRAND_IMAGES = {
   'Cointreau Orange Liqueur': 'cointreau',
   'Viceroy 5 Year Old': 'viceroy',
   'Budweiser': 'budweiser',
-  'Amstel Lager': 'amstel',
-  'Guinness Foreign Extra': 'guinness',
   '4th Street Sweet Red/White': '4th-street',
   '4th Street Sweet Red/Rose': '4th-street',
   'Amarula Original Cream': 'amarula',
