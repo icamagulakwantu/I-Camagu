@@ -857,12 +857,14 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                         <span className="text-sm font-bold text-ink">{idx + 1}. {name}</span>
                         <div className="flex gap-1">
                           <button type="button" onClick={() => moveInRotation(idx, -1)} disabled={idx === 0}
-                            className="w-7 h-7 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center">
-                            <Icon name="arrowUp" size={12} />
+                            aria-label={`Move ${name} up in the rotation order`}
+                            className="w-11 h-11 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center">
+                            <Icon name="arrowUp" size={14} />
                           </button>
                           <button type="button" onClick={() => moveInRotation(idx, 1)} disabled={idx === rotationDraft.length - 1}
-                            className="w-7 h-7 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center">
-                            <Icon name="arrowDown" size={12} />
+                            aria-label={`Move ${name} down in the rotation order`}
+                            className="w-11 h-11 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center">
+                            <Icon name="arrowDown" size={14} />
                           </button>
                         </div>
                       </div>

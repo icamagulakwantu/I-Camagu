@@ -459,7 +459,8 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                             <button
                               type="button"
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="w-8 h-8 rounded-pill bg-cream-dark text-ink font-bold active:scale-90 transition-transform"
+                              aria-label={`Decrease quantity of ${item.sku?.name || 'item'}`}
+                              className="w-11 h-11 rounded-pill bg-cream-dark text-ink font-bold active:scale-90 transition-transform"
                             >
                               −
                             </button>
@@ -467,7 +468,8 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                             <button
                               type="button"
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="w-8 h-8 rounded-pill bg-sage-500 text-white font-bold active:scale-90 transition-transform"
+                              aria-label={`Increase quantity of ${item.sku?.name || 'item'}`}
+                              className="w-11 h-11 rounded-pill bg-sage-500 text-white font-bold active:scale-90 transition-transform"
                             >
                               +
                             </button>

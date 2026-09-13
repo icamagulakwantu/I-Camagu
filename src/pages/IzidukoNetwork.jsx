@@ -176,7 +176,8 @@ function IzidukoNetwork({ onBack }) {
                         type="button"
                         onClick={() => goTo(matchIndex - 1)}
                         disabled={matchIndex === 0}
-                        className="w-9 h-9 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center"
+                        aria-label="Previous match"
+                        className="w-11 h-11 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center"
                       >
                         <Icon name="arrowLeft" size={15} color="#2b2620" />
                       </button>
@@ -185,7 +186,8 @@ function IzidukoNetwork({ onBack }) {
                         type="button"
                         onClick={() => goTo(matchIndex + 1)}
                         disabled={matchIndex >= matches.length - 1}
-                        className="w-9 h-9 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center"
+                        aria-label="Next match"
+                        className="w-11 h-11 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center"
                       >
                         <Icon name="arrowRight" size={15} color="#2b2620" />
                       </button>

@@ -20,6 +20,30 @@
   button, a, [role="button"] {
     @apply select-none;
   }
+
+  /* Visible only for keyboard/switch navigation (:focus-visible), never on a
+     touch tap or mouse click — the app is touch-first and every button
+     already has its own active:scale-* tap feedback, so a permanent ring
+     would just be visual noise for the common case this app is built for. */
+  a:focus-visible, button:focus-visible, input:focus-visible,
+  select:focus-visible, textarea:focus-visible, [role="button"]:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid #c45c26;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* Respect a user's OS-level "reduce motion" request — every transition and
+   keyframe animation in this file collapses to near-instant instead of
+   silently ignoring an accessibility setting the user already turned on. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @layer utilities {
