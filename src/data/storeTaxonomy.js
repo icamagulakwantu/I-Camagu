@@ -1,13 +1,22 @@
 /**
  * Store taxonomy — one hierarchy, two levels, no competing chip rows.
  *
- *   department (Drinks | Meat & Livestock | Staples & Dry Goods | Vegetables)
+ *   department (Drinks | Meat | Groceries | Supplies | Clothing)
  *     └── aisle (Live animals, Meat & poultry, Spirits, Wine, …)
  *
  * Maps the real backend `Sku.category` codes (MEAT, LIVESTOCK_ANIMAL,
  * SOFT_DRINKS, WHISKY, …) into a human aisle instead of rendering the raw
- * codes as a flat wall of pills. Display-layer only — no schema change.
- * Order is deliberate: Drinks, Meat/Livestock, Staples/Dry Goods, Vegetables.
+ * codes as a flat wall of pills. Display-layer only — no schema change
+ * (Sku.category is a plain string, not a DB enum).
+ *
+ * Five departments, in this order, per the founder's call: alcohol and
+ * food used to sit under one merged "Staples & Dry Goods" department
+ * alongside a separate "Vegetables" one — now Groceries and Supplies
+ * (ceremony/ritual items) are their own top-level departments, fresh
+ * produce folds into Groceries, and Clothing is a new department shell
+ * (no real SKUs yet — same "the tab exists ahead of the catalogue"
+ * pattern already used for supplier categories with zero partners on
+ * file) ready for when clothing items are added.
  */
 
 export const DEPARTMENTS = [
@@ -34,30 +43,39 @@ export const DEPARTMENTS = [
     ],
   },
   {
-    id: 'staples',
-    name: 'Staples & Dry Goods',
-    short: 'Staples',
+    id: 'groceries',
+    name: 'Groceries',
+    short: 'Groceries',
     xhosa: 'Ukutya',
     aisles: [
       { id: 'grains', name: 'Grains & dry goods', categories: ['DRY_GOODS', 'GROCERY_BULK', 'GROCERY'] },
       { id: 'tinned', name: 'Tinned goods', categories: ['CANNED_GOODS'] },
+      { id: 'produce', name: 'Fresh produce', categories: ['FRESH_PRODUCE'] },
+    ],
+  },
+  {
+    id: 'supplies',
+    name: 'Supplies',
+    short: 'Supplies',
+    xhosa: 'Izixhobo',
+    aisles: [
       { id: 'ritual', name: 'Ceremony supplies', categories: ['RITUAL_SUPPLIES', 'ULWALUKO_SUPPLIES'] },
     ],
   },
   {
-    id: 'vegetables',
-    name: 'Vegetables',
-    short: 'Veggies',
-    xhosa: 'Imifuno',
+    id: 'clothing',
+    name: 'Clothing',
+    short: 'Clothing',
+    xhosa: 'Impahla',
     aisles: [
-      { id: 'produce', name: 'Fresh produce', categories: ['FRESH_PRODUCE'] },
+      { id: 'general', name: 'General clothing', categories: ['CLOTHING'] },
     ],
   },
 ]
 
 export function departmentOf(sku) {
   return DEPARTMENTS.find((d) => d.aisles.some((a) => a.categories.includes(sku?.category)))
-    || DEPARTMENTS.find((d) => d.id === 'staples')
+    || DEPARTMENTS.find((d) => d.id === 'groceries')
 }
 
 export function aisleOf(sku) {
