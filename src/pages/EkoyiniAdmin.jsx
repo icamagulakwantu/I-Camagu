@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
+import { Skeleton } from '../components/ui/Skeleton.jsx'
 
 const STATUS_COLORS = { PENDING: 'bg-cream-dark text-ink-muted', QUOTED: 'bg-sage-100 text-sage-700', CONFIRMED: 'bg-sage-500 text-white', DECLINED: 'bg-terracotta/20 text-terracotta' }
 const STATUSES = ['PENDING', 'QUOTED', 'CONFIRMED', 'DECLINED']
@@ -42,7 +43,7 @@ function EkoyiniAdmin({ onBack }) {
                           }
                   }
 
-                    if (loading) return <div className="p-4 text-ink-muted">Loading...</div>
+                    if (loading) return <div className="p-4 space-y-3"><Skeleton className="h-20 w-full rounded-soft" /><Skeleton className="h-20 w-full rounded-soft" /></div>
 
                     if (forbidden) {
                           return (

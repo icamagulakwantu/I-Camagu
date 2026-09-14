@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import CeremonyIcon from '../components/CeremonyIcon.jsx'
+import { Skeleton } from '../components/ui/Skeleton.jsx'
 
 const CEREMONY_META = {
   ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', image: '/images/ceremonies/ulwaluko.jpg' },
@@ -109,7 +110,10 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
           </div>
         </>
       ) : loading ? (
-        <div className="text-center text-ink-muted py-8">Loading your ceremonies...</div>
+        <div className="space-y-2.5">
+          <Skeleton className="h-16 w-full rounded-soft" />
+          <Skeleton className="h-16 w-full rounded-soft" />
+        </div>
       ) : ceremonies.length > 0 ? (
         <div className="space-y-2.5">
           {ceremonies.map((c) => (

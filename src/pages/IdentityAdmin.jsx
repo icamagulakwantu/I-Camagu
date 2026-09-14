@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
+import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 
 function IdentityAdmin({ onBack }) {
@@ -44,7 +45,7 @@ function IdentityAdmin({ onBack }) {
     }
   }
 
-  if (loading) return <div className="p-4 text-ink-muted">Loading...</div>
+  if (loading) return <div className="p-4 space-y-3"><Skeleton className="h-20 w-full rounded-soft" /><Skeleton className="h-20 w-full rounded-soft" /></div>
 
   if (forbidden) {
     return (
