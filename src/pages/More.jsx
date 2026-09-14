@@ -3,9 +3,15 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { cn } from '../lib/utils'
 import Icon from '../components/Icon.jsx'
 
+// Grouped per the Lovable review's suggested More-menu structure: My
+// culture / My money and orders / Community services / Profile and
+// security / Help and legal — plus a separate Admin Tools section that
+// only renders for an actual admin (section-level, not just per-item),
+// since scattering four admin-only screens into "Services" was exactly
+// the kind of un-role-gated menu the review flagged.
 const SECTIONS = [
   {
-    title: 'Ceremony & Culture',
+    title: 'My Culture',
     items: [
       { id: 'ceremony', icon: 'clipboard', label: 'Ceremony Preparation' },
       { id: 'templates', icon: 'template', label: 'Ceremony Templates' },
@@ -18,36 +24,47 @@ const SECTIONS = [
     ],
   },
   {
-    title: 'Money & Community',
+    title: 'My Money & Orders',
     items: [
       { id: 'ukugida', icon: 'send', label: 'Ukugida' },
       { id: 'myorders', icon: 'package', label: 'My Orders' },
       { id: 'expenditure', icon: 'coins', label: 'My Spending' },
-      { id: 'supplier', icon: 'store', label: 'Supplier Dashboard' },
       { id: 'shrinefund', icon: 'flame', label: 'Ubuhlanti' },
     ],
   },
   {
-    title: 'Services',
+    title: 'Community Services',
     items: [
       { id: 'ekoyini', icon: 'cocktail', label: 'Ekoyini Mobile Bar' },
-      { id: 'ekoyiniadmin', icon: 'settings', label: 'Ekoyini Admin', adminOnly: true },
-      { id: 'identityadmin', icon: 'key', label: 'Identity Admin', adminOnly: true },
-      { id: 'marginadmin', icon: 'chart', label: 'Cost & Margin', adminOnly: true },
-      { id: 'demandadmin', icon: 'coins', label: 'Demand & Suppliers', adminOnly: true },
+      { id: 'supplier', icon: 'store', label: 'Supplier Dashboard' },
       { id: 'portal', icon: 'image', label: 'Digital Portal' },
       { id: 'directory', icon: 'book', label: 'Directory' },
     ],
   },
   {
-    title: 'Account',
+    title: 'Profile & Security',
     items: [
       { id: 'profile', icon: 'user', label: 'Profile' },
       { id: 'activity', icon: 'activity', label: 'My Activity' },
       { id: 'pin', icon: 'key', label: 'Security PIN' },
       { id: 'account', icon: 'lock', label: 'Account & Privacy' },
+    ],
+  },
+  {
+    title: 'Help & Legal',
+    items: [
       { id: 'privacy', icon: 'file', label: 'Privacy Policy' },
       { id: 'help', icon: 'help', label: 'Help & Support' },
+    ],
+  },
+  {
+    title: 'Admin Tools',
+    adminOnly: true,
+    items: [
+      { id: 'demandadmin', icon: 'coins', label: 'Demand & Suppliers' },
+      { id: 'ekoyiniadmin', icon: 'settings', label: 'Ekoyini Admin' },
+      { id: 'identityadmin', icon: 'key', label: 'Identity Admin' },
+      { id: 'marginadmin', icon: 'chart', label: 'Cost & Margin' },
     ],
   },
 ]
@@ -90,11 +107,12 @@ export default function More({ onNavigate }) {
         </div>
       )}
 
-      {SECTIONS.map((section, sectionIndex) => {
+      {SECTIONS.filter((section) => !section.adminOnly || user?.isAdmin).map((section, sectionIndex) => {
         const alt = sectionIndex % 2 === 1
-        // adminOnly items (Ekoyini Admin, Identity Admin, Cost & Margin) lead
-        // nowhere for anyone else — the backend already 403s them, this just
-        // stops showing a door with no room behind it.
+        // Per-item adminOnly still applies within an otherwise-visible
+        // section — a screen that leads nowhere for anyone else (the
+        // backend already 403s it) shouldn't advertise a door with no
+        // room behind it.
         const items = section.items.filter((item) => !item.adminOnly || user?.isAdmin)
         if (items.length === 0) return null
         return (
