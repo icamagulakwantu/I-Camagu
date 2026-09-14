@@ -614,6 +614,15 @@ model PoolPayment {
   status            String   @default("PENDING")
   refundRequestedAt DateTime?
   refundFeeZAR      Decimal? @db.Decimal(10, 2)
+  // The PSP's raw webhook payload for this payment, kept verbatim for
+  // reconciliation/debugging — same pattern as RawBankLog.rawPayload for
+  // manual EFT. Null for manual-EFT payments, which have no webhook.
+  rawPayload Json?
+  // When the PSP itself confirmed settlement (money actually moved) —
+  // distinct from updatedAt, which changes on any edit. Null until a real
+  // PSP adapter exists; a manual-EFT payment is "settled" when an official
+  // marks it CLEARED, which this field doesn't need to track.
+  settledAt  DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -657,6 +666,16 @@ model Partner {
   longitude Float?
   moq       Int?
   createdAt DateTime    @default(now())
+
+  // Settlement destination for a PSP-routed pool payout (Stitch/Ozow-style
+  // same-day pass-through). Null until a real banking relationship exists
+  // for this partner — a pool works with no Partner at all (see BulkPool),
+  // and a Partner works with no bank details yet, same "never block on the
+  // next layer" principle applied one level further down.
+  bankName          String?
+  bankAccountHolder String?
+  bankAccountNumber String?
+  bankBranchCode    String?
 
   pools BulkPool[]
 }

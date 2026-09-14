@@ -155,4 +155,30 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "Sku" ALTER COLUMN "casePriceZAR" DROP NOT NULL;'
   );
+  // Settlement destination for a PSP-routed pool payout (Stitch/Ozow-style
+  // same-day pass-through). Null until a real banking relationship exists
+  // for this partner.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Partner" ADD COLUMN IF NOT EXISTS "bankName" TEXT;'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Partner" ADD COLUMN IF NOT EXISTS "bankAccountHolder" TEXT;'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Partner" ADD COLUMN IF NOT EXISTS "bankAccountNumber" TEXT;'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Partner" ADD COLUMN IF NOT EXISTS "bankBranchCode" TEXT;'
+  );
+  // A PSP's raw webhook payload for a pool payment, kept verbatim for
+  // reconciliation/debugging (same pattern as RawBankLog.rawPayload), plus
+  // when the PSP itself confirmed settlement. Both null for manual-EFT
+  // payments, which have no webhook and are settled by an official marking
+  // them CLEARED instead.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "rawPayload" JSONB;'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "settledAt" TIMESTAMP(3);'
+  );
 }
