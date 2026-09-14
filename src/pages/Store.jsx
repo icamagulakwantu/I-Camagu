@@ -11,7 +11,7 @@ function Store({ onGoToBasket, basketCount }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   const [allSkus, setAllSkus] = useState([])
-  const [activeDept, setActiveDept] = useState('all')
+  const [activeDept, setActiveDept] = useState(DEPARTMENTS[0].id)
   const [activeAisle, setActiveAisle] = useState('all')
   const [loading, setLoading] = useState(true)
   const [addingId, setAddingId] = useState(null)
@@ -45,8 +45,8 @@ function Store({ onGoToBasket, basketCount }) {
       return allSkus.filter((s) => s.name.toLowerCase().includes(q))
     }
     return allSkus.filter((s) => {
-      if (activeDept !== 'all' && departmentOf(s).id !== activeDept) return false
-      if (activeDept !== 'all' && activeAisle !== 'all' && aisleOf(s).id !== activeAisle) return false
+      if (departmentOf(s).id !== activeDept) return false
+      if (activeAisle !== 'all' && aisleOf(s).id !== activeAisle) return false
       return true
     })
   }, [allSkus, activeDept, activeAisle, isSearching, searchQuery])
@@ -126,9 +126,11 @@ function Store({ onGoToBasket, basketCount }) {
 
       {!isSearching && (
         <>
-          {/* Level 1 — departments, in order: Drinks, Meat/Livestock, Staples/Dry Goods, Vegetables */}
+          {/* Level 1 — departments, in order: Drinks, Meat, Groceries, Supplies, Clothing.
+              No "All" tile: every item lives under exactly one department, so
+              browsing "everything" is just the whole heavy catalogue with no
+              extra value over picking a department first. */}
           <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-1">
-            <DeptTile label="All" xhosa="Konke" active={activeDept === 'all'} onClick={() => pickDept('all')} />
             {DEPARTMENTS.map((d) => (
               <DeptTile key={d.id} label={d.short} xhosa={d.xhosa} active={activeDept === d.id} onClick={() => pickDept(d.id)} />
             ))}
