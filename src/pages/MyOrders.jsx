@@ -1,18 +1,25 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
+import { EmptyState } from '../components/ui/EmptyState.jsx'
+import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 import { resolveOrderStage } from '../data/orderStages.js'
 import { OrderStageTracker } from '../components/ui/OrderStageTracker.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50'
-const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+// 2 decimal places, matching the money formatting every other screen in the
+// app uses (Store, Basket, ShrineFund) — this used to round to whole Rand,
+// which meant the same order card could show "R1234.56" for its total next
+// to "R1235" for one member's share.
+const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 function MyOrders({ onBack }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   const [documents, setDocuments] = useState([])
   const [payments, setPayments] = useState([])
+  const [loading, setLoading] = useState(true)
   const [referenceDrafts, setReferenceDrafts] = useState({})
   const [submittingId, setSubmittingId] = useState(null)
 
@@ -32,6 +39,8 @@ function MyOrders({ onBack }) {
       showToast(err.message, 'error')
       setDocuments([])
       setPayments([])
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -98,8 +107,13 @@ function MyOrders({ onBack }) {
       <button onClick={onBack} className="text-sm text-brand-black/60 mb-4">← Back</button>
       <h2 className="text-2xl font-extrabold text-brand-black mb-4">My Orders</h2>
 
-      {documents.length === 0 ? (
-        <p className="text-brand-black/50 text-sm">No matched bulk orders yet — submit a cart to a pool from the Store.</p>
+      {loading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-32 w-full rounded-soft" />
+          <Skeleton className="h-32 w-full rounded-soft" />
+        </div>
+      ) : documents.length === 0 ? (
+        <EmptyState emoji="📦" title="No matched bulk orders yet" description="Submit a cart to a pool from the Store." />
       ) : (
         <div className="space-y-3">
           {documents.map((doc) => {
@@ -134,7 +148,7 @@ function MyOrders({ onBack }) {
                     )}
                   </div>
                 ))}
-                <p className="text-sm font-bold text-brand-black mt-2">Group total: R{parseFloat(doc.totalAmountZAR).toFixed(2)}</p>
+                <p className="text-sm font-bold text-brand-black mt-2">Group total: {money(doc.totalAmountZAR)}</p>
 
                 {payment && (
                   <div className="mt-3 pt-3 border-t border-terracotta/15">

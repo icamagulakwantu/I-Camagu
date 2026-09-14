@@ -261,14 +261,16 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           <button
             type="button"
             onClick={shareBasket}
-            className="bg-terracotta text-cream text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform"
+            className="bg-terracotta text-cream text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform flex items-center gap-1.5"
           >
-            {copied ? 'Copied!' : 'Share Cart 🔗'}
+            {copied ? 'Copied!' : <><Icon name="share" size={12} color="#fdf8f0" /> Share Cart</>}
           </button>
         )}
       </div>
 
-      <h2 className="font-display font-bold text-2xl text-ink mb-4">My Cart 🛒</h2>
+      <h2 className="font-display font-bold text-2xl text-ink mb-4 flex items-center gap-2">
+        <Icon name="cart" size={22} color="#2b2620" /> My Cart
+      </h2>
 
       {poolStatuses.map((poolStatus) => (
         <div key={poolStatus.basketId} className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
@@ -334,8 +336,8 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
             return (
               <>
                 {sm.currentTier && (
-                  <p className="text-[11px] font-black uppercase tracking-wide text-white bg-white/20 inline-block px-2 py-1 rounded-pill mb-2">
-                    🌟 {sm.currentTier.name} unlocked
+                  <p className="text-[11px] font-black uppercase tracking-wide text-white bg-white/20 inline-flex items-center gap-1 px-2 py-1 rounded-pill mb-2">
+                    <Icon name="check" size={11} color="#fff" strokeWidth={2.5} /> {sm.currentTier.name} unlocked
                     {tierValueLabel(sm.currentTier, sm.basis) && ` · ${tierValueLabel(sm.currentTier, sm.basis)}`}
                   </p>
                 )}
@@ -400,9 +402,9 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                   <button
                     type="button"
                     onClick={() => inviteToSmartMatch(poolStatus)}
-                    className="bg-white text-terracotta text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform"
+                    className="bg-white text-terracotta text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform flex items-center gap-1.5"
                   >
-                    {invitedId === poolStatus.basketId ? 'Copied!' : 'Invite on WhatsApp 📲'}
+                    {invitedId === poolStatus.basketId ? 'Copied!' : <><Icon name="send" size={12} color="#c45c26" /> Invite on WhatsApp</>}
                   </button>
                   <button
                     type="button"
@@ -461,7 +463,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                             />
                           ) : (
                             <span className="w-14 h-14 rounded-soft bg-terracotta/10 flex items-center justify-center shrink-0">
-                              <Icon name={g === 'meat' ? 'users' : g === 'beverages' ? 'cocktail' : 'package'} size={20} color="#c45c26" />
+                              <Icon name={g === 'beverages' ? 'cocktail' : 'package'} size={20} color="#c45c26" />
                             </span>
                           )}
                           <div className="flex-1 min-w-0">
