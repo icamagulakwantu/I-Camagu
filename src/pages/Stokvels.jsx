@@ -950,7 +950,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                 <div key={p.id} className="bg-white border-2 border-sage-500 rounded-soft p-3 mb-2 shadow-sm">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-bold">R{Number(p.amount || 0).toFixed(2)}</span>
-                    <span className="text-xs text-ink-muted">{p.approvals?.length || 0} approval(s)</span>
+                    <span className="text-xs text-ink-muted">{p.approvals?.length || 0} of {stokvel.requiredApprovals} approval{stokvel.requiredApprovals === 1 ? '' : 's'}</span>
                   </div>
                   {isOfficial && (
                     <button
