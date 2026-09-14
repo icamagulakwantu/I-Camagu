@@ -1,6 +1,6 @@
 import prisma from '../config/db.js';
 
-const VALID_TYPES = ['TAVERN', 'BUTCHERY'];
+const VALID_TYPES = ['TAVERN', 'BUTCHERY', 'GROCERY', 'PRODUCE'];
 
 export async function registerAsSupplier(userId, { name, type, area, moq, latitude, longitude }) {
   if (!name || !name.trim()) {
@@ -9,7 +9,7 @@ export async function registerAsSupplier(userId, { name, type, area, moq, latitu
     throw err;
   }
   if (!VALID_TYPES.includes(type)) {
-    const err = new Error('Type must be TAVERN or BUTCHERY');
+    const err = new Error(`Type must be one of: ${VALID_TYPES.join(', ')}`);
     err.status = 400;
     throw err;
   }
@@ -55,7 +55,7 @@ export async function confirmPoolPayment(userId, paymentId) {
     err.status = 404;
     throw err;
   }
-  if (payment.pool.partner.userId !== userId) {
+  if (payment.pool.partner?.userId !== userId) {
     const err = new Error('Not your pool');
     err.status = 403;
     throw err;
@@ -87,7 +87,7 @@ export async function processRefund(userId, paymentId, feeZAR) {
     err.status = 404;
     throw err;
   }
-  if (payment.pool.partner.userId !== userId) {
+  if (payment.pool.partner?.userId !== userId) {
     const err = new Error('Not your pool');
     err.status = 403;
     throw err;
@@ -134,7 +134,7 @@ export async function markPoolFulfilled(userId, poolId) {
     err.status = 404;
     throw err;
   }
-  if (pool.partner.userId !== userId) {
+  if (pool.partner?.userId !== userId) {
     const err = new Error('Not your pool');
     err.status = 403;
     throw err;

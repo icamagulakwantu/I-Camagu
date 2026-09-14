@@ -8,6 +8,7 @@ import { DEPARTMENTS, departmentOf } from '../data/storeTaxonomy.js'
 import { unitOf, quantityLabel } from '../data/bulkUnits.js'
 import { resolveOrderStage } from '../data/orderStages.js'
 import { OrderStageTracker } from '../components/ui/OrderStageTracker.jsx'
+import { CATEGORY_LABEL } from '../data/poolCategories.js'
 
 // This pool's rolling window closes on windowDeadline — after that, new
 // baskets join a fresh pool instead of piling onto this one. Real data
@@ -38,8 +39,8 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
   const [copied, setCopied] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   // A single cart submission can now split into more than one pool — one
-  // per category (drinks vs. everything else), since a partner is only
-  // ever a tavern or a butchery, never both. So this is a list, not one.
+  // per category (drinks, meat & livestock, groceries, produce), since a
+  // pool is always one category. So this is a list, not one.
   const [poolStatuses, setPoolStatuses] = useState([])
   const [cancellingId, setCancellingId] = useState(null)
   const [invitedId, setInvitedId] = useState(null)
@@ -192,7 +193,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       ? `R${sm.currentAmountZAR.toFixed(2)} pooled so far`
       : `${sm.pallets.toFixed(1)} pallets pooled so far`
     const lines = [
-      `Pooling a bulk order with ${poolStatus.partnerName} near ${poolStatus.area} on iCamagu SmartMatch.`,
+      `Pooling a ${CATEGORY_LABEL[poolStatus.category].toLowerCase()} bulk order${poolStatus.partnerName ? ` with ${poolStatus.partnerName}` : ''} near ${poolStatus.area} on iCamagu SmartMatch.`,
       sm.currentTier
         ? `We're at ${sm.currentTier.name} — ${standing}${tierValueLabel(sm.currentTier, sm.basis) ? ` (${tierValueLabel(sm.currentTier, sm.basis)})` : ''}.`
         : `We're at ${standing}${sm.nextTier ? ', working toward our first tier' : ''}.`,
@@ -264,14 +265,19 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       {poolStatuses.map((poolStatus) => (
         <div key={poolStatus.basketId} className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
           <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">
-            Smart Match — {poolStatus.partnerType === 'TAVERN' ? 'Drinks' : 'Food & other items'}
+            Smart Match — {CATEGORY_LABEL[poolStatus.category]}
           </p>
+          {poolStatus.partnerName && (
+            <p className="text-[11px] font-bold text-white/90 mb-1 flex items-center gap-1">
+              <Icon name="check" size={11} color="#fff" /> Confirmed supplier: {poolStatus.partnerName}
+            </p>
+          )}
           <p className="text-sm font-bold mb-2">
             {poolStatus.poolStatus === 'OPEN'
-              ? `Pooling with other members near ${poolStatus.area} via ${poolStatus.partnerName} — the more members join, the bigger the discount.`
+              ? `Pooling with other members near ${poolStatus.area}${poolStatus.partnerName ? ` via ${poolStatus.partnerName}` : ''} — the more members join, the bigger the discount.`
               : poolStatus.poolStatus === 'FULFILLED'
-                ? `Delivered/collected — your order from ${poolStatus.partnerName} is complete.`
-                : `Matched! Your order pooled with other members via ${poolStatus.partnerName}.`}
+                ? `Delivered/collected — your order${poolStatus.partnerName ? ` from ${poolStatus.partnerName}` : ''} is complete.`
+                : `Matched! Your order pooled with other members${poolStatus.partnerName ? ` via ${poolStatus.partnerName}` : ''}.`}
           </p>
 
           <div className="mb-3">
@@ -286,6 +292,10 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                 <p className="text-xs text-white/90 mb-2">Your payment is confirmed — waiting on the supplier to fulfil the order.</p>
               ) : poolStatus.payment?.hasReference ? (
                 <p className="text-xs text-white/90 mb-2">Your EFT reference is in — waiting on the supplier to confirm receipt.</p>
+              ) : !poolStatus.partnerName ? (
+                <p className="text-xs text-white/90 mb-2">
+                  MOQ reached! We're finalizing a supplier for this pool now — payment details will show here as soon as one is confirmed.
+                </p>
               ) : (
                 <p className="text-xs text-white/90 mb-2">
                   MOQ reached — pay your share (R{poolStatus.payment?.amountZAR ? Number(poolStatus.payment.amountZAR).toFixed(2) : '—'}) via EFT and enter your reference in My Orders.

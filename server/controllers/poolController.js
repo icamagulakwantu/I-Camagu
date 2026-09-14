@@ -2,7 +2,7 @@ import prisma from '../config/db.js';
 import { submitBasketToPool } from '../services/matchmakerService.js';
 import { PALLET_CASES, palletsForCases, resolveTierLadder, getTierForMetric, getNextTierForMetric, amountToReachTier } from '../utils/smartMatchTiers.js';
 
-const CATEGORY_LABEL = { TAVERN: 'Drinks', BUTCHERY: 'Food & other items' };
+export const CATEGORY_LABEL = { TAVERN: 'Drinks', BUTCHERY: 'Meat & livestock', GROCERY: 'Groceries & other items', PRODUCE: 'Fresh produce' };
 
 export async function submitToPool(req, res) {
   const { basketId } = req.body;
@@ -14,15 +14,11 @@ export async function submitToPool(req, res) {
     const result = await submitBasketToPool(req.userId, basketId);
     const lines = result.submissions.map((s) =>
       s.matched
-        ? `${CATEGORY_LABEL[s.partnerType]} matched with ${s.partnerName}! Group code: ${s.groupCode}`
-        : `${CATEGORY_LABEL[s.partnerType]} parked with ${s.partnerName} — ${s.currentCases}/${s.moqTarget} cases needed.`
+        ? `${CATEGORY_LABEL[s.category]} matched${s.partnerName ? ` with ${s.partnerName}` : ''}! Group code: ${s.groupCode}`
+        : `${CATEGORY_LABEL[s.category]} pooling${s.partnerName ? ` with ${s.partnerName}` : ''} — ${s.currentCases}/${s.moqTarget} cases needed.`
     );
-    for (const type of result.unmatchedTypes) {
-      lines.push(`No ${CATEGORY_LABEL[type].toLowerCase()} supplier is set up in your area yet — those items stayed in your cart.`);
-    }
-    if (lines.length === 0) lines.push('Nothing could be submitted.');
 
-    res.json({ ...result, message: lines.join(' ') });
+    res.json({ ...result, message: lines.join(' ') || 'Nothing could be submitted.' });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -82,7 +78,7 @@ export async function requestPoolPaymentRefund(req, res) {
       data: { refundRequestedAt: new Date() },
     });
 
-    if (payment.pool.partner.userId) {
+    if (payment.pool.partner?.userId) {
       const { createNotification } = await import('../services/notificationDbService.js');
       await createNotification(
         payment.pool.partner.userId,
@@ -155,8 +151,11 @@ export async function getMyPoolStatus(req, res) {
       statuses.push({
         basketId: basket.id,
         basketStatus: basket.status,
-        partnerType: basket.pool.partner.type,
-        partnerName: basket.pool.partner.name,
+        category: basket.pool.category,
+        // A pool works fully with or without a confirmed supplier attached
+        // — this is null until one matches automatically or gets attached
+        // once a real deal is signed.
+        partnerName: basket.pool.partner?.name || null,
         area: basket.pool.area,
         currentCases,
         moqTarget: basket.pool.moqTarget,

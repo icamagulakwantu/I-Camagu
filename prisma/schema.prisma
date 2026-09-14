@@ -33,6 +33,8 @@ enum BasketStatus {
 enum PartnerType {
   TAVERN
   BUTCHERY
+  GROCERY
+  PRODUCE
 }
 
 enum ClanConnectionStatus {
@@ -546,8 +548,16 @@ model Sku {
 
 model BulkPool {
   id        String    @id @default(cuid())
-  partnerId String
-  partner   Partner   @relation(fields: [partnerId], references: [id])
+  // Which real-world category this pool is for (alcohol/meat/groceries/
+  // produce) — always set at creation, independent of whether a real
+  // confirmed supplier exists yet. Pool formation and joining must never
+  // depend on a Partner row existing (founder's explicit call): a partner
+  // gets attached automatically once one matches, or manually once a real
+  // deal is signed, but the pool itself works — collects members, tracks
+  // MOQ progress — with or without one.
+  category  PartnerType
+  partnerId String?
+  partner   Partner?  @relation(fields: [partnerId], references: [id])
   area      String
   deadline  DateTime?
   moqTarget Int

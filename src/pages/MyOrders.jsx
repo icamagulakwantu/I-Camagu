@@ -145,6 +145,10 @@ function MyOrders({ onBack }) {
                       <>
                         {payment.status === 'CLEARED' ? (
                           <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Payment confirmed by supplier</p>
+                        ) : !payment.pool?.partner ? (
+                          <p className="text-[11px] text-brand-black/50">
+                            MOQ reached — we're finalizing a supplier for this pool now. Payment details will show here as soon as one is confirmed.
+                          </p>
                         ) : (
                           <div>
                             <p className="text-[11px] text-brand-black/50 mb-2">

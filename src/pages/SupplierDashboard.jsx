@@ -96,8 +96,10 @@ function RegisterForm({ onRegistered }) {
             value={type} onChange={(e) => setType(e.target.value)}
             className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm bg-white"
           >
-            <option value="TAVERN">Tavern (alcohol)</option>
-            <option value="BUTCHERY">Butchery (meat)</option>
+            <option value="TAVERN">Tavern / liquor distributor (alcohol)</option>
+            <option value="BUTCHERY">Butchery / livestock (meat)</option>
+            <option value="GROCERY">Grocery wholesaler (groceries & other items)</option>
+            <option value="PRODUCE">Produce supplier (fresh produce)</option>
           </select>
           <input
             type="text" placeholder="Area you serve (e.g. Gugulethu)" value={area}
