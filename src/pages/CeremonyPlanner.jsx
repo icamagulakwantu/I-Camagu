@@ -101,7 +101,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     fetchPlans()
     fetch('/api/ceremonies/types', { headers: { Authorization: `Bearer ${accessToken}` } })
       .then(res => res.json())
-      .then(data => setCeremonyTypes(Array.isArray(data) ? data.filter(type => type !== 'IMIGIDI' && type !== 'UMSEBENZI_WENKOMO') : []))
+      .then(data => setCeremonyTypes(Array.isArray(data) ? data : []))
       .catch(() => setCeremonyTypes([]))
   }, [accessToken, selectedCeremonyId])
 

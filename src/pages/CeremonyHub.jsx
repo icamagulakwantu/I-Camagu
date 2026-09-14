@@ -27,6 +27,11 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
   const [ceremonyTypes, setCeremonyTypes] = useState([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('types')
+  // The hero card's photo isn't guaranteed to actually load — a missing file,
+  // a bad deploy, being offline — so track a real load failure and fall back
+  // to the same gradient treatment used when a type has no photo at all,
+  // rather than showing a broken image with text stamped over it.
+  const [leadImageFailed, setLeadImageFailed] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -39,7 +44,7 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
         const ceremonyData = await ceremonyRes.json()
         const typeData = typeRes.ok ? await typeRes.json() : []
         setCeremonies(Array.isArray(ceremonyData) ? ceremonyData : [])
-        setCeremonyTypes(Array.isArray(typeData) ? typeData.filter(type => type !== 'IMIGIDI' && type !== 'UMSEBENZI_WENKOMO') : [])
+        setCeremonyTypes(Array.isArray(typeData) ? typeData : [])
       })
       .catch(err => console.error('Error fetching ceremonies:', err))
       .finally(() => setLoading(false))
@@ -72,10 +77,10 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
         <>
           {leadMeta && (
             <button onClick={() => onOpenType(leadType)}
-              className={`${leadMeta.image ? '' : 'wash-ember grain'} card-paper w-full text-left overflow-hidden mb-3 p-5 relative min-h-[220px] flex flex-col justify-end`}>
-              {leadMeta.image && (
+              className={`${leadMeta.image && !leadImageFailed ? '' : 'wash-ember grain'} card-paper w-full text-left overflow-hidden mb-3 p-5 relative min-h-[220px] flex flex-col justify-end`}>
+              {leadMeta.image && !leadImageFailed && (
                 <>
-                  <img src={leadMeta.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  <img src={leadMeta.image} alt="" onError={() => setLeadImageFailed(true)} className="absolute inset-0 w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/35 to-transparent" />
                 </>
               )}

@@ -23,7 +23,7 @@ const STEPS = [
       { title: 'Ukudidiyela', day: 'Day 1', text: 'Boil water over an eziko/wood fire in a traditional pot, mix with maize meal and umbona. Once cooled at night, add the first half of the amazimba.' },
         { title: 'Ukupheka Izidudu', day: 'Day 2, morning', text: 'Cook the mixture into izidudu. Transfer into 15–20kg enamel dishes and let cool completely.' },
           { title: 'Ukufaka', day: 'Day 2, after cooling', text: 'Transfer into the ifatyi (blue plastic container) sized for your volume, and add the remaining amazimba.' },
-            { title: 'Fermenting Stage', day: 'Day 3', text: 'Let it stand undisturbed for a full day to rise and form rich foam (igwebu). [Term pending verification — flag any correction to Thandu.]' },
+            { title: 'Fermenting Stage', day: 'Day 3', text: 'Let it stand undisturbed for a full day to rise and form rich foam (igwebu).' },
               { title: 'Ukuhluza', day: 'Day 4', text: 'Strain the mixture completely using traditional strainers to extract the sacred, thin liquid the people and elders will drink.' },
 ]
 

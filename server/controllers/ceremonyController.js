@@ -3,9 +3,18 @@ import crypto from 'crypto';
 import { CeremonyType } from '@prisma/client';
 import { CEREMONY_COST_PROFILES, getDefaultItemsForType } from './ceremonyCostProfiles.js';
 
+// UMSEBENZI_WENKOMO and IMIGIDI predate UMGIDI as the real user-facing type
+// (UMGIDI is the correct standalone ceremony; IMIGIDI was a duplicate alias
+// and UMSEBENZI_WENKOMO an old grouping that got broken apart into
+// independent ceremony types — see CHANGES_DEEP_AUDIT.md). Kept in the enum
+// because existing rows reference them, but never offered as a choice for a
+// new ceremony. Filtered here, once, so every screen that lists ceremony
+// types gets the same real list without needing to know this history.
+const LEGACY_CEREMONY_TYPES = new Set(['UMSEBENZI_WENKOMO', 'IMIGIDI']);
+
 export const getCeremonyTypes = async (req, res) => {
       try {
-              res.json(Object.values(CeremonyType));
+              res.json(Object.values(CeremonyType).filter((type) => !LEGACY_CEREMONY_TYPES.has(type)));
       } catch (error) {
               console.error('Error fetching ceremony types:', error);
                   res.status(500).json({ error: 'Internal server error' });
