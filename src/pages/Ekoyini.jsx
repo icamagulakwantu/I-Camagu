@@ -1,14 +1,18 @@
 import { useState } from 'react'
 import { useToast } from '../components/ui/Toast.jsx'
 import { cn } from '../lib/utils'
+import Icon from '../components/Icon.jsx'
 import EkoyiniQuoteForm from './EkoyiniQuoteForm.jsx'
 
+// Icon, not emoji — matches the line-icon set used everywhere else in the
+// app. No exact "champagne" or "crown" glyph exists in that set, so these
+// are the closest real fits rather than invented new icon shapes.
 const PACKAGES = [
-  { id: 'heritage', name: 'Heritage', emoji: '🥂', price: 'R4,500', desc: 'Essential bar setup' },
-  { id: 'signature', name: 'Signature', emoji: '🍾', price: 'R7,500', desc: 'Premium selection' },
-  { id: 'prestige', name: 'Prestige', emoji: '🍹', price: 'R12,000', desc: 'Full luxury experience' },
-  { id: 'royal', name: 'Royal', emoji: '👑', price: 'R18,000', desc: 'The complete package' },
-  { id: 'custom', name: 'Custom', emoji: '✨', price: 'Quote', desc: 'Tailored to your needs' },
+  { id: 'heritage', name: 'Heritage', icon: 'beer', price: 'R4,500', desc: 'Essential bar setup' },
+  { id: 'signature', name: 'Signature', icon: 'cocktail', price: 'R7,500', desc: 'Premium selection' },
+  { id: 'prestige', name: 'Prestige', icon: 'gift', price: 'R12,000', desc: 'Full luxury experience' },
+  { id: 'royal', name: 'Royal', icon: 'shieldCheck', price: 'R18,000', desc: 'The complete package' },
+  { id: 'custom', name: 'Custom', icon: 'settings', price: 'Quote', desc: 'Tailored to your needs' },
 ]
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
@@ -58,8 +62,8 @@ export default function Ekoyini({ onBack }) {
               pressable
             )}
           >
-            <div className="w-12 h-12 rounded-full bg-sage-50 flex items-center justify-center text-2xl flex-shrink-0">
-              {pkg.emoji}
+            <div className="w-12 h-12 rounded-full bg-sage-50 flex items-center justify-center flex-shrink-0">
+              <Icon name={pkg.icon} size={22} color="#4a7a4a" />
             </div>
             <div className="flex-1">
               <div className="flex justify-between items-center">

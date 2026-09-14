@@ -40,7 +40,14 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
   const [form, setForm] = useState({
     fullName: user ? user.firstName : '', surname: user ? user.lastName : '', clientEmail: user?.email || '',
     cellPhone: '', whatsappNumber: '', altContactName: '', altContactNumber: '', hearAboutUs: '', referralName: '',
-    eventType: 'IMIGIDI', otherEventType: '', eventDate: '', eventStartTime: '', eventEndTime: '',
+    // Must match the first entry in EVENT_TYPES — the <select> below falls
+    // back to displaying its first option when the bound value doesn't
+    // match any of them, which silently desyncs what's shown from what's
+    // submitted if this ever drifts from that list again (it used to
+    // default to 'IMIGIDI', a value not in EVENT_TYPES at all: the
+    // dropdown displayed "UMGIDI" while the real state — and whatever got
+    // submitted if nobody touched the field — stayed 'IMIGIDI').
+    eventType: EVENT_TYPES[0], otherEventType: '', eventDate: '', eventStartTime: '', eventEndTime: '',
     barServiceStart: '', barServiceEnd: '', setupAccessTime: '', breakdownCompleteBy: '',
     venueName: '', physicalAddress: '', venueArea: '', city: '', venueType: 'OUTDOORS_OPEN',
     parkingAvailable: 'YES', parkingNote: '', powerAccess: 'YES', waterAccess: 'YES',

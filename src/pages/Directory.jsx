@@ -290,12 +290,15 @@ function Directory({ onBack }) {
                 <><Icon name="file" size={13} /> Upload ID/FICA document (optional, speeds up verification)</>
               )}
             </button>
-            <input 
-              ref={fileInputRef} 
-              type="file" 
-              accept="image/*,.pdf" 
-              onChange={handleDocSelect} 
-              className="hidden" 
+            {!idDocUrl && !uploadingDoc && (
+              <p className="text-[10px] text-ink-muted text-center -mt-2">Image or PDF, up to 1.5MB</p>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.pdf"
+              onChange={handleDocSelect}
+              className="hidden"
             />
 
             <button type="submit" className="w-full bg-sage-500 hover:bg-sage-600 text-white font-bold py-2.5 rounded-pill text-sm transition-colors">

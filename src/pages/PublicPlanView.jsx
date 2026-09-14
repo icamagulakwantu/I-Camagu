@@ -22,7 +22,9 @@ function PublicPlanView({ token }) {
                 if (error) {
                         return (
                                   <div className="min-h-screen bg-cream flex flex-col items-center justify-center px-6 text-center">
-                                          <p className="text-4xl mb-3">🔗</p>
+                                          <div className="w-14 h-14 rounded-full bg-terracotta/10 flex items-center justify-center mb-3">
+                                                  <Icon name="link" size={24} color="#c45c26" />
+                                          </div>
                                                   <p className="font-bold text-ink mb-1">{error}</p>
                                                           <a href="/" className="mt-4 text-sage-600 underline text-sm">Go to iCamagu</a>
                                                                 </div>
