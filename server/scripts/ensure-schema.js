@@ -138,6 +138,16 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "tierLadder" JSONB;'
   );
+  // Real, per-item cost on a ceremony checklist item — for anything that
+  // isn't a priced catalogue item (a lift in a friend's bakkie for exactly
+  // R200 of petrol has no SKU). Nullable both ways: an estimate is
+  // optional, and nothing is guessed until a member enters a real number.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "CeremonyChecklistItem" ADD COLUMN IF NOT EXISTS "targetCostZAR" DECIMAL(10,2);'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "CeremonyChecklistItem" ADD COLUMN IF NOT EXISTS "actualCostZAR" DECIMAL(10,2);'
+  );
   // A grocery/produce SKU can now exist before it has a real member price —
   // catalogued from the founder's own list, priced only once someone has
   // actually been to Makro/Food Lover's. Downstream code treats a null

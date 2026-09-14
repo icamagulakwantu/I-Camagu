@@ -63,7 +63,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   const [newType, setNewType] = useState(defaultType || 'ULWALUKO')
   const [ceremonyTypes, setCeremonyTypes] = useState([])
   const [confirmDelete, setConfirmDelete] = useState(null)
-  const [newChecklistItem, setNewChecklistItem] = useState({ phase: 'CUSTOM', label: '', isOptional: true })
+  const [newChecklistItem, setNewChecklistItem] = useState({ phase: 'CUSTOM', label: '', isOptional: true, actualCostZAR: '' })
 
   // ----- State for pledges (from File 1) -----
   const [pledges, setPledges] = useState([])
@@ -253,7 +253,12 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
 
   const updateItemActualCost = async (itemId, actualCostZAR) => {
     try {
-      const res = await fetch(`/api/ceremonies/plans/items/${itemId}/cost`, {
+      const item = (activePlan.checklistItems || []).find(i => i.id === itemId)
+      const endpoint = item?.ceremonyId
+        ? `/api/ceremonies/checklist/${itemId}`
+        : `/api/ceremonies/plans/items/${itemId}/cost`
+
+      const res = await fetch(endpoint, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({ actualCostZAR: actualCostZAR === '' ? null : parseFloat(actualCostZAR) }),
@@ -278,7 +283,10 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
       const res = await fetch(`/api/ceremonies/${activePlan.ceremonyId}/checklist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify(newChecklistItem),
+        body: JSON.stringify({
+          ...newChecklistItem,
+          actualCostZAR: newChecklistItem.actualCostZAR === '' ? null : parseFloat(newChecklistItem.actualCostZAR),
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Could not add checklist item')
@@ -287,7 +295,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         ...prev,
         checklistItems: [...(prev.checklistItems || []), data],
       }))
-      setNewChecklistItem({ phase: 'CUSTOM', label: '', isOptional: true })
+      setNewChecklistItem({ phase: 'CUSTOM', label: '', isOptional: true, actualCostZAR: '' })
       showToast('Custom checklist item added', 'success')
     } catch (err) {
       showToast(err.message || 'Could not add checklist item', 'error')
@@ -576,6 +584,18 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
                 onChange={(e) => setNewChecklistItem({ ...newChecklistItem, label: e.target.value })}
                 className="flex-1 border border-terracotta/20 rounded-soft px-3 py-2 text-sm" required />
             </div>
+            {/* Not every real cost is a priced item in the app — a lift to the
+                mountain in a friend's bakkie for exactly R200 of petrol has no
+                SKU, so this is a free-form real amount, not a computed line
+                item. Optional: plenty of checklist items genuinely cost nothing
+                or aren't known yet. */}
+            <input
+              type="number" inputMode="decimal" step="0.01" min="0"
+              placeholder="What did this actually cost you? (R, optional)"
+              value={newChecklistItem.actualCostZAR}
+              onChange={(e) => setNewChecklistItem({ ...newChecklistItem, actualCostZAR: e.target.value })}
+              className="w-full border border-terracotta/20 rounded-soft px-3 py-2 text-sm"
+            />
             <label className="flex items-center gap-2 text-xs text-ink-muted">
               <input type="checkbox" checked={newChecklistItem.isOptional}
                 onChange={(e) => setNewChecklistItem({ ...newChecklistItem, isOptional: e.target.checked })} />
@@ -698,6 +718,11 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Checklist</h3>
+            {items.some(i => i.actualCostZAR != null) && (
+              <span className="text-xs font-bold text-sage-600">
+                R{items.reduce((sum, i) => sum + (i.actualCostZAR != null ? parseFloat(i.actualCostZAR) : 0), 0).toLocaleString('en-ZA', { maximumFractionDigits: 0 })} logged
+              </span>
+            )}
           </div>
           <div className="divide-y divide-cream-dark/50">
             {items.map((item) => (
@@ -725,24 +750,22 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
                     {item.label}
                   </ScrollableLabel>
                 </button>
-                {!item.ceremonyId && (
-                  <div className="flex-shrink-0 text-right">
-                    {item.targetCostZAR != null && (
-                      <p className="text-[9px] text-ink-muted uppercase">Est. R{parseFloat(item.targetCostZAR).toFixed(0)}</p>
-                    )}
-                    <input
-                      type="number"
-                      placeholder="Actual R"
-                      defaultValue={item.actualCostZAR != null ? parseFloat(item.actualCostZAR) : ''}
-                      onBlur={(e) => {
-                        const val = e.target.value
-                        if (val !== '' && parseFloat(val) === parseFloat(item.actualCostZAR)) return
-                        updateItemActualCost(item.id, val)
-                      }}
-                      className="w-20 border border-cream-dark rounded-soft px-2 py-1 text-xs text-right"
-                    />
-                  </div>
-                )}
+                <div className="flex-shrink-0 text-right">
+                  {item.targetCostZAR != null && (
+                    <p className="text-[9px] text-ink-muted uppercase">Est. R{parseFloat(item.targetCostZAR).toFixed(0)}</p>
+                  )}
+                  <input
+                    type="number"
+                    placeholder="Actual R"
+                    defaultValue={item.actualCostZAR != null ? parseFloat(item.actualCostZAR) : ''}
+                    onBlur={(e) => {
+                      const val = e.target.value
+                      if (val !== '' && parseFloat(val) === parseFloat(item.actualCostZAR)) return
+                      updateItemActualCost(item.id, val)
+                    }}
+                    className="w-20 border border-cream-dark rounded-soft px-2 py-1 text-xs text-right"
+                  />
+                </div>
               </div>
             ))}
           </div>

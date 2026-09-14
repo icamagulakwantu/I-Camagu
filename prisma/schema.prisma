@@ -973,6 +973,14 @@ model CeremonyChecklistItem {
   label       String
   isOptional  Boolean  @default(false)
   isCompleted Boolean  @default(false)
+  // Not every real cost is a priced catalogue item — a lift to the
+  // mountain in a friend's bakkie for exactly R200 of petrol has no SKU
+  // and no fixed price, but it's still a real cost the host paid. Members
+  // record it directly on the checklist item itself: targetCostZAR for a
+  // rough estimate (optional), actualCostZAR for what it really cost once
+  // known. Both null until someone actually enters a number — never guessed.
+  targetCostZAR Decimal? @db.Decimal(10, 2)
+  actualCostZAR Decimal? @db.Decimal(10, 2)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

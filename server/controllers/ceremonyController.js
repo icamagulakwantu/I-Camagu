@@ -305,7 +305,7 @@ export const addPledge = async (req, res) => {
 
 export const addCeremonyChecklistItem = async (req, res) => {
       const { id } = req.params;
-      const { phase, label, isOptional } = req.body;
+      const { phase, label, isOptional, actualCostZAR } = req.body;
       if (!label) return res.status(400).json({ error: 'label is required' });
 
       try {
@@ -319,6 +319,12 @@ export const addCeremonyChecklistItem = async (req, res) => {
                         phase: phase || 'CUSTOM',
                         label: label.trim(),
                         isOptional: !!isOptional,
+                        // Real cost, entered right when the item is added — never a
+                        // hardcoded catalogue price, since plenty of real ceremony
+                        // costs (a friend's bakkie, a borrowed tent) have no SKU.
+                        actualCostZAR: actualCostZAR !== undefined && actualCostZAR !== '' && actualCostZAR !== null
+                              ? actualCostZAR
+                              : null,
                   },
             });
             res.status(201).json(item);
@@ -583,11 +589,13 @@ export const updateCeremony = async (req, res) => {
       }
 };
 
-// PATCH /checklist/:id - toggle checklist item (CeremonyChecklistItem)
+// PATCH /checklist/:id - partial update (CeremonyChecklistItem): isCompleted
+// and/or actualCostZAR. Only touches fields actually present in the body —
+// omitting isCompleted used to silently reset it to false on every call.
 export const updateChecklistItem = async (req, res) => {
       try {
               const { id } = req.params;
-                  const { isCompleted } = req.body;
+                  const { isCompleted, actualCostZAR } = req.body;
 
                       const item = await prisma.ceremonyChecklistItem.findUnique({
                                 where: { id },
@@ -597,9 +605,15 @@ export const updateChecklistItem = async (req, res) => {
                           if (!item) return res.status(404).json({ error: 'Checklist item not found' });
                               if (item.ceremony.hostId !== req.user.id) return res.status(403).json({ error: 'Not your ceremony' });
 
+                                  const data = {};
+                                  if (isCompleted !== undefined) data.isCompleted = !!isCompleted;
+                                  if (actualCostZAR !== undefined) {
+                                        data.actualCostZAR = actualCostZAR === null || actualCostZAR === '' ? null : actualCostZAR;
+                                  }
+
                                   const updated = await prisma.ceremonyChecklistItem.update({
                                             where: { id },
-                                                  data: { isCompleted: !!isCompleted },
+                                                  data,
                                   });
                                       res.json(updated);
       } catch (error) {
