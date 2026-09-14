@@ -89,6 +89,9 @@ const RULES = [
   { name: /blanket|tarpaulin|sail|container|\bclay\b|\bikoto\b/i, unit: 'each' },
   { category: 'RITUAL_SUPPLIES', unit: 'each' },
   { category: 'ULWALUKO_SUPPLIES', unit: 'each' },
+
+  // --- Clothing: sold per garment, not per case ---
+  { category: 'CLOTHING', unit: 'each' },
 ];
 
 // Everything else — all the alcohol categories, mixers, soft drinks — really
