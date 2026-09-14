@@ -36,6 +36,12 @@ function Onboarding({ onDone }) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
 
+  // Registration no longer asks for the base clan names upfront (see
+  // Login.jsx) — a member who registered that way still needs a place to
+  // add them, so this step now asks for whichever of the four lines are
+  // still missing, not just the grandmother lines it always asked for.
+  const [paternalIziduko, setPaternalIziduko] = useState(user?.paternalIziduko || '')
+  const [maternalIziduko, setMaternalIziduko] = useState(user?.maternalIziduko || '')
   const [paternalGrandmotherIziduko, setPaternalGrandmotherIziduko] = useState(user?.paternalGrandmotherIziduko || '')
   const [maternalGrandmotherIziduko, setMaternalGrandmotherIziduko] = useState(user?.maternalGrandmotherIziduko || '')
   const [address, setAddress] = useState('')
@@ -99,12 +105,22 @@ function Onboarding({ onDone }) {
 
   const saveAncestryAndContinue = async () => {
     setError('')
-    const hasNewGrandmotherLine =
+    const hasNewLine =
+      (paternalIziduko && paternalIziduko !== user?.paternalIziduko) ||
+      (maternalIziduko && maternalIziduko !== user?.maternalIziduko) ||
       (paternalGrandmotherIziduko && paternalGrandmotherIziduko !== user?.paternalGrandmotherIziduko) ||
       (maternalGrandmotherIziduko && maternalGrandmotherIziduko !== user?.maternalGrandmotherIziduko)
 
-    if (!hasNewGrandmotherLine) {
+    if (!hasNewLine) {
       setStep('details')
+      return
+    }
+
+    // The endpoint requires both base lines together (it can't save a
+    // grandmother line alone without them) — send whatever's filled in,
+    // falling back to what's already on the account.
+    if (!paternalIziduko || !maternalIziduko) {
+      setError('Paternal and maternal Iziduko are both needed to save your clan lines')
       return
     }
 
@@ -114,8 +130,8 @@ function Onboarding({ onDone }) {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({
-          paternalIziduko: user?.paternalIziduko,
-          maternalIziduko: user?.maternalIziduko,
+          paternalIziduko,
+          maternalIziduko,
           paternalGrandmotherIziduko,
           maternalGrandmotherIziduko,
         }),
@@ -190,7 +206,11 @@ function Onboarding({ onDone }) {
           <div className="space-y-4">
             <div>
               <h2 className="font-display font-bold text-xl text-ink mb-1">A face and a fuller line</h2>
-              <p className="text-ink-muted text-xs">A photo helps clan matches recognise you. Your grandmothers' Iziduko sharpen those matches further — both are optional.</p>
+              <p className="text-ink-muted text-xs">
+                {user?.paternalIziduko
+                  ? "A photo helps clan matches recognise you. Your grandmothers' Iziduko sharpen those matches further — both are optional."
+                  : 'A photo helps clan matches recognise you. Your Iziduko (clan names) power ClanMatch — finding relatives across South Africa who share your bloodline. All optional, add later from your profile if you\'d rather skip for now.'}
+              </p>
             </div>
 
             <div className="flex flex-col items-center gap-2">
@@ -211,6 +231,28 @@ function Onboarding({ onDone }) {
             </div>
 
             <div className="space-y-2">
+              {!user?.paternalIziduko && (
+                <>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Paternal Iziduko</label>
+                    <input
+                      type="text" placeholder="Optional"
+                      value={paternalIziduko}
+                      onChange={(e) => setPaternalIziduko(e.target.value)}
+                      className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Maternal Iziduko</label>
+                    <input
+                      type="text" placeholder="Optional"
+                      value={maternalIziduko}
+                      onChange={(e) => setMaternalIziduko(e.target.value)}
+                      className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1"
+                    />
+                  </div>
+                </>
+              )}
               <div>
                 <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Paternal grandmother's Iziduko</label>
                 <input

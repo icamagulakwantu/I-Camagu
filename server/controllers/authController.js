@@ -66,10 +66,16 @@ export async function checkEmail(req, res) {
 
 // NEW: full registration with a real password, replacing the OTP-only flow as primary
 export async function registerWithPassword(req, res) {
+  // Iziduko is collected as a post-signup follow-up now (same step the
+  // Google sign-in path already uses), not upfront during registration —
+  // asking for clan names before someone understands why iCamagu wants
+  // them just adds friction to account creation. Still accepted here if a
+  // caller does send it (kept optional, not removed) so nothing breaks for
+  // an existing client sending the old shape.
   const { email, password, firstName, lastName, paternalIziduko, maternalIziduko } = req.body;
 
-  if (!email || !password || !firstName || !lastName || !paternalIziduko || !maternalIziduko) {
-    return res.status(400).json({ error: 'All fields are required, including both Iziduko' });
+  if (!email || !password || !firstName || !lastName) {
+    return res.status(400).json({ error: 'Email, password, first name and surname are required' });
   }
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
 
@@ -79,7 +85,7 @@ export async function registerWithPassword(req, res) {
 
     const passwordHash = await hashPassword(password);
     const user = await prisma.user.create({
-      data: { email, passwordHash, firstName, lastName, paternalIziduko, maternalIziduko },
+      data: { email, passwordHash, firstName, lastName, paternalIziduko: paternalIziduko || null, maternalIziduko: maternalIziduko || null },
     });
 
     const { syncUserClanGroups } = await import('../services/izidukoService.js');
@@ -87,7 +93,7 @@ export async function registerWithPassword(req, res) {
 
     const { accessToken, refreshToken } = await generateTokenPair(user.id);
     res.cookie('jid', refreshToken, REFRESH_COOKIE_OPTIONS);
-    res.status(201).json({ accessToken, user: serializeUser(user) });
+    res.status(201).json({ accessToken, user: serializeUser(user), needsIziduko: !user.paternalIziduko });
   } catch (error) {
     console.error('Register with password error:', error.message);
     res.status(500).json({ error: 'Could not register' });
