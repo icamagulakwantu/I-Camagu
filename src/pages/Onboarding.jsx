@@ -6,11 +6,13 @@ import Icon from '../components/Icon.jsx'
 
 const STEPS = ['welcome', 'ancestry', 'details']
 
+// Same line-icon set used everywhere else in the app, not emoji — the
+// welcome step used to be the one screen that looked like a different app.
 const FEATURES = [
-  { emoji: '📿', label: 'Ceremonies', desc: 'Plan and budget umsebenzi, weddings & rites of passage' },
-  { emoji: '🏘️', label: 'Stokvels', desc: 'Save together, track contributions, pay out fairly' },
-  { emoji: '🛒', label: 'Store', desc: 'Bulk-buy alcohol, meat & supplies for your event' },
-  { emoji: '🤝', label: 'Iziduko Network', desc: 'Find your bloodline through your clan names' },
+  { icon: 'calendarRange', label: 'Ceremonies', desc: 'Plan and budget umsebenzi, weddings & rites of passage' },
+  { icon: 'coins', label: 'Stokvels', desc: 'Save together, track contributions, pay out fairly' },
+  { icon: 'store', label: 'Store', desc: 'Bulk-buy alcohol, meat & supplies for your event' },
+  { icon: 'link', label: 'Iziduko Network', desc: 'Find your bloodline through your clan names' },
 ]
 
 function ProgressDots({ step }) {
@@ -41,6 +43,10 @@ function Onboarding({ onDone }) {
   const [age, setAge] = useState('')
   const [coords, setCoords] = useState(null)
   const [locating, setLocating] = useState(false)
+  // Shown the instant a file is picked, via a local object URL — so there's
+  // a real preview before the upload round-trip finishes, not just once the
+  // server confirms it and user.profileImage updates.
+  const [localPreview, setLocalPreview] = useState(null)
 
   const useMyLocation = async () => {
     setLocating(true)
@@ -62,6 +68,7 @@ function Onboarding({ onDone }) {
       showToast('Photo too large — please choose an image under 1.5MB', 'error')
       return
     }
+    setLocalPreview(URL.createObjectURL(file))
     setUploading(true)
     const reader = new FileReader()
     reader.onload = async () => {
@@ -77,6 +84,7 @@ function Onboarding({ onDone }) {
         showToast('Photo added', 'success')
       } catch (err) {
         showToast(err.message || 'Error uploading photo', 'error')
+        setLocalPreview(null)
       } finally {
         setUploading(false)
       }
@@ -163,7 +171,7 @@ function Onboarding({ onDone }) {
             <div className="grid grid-cols-2 gap-3">
               {FEATURES.map((f) => (
                 <div key={f.label} className="bg-sage-50 border border-sage-200 rounded-soft p-3">
-                  <span className="text-xl">{f.emoji}</span>
+                  <Icon name={f.icon} size={20} color="#4a7a4a" />
                   <p className="font-bold text-xs text-ink mt-1">{f.label}</p>
                   <p className="text-[10px] text-ink-muted leading-snug mt-0.5">{f.desc}</p>
                 </div>
@@ -185,19 +193,20 @@ function Onboarding({ onDone }) {
               <p className="text-ink-muted text-xs">A photo helps clan matches recognise you. Your grandmothers' Iziduko sharpen those matches further — both are optional.</p>
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center gap-2">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
                 className="w-20 h-20 rounded-full bg-sage-50 border-2 border-dashed border-sage-300 flex items-center justify-center overflow-hidden"
               >
-                {user?.profileImage ? (
-                  <img src={user.profileImage} alt="" className="w-full h-full object-cover" />
+                {localPreview || user?.profileImage ? (
+                  <img src={localPreview || user.profileImage} alt="" className={`w-full h-full object-cover ${uploading ? 'opacity-60' : ''}`} />
                 ) : (
-                  <span className="text-2xl">{uploading ? '…' : '📷'}</span>
+                  <Icon name="camera" size={24} color="#4a7a4a" />
                 )}
               </button>
+              <p className="text-[10px] text-ink-muted">JPG or PNG, up to 1.5MB</p>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoSelect} className="hidden" />
             </div>
 
