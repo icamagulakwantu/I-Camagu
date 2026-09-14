@@ -21,7 +21,7 @@ function Avatar({ src, size = 'w-12 h-12' }) {
   )
 }
 
-function IzidukoNetwork({ onBack }) {
+function IzidukoNetwork({ onBack, onGoToClanLines }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
 
@@ -157,7 +157,13 @@ function IzidukoNetwork({ onBack }) {
         {loading ? (
           <div className="space-y-2"><Skeleton className="h-20 w-full" /><Skeleton className="h-20 w-full" /></div>
         ) : !profileComplete ? (
-          <EmptyState emoji="🧬" title="Complete your ancestral profile first" description={message || 'Add your four Isiduko lines and a profile photo before viewing clan member profiles.'} />
+          <EmptyState
+            emoji="🧬"
+            title="Complete your ancestral profile first"
+            description={message || 'Add your four Isiduko lines and a profile photo before viewing clan member profiles.'}
+            primaryLabel={onGoToClanLines ? 'Add my Iziduko' : undefined}
+            onPrimary={onGoToClanLines}
+          />
         ) : (
           <>
             {tab === 'matches' && (

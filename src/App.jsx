@@ -278,7 +278,7 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
 
       <div className="text-center mb-6">
         <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-6 h-6 mx-auto opacity-40" />
-        <p className="mt-2 font-display italic text-sm text-brand-black/50">What the family carries, no one carries alone.</p>
+        <p className="mt-2 font-display italic text-sm text-brand-black/50">Umntu, ngumntu ngabantu.</p>
       </div>
 
       {/* Did You Know */}
@@ -397,6 +397,11 @@ function MainApp() {
   const [budgetPlanTitle, setBudgetPlanTitle] = useState('')
   const [ekoyiniBookingCeremonyId, setEkoyiniBookingCeremonyId] = useState(null)
   const [ekoyiniBookingCeremonyTitle, setEkoyiniBookingCeremonyTitle] = useState('')
+  // Lets IzidukoNetwork send someone straight to Profile's Clan Lines tab
+  // to add a missing Iziduko, instead of just telling them it's missing.
+  // Profile clears this itself once read, so a later ordinary visit to
+  // Profile (via More) doesn't get stuck reopening on the same tab.
+  const [profileInitialTab, setProfileInitialTab] = useState(null)
 
   const goHome = () => setScreen('home')
   const goMore = () => setScreen('more')
@@ -504,7 +509,12 @@ function MainApp() {
       case 'ukusoka':
         return <Ukusoka onBack={goMore} />
       case 'iziduko':
-        return <IzidukoNetwork onBack={goMore} />
+        return (
+          <IzidukoNetwork
+            onBack={goMore}
+            onGoToClanLines={() => { setProfileInitialTab('clan'); setScreen('profile') }}
+          />
+        )
       case 'supplier':
         return <SupplierDashboard onBack={goMore} />
       case 'portal':
@@ -550,7 +560,13 @@ function MainApp() {
       case 'more':
         return <More onNavigate={setScreen} onBack={goHome} />
       case 'profile':
-        return <Profile onNavigate={setScreen} />
+        return (
+          <Profile
+            onNavigate={setScreen}
+            initialTab={profileInitialTab}
+            onConsumeInitialTab={() => setProfileInitialTab(null)}
+          />
+        )
       default:
         return <Dashboard onNavigate={setScreen} basketCount={basketCount} onSelectCeremony={openExistingCeremony} />
     }

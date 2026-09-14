@@ -33,9 +33,12 @@ export default function DidYouKnow() {
   return (
     <div className="relative select-none text-left">
       <div className="flex justify-between items-center mb-1">
-        <span className="text-[10px] font-black uppercase tracking-wider text-brand-ochre">
-          Did You Know? ({currentIndex + 1}/{legends.length})
-        </span>
+        <div>
+          <p className="font-display font-bold text-sm text-brand-black leading-tight">Xhosa Greatness</p>
+          <span className="text-[9px] font-black uppercase tracking-wider text-brand-ochre">
+            Did You Know? ({currentIndex + 1}/{legends.length})
+          </span>
+        </div>
         <div className="flex gap-2">
           {/* Visually a 20px dot (matches the compact header row), but the
               actual tap target is a full 44px square via an invisible

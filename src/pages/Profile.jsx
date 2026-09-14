@@ -29,13 +29,20 @@ const TABS = [
   { id: 'verification', label: 'Verification' },
 ]
 
-export default function Profile({ onNavigate }) {
+export default function Profile({ onNavigate, initialTab, onConsumeInitialTab }) {
   const { user, logout, accessToken, updateUser } = useAuth()
   const { showToast } = useToast()
   const fileInputRef = useRef(null)
   const idDocInputRef = useRef(null)
 
-  const [tab, setTab] = useState('personal')
+  const [tab, setTab] = useState(initialTab || 'personal')
+
+  // Consume once — otherwise a later, ordinary visit to Profile (e.g. from
+  // the More menu) would keep reopening on whatever tab sent us here last.
+  useEffect(() => {
+    if (initialTab) onConsumeInitialTab?.()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [uploading, setUploading] = useState(false)
   const [locating, setLocating] = useState(false)
   const [coords, setCoords] = useState(null)
