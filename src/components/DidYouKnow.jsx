@@ -36,11 +36,15 @@ export default function DidYouKnow() {
         <span className="text-[10px] font-black uppercase tracking-wider text-brand-ochre">
           Did You Know? ({currentIndex + 1}/{legends.length})
         </span>
-        <div className="flex gap-1">
+        <div className="flex gap-2">
+          {/* Visually a 20px dot (matches the compact header row), but the
+              actual tap target is a full 44px square via an invisible
+              ::after that extends past the button's own box — clicking
+              anywhere on it still fires the button's onClick. */}
           <button
             type="button"
             onClick={handlePrev}
-            className="w-5 h-5 rounded-full bg-brand-sage/10 text-brand-sage text-xs font-black flex items-center justify-center active:scale-95"
+            className="relative w-5 h-5 rounded-full bg-brand-sage/10 text-brand-sage text-xs font-black flex items-center justify-center active:scale-95 after:content-[''] after:absolute after:-inset-3"
             aria-label="Previous legend"
           >
             ‹
@@ -48,7 +52,7 @@ export default function DidYouKnow() {
           <button
             type="button"
             onClick={handleNext}
-            className="w-5 h-5 rounded-full bg-brand-sage/10 text-brand-sage text-xs font-black flex items-center justify-center active:scale-95"
+            className="relative w-5 h-5 rounded-full bg-brand-sage/10 text-brand-sage text-xs font-black flex items-center justify-center active:scale-95 after:content-[''] after:absolute after:-inset-3"
             aria-label="Next legend"
           >
             ›

@@ -3,6 +3,27 @@ import prisma from '../config/db.js';
 import { syncUserClanGroups } from '../services/izidukoService.js';
 import { setPin, hasPinSet } from '../services/pinService.js';
 
+// Live availability check as someone types a username, so "already taken"
+// shows before they submit rather than after. Same rule the real submit
+// endpoint enforces (setUsername below) — this just checks it earlier.
+export async function checkUsernameAvailable(req, res) {
+  const username = (req.query.username || '').trim();
+  if (username.length < 3) {
+    return res.json({ available: false, reason: 'Must be at least 3 characters' });
+  }
+
+  try {
+    const existing = await prisma.user.findUnique({ where: { username } });
+    if (existing && existing.id !== req.userId) {
+      return res.json({ available: false, reason: 'Already taken' });
+    }
+    res.json({ available: true });
+  } catch (error) {
+    console.error('Check username error:', error.message);
+    res.status(500).json({ error: 'Could not check username' });
+  }
+}
+
 export async function setUsername(req, res) {
   const { username } = req.body;
   const userId = req.userId;
