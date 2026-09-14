@@ -64,24 +64,38 @@ function AccountSettings({ onBack, onOpenPrivacy }) {
         </button>
       </div>
 
-      <div className="bg-white border-2 border-terracotta rounded-soft p-4">
-        <p className="font-bold text-sm text-terracotta mb-1">Delete your account</p>
-        <p className="text-xs text-ink-muted mb-3">This is permanent. Financial records stay for audit purposes but are anonymized.</p>
+      {/* Separated from the actions above by real distance and a distinct
+          wash background, not just a thicker border on an otherwise
+          identical white card — this is the one action here that can't be
+          undone. */}
+      <div className="mt-8">
+        <p className="text-[10px] font-black uppercase tracking-wider text-terracotta mb-2">Danger zone</p>
+        <div className="bg-terracotta/5 border-2 border-terracotta rounded-soft p-4">
+          <p className="font-bold text-sm text-terracotta mb-2">Delete your account</p>
+          <ul className="text-xs text-ink-muted mb-3 space-y-1 list-disc pl-4">
+            <li>Your profile, stokvel memberships and ceremony plans are permanently deleted.</li>
+            <li>Financial records are kept but anonymized, as required for audit purposes.</li>
+            <li>This cannot be undone.</li>
+          </ul>
 
-        {!showDeleteForm ? (
-          <button onClick={() => setShowDeleteForm(true)} className="w-full border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm">
-            Delete My Account
-          </button>
-        ) : (
-          <form onSubmit={deleteAccount} className="space-y-2">
-            <input type="password" placeholder="Confirm your password" value={password} onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
-            <input type="text" placeholder='Type "DELETE MY ACCOUNT"' value={confirmText} onChange={(e) => setConfirmText(e.target.value)}
-              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
-            {error && <p className="text-terracotta text-xs">{error}</p>}
-            <button type="submit" className="w-full bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm">Permanently Delete</button>
-          </form>
-        )}
+          {!showDeleteForm ? (
+            <button onClick={() => setShowDeleteForm(true)} className="w-full border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm">
+              Delete My Account
+            </button>
+          ) : (
+            <form onSubmit={deleteAccount} className="space-y-2">
+              <input type="password" placeholder="Confirm your password" value={password} onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm bg-white" />
+              <input type="text" placeholder='Type "DELETE MY ACCOUNT"' value={confirmText} onChange={(e) => setConfirmText(e.target.value)}
+                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm bg-white" required />
+              {error && <p className="text-terracotta text-xs">{error}</p>}
+              <button type="submit" className="w-full bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm">Permanently Delete</button>
+              <button type="button" onClick={() => { setShowDeleteForm(false); setError(''); setPassword(''); setConfirmText('') }} className="w-full text-xs text-ink-muted underline py-1">
+                Cancel
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   )

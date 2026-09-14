@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
+import { Skeleton } from '../components/ui/Skeleton.jsx'
 
 function Templates({ onBack }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   const [templates, setTemplates] = useState([])
+  const [loading, setLoading] = useState(true)
   const [activeTemplate, setActiveTemplate] = useState(null)
   const [newTitle, setNewTitle] = useState('')
 
@@ -15,6 +17,7 @@ function Templates({ onBack }) {
       .then(res => res.json())
       .then((data) => setTemplates(Array.isArray(data) ? data : []))
       .catch(() => { showToast('Could not load templates', 'error'); setTemplates([]) })
+      .finally(() => setLoading(false))
   }
 
   useEffect(() => { fetchTemplates() }, [])
@@ -53,23 +56,32 @@ function Templates({ onBack }) {
   }
 
   return (
-    <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
-      <button onClick={onBack} className="text-sm text-ink-muted mb-4">← Back</button>
-      <h2 className="font-display font-bold text-2xl text-ink mb-1">My Templates</h2>
-      <p className="text-xs text-ink-muted mb-4">Save a ceremony plan's structure once, reuse it for the next one.</p>
+    <div className="min-h-screen pb-24 bg-cream">
+      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
+        <button onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
+        <h1 className="font-display font-bold text-2xl">My Templates</h1>
+        <p className="text-white/70 text-sm mt-1">Save a ceremony plan's structure once, reuse it for the next one.</p>
+      </div>
 
-      {templates.length === 0 ? (
-        <EmptyState emoji="📑" title="No templates yet" description="Save a completed plan as a template from Ceremony Preparation." />
-      ) : (
-        <div className="space-y-2">
-          {templates.map((t) => (
-            <button key={t.id} onClick={() => setActiveTemplate(t)} className="w-full text-left bg-white border-2 border-terracotta/25 rounded-soft p-3">
-              <p className="font-bold text-sm">{t.title}</p>
-              <p className="text-xs text-ink-muted">{t.ceremonyType.replace(/_/g, ' ')} • {t.checklistItems.length} items</p>
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="px-4 mt-4">
+        {loading ? (
+          <div className="space-y-2">
+            <Skeleton className="h-16 w-full rounded-soft" />
+            <Skeleton className="h-16 w-full rounded-soft" />
+          </div>
+        ) : templates.length === 0 ? (
+          <EmptyState emoji="📑" title="No templates yet" description="Save a completed plan as a template from Ceremony Preparation." />
+        ) : (
+          <div className="space-y-2">
+            {templates.map((t) => (
+              <button key={t.id} onClick={() => setActiveTemplate(t)} className="w-full text-left bg-white border-2 border-terracotta/25 rounded-soft p-3">
+                <p className="font-bold text-sm">{t.title}</p>
+                <p className="text-xs text-ink-muted">{t.ceremonyType.replace(/_/g, ' ')} • {t.checklistItems.length} items</p>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

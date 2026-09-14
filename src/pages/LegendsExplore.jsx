@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { isAdminEmail } from '../lib/admin.js'
+import { EmptyState } from '../components/ui/EmptyState.jsx'
+import { Skeleton } from '../components/ui/Skeleton.jsx'
 
 const STATUS_LABEL = {
   VERIFIED: 'Verified',
@@ -13,6 +15,7 @@ function LegendsExplore({ onBack }) {
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
   const [legends, setLegends] = useState([])
+  const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('')
 
   const isAdmin = isAdminEmail(user?.email)
@@ -25,6 +28,7 @@ function LegendsExplore({ onBack }) {
         setLegends(Array.isArray(data) ? data : [])
       })
       .catch(() => setLegends([]))
+      .finally(() => setLoading(false))
   }
 
   useEffect(() => { fetchLegends() }, [])
@@ -49,11 +53,23 @@ function LegendsExplore({ onBack }) {
   const filtered = activeCategory ? legends.filter(l => l.category === activeCategory) : legends
 
   return (
-    <div className="px-4 pt-6 pb-24 icamagu-bg min-h-screen">
-      <button onClick={onBack} className="text-sm text-brand-black/60 mb-4">← Back</button>
-      <h2 className="text-2xl font-extrabold text-brand-black mb-1">House of AmaXhosa</h2>
-      <p className="text-sm text-brand-black/60 mb-4">Camagu. This is who we are.</p>
+    <div className="min-h-screen pb-24 bg-cream">
+      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
+        <button onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
+        <h1 className="font-display font-bold text-2xl">House of AmaXhosa</h1>
+        <p className="text-white/70 text-sm mt-1">Camagu. This is who we are.</p>
+      </div>
 
+      <div className="px-4 mt-4">
+      {loading ? (
+        <div className="space-y-2">
+          <Skeleton className="h-24 w-full rounded-soft" />
+          <Skeleton className="h-24 w-full rounded-soft" />
+        </div>
+      ) : legends.length === 0 ? (
+        <EmptyState emoji="📜" title="No entries yet" description="The House of AmaXhosa is still being built — check back soon." />
+      ) : (
+      <>
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
         <button onClick={() => setActiveCategory('')}
           className={`whitespace-nowrap px-3 py-1 text-xs font-bold border rounded-pill ${!activeCategory ? 'bg-brand-blue text-brand-cream border-brand-blue' : 'bg-white border-brand-black/30'}`}>
@@ -98,6 +114,9 @@ function LegendsExplore({ onBack }) {
             )}
           </div>
         ))}
+      </div>
+      </>
+      )}
       </div>
     </div>
   )
