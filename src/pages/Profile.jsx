@@ -7,12 +7,27 @@ import Icon from '../components/Icon.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96]'
 
+// "Pending" matches the wording Directory.jsx already uses for a
+// practitioner/vendor awaiting review — this screen previously said
+// "Pending review" and "Not approved", which read like a different app's
+// verification system.
 const IDENTITY_STATUS_META = {
   UNVERIFIED: { label: 'Not verified', bg: 'bg-cream', border: 'border-cream-dark', text: 'text-ink-muted', icon: 'key' },
-  PENDING: { label: 'Pending review', bg: 'bg-ochre/10', border: 'border-ochre', text: 'text-ochre-dark', icon: 'clock' },
+  PENDING: { label: 'Pending', bg: 'bg-ochre/10', border: 'border-ochre', text: 'text-ochre-dark', icon: 'clock' },
   VERIFIED: { label: 'Verified', bg: 'bg-sage-50', border: 'border-sage-500', text: 'text-sage-600', icon: 'check' },
   REJECTED: { label: 'Not approved', bg: 'bg-terracotta/10', border: 'border-terracotta', text: 'text-terracotta', icon: 'close' },
 }
+
+// Three genuinely separate concerns that used to be stacked on one long
+// scroll — a member's personal contact details, their clan lines (used for
+// ClanMatch, not contact), and identity verification (a KYC-style review
+// flow with its own status). Splitting them into tabs, the same pattern
+// already used for Stokvel detail and ceremony plan screens.
+const TABS = [
+  { id: 'personal', label: 'Personal' },
+  { id: 'clan', label: 'Clan Lines' },
+  { id: 'verification', label: 'Verification' },
+]
 
 export default function Profile({ onNavigate }) {
   const { user, logout, accessToken, updateUser } = useAuth()
@@ -20,7 +35,7 @@ export default function Profile({ onNavigate }) {
   const fileInputRef = useRef(null)
   const idDocInputRef = useRef(null)
 
-  const [editing, setEditing] = useState(false)
+  const [tab, setTab] = useState('personal')
   const [uploading, setUploading] = useState(false)
   const [locating, setLocating] = useState(false)
   const [coords, setCoords] = useState(null)
@@ -31,6 +46,9 @@ export default function Profile({ onNavigate }) {
   const [idDocumentUrl, setIdDocumentUrl] = useState(null)
   const [submittingId, setSubmittingId] = useState(false)
   const [consented, setConsented] = useState(false)
+
+  const [editingPersonal, setEditingPersonal] = useState(false)
+  const [editingClan, setEditingClan] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -98,11 +116,13 @@ export default function Profile({ onNavigate }) {
     }
   }
 
-  const [form, setForm] = useState({
+  const [clanForm, setClanForm] = useState({
     paternalIziduko: user?.paternalIziduko || '',
     maternalIziduko: user?.maternalIziduko || '',
     paternalGrandmotherIziduko: user?.paternalGrandmotherIziduko || '',
     maternalGrandmotherIziduko: user?.maternalGrandmotherIziduko || '',
+  })
+  const [personalForm, setPersonalForm] = useState({
     address: user?.address || '',
     age: user?.age || '',
     phoneNumber: user?.phoneNumber || '',
@@ -137,40 +157,39 @@ export default function Profile({ onNavigate }) {
     reader.readAsDataURL(file)
   }
 
-  const saveAll = async (e) => {
+  const saveClan = async (e) => {
     e.preventDefault()
     try {
-      const izRes = await fetch('/api/user/iziduko', {
+      const res = await fetch('/api/user/iziduko', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({
-          paternalIziduko: form.paternalIziduko,
-          maternalIziduko: form.maternalIziduko,
-          paternalGrandmotherIziduko: form.paternalGrandmotherIziduko,
-          maternalGrandmotherIziduko: form.maternalGrandmotherIziduko,
-        }),
+        body: JSON.stringify(clanForm),
       })
-      const izData = await izRes.json()
-      if (!izRes.ok) throw new Error(izData.error || 'Failed to update Iziduko')
-
-      const profRes = await fetch('/api/user/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({
-          address: form.address,
-          age: form.age,
-          phoneNumber: form.phoneNumber,
-          ...(coords || {}),
-        }),
-      })
-      const profData = await profRes.json()
-      if (!profRes.ok) throw new Error(profData.error || 'Failed to update profile details')
-
-      updateUser({ ...izData, ...profData })
-      setEditing(false)
-      showToast('Profile updated', 'success')
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to update Iziduko')
+      updateUser(data)
+      setEditingClan(false)
+      showToast('Clan lines updated', 'success')
     } catch (err) {
-      showToast(err.message || 'Could not save profile details', 'error')
+      showToast(err.message || 'Could not save clan lines', 'error')
+    }
+  }
+
+  const savePersonal = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ ...personalForm, ...(coords || {}) }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to update profile details')
+      updateUser(data)
+      setEditingPersonal(false)
+      showToast('Personal details updated', 'success')
+    } catch (err) {
+      showToast(err.message || 'Could not save personal details', 'error')
     }
   }
 
@@ -185,7 +204,7 @@ export default function Profile({ onNavigate }) {
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-10 rounded-b-[2.5rem] relative overflow-hidden">
+      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-6 rounded-b-[2.5rem] relative overflow-hidden">
         <div className="relative flex items-center gap-4">
           <button
             type="button"
@@ -211,171 +230,224 @@ export default function Profile({ onNavigate }) {
         </div>
       </div>
 
-      <div className="mx-4 -mt-6 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-elevated relative z-10">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Iziduko & Details</h3>
-          {!editing && (
-            <button type="button" onClick={() => setEditing(true)} className="text-xs text-sage-600 font-bold underline">Edit</button>
-          )}
-        </div>
-
-        {editing ? (
-          <form onSubmit={saveAll} className="space-y-2">
-            <input placeholder="Paternal Iziduko" value={form.paternalIziduko}
-              onChange={(e) => setForm({ ...form, paternalIziduko: e.target.value })}
-              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
-            <input placeholder="Maternal Iziduko" value={form.maternalIziduko}
-              onChange={(e) => setForm({ ...form, maternalIziduko: e.target.value })}
-              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
-            <input placeholder="Paternal grandmother's Isiduko" value={form.paternalGrandmotherIziduko}
-              onChange={(e) => setForm({ ...form, paternalGrandmotherIziduko: e.target.value })}
-              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
-            <input placeholder="Maternal grandmother's Isiduko" value={form.maternalGrandmotherIziduko}
-              onChange={(e) => setForm({ ...form, maternalGrandmotherIziduko: e.target.value })}
-              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
-            <input placeholder="Address" value={form.address}
-              onChange={(e) => setForm({ ...form, address: e.target.value })}
-              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
+      {/* Tabs */}
+      <div className="px-4 -mt-4 relative z-10">
+        <div className="flex rounded-pill border-2 border-terracotta/20 bg-white p-1 shadow-elevated">
+          {TABS.map((t) => (
             <button
-              type="button" onClick={useMyLocation} disabled={locating}
-              className="text-xs font-bold text-sage-600 flex items-center gap-1"
-            >
-              <Icon name="mapPin" size={12} />
-              {locating ? 'Locating...' : coords ? <>Location captured <Icon name="check" size={12} /></> : 'Use my current location'}
-            </button>
-            <input type="number" placeholder="Age" value={form.age}
-              onChange={(e) => setForm({ ...form, age: e.target.value })}
-              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
-            <input placeholder="Phone number" value={form.phoneNumber}
-              onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
-              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
-            <div className="flex gap-2 pt-2">
-              <button type="submit" className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm">Save</button>
-              <button type="button" onClick={() => setEditing(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">Cancel</button>
-            </div>
-          </form>
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-sage-50 rounded-2xl p-4">
-              <p className="text-[10px] font-bold text-sage-600 uppercase tracking-wider">Paternal</p>
-              <p className="font-bold text-ink">{user?.paternalIziduko || '—'}</p>
-            </div>
-            <div className="bg-cream rounded-2xl p-4 border-2 border-cream-dark">
-              <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Maternal</p>
-              <p className="font-bold text-ink">{user?.maternalIziduko || '—'}</p>
-            </div>
-            <div className="bg-sage-50 rounded-2xl p-4">
-              <p className="text-[10px] font-bold text-sage-600 uppercase tracking-wider">Paternal grandmother</p>
-              <p className="font-bold text-ink">{user?.paternalGrandmotherIziduko || '—'}</p>
-            </div>
-            <div className="bg-cream rounded-2xl p-4 border-2 border-cream-dark">
-              <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Maternal grandmother</p>
-              <p className="font-bold text-ink">{user?.maternalGrandmotherIziduko || '—'}</p>
-            </div>
-            {user?.address && (
-              <p className="col-span-2 text-sm text-ink-muted flex items-center gap-1">
-                <Icon name="mapPin" size={13} /> {user.address}{user?.latitude != null && <span className="text-sage-600 font-bold"> · located</span>}
-              </p>
-            )}
-            {user?.phoneNumber && <p className="col-span-2 text-sm text-ink-muted flex items-center gap-1"><Icon name="phone" size={13} /> {user.phoneNumber}</p>}
-          </div>
-        )}
-      </div>
-
-      <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-elevated">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Identity Verification</h3>
-          {identity && (
-            <span className={cn(
-              'text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-pill border flex items-center gap-1',
-              IDENTITY_STATUS_META[identity.status]?.bg, IDENTITY_STATUS_META[identity.status]?.border, IDENTITY_STATUS_META[identity.status]?.text
-            )}>
-              <Icon name={IDENTITY_STATUS_META[identity.status]?.icon} size={11} />
-              {IDENTITY_STATUS_META[identity.status]?.label}
-            </span>
-          )}
-        </div>
-
-        <p className="text-xs text-ink-muted mb-3">
-          Verify your ID to unlock stokvel roles and future biometric features. Your ID number is encrypted — only admins reviewing your submission can see it.
-        </p>
-
-        {identity?.status === 'VERIFIED' && (
-          <p className="text-sm text-sage-600 font-bold flex items-center gap-1">
-            <Icon name="check" size={14} /> ID ending in {identity.last4} verified
-          </p>
-        )}
-
-        {identity?.status === 'PENDING' && (
-          <p className="text-sm text-ochre-dark font-bold flex items-center gap-1">
-            <Icon name="clock" size={14} /> ID ending in {identity.last4} is awaiting review
-          </p>
-        )}
-
-        {(identity?.status === 'UNVERIFIED' || identity?.status === 'REJECTED') && !identityForm && (
-          <>
-            {identity?.status === 'REJECTED' && identity?.rejectionReason && (
-              <p className="text-sm text-terracotta font-bold mb-2">Not approved: {identity.rejectionReason}</p>
-            )}
-            <button
+              key={t.id}
               type="button"
-              onClick={() => setIdentityForm(true)}
-              className="w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm flex items-center justify-center gap-2"
+              onClick={() => setTab(t.id)}
+              className={`flex-1 rounded-pill py-2 text-[12px] font-bold transition-colors ${tab === t.id ? 'bg-terracotta text-white' : 'text-ink-muted'}`}
             >
-              <Icon name="key" size={14} color="#fff" /> {identity?.status === 'REJECTED' ? 'Resubmit ID' : 'Verify my ID'}
-            </button>
-          </>
-        )}
-
-        {identityForm && (
-          <form onSubmit={submitIdentity} className="space-y-2">
-            <input
-              placeholder="13-digit South African ID number"
-              value={idNumber}
-              onChange={(e) => setIdNumber(e.target.value.replace(/\D/g, '').slice(0, 13))}
-              inputMode="numeric"
-              className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm tracking-wider"
-              required
-            />
-            <input ref={idDocInputRef} type="file" accept="image/*" onChange={handleIdDocSelect} className="hidden" />
-            <button
-              type="button"
-              onClick={() => idDocInputRef.current?.click()}
-              className="w-full border-2 border-dashed border-ink/30 rounded-soft py-3 text-sm font-bold text-ink-muted flex items-center justify-center gap-2"
-            >
-              {idDocumentUrl ? (
-                <><Icon name="check" size={14} color="#4a7a4a" /> ID photo attached</>
-              ) : (
-                <><Icon name="camera" size={14} /> Attach a photo of your ID</>
+              {t.label}
+              {t.id === 'verification' && identity && identity.status !== 'UNVERIFIED' && (
+                <span className={`ml-1.5 inline-block w-1.5 h-1.5 rounded-full align-middle ${identity.status === 'VERIFIED' ? 'bg-sage-500' : identity.status === 'REJECTED' ? 'bg-terracotta' : 'bg-brand-ochre'} ${tab === t.id ? 'opacity-90' : ''}`} />
               )}
             </button>
-            <label className="flex items-start gap-2 pt-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={consented}
-                onChange={(e) => setConsented(e.target.checked)}
-                className="mt-0.5 flex-shrink-0"
-              />
-              <span className="text-xs text-ink-muted leading-snug">
-                I agree that iCamagu can collect and encrypt my ID number and ID document photo to verify my identity, as described in the{' '}
-                <button
-                  type="button"
-                  onClick={() => onNavigate?.('privacy')}
-                  className="text-sage-600 underline font-bold"
-                >
-                  Privacy Policy
-                </button>.
-              </span>
-            </label>
-            <div className="flex gap-2 pt-2">
-              <button type="submit" disabled={submittingId || !consented} className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm disabled:opacity-60">
-                {submittingId ? 'Submitting...' : 'Submit for review'}
-              </button>
-              <button type="button" onClick={() => setIdentityForm(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">Cancel</button>
-            </div>
-          </form>
-        )}
+          ))}
+        </div>
       </div>
+
+      {tab === 'personal' && (
+        <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-elevated">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Personal Details</h3>
+            {!editingPersonal && (
+              <button type="button" onClick={() => setEditingPersonal(true)} className="text-xs text-sage-600 font-bold underline">Edit</button>
+            )}
+          </div>
+
+          {editingPersonal ? (
+            <form onSubmit={savePersonal} className="space-y-2">
+              <input placeholder="Address" value={personalForm.address}
+                onChange={(e) => setPersonalForm({ ...personalForm, address: e.target.value })}
+                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
+              <button
+                type="button" onClick={useMyLocation} disabled={locating}
+                className="text-xs font-bold text-sage-600 flex items-center gap-1"
+              >
+                <Icon name="mapPin" size={12} />
+                {locating ? 'Locating...' : coords ? <>Location captured <Icon name="check" size={12} /></> : 'Use my current location'}
+              </button>
+              <input type="number" placeholder="Age" value={personalForm.age}
+                onChange={(e) => setPersonalForm({ ...personalForm, age: e.target.value })}
+                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
+              <input placeholder="Phone number" value={personalForm.phoneNumber}
+                onChange={(e) => setPersonalForm({ ...personalForm, phoneNumber: e.target.value })}
+                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
+              <div className="flex gap-2 pt-2">
+                <button type="submit" className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm">Save</button>
+                <button type="button" onClick={() => setEditingPersonal(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">Cancel</button>
+              </div>
+            </form>
+          ) : (
+            <div className="space-y-2">
+              {user?.address && (
+                <p className="text-sm text-ink-muted flex items-center gap-1.5">
+                  <Icon name="mapPin" size={13} /> {user.address}{user?.latitude != null && <span className="text-sage-600 font-bold"> · located</span>}
+                </p>
+              )}
+              {user?.phoneNumber && <p className="text-sm text-ink-muted flex items-center gap-1.5"><Icon name="phone" size={13} /> {user.phoneNumber}</p>}
+              {user?.age && <p className="text-sm text-ink-muted">Age: <strong className="text-ink">{user.age}</strong></p>}
+              {!user?.address && !user?.phoneNumber && !user?.age && (
+                <p className="text-sm text-ink-muted">No personal details added yet.</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === 'clan' && (
+        <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-elevated">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Iziduko (Clan Lines)</h3>
+            {!editingClan && (
+              <button type="button" onClick={() => setEditingClan(true)} className="text-xs text-sage-600 font-bold underline">Edit</button>
+            )}
+          </div>
+
+          {editingClan ? (
+            <form onSubmit={saveClan} className="space-y-2">
+              <input placeholder="Paternal Iziduko" value={clanForm.paternalIziduko}
+                onChange={(e) => setClanForm({ ...clanForm, paternalIziduko: e.target.value })}
+                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
+              <input placeholder="Maternal Iziduko" value={clanForm.maternalIziduko}
+                onChange={(e) => setClanForm({ ...clanForm, maternalIziduko: e.target.value })}
+                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
+              <input placeholder="Paternal grandmother's Isiduko" value={clanForm.paternalGrandmotherIziduko}
+                onChange={(e) => setClanForm({ ...clanForm, paternalGrandmotherIziduko: e.target.value })}
+                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
+              <input placeholder="Maternal grandmother's Isiduko" value={clanForm.maternalGrandmotherIziduko}
+                onChange={(e) => setClanForm({ ...clanForm, maternalGrandmotherIziduko: e.target.value })}
+                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
+              <div className="flex gap-2 pt-2">
+                <button type="submit" className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm">Save</button>
+                <button type="button" onClick={() => setEditingClan(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">Cancel</button>
+              </div>
+            </form>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-sage-50 rounded-2xl p-4">
+                <p className="text-[10px] font-bold text-sage-600 uppercase tracking-wider">Paternal</p>
+                <p className="font-bold text-ink">{user?.paternalIziduko || '—'}</p>
+              </div>
+              <div className="bg-cream rounded-2xl p-4 border-2 border-cream-dark">
+                <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Maternal</p>
+                <p className="font-bold text-ink">{user?.maternalIziduko || '—'}</p>
+              </div>
+              <div className="bg-sage-50 rounded-2xl p-4">
+                <p className="text-[10px] font-bold text-sage-600 uppercase tracking-wider">Paternal grandmother</p>
+                <p className="font-bold text-ink">{user?.paternalGrandmotherIziduko || '—'}</p>
+              </div>
+              <div className="bg-cream rounded-2xl p-4 border-2 border-cream-dark">
+                <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Maternal grandmother</p>
+                <p className="font-bold text-ink">{user?.maternalGrandmotherIziduko || '—'}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === 'verification' && (
+        <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-elevated">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Identity Verification</h3>
+            {identity && (
+              <span className={cn(
+                'text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-pill border flex items-center gap-1',
+                IDENTITY_STATUS_META[identity.status]?.bg, IDENTITY_STATUS_META[identity.status]?.border, IDENTITY_STATUS_META[identity.status]?.text
+              )}>
+                <Icon name={IDENTITY_STATUS_META[identity.status]?.icon} size={11} />
+                {IDENTITY_STATUS_META[identity.status]?.label}
+              </span>
+            )}
+          </div>
+
+          <p className="text-xs text-ink-muted mb-3">
+            Verify your ID to unlock stokvel roles and future biometric features. Your ID number is encrypted, and both it and your ID photo are only ever seen by an admin reviewing your submission — never by other members.
+          </p>
+
+          {identity?.status === 'VERIFIED' && (
+            <p className="text-sm text-sage-600 font-bold flex items-center gap-1">
+              <Icon name="check" size={14} /> ID ending in {identity.last4} verified
+            </p>
+          )}
+
+          {identity?.status === 'PENDING' && (
+            <p className="text-sm text-ochre-dark font-bold flex items-center gap-1">
+              <Icon name="clock" size={14} /> ID ending in {identity.last4} is awaiting review
+            </p>
+          )}
+
+          {(identity?.status === 'UNVERIFIED' || identity?.status === 'REJECTED') && !identityForm && (
+            <>
+              {identity?.status === 'REJECTED' && identity?.rejectionReason && (
+                <p className="text-sm text-terracotta font-bold mb-2">Not approved: {identity.rejectionReason}</p>
+              )}
+              <button
+                type="button"
+                onClick={() => setIdentityForm(true)}
+                className="w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm flex items-center justify-center gap-2"
+              >
+                <Icon name="key" size={14} color="#fff" /> {identity?.status === 'REJECTED' ? 'Resubmit ID' : 'Verify my ID'}
+              </button>
+            </>
+          )}
+
+          {identityForm && (
+            <form onSubmit={submitIdentity} className="space-y-2">
+              <input
+                placeholder="13-digit South African ID number"
+                value={idNumber}
+                onChange={(e) => setIdNumber(e.target.value.replace(/\D/g, '').slice(0, 13))}
+                inputMode="numeric"
+                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm tracking-wider"
+                required
+              />
+              <input ref={idDocInputRef} type="file" accept="image/*" onChange={handleIdDocSelect} className="hidden" />
+              <button
+                type="button"
+                onClick={() => idDocInputRef.current?.click()}
+                className="w-full border-2 border-dashed border-ink/30 rounded-soft py-3 text-sm font-bold text-ink-muted flex items-center justify-center gap-2"
+              >
+                {idDocumentUrl ? (
+                  <><Icon name="check" size={14} color="#4a7a4a" /> ID photo attached</>
+                ) : (
+                  <><Icon name="camera" size={14} /> Attach a photo of your ID</>
+                )}
+              </button>
+              <p className="text-[11px] text-ink-muted -mt-1 flex items-start gap-1">
+                <Icon name="key" size={11} className="mt-0.5 flex-shrink-0" /> Only an admin reviewing your submission can see this photo — it's never shown to other members or on your public profile.
+              </p>
+              <label className="flex items-start gap-2 pt-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consented}
+                  onChange={(e) => setConsented(e.target.checked)}
+                  className="mt-0.5 flex-shrink-0"
+                />
+                <span className="text-xs text-ink-muted leading-snug">
+                  I agree that iCamagu can collect and encrypt my ID number and ID document photo to verify my identity, as described in the{' '}
+                  <button
+                    type="button"
+                    onClick={() => onNavigate?.('privacy')}
+                    className="text-sage-600 underline font-bold"
+                  >
+                    Privacy Policy
+                  </button>.
+                </span>
+              </label>
+              <div className="flex gap-2 pt-2">
+                <button type="submit" disabled={submittingId || !consented} className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm disabled:opacity-60">
+                  {submittingId ? 'Submitting...' : 'Submit for review'}
+                </button>
+                <button type="button" onClick={() => setIdentityForm(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">Cancel</button>
+              </div>
+            </form>
+          )}
+        </div>
+      )}
 
       <div className="px-4 mt-8 mb-8">
         <button
