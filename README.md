@@ -62,7 +62,10 @@ The current documented ceremony structures include:
 - Inkobe zikaMama
 - Ukubuyisa
 - Umsebenzi weGqirha
-- Generic/custom ceremony planning
+- Wedding
+- General Event (custom/other ceremony planning)
+
+Ulwaluko, Umgidi, Intambo Enkulu, Ukukhapha, Inkobe zikaMama, Ukubuyisa, and Umsebenzi weGqirha each have their own default checklist and cost profile (see section 3). Wedding and General Event currently use the same generic planning structure rather than a dedicated checklist/cost profile of their own.
 
 The system is designed so ceremony knowledge can continue to grow through community engagement and verified cultural documentation.
 
@@ -88,10 +91,13 @@ The current implementation documentation identifies **147 default checklist entr
 
 These are default planning structures, not intended to prevent families from adding their own requirements.
 
+Each checklist item — default or custom — can carry a real cost: an optional target/estimate, and an actual amount once known. This matters because plenty of real ceremony costs are not a priced catalogue item at all (a lift to the mountain in a friend's bakkie for exactly R200 of petrol has no SKU and no fixed price) — the cost is entered directly against the item, never hardcoded or guessed, and a running total of what's been logged is shown against the checklist.
+
 The checklist system is intended to support:
 
 - Default ceremony items
 - Custom items
+- Real per-item cost tracking (target and actual)
 - Item completion
 - Responsibility assignment
 - Ceremony-specific variations
@@ -312,18 +318,32 @@ Stokvel deletion is restricted where real funds remain.
 
 ## 12. Collective Bulk Buying
 
-iCamagu is designed to become collective purchasing and negotiation infrastructure.
+iCamagu is collective purchasing and negotiation infrastructure. This is implemented, not just planned.
 
-The initial focus includes:
+### The Store
 
-- Alcohol
-- Livestock
+The Store is organised into five departments: Drinks, Meat & Livestock, Groceries, Supplies (ceremony/ritual items), and Clothing. It is a real, priced catalogue, not a mockup — most SKUs carry a real researched supplier price, and unpriced rows are marked as not-yet-orderable rather than hidden or given an invented price.
 
-Future expansion can include:
+### Pool matching
 
-- Groceries
-- Household products
-- Other community purchasing categories
+A member does not choose which outlet or distributor their order pools with — that decision depends on facts the app has and the member doesn't (who's nearby, what category the item is, which pool is already closest to its bulk-pricing minimum), so the platform matches automatically. There is no manual partner picker.
+
+Every item belongs to one of four real supplier categories, matching the actual tier-2 suppliers the platform buys from:
+
+- **Tavern** — alcohol and drinks (e.g. Makro, Big Daddy's, United Distributors, Ultra, Bluebottle).
+- **Butchery** — meat and livestock (farms and livestock suppliers).
+- **Grocery** — groceries and dry goods (e.g. Makro, Springbok, Jumbo/Massmart).
+- **Produce** — fresh produce (farmers, Food Lover's Market, Markman Fruit & Veg Depot).
+
+A basket that mixes categories (drinks and groceries in one cart) splits into a separate pool per category on submission, since a pool is always one category and one area.
+
+**Pool formation is fully decoupled from having a confirmed supplier.** Which real distributor eventually fulfils a pool is a background business relationship, not something a member is ever blocked on — a pool can be created, joined, and reach its bulk-pricing minimum with no partner attached yet. Once a real partner relationship exists for that category and area, it attaches automatically (best-effort, never a gate) and appears to members as a "confirmed supplier" badge — shown as a credibility signal and free marketing for the partner, not a requirement to participate.
+
+Each pool shows a live tiered discount ladder, so members can see exactly how close the group is to the next real price break, and can invite others (e.g. via WhatsApp) to help clear it. A pool's expiry is solely the target date whoever started it chose (e.g. "this is for December") — not a fixed universal timer — so a pool can stay open for as long as it genuinely needs to.
+
+### Demand visibility
+
+An admin dashboard aggregates real pooled demand by category — pool count, cases, Rand value, member count — across every open and matched pool, including pools with no confirmed supplier yet. This turns pooled demand into the real negotiating number needed in a supplier conversation (e.g. "we already have R14,000 of alcohol orders ready in this area"), and gives a one-click way to attach a real partner to a pool once a deal is signed.
 
 The goal is to combine community demand so buyers can access negotiated bulk pricing.
 
@@ -343,7 +363,11 @@ That creates unnecessary counterparty risk and could expose the community to:
 - Disputes over balances
 - Poor reconciliation
 
-The intended flow is:
+### Current state
+
+No live payment gateway exists yet. A pool reaching its bulk-pricing minimum creates a payment record per member, but until a real PSP is integrated, payment is manual EFT direct to the confirmed supplier, reconciled by the member entering their own EFT reference and the supplier confirming receipt from their own dashboard. If a pool matches before a confirmed supplier is attached, members are told plainly that a supplier is being finalised rather than being asked to pay a reference that doesn't yet resolve to anyone real.
+
+The intended flow, once a PSP is integrated, is:
 
 ```text
 Buyer
@@ -378,23 +402,47 @@ Where a user requests a refund, the requester should bear the applicable refund/
 
 The exact fee structure must be clearly communicated before payment.
 
+A member can already request a refund on a pool payment from within the app; the request is flagged to the supplier, who processes it manually from their own dashboard (there is no automated payout yet, matching the manual-EFT state described in section 13).
+
 ---
 
 ## 15. Vendors and Marketplace
 
-The vendor ecosystem can include:
+The pool-matching architecture (section 12) is built around four real supplier categories — every Store item and every bulk pool belongs to exactly one:
 
-### Liquor suppliers
+### Tavern (alcohol and drinks)
 
-Examples include:
+Tier-2 suppliers/distributors, e.g.:
 
 - Makro Liquor
-- Preston's
+- Big Daddy's
+- United Distributors
+- Ultra
+- Bluebottle
 - Other liquor stores and distributors
+
+### Butchery (meat and livestock)
+
+- Farms and livestock suppliers
+- Other meat suppliers
+
+### Grocery (groceries and dry goods)
+
+- Makro
+- Springbok
+- Jumbo (Massmart)
+- Other grocery suppliers
+
+### Produce (fresh produce)
+
+- Farmers
+- Food Lover's Market
+- Markman Fruit & Veg Depot
+- Other produce suppliers
 
 ### Ceremony clothing
 
-Examples include:
+A fifth Store department with no dedicated pool-matching category of its own yet. Examples of future suppliers include:
 
 - Navada
 - Grasshopper
@@ -403,15 +451,13 @@ Examples include:
 
 ### Other future suppliers
 
-- Livestock providers
-- Grocery suppliers
 - Catering providers
 - Transport providers
 - Entertainment providers
 - Security providers
 - Tourism partners
 
-Vendor relationships should be represented as infrastructure/partner relationships rather than hardcoded assumptions.
+A partner listed under one of the four pool-matching categories is a real, confirmed business relationship — established partners are shown to members as a credibility signal once attached to a pool, never as a requirement to form or join one (section 12). Vendor relationships should be represented as infrastructure/partner relationships rather than hardcoded assumptions.
 
 ---
 
@@ -579,11 +625,12 @@ The core cultural functionality is intended to remain free for users.
 
 Potential revenue streams include:
 
-- Bulk-buying infrastructure and negotiated supplier spreads
+- Bulk-buying infrastructure and negotiated supplier spreads (tavern, butchery, grocery, and produce categories are all live — section 12)
 - Vendor marketplace relationships
 - Alcohol marketplace margins
 - Livestock marketplace economics
-- Future grocery marketplace economics
+- Grocery and produce marketplace economics
+- Future clothing marketplace economics
 - Ekoyini Mobile Bar services
 - Cultural tourism packages
 - Tourism referrals
@@ -615,6 +662,7 @@ Potential premium functionality, such as additional digital storage, can be offe
 - React
 - Vite
 - Tailwind CSS
+- Installable PWA (offline-aware, auto-updating service worker — see `src/lib/appUpdate.js`)
 
 ### Backend
 
@@ -628,8 +676,9 @@ Potential premium functionality, such as additional digital storage, can be offe
 
 ### Infrastructure
 
-- Supabase
+- Supabase (database + storage)
 - Supabase Storage
+- Render (hosting)
 
 ### Authentication
 
@@ -670,19 +719,24 @@ The schema contains the application's major domain structures, including:
 - Contributions
 - Payouts
 - Ledgers
-- Products
-- Orders
-- Pools
-- Iziduko
-- Cultural knowledge
+- Products (SKUs)
+- Baskets / Orders
+- Bulk pools (partner attachment is optional — a pool always knows its own category, independent of whether a confirmed supplier is attached; see section 12)
+- Suppliers/partners
+- Iziduko / ClanMatch connections
+- Cultural knowledge (Legends)
 - Ceremony media
 - Notifications
+- Directory (practitioners and vendors)
+- Identity verification
 - Ekoyini services
 - Tourism-related infrastructure
 
 The database should remain the source of truth for dynamic application data.
 
 Frontend components should not hardcode database entities that are intended to be user- or admin-managed.
+
+This project currently has no formal migration history — schema changes are applied directly against the production database and mirrored by hand into `schema.prisma`, with idempotent boot-time column checks (`server/scripts/ensure-schema.js`) as the safety net. This should be kept in mind before assuming a standard `prisma migrate` workflow applies.
 
 ---
 
