@@ -68,6 +68,12 @@ function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.75, cla
       width={size} height={size} viewBox="0 0 24 24" fill="none"
       stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"
       className={className}
+      // Every call site in the app pairs this with a visible text label
+      // (a button's own label, a heading, adjacent copy) — the icon itself
+      // carries no information a screen reader needs to announce on top
+      // of that, and left unmarked, an unlabeled inline SVG's accessible
+      // name is inconsistent across browsers/screen readers.
+      aria-hidden="true"
     >
       {path}
     </svg>
