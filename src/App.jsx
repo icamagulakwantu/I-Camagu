@@ -463,6 +463,29 @@ function MainApp() {
 
                 useEffect(() => { refreshPendingApprovals() }, [screen])
 
+  // NotificationBell only lives in the Home header, so anyone on Store,
+  // Ceremonies, Stokvels or More has no way to see an unread notification
+  // exists until they happen to go back to Home. Mirror it on the Home tab
+  // of BottomNav — visible on every screen — same pattern as the basket and
+  // pending-approval badges above.
+  const [unreadNotifications, setUnreadNotifications] = useState(0)
+
+  const refreshUnreadNotifications = () => {
+    if (!accessToken) return
+    fetch('/api/notifications/unread-count', { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then((res) => res.json())
+      .then((data) => setUnreadNotifications(data.count || 0))
+      .catch(() => {})
+  }
+
+  useEffect(() => {
+    refreshUnreadNotifications()
+    const interval = setInterval(refreshUnreadNotifications, 30000)
+    return () => clearInterval(interval)
+  }, [accessToken])
+
+  useEffect(() => { refreshUnreadNotifications() }, [screen])
+
   const renderScreen = () => {
     switch (screen) {
       case 'ceremonyhub':
@@ -593,6 +616,7 @@ function MainApp() {
         onNavigate={setScreen}
         basketCount={basketCount}
         pendingApprovals={pendingApprovals}
+        unreadNotifications={unreadNotifications}
       />
     </div>
   )
