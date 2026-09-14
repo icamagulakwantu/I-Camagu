@@ -110,12 +110,15 @@ export async function ensureCeremonyBudgetColumns() {
     'ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "capCases" INTEGER;'
   );
   // Backfill only — never overwrites a value that's already set. Existing
-  // OPEN pools predate the rolling window, so give them a real 72-hour
-  // window and a real cap off their own moqTarget instead of leaving them
-  // permanently uncapped.
-  await prisma.$executeRawUnsafe(
-    `UPDATE "BulkPool" SET "deadline" = NOW() + INTERVAL '72 hours' WHERE status = 'OPEN' AND "deadline" IS NULL;`
-  );
+  // OPEN pools predate the rolling window, so give them a real cap off
+  // their own moqTarget instead of leaving them permanently uncapped.
+  //
+  // Deliberately does NOT backfill a deadline anymore: a pool's expiry is
+  // now solely the target date whoever started it chose (see
+  // poolWindow.js) — null means "no target date set", not "forgot to set
+  // one". This ran once already for pools that predated the deadline
+  // column entirely; re-adding a 72-hour default here would silently
+  // overwrite every intentionally-open-ended pool on the next deploy.
   await prisma.$executeRawUnsafe(
     `UPDATE "BulkPool" SET "capCases" = "moqTarget" * 4 WHERE status = 'OPEN' AND "capCases" IS NULL;`
   );

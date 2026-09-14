@@ -10,16 +10,22 @@ import { resolveOrderStage } from '../data/orderStages.js'
 import { OrderStageTracker } from '../components/ui/OrderStageTracker.jsx'
 import { CATEGORY_LABEL } from '../data/poolCategories.js'
 
-// This pool's rolling window closes on windowDeadline — after that, new
-// baskets join a fresh pool instead of piling onto this one. Real data
-// from BulkPool.deadline, no fabricated countdown.
+// A pool only has a deadline at all when whoever opened it set a real
+// target date (e.g. "this is for December") — no more fixed universal
+// window. Real data from BulkPool.deadline, no fabricated countdown. Close
+// in (hours/days) reads fine for a near-term deadline; a target date
+// that's genuinely far out reads better as the actual date than as
+// "closes in 83 days".
 function windowClosesLabel(windowDeadline) {
-  const msLeft = new Date(windowDeadline).getTime() - Date.now()
-  if (msLeft <= 0) return 'This window has closed — new members are joining a fresh pool.'
+  const deadline = new Date(windowDeadline)
+  const msLeft = deadline.getTime() - Date.now()
+  if (msLeft <= 0) return 'The target date has passed — new members are joining a fresh pool.'
   const hoursLeft = Math.ceil(msLeft / (60 * 60 * 1000))
-  if (hoursLeft <= 1) return 'This pooling window closes in under an hour.'
-  if (hoursLeft < 24) return `This pooling window closes in ${hoursLeft}h.`
-  return `This pooling window closes in ${Math.round(hoursLeft / 24)} day${Math.round(hoursLeft / 24) === 1 ? '' : 's'}.`
+  if (hoursLeft <= 1) return 'This pool closes to new members in under an hour.'
+  if (hoursLeft < 24) return `This pool closes to new members in ${hoursLeft}h.`
+  const daysLeft = Math.round(hoursLeft / 24)
+  if (daysLeft <= 14) return `This pool closes to new members in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.`
+  return `Pooling until ${deadline.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long' })}.`
 }
 
 // A tier's real value, worded for whichever basis this pool uses — a
@@ -38,6 +44,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [targetDate, setTargetDate] = useState('')
   // A single cart submission can now split into more than one pool — one
   // per category (drinks, meat & livestock, groceries, produce), since a
   // pool is always one category. So this is a list, not one.
@@ -131,11 +138,12 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ basketId: basketData.basket.id }),
+        body: JSON.stringify({ basketId: basketData.basket.id, targetDate: targetDate || undefined }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to submit cart.')
-      showToast(data.message || 'Cart submitted successfully!', data.unmatchedTypes?.length ? 'info' : 'success')
+      showToast(data.message || 'Cart submitted successfully!', 'success')
+      setTargetDate('')
       fetchBasket()
       fetchPoolStatus()
     } catch (err) {
@@ -520,6 +528,22 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
             <p className="text-xs font-black uppercase text-ink-muted mb-1">Smart Match — Join a Bulk Order</p>
             <p className="text-xs text-ink-muted mb-3">
               iCamagu automatically pools your cart with other members buying the same kind of thing nearby — even across different stokvels — and matches you to whichever pool gets you to bulk pricing soonest. Drinks and other items are matched to their own pools.
+            </p>
+
+            <label className="block text-[11px] font-bold text-ink-muted mb-1">
+              Planning ahead? Set a target date (optional)
+            </label>
+            <input
+              type="date"
+              value={targetDate}
+              onChange={(e) => setTargetDate(e.target.value)}
+              min={new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)}
+              className="w-full border border-cream-dark rounded-soft px-3 py-2.5 mb-1 bg-cream text-xs font-bold text-ink"
+            />
+            <p className="text-[11px] text-ink-muted mb-3">
+              {targetDate
+                ? `Only applies if this starts a brand-new pool — it'll stay open to new members until then instead of closing quickly.`
+                : `Leave blank to pool as soon as possible — only applies if this starts a brand-new pool, not one you're joining.`}
             </p>
 
             <button

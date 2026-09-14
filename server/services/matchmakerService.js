@@ -45,7 +45,13 @@ function tierBasisForCategory(category) {
 // Pool formation must never depend on a confirmed supplier existing yet
 // (the founder's explicit call): members can always form and join a pool;
 // which real distributor eventually fulfils it is a separate, later step.
-async function findOrCreateOpenPool(category, area) {
+//
+// targetDate only matters when a *new* pool is being opened — it's the
+// date whoever starts the pool chose (e.g. "this is for December"), not a
+// fixed universal timer. Joining an already-open pool inherits whatever
+// deadline (or lack of one) that pool already has; one later member can't
+// silently shorten or remove the date everyone already in it is relying on.
+async function findOrCreateOpenPool(category, area, targetDate) {
   let pool = await prisma.bulkPool.findFirst({
     where: { category, area, status: 'OPEN' },
     include: { baskets: { include: { items: true } } },
@@ -69,7 +75,7 @@ async function findOrCreateOpenPool(category, area) {
         moqTarget,
         status: 'OPEN',
         tierBasis: tierBasisForCategory(category),
-        ...newPoolWindow(moqTarget),
+        ...newPoolWindow(moqTarget, targetDate),
       },
     });
   }
@@ -156,7 +162,7 @@ async function notifySmartMatchTierIfCrossed(pool, currentCases, currentAmountZA
   await notifyAdminOfSmartMatchTier(pool, tier, currentCases, currentAmountZAR);
 }
 
-export async function submitBasketToPool(userId, basketId) {
+export async function submitBasketToPool(userId, basketId, targetDate) {
   const [basket, user] = await Promise.all([
     prisma.basket.findFirst({
       where: { id: basketId, userId, status: 'DRAFT' },
@@ -166,6 +172,17 @@ export async function submitBasketToPool(userId, basketId) {
   ]);
   if (!basket) throw new Error('Basket not found or already submitted');
   if (basket.items.length === 0) throw new Error('Basket is empty');
+
+  // Optional — "this cart is for December" instead of a fixed 72-hour
+  // window. Only matters if a brand-new pool ends up getting opened; an
+  // existing open pool keeps whatever deadline it already has.
+  let parsedTargetDate = null;
+  if (targetDate) {
+    const d = new Date(targetDate);
+    if (isNaN(d.getTime())) throw new Error('Target date is not a valid date');
+    if (d.getTime() <= Date.now()) throw new Error('Target date must be in the future');
+    parsedTargetDate = d;
+  }
 
   // A member's own declared area is what a pool is scoped by — a partner,
   // if and when one gets attached, doesn't need to be in the same area
@@ -198,13 +215,14 @@ export async function submitBasketToPool(userId, basketId) {
       data: { basketId: groupBasket.id },
     });
 
-    const pool = await findOrCreateOpenPool(category, area);
+    const pool = await findOrCreateOpenPool(category, area, parsedTargetDate);
     await prisma.basket.update({ where: { id: groupBasket.id }, data: { status: 'PARKED', poolId: pool.id } });
     const result = await checkAndMatchPool(pool.id);
     submissions.push({
       category,
       partnerName: pool.partner?.name || null,
       area: pool.area,
+      windowDeadline: pool.deadline,
       matched: result.matched,
       currentCases: result.currentCases,
       moqTarget: pool.moqTarget,

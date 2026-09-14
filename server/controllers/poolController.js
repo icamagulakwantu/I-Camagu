@@ -5,13 +5,13 @@ import { PALLET_CASES, palletsForCases, resolveTierLadder, getTierForMetric, get
 export const CATEGORY_LABEL = { TAVERN: 'Drinks', BUTCHERY: 'Meat & livestock', GROCERY: 'Groceries & other items', PRODUCE: 'Fresh produce' };
 
 export async function submitToPool(req, res) {
-  const { basketId } = req.body;
+  const { basketId, targetDate } = req.body;
   if (!basketId) {
     return res.status(400).json({ error: 'basketId is required' });
   }
 
   try {
-    const result = await submitBasketToPool(req.userId, basketId);
+    const result = await submitBasketToPool(req.userId, basketId, targetDate);
     const lines = result.submissions.map((s) =>
       s.matched
         ? `${CATEGORY_LABEL[s.category]} matched${s.partnerName ? ` with ${s.partnerName}` : ''}! Group code: ${s.groupCode}`
