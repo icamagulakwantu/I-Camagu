@@ -2,6 +2,7 @@ import prisma from '../config/db.js';
 import { resolveTierLadder, getTierForMetric, palletsForCases } from '../utils/smartMatchTiers.js';
 import { notifyAdminOfSmartMatchTier } from './notificationService.js';
 import { newPoolWindow, isPoolWindowClosed } from '../utils/poolWindow.js';
+import { haversineKm } from '../utils/geo.js';
 
 // Honest simplification, noted here for future reference: MOQ matching here
 // is by TOTAL CASE COUNT in the pool, not per-SKU. A true per-SKU MOQ engine
@@ -10,6 +11,107 @@ import { newPoolWindow, isPoolWindowClosed } from '../utils/poolWindow.js';
 
 function generateGroupCode() {
   return 'GRP-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+// Which kind of partner a SKU's category needs — mirrors the "Drinks"
+// department in src/data/storeTaxonomy.js exactly. There are only two
+// Partner types today (TAVERN, BUTCHERY), so this is a binary split:
+// anything sold at a bottle store/tavern (including soft drinks and water,
+// which the Store groups under "Drinks" too) goes to a TAVERN; everything
+// else — meat, livestock, dry goods, produce, ceremony supplies — goes to
+// a BUTCHERY, the app's only non-alcohol wholesale partner type so far.
+const TAVERN_CATEGORIES = new Set([
+  'BEER', 'CIDER_RTD',
+  'BRANDY', 'WHISKY', 'VODKA', 'VODKA_PREMIUM', 'GIN', 'TEQUILA', 'TEQUILA_PREMIUM', 'COGNAC', 'LIQUEUR', 'MIXER',
+  'WINE', 'WINE_BOX', 'SPARKLING', 'CHAMPAGNE',
+  'SOFT_DRINKS', 'WATER',
+]);
+
+function partnerTypeForSku(sku) {
+  return TAVERN_CATEGORIES.has(sku.category) ? 'TAVERN' : 'BUTCHERY';
+}
+
+// Finds (or opens) the right pool for a partner — same "reuse unless the
+// window's full or expired" rule as before, just pulled out so it can be
+// called once per category instead of once per whole basket.
+async function findOrCreateOpenPool(partner) {
+  let pool = await prisma.bulkPool.findFirst({
+    where: { partnerId: partner.id, area: partner.area, status: 'OPEN' },
+    include: { baskets: { include: { items: true } } },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (pool) {
+    const currentCases = pool.baskets
+      .filter((b) => b.status !== 'CANCELLED')
+      .reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
+    if (isPoolWindowClosed(pool, currentCases)) pool = null;
+  }
+  if (!pool) {
+    const moqTarget = partner.moq || 50;
+    pool = await prisma.bulkPool.create({
+      data: { partnerId: partner.id, area: partner.area, moqTarget, status: 'OPEN', ...newPoolWindow(moqTarget) },
+    });
+  }
+  return pool;
+}
+
+// Picks the best-fit partner of a given type for this member — no manual
+// choice, per the founder's call: a member (or a stokvel) has no real basis
+// to pick between outlets, since the right one depends on facts the app
+// already has and the member doesn't (who's nearby, who's already close to
+// their bulk-pricing minimum).
+//
+// Real distance wins when both the member and the partner have coordinates
+// on file. Today's real partners don't yet (no lat/lng entered), so the
+// practical tiebreak is "order volume" — prefer whichever partner's open
+// pool is already furthest toward its MOQ, so a member's order helps an
+// existing pool clear instead of always starting a fresh wait from zero —
+// then the member's own area string, then partner name for a stable result.
+export async function pickBestPartnerForCategory(userId, partnerType) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { latitude: true, longitude: true, location: true },
+  });
+
+  const partners = await prisma.partner.findMany({
+    where: { type: partnerType },
+    include: {
+      pools: {
+        where: { status: 'OPEN' },
+        include: { baskets: { include: { items: true } } },
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+      },
+    },
+  });
+  if (partners.length === 0) return null;
+
+  const scored = partners.map((partner) => {
+    const distanceKm =
+      user?.latitude != null && user?.longitude != null && partner.latitude != null && partner.longitude != null
+        ? haversineKm(user.latitude, user.longitude, partner.latitude, partner.longitude)
+        : null;
+
+    const openPool = partner.pools[0] || null;
+    const currentCases = openPool
+      ? openPool.baskets.filter((b) => b.status !== 'CANCELLED').reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0)
+      : 0;
+    const progress = openPool ? Math.min(1, currentCases / openPool.moqTarget) : 0;
+    const sameArea = user?.location && partner.area === user.location ? 1 : 0;
+
+    return { partner, distanceKm, progress, sameArea };
+  });
+
+  scored.sort((a, b) => {
+    if (a.distanceKm != null && b.distanceKm != null) return a.distanceKm - b.distanceKm;
+    if (a.distanceKm != null) return -1;
+    if (b.distanceKm != null) return 1;
+    if (b.progress !== a.progress) return b.progress - a.progress;
+    if (b.sameArea !== a.sameArea) return b.sameArea - a.sameArea;
+    return a.partner.name.localeCompare(b.partner.name);
+  });
+
+  return scored[0].partner;
 }
 
 // Real tier milestones — pallets for an alcohol pool, Rand pooled for a
@@ -30,45 +132,61 @@ async function notifySmartMatchTierIfCrossed(pool, currentCases, currentAmountZA
   await notifyAdminOfSmartMatchTier(pool, tier, currentCases, currentAmountZAR);
 }
 
-export async function submitBasketToPool(userId, basketId, partnerId) {
+export async function submitBasketToPool(userId, basketId) {
   const basket = await prisma.basket.findFirst({
     where: { id: basketId, userId, status: 'DRAFT' },
-    include: { items: true },
+    include: { items: { include: { sku: true } } },
   });
   if (!basket) throw new Error('Basket not found or already submitted');
   if (basket.items.length === 0) throw new Error('Basket is empty');
 
-  const partner = await prisma.partner.findUnique({ where: { id: partnerId } });
-  if (!partner) throw new Error('Partner not found');
-
-  let pool = await prisma.bulkPool.findFirst({
-    where: { partnerId, area: partner.area, status: 'OPEN' },
-    include: { baskets: { include: { items: true } } },
-    orderBy: { createdAt: 'desc' },
-  });
-  if (pool) {
-    const currentCases = pool.baskets
-      .filter((b) => b.status !== 'CANCELLED')
-      .reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
-    // This window is full or has run its 72-hour course — don't pile a new
-    // basket onto it, open a fresh pool instead so the batch stays a
-    // predictable size for the supplier to actually fulfil.
-    if (isPoolWindowClosed(pool, currentCases)) pool = null;
+  // A basket can hold both alcohol and non-alcohol items, but a partner is
+  // only ever a tavern or a butchery — never both. Split by the partner
+  // type each item actually needs, and submit each group to its own pool.
+  const groups = new Map();
+  for (const item of basket.items) {
+    const type = partnerTypeForSku(item.sku);
+    if (!groups.has(type)) groups.set(type, []);
+    groups.get(type).push(item);
   }
-  if (!pool) {
-    const moqTarget = partner.moq || 50;
-    pool = await prisma.bulkPool.create({
-      data: { partnerId, area: partner.area, moqTarget, status: 'OPEN', ...newPoolWindow(moqTarget) },
+
+  const submissions = [];
+  const unmatchedTypes = [];
+
+  for (const [partnerType, items] of groups) {
+    const partner = await pickBestPartnerForCategory(userId, partnerType);
+    if (!partner) {
+      // No partner of this type exists anywhere yet — those items simply
+      // can't be pooled. Leave them where they are (still on the original
+      // DRAFT basket) rather than losing them or forcing a mismatched
+      // partner on them.
+      unmatchedTypes.push(partnerType);
+      continue;
+    }
+
+    // Each matched group gets its own basket row so it can be parked
+    // against its own pool independently of the others.
+    const groupBasket = await prisma.basket.create({ data: { userId, status: 'DRAFT' } });
+    await prisma.basketItem.updateMany({
+      where: { id: { in: items.map((it) => it.id) } },
+      data: { basketId: groupBasket.id },
+    });
+
+    const pool = await findOrCreateOpenPool(partner);
+    await prisma.basket.update({ where: { id: groupBasket.id }, data: { status: 'PARKED', poolId: pool.id } });
+    const result = await checkAndMatchPool(pool.id);
+    submissions.push({
+      partnerType,
+      partnerName: partner.name,
+      partnerArea: partner.area,
+      matched: result.matched,
+      currentCases: result.currentCases,
+      moqTarget: pool.moqTarget,
+      groupCode: result.groupCode,
     });
   }
 
-  await prisma.basket.update({
-    where: { id: basketId },
-    data: { status: 'PARKED', poolId: pool.id },
-  });
-
-  const result = await checkAndMatchPool(pool.id);
-  return { pool, matched: result.matched, currentCases: result.currentCases, moqTarget: pool.moqTarget, groupCode: result.groupCode };
+  return { submissions, unmatchedTypes };
 }
 
 export async function checkAndMatchPool(poolId) {

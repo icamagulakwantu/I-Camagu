@@ -1,22 +1,28 @@
 import prisma from '../config/db.js';
 import { submitBasketToPool } from '../services/matchmakerService.js';
-import { sortByDistance } from '../utils/geo.js';
 import { PALLET_CASES, palletsForCases, resolveTierLadder, getTierForMetric, getNextTierForMetric, amountToReachTier } from '../utils/smartMatchTiers.js';
 
+const CATEGORY_LABEL = { TAVERN: 'Drinks', BUTCHERY: 'Food & other items' };
+
 export async function submitToPool(req, res) {
-  const { basketId, partnerId } = req.body;
-  if (!basketId || !partnerId) {
-    return res.status(400).json({ error: 'basketId and partnerId are required' });
+  const { basketId } = req.body;
+  if (!basketId) {
+    return res.status(400).json({ error: 'basketId is required' });
   }
 
   try {
-    const result = await submitBasketToPool(req.userId, basketId, partnerId);
-    res.json({
-      ...result,
-      message: result.matched
-        ? `Your order matched! Group code: ${result.groupCode}`
-        : `Basket parked. ${result.currentCases}/${result.moqTarget} cases needed to reach the bulk order minimum.`,
-    });
+    const result = await submitBasketToPool(req.userId, basketId);
+    const lines = result.submissions.map((s) =>
+      s.matched
+        ? `${CATEGORY_LABEL[s.partnerType]} matched with ${s.partnerName}! Group code: ${s.groupCode}`
+        : `${CATEGORY_LABEL[s.partnerType]} parked with ${s.partnerName} — ${s.currentCases}/${s.moqTarget} cases needed.`
+    );
+    for (const type of result.unmatchedTypes) {
+      lines.push(`No ${CATEGORY_LABEL[type].toLowerCase()} supplier is set up in your area yet — those items stayed in your cart.`);
+    }
+    if (lines.length === 0) lines.push('Nothing could be submitted.');
+
+    res.json({ ...result, message: lines.join(' ') });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -94,93 +100,90 @@ export async function requestPoolPaymentRefund(req, res) {
 }
 
 /**
- * The requesting user's most recent parked/matched basket, with live Smart
- * Match progress — how many combined cases the pool has reached toward its
- * bulk-pricing minimum. Baskets in a pool aren't the "current" draft basket
- * anymore (getMyBasket only ever returns the active DRAFT), so this is the
- * only place that surfaces ongoing pool status back to the member.
+ * Every parked/matched basket the requesting member currently has, each
+ * with its own live Smart Match progress. A member can have more than one
+ * at once now that a single cart submission splits by category (drinks vs.
+ * everything else) into separate pools — this used to assume just one.
+ * Baskets in a pool aren't the "current" draft basket anymore (getMyBasket
+ * only ever returns the active DRAFT), so this is the only place that
+ * surfaces ongoing pool status back to the member.
  */
 export async function getMyPoolStatus(req, res) {
   try {
-    const basket = await prisma.basket.findFirst({
+    const baskets = await prisma.basket.findMany({
       where: { userId: req.userId, status: { in: ['PARKED', 'MATCHED'] } },
       orderBy: { updatedAt: 'desc' },
       include: { pool: { include: { partner: true, baskets: { include: { items: { include: { sku: true } } } } } } },
     });
-    if (!basket || !basket.pool) return res.json(null);
 
-    const activeBaskets = basket.pool.baskets.filter((b) => b.status !== 'CANCELLED');
-    const currentCases = activeBaskets.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
-    // Real Rand pooled so far — only meaningful for an AMOUNT-basis pool,
-    // computed off each item's real casePriceZAR, never guessed.
-    const currentAmountZAR = activeBaskets.reduce(
-      (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity * parseFloat(i.sku?.casePriceZAR || 0), 0),
-      0
-    );
+    const statuses = [];
+    for (const basket of baskets) {
+      if (!basket.pool) continue;
 
-    // SmartMatch tier standing — pallets for an alcohol pool, Rand pooled
-    // for a groceries/livestock one (see smartMatchTiers.js). The ladder
-    // itself carries each tier's real value (or null, "TBC") — nothing
-    // here is fabricated.
-    const basis = basket.pool.tierBasis || 'PALLETS';
-    const isAmount = basis === 'AMOUNT';
-    const metric = isAmount ? currentAmountZAR : palletsForCases(currentCases);
-    const ladder = resolveTierLadder(basket.pool);
-    const currentTier = getTierForMetric(metric, ladder);
-    const nextTier = getNextTierForMetric(metric, ladder);
-    const remaining = amountToReachTier(metric, nextTier);
+      const activeBaskets = basket.pool.baskets.filter((b) => b.status !== 'CANCELLED');
+      const currentCases = activeBaskets.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
+      // Real Rand pooled so far — only meaningful for an AMOUNT-basis pool,
+      // computed off each item's real casePriceZAR, never guessed.
+      const currentAmountZAR = activeBaskets.reduce(
+        (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity * parseFloat(i.sku?.casePriceZAR || 0), 0),
+        0
+      );
 
-    // The member's own payment on this pool, once one exists (created the
-    // moment the pool matches — see matchmakerService). Surfaced here too,
-    // not just on My Orders, so the Basket screen can show real end-to-end
-    // progress (Collecting → MOQ reached → Payment submitted → Payment
-    // confirmed → Ready for delivery) instead of stopping at "Matched!".
-    const payment = await prisma.poolPayment.findFirst({
-      where: { poolId: basket.pool.id, userId: req.userId },
-      orderBy: { createdAt: 'desc' },
-      select: { status: true, providerReference: true, amountZAR: true },
-    });
+      // SmartMatch tier standing — pallets for an alcohol pool, Rand pooled
+      // for a groceries/livestock one (see smartMatchTiers.js). The ladder
+      // itself carries each tier's real value (or null, "TBC") — nothing
+      // here is fabricated.
+      const basis = basket.pool.tierBasis || 'PALLETS';
+      const isAmount = basis === 'AMOUNT';
+      const metric = isAmount ? currentAmountZAR : palletsForCases(currentCases);
+      const ladder = resolveTierLadder(basket.pool);
+      const currentTier = getTierForMetric(metric, ladder);
+      const nextTier = getNextTierForMetric(metric, ladder);
+      const remaining = amountToReachTier(metric, nextTier);
 
-    res.json({
-      basketId: basket.id,
-      basketStatus: basket.status,
-      partnerName: basket.pool.partner.name,
-      area: basket.pool.area,
-      currentCases,
-      moqTarget: basket.pool.moqTarget,
-      poolStatus: basket.pool.status,
-      windowDeadline: basket.pool.deadline,
-      capCases: basket.pool.capCases,
-      payment: payment
-        ? { status: payment.status, hasReference: !!payment.providerReference, amountZAR: payment.amountZAR }
-        : null,
-      smartMatch: {
-        basis,
-        pallets: palletsForCases(currentCases),
-        currentAmountZAR,
-        ladder,
-        currentTier,
-        nextTier,
-        // Still needed to reach nextTier, in whatever unit members act on:
-        // whole cases for a pallet pool, Rand for an amount pool.
-        toNextTier: isAmount ? Math.ceil(remaining) : Math.ceil(remaining * PALLET_CASES),
-      },
-    });
+      // The member's own payment on this pool, once one exists (created the
+      // moment the pool matches — see matchmakerService). Surfaced here too,
+      // not just on My Orders, so the Basket screen can show real end-to-end
+      // progress (Collecting → MOQ reached → Payment submitted → Payment
+      // confirmed → Ready for delivery) instead of stopping at "Matched!".
+      const payment = await prisma.poolPayment.findFirst({
+        where: { poolId: basket.pool.id, userId: req.userId },
+        orderBy: { createdAt: 'desc' },
+        select: { status: true, providerReference: true, amountZAR: true },
+      });
+
+      statuses.push({
+        basketId: basket.id,
+        basketStatus: basket.status,
+        partnerType: basket.pool.partner.type,
+        partnerName: basket.pool.partner.name,
+        area: basket.pool.area,
+        currentCases,
+        moqTarget: basket.pool.moqTarget,
+        poolStatus: basket.pool.status,
+        windowDeadline: basket.pool.deadline,
+        capCases: basket.pool.capCases,
+        payment: payment
+          ? { status: payment.status, hasReference: !!payment.providerReference, amountZAR: payment.amountZAR }
+          : null,
+        smartMatch: {
+          basis,
+          pallets: palletsForCases(currentCases),
+          currentAmountZAR,
+          ladder,
+          currentTier,
+          nextTier,
+          // Still needed to reach nextTier, in whatever unit members act on:
+          // whole cases for a pallet pool, Rand for an amount pool.
+          toNextTier: isAmount ? Math.ceil(remaining) : Math.ceil(remaining * PALLET_CASES),
+        },
+      });
+    }
+
+    res.json(statuses);
   } catch (error) {
     console.error('Get my pool status error:', error.message);
     res.status(500).json({ error: 'Could not fetch pool status' });
-  }
-}
-
-export async function getPartners(req, res) {
-  try {
-    const partners = await prisma.partner.findMany({ orderBy: { name: 'asc' } });
-    const lat = req.query.lat ? parseFloat(req.query.lat) : null;
-    const lng = req.query.lng ? parseFloat(req.query.lng) : null;
-    res.json(sortByDistance(partners, lat, lng));
-  } catch (error) {
-    console.error('Get partners error:', error.message);
-    res.status(500).json({ error: 'Could not fetch partners' });
   }
 }
 

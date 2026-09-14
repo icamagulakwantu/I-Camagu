@@ -21,16 +21,28 @@ function windowClosesLabel(windowDeadline) {
   return `This pooling window closes in ${Math.round(hoursLeft / 24)} day${Math.round(hoursLeft / 24) === 1 ? '' : 's'}.`
 }
 
+// A tier's real value, worded for whichever basis this pool uses — a
+// case price for a pallet pool, a discount percentage for an amount pool.
+// Null (no real quote entered yet) renders as nothing, never a guessed number.
+function tierValueLabel(tier, basis) {
+  if (!tier || tier.value == null) return ''
+  return basis === 'AMOUNT' ? `${Number(tier.value)}% off` : `R${Number(tier.value).toFixed(2)}/case`
+}
+
 export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
-  const { accessToken, user } = useAuth()
+  const { accessToken } = useAuth()
   const { showToast } = useToast()
-  
+
   const [basketData, setBasketData] = useState({ basket: null, items: [], totalCases: 0, totalZAR: 0 })
   const [loading, setLoading] = useState(true)
-  const [partners, setPartners] = useState([])
-  const [selectedPartner, setSelectedPartner] = useState('')
   const [copied, setCopied] = useState(false)
-  const [poolStatus, setPoolStatus] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+  // A single cart submission can now split into more than one pool — one
+  // per category (drinks vs. everything else), since a partner is only
+  // ever a tavern or a butchery, never both. So this is a list, not one.
+  const [poolStatuses, setPoolStatuses] = useState([])
+  const [cancellingId, setCancellingId] = useState(null)
+  const [invitedId, setInvitedId] = useState(null)
 
   const fetchPoolStatus = useCallback(async () => {
     try {
@@ -38,9 +50,9 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       const data = await res.json()
-      setPoolStatus(res.ok ? data : null)
+      setPoolStatuses(res.ok && Array.isArray(data) ? data : [])
     } catch {
-      setPoolStatus(null)
+      setPoolStatuses([])
     }
   }, [accessToken])
 
@@ -52,14 +64,14 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       })
       if (!res.ok) throw new Error()
       const data = await res.json()
-      
+
       const formattedData = {
         basket: data.basket || data,
         items: data.items || [],
         totalCases: data.totalCases || 0,
         totalZAR: data.totalZAR || 0,
       }
-      
+
       setBasketData(formattedData)
       if (onBasketChanged) onBasketChanged(formattedData.totalCases)
     } catch {
@@ -72,16 +84,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
   useEffect(() => {
     fetchBasket()
     fetchPoolStatus()
-    const geoQuery = user?.latitude != null && user?.longitude != null
-      ? `?lat=${user.latitude}&lng=${user.longitude}`
-      : ''
-    fetch(`/api/basket/partners${geoQuery}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => setPartners(Array.isArray(data) ? data : []))
-      .catch(() => setPartners([]))
-  }, [accessToken, fetchBasket, fetchPoolStatus, user?.latitude, user?.longitude])
+  }, [fetchBasket, fetchPoolStatus])
 
   const updateQuantity = async (itemId, newQuantity) => {
     if (newQuantity < 1) return removeItem(itemId)
@@ -114,8 +117,12 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
     }
   }
 
+  // No partner picker — a member has no real basis to choose between
+  // outlets, so the app matches each item to the right pool itself, based
+  // on category, location, and which pool is already closest to unlocking.
   const submitToPool = async () => {
-    if (!selectedPartner) return showToast('Choose a partner tavern/butchery first', 'error')
+    if (!basketData.basket?.id) return
+    setSubmitting(true)
     try {
       const res = await fetch('/api/basket/submit-to-pool', {
         method: 'POST',
@@ -123,36 +130,37 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ basketId: basketData.basket?.id, partnerId: selectedPartner }),
+        body: JSON.stringify({ basketId: basketData.basket.id }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to submit cart.')
-      showToast(data.message || 'Cart submitted successfully!', 'success')
+      showToast(data.message || 'Cart submitted successfully!', data.unmatchedTypes?.length ? 'info' : 'success')
       fetchBasket()
       fetchPoolStatus()
     } catch (err) {
       showToast(err.message, 'error')
+    } finally {
+      setSubmitting(false)
     }
   }
 
-  const [cancellingPool, setCancellingPool] = useState(false)
-  const cancelParkedBasket = async () => {
-    if (!poolStatus?.basketId) return
-    setCancellingPool(true)
+  const cancelParkedBasket = async (basketId) => {
+    if (!basketId) return
+    setCancellingId(basketId)
     try {
       const res = await fetch('/api/basket/pool/cancel-basket', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ basketId: poolStatus.basketId }),
+        body: JSON.stringify({ basketId }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Could not withdraw cart')
       showToast(data.message || 'Withdrawn from pool', 'info')
-      setPoolStatus(null)
+      setPoolStatuses((prev) => prev.filter((p) => p.basketId !== basketId))
     } catch (err) {
       showToast(err.message, 'error')
     } finally {
-      setCancellingPool(false)
+      setCancellingId(null)
     }
   }
 
@@ -173,22 +181,11 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
     }
   }
 
-  // A tier's real value, worded for whichever basis this pool uses — a
-  // case price for a pallet pool, a discount percentage for an amount
-  // pool. Null (no real quote entered yet) renders as nothing, never a
-  // guessed number.
-  const tierValueLabel = (tier, basis) => {
-    if (!tier || tier.value == null) return ''
-    return basis === 'AMOUNT' ? `${Number(tier.value)}% off` : `R${Number(tier.value).toFixed(2)}/case`
-  }
-
   // Recruits more people into this SmartMatch pool — the whole point of
   // showing tiers at all. Every number here is real (real cases or Rand,
   // real partner/area); a tier's value only appears when a real negotiated
   // figure exists for it, never a guessed discount.
-  const [invited, setInvited] = useState(false)
-  const inviteToSmartMatch = () => {
-    if (!poolStatus) return
+  const inviteToSmartMatch = (poolStatus) => {
     const sm = poolStatus.smartMatch
     const isAmount = sm.basis === 'AMOUNT'
     const standing = isAmount
@@ -209,9 +206,9 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       navigator.share({ title: 'Join our SmartMatch pool', text }).catch(() => {})
     } else {
       navigator.clipboard.writeText(text)
-      setInvited(true)
+      setInvitedId(poolStatus.basketId)
       showToast('Invite copied — paste it into WhatsApp', 'info')
-      setTimeout(() => setInvited(false), 2000)
+      setTimeout(() => setInvitedId(null), 2000)
     }
   }
 
@@ -264,9 +261,11 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
 
       <h2 className="font-display font-bold text-2xl text-ink mb-4">My Cart 🛒</h2>
 
-      {poolStatus && (
-        <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
-          <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">Smart Match</p>
+      {poolStatuses.map((poolStatus) => (
+        <div key={poolStatus.basketId} className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
+          <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">
+            Smart Match — {poolStatus.partnerType === 'TAVERN' ? 'Drinks' : 'Food & other items'}
+          </p>
           <p className="text-sm font-bold mb-2">
             {poolStatus.poolStatus === 'OPEN'
               ? `Pooling with other members near ${poolStatus.area} via ${poolStatus.partnerName} — the more members join, the bigger the discount.`
@@ -382,25 +381,25 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                 <div className="flex items-center gap-3 flex-wrap">
                   <button
                     type="button"
-                    onClick={inviteToSmartMatch}
+                    onClick={() => inviteToSmartMatch(poolStatus)}
                     className="bg-white text-terracotta text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform"
                   >
-                    {invited ? 'Copied!' : 'Invite on WhatsApp 📲'}
+                    {invitedId === poolStatus.basketId ? 'Copied!' : 'Invite on WhatsApp 📲'}
                   </button>
                   <button
                     type="button"
-                    onClick={cancelParkedBasket}
-                    disabled={cancellingPool}
+                    onClick={() => cancelParkedBasket(poolStatus.basketId)}
+                    disabled={cancellingId === poolStatus.basketId}
                     className="text-xs font-bold text-white/90 underline disabled:opacity-50"
                   >
-                    {cancellingPool ? 'Withdrawing...' : 'Withdraw from this pool'}
+                    {cancellingId === poolStatus.basketId ? 'Withdrawing...' : 'Withdraw from this pool'}
                   </button>
                 </div>
               </>
             )
           })()}
         </div>
-      )}
+      ))}
 
       {itemsList.length === 0 ? (
         <EmptyState
@@ -503,31 +502,23 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
             )}
           </div>
 
-          {/* Partner Bulk Pool Section */}
+          {/* Submit to Bulk Pool — no partner picker. Which outlet a
+              member's order pools with isn't something they have a real
+              basis to choose (it depends on who's nearby and whose pool is
+              already closest to unlocking) — the app matches it automatically. */}
           <div className="bg-white border border-cream-dark rounded-soft p-4 shadow-soft">
             <p className="text-xs font-black uppercase text-ink-muted mb-1">Smart Match — Join a Bulk Order</p>
-            <p className="text-xs text-ink-muted mb-2">
-              iCamagu pools your cart with other members buying alcohol or livestock/meat from the same partner, so everyone unlocks bulk pricing sooner — even across different stokvels.
+            <p className="text-xs text-ink-muted mb-3">
+              iCamagu automatically pools your cart with other members buying the same kind of thing nearby — even across different stokvels — and matches you to whichever pool gets you to bulk pricing soonest. Drinks and other items are matched to their own pools.
             </p>
-            <select
-              value={selectedPartner}
-              onChange={(e) => setSelectedPartner(e.target.value)}
-              className="w-full border border-cream-dark rounded-soft px-3 py-2.5 mb-3 bg-cream text-xs font-bold text-ink"
-            >
-              <option value="">Choose a partner tavern/butchery</option>
-              {partners.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({p.area}){p.distanceKm != null ? ` · ${p.distanceKm}km away` : ''}
-                </option>
-              ))}
-            </select>
 
             <button
               type="button"
               onClick={submitToPool}
-              className="w-full bg-sage-500 hover:bg-sage-600 text-white font-bold py-3 rounded-pill shadow-glow active:scale-[0.96] transition-transform text-sm"
+              disabled={submitting}
+              className="w-full bg-sage-500 hover:bg-sage-600 text-white font-bold py-3 rounded-pill shadow-glow active:scale-[0.96] transition-transform text-sm disabled:opacity-50"
             >
-              Submit Cart to Bulk Pool
+              {submitting ? 'Submitting...' : 'Submit Cart to Bulk Pool'}
             </button>
           </div>
         </>
