@@ -1,0 +1,184 @@
+import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '../context/AuthContext.jsx'
+import { useToast } from '../components/ui/Toast.jsx'
+import { EmptyState } from '../components/ui/EmptyState.jsx'
+import { Skeleton } from '../components/ui/Skeleton.jsx'
+import Icon from '../components/Icon.jsx'
+import { CATEGORY_LABEL } from '../data/poolCategories.js'
+
+const money = (n) => `R${Number(n || 0).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50'
+
+// Admin-only. Real, committed pooled demand across every category — not a
+// projection or an estimate, just what members have already put in a cart
+// and parked in a pool. This is the number a founder actually takes into a
+// supplier negotiation ("we already have R14,000 of alcohol orders ready in
+// Motherwell"), and the tool to attach a real confirmed supplier to a pool
+// once a deal is signed. No payment custody happens here — the app has
+// never held member funds; this is a demand/leverage view only.
+export default function DemandDashboard({ onBack }) {
+  const { accessToken } = useAuth()
+  const { showToast } = useToast()
+  const [overview, setOverview] = useState(null)
+  const [unassigned, setUnassigned] = useState([])
+  const [partners, setPartners] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [denied, setDenied] = useState(false)
+  const [selectedPartner, setSelectedPartner] = useState({})
+  const [assigningId, setAssigningId] = useState(null)
+
+  const authedFetch = useCallback((url, options = {}) => fetch(url, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}`, ...options.headers },
+  }), [accessToken])
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const [overviewRes, unassignedRes, partnersRes] = await Promise.all([
+        authedFetch('/api/supplier/admin/demand-overview'),
+        authedFetch('/api/supplier/admin/unassigned-pools'),
+        authedFetch('/api/supplier/admin/partners'),
+      ])
+      if (overviewRes.status === 403) { setDenied(true); return }
+      if (!overviewRes.ok || !unassignedRes.ok || !partnersRes.ok) throw new Error('Could not load demand data')
+      setOverview(await overviewRes.json())
+      setUnassigned(await unassignedRes.json())
+      setPartners(await partnersRes.json())
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setLoading(false)
+    }
+  }, [authedFetch, showToast])
+
+  useEffect(() => { load() }, [load])
+
+  const assignPartner = async (poolId) => {
+    const partnerId = selectedPartner[poolId]
+    if (!partnerId) return showToast('Choose a partner first', 'error')
+    setAssigningId(poolId)
+    try {
+      const res = await authedFetch('/api/supplier/admin/assign-partner', {
+        method: 'POST',
+        body: JSON.stringify({ poolId, partnerId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not assign partner')
+      showToast(data.message, 'success')
+      load()
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setAssigningId(null)
+    }
+  }
+
+  if (denied) {
+    return (
+      <div className="min-h-screen bg-cream px-4 pt-10">
+        <button onClick={onBack} className="text-sm text-ink-muted mb-4 block">← Back</button>
+        <EmptyState emoji="🔒" title="Admin access required" description="This view isn't available on your account." />
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen pb-24 bg-cream">
+      <div className="bg-gradient-to-br from-ink to-brand-black text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
+        <button onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
+        <h1 className="font-display font-bold text-2xl">Demand &amp; Suppliers</h1>
+        <p className="text-white/70 text-sm mt-1">Real pooled demand, for negotiating with real suppliers.</p>
+      </div>
+
+      <div className="px-4 mt-4 space-y-4">
+        {loading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-24 w-full rounded-soft" />
+            <Skeleton className="h-24 w-full rounded-soft" />
+          </div>
+        ) : (
+          <>
+            <div className="wash-ember grain rounded-soft p-5 text-white">
+              <p className="eyebrow text-cream/75 mb-1">Total committed demand (open + matched)</p>
+              <p className="font-display font-extrabold text-3xl tabular">{money(overview?.totalValueZAR)}</p>
+              <p className="text-xs text-cream/80 mt-1">
+                {overview?.totalPoolCount || 0} pool{overview?.totalPoolCount === 1 ? '' : 's'} · {overview?.totalMemberCount || 0} member{overview?.totalMemberCount === 1 ? '' : 's'} ready to buy
+              </p>
+            </div>
+
+            <div>
+              <p className="eyebrow mb-2">By category</p>
+              {(overview?.categories || []).length === 0 ? (
+                <p className="text-sm text-ink-muted">No open or matched pools right now.</p>
+              ) : (
+                <div className="space-y-2">
+                  {overview.categories.map((c) => (
+                    <div key={c.category} className="card-paper p-4 flex items-center justify-between">
+                      <div>
+                        <p className="font-bold text-sm text-ink">{CATEGORY_LABEL[c.category] || c.category}</p>
+                        <p className="text-xs text-ink-muted mt-0.5">
+                          {c.poolCount} pool{c.poolCount === 1 ? '' : 's'} · {c.cases} case{c.cases === 1 ? '' : 's'} · {c.memberCount} member{c.memberCount === 1 ? '' : 's'}
+                          {c.unassignedPoolCount > 0 && <span className="text-terracotta font-bold"> · {c.unassignedPoolCount} awaiting supplier</span>}
+                        </p>
+                      </div>
+                      <p className="tabular font-display font-bold text-lg text-ink">{money(c.valueZAR)}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <p className="eyebrow mb-2">Pools awaiting a confirmed supplier</p>
+              {unassigned.length === 0 ? (
+                <p className="text-sm text-ink-muted">Every open or matched pool already has a supplier attached.</p>
+              ) : (
+                <div className="space-y-3">
+                  {unassigned.map((pool) => (
+                    <div key={pool.id} className="card-paper p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <p className="font-bold text-sm text-ink">{CATEGORY_LABEL[pool.category] || pool.category} — {pool.area}</p>
+                          <p className="text-xs text-ink-muted mt-0.5">
+                            {pool.status === 'MATCHED' ? 'MOQ reached — ' : ''}{pool.cases}/{pool.moqTarget} cases · {pool.memberCount} member{pool.memberCount === 1 ? '' : 's'}
+                          </p>
+                        </div>
+                        <p className="tabular font-bold text-sm text-terracotta flex-shrink-0">{money(pool.valueZAR)}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <select
+                          value={selectedPartner[pool.id] || ''}
+                          onChange={(e) => setSelectedPartner((prev) => ({ ...prev, [pool.id]: e.target.value }))}
+                          className="flex-1 border border-cream-dark rounded-soft px-3 py-2 text-xs font-bold bg-white"
+                        >
+                          <option value="">Choose a confirmed supplier...</option>
+                          {partners.filter((p) => p.type === pool.category).map((p) => (
+                            <option key={p.id} value={p.id}>{p.name} ({p.area})</option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => assignPartner(pool.id)}
+                          disabled={assigningId === pool.id}
+                          className={`bg-sage-500 text-white text-xs font-bold px-4 rounded-pill ${pressable}`}
+                        >
+                          {assigningId === pool.id ? '...' : 'Attach'}
+                        </button>
+                      </div>
+                      {partners.filter((p) => p.type === pool.category).length === 0 && (
+                        <p className="text-[11px] text-ink-muted mt-2">
+                          No {(CATEGORY_LABEL[pool.category] || pool.category).toLowerCase()} suppliers registered yet — register one via the Supplier Dashboard once a deal is confirmed.
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

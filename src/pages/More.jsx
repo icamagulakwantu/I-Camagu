@@ -34,6 +34,7 @@ const SECTIONS = [
       { id: 'ekoyiniadmin', icon: 'settings', label: 'Ekoyini Admin', adminOnly: true },
       { id: 'identityadmin', icon: 'key', label: 'Identity Admin', adminOnly: true },
       { id: 'marginadmin', icon: 'chart', label: 'Cost & Margin', adminOnly: true },
+      { id: 'demandadmin', icon: 'coins', label: 'Demand & Suppliers', adminOnly: true },
       { id: 'portal', icon: 'image', label: 'Digital Portal' },
       { id: 'directory', icon: 'book', label: 'Directory' },
     ],

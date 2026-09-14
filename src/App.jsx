@@ -27,6 +27,7 @@ import Ekoyini from './pages/Ekoyini.jsx'
 import EkoyiniAdmin from './pages/EkoyiniAdmin.jsx'
 import IdentityAdmin from './pages/IdentityAdmin.jsx'
 import MarginAdmin from './pages/MarginAdmin.jsx'
+import DemandDashboard from './pages/DemandDashboard.jsx'
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import Hierarchy from './pages/Hierarchy.jsx'
 import MyOrders from './pages/MyOrders.jsx'
@@ -77,6 +78,7 @@ const MORE_SCREENS = [
   'ekoyiniadmin',
   'identityadmin',
   'marginadmin',
+  'demandadmin',
   'privacy',
   'hierarchy',
   'myorders',
@@ -122,6 +124,7 @@ const SCREEN_TO_PATH = {
   ekoyiniadmin: '/more/ekoyini-admin',
   identityadmin: '/more/identity-admin',
   marginadmin: '/more/margin-admin',
+  demandadmin: '/more/demand-admin',
   privacy: '/more/privacy',
   hierarchy: '/more/hierarchy',
   expenditure: '/more/spending',
@@ -514,6 +517,8 @@ function MainApp() {
         return <IdentityAdmin onBack={goMore} />
       case 'marginadmin':
         return <MarginAdmin onBack={goMore} />
+      case 'demandadmin':
+        return <DemandDashboard onBack={goMore} />
       case 'hierarchy':
         return <Hierarchy onBack={goMore} />
       case 'myorders':
