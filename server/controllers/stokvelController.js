@@ -19,6 +19,15 @@ export async function createStokvel(req, res) {
     return res.status(400).json({ error: `Type must be one of: ${validTypes.join(', ')}` });
   }
 
+  for (const [field, value] of [['contributionAmount', contributionAmount], ['targetAmount', targetAmount]]) {
+    if (value !== undefined && value !== null && value !== '') {
+      const parsed = parseFloat(value);
+      if (isNaN(parsed) || parsed < 0) {
+        return res.status(400).json({ error: `${field} must be a positive number` });
+      }
+    }
+  }
+
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
@@ -337,7 +346,15 @@ export async function updateStokvel(req, res) {
   for (const field of UPDATABLE_STOKVEL_FIELDS) {
     if (req.body[field] === undefined) continue;
     if (field === 'contributionAmount' || field === 'targetAmount') {
-      updateData[field] = req.body[field] === null || req.body[field] === '' ? null : parseFloat(req.body[field]);
+      if (req.body[field] === null || req.body[field] === '') {
+        updateData[field] = null;
+      } else {
+        const parsed = parseFloat(req.body[field]);
+        if (isNaN(parsed) || parsed < 0) {
+          return res.status(400).json({ error: `${field} must be a positive number, or null to clear it` });
+        }
+        updateData[field] = parsed;
+      }
     } else if (field === 'targetDate') {
       updateData[field] = req.body[field] ? new Date(req.body[field]) : null;
     } else {

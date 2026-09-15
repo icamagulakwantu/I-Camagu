@@ -30,7 +30,11 @@ export async function getMyBasket(req, res) {
 export async function addItem(req, res) {
       const { skuId, quantity } = req.body; // quantity = number of CASES, never single bottles
 
-        if (!skuId || !quantity || quantity < 1) {
+        // A non-numeric quantity (e.g. "abc") coerces to NaN, and NaN < 1 is
+        // false — that let a bad quantity slip past a plain `quantity < 1`
+        // check. parseInt first, then check isNaN explicitly.
+        const numericQuantity = parseInt(quantity, 10);
+        if (!skuId || isNaN(numericQuantity) || numericQuantity < 1) {
                 return res.status(400).json({ error: 'skuId and a quantity of at least 1 case are required' });
         }
 
@@ -46,11 +50,11 @@ export async function addItem(req, res) {
                                   const item = existing
                                         ? await prisma.basketItem.update({
                                                       where: { id: existing.id },
-                                                                data: { quantity: existing.quantity + parseInt(quantity) },
+                                                                data: { quantity: existing.quantity + numericQuantity },
                                                                           include: { sku: { select: PUBLIC_SKU_SELECT } },
                                         })
                                               : await prisma.basketItem.create({
-                                                            data: { basketId: basket.id, skuId, quantity: parseInt(quantity) },
+                                                            data: { basketId: basket.id, skuId, quantity: numericQuantity },
                                                                       include: { sku: { select: PUBLIC_SKU_SELECT } },
                                               });
 
@@ -65,8 +69,9 @@ export async function addItem(req, res) {
 export async function updateItem(req, res) {
   const { itemId } = req.params;
   const { quantity } = req.body;
+  const numericQuantity = parseInt(quantity, 10);
 
-  if (!quantity || parseInt(quantity) < 1) {
+  if (isNaN(numericQuantity) || numericQuantity < 1) {
     return res.status(400).json({ error: 'Quantity must be at least 1 case' });
   }
 
@@ -79,7 +84,7 @@ export async function updateItem(req, res) {
 
     const updated = await prisma.basketItem.update({
       where: { id: itemId },
-      data: { quantity: parseInt(quantity) },
+      data: { quantity: numericQuantity },
       include: { sku: { select: PUBLIC_SKU_SELECT } },
     });
 
