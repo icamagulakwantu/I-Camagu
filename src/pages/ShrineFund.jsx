@@ -12,6 +12,7 @@ function ShrineFund({ onBack }) {
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState(null)
+  const [loadFailed, setLoadFailed] = useState(false)
   const [donateOpen, setDonateOpen] = useState(false)
   const [donateAmount, setDonateAmount] = useState('')
   const [donorName, setDonorName] = useState('')
@@ -19,10 +20,14 @@ function ShrineFund({ onBack }) {
   const [submitting, setSubmitting] = useState(false)
 
   const fetchTotal = () => {
+    setLoadFailed(false)
     fetch('/api/stokvels/shrine-fund/total', { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Could not load fund total')
+        return res.json()
+      })
       .then((d) => setData(d))
-      .catch(() => setData(null))
+      .catch(() => { setData(null); setLoadFailed(true) })
       .finally(() => setLoading(false))
   }
 
@@ -80,6 +85,13 @@ function ShrineFund({ onBack }) {
         <div className="bg-white border-2 border-terracotta/25 rounded-soft p-6 shadow-card text-center">
           {loading ? (
             <Skeleton className="h-12 w-48 mx-auto" />
+          ) : loadFailed ? (
+            <>
+              <p className="text-sm text-ink-muted">Could not load the fund total — not R0, just not loaded yet.</p>
+              <button type="button" onClick={fetchTotal} className="text-xs font-bold text-terracotta mt-2 underline">
+                Try again
+              </button>
+            </>
           ) : (
             <>
               <p className="text-[11px] font-black uppercase tracking-widest text-ink-muted mb-1">Total raised, all-time</p>
@@ -88,7 +100,7 @@ function ShrineFund({ onBack }) {
           )}
         </div>
 
-        {!loading && (
+        {!loading && !loadFailed && (
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div className="bg-white border border-terracotta/15 rounded-soft p-3 text-center">
               <p className="font-display font-bold text-lg text-ink">{data?.payoutContributionCount || 0}</p>
@@ -108,7 +120,7 @@ function ShrineFund({ onBack }) {
         {/* Where the fund's money has actually gone. Only real, recorded
             allocations appear — until then this says so plainly rather than
             showing a row of zeros that looks like activity. */}
-        {!loading && (
+        {!loading && !loadFailed && (
           <div className="bg-white border border-terracotta/15 rounded-soft p-4 mt-4">
             <p className="text-[11px] font-black uppercase tracking-widest text-ink-muted mb-2">
               Where the fund has been invested

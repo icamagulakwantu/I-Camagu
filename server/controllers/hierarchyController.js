@@ -40,7 +40,7 @@ export async function setGroupAllocation(req, res) {
         }
 
           const qty = parseInt(quantity, 10);
-          if (isNaN(qty)) return res.status(400).json({ error: 'quantity must be a number' });
+          if (isNaN(qty) || qty <= 0) return res.status(400).json({ error: 'quantity must be a positive number' });
 
           try {
                   const group = await prisma.ceremonyGroup.findUnique({
