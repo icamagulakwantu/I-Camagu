@@ -57,12 +57,18 @@ router.post('/bereavement/toggle', requireAuth, toggleBereavementProtocol);
 router.post('/announcements', requireAuth, postAnnouncement);
 router.get('/:stokvelId/announcements', requireAuth, getAnnouncements);
 
+// Both of these check a PIN (see pinService.verifyPin) before releasing real
+// money — a 4-6 digit PIN is only up to a million combinations, so without a
+// limiter here a stolen access token would be enough to brute-force it in a
+// tight loop. Same strict budget already used for password/OTP attempts.
+const pinLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
+
 router.post('/contributions/submit', requireAuth, submitContribution);
-router.post('/contributions/confirm', requireAuth, confirmContribution);
+router.post('/contributions/confirm', requireAuth, pinLimiter, confirmContribution);
 router.get('/:stokvelId/contributions/pending', requireAuth, getPendingContributions);
 
 router.post('/payouts/request', requireAuth, requestPayout);
 router.delete('/:stokvelId', requireAuth, deleteStokvel);
-router.post('/payouts/approve', requireAuth, approvePayout);
+router.post('/payouts/approve', requireAuth, pinLimiter, approvePayout);
 
 export default router;
