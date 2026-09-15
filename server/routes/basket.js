@@ -4,7 +4,7 @@ import { getCatalogue, getCategories } from '../controllers/catalogueController.
 import { submitToPool, getMyOrderDocuments, confirmOrderLine, getMyPoolPayments, submitPoolPaymentReference, getMyPoolStatus, getPoolSummary, cancelParkedBasket, requestPoolPaymentRefund } from '../controllers/poolController.js';
 import { getMyBasket, addItem, updateItem, removeItem } from '../controllers/basketController.js';
 import { getCatalogueMargins, setSkuCostPrice, setSkuRetailPrice } from '../controllers/marginController.js';
-import { getOnlinePaymentStatus, initiatePoolPaymentOnline } from '../controllers/paymentController.js';
+import { getOnlinePaymentStatus, initiatePoolPaymentOnline, getPendingSupplierPayouts, forwardSupplierPayout } from '../controllers/paymentController.js';
 
 const router = express.Router();
 
@@ -33,5 +33,10 @@ router.post('/pool-payments/:paymentId/pay-online', requireAuth, initiatePoolPay
 router.get('/margins', requireAuth, getCatalogueMargins);
 router.patch('/margins/:skuId/cost', requireAuth, setSkuCostPrice);
 router.patch('/margins/:skuId/retail', requireAuth, setSkuRetailPrice);
+
+// Admin-only: PSP-collected payments iCamagu is still holding, awaiting a
+// manual transfer to the supplier. Each handler checks admin itself.
+router.get('/admin/pending-payouts', requireAuth, getPendingSupplierPayouts);
+router.post('/admin/pending-payouts/:paymentId/forward', requireAuth, forwardSupplierPayout);
 
 export default router;

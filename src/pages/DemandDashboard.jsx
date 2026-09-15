@@ -14,18 +14,34 @@ const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96
 // and parked in a pool. This is the number a founder actually takes into a
 // supplier negotiation ("we already have R14,000 of alcohol orders ready in
 // Motherwell"), and the tool to attach a real confirmed supplier to a pool
-// once a deal is signed. No payment custody happens here — the app has
-// never held member funds; this is a demand/leverage view only.
+// once a deal is signed.
+//
+// The Payouts tab is the one place this screen does touch real money: a
+// member paying online (PayFast) lands their payment in iCamagu's own
+// merchant account, not the supplier's — unlike manual EFT, where the
+// member pays the supplier directly. Until a real payout API exists for
+// that (Stitch/Ozow/PayFast payouts — a business relationship still to be
+// built), forwarding that money to the supplier is a manual bank transfer,
+// and this is where an admin tracks which ones are still outstanding.
+const TABS = [
+  { id: 'demand', label: 'Demand & Suppliers' },
+  { id: 'payouts', label: 'Payouts' },
+]
+
 export default function DemandDashboard({ onBack }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
+  const [tab, setTab] = useState('demand')
   const [overview, setOverview] = useState(null)
   const [unassigned, setUnassigned] = useState([])
   const [partners, setPartners] = useState([])
+  const [pendingPayouts, setPendingPayouts] = useState([])
   const [loading, setLoading] = useState(true)
   const [denied, setDenied] = useState(false)
   const [selectedPartner, setSelectedPartner] = useState({})
   const [assigningId, setAssigningId] = useState(null)
+  const [forwardDrafts, setForwardDrafts] = useState({})
+  const [forwardingId, setForwardingId] = useState(null)
 
   const authedFetch = useCallback((url, options = {}) => fetch(url, {
     ...options,
@@ -35,16 +51,18 @@ export default function DemandDashboard({ onBack }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [overviewRes, unassignedRes, partnersRes] = await Promise.all([
+      const [overviewRes, unassignedRes, partnersRes, payoutsRes] = await Promise.all([
         authedFetch('/api/supplier/admin/demand-overview'),
         authedFetch('/api/supplier/admin/unassigned-pools'),
         authedFetch('/api/supplier/admin/partners'),
+        authedFetch('/api/basket/admin/pending-payouts'),
       ])
       if (overviewRes.status === 403) { setDenied(true); return }
-      if (!overviewRes.ok || !unassignedRes.ok || !partnersRes.ok) throw new Error('Could not load demand data')
+      if (!overviewRes.ok || !unassignedRes.ok || !partnersRes.ok || !payoutsRes.ok) throw new Error('Could not load demand data')
       setOverview(await overviewRes.json())
       setUnassigned(await unassignedRes.json())
       setPartners(await partnersRes.json())
+      setPendingPayouts(await payoutsRes.json())
     } catch (err) {
       showToast(err.message, 'error')
     } finally {
@@ -53,6 +71,27 @@ export default function DemandDashboard({ onBack }) {
   }, [authedFetch, showToast])
 
   useEffect(() => { load() }, [load])
+
+  const forwardPayout = async (paymentId) => {
+    const draft = forwardDrafts[paymentId] || {}
+    if (!draft.reference?.trim()) return showToast('Enter the bank reference for this transfer first', 'error')
+    setForwardingId(paymentId)
+    try {
+      const res = await authedFetch(`/api/basket/admin/pending-payouts/${paymentId}/forward`, {
+        method: 'POST',
+        body: JSON.stringify({ reference: draft.reference.trim(), note: draft.note?.trim() || undefined }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not mark payout forwarded')
+      showToast(data.message || 'Marked as forwarded', 'success')
+      setForwardDrafts((prev) => ({ ...prev, [paymentId]: undefined }))
+      load()
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setForwardingId(null)
+    }
+  }
 
   const assignPartner = async (poolId) => {
     const partnerId = selectedPartner[poolId]
@@ -91,13 +130,31 @@ export default function DemandDashboard({ onBack }) {
         <p className="text-white/70 text-sm mt-1">Real pooled demand, for negotiating with real suppliers.</p>
       </div>
 
+      <div className="flex gap-2 px-4 mt-4">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setTab(t.id)}
+            className={`flex-1 py-2 rounded-pill text-xs font-bold transition-colors ${
+              tab === t.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
+            }`}
+          >
+            {t.label}
+            {t.id === 'payouts' && pendingPayouts.length > 0 && (
+              <span className={tab === t.id ? 'text-white/80' : 'text-terracotta'}> ({pendingPayouts.length})</span>
+            )}
+          </button>
+        ))}
+      </div>
+
       <div className="px-4 mt-4 space-y-4">
         {loading ? (
           <div className="space-y-3">
             <Skeleton className="h-24 w-full rounded-soft" />
             <Skeleton className="h-24 w-full rounded-soft" />
           </div>
-        ) : (
+        ) : tab === 'demand' ? (
           <>
             <div className="wash-ember grain rounded-soft p-5 text-white">
               <p className="eyebrow text-cream/75 mb-1">Total committed demand (open + matched)</p>
@@ -176,6 +233,71 @@ export default function DemandDashboard({ onBack }) {
                 </div>
               )}
             </div>
+          </>
+        ) : (
+          <>
+            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
+              <p className="text-xs text-ink-muted leading-relaxed">
+                A member paying online lands their money in iCamagu's own PayFast account, not the
+                supplier's. Each of these still needs a real bank transfer to the supplier — mark it
+                forwarded once that transfer is done, with the bank reference for the record.
+              </p>
+            </div>
+
+            {pendingPayouts.length === 0 ? (
+              <EmptyState emoji="✅" title="Nothing outstanding" description="Every online payment has been forwarded to its supplier." />
+            ) : (
+              <div className="space-y-3">
+                {pendingPayouts.map((p) => {
+                  const draft = forwardDrafts[p.id] || {}
+                  return (
+                    <div key={p.id} className="card-paper p-4">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="font-bold text-sm text-ink">{p.pool?.partner?.name || `${CATEGORY_LABEL[p.pool?.category] || p.pool?.category} pool`}</p>
+                        <p className="tabular font-display font-bold text-lg text-ink">{money(p.amountZAR)}</p>
+                      </div>
+                      <p className="text-xs text-ink-muted mb-1">
+                        From {p.user?.firstName} {p.user?.lastName} ({p.user?.email}) · {p.provider}
+                      </p>
+                      {p.pool?.partner?.bankName ? (
+                        <p className="text-xs text-ink-muted mb-3">
+                          Pay to: {p.pool.partner.bankName} · {p.pool.partner.bankAccountHolder} · {p.pool.partner.bankAccountNumber}
+                          {p.pool.partner.bankBranchCode ? ` · branch ${p.pool.partner.bankBranchCode}` : ''}
+                        </p>
+                      ) : (
+                        <p className="text-[11px] text-terracotta font-bold mb-3">
+                          No bank details on file for this supplier yet — add them via the Supplier Dashboard before transferring.
+                        </p>
+                      )}
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          placeholder="Bank reference for this transfer"
+                          value={draft.reference || ''}
+                          onChange={(e) => setForwardDrafts((prev) => ({ ...prev, [p.id]: { ...prev[p.id], reference: e.target.value } }))}
+                          className="w-full border border-cream-dark rounded-soft px-3 py-2 text-xs"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Note (optional)"
+                          value={draft.note || ''}
+                          onChange={(e) => setForwardDrafts((prev) => ({ ...prev, [p.id]: { ...prev[p.id], note: e.target.value } }))}
+                          className="w-full border border-cream-dark rounded-soft px-3 py-2 text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => forwardPayout(p.id)}
+                          disabled={forwardingId === p.id}
+                          className={`w-full bg-sage-500 text-white text-xs font-bold py-2 rounded-pill ${pressable}`}
+                        >
+                          {forwardingId === p.id ? 'Saving...' : 'Mark forwarded to supplier'}
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </>
         )}
       </div>

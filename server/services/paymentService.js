@@ -134,3 +134,53 @@ export async function handlePayFastWebhook(rawBody) {
 
   return { status: event.status };
 }
+
+// Admin-only bookkeeping for the manual step described at the top of this
+// file: a PSP-collected payment sits in iCamagu's own account until someone
+// actually wires it to the supplier. Without this, that money has no
+// tracked owner — an admin would have no way to tell what's already been
+// forwarded from what's still sitting there.
+export async function listPendingSupplierPayouts() {
+  const payments = await prisma.poolPayment.findMany({
+    where: { provider: { not: 'MANUAL_EFT' }, status: 'CLEARED', payoutForwardedAt: null },
+    include: {
+      pool: { include: { partner: true } },
+      user: { select: { firstName: true, lastName: true, email: true } },
+    },
+    orderBy: { settledAt: 'asc' },
+  });
+  return payments;
+}
+
+export async function markPayoutForwarded(paymentId, { reference, note }) {
+  const payment = await prisma.poolPayment.findUnique({ where: { id: paymentId } });
+  if (!payment) {
+    const err = new Error('Payment not found');
+    err.status = 404;
+    throw err;
+  }
+  if (payment.provider === 'MANUAL_EFT') {
+    const err = new Error('Manual EFT payments go straight to the supplier — there is nothing to forward');
+    err.status = 400;
+    throw err;
+  }
+  if (payment.status !== 'CLEARED') {
+    const err = new Error(`Payment is ${payment.status} — only a CLEARED payment can be marked forwarded`);
+    err.status = 409;
+    throw err;
+  }
+  if (payment.payoutForwardedAt) {
+    const err = new Error('This payment has already been marked forwarded');
+    err.status = 409;
+    throw err;
+  }
+
+  return prisma.poolPayment.update({
+    where: { id: paymentId },
+    data: {
+      payoutForwardedAt: new Date(),
+      payoutReference: reference || null,
+      payoutNote: note || null,
+    },
+  });
+}

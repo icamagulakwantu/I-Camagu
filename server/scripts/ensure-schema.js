@@ -181,4 +181,19 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "settledAt" TIMESTAMP(3);'
   );
+  // Tracks the manual bank transfer that moves a PSP-collected payment
+  // (provider e.g. 'PAYFAST') on from iCamagu's own merchant account to the
+  // supplier — a real gap the PayFast integration opened up (PayFast pays
+  // iCamagu, not the supplier directly), to be closed later by a real
+  // payout API once a PSP relationship exists for it. Manual-EFT payments
+  // never touch these; the member already paid the supplier directly.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "payoutForwardedAt" TIMESTAMP(3);'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "payoutReference" TEXT;'
+  );
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "payoutNote" TEXT;'
+  );
 }

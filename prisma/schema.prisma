@@ -623,6 +623,17 @@ model PoolPayment {
   // PSP adapter exists; a manual-EFT payment is "settled" when an official
   // marks it CLEARED, which this field doesn't need to track.
   settledAt  DateTime?
+  // A PSP-collected payment (provider e.g. 'PAYFAST') lands in iCamagu's own
+  // merchant account, not the supplier's — unlike manual EFT, where the
+  // member pays the supplier directly and CLEARED already means the
+  // supplier has the money. Until a real payout API exists (Stitch/Ozow/
+  // PayFast payouts — a real business relationship, not yet in place),
+  // forwarding that money to the supplier is a manual bank transfer an
+  // admin does by hand and records here. Null and irrelevant for
+  // manual-EFT payments, where no such forwarding step exists.
+  payoutForwardedAt DateTime?
+  payoutReference   String?
+  payoutNote        String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
