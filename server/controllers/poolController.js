@@ -5,18 +5,25 @@ import { PALLET_CASES, palletsForCases, resolveTierLadder, getTierForMetric, get
 export const CATEGORY_LABEL = { TAVERN: 'Drinks', BUTCHERY: 'Meat & livestock', GROCERY: 'Groceries & other items', PRODUCE: 'Fresh produce' };
 
 export async function submitToPool(req, res) {
-  const { basketId, targetDate } = req.body;
+  const { basketId, targetDate, joinPoolId } = req.body;
   if (!basketId) {
     return res.status(400).json({ error: 'basketId is required' });
   }
 
   try {
-    const result = await submitBasketToPool(req.userId, basketId, targetDate);
-    const lines = result.submissions.map((s) =>
-      s.matched
+    const result = await submitBasketToPool(req.userId, basketId, targetDate, joinPoolId);
+    const lines = result.submissions.map((s) => {
+      const base = s.matched
         ? `${CATEGORY_LABEL[s.category]} matched${s.partnerName ? ` with ${s.partnerName}` : ''}! Group code: ${s.groupCode}`
-        : `${CATEGORY_LABEL[s.category]} pooling${s.partnerName ? ` with ${s.partnerName}` : ''} — ${s.currentCases}/${s.moqTarget} cases needed.`
-    );
+        : `${CATEGORY_LABEL[s.category]} pooling${s.partnerName ? ` with ${s.partnerName}` : ''} — ${s.currentCases}/${s.moqTarget} cases needed.`;
+      // Tells the truth when the pool they were invited to had already
+      // closed by the time they submitted — never silently substitutes a
+      // different pool without saying so.
+      if (s.joinedInvitedPool === false) {
+        return `${base} (The pool you were invited to had already closed, so you joined a new one in your own area instead.)`;
+      }
+      return base;
+    });
 
     res.json({ ...result, message: lines.join(' ') || 'Nothing could be submitted.' });
   } catch (error) {
@@ -151,6 +158,7 @@ export async function getMyPoolStatus(req, res) {
       statuses.push({
         basketId: basket.id,
         basketStatus: basket.status,
+        poolId: basket.pool.id,
         category: basket.pool.category,
         // A pool works fully with or without a confirmed supplier attached
         // — this is null until one matches automatically or gets attached
@@ -183,6 +191,53 @@ export async function getMyPoolStatus(req, res) {
   } catch (error) {
     console.error('Get my pool status error:', error.message);
     res.status(500).json({ error: 'Could not fetch pool status' });
+  }
+}
+
+/**
+ * Minimal, authenticated preview of a specific pool, for a member who
+ * followed a real "join this pool" invite link (see Basket.jsx /
+ * inviteToSmartMatch and /pool/:id in App.jsx) before they've added
+ * anything to their own basket yet. Real numbers only — same tier maths
+ * as getMyPoolStatus — never fabricated for a pool the member hasn't
+ * joined.
+ */
+export async function getPoolSummary(req, res) {
+  const { id } = req.params;
+  try {
+    const pool = await prisma.bulkPool.findUnique({
+      where: { id },
+      include: { partner: true, baskets: { include: { items: { include: { sku: true } } } } },
+    });
+    if (!pool) return res.status(404).json({ error: 'Pool not found' });
+
+    const activeBaskets = pool.baskets.filter((b) => b.status !== 'CANCELLED');
+    const currentCases = activeBaskets.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
+    const basis = pool.tierBasis || 'PALLETS';
+    const isAmount = basis === 'AMOUNT';
+    const currentAmountZAR = isAmount
+      ? activeBaskets.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity * parseFloat(i.sku?.casePriceZAR || 0), 0), 0)
+      : 0;
+    const metric = isAmount ? currentAmountZAR : palletsForCases(currentCases);
+    const ladder = resolveTierLadder(pool);
+
+    res.json({
+      id: pool.id,
+      category: pool.category,
+      area: pool.area,
+      partnerName: pool.partner?.name || null,
+      status: pool.status,
+      smartMatch: {
+        basis,
+        pallets: palletsForCases(currentCases),
+        currentAmountZAR,
+        currentTier: getTierForMetric(metric, ladder),
+        nextTier: getNextTierForMetric(metric, ladder),
+      },
+    });
+  } catch (error) {
+    console.error('Get pool summary error:', error.message);
+    res.status(500).json({ error: 'Could not fetch pool summary' });
   }
 }
 

@@ -1,7 +1,7 @@
 import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { getCatalogue, getCategories } from '../controllers/catalogueController.js';
-import { submitToPool, getMyOrderDocuments, confirmOrderLine, getMyPoolPayments, submitPoolPaymentReference, getMyPoolStatus, cancelParkedBasket, requestPoolPaymentRefund } from '../controllers/poolController.js';
+import { submitToPool, getMyOrderDocuments, confirmOrderLine, getMyPoolPayments, submitPoolPaymentReference, getMyPoolStatus, getPoolSummary, cancelParkedBasket, requestPoolPaymentRefund } from '../controllers/poolController.js';
 import { getMyBasket, addItem, updateItem, removeItem } from '../controllers/basketController.js';
 import { getCatalogueMargins, setSkuCostPrice, setSkuRetailPrice } from '../controllers/marginController.js';
 
@@ -18,6 +18,7 @@ router.delete('/items/:itemId', requireAuth, removeItem);
 
 router.post('/submit-to-pool', requireAuth, submitToPool);
 router.get('/pool-status/my', requireAuth, getMyPoolStatus);
+router.get('/pool/:id/summary', requireAuth, getPoolSummary);
 router.post('/pool/cancel-basket', requireAuth, cancelParkedBasket);
 router.post('/pool-payments/refund-request', requireAuth, requestPoolPaymentRefund);
 router.get('/order-documents/my', requireAuth, getMyOrderDocuments);

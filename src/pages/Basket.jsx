@@ -51,6 +51,10 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
   const [poolStatuses, setPoolStatuses] = useState([])
   const [cancellingId, setCancellingId] = useState(null)
   const [invitedId, setInvitedId] = useState(null)
+  // Set when this member arrived via a real "join this pool" invite link
+  // (see inviteToSmartMatch below and /pool/:id in App.jsx) and hasn't
+  // submitted yet — null once dismissed or consumed by a submission.
+  const [joiningPool, setJoiningPool] = useState(null)
 
   const fetchPoolStatus = useCallback(async () => {
     try {
@@ -93,6 +97,27 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
     fetchBasket()
     fetchPoolStatus()
   }, [fetchBasket, fetchPoolStatus])
+
+  useEffect(() => {
+    const pendingId = localStorage.getItem('icamagu_join_pool_id')
+    if (!pendingId || !accessToken) return
+    fetch(`/api/basket/pool/${pendingId}/summary`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        // A pool that's gone or no longer OPEN can't be joined — don't
+        // keep prompting for it.
+        if (data && data.status === 'OPEN') setJoiningPool(data)
+        else localStorage.removeItem('icamagu_join_pool_id')
+      })
+      .catch(() => localStorage.removeItem('icamagu_join_pool_id'))
+  }, [accessToken])
+
+  const dismissJoiningPool = () => {
+    localStorage.removeItem('icamagu_join_pool_id')
+    setJoiningPool(null)
+  }
 
   const updateQuantity = async (itemId, newQuantity) => {
     if (newQuantity < 1) return removeItem(itemId)
@@ -138,12 +163,20 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ basketId: basketData.basket.id, targetDate: targetDate || undefined }),
+        body: JSON.stringify({
+          basketId: basketData.basket.id,
+          targetDate: targetDate || undefined,
+          joinPoolId: joiningPool?.id || undefined,
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to submit cart.')
       showToast(data.message || 'Cart submitted successfully!', 'success')
       setTargetDate('')
+      // The join attempt is consumed either way — whether it landed them
+      // in the invited pool or, honestly, a fresh one because the invite
+      // had gone stale (see the message itself for which happened).
+      if (joiningPool) dismissJoiningPool()
       fetchBasket()
       fetchPoolStatus()
     } catch (err) {
@@ -207,7 +240,18 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
         : `We're at ${standing}${sm.nextTier ? ', working toward our first tier' : ''}.`,
       sm.nextTier &&
         `${isAmount ? `R${sm.toNextTier}` : `${sm.toNextTier} more cases`} unlocks ${sm.nextTier.name}${tierValueLabel(sm.nextTier, sm.basis) ? ` at ${tierValueLabel(sm.nextTier, sm.basis)}` : ''} for everyone in the pool.`,
+      // Tier names like "Amazibazana Goal" are a fixed, standard ladder
+      // used across every alcohol pool platform-wide — not specific to
+      // this group — spelled out here since it reads as a mismatched
+      // group name otherwise.
+      !isAmount && (sm.currentTier || sm.nextTier) &&
+        `(Tier names are standard across every iCamagu drinks pool, not specific to this group.)`,
       `Join and add your order:`,
+      // The actual point of the message — without this, "Join and add
+      // your order" had nothing to tap. Only buildable now that poolId
+      // comes back from /pool-status/my; tapping it lands the recipient
+      // in this exact pool, not just "somewhere in their own area."
+      poolStatus.poolId ? `${window.location.origin}/pool/${poolStatus.poolId}` : null,
     ].filter(Boolean)
     const text = lines.join('\n\n')
 
@@ -271,6 +315,26 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       <h2 className="font-display font-bold text-2xl text-ink mb-4 flex items-center gap-2">
         <Icon name="cart" size={22} color="#2b2620" /> My Cart
       </h2>
+
+      {joiningPool && (
+        <div className="bg-white border-2 border-sage-600 rounded-soft p-4 mb-4 shadow-soft">
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <p className="text-[10px] font-black uppercase tracking-wider text-sage-700">
+              You were invited to a pool
+            </p>
+            <button type="button" onClick={dismissJoiningPool} className="text-ink/40 hover:text-ink/70 text-xs font-bold shrink-0">
+              Not now
+            </button>
+          </div>
+          <p className="text-sm font-bold text-ink mb-1">
+            {CATEGORY_LABEL[joiningPool.category]} pool near {joiningPool.area}
+            {joiningPool.partnerName ? ` with ${joiningPool.partnerName}` : ''}
+          </p>
+          <p className="text-xs text-ink/60">
+            Add {CATEGORY_LABEL[joiningPool.category].toLowerCase()} items and submit your cart to join this exact pool — not just a new one in your own area.
+          </p>
+        </div>
+      )}
 
       {poolStatuses.map((poolStatus) => (
         <div key={poolStatus.basketId} className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
@@ -382,6 +446,12 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                   </div>
                 ) : (
                   <p className="text-xs text-white/90 mb-1.5">Volume discount tiers aren't set up for this pool yet.</p>
+                )}
+
+                {sm.ladder && !isAmount && (
+                  <p className="text-[10px] text-white/60 mb-1.5">
+                    Tier names like "{sm.ladder[0].name}" are standard across every iCamagu drinks pool — not specific to this group.
+                  </p>
                 )}
 
                 <p className="text-xs text-white/90 mb-1">

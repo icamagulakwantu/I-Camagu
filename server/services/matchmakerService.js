@@ -162,7 +162,20 @@ async function notifySmartMatchTierIfCrossed(pool, currentCases, currentAmountZA
   await notifyAdminOfSmartMatchTier(pool, tier, currentCases, currentAmountZAR);
 }
 
-export async function submitBasketToPool(userId, basketId, targetDate) {
+// A member tapped a real "join this pool" invite link (see Basket.jsx /
+// inviteToSmartMatch) rather than arriving through normal category+area
+// auto-matching. The pool is still returned even if it's no longer OPEN
+// (its category is needed either way, to know which basket group the
+// invite was for) — callers check `.status === 'OPEN'` themselves before
+// treating it as joinable, so a closed/matched target degrades to "this
+// category falls back to normal auto-matching" instead of silently
+// losing track of what the invite was even for.
+async function getInvitedPool(joinPoolId) {
+  if (!joinPoolId) return null;
+  return prisma.bulkPool.findUnique({ where: { id: joinPoolId }, include: { partner: true } });
+}
+
+export async function submitBasketToPool(userId, basketId, targetDate, joinPoolId) {
   const [basket, user] = await Promise.all([
     prisma.basket.findFirst({
       where: { id: basketId, userId, status: 'DRAFT' },
@@ -204,6 +217,13 @@ export async function submitBasketToPool(userId, basketId, targetDate) {
     groups.get(category).push(item);
   }
 
+  // Resolved once, up front, so a multi-category basket can tell "this is
+  // the category the invite link was actually for" apart from "this
+  // category has nothing to do with the invite" when building submissions
+  // below — a joinPoolId only ever targets one category.
+  const invitedPool = await getInvitedPool(joinPoolId);
+  const joinPoolCategory = invitedPool?.category ?? null;
+
   const submissions = [];
 
   for (const [category, items] of groups) {
@@ -215,7 +235,9 @@ export async function submitBasketToPool(userId, basketId, targetDate) {
       data: { basketId: groupBasket.id },
     });
 
-    const pool = await findOrCreateOpenPool(category, area, parsedTargetDate);
+    const isInvitedCategory = Boolean(joinPoolId) && category === joinPoolCategory;
+    const invitedPoolStillJoinable = isInvitedCategory && invitedPool.status === 'OPEN';
+    const pool = invitedPoolStillJoinable ? invitedPool : (await findOrCreateOpenPool(category, area, parsedTargetDate));
     await prisma.basket.update({ where: { id: groupBasket.id }, data: { status: 'PARKED', poolId: pool.id } });
     const result = await checkAndMatchPool(pool.id);
     submissions.push({
@@ -227,6 +249,14 @@ export async function submitBasketToPool(userId, basketId, targetDate) {
       currentCases: result.currentCases,
       moqTarget: pool.moqTarget,
       groupCode: result.groupCode,
+      // Only defined for the category an invite link actually targeted:
+      // true means they landed in the exact pool they were invited to;
+      // false means that pool had already closed or matched by the time
+      // they submitted, so they were matched into a fresh one in their
+      // own area instead — surfaced honestly rather than silently
+      // substituted. undefined for every other category in the basket,
+      // since the invite never applied to those.
+      joinedInvitedPool: isInvitedCategory ? invitedPoolStillJoinable : undefined,
     });
   }
 

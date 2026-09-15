@@ -406,10 +406,15 @@ function MainApp() {
   const goHome = () => setScreen('home')
   const goMore = () => setScreen('more')
 
-  // Land on a real /home URL instead of the bare "/" the auth wall opens on.
+  // Land on a real /home URL instead of the bare "/" the auth wall opens on
+  // — unless a pool-invite link (see PoolJoinRoute) just stashed a pending
+  // join, in which case go straight to the cart, where the join banner
+  // and the actual submit action live, instead of leaving the member to
+  // find their own way there.
   useEffect(() => {
     if (location.pathname === '/' || location.pathname === '') {
-      navigate('/home', { replace: true })
+      const pendingJoinPoolId = localStorage.getItem('icamagu_join_pool_id')
+      navigate(pendingJoinPoolId ? SCREEN_TO_PATH.basket : '/home', { replace: true })
     }
   }, [location.pathname, navigate])
 
@@ -666,6 +671,21 @@ function ResetPasswordRoute() {
   return <ResetPassword token={token} />
 }
 
+// A real "join this pool" invite link (see Basket.jsx / inviteToSmartMatch).
+// Stashes the target pool id where Basket.jsx can pick it up once the
+// member is signed in — works whether they're already logged in or not,
+// since AuthenticatedApp's own login/username/onboarding gate runs
+// normally after this redirect, and localStorage survives all of it.
+function PoolJoinRoute() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (id) localStorage.setItem('icamagu_join_pool_id', id)
+    navigate('/', { replace: true })
+  }, [id, navigate])
+  return null
+}
+
 // ---------- App Entry ----------
 export default function App() {
   return (
@@ -674,6 +694,7 @@ export default function App() {
       <Routes>
         <Route path="/share/:token" element={<ShareRoute />} />
         <Route path="/reset-password/:token" element={<ResetPasswordRoute />} />
+        <Route path="/pool/:id" element={<PoolJoinRoute />} />
         {/* Ubuhlanti bakwa Xhosa is a public fund — anyone can see what it
             has raised and pledge a donation without an iCamagu account. */}
         <Route path="/ubuhlanti" element={<PublicUbuhlanti />} />
