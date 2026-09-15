@@ -154,6 +154,34 @@ export async function notifyAdminOfSmartMatchTier(pool, tier, currentCases, curr
   }
 }
 
+// A verified, genuinely-from-PayFast webhook that still failed to process
+// (unknown payment, amount mismatch, a DB error) is not noise — it means a
+// real payment PayFast believes it settled isn't reflected in our own
+// records. Without this alert, the only way to find out was someone reading
+// Render's logs by hand. Deliberately NOT called for a webhook that failed
+// signature/server-side verification (see webhooks.js) — the public
+// endpoint gets hit by bots and PayFast's own harmless retries of already-
+// processed events, and alerting on every one of those would bury the
+// alerts that actually matter.
+export async function notifyAdminOfPaymentWebhookFailure(paymentId, errorMessage) {
+  try {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: ADMIN_EMAILS,
+      subject: `iCamagu: a verified PayFast payment failed to process${paymentId ? ` (${paymentId})` : ''}`,
+      html: `
+        <h2>A PayFast webhook passed verification but failed to process</h2>
+        <p>PayFast confirmed this notification is genuinely theirs, but recording it against our own PoolPayment failed — this payment may be settled on PayFast's side without being reflected here yet.</p>
+        ${row('Payment ID', paymentId)}
+        ${row('Error', errorMessage)}
+        <p style="color:#888;font-size:12px;">PayFast will keep retrying this notification until it gets a 200 response, so this may resolve itself — but if it keeps recurring for the same payment, it needs a look.</p>
+      `,
+    });
+  } catch (error) {
+    console.error('Payment webhook failure admin notification failed:', error.message);
+  }
+}
+
 export async function notifyPayoutCleared(recipientEmail, recipientName, amount, stokvelName, contributionAmount) {
   try {
     await resend.emails.send({
