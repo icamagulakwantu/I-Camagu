@@ -115,7 +115,7 @@ function RegisterForm({ onRegistered }) {
           </button>
           <p className="text-[10px] text-ink-muted -mt-1">Lets members find you as the nearest supplier and helps us plan delivery logistics.</p>
           <input
-            type="number" placeholder="Minimum order quantity (optional, cases)" value={moq}
+            type="number" min="0" placeholder="Minimum order quantity (optional, cases)" value={moq}
             onChange={(e) => setMoq(e.target.value)}
             className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm"
           />

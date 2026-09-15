@@ -77,29 +77,31 @@ export async function submitQuoteRequest(req, res) {
 }
 
 export async function getAllQuoteRequests(req, res) {
-  const user = await prisma.user.findUnique({ where: { id: req.userId } });
-  if (!isAdminEmail(user.email)) return res.status(403).json({ error: 'Admin only' });
-
   try {
+    const user = await prisma.user.findUnique({ where: { id: req.userId } });
+    if (!user || !isAdminEmail(user.email)) return res.status(403).json({ error: 'Admin only' });
+
     const quotes = await prisma.ekoyiniQuoteRequest.findMany({ orderBy: { createdAt: 'desc' } });
     res.json(quotes);
   } catch (error) {
+    console.error('Get all quote requests error:', error.message);
     res.status(500).json({ error: 'Could not fetch quote requests' });
   }
 }
 
 export async function updateQuoteStatus(req, res) {
   const { quoteId, status } = req.body;
-  const user = await prisma.user.findUnique({ where: { id: req.userId } });
-  if (!isAdminEmail(user.email)) return res.status(403).json({ error: 'Admin only' });
-
   const validStatuses = ['PENDING', 'QUOTED', 'CONFIRMED', 'DECLINED'];
   if (!validStatuses.includes(status)) return res.status(400).json({ error: 'Invalid status' });
 
   try {
+    const user = await prisma.user.findUnique({ where: { id: req.userId } });
+    if (!user || !isAdminEmail(user.email)) return res.status(403).json({ error: 'Admin only' });
+
     const quote = await prisma.ekoyiniQuoteRequest.update({ where: { id: quoteId }, data: { status } });
     res.json(quote);
   } catch (error) {
+    console.error('Update quote status error:', error.message);
     res.status(500).json({ error: 'Could not update status' });
   }
 }

@@ -18,6 +18,15 @@ export async function registerAsSupplier(userId, { name, type, area, moq, latitu
     err.status = 400;
     throw err;
   }
+  let parsedMoq = null;
+  if (moq !== undefined && moq !== null && moq !== '') {
+    parsedMoq = parseInt(moq, 10);
+    if (isNaN(parsedMoq) || parsedMoq < 0) {
+      const err = new Error('Minimum order quantity must be a positive number');
+      err.status = 400;
+      throw err;
+    }
+  }
 
   try {
     return await prisma.partner.create({
@@ -26,7 +35,7 @@ export async function registerAsSupplier(userId, { name, type, area, moq, latitu
         name: name.trim(),
         type,
         area: area.trim(),
-        moq: moq ? parseInt(moq, 10) : null,
+        moq: parsedMoq,
         latitude: latitude != null ? latitude : null,
         longitude: longitude != null ? longitude : null,
       },
@@ -103,9 +112,19 @@ export async function processRefund(userId, paymentId, feeZAR) {
     throw err;
   }
 
+  let parsedFee = 0;
+  if (feeZAR !== undefined && feeZAR !== null && feeZAR !== '') {
+    parsedFee = parseFloat(feeZAR);
+    if (isNaN(parsedFee) || parsedFee < 0) {
+      const err = new Error('Refund fee must be a positive number');
+      err.status = 400;
+      throw err;
+    }
+  }
+
   const updated = await prisma.poolPayment.update({
     where: { id: paymentId },
-    data: { status: 'REFUNDED', refundFeeZAR: feeZAR ? parseFloat(feeZAR) : 0 },
+    data: { status: 'REFUNDED', refundFeeZAR: parsedFee },
   });
 
   const { createNotification } = await import('./notificationDbService.js');
