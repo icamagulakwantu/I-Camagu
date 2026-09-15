@@ -287,69 +287,101 @@ export async function checkAndMatchPool(poolId) {
     return { matched: false, currentCases };
   }
 
-  // MOQ reached — generate the Order Confirmation Document
-  const lineItemsBySku = {};
-  for (const basket of activeBaskets) {
-    for (const item of basket.items) {
-      const key = item.skuId;
-      if (!lineItemsBySku[key]) lineItemsBySku[key] = { quantity: 0, memberContributions: [] };
-      lineItemsBySku[key].quantity += item.quantity;
-      lineItemsBySku[key].memberContributions.push({ userId: basket.userId, quantity: item.quantity });
+  // MOQ reached — but two members' submissions can both read the pool as
+  // still OPEN and both land here around the same time (this function is
+  // called from submitBasketToPool on every submission). Without a guard,
+  // both would try to create this pool's OrderConfirmationDocument, which
+  // is unique per poolId — the loser would throw a raw Prisma constraint
+  // error even though their own basket really had just been parked into
+  // the now-matched pool. The whole claim-through-payments sequence runs
+  // in one transaction: the OPEN -> MATCHED update only succeeds for one
+  // concurrent caller (Postgres row-locks it), and if anything after that
+  // fails, the transaction rolls back the status flip too — no pool stuck
+  // at MATCHED with no document, no half-created payments.
+  const matchResult = await prisma.$transaction(async (tx) => {
+    const claim = await tx.bulkPool.updateMany({
+      where: { id: pool.id, status: 'OPEN' },
+      data: { status: 'MATCHED' },
+    });
+    if (claim.count === 0) {
+      // Someone else's call already matched this pool — don't create a
+      // second document, just report the real, already-created one.
+      const alreadyMatched = await tx.bulkPool.findUnique({
+        where: { id: pool.id },
+        include: { orderDocument: true },
+      });
+      return {
+        matched: true,
+        currentCases,
+        documentId: alreadyMatched?.orderDocument?.id,
+        groupCode: alreadyMatched?.orderDocument?.groupCode,
+      };
     }
-  }
 
-  const skus = await prisma.sku.findMany({ where: { id: { in: Object.keys(lineItemsBySku) } } });
-  const skuMap = Object.fromEntries(skus.map(s => [s.id, s]));
+    // Generate the Order Confirmation Document
+    const lineItemsBySku = {};
+    for (const basket of activeBaskets) {
+      for (const item of basket.items) {
+        const key = item.skuId;
+        if (!lineItemsBySku[key]) lineItemsBySku[key] = { quantity: 0, memberContributions: [] };
+        lineItemsBySku[key].quantity += item.quantity;
+        lineItemsBySku[key].memberContributions.push({ userId: basket.userId, quantity: item.quantity });
+      }
+    }
 
-  const totalAmountZAR = Object.entries(lineItemsBySku).reduce(
-    (sum, [skuId, data]) => sum + (data.quantity * parseFloat(skuMap[skuId].casePriceZAR || 0)),
-    0
-  );
+    const skus = await tx.sku.findMany({ where: { id: { in: Object.keys(lineItemsBySku) } } });
+    const skuMap = Object.fromEntries(skus.map(s => [s.id, s]));
 
-  const document = await prisma.orderConfirmationDocument.create({
-    data: {
-      poolId: pool.id,
-      groupCode: generateGroupCode(),
-      totalAmountZAR,
-      // Default safety measure per Section 4.2: collection points default to
-      // a location near a police station, mirroring real-world SAB delivery practice.
-      deliveryLocation: `Near the police station closest to ${pool.area} — exact location to be confirmed`,
-      status: 'PENDING_MEMBER_CONFIRMATION',
-    },
-  });
+    const totalAmountZAR = Object.entries(lineItemsBySku).reduce(
+      (sum, [skuId, data]) => sum + (data.quantity * parseFloat(skuMap[skuId].casePriceZAR || 0)),
+      0
+    );
 
-  for (const basket of activeBaskets) {
-    let memberAmountZAR = 0;
-    for (const item of basket.items) {
-      const sku = skuMap[item.skuId];
-      memberAmountZAR += item.quantity * parseFloat(sku.casePriceZAR || 0);
-      await prisma.orderLineConfirmation.create({
+    const document = await tx.orderConfirmationDocument.create({
+      data: {
+        poolId: pool.id,
+        groupCode: generateGroupCode(),
+        totalAmountZAR,
+        // Default safety measure per Section 4.2: collection points default to
+        // a location near a police station, mirroring real-world SAB delivery practice.
+        deliveryLocation: `Near the police station closest to ${pool.area} — exact location to be confirmed`,
+        status: 'PENDING_MEMBER_CONFIRMATION',
+      },
+    });
+
+    for (const basket of activeBaskets) {
+      let memberAmountZAR = 0;
+      for (const item of basket.items) {
+        const sku = skuMap[item.skuId];
+        memberAmountZAR += item.quantity * parseFloat(sku.casePriceZAR || 0);
+        await tx.orderLineConfirmation.create({
+          data: {
+            documentId: document.id,
+            memberId: basket.userId,
+            itemDescription: `${sku.name} (${sku.bottleFormat})`,
+            quantity: item.quantity,
+            unitType: 'CASE',
+          },
+        });
+      }
+      await tx.basket.update({ where: { id: basket.id }, data: { status: 'MATCHED' } });
+
+      // One PENDING PoolPayment per member for their share — manual EFT to the
+      // supplier for now (no PSP yet); the supplier confirms receipt from their
+      // own dashboard, mirroring how stokvel contributions get confirmed.
+      await tx.poolPayment.create({
         data: {
-          documentId: document.id,
-          memberId: basket.userId,
-          itemDescription: `${sku.name} (${sku.bottleFormat})`,
-          quantity: item.quantity,
-          unitType: 'CASE',
+          poolId: pool.id,
+          userId: basket.userId,
+          provider: 'MANUAL_EFT',
+          amountZAR: memberAmountZAR,
+          status: 'PENDING',
         },
       });
     }
-    await prisma.basket.update({ where: { id: basket.id }, data: { status: 'MATCHED' } });
 
-    // One PENDING PoolPayment per member for their share — manual EFT to the
-    // supplier for now (no PSP yet); the supplier confirms receipt from their
-    // own dashboard, mirroring how stokvel contributions get confirmed.
-    await prisma.poolPayment.create({
-      data: {
-        poolId: pool.id,
-        userId: basket.userId,
-        provider: 'MANUAL_EFT',
-        amountZAR: memberAmountZAR,
-        status: 'PENDING',
-      },
-    });
-  }
+    return { matched: true, currentCases, documentId: document.id, groupCode: document.groupCode };
+  });
 
-  await prisma.bulkPool.update({ where: { id: pool.id }, data: { status: 'MATCHED' } });
-
-  return { matched: true, currentCases, documentId: document.id, groupCode: document.groupCode };
+  return matchResult;
 }
