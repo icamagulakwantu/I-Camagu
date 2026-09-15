@@ -32,12 +32,20 @@ export async function addWristbandTier(req, res) {
                 return res.status(400).json({ error: 'bookingId, colorLabel, and entitlement are required' });
         }
 
+          let parsedGuestCount = null;
+          if (guestCount !== undefined && guestCount !== null && guestCount !== '') {
+            parsedGuestCount = parseInt(guestCount, 10);
+            if (isNaN(parsedGuestCount) || parsedGuestCount < 0) {
+              return res.status(400).json({ error: 'guestCount must be a positive number' });
+            }
+          }
+
           try {
                   const booking = await prisma.barServiceBooking.findUnique({ where: { id: bookingId } });
                   if (!booking || booking.hostId !== req.userId) return res.status(403).json({ error: 'Not your booking' });
 
                   const tier = await prisma.wristbandTier.create({
-                            data: { bookingId, colorLabel, entitlement, guestCount: guestCount ? parseInt(guestCount) : null },
+                            data: { bookingId, colorLabel, entitlement, guestCount: parsedGuestCount },
                   });
                       res.status(201).json(tier);
           } catch (error) {
@@ -55,10 +63,26 @@ export async function createTourismPackage(req, res) {
           const price = parseFloat(pricePerHeadZAR);
             const share = parseFloat(hostShareZAR);
 
+              // NaN comparisons are always false, so `share > price * MAX...` was
+              // silently skipped whenever either value failed to parse — letting a
+              // garbage or negative price/share straight past the 30%-cap rule and
+              // into the Decimal columns below.
+              if (isNaN(price) || price < 0 || isNaN(share) || share < 0) {
+                return res.status(400).json({ error: 'pricePerHeadZAR and hostShareZAR must be positive numbers' });
+              }
+
               if (share > price * MAX_TOURISM_SHARE_PERCENT) {
                       return res.status(400).json({
                                 error: `Host share cannot exceed ${MAX_TOURISM_SHARE_PERCENT * 100}% of the per-head price (max R${(price * MAX_TOURISM_SHARE_PERCENT).toFixed(2)})`,
                       });
+              }
+
+              let parsedMaxGroupSize = null;
+              if (maxGroupSize !== undefined && maxGroupSize !== null && maxGroupSize !== '') {
+                parsedMaxGroupSize = parseInt(maxGroupSize, 10);
+                if (isNaN(parsedMaxGroupSize) || parsedMaxGroupSize <= 0) {
+                  return res.status(400).json({ error: 'maxGroupSize must be a positive number' });
+                }
               }
 
                 try {
@@ -67,10 +91,10 @@ export async function createTourismPackage(req, res) {
 
                                 const pkg = await prisma.tourismPackage.upsert({
                                           where: { ceremonyId },
-                                                update: { pricePerHeadZAR: price, hostShareZAR: share, maxGroupSize: maxGroupSize ? parseInt(maxGroupSize) : null },
+                                                update: { pricePerHeadZAR: price, hostShareZAR: share, maxGroupSize: parsedMaxGroupSize },
                                                       create: {
                                                                   ceremonyId, hostId: req.userId, pricePerHeadZAR: price, hostShareZAR: share,
-                                                                          maxGroupSize: maxGroupSize ? parseInt(maxGroupSize) : null,
+                                                                          maxGroupSize: parsedMaxGroupSize,
                                                                                   isEnabled: false, // strictly opt-in — host must separately enable
                                                       },
                                 });
@@ -117,6 +141,11 @@ export async function logTourismBooking(req, res) {
   if (!tourismPackageId || !tourismCompanyName || !groupSize || totalPaidZAR === undefined) {
     return res.status(400).json({ error: 'tourismPackageId, tourismCompanyName, groupSize, and totalPaidZAR are required' });
   }
+  const parsedGroupSize = parseInt(groupSize, 10);
+  const parsedTotalPaid = parseFloat(totalPaidZAR);
+  if (isNaN(parsedGroupSize) || parsedGroupSize <= 0 || isNaN(parsedTotalPaid) || parsedTotalPaid < 0) {
+    return res.status(400).json({ error: 'groupSize and totalPaidZAR must be positive numbers' });
+  }
   const resolvedStatus = status && VALID_BOOKING_STATUSES.includes(status) ? status : 'CONFIRMED';
 
   try {
@@ -127,8 +156,8 @@ export async function logTourismBooking(req, res) {
       data: {
         tourismPackageId,
         tourismCompanyName,
-        groupSize: parseInt(groupSize, 10),
-        totalPaidZAR: parseFloat(totalPaidZAR),
+        groupSize: parsedGroupSize,
+        totalPaidZAR: parsedTotalPaid,
         status: resolvedStatus,
       },
     });
