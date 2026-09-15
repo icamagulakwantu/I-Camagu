@@ -232,6 +232,25 @@ export async function getSupplierPools(userId) {
     const confirmed = pool.orderDocument?.lineItems.filter((l) => l.confirmedAt).length || 0;
     const totalLines = pool.orderDocument?.lineItems.length || 0;
 
+    // One group per cart's orderReference — the actual packing/distribution
+    // list for splitting this pool's physical stock (e.g. 6 pallets) so
+    // each member's portion is labelled with the same code they paid
+    // against, not just their name.
+    const distribution = (pool.orderDocument?.lineItems || []).reduce((groups, li) => {
+      let group = groups.find((g) => g.orderReference === li.orderReference);
+      if (!group) {
+        const payment = pool.payments.find((p) => p.paymentReference === li.orderReference);
+        group = {
+          orderReference: li.orderReference,
+          memberName: payment ? `${payment.user.firstName} ${payment.user.lastName}` : null,
+          items: [],
+        };
+        groups.push(group);
+      }
+      group.items.push({ description: li.itemDescription, quantity: li.quantity, unitType: li.unitType, confirmedAt: li.confirmedAt });
+      return groups;
+    }, []);
+
     return {
       id: pool.id,
       area: pool.area,
@@ -253,6 +272,7 @@ export async function getSupplierPools(userId) {
         refundRequestedAt: p.refundRequestedAt,
       })),
       canFulfill: pool.status === 'MATCHED' && pool.payments.every((p) => p.status === 'CLEARED' || p.status === 'REFUNDED'),
+      distribution,
       orderDocument: pool.orderDocument
         ? {
             groupCode: pool.orderDocument.groupCode,

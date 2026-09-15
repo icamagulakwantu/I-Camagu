@@ -177,6 +177,11 @@ function MyOrders({ onBack }) {
                   <OrderStageTracker currentIndex={stageIndex} tone="light" />
                 </div>
                 <p className="text-xs text-brand-black/50 mb-2 flex items-center gap-1"><Icon name="mapPin" size={12} /> {doc.deliveryLocation}</p>
+                {payment?.paymentReference && (
+                  <p className="text-[11px] text-brand-black/50 mb-2">
+                    Your reference: <span className="font-mono font-bold text-brand-blue">{payment.paymentReference}</span> — the same code goes on your EFT and identifies your share at collection.
+                  </p>
+                )}
                 {doc.lineItems.map((li) => (
                   <div key={li.id} className="flex justify-between items-center py-1">
                     <p className="text-sm text-brand-black/70">{li.quantity} {li.unitType.toLowerCase()}(s) — {li.itemDescription}</p>

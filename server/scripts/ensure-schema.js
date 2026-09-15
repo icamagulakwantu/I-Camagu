@@ -217,4 +217,25 @@ export async function ensureCeremonyBudgetColumns() {
     EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL;
     END $$;
   `);
+  // Same idea, one level up: the cart itself (Basket) gets the reference,
+  // not just its payment — so a supplier splitting a matched pool's
+  // physical stock (e.g. 6 pallets) can label each portion by whose order
+  // it is, not just who paid. Reused verbatim as that basket's
+  // PoolPayment.paymentReference (see matchmakerService.generateOrderReference).
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "Basket" ADD COLUMN IF NOT EXISTS "orderReference" TEXT;'
+  );
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      ALTER TABLE "Basket" ADD CONSTRAINT "Basket_orderReference_key" UNIQUE ("orderReference");
+    EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL;
+    END $$;
+  `);
+  // Carried on each line item too (denormalized on purpose) so the
+  // packing/distribution list reads the reference directly, without joining
+  // back to Basket through memberId. Many rows legitimately share one value
+  // (every item from the same cart) — never unique.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "OrderLineConfirmation" ADD COLUMN IF NOT EXISTS "orderReference" TEXT;'
+  );
 }

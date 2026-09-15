@@ -16,15 +16,16 @@ function generateGroupCode(tx) {
   return generateUniqueReference('GRP', async (code) => !!(await tx.orderConfirmationDocument.findUnique({ where: { groupCode: code } })));
 }
 
-// Every member's own share of a matched pool gets its own reference — used
-// to tell them what to put in their EFT (see MyOrders.jsx) so a supplier
-// reviewing their bank statement can match one specific transfer to one
-// specific member's payment. Before this, every member in the same pool was
-// told to use the pool's shared groupCode as their EFT reference, which
-// made that matching impossible — a supplier reviewing statements would see
-// the same code from every member in the pool and no way to tell them apart.
-function generatePaymentReference(tx) {
-  return generateUniqueReference('PAY', async (code) => !!(await tx.poolPayment.findUnique({ where: { paymentReference: code } })));
+// One reference per matched basket — the cart's own identity within the
+// pool, distinct from the pool-wide groupCode above. Two jobs, same code:
+// it's what a member is told to put in their manual EFT (see MyOrders.jsx),
+// and it's what a supplier splitting a matched pool's physical stock (e.g.
+// 6 pallets) labels that member's portion with — so one glance at a
+// reference tells you both "who paid this" and "whose order this is".
+// Before this, every member in the same pool was told to use the pool's
+// shared groupCode for both, which couldn't distinguish either one.
+function generateOrderReference(tx) {
+  return generateUniqueReference('ORD', async (code) => !!(await tx.basket.findUnique({ where: { orderReference: code } })));
 }
 
 // Which real-world category a SKU needs — mirrors the departments in
@@ -365,6 +366,10 @@ export async function checkAndMatchPool(poolId) {
     });
 
     for (const basket of activeBaskets) {
+      // One reference for this whole cart — same code on every line item,
+      // the basket itself, and the payment created for it below. See
+      // generateOrderReference above for why one code does both jobs.
+      const orderReference = await generateOrderReference(tx);
       let memberAmountZAR = 0;
       for (const item of basket.items) {
         const sku = skuMap[item.skuId];
@@ -373,20 +378,21 @@ export async function checkAndMatchPool(poolId) {
           data: {
             documentId: document.id,
             memberId: basket.userId,
+            orderReference,
             itemDescription: `${sku.name} (${sku.bottleFormat})`,
             quantity: item.quantity,
             unitType: 'CASE',
           },
         });
       }
-      await tx.basket.update({ where: { id: basket.id }, data: { status: 'MATCHED' } });
+      await tx.basket.update({ where: { id: basket.id }, data: { status: 'MATCHED', orderReference } });
 
       // One PENDING PoolPayment per member for their share — manual EFT to the
       // supplier for now (no PSP yet); the supplier confirms receipt from their
       // own dashboard, mirroring how stokvel contributions get confirmed. Its
-      // own paymentReference (distinct from the order's shared groupCode) is
-      // what actually lets that confirmation be unambiguous — see
-      // generatePaymentReference above.
+      // paymentReference is this same orderReference — the order and the
+      // payment for it are the same cart, so they share one code rather than
+      // forcing a supplier to cross-reference two.
       await tx.poolPayment.create({
         data: {
           poolId: pool.id,
@@ -394,7 +400,7 @@ export async function checkAndMatchPool(poolId) {
           provider: 'MANUAL_EFT',
           amountZAR: memberAmountZAR,
           status: 'PENDING',
-          paymentReference: await generatePaymentReference(tx),
+          paymentReference: orderReference,
         },
       });
     }

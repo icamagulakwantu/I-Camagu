@@ -280,6 +280,27 @@ function SupplierDashboard({ onBack }) {
                     </div>
                   )}
 
+                  {(pool.distribution || []).length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-terracotta/10">
+                      <p className="text-[10px] font-black uppercase text-ink-muted mb-2">Split by reference — for dividing up the stock</p>
+                      <div className="space-y-2">
+                        {pool.distribution.map((group) => (
+                          <div key={group.orderReference} className="bg-cream rounded-soft p-2.5">
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="font-mono text-xs font-bold text-brand-blue">{group.orderReference || 'No reference'}</p>
+                              {group.memberName && <p className="text-[10px] text-ink-muted truncate">{group.memberName}</p>}
+                            </div>
+                            {group.items.map((item, idx) => (
+                              <p key={idx} className="text-[10px] text-ink-muted">
+                                {item.quantity} {item.unitType.toLowerCase()}(s) — {item.description}
+                              </p>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {(pool.payments || []).length > 0 && (
                     <div className="mt-3 pt-3 border-t border-terracotta/10">
                       <p className="text-[10px] font-black uppercase text-ink-muted mb-2">Member Payments</p>

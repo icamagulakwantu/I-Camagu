@@ -483,6 +483,14 @@ model Basket {
   ceremonyType CeremonyType?
   poolId       String?
   pool         BulkPool?     @relation(fields: [poolId], references: [id])
+  // System-generated, globally unique — set once this basket's pool matches
+  // (server/utils/referenceGenerator.js). Identifies this one cart's
+  // contribution to the pool, e.g. so 6 pallets can be split up and labelled
+  // by whose order is whose at collection/delivery time. Reused as-is for
+  // this basket's PoolPayment.paymentReference, since it's the same cart on
+  // both sides — one code a member both pays against and is handed goods
+  // against. Null until matched.
+  orderReference String?     @unique
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -669,6 +677,11 @@ model OrderLineConfirmation {
   documentId      String
   document        OrderConfirmationDocument @relation(fields: [documentId], references: [id])
   memberId        String
+  // The matching Basket.orderReference — carried directly on each line item
+  // (not just memberId) so a supplier splitting a pool's physical stock can
+  // read the reference straight off the packing list, no lookup needed.
+  // Shared by every line item from the same cart, so never unique here.
+  orderReference  String?
   itemDescription String
   quantity        Int
   unitType        String
