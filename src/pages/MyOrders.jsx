@@ -206,7 +206,13 @@ function MyOrders({ onBack }) {
                           </p>
                         ) : (
                           <div>
-                            {onlinePaymentAvailable && (
+                            {/* Alcohol never gets the online option — that money would
+                                land in iCamagu's own account instead of the licensed
+                                supplier's, which is real liquor-licensing exposure a
+                                direct member-to-supplier EFT never had. The server
+                                enforces this too (paymentService.initiatePoolPayment),
+                                this is just so the button doesn't appear only to fail. */}
+                            {onlinePaymentAvailable && payment.pool?.category !== 'TAVERN' && (
                               <>
                                 <button
                                   onClick={() => payOnline(payment.id)}

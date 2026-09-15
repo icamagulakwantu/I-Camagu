@@ -35,6 +35,23 @@ export function isOnlinePaymentConfigured() {
   return getAdapter() !== null;
 }
 
+// Alcohol sales carry real liquor-licensing exposure that manual EFT never
+// did: a member paying a tavern/liquor supplier directly means iCamagu
+// never touches the money, so it's clearly just a matching platform, not a
+// party to the sale. PayFast collecting into iCamagu's OWN account instead
+// puts iCamagu in the payment chain for the alcohol itself — which a
+// regulator could read as iCamagu conducting the sale without holding its
+// own liquor license, and could just as easily jeopardize the supplier's
+// license too (most have conditions about who the licensee may transact
+// through). So: never offered for TAVERN pools, full stop, until that's
+// been resolved with real legal advice. Non-alcohol categories carry none
+// of that exposure.
+const ALCOHOL_CATEGORY = 'TAVERN';
+
+export function isOnlinePaymentEligible(category) {
+  return isOnlinePaymentConfigured() && category !== ALCOHOL_CATEGORY;
+}
+
 export async function initiatePoolPayment(userId, paymentId, baseUrl) {
   const adapter = getAdapter();
   if (!adapter) {
@@ -50,6 +67,11 @@ export async function initiatePoolPayment(userId, paymentId, baseUrl) {
   if (!payment || payment.userId !== userId) {
     const err = new Error('Payment not found');
     err.status = 404;
+    throw err;
+  }
+  if (payment.pool.category === ALCOHOL_CATEGORY) {
+    const err = new Error('Online payment isn\'t available for alcohol orders — please pay the supplier directly via manual EFT.');
+    err.status = 403;
     throw err;
   }
   if (payment.status !== 'PENDING') {
