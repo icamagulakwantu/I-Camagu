@@ -2,14 +2,29 @@ import prisma from '../config/db.js';
 import { resolveTierLadder, getTierForMetric, palletsForCases } from '../utils/smartMatchTiers.js';
 import { notifyAdminOfSmartMatchTier } from './notificationService.js';
 import { newPoolWindow, isPoolWindowClosed } from '../utils/poolWindow.js';
+import { generateUniqueReference } from '../utils/referenceGenerator.js';
 
 // Honest simplification, noted here for future reference: MOQ matching here
 // is by TOTAL CASE COUNT in the pool, not per-SKU. A true per-SKU MOQ engine
 // (matching Section 4.2 fully) needs Partner-level per-SKU MOQ data, which
 // doesn't exist in the schema yet — this is a deliberate v1 simplification.
 
-function generateGroupCode() {
-  return 'GRP-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+// One order code per matched pool — identifies the order as a whole (what
+// the delivery/collection document is for). Distinct from each member's own
+// paymentReference below, which identifies one specific person's payment.
+function generateGroupCode(tx) {
+  return generateUniqueReference('GRP', async (code) => !!(await tx.orderConfirmationDocument.findUnique({ where: { groupCode: code } })));
+}
+
+// Every member's own share of a matched pool gets its own reference — used
+// to tell them what to put in their EFT (see MyOrders.jsx) so a supplier
+// reviewing their bank statement can match one specific transfer to one
+// specific member's payment. Before this, every member in the same pool was
+// told to use the pool's shared groupCode as their EFT reference, which
+// made that matching impossible — a supplier reviewing statements would see
+// the same code from every member in the pool and no way to tell them apart.
+function generatePaymentReference(tx) {
+  return generateUniqueReference('PAY', async (code) => !!(await tx.poolPayment.findUnique({ where: { paymentReference: code } })));
 }
 
 // Which real-world category a SKU needs — mirrors the departments in
@@ -340,7 +355,7 @@ export async function checkAndMatchPool(poolId) {
     const document = await tx.orderConfirmationDocument.create({
       data: {
         poolId: pool.id,
-        groupCode: generateGroupCode(),
+        groupCode: await generateGroupCode(tx),
         totalAmountZAR,
         // Default safety measure per Section 4.2: collection points default to
         // a location near a police station, mirroring real-world SAB delivery practice.
@@ -368,7 +383,10 @@ export async function checkAndMatchPool(poolId) {
 
       // One PENDING PoolPayment per member for their share — manual EFT to the
       // supplier for now (no PSP yet); the supplier confirms receipt from their
-      // own dashboard, mirroring how stokvel contributions get confirmed.
+      // own dashboard, mirroring how stokvel contributions get confirmed. Its
+      // own paymentReference (distinct from the order's shared groupCode) is
+      // what actually lets that confirmation be unambiguous — see
+      // generatePaymentReference above.
       await tx.poolPayment.create({
         data: {
           poolId: pool.id,
@@ -376,6 +394,7 @@ export async function checkAndMatchPool(poolId) {
           provider: 'MANUAL_EFT',
           amountZAR: memberAmountZAR,
           status: 'PENDING',
+          paymentReference: await generatePaymentReference(tx),
         },
       });
     }

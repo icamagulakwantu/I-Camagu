@@ -290,7 +290,10 @@ function SupplierDashboard({ onBack }) {
                               <div className="min-w-0">
                                 <p className="text-xs font-bold text-ink truncate">{p.memberName}</p>
                                 <p className="text-[10px] text-ink-muted">
-                                  {money(p.amountZAR)}{p.providerReference ? ` · ref: ${p.providerReference}` : ' · no reference yet'}
+                                  {money(p.amountZAR)}{p.paymentReference ? ` · expect ref: ${p.paymentReference}` : ''}
+                                </p>
+                                <p className="text-[10px] text-ink-muted">
+                                  {p.providerReference ? `Member entered: ${p.providerReference}` : 'Member hasn\'t entered a reference yet'}
                                 </p>
                               </div>
                               {p.status === 'REFUNDED' ? (

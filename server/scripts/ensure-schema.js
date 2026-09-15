@@ -196,4 +196,20 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "payoutNote" TEXT;'
   );
+  // Every member's own share of a matched pool now gets its own
+  // system-generated reference (server/utils/referenceGenerator.js),
+  // distinct from the order's shared groupCode — see the schema.prisma
+  // comment for why sharing one code across every member in a pool was a
+  // real reconciliation gap. Null on payments created before this existed;
+  // Postgres allows any number of NULLs under a UNIQUE constraint (NULL is
+  // never considered equal to another NULL), so old rows don't collide.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "paymentReference" TEXT;'
+  );
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      ALTER TABLE "PoolPayment" ADD CONSTRAINT "PoolPayment_paymentReference_key" UNIQUE ("paymentReference");
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END $$;
+  `);
 }

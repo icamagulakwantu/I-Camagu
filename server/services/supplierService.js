@@ -248,6 +248,7 @@ export async function getSupplierPools(userId) {
         memberName: `${p.user.firstName} ${p.user.lastName}`,
         amountZAR: p.amountZAR,
         status: p.status,
+        paymentReference: p.paymentReference,
         providerReference: p.providerReference,
         refundRequestedAt: p.refundRequestedAt,
       })),

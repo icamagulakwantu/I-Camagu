@@ -225,7 +225,7 @@ function MyOrders({ onBack }) {
                               </>
                             )}
                             <p className="text-[11px] text-brand-black/50 mb-2">
-                              Pay {money(payment.amountZAR)} via EFT to {doc.groupCode ? `reference "${doc.groupCode}"` : 'the supplier'}, then enter your reference below so they can confirm receipt.
+                              Pay {money(payment.amountZAR)} via EFT using {payment.paymentReference ? `reference "${payment.paymentReference}"` : 'your own reference'} — this code is yours alone, not shared with the rest of the pool, so the supplier can tell your payment apart from everyone else's. Then enter your reference below so they can confirm receipt.
                             </p>
                             <div className="flex gap-2">
                               <input

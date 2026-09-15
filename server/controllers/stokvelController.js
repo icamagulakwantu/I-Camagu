@@ -1,9 +1,22 @@
 import prisma from '../config/db.js';
+import { generateUniqueReference } from '../utils/referenceGenerator.js';
 
-function generateReferenceCode(firstName, sequenceNumber) {
+// STK-XXX-### is a per-account code, not a per-transaction one: a member
+// keeps the SAME code across every one of their own contributions (that
+// stability is what lets reconciliationService match a recurring bank
+// narration back to them), so reusing it for its own owner is correct, not
+// a collision. It was previously only unique per-stokvel by construction
+// (@@unique([stokvelId, referenceCode])) — checked globally here so two
+// different stokvels' first members can't both land on STK-THA-001. A
+// genuine collision falls back to a random suffix instead of silently
+// colliding with someone else's reference.
+async function generateReferenceCode(firstName, sequenceNumber) {
   const initials = (firstName || 'MEM').slice(0, 3).toUpperCase().padEnd(3, 'X');
   const number = String(sequenceNumber).padStart(3, '0');
-  return `STK-${initials}-${number}`;
+  const base = `STK-${initials}-${number}`;
+  const exists = async (code) => !!(await prisma.stokvelMember.findFirst({ where: { referenceCode: code } }));
+  if (!(await exists(base))) return base;
+  return generateUniqueReference(`STK-${initials}`, exists);
 }
 
 export async function createStokvel(req, res) {
@@ -49,7 +62,7 @@ export async function createStokvel(req, res) {
       data: { stokvelId: stokvel.id, totalBalance: 0 },
     });
 
-    const referenceCode = generateReferenceCode(user.firstName, 1);
+    const referenceCode = await generateReferenceCode(user.firstName, 1);
     await prisma.stokvelMember.create({
       data: { stokvelId: stokvel.id, userId, referenceCode },
     });
@@ -111,7 +124,7 @@ export async function joinStokvel(req, res) {
 
     const memberCount = await prisma.stokvelMember.count({ where: { stokvelId } });
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    const referenceCode = generateReferenceCode(user.firstName, memberCount + 1);
+    const referenceCode = await generateReferenceCode(user.firstName, memberCount + 1);
 
     const membership = await prisma.stokvelMember.create({
       data: { stokvelId, userId, referenceCode },

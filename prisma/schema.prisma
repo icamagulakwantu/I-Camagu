@@ -610,6 +610,15 @@ model PoolPayment {
   user              User     @relation(fields: [userId], references: [id])
   provider          String
   providerReference String?
+  // System-generated, globally unique — see server/utils/referenceGenerator.js.
+  // What THIS member is actually told to use as their EFT reference, distinct
+  // from the pool's shared BulkPool.orderDocument.groupCode (which identifies
+  // the order as a whole, not any one person's payment). Without a reference
+  // per payment, every member in the same matched pool would be told to use
+  // the same code, and a supplier reviewing their bank statement would have
+  // no way to tell whose transfer was whose. Null only for payments created
+  // before this field existed.
+  paymentReference  String?  @unique
   amountZAR         Decimal  @db.Decimal(10, 2)
   status            String   @default("PENDING")
   refundRequestedAt DateTime?
