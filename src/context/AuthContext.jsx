@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useRef } from 'react'
 
 export const AuthContext = createContext(null)
 
@@ -7,9 +7,20 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [checkingSession, setCheckingSession] = useState(true)
   const [debugInfo, setDebugInfo] = useState('')
+  // The refresh endpoint rotates the refresh cookie and revokes the token it
+  // was called with — presenting the same (now-revoked) token twice, which
+  // is exactly what happens if two triggers (the interval, a tab regaining
+  // focus, visibilitychange) fire close together, reads server-side as
+  // token reuse and wipes out every one of the user's sessions as a
+  // suspected compromise. Sharing one in-flight promise across triggers
+  // means a second, near-simultaneous call gets the same result instead of
+  // making its own doomed request.
+  const refreshInFlight = useRef(null)
 
   const silentRefresh = () => {
-    return fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' })
+    if (refreshInFlight.current) return refreshInFlight.current
+
+    const promise = fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' })
       .then(async (res) => {
         if (!res.ok) throw new Error('Session expired')
         const data = await res.json()
@@ -24,6 +35,12 @@ export function AuthProvider({ children }) {
         setUser(null)
         return false
       })
+      .finally(() => {
+        refreshInFlight.current = null
+      })
+
+    refreshInFlight.current = promise
+    return promise
   }
 
   useEffect(() => {
@@ -36,6 +53,25 @@ export function AuthProvider({ children }) {
     if (!accessToken) return
     const interval = setInterval(() => { silentRefresh() }, 10 * 60 * 1000)
     return () => clearInterval(interval)
+  }, [accessToken])
+
+  // Mobile browsers throttle or fully suspend setInterval timers while a tab
+  // is backgrounded — the very common "switch to WhatsApp and come back"
+  // case — so the 10-minute timer above can't be relied on alone. Refresh
+  // immediately whenever the app becomes visible again, so a session that's
+  // been away longer than 15 minutes recovers on its own instead of every
+  // subsequent request failing with a 401 until the person manually reloads.
+  useEffect(() => {
+    if (!accessToken) return
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') silentRefresh()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('focus', onVisible)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('focus', onVisible)
+    }
   }, [accessToken])
 
   const login = (token, userData) => {
