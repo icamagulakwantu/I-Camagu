@@ -20,7 +20,7 @@ export async function processRawLog(rawLogId) {
               where: { id: rawLogId },
                   include: { stokvel: true },
       });
-        
+
           if (!rawLog) return null;
             if (rawLog.matchedMemberId) return null; // Already processed
 
@@ -36,27 +36,39 @@ export async function processRawLog(rawLogId) {
                             });
 
                                 if (member) {
-                                          // Mark as matched
-                                                await prisma.rawBankLog.update({
-                                                            where: { id: rawLog.id },
-                                                                    data: { matchedMemberId: member.id },
+                                          // A manual "run reconciliation" trigger and the auto-run that
+                                          // follows every createRawLog call can both reach this same
+                                          // rawLogId around the same time — the plain matchedMemberId
+                                          // check above reads before either write commits. Gate the
+                                          // claim atomically so only one caller can win it; the other
+                                          // must not create a second Contribution or double-credit the
+                                          // ledger for the same bank entry.
+                                          const claimed = await prisma.$transaction(async (tx) => {
+                                                const claim = await tx.rawBankLog.updateMany({
+                                                      where: { id: rawLog.id, matchedMemberId: null },
+                                                      data: { matchedMemberId: member.id },
+                                                });
+                                                if (claim.count === 0) return false;
+
+                                                // Create contribution record
+                                                await tx.contribution.create({
+                                                      data: {
+                                                            stokvelId: rawLog.stokvelId,
+                                                            memberId: member.id,
+                                                            amount: rawLog.amount,
+                                                            status: 'CONFIRMED',
+                                                            rawBankLogId: rawLog.id,
+                                                      },
                                                 });
 
-                                                      // Create contribution record
-                                                            await prisma.contribution.create({
-                                                                        data: {
-                                                                                      stokvelId: rawLog.stokvelId,
-                                                                                                memberId: member.id,
-                                                                                                          amount: rawLog.amount,
-                                                                                                                    status: 'CONFIRMED',
-                                                                                                                              rawBankLogId: rawLog.id,
-                                                                        },
-                                                            });
+                                                // Update group ledger
+                                                await upsertGroupLedgerTx(tx, rawLog.stokvelId, rawLog.amount);
+                                                return true;
+                                          });
 
-                                                                  // Update group ledger
-                                                                        await upsertGroupLedger(rawLog.stokvelId, rawLog.amount);
+                                          if (!claimed) return null; // Someone else's concurrent call already matched it
 
-                                                                              return { status: 'MATCHED', memberId: member.id, amount: rawLog.amount };
+                                          return { status: 'MATCHED', memberId: member.id, amount: rawLog.amount };
                                 }
                 }
 
@@ -79,6 +91,11 @@ export async function runReconciliation(stokvelId) {
           for (const log of unmatched) {
                   try {
                             const result = await processRawLog(log.id);
+                                  // null means a concurrent call (another runReconciliation, or a
+                                  // manualAssign) already claimed this exact log in between the
+                                  // findMany above and this iteration reaching it — not an error,
+                                  // just nothing left for this call to do for it.
+                                  if (!result) continue;
                                   if (result.status === 'MATCHED') results.matched++;
                                         else results.unmatched++;
                   } catch (error) {
@@ -118,25 +135,33 @@ export async function manualAssign(rawLogId, memberId, officialId) {
                   });
                     if (!official) throw new Error('Only officials can manually assign transactions');
 
-                      // Mark as matched
-                        await prisma.rawBankLog.update({
-                                where: { id: rawLog.id },
-                                    data: { matchedMemberId: member.id },
+                      // Two officials assigning the same raw log at once (or this racing
+                      // against the auto-run in processRawLog) could both pass the plain
+                      // matchedMemberId check above before either write commits. Gate the
+                      // claim atomically inside one transaction so only one caller can
+                      // create the contribution and touch the ledger for this entry.
+                      const claimed = await prisma.$transaction(async (tx) => {
+                        const claim = await tx.rawBankLog.updateMany({
+                          where: { id: rawLog.id, matchedMemberId: null },
+                          data: { matchedMemberId: member.id },
+                        });
+                        if (claim.count === 0) return false;
+
+                        await tx.contribution.create({
+                          data: {
+                            stokvelId: rawLog.stokvelId,
+                            memberId: member.id,
+                            amount: rawLog.amount,
+                            status: 'CONFIRMED',
+                            rawBankLogId: rawLog.id,
+                          },
                         });
 
-                          // Create contribution
-                            await prisma.contribution.create({
-                                    data: {
-                                              stokvelId: rawLog.stokvelId,
-                                                    memberId: member.id,
-                                                          amount: rawLog.amount,
-                                                                status: 'CONFIRMED',
-                                                                      rawBankLogId: rawLog.id,
-                                    },
-                            });
+                        await upsertGroupLedgerTx(tx, rawLog.stokvelId, rawLog.amount);
+                        return true;
+                      });
 
-                              // Update group ledger
-                                await upsertGroupLedger(rawLog.stokvelId, rawLog.amount);
+                      if (!claimed) throw new Error('Already matched');
 
                                   return { status: 'MANUALLY_ASSIGNED', memberId: member.id, amount: rawLog.amount };
 }
@@ -168,14 +193,16 @@ export async function getGroupLedger(stokvelId) {
       });
 }
 
-// Helper: create or update group ledger
-async function upsertGroupLedger(stokvelId, delta) {
-      const existing = await prisma.stokvelGroupLedger.findUnique({
+// Helper: create or update group ledger. Takes the Prisma client (or an
+// active $transaction's tx) explicitly so callers running inside a
+// transaction don't accidentally issue this write outside it.
+async function upsertGroupLedgerTx(client, stokvelId, delta) {
+      const existing = await client.stokvelGroupLedger.findUnique({
               where: { stokvelId },
       });
 
         if (existing) {
-                await prisma.stokvelGroupLedger.update({
+                await client.stokvelGroupLedger.update({
                           where: { stokvelId },
                                 data: {
                                             totalBalance: {
@@ -185,7 +212,7 @@ async function upsertGroupLedger(stokvelId, delta) {
                                 },
                 });
         } else {
-                await prisma.stokvelGroupLedger.create({
+                await client.stokvelGroupLedger.create({
                           data: {
                                       stokvelId,
                                               totalBalance: delta,
