@@ -96,6 +96,18 @@ export const createCeremony = async (req, res) => {
                                 return res.status(400).json({ error: 'Missing required fields' });
                       }
 
+                      // updateCeremony validates budgetZAR (parse + non-negative); this
+                      // creation path never got the same treatment, so a garbage or
+                      // negative budget could be set at creation and only get caught
+                      // later, if ever, on an edit.
+                      let parsedBudget = null;
+                      if (budgetZAR !== undefined && budgetZAR !== '' && budgetZAR !== null) {
+                        parsedBudget = parseFloat(budgetZAR);
+                        if (isNaN(parsedBudget) || parsedBudget < 0) {
+                          return res.status(400).json({ error: 'budgetZAR must be a positive number' });
+                        }
+                      }
+
                           const ceremony = await prisma.ceremony.create({
                                     data: {
                                                 title,
@@ -104,7 +116,7 @@ export const createCeremony = async (req, res) => {
                                                                         notes: notes || '',
                                                                                 hostId,
                                                                                         status: 'PLANNING',
-                                                                                                budgetZAR: budgetZAR !== undefined && budgetZAR !== '' ? budgetZAR : null,
+                                                                                                budgetZAR: parsedBudget,
                                     },
                           });
                               res.status(201).json(ceremony);
@@ -294,6 +306,14 @@ export const addPledge = async (req, res) => {
                             return res.status(400).json({ error: 'planId, pledgerName, and pledgedItem are required' });
                   }
 
+                  let parsedPledgeAmount = null;
+                  if (pledgedAmountZAR !== undefined && pledgedAmountZAR !== '' && pledgedAmountZAR !== null) {
+                    parsedPledgeAmount = parseFloat(pledgedAmountZAR);
+                    if (isNaN(parsedPledgeAmount) || parsedPledgeAmount < 0) {
+                      return res.status(400).json({ error: 'pledgedAmountZAR must be a positive number' });
+                    }
+                  }
+
                       const plan = await prisma.preparationPlan.findUnique({ where: { id: planId } });
 
                           if (!plan) return res.status(404).json({ error: 'Plan not found' });
@@ -305,7 +325,7 @@ export const addPledge = async (req, res) => {
                                                                 pledgerName,
                                                                         relationship: relationship || null,
                                                                                 pledgedItem,
-                                                                                        pledgedAmountZAR: pledgedAmountZAR || null,
+                                                                                        pledgedAmountZAR: parsedPledgeAmount,
                                                                                                 linkedChecklistItemId: linkedChecklistItemId || null,
                                                                                                         paidAmountZAR: 0,
                                             },
@@ -465,9 +485,25 @@ export const createAutoCeremony = async (req, res) => {
                                 return res.status(400).json({ error: 'Missing required fields' });
                       }
 
+                      // Same gap as createCeremony: this is the actual path the app's
+                      // "Create New Plan" form uses, and it stored budgetZAR unvalidated.
+                      let parsedBudget = null;
+                      if (budgetZAR !== undefined && budgetZAR !== '' && budgetZAR !== null) {
+                        parsedBudget = parseFloat(budgetZAR);
+                        if (isNaN(parsedBudget) || parsedBudget < 0) {
+                          return res.status(400).json({ error: 'budgetZAR must be a positive number' });
+                        }
+                      }
+
                           const defaultItems = getDefaultItemsForType(type);
                               const costProfile = CEREMONY_COST_PROFILES[type];
-                              const parsedGuestCount = guestCount !== undefined && guestCount !== '' ? parseInt(guestCount, 10) : null;
+                              let parsedGuestCount = null;
+                              if (guestCount !== undefined && guestCount !== '' && guestCount !== null) {
+                                parsedGuestCount = parseInt(guestCount, 10);
+                                if (isNaN(parsedGuestCount) || parsedGuestCount < 0) {
+                                  return res.status(400).json({ error: 'guestCount must be a positive number' });
+                                }
+                              }
 
                                   const ceremony = await prisma.$transaction(async (tx) => {
                                             const newCeremony = await tx.ceremony.create({
@@ -478,7 +514,7 @@ export const createAutoCeremony = async (req, res) => {
                                                                                                     notes: notes || '',
                                                                                                               hostId,
                                                                                                                         status: 'PLANNING',
-                                                                                                                                  budgetZAR: budgetZAR !== undefined && budgetZAR !== '' ? budgetZAR : null,
+                                                                                                                                  budgetZAR: parsedBudget,
                                                                                                                                   guestCount: parsedGuestCount,
                                                         },
                                             });
@@ -668,6 +704,24 @@ export const updateCostItem = async (req, res) => {
               const { id } = req.params;
                   const { quantity, unitCost, isInputField, inputType, suggestedAmount, isPurchased } = req.body;
 
+                      // Both are Float columns fed straight into itemTotal math
+                      // (getCostEstimate multiplies them) — an unvalidated NaN or
+                      // negative value here would corrupt every budget total downstream.
+                      let parsedQuantity;
+                      if (quantity !== undefined) {
+                        parsedQuantity = parseFloat(quantity);
+                        if (isNaN(parsedQuantity) || parsedQuantity < 0) {
+                          return res.status(400).json({ error: 'quantity must be a positive number' });
+                        }
+                      }
+                      let parsedUnitCost;
+                      if (unitCost !== undefined) {
+                        parsedUnitCost = parseFloat(unitCost);
+                        if (isNaN(parsedUnitCost) || parsedUnitCost < 0) {
+                          return res.status(400).json({ error: 'unitCost must be a positive number' });
+                        }
+                      }
+
                       const item = await prisma.ceremonyCostItem.findUnique({
                                 where: { id },
                                       include: { ceremony: true },
@@ -679,8 +733,8 @@ export const updateCostItem = async (req, res) => {
                                   const updated = await prisma.ceremonyCostItem.update({
                                             where: { id },
                                                   data: {
-                                                              quantity: quantity !== undefined ? quantity : undefined,
-                                                                      unitCost: unitCost !== undefined ? unitCost : undefined,
+                                                              quantity: parsedQuantity,
+                                                                      unitCost: parsedUnitCost,
                                                                               isInputField: isInputField !== undefined ? isInputField : undefined,
                                                                                       inputType: inputType || undefined,
                                                                                               suggestedAmount: suggestedAmount !== undefined ? suggestedAmount : undefined,
