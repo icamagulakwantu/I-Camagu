@@ -44,6 +44,15 @@ checkRequiredEnvVars();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Render terminates TLS and proxies every request through its own edge —
+// without this, req.ip (and the rate limiter keyed on it, see
+// middleware/rateLimiter.js) resolves to Render's proxy, not the real
+// client. Every user would then share one rate-limit bucket per route:
+// five login attempts total, from anyone, would 429-lock out the entire
+// app. Trusting exactly one hop (Render's own proxy) makes Express read
+// the real client IP from X-Forwarded-For instead.
+app.set('trust proxy', 1);
+
 // The frontend is served by this same Express process, so ordinary app
 // traffic is same-origin and sends no Origin header at all — those requests
 // (and native/webview clients) must keep working. Anything that DOES send an
