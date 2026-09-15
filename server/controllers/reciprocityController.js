@@ -10,14 +10,26 @@ export async function addReciprocityEntry(req, res) {
                   return res.status(400).json({ error: "direction must be 'GIVEN' or 'RECEIVED'" });
           }
 
-            try {
+            // A non-numeric quantity (e.g. "abc") is a truthy string, so a bare
+          // `quantity ? parseInt(quantity) : null` still calls parseInt and
+          // stores NaN — which Prisma then rejects for this Int? column with an
+          // unhandled 500 instead of a clean validation error.
+          let numericQuantity = null;
+          if (quantity !== undefined && quantity !== null && quantity !== '') {
+            numericQuantity = parseInt(quantity, 10);
+            if (isNaN(numericQuantity)) {
+              return res.status(400).json({ error: 'quantity must be a number' });
+            }
+          }
+
+          try {
                     const entry = await prisma.reciprocityEntry.create({
                               data: {
                                           userId: req.userId,
                                                   direction,
                                                           counterpartyName,
                                                                   itemDescription,
-                                                                          quantity: quantity ? parseInt(quantity) : null,
+                                                                          quantity: numericQuantity,
                                                                                   unitType: unitType || null,
                                                                                           ceremonyType: ceremonyType || null,
                                                                                                   ceremonyLabel: ceremonyLabel || null,
@@ -49,6 +61,14 @@ export async function addReciprocityEntriesBatch(req, res) {
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: 'At least one item is required' });
   }
+  // Same NaN-bypass gap as addReciprocityEntry, but per item here — a bad
+  // quantity on any one item would otherwise reach Prisma as NaN and fail
+  // the whole batch with an unhandled 500.
+  for (const i of items) {
+    if (i?.quantity !== undefined && i.quantity !== null && i.quantity !== '' && isNaN(parseInt(i.quantity, 10))) {
+      return res.status(400).json({ error: `quantity for "${i.itemDescription || 'an item'}" must be a number` });
+    }
+  }
   const cleanItems = items
     .filter((i) => i && i.itemDescription && i.itemDescription.trim())
     .map((i) => ({
@@ -56,7 +76,7 @@ export async function addReciprocityEntriesBatch(req, res) {
       direction,
       counterpartyName,
       itemDescription: i.itemDescription.trim(),
-      quantity: i.quantity ? parseInt(i.quantity) : null,
+      quantity: (i.quantity !== undefined && i.quantity !== null && i.quantity !== '') ? parseInt(i.quantity, 10) : null,
       unitType: i.unitType || null,
       ceremonyType: ceremonyType || null,
       ceremonyLabel: ceremonyLabel || null,
