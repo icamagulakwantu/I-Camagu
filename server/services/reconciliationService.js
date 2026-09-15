@@ -89,11 +89,20 @@ export async function runReconciliation(stokvelId) {
             return results;
 }
 
-// Manual assignment by officials (for unmatched entries)
+// Manual assignment by officials (for unmatched entries). Only for CREDIT
+// entries — a bank entry a member paid in. A DEBIT (money leaving the
+// account) isn't a member "contribution" and previously got mismatched as
+// one here, which also incremented the group ledger instead of decrementing
+// it (the same +amount call as the CREDIT path, since direction was never
+// consulted). Record an outgoing transaction as a group expense instead
+// (see recordGroupExpense) — that already handles the sign correctly.
 export async function manualAssign(rawLogId, memberId, officialId) {
       const rawLog = await prisma.rawBankLog.findUnique({ where: { id: rawLogId } });
         if (!rawLog) throw new Error('Raw log not found');
           if (rawLog.matchedMemberId) throw new Error('Already matched');
+            if (rawLog.direction !== 'CREDIT') {
+              throw new Error('Only a CREDIT entry can be assigned as a member contribution — record a DEBIT as a group expense instead');
+            }
 
             const member = await prisma.stokvelMember.findFirst({
                     where: { id: memberId, stokvelId: rawLog.stokvelId },

@@ -23,6 +23,16 @@ export async function createRawLog(req, res) {
                   return res.status(400).json({ error: 'direction must be CREDIT or DEBIT' });
           }
 
+            // A bank entry's sign is carried entirely by `direction` (CREDIT vs
+            // DEBIT) — the amount itself is always entered as a positive figure,
+            // same as reading a real bank statement. Downstream (see
+            // reconciliationService) relies on this being positive to apply the
+            // correct sign to the ledger.
+            const numericAmount = parseFloat(amount);
+            if (isNaN(numericAmount) || numericAmount <= 0) {
+              return res.status(400).json({ error: 'Amount must be a positive number' });
+            }
+
             try {
                     // Verify user is an official of this stokvel
                         const official = await prisma.stokvelOfficial.findFirst({
@@ -37,7 +47,7 @@ export async function createRawLog(req, res) {
                                                       stokvelId,
                                                               rawPayload: { manuallyEntered: true, enteredBy: req.userId },
                                                                       narration: narration || null,
-                                                                              amount,
+                                                                              amount: numericAmount,
                                                                                       direction,
                                           },
                                 });

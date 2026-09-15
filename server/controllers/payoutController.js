@@ -175,73 +175,85 @@ export async function donateToShrineFund(req, res) {
 }
 
 export async function requestPayout(req, res) {
-      const userId = req.userId;
-        const { stokvelId, amount, recipientId, contributeOptIn } = req.body;
+  const userId = req.userId;
+  const { stokvelId, amount, recipientId, contributeOptIn } = req.body;
 
-          if (!stokvelId || !amount) {
-                  return res.status(400).json({ error: 'stokvelId and amount are required' });
-          }
+  if (!stokvelId || !amount) {
+    return res.status(400).json({ error: 'stokvelId and amount are required' });
+  }
 
-            try {
-                    // Check membership
-                        const membership = await prisma.stokvelMember.findFirst({ where: { stokvelId, userId } });
-                            if (!membership) return res.status(403).json({ error: 'You are not a member of this stokvel' });
+  const requestedAmount = parseFloat(amount);
+  if (isNaN(requestedAmount) || requestedAmount <= 0) {
+    return res.status(400).json({ error: 'Amount must be a positive number' });
+  }
 
-                                const stokvel = await prisma.stokvel.findUnique({ where: { id: stokvelId } });
-                                if (!stokvel) return res.status(404).json({ error: 'Stokvel not found' });
+  try {
+    // Check membership
+    const membership = await prisma.stokvelMember.findFirst({ where: { stokvelId, userId } });
+    if (!membership) return res.status(403).json({ error: 'You are not a member of this stokvel' });
 
-                                const requestedAmount = parseFloat(amount);
+    const stokvel = await prisma.stokvel.findUnique({ where: { id: stokvelId } });
+    if (!stokvel) return res.status(404).json({ error: 'Stokvel not found' });
 
-                                    let finalRecipientId = recipientId || userId;
+    let finalRecipientId = recipientId || userId;
 
-                                                // Rotating stokvels (umgalelo) must pay out strictly in turn — the
-                                                // recipient is always whoever is next in rotationOrder, regardless
-                                                // of who submits the request. Checked before the balance so a
-                                                // misconfigured rotation surfaces before an amount complaint.
-                                                if (stokvel.type === 'UMGALELO_ROTATING') {
-                                                  const order = Array.isArray(stokvel.rotationOrder) ? stokvel.rotationOrder : null;
-                                                  if (!order || order.length === 0) {
-                                                    return res.status(400).json({ error: 'This rotating stokvel has no rotation order set yet — ask an official to set one first.' });
-                                                  }
-                                                  const currentTurnUserId = order[stokvel.currentRotationIndex % order.length];
-                                                  if (recipientId && recipientId !== currentTurnUserId) {
-                                                    return res.status(400).json({ error: "It's not this member's turn in the rotation yet" });
-                                                  }
-                                                  finalRecipientId = currentTurnUserId;
-                                                }
+    // Rotating stokvels (umgalelo) must pay out strictly in turn — the
+    // recipient is always whoever is next in rotationOrder, regardless
+    // of who submits the request. Checked before the balance so a
+    // misconfigured rotation surfaces before an amount complaint.
+    if (stokvel.type === 'UMGALELO_ROTATING') {
+      const order = Array.isArray(stokvel.rotationOrder) ? stokvel.rotationOrder : null;
+      if (!order || order.length === 0) {
+        return res.status(400).json({ error: 'This rotating stokvel has no rotation order set yet — ask an official to set one first.' });
+      }
+      const currentTurnUserId = order[stokvel.currentRotationIndex % order.length];
+      if (recipientId && recipientId !== currentTurnUserId) {
+        return res.status(400).json({ error: "It's not this member's turn in the rotation yet" });
+      }
+      finalRecipientId = currentTurnUserId;
+    } else if (recipientId) {
+      // A non-rotating payout can still be requested on someone else's
+      // behalf (e.g. a household head), but only for a real member of
+      // this stokvel — not an arbitrary user id.
+      const recipientMembership = await prisma.stokvelMember.findFirst({ where: { stokvelId, userId: recipientId } });
+      if (!recipientMembership) return res.status(400).json({ error: 'recipientId must be a member of this stokvel' });
+    }
 
-                                                // Check balance
-                                                const ledger = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
-                                                if (ledger && parseFloat(ledger.totalBalance) < requestedAmount) {
-                                                  return res.status(400).json({ error: 'Requested amount exceeds the group balance' });
-                                                }
+    // Check balance — a stokvel always gets a ledger row at creation
+    // (see createStokvel), so a missing one here is unexpected; treat it
+    // as blocking rather than silently skipping the balance check.
+    const ledger = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
+    if (!ledger) return res.status(409).json({ error: 'This stokvel has no group ledger yet — contact support' });
+    if (parseFloat(ledger.totalBalance) < requestedAmount) {
+      return res.status(400).json({ error: 'Requested amount exceeds the group balance' });
+    }
 
-                                                // Create ONE payout
-                                                    const payout = await prisma.payout.create({
-                                                              data: {
-                                                                          stokvelId,
-                                                                                  recipientId: finalRecipientId,
-                                                                                          amount: requestedAmount,
-                                                                                                  status: 'PENDING_APPROVAL',
-                                                                                                  contributionOptIn: contributeOptIn === true,
-                                                              },
-                                                    });
+    // Create ONE payout
+    const payout = await prisma.payout.create({
+      data: {
+        stokvelId,
+        recipientId: finalRecipientId,
+        amount: requestedAmount,
+        status: 'PENDING_APPROVAL',
+        contributionOptIn: contributeOptIn === true,
+      },
+    });
 
-                                                        // Notify officials
-                                                            const { notifyMany } = await import('../services/notificationDbService.js');
-                                                                const officials = await prisma.stokvelOfficial.findMany({ where: { stokvelId } });
-                                                                    await notifyMany(
-                                                                              officials.map(o => o.userId),
-                                                                                    'PAYOUT_APPROVAL_NEEDED',
-                                                                                          `A payout of R${requestedAmount.toFixed(2)} needs your approval.`,
-                                                                                                'stokvels'
-                                                                    );
+    // Notify officials
+    const { notifyMany } = await import('../services/notificationDbService.js');
+    const officials = await prisma.stokvelOfficial.findMany({ where: { stokvelId } });
+    await notifyMany(
+      officials.map(o => o.userId),
+      'PAYOUT_APPROVAL_NEEDED',
+      `A payout of R${requestedAmount.toFixed(2)} needs your approval.`,
+      'stokvels'
+    );
 
-                                                                        res.status(201).json({ payout, message: 'Payout requested. Awaiting official approval.' });
-            } catch (error) {
-                    console.error('Request payout error:', error.message);
-                        res.status(500).json({ error: 'Could not request payout' });
-            }
+    res.status(201).json({ payout, message: 'Payout requested. Awaiting official approval.' });
+  } catch (error) {
+    console.error('Request payout error:', error.message);
+    res.status(500).json({ error: 'Could not request payout' });
+  }
 }
 
 export async function approvePayout(req, res) {

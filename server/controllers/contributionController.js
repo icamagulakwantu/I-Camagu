@@ -118,13 +118,18 @@ export async function recordGroupExpense(req, res) {
 
   if (!stokvelId || !amount) return res.status(400).json({ error: 'stokvelId and amount are required' });
 
+  const requestedAmount = parseFloat(amount);
+  if (isNaN(requestedAmount) || requestedAmount <= 0) {
+    return res.status(400).json({ error: 'Amount must be a positive number' });
+  }
+
   try {
     const official = await prisma.stokvelOfficial.findFirst({ where: { stokvelId, userId } });
     if (!official) return res.status(403).json({ error: 'Only stokvel officials can record a group expense' });
 
     const ledger = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
-    const requestedAmount = parseFloat(amount);
-    if (ledger && parseFloat(ledger.totalBalance) < requestedAmount) {
+    if (!ledger) return res.status(409).json({ error: 'This stokvel has no group ledger yet — contact support' });
+    if (parseFloat(ledger.totalBalance) < requestedAmount) {
       return res.status(400).json({ error: 'Expense amount exceeds the group balance' });
     }
 
@@ -153,27 +158,32 @@ export async function recordGroupExpense(req, res) {
 }
 
 export async function recordInterest(req, res) {
-          const userId = req.userId;
-                  const { stokvelId, amount, note, proofNote } = req.body;
+  const userId = req.userId;
+  const { stokvelId, amount, note, proofNote } = req.body;
 
-                            if (!stokvelId || !amount) return res.status(400).json({ error: 'stokvelId and amount are required' });
+  if (!stokvelId || !amount) return res.status(400).json({ error: 'stokvelId and amount are required' });
 
-                                        try {
-                                                                const official = await prisma.stokvelOfficial.findFirst({ where: { stokvelId, userId } });
-                                                                                        if (!official) return res.status(403).json({ error: 'Only stokvel officials can record interest' });
+  const requestedAmount = parseFloat(amount);
+  if (isNaN(requestedAmount) || requestedAmount <= 0) {
+    return res.status(400).json({ error: 'Amount must be a positive number' });
+  }
 
-                                                                                                                    const ledger = await prisma.stokvelGroupLedger.update({
-                                                                                                                                                              where: { stokvelId },
-                                                                                                                                                                                                          data: {
-                                                                                                                                                                                                                                                                      totalBalance: { increment: parseFloat(amount) },
-                                                                                                                                                                                                                                                                                                                                      interestEarned: { increment: parseFloat(amount) },
-                                                                                                                                                                                                          },
-                                                                                                                    });
+  try {
+    const official = await prisma.stokvelOfficial.findFirst({ where: { stokvelId, userId } });
+    if (!official) return res.status(403).json({ error: 'Only stokvel officials can record interest' });
 
-                                                                                                                                                    res.json({ ledger, message: 'Interest recorded and added to the group balance.' });
-                                        } catch (error) {
-                                                                console.error('Record interest error:', error.message);
-                                                                                        res.status(500).json({ error: 'Could not record interest' });
-                                        }
-                                                                                                                                                                                                          }
+    const ledger = await prisma.stokvelGroupLedger.update({
+      where: { stokvelId },
+      data: {
+        totalBalance: { increment: requestedAmount },
+        interestEarned: { increment: requestedAmount },
+      },
+    });
+
+    res.json({ ledger, message: 'Interest recorded and added to the group balance.' });
+  } catch (error) {
+    console.error('Record interest error:', error.message);
+    res.status(500).json({ error: 'Could not record interest' });
+  }
+}
                                                                                     
