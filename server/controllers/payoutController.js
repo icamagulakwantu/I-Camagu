@@ -257,124 +257,147 @@ export async function requestPayout(req, res) {
 }
 
 export async function approvePayout(req, res) {
-      const userId = req.userId;
-        const { payoutId, pin } = req.body;
+  const userId = req.userId;
+  const { payoutId, pin } = req.body;
 
-          if (!payoutId) return res.status(400).json({ error: 'payoutId is required' });
-          if (!pin) return res.status(400).json({ error: 'PIN is required to approve a payout' });
+  if (!payoutId) return res.status(400).json({ error: 'payoutId is required' });
+  if (!pin) return res.status(400).json({ error: 'PIN is required to approve a payout' });
 
-          const { verifyPin } = await import('../services/pinService.js');
-          const pinCheck = await verifyPin(userId, pin);
-          if (!pinCheck.valid) {
-            const message = pinCheck.reason === 'NO_PIN_SET'
-              ? 'You need to set a security PIN first — go to More → Security PIN.'
-              : 'Incorrect PIN';
-            return res.status(401).json({ error: message });
-          }
+  const { verifyPin } = await import('../services/pinService.js');
+  const pinCheck = await verifyPin(userId, pin);
+  if (!pinCheck.valid) {
+    const message = pinCheck.reason === 'NO_PIN_SET'
+      ? 'You need to set a security PIN first — go to More → Security PIN.'
+      : 'Incorrect PIN';
+    return res.status(401).json({ error: message });
+  }
 
-            try {
-                    const payout = await prisma.payout.findUnique({
-                              where: { id: payoutId },
-                                    include: { approvals: true, stokvel: true },
-                    });
-                        if (!payout) return res.status(404).json({ error: 'Payout not found' });
-                            if (payout.status !== 'PENDING_APPROVAL') return res.status(409).json({ error: `Payout is already ${payout.status}` });
+  try {
+    const payout = await prisma.payout.findUnique({
+      where: { id: payoutId },
+      include: { approvals: true, stokvel: true },
+    });
+    if (!payout) return res.status(404).json({ error: 'Payout not found' });
+    if (payout.status !== 'PENDING_APPROVAL') return res.status(409).json({ error: `Payout is already ${payout.status}` });
 
-                                const official = await prisma.stokvelOfficial.findFirst({
-                                          where: { stokvelId: payout.stokvelId, userId },
-                                });
-                                    if (!official) return res.status(403).json({ error: 'Only stokvel officials can approve payouts' });
+    const official = await prisma.stokvelOfficial.findFirst({
+      where: { stokvelId: payout.stokvelId, userId },
+    });
+    if (!official) return res.status(403).json({ error: 'Only stokvel officials can approve payouts' });
 
-                                        const alreadyApproved = await prisma.payoutApproval.findFirst({
-                                                  where: { payoutId, officialId: official.id },
-                                        });
-                                            if (alreadyApproved) return res.status(409).json({ error: 'You have already approved this payout' });
+    try {
+      await prisma.payoutApproval.create({
+        data: { payoutId, officialId: official.id },
+      });
+    } catch (createError) {
+      // Two rapid taps from the same official both pass a plain findFirst
+      // check before either row commits — the unique constraint on
+      // [payoutId, officialId] is the real guard against a double approval.
+      if (createError.code === 'P2002') {
+        return res.status(409).json({ error: 'You have already approved this payout' });
+      }
+      throw createError;
+    }
 
-                                                await prisma.payoutApproval.create({
-                                                          data: { payoutId, officialId: official.id },
-                                                });
+    const approvalCount = await prisma.payoutApproval.count({ where: { payoutId } });
+    const requiredApprovals = payout.stokvel.requiredApprovals;
 
-                                                    const approvalCount = await prisma.payoutApproval.count({ where: { payoutId } });
-                                                        const requiredApprovals = payout.stokvel.requiredApprovals;
+    if (approvalCount >= requiredApprovals) {
+      // Two officials approving within the same window can both reach this
+      // branch — both see the threshold met before either has cleared the
+      // payout, since nothing before this point locks the payout row. Without
+      // a guard, both would run the block below and double-decrement the
+      // group ledger, double-create a shrine contribution, and double-advance
+      // the rotation for one real payout. Claim the PENDING_APPROVAL ->
+      // CLEARED transition atomically first — only one concurrent request
+      // can win it (Postgres row-locks the update).
+      const claim = await prisma.payout.updateMany({
+        where: { id: payoutId, status: 'PENDING_APPROVAL' },
+        data: { status: 'CLEARED', clearedAt: new Date() },
+      });
 
-                                                            if (approvalCount >= requiredApprovals) {
-                                                                      // Only ever computed/recorded if the recipient opted in when they
-                                                                      // requested this payout — never a forced deduction.
-                                                                      const contributionAmount = payout.contributionOptIn
-                                                                        ? parseFloat(payout.amount) * SUGGESTED_CONTRIBUTION_RATE
-                                                                        : null;
+      if (claim.count === 0) {
+        // Someone else's concurrent approval already cleared it — this
+        // request's own approval row is still recorded, just don't redo
+        // the money-moving side effects.
+        return res.json({
+          status: 'CLEARED',
+          message: 'Payout approved and cleared.',
+        });
+      }
 
-                                                                            await prisma.$transaction(async (tx) => {
-                                                                                        await tx.payout.update({
-                                                                                                      where: { id: payoutId },
-                                                                                                                data: { status: 'CLEARED', clearedAt: new Date() },
-                                                                                        });
+      // Only ever computed/recorded if the recipient opted in when they
+      // requested this payout — never a forced deduction.
+      const contributionAmount = payout.contributionOptIn
+        ? parseFloat(payout.amount) * SUGGESTED_CONTRIBUTION_RATE
+        : null;
 
-                                                                                                await tx.stokvelGroupLedger.update({
-                                                                                                              where: { stokvelId: payout.stokvelId },
-                                                                                                                        data: { totalBalance: { decrement: payout.amount } },
-                                                                                                });
+      await prisma.$transaction(async (tx) => {
+        await tx.stokvelGroupLedger.update({
+          where: { stokvelId: payout.stokvelId },
+          data: { totalBalance: { decrement: payout.amount } },
+        });
 
-                                                                                                        if (contributionAmount) {
-                                                                                                          await tx.shrineContribution.create({
-                                                                                                                        data: { payoutId, amount: contributionAmount, source: 'PAYOUT_CONTRIBUTION', status: 'CONFIRMED' },
-                                                                                                          });
-                                                                                                        }
+        if (contributionAmount) {
+          await tx.shrineContribution.create({
+            data: { payoutId, amount: contributionAmount, source: 'PAYOUT_CONTRIBUTION', status: 'CONFIRMED' },
+          });
+        }
 
-                                                                                                        // Advance the umgalelo rotation once this recipient's payout has
-                                                                                                        // actually cleared, so the next request defaults to the next person.
-                                                                                                        if (
-                                                                                                          payout.stokvel.type === 'UMGALELO_ROTATING' &&
-                                                                                                          Array.isArray(payout.stokvel.rotationOrder) &&
-                                                                                                          payout.stokvel.rotationOrder.length > 0
-                                                                                                        ) {
-                                                                                                          const order = payout.stokvel.rotationOrder;
-                                                                                                          const nextIndex = (payout.stokvel.currentRotationIndex + 1) % order.length;
-                                                                                                          await tx.stokvel.update({
-                                                                                                            where: { id: payout.stokvelId },
-                                                                                                            data: { currentRotationIndex: nextIndex },
-                                                                                                          });
-                                                                                                        }
-                                                                            });
+        // Advance the umgalelo rotation once this recipient's payout has
+        // actually cleared, so the next request defaults to the next person.
+        if (
+          payout.stokvel.type === 'UMGALELO_ROTATING' &&
+          Array.isArray(payout.stokvel.rotationOrder) &&
+          payout.stokvel.rotationOrder.length > 0
+        ) {
+          const order = payout.stokvel.rotationOrder;
+          const nextIndex = (payout.stokvel.currentRotationIndex + 1) % order.length;
+          await tx.stokvel.update({
+            where: { id: payout.stokvelId },
+            data: { currentRotationIndex: nextIndex },
+          });
+        }
+      });
 
-                                                                                  const recipient = await prisma.user.findUnique({ where: { id: payout.recipientId } });
-                                                                                  const { notifyPayoutCleared } = await import('../services/notificationService.js');
-                                                                                  if (recipient?.email) {
-                                                                                        await notifyPayoutCleared(
-                                                                                                  recipient.email,
-                                                                                                  recipient.firstName,
-                                                                                                  parseFloat(payout.amount),
-                                                                                                  payout.stokvel.name,
-                                                                                                  contributionAmount
-                                                                                        );
-                                                                                  }
+      const recipient = await prisma.user.findUnique({ where: { id: payout.recipientId } });
+      const { notifyPayoutCleared } = await import('../services/notificationService.js');
+      if (recipient?.email) {
+        await notifyPayoutCleared(
+          recipient.email,
+          recipient.firstName,
+          parseFloat(payout.amount),
+          payout.stokvel.name,
+          contributionAmount
+        );
+      }
 
-                                                                                  const { createNotification } = await import('../services/notificationDbService.js');
-                                                                                  await createNotification(
-                                                                                            payout.recipientId,
-                                                                                            'PAYOUT_CLEARED',
-                                                                                            `Your payout of R${parseFloat(payout.amount).toFixed(2)} from ${payout.stokvel.name} has cleared.`,
-                                                                                            'stokvels'
-                                                                                  );
+      const { createNotification } = await import('../services/notificationDbService.js');
+      await createNotification(
+        payout.recipientId,
+        'PAYOUT_CLEARED',
+        `Your payout of R${parseFloat(payout.amount).toFixed(2)} from ${payout.stokvel.name} has cleared.`,
+        'stokvels'
+      );
 
-                                                                                  return res.json({
-                                                                                              status: 'CLEARED',
-                                                                                                      message: 'Payout approved and cleared.',
-                                                                                                              contributionAmount,
-                                                                                                                      contributionNote: contributionAmount
-                                                                                                                        ? 'Includes a voluntary Ubuhlanti bakwa Xhosa contribution, as chosen when this payout was requested.'
-                                                                                                                        : null,
-                                                                                  });
-                                                            }
+      return res.json({
+        status: 'CLEARED',
+        message: 'Payout approved and cleared.',
+        contributionAmount,
+        contributionNote: contributionAmount
+          ? 'Includes a voluntary Ubuhlanti bakwa Xhosa contribution, as chosen when this payout was requested.'
+          : null,
+      });
+    }
 
-                                                                res.json({
-                                                                          status: 'PENDING_APPROVAL',
-                                                                                message: `Approval recorded. ${requiredApprovals - approvalCount} more approval(s) needed.`,
-                                                                                      approvalsSoFar: approvalCount,
-                                                                                            requiredApprovals,
-                                                                });
-            } catch (error) {
-                    console.error('Approve payout error:', error.message);
-                        res.status(500).json({ error: 'Could not approve payout' });
-            }
+    res.json({
+      status: 'PENDING_APPROVAL',
+      message: `Approval recorded. ${requiredApprovals - approvalCount} more approval(s) needed.`,
+      approvalsSoFar: approvalCount,
+      requiredApprovals,
+    });
+  } catch (error) {
+    console.error('Approve payout error:', error.message);
+    res.status(500).json({ error: 'Could not approve payout' });
+  }
 }
