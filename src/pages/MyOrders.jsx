@@ -22,6 +22,8 @@ function MyOrders({ onBack }) {
   const [loading, setLoading] = useState(true)
   const [referenceDrafts, setReferenceDrafts] = useState({})
   const [submittingId, setSubmittingId] = useState(null)
+  const [onlinePaymentAvailable, setOnlinePaymentAvailable] = useState(false)
+  const [payingOnlineId, setPayingOnlineId] = useState(null)
 
   const fetchAll = async () => {
     try {
@@ -45,6 +47,45 @@ function MyOrders({ onBack }) {
   }
 
   useEffect(() => { fetchAll() }, [])
+
+  useEffect(() => {
+    fetch('/api/basket/pool-payments/online-status', { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then((res) => res.json())
+      .then((data) => setOnlinePaymentAvailable(!!data.available))
+      .catch(() => setOnlinePaymentAvailable(false))
+  }, [accessToken])
+
+  // PayFast redirects the browser back here after checkout — the webhook
+  // that actually clears the payment can land a moment after this redirect,
+  // so one immediate refetch plus a short delayed one covers that gap
+  // instead of the member seeing a stale "still pending" right after paying.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const outcome = params.get('payment')
+    if (!outcome) return
+    if (outcome === 'success') showToast('Payment received — confirming with the supplier...', 'success')
+    else if (outcome === 'cancelled') showToast('Payment cancelled', 'info')
+    window.history.replaceState({}, '', window.location.pathname)
+    const retry = setTimeout(fetchAll, 2500)
+    return () => clearTimeout(retry)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const payOnline = async (paymentId) => {
+    setPayingOnlineId(paymentId)
+    try {
+      const res = await fetch(`/api/basket/pool-payments/${paymentId}/pay-online`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not start online payment')
+      window.location.href = data.redirectUrl
+    } catch (err) {
+      showToast(err.message, 'error')
+      setPayingOnlineId(null)
+    }
+  }
 
   const confirmLine = async (lineItemId) => {
     try {
@@ -165,6 +206,18 @@ function MyOrders({ onBack }) {
                           </p>
                         ) : (
                           <div>
+                            {onlinePaymentAvailable && (
+                              <>
+                                <button
+                                  onClick={() => payOnline(payment.id)}
+                                  disabled={payingOnlineId === payment.id}
+                                  className={`w-full bg-brand-blue text-brand-cream font-bold py-2.5 rounded-pill text-sm mb-2 ${pressable}`}
+                                >
+                                  {payingOnlineId === payment.id ? 'Redirecting...' : `Pay ${money(payment.amountZAR)} online (test mode)`}
+                                </button>
+                                <p className="text-[10px] text-brand-black/40 text-center mb-3">— or pay by manual EFT instead —</p>
+                              </>
+                            )}
                             <p className="text-[11px] text-brand-black/50 mb-2">
                               Pay {money(payment.amountZAR)} via EFT to {doc.groupCode ? `reference "${doc.groupCode}"` : 'the supplier'}, then enter your reference below so they can confirm receipt.
                             </p>

@@ -35,6 +35,7 @@ import directoryRoutes from './routes/directory.js';
 import accountRoutes from './routes/account.js';
 import supplierRoutes from './routes/supplier.js';
 import identityRoutes from './routes/identity.js';
+import webhookRoutes from './routes/webhooks.js';
 import { checkRequiredEnvVars, envStatus } from './config/envCheck.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -114,6 +115,7 @@ app.use('/api/directory', directoryRoutes);
 app.use('/api/account', accountRoutes);
 app.use('/api/supplier', supplierRoutes);
 app.use('/api/identity', identityRoutes);
+app.use('/api/webhooks', webhookRoutes);
 
 // Serve the built frontend
 app.use(express.static(path.join(__dirname, '..', 'dist')));

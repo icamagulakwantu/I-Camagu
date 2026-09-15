@@ -16,6 +16,13 @@ const OPTIONAL = [
   { name: 'SUPABASE_URL', breaks: 'Supabase Storage (ceremony photo uploads)' },
   { name: 'SUPABASE_SERVICE_ROLE_KEY', breaks: 'Supabase Storage (ceremony photo uploads)' },
   { name: 'SUPABASE_STORAGE_BUCKET', breaks: 'Supabase Storage (ceremony photo uploads)' },
+  // Missing either means paymentService.isOnlinePaymentConfigured() returns
+  // false — the "Pay online" button just doesn't appear, and every pool
+  // payment falls back to the existing manual-EFT-and-reference flow.
+  // PAYFAST_SANDBOX defaults to true (sandbox) whenever unset; only an
+  // explicit 'false' points this at PayFast's live endpoint.
+  { name: 'PAYFAST_MERCHANT_ID', breaks: 'online pool payments (falls back to manual EFT)' },
+  { name: 'PAYFAST_MERCHANT_KEY', breaks: 'online pool payments (falls back to manual EFT)' },
 ];
 
 export function checkRequiredEnvVars() {
