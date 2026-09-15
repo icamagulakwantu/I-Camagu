@@ -206,10 +206,15 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "paymentReference" TEXT;'
   );
+  // Postgres raises duplicate_table (42P07), not duplicate_object (42710),
+  // when the unique index backing this constraint already exists — catching
+  // only duplicate_object left this throwing (caught further up, so boot
+  // still succeeds, but it logged a scary-looking error on every restart
+  // once the constraint existed).
   await prisma.$executeRawUnsafe(`
     DO $$ BEGIN
       ALTER TABLE "PoolPayment" ADD CONSTRAINT "PoolPayment_paymentReference_key" UNIQUE ("paymentReference");
-    EXCEPTION WHEN duplicate_object THEN NULL;
+    EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL;
     END $$;
   `);
 }
