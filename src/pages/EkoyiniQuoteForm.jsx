@@ -69,7 +69,38 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
 
   const totalSteps = 6
 
+  // The wizard has no <form> element (each step's inputs are just <div>s of
+  // plain <input>s), so the HTML `required` attribute below never actually
+  // fires — it's decorative. Without this, a user could click through all 6
+  // steps with every required field blank and only find out via a vague
+  // "fill in all required fields" error from the server at the very end,
+  // with no clue which step or field was the problem.
+  const REQUIRED_BY_STEP = {
+    1: [['fullName', 'Full name'], ['surname', 'Surname'], ['clientEmail', 'Email address'], ['cellPhone', 'Cell phone number']],
+    2: [['eventDate', 'Event date']],
+    3: [['venueArea', 'Area / Suburb']],
+    4: [['guestCount', 'Total guests expected']],
+  }
+
+  const validateStep = (stepNum) => {
+    const fields = REQUIRED_BY_STEP[stepNum]
+    if (!fields) return true
+    const missing = fields.find(([key]) => !String(form[key] || '').trim())
+    if (missing) {
+      setError(`${missing[1]} is required`)
+      return false
+    }
+    setError('')
+    return true
+  }
+
+  const goToStep = (nextStep) => {
+    if (nextStep > step && !validateStep(step)) return
+    setStep(nextStep)
+  }
+
   const handleSubmit = async () => {
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)) return
     setError('')
     try {
       const res = await fetch('/api/ekoyini/quote', {
@@ -265,10 +296,13 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
       )}
 
       {step < 6 && (
-        <div className="flex gap-2 mt-2">
-          {step > 1 && <button onClick={() => setStep(step - 1)} className="flex-1 border-2 border-terracotta/25 text-brand-black font-bold py-2 rounded-pill text-sm">Back</button>}
-          <button onClick={() => setStep(step + 1)} className="flex-1 bg-brand-blue text-brand-cream font-bold py-2 rounded-pill text-sm">Next</button>
-        </div>
+        <>
+          {error && <p className="text-brand-ochre text-sm mb-2">{error}</p>}
+          <div className="flex gap-2 mt-2">
+            {step > 1 && <button onClick={() => goToStep(step - 1)} className="flex-1 border-2 border-terracotta/25 text-brand-black font-bold py-2 rounded-pill text-sm">Back</button>}
+            <button onClick={() => goToStep(step + 1)} className="flex-1 bg-brand-blue text-brand-cream font-bold py-2 rounded-pill text-sm">Next</button>
+          </div>
+        </>
       )}
     </div>
   )
