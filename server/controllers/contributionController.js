@@ -4,51 +4,56 @@ import prisma from '../config/db.js';
 // Member marks a contribution as paid — this does NOT touch the ledger yet.
 // It's a claim, pending an official's confirmation.
 export async function confirmContribution(req, res) {
-          const userId = req.userId;
-                  const { contributionId, pin } = req.body;
+  const userId = req.userId;
+  const { contributionId, pin } = req.body;
 
-                            if (!contributionId) return res.status(400).json({ error: 'contributionId is required' });
-                                        if (!pin) return res.status(400).json({ error: 'PIN is required to confirm a contribution' });
+  if (!contributionId) return res.status(400).json({ error: 'contributionId is required' });
+  if (!pin) return res.status(400).json({ error: 'PIN is required to confirm a contribution' });
 
-                                                      const { verifyPin } = await import('../services/pinService.js');
-                                                                      const pinCheck = await verifyPin(userId, pin);
-                                                                                        if (!pinCheck.valid) {
-                                                                                                                      const message = pinCheck.reason === 'NO_PIN_SET'
-                                                                                                                                                      ? 'You need to set a security PIN first — go to More → Security PIN.'
-                                                                                                                                                                                            : 'Incorrect PIN';
-                                                                                                                                                                                                                                      return res.status(401).json({ error: message });
-                                                                                        }
+  const { verifyPin } = await import('../services/pinService.js');
+  const pinCheck = await verifyPin(userId, pin);
+  if (!pinCheck.valid) {
+    const message = pinCheck.reason === 'NO_PIN_SET'
+      ? 'You need to set a security PIN first — go to More → Security PIN.'
+      : 'Incorrect PIN';
+    return res.status(401).json({ error: message });
+  }
 
-                                                                                                            try {
-                                                                                                                                            const contribution = await prisma.contribution.findUnique({ where: { id: contributionId } });
-                                                                                                                                                                            if (!contribution) return res.status(404).json({ error: 'Contribution not found' });
-                                                                                                                                                                                                                if (contribution.status === 'CONFIRMED') return res.status(409).json({ error: 'Already confirmed' });
+  try {
+    const contribution = await prisma.contribution.findUnique({ where: { id: contributionId } });
+    if (!contribution) return res.status(404).json({ error: 'Contribution not found' });
+    if (contribution.status === 'CONFIRMED') return res.status(409).json({ error: 'Already confirmed' });
 
-                                                                                                                                                                                                                                                        const official = await prisma.stokvelOfficial.findFirst({
-                                                                                                                                                                                                                                                                                                              where: { stokvelId: contribution.stokvelId, userId },
-                                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                                                                                    if (!official) return res.status(403).json({ error: 'Only stokvel officials can confirm contributions' });
+    const official = await prisma.stokvelOfficial.findFirst({
+      where: { stokvelId: contribution.stokvelId, userId },
+    });
+    if (!official) return res.status(403).json({ error: 'Only stokvel officials can confirm contributions' });
 
-                                                                                                                                                                                                                                                                                                                                                    const updated = await prisma.$transaction(async (tx) => {
-                                                                                                                                                                                                                                                                                                                                                                                                                  const confirmed = await tx.contribution.update({
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            where: { id: contributionId },
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          data: { status: 'CONFIRMED' },
-                                                                                                                                                                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  await tx.stokvelGroupLedger.update({
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  where: { stokvelId: contribution.stokvelId },
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      data: { totalBalance: { increment: contribution.amount } },
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        return confirmed;
-                                                                                                                                                                                                                                                                                                                                                    });
+    // Two officials confirming the same contribution within the same narrow
+    // window could both pass the plain status check above before either
+    // write commits, then both increment the ledger — crediting one real
+    // contribution twice. Gate the update itself on status still being
+    // PENDING; only the request that actually flips it touches the ledger.
+    const updated = await prisma.$transaction(async (tx) => {
+      const claim = await tx.contribution.updateMany({
+        where: { id: contributionId, status: 'PENDING' },
+        data: { status: 'CONFIRMED' },
+      });
+      if (claim.count === 0) return null;
+      await tx.stokvelGroupLedger.update({
+        where: { stokvelId: contribution.stokvelId },
+        data: { totalBalance: { increment: contribution.amount } },
+      });
+      return tx.contribution.findUnique({ where: { id: contributionId } });
+    });
 
-                                                                                                                                                                                                                                                                                                                                                                                                        res.json({ contribution: updated, message: 'Contribution confirmed and added to the group ledger.' });
-                                                                                                            } catch (error) {
-                                                                                                                                            console.error('Confirm contribution error:', error.message);
-                                                                                                                                                                            res.status(500).json({ error: 'Could not confirm contribution' });
-                                                                                                            }
+    if (!updated) return res.status(409).json({ error: 'Already confirmed' });
+    res.json({ contribution: updated, message: 'Contribution confirmed and added to the group ledger.' });
+  } catch (error) {
+    console.error('Confirm contribution error:', error.message);
+    res.status(500).json({ error: 'Could not confirm contribution' });
+  }
 }
-
-// src/controllers/contributionController.js
 
 export async function submitContribution(req, res) {
   const userId = req.userId;
