@@ -5,13 +5,17 @@ export async function addExpenditureEntry(req, res) {
         if (!itemName || !price || !purchasedAt) {
                 return res.status(400).json({ error: 'itemName, price, and purchasedAt are required' });
         }
+          const numericPrice = parseFloat(price);
+            if (isNaN(numericPrice) || numericPrice <= 0) {
+                  return res.status(400).json({ error: 'price must be a positive number' });
+            }
 
           try {
                   const entry = await prisma.expenditureEntry.create({
                             data: {
                                         userId: req.userId,
                                                 itemName,
-                                                        price: parseFloat(price),
+                                                        price: numericPrice,
                                                                 category: category || null,
                                                                         source: 'MANUAL',
                                                                                 purchasedAt: new Date(purchasedAt),

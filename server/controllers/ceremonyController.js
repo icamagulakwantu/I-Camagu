@@ -251,6 +251,20 @@ export const updateChecklistItemCost = async (req, res) => {
       try {
               const { itemId } = req.params;
                   const { actualCostZAR } = req.body;
+                  // undefined (field omitted) leaves the cost untouched, matching
+                  // Prisma's own semantics; '' or null explicitly clears it; anything
+                  // else must be a real, non-negative number.
+                  let costValue;
+                  if (actualCostZAR === undefined) {
+                    costValue = undefined;
+                  } else if (actualCostZAR === '' || actualCostZAR === null) {
+                    costValue = null;
+                  } else {
+                    costValue = parseFloat(actualCostZAR);
+                    if (isNaN(costValue) || costValue < 0) {
+                      return res.status(400).json({ error: 'actualCostZAR must be a positive number, or null to clear it' });
+                    }
+                  }
 
                       const item = await prisma.checklistItem.findUnique({
                                 where: { id: itemId },
@@ -262,7 +276,7 @@ export const updateChecklistItemCost = async (req, res) => {
 
                                   const updated = await prisma.checklistItem.update({
                                             where: { id: itemId },
-                                                  data: { actualCostZAR },
+                                                  data: { actualCostZAR: costValue },
                                   });
                                       res.json(updated);
       } catch (error) {
@@ -308,6 +322,14 @@ export const addCeremonyChecklistItem = async (req, res) => {
       const { phase, label, isOptional, actualCostZAR } = req.body;
       if (!label) return res.status(400).json({ error: 'label is required' });
 
+      let costValue = null;
+      if (actualCostZAR !== undefined && actualCostZAR !== '' && actualCostZAR !== null) {
+        costValue = parseFloat(actualCostZAR);
+        if (isNaN(costValue) || costValue < 0) {
+          return res.status(400).json({ error: 'actualCostZAR must be a positive number, or omitted' });
+        }
+      }
+
       try {
             const ceremony = await prisma.ceremony.findUnique({ where: { id } });
             if (!ceremony) return res.status(404).json({ error: 'Ceremony not found' });
@@ -322,9 +344,7 @@ export const addCeremonyChecklistItem = async (req, res) => {
                         // Real cost, entered right when the item is added — never a
                         // hardcoded catalogue price, since plenty of real ceremony
                         // costs (a friend's bakkie, a borrowed tent) have no SKU.
-                        actualCostZAR: actualCostZAR !== undefined && actualCostZAR !== '' && actualCostZAR !== null
-                              ? actualCostZAR
-                              : null,
+                        actualCostZAR: costValue,
                   },
             });
             res.status(201).json(item);
@@ -566,6 +586,18 @@ export const updateCeremony = async (req, res) => {
               const { id } = req.params;
                   const { title, eventDate, status, notes, budgetZAR, guestCount } = req.body;
 
+                      let parsedBudget;
+                      if (budgetZAR === undefined) {
+                        parsedBudget = undefined;
+                      } else if (budgetZAR === '' || budgetZAR === null) {
+                        parsedBudget = null;
+                      } else {
+                        parsedBudget = parseFloat(budgetZAR);
+                        if (isNaN(parsedBudget) || parsedBudget < 0) {
+                          return res.status(400).json({ error: 'budgetZAR must be a positive number, or null to clear it' });
+                        }
+                      }
+
                       const ceremony = await prisma.ceremony.findUnique({ where: { id } });
 
                           if (!ceremony) return res.status(404).json({ error: 'Ceremony not found' });
@@ -578,7 +610,7 @@ export const updateCeremony = async (req, res) => {
                                                                       eventDate: eventDate ? new Date(eventDate) : undefined,
                                                                               status: status || undefined,
                                                                                       notes: notes !== undefined ? notes : undefined,
-                                                                                              budgetZAR: budgetZAR !== undefined ? (budgetZAR === '' || budgetZAR === null ? null : budgetZAR) : undefined,
+                                                                                              budgetZAR: parsedBudget,
                                                                                               guestCount: guestCount !== undefined ? (guestCount === '' || guestCount === null ? null : parseInt(guestCount, 10)) : undefined,
                                                   },
                                   });
@@ -608,7 +640,15 @@ export const updateChecklistItem = async (req, res) => {
                                   const data = {};
                                   if (isCompleted !== undefined) data.isCompleted = !!isCompleted;
                                   if (actualCostZAR !== undefined) {
-                                        data.actualCostZAR = actualCostZAR === null || actualCostZAR === '' ? null : actualCostZAR;
+                                        if (actualCostZAR === null || actualCostZAR === '') {
+                                          data.actualCostZAR = null;
+                                        } else {
+                                          const parsedCost = parseFloat(actualCostZAR);
+                                          if (isNaN(parsedCost) || parsedCost < 0) {
+                                            return res.status(400).json({ error: 'actualCostZAR must be a positive number, or null to clear it' });
+                                          }
+                                          data.actualCostZAR = parsedCost;
+                                        }
                                   }
 
                                   const updated = await prisma.ceremonyChecklistItem.update({
