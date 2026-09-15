@@ -999,7 +999,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         ) : (
           <div className="space-y-2">
             {plans.map((plan) => {
-              const done = plan.checklistItems?.filter(i => i.isChecked).length || 0
+              const done = plan.checklistItems?.filter(i => i.isChecked || i.isCompleted).length || 0
               const total = plan.checklistItems?.length || 0
               return (
                 <button
