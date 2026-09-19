@@ -50,6 +50,7 @@ const EXTRACTED_BRAND_IMAGES = {
   "Hunter's Chilled": 'hunters-chilled',
   'Windhoek Lager/Light': 'windhoek-lager',
   'Amstel Lager': 'amstel-lager',
+  'Castle Milk Stout': 'castle-milk-stout',
 };
 
 export async function backfillExtractedBrandPhotos() {
