@@ -14,7 +14,6 @@ const BROKEN_PHOTO_NAMES = [
   "Redd's MXD Pine/Guarana",
   'Three Ships 5 Year Old',
   'Cointreau Orange Liqueur',
-  'Viceroy 5 Year Old',
   '4th Street Sweet Red/White',
   '4th Street Sweet Red/Rose',
   'Amarula Original Cream',

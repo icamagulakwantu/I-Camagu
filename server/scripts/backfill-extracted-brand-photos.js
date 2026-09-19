@@ -52,6 +52,13 @@ const EXTRACTED_BRAND_IMAGES = {
   'Amstel Lager': 'amstel-lager',
   'Castle Milk Stout': 'castle-milk-stout',
   'Guinness Foreign Extra': 'guinness-foreign-extra',
+  'Wellington VO': 'wellington-vo',
+  // A real bottle photo arrived after this was cleared for having a
+  // text-only logo card — restored now with the actual product photo.
+  'Viceroy 5 Year Old': 'viceroy',
+  'Southern Comfort': 'southern-comfort',
+  'Captain Morgan Spiced Gold': 'captain-morgan-spiced-gold',
+  'Klipdrift Premium': 'klipdrift-premium',
 };
 
 export async function backfillExtractedBrandPhotos() {

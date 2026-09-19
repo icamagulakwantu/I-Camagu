@@ -26,6 +26,7 @@ import { backfillExtractedBrandPhotos } from './scripts/backfill-extracted-brand
 import { clearBrokenBrandPhotos } from './scripts/clear-broken-brand-photos.js';
 import { backfillFormatSpecificPhotos } from './scripts/backfill-format-specific-photos.js';
 import { fixBeerQuartFormats } from './scripts/fix-beer-quart-formats.js';
+import { backfillFounderSourcedSkus } from './scripts/backfill-founder-sourced-skus.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -215,6 +216,9 @@ ensureCeremonyBudgetColumns()
       });
       await backfillVerifiedRetailPrices().catch((err) => {
         logBackfillError('Verified retail price backfill', err);
+      });
+      await backfillFounderSourcedSkus().catch((err) => {
+        logBackfillError('Founder-sourced SKU backfill', err);
       });
       await backfillExtractedBrandPhotos().catch((err) => {
         logBackfillError('Extracted brand photo backfill', err);
