@@ -48,7 +48,7 @@ const EXTRACTED_BRAND_IMAGES = {
   'Breezer (Red/Watermelon)': 'breezer',
   'Chillers Punch': 'chillers-punch',
   "Hunter's Chilled": 'hunters-chilled',
-  'Windhoek Lager/Light': 'windhoek-lager',
+  'Windhoek Lager': 'windhoek-lager',
   'Amstel Lager': 'amstel-lager',
   'Castle Milk Stout': 'castle-milk-stout',
   'Guinness Foreign Extra': 'guinness-foreign-extra',

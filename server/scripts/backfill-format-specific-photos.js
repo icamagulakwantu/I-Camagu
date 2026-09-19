@@ -16,6 +16,14 @@ const FORMAT_SPECIFIC_IMAGES = [
   // the original bottle shot untouched.
   { name: 'Heineken', bottleFormat: 'Can (500ml)', slug: 'heineken-can' },
   { name: 'Heineken', bottleFormat: 'Dumpy (340ml)', slug: 'heineken-dumpy' },
+  // Windhoek Lager's can; the bottle shot (windhoek-lager.png, matched by
+  // name in backfill-extracted-brand-photos.js) already covers Quart/Dumpy.
+  { name: 'Windhoek Lager', bottleFormat: 'Can (500ml)', slug: 'windhoek-lager-can' },
+  // Windhoek Draught and Stella Artois already had a real bottle photo
+  // (windhoek-draught.png / stella-artois.png) covering every format by
+  // name; these give their Can row its own actual can photo instead.
+  { name: 'Windhoek Draught', bottleFormat: 'Can (500ml)', slug: 'windhoek-draught-can' },
+  { name: 'Stella Artois', bottleFormat: 'Can (500ml)', slug: 'stella-artois-can' },
 ];
 
 export async function backfillFormatSpecificPhotos() {

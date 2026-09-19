@@ -25,6 +25,7 @@ import { backfillQuartGaps } from './scripts/backfill-quart-gaps.js';
 import { backfillExtractedBrandPhotos } from './scripts/backfill-extracted-brand-photos.js';
 import { clearBrokenBrandPhotos } from './scripts/clear-broken-brand-photos.js';
 import { backfillFormatSpecificPhotos } from './scripts/backfill-format-specific-photos.js';
+import { fixBeerQuartFormats } from './scripts/fix-beer-quart-formats.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -182,6 +183,9 @@ ensureCeremonyBudgetColumns()
     // Idempotent — safe to run on every boot, once DATABASE_URL is fixed.
     // Sequential, not concurrent, so they don't pile onto the pooler at once.
     (async () => {
+      await fixBeerQuartFormats().catch((err) => {
+        logBackfillError('Beer quart format fix', err);
+      });
       await backfillBrandImages().catch((err) => {
         logBackfillError('Brand image backfill', err);
       });
