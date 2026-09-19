@@ -23,6 +23,16 @@ const SPLITS = [
   { bundledName: 'Brutal Fruit Ruby/Litchi', flavours: ['Brutal Fruit Ruby Apple', 'Brutal Fruit Strawberry Rouge'] },
   { bundledName: 'Breezer (Red/Watermelon)', flavours: ['Breezer Blueberry', 'Breezer Watermelon', 'Breezer Blackberry'] },
   { bundledName: 'Belgravia G&T (Asstd)', flavours: ['Belgravia Gin & Dark Cherry', 'Belgravia Gin & Dry Lemon'] },
+  // "Strawberry/Lime" was never the full flavour range — real photos show
+  // four: Pear, Strawberry & Lime, Raspberry, Mixed Fruit.
+  { bundledName: 'Kopparberg Strawberry/Lime', flavours: ['Kopparberg Pear', 'Kopparberg Strawberry & Lime', 'Kopparberg Raspberry', 'Kopparberg Mixed Fruit'] },
+  // "Green" wasn't a real Redd's flavour — the actual third variant is Dry.
+  { bundledName: "Redd's Berry/Orig/Green", flavours: ["Redd's Original", "Redd's Berry", "Redd's Dry"] },
+  { bundledName: "Redd's MXD Pine/Guarana", flavours: ["Redd's MXD Pine", "Redd's MXD Guarana"] },
+  { bundledName: "Hunter's Dry/Gold", flavours: ["Hunter's Dry", "Hunter's Gold"] },
+  // Not a slash-bundled name, but the same underlying problem: one generic
+  // Sku standing in for several real, differently flavoured products.
+  { bundledName: 'Chillers Punch', flavours: ['Chillers Punch Milano Spritz', 'Chillers Punch Caribbean Chaos', 'Chillers Punch Tequila Sunrise (Zero Alcohol)', 'Chillers Punch Peach & Mango'] },
 ];
 
 export async function splitBundledFlavourSkus() {

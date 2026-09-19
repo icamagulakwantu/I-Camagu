@@ -44,7 +44,10 @@ const EXTRACTED_BRAND_IMAGES = {
   'Lion Lager': 'lion-lager',
   'Extreme Energy': 'extreme-energy',
   'Flying Fish Lemon/Apple': 'flying-fish-lemon-apple',
-  'Chillers Punch': 'chillers-punch',
+  // Seed data pointed this at flying-fish-chill.jpg, a file that did exist
+  // but was a low-quality flyer crop; replaced with a real studio shot
+  // (saved as .png, matching the convention every other entry here uses).
+  'Flying Fish Chill': 'flying-fish-chill',
   "Hunter's Chilled": 'hunters-chilled',
   'Windhoek Lager': 'windhoek-lager',
   'Amstel Lager': 'amstel-lager',
@@ -73,6 +76,24 @@ const EXTRACTED_BRAND_IMAGES = {
   'Bernini Blush': 'bernini-blush',
   'Belgravia Gin & Dark Cherry': 'belgravia-dark-cherry',
   'Belgravia Gin & Dry Lemon': 'belgravia-dry-lemon',
+  'Kopparberg Pear': 'kopparberg-pear',
+  'Kopparberg Strawberry & Lime': 'kopparberg-strawberry-lime',
+  'Kopparberg Raspberry': 'kopparberg-raspberry',
+  // Mixed Fruit only has a can photo — used as the default for every format.
+  'Kopparberg Mixed Fruit': 'kopparberg-mixed-fruit-can',
+  "Redd's Original": 'redds-original',
+  "Redd's Berry": 'redds-berry',
+  "Redd's Dry": 'redds-dry',
+  "Redd's MXD Pine": 'redds-mxd-pine',
+  "Redd's MXD Guarana": 'redds-mxd-guarana',
+  "Hunter's Dry": 'hunters-dry',
+  "Hunter's Gold": 'hunters-gold',
+  // All four Chillers Punch flavours only have a can photo — used as the
+  // default for every format (Can and Dumpy both).
+  'Chillers Punch Milano Spritz': 'chillers-punch-milano-spritz',
+  'Chillers Punch Caribbean Chaos': 'chillers-punch-caribbean-chaos',
+  'Chillers Punch Tequila Sunrise (Zero Alcohol)': 'chillers-punch-tequila-sunrise-zero',
+  'Chillers Punch Peach & Mango': 'chillers-punch-peach-mango',
 };
 
 export async function backfillExtractedBrandPhotos() {

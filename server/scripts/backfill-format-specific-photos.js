@@ -33,6 +33,13 @@ const FORMAT_SPECIFIC_IMAGES = [
   { name: 'Breezer Blackberry', bottleFormat: 'Can (500ml)', slug: 'breezer-blackberry-can' },
   { name: 'Bernini Classic', bottleFormat: 'Can (500ml)', slug: 'bernini-classic-can' },
   { name: 'Bernini Blush', bottleFormat: 'Can (500ml)', slug: 'bernini-blush-can' },
+  { name: 'Kopparberg Pear', bottleFormat: 'Can (500ml)', slug: 'kopparberg-pear-can' },
+  { name: 'Kopparberg Strawberry & Lime', bottleFormat: 'Can (500ml)', slug: 'kopparberg-strawberry-lime-can' },
+  { name: "Redd's Original", bottleFormat: 'Can (500ml)', slug: 'redds-original-can' },
+  { name: "Redd's Berry", bottleFormat: 'Can (500ml)', slug: 'redds-berry-can' },
+  { name: "Hunter's Gold", bottleFormat: 'Can (500ml)', slug: 'hunters-gold-can' },
+  { name: 'Flying Fish Chill', bottleFormat: 'Can (500ml)', slug: 'flying-fish-chill-can' },
+  { name: 'Extreme Energy', bottleFormat: 'Can (500ml)', slug: 'extreme-energy-can' },
 ];
 
 export async function backfillFormatSpecificPhotos() {
