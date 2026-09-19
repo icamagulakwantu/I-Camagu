@@ -40,6 +40,11 @@ const FORMAT_SPECIFIC_IMAGES = [
   { name: "Hunter's Gold", bottleFormat: 'Can (500ml)', slug: 'hunters-gold-can' },
   { name: 'Flying Fish Chill', bottleFormat: 'Can (500ml)', slug: 'flying-fish-chill-can' },
   { name: 'Extreme Energy', bottleFormat: 'Can (500ml)', slug: 'extreme-energy-can' },
+  // Savanna Dry's big returnable bottle (fix-savanna-dry-format.js corrected
+  // it from a wrong 750ml to the real 500ml) gets its own photo, distinct
+  // from the Dumpy bottle shot that's the default for the name.
+  { name: 'Savanna Dry', bottleFormat: 'Quart (500ml)', slug: 'savanna-dry-quart' },
+  { name: 'Savanna Dry', bottleFormat: 'Can (500ml)', slug: 'savanna-dry-can' },
 ];
 
 export async function backfillFormatSpecificPhotos() {

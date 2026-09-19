@@ -27,7 +27,7 @@ const EXTRACTED_BRAND_IMAGES = {
   'Black Label': 'carling-black-label',
   'Castle Lite': 'castle-lite',
   'Windhoek Draught': 'windhoek-draught',
-  'Savanna Dry/Light': 'savanna-dry',
+  'Savanna Dry': 'savanna-dry',
   'Stella Artois': 'stella-artois',
   'Corona': 'corona',
   'Johnnie Walker Red Label': 'johnnie-walker-red-label',

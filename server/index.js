@@ -26,6 +26,7 @@ import { backfillExtractedBrandPhotos } from './scripts/backfill-extracted-brand
 import { clearBrokenBrandPhotos } from './scripts/clear-broken-brand-photos.js';
 import { backfillFormatSpecificPhotos } from './scripts/backfill-format-specific-photos.js';
 import { fixBeerQuartFormats } from './scripts/fix-beer-quart-formats.js';
+import { fixSavannaDryFormat } from './scripts/fix-savanna-dry-format.js';
 import { backfillFounderSourcedSkus } from './scripts/backfill-founder-sourced-skus.js';
 import { splitBundledFlavourSkus } from './scripts/split-bundled-flavour-skus.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
@@ -187,6 +188,9 @@ ensureCeremonyBudgetColumns()
     (async () => {
       await fixBeerQuartFormats().catch((err) => {
         logBackfillError('Beer quart format fix', err);
+      });
+      await fixSavannaDryFormat().catch((err) => {
+        logBackfillError('Savanna Dry format fix', err);
       });
       await splitBundledFlavourSkus().catch((err) => {
         logBackfillError('Bundled flavour split', err);
