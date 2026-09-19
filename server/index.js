@@ -22,6 +22,7 @@ import { backfillClothingSkus } from './scripts/backfill-clothing-skus.js';
 import { backfillMoninSyrups } from './scripts/backfill-monin-syrups.js';
 import { backfillBulkUnits, backfillVerifiedRetailPrices } from './scripts/backfill-bulk-units.js';
 import { backfillExtractedBrandPhotos } from './scripts/backfill-extracted-brand-photos.js';
+import { clearBrokenBrandPhotos } from './scripts/clear-broken-brand-photos.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -208,6 +209,9 @@ ensureCeremonyBudgetColumns()
       });
       await backfillExtractedBrandPhotos().catch((err) => {
         logBackfillError('Extracted brand photo backfill', err);
+      });
+      await clearBrokenBrandPhotos().catch((err) => {
+        logBackfillError('Broken brand photo clear', err);
       });
     })();
   });

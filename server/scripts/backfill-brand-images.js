@@ -16,29 +16,18 @@ const BRAND_IMAGES = {
   // in alcohol-image-sources.json / backfill-alcohol-photos.js; removed
   // from here so this boot-time backfill can't overwrite them back to the
   // deleted logo files on the next deploy.
-  'Brutal Fruit Ruby/Litchi': 'brutal-fruit',
-  "Redd's Berry/Orig/Green": 'redds',
-  "Redd's MXD Pine/Guarana": 'mxd',
+  //
+  // A second wave went the same way: Brutal Fruit, Redd's (both), Glenfiddich
+  // 12, Three Ships, Strettons (both), Russian Bear (both), Remy Martin
+  // (both), Jose Cuervo Especial (both), Cointreau, Viceroy, 4th Street
+  // (both), Amarula (both), Bernini and Count Pushkin were either a plain
+  // text/wordmark logo card with no bottle in it at all, or a bottle at an
+  // angle against a colored lifestyle-photo background (some cropped from a
+  // black card, several also caught a second bottle in frame) — same fix:
+  // pulled from here and the files deleted, rather than left showing a photo
+  // that isn't an actual clean product shot.
   'Hennessy VS': 'hennessy-vs',
   'Hennessy VSOP': 'hennessy-vsop',
-  'Glenfiddich 12 Year': 'glenfiddich-12',
-  'Three Ships 5 Year Old': 'three-ships',
-  'Strettons London Dry': 'strettons-london-dry',
-  'Strettons Wild Berry': 'strettons-wild-berry',
-  'Russian Bear Standard': 'russian-bear-standard',
-  'Russian Bear Flavours': 'russian-bear-flavours',
-  'Remy Martin VSOP': 'remy-martin-vsop',
-  'Remy Martin 1738 Accord Royal': 'remy-martin-1738',
-  'Jose Cuervo Especial Silver': 'jose-cuervo-especial-silver',
-  'Jose Cuervo Especial Reposado': 'jose-cuervo-especial-reposado',
-  'Cointreau Orange Liqueur': 'cointreau',
-  'Viceroy 5 Year Old': 'viceroy',
-  '4th Street Sweet Red/White': '4th-street',
-  '4th Street Sweet Red/Rose': '4th-street',
-  'Amarula Original Cream': 'amarula',
-  'Amarula Ethiopian Coffee': 'amarula',
-  'Bernini Classic/Blush/Ruby': 'bernini',
-  'Count Pushkin Vodka': 'count-pushkin',
 };
 
 export async function backfillBrandImages() {

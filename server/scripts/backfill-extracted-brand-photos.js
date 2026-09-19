@@ -48,6 +48,8 @@ const EXTRACTED_BRAND_IMAGES = {
   'Breezer (Red/Watermelon)': 'breezer',
   'Chillers Punch': 'chillers-punch',
   "Hunter's Chilled": 'hunters-chilled',
+  'Windhoek Lager/Light': 'windhoek-lager',
+  'Amstel Lager': 'amstel-lager',
 };
 
 export async function backfillExtractedBrandPhotos() {
