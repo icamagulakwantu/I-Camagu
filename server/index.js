@@ -21,6 +21,7 @@ import { backfillGroceryBulkCatalog } from './scripts/backfill-grocery-bulk-cata
 import { backfillClothingSkus } from './scripts/backfill-clothing-skus.js';
 import { backfillMoninSyrups } from './scripts/backfill-monin-syrups.js';
 import { backfillBulkUnits, backfillVerifiedRetailPrices } from './scripts/backfill-bulk-units.js';
+import { backfillQuartGaps } from './scripts/backfill-quart-gaps.js';
 import { backfillExtractedBrandPhotos } from './scripts/backfill-extracted-brand-photos.js';
 import { clearBrokenBrandPhotos } from './scripts/clear-broken-brand-photos.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
@@ -200,6 +201,9 @@ ensureCeremonyBudgetColumns()
       });
       await backfillMoninSyrups().catch((err) => {
         logBackfillError('Monin syrup backfill', err);
+      });
+      await backfillQuartGaps().catch((err) => {
+        logBackfillError('Quart gap backfill', err);
       });
       await backfillBulkUnits().catch((err) => {
         logBackfillError('Bulk unit backfill', err);
