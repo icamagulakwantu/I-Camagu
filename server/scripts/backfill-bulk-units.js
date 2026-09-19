@@ -45,7 +45,7 @@ const VERIFIED_RETAIL = [
   // SA brandy — Checkers / Makro shelf price.
   { name: 'Klipdrift Export', bottleFormat: '750ml Bottle', retail: 189.99, source: 'Checkers' },
   // Beer quart-format gaps (backfill-quart-gaps.js) — shelf price per bottle.
-  { name: 'Flying Fish Lemon/Apple', bottleFormat: 'Quart (660ml)', retail: 24.99, source: 'Shoprite' },
+  { name: 'Flying Fish Lemon', bottleFormat: 'Quart (660ml)', retail: 24.99, source: 'Shoprite' },
   { name: 'Stella Artois', bottleFormat: 'Quart (620ml)', retail: 28.00, source: 'Pick n Pay' },
 ];
 

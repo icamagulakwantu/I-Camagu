@@ -10,13 +10,12 @@ import prisma from '../config/db.js';
 
 const BROKEN_PHOTO_NAMES = [
   // 'Brutal Fruit Ruby/Litchi', 'Bernini Classic/Blush/Ruby', "Redd's
-  // Berry/Orig/Green" and "Redd's MXD Pine/Guarana" themselves no longer
-  // exist — all split into per-flavour rows (split-bundled-flavour-skus.js),
-  // which now have their own real photos.
+  // Berry/Orig/Green", "Redd's MXD Pine/Guarana", '4th Street Sweet
+  // Red/White' and '4th Street Sweet Red/Rose' themselves no longer exist —
+  // all split into per-flavour rows (split-bundled-flavour-skus.js), which
+  // now have their own real photos.
   'Three Ships 5 Year Old',
   'Cointreau Orange Liqueur',
-  '4th Street Sweet Red/White',
-  '4th Street Sweet Red/Rose',
   'Amarula Original Cream',
   'Amarula Ethiopian Coffee',
   'Count Pushkin Vodka',

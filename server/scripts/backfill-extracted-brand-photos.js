@@ -43,7 +43,10 @@ const EXTRACTED_BRAND_IMAGES = {
   'Hansa Pilsener': 'hansa-pilsener',
   'Lion Lager': 'lion-lager',
   'Extreme Energy': 'extreme-energy',
-  'Flying Fish Lemon/Apple': 'flying-fish-lemon-apple',
+  // Bundled name split (split-bundled-flavour-skus.js) — the photo actually
+  // shows the Lemon flavour specifically, so it stays with that row; Apple
+  // starts with no photo until one arrives.
+  'Flying Fish Lemon': 'flying-fish-lemon-apple',
   // Seed data pointed this at flying-fish-chill.jpg, a file that did exist
   // but was a low-quality flyer crop; replaced with a real studio shot
   // (saved as .png, matching the convention every other entry here uses).
@@ -94,6 +97,12 @@ const EXTRACTED_BRAND_IMAGES = {
   'Chillers Punch Caribbean Chaos': 'chillers-punch-caribbean-chaos',
   'Chillers Punch Tequila Sunrise (Zero Alcohol)': 'chillers-punch-tequila-sunrise-zero',
   'Chillers Punch Peach & Mango': 'chillers-punch-peach-mango',
+  // These two photos were set on the old bundled row by a direct manual
+  // write, not through this dict, so the split (which never copies
+  // imageUrl) would otherwise drop them. Each photo shows one specific
+  // flavour, so it stays with that row; the other flavours start bare.
+  'Sambuca Lupini Black': 'sambuca-lupini-black-gold',
+  'Absolut Watermelon': 'absolut-watermelon-lime-citron',
 };
 
 export async function backfillExtractedBrandPhotos() {

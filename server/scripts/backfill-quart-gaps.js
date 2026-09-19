@@ -21,7 +21,7 @@ import prisma from '../config/db.js';
 import { upsertSkuByNameAndBottleFormat } from '../utils/upsertSku.js';
 
 const QUART_GAPS = [
-  { name: 'Flying Fish Lemon/Apple', bottleFormat: 'Quart (660ml)' },
+  { name: 'Flying Fish Lemon', bottleFormat: 'Quart (660ml)' },
   { name: 'Stella Artois', bottleFormat: 'Quart (620ml)' },
 ];
 

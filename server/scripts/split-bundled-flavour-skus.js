@@ -35,6 +35,23 @@ const SPLITS = [
   // Not a slash-bundled name, but the same underlying problem: one generic
   // Sku standing in for several real, differently flavoured products.
   { bundledName: 'Chillers Punch', flavours: ['Chillers Punch Milano Spritz', 'Chillers Punch Caribbean Chaos', 'Chillers Punch Tequila Sunrise (Zero Alcohol)', 'Chillers Punch Peach & Mango'] },
+  // These bundled "X/Y" names were each a single Sku button covering two or
+  // three genuinely different, independently orderable products — the
+  // merchant had no way to know which flavour was actually ordered, and the
+  // buyer had no way to choose. Split into one row per real product.
+  { bundledName: 'Flying Fish Lemon/Apple', flavours: ['Flying Fish Lemon', 'Flying Fish Apple'] },
+  { bundledName: 'Smirnoff Spin/Storm', flavours: ['Smirnoff Spin', 'Smirnoff Storm'] },
+  { bundledName: 'Strongbow Gold/Apple', flavours: ['Strongbow Gold', 'Strongbow Apple'] },
+  { bundledName: 'Inverroche Amber/Verdant', flavours: ['Inverroche Amber', 'Inverroche Verdant'] },
+  { bundledName: 'Sambuca Generic Blue/White', flavours: ['Sambuca Generic Blue', 'Sambuca Generic White'] },
+  { bundledName: 'Sambuca Lupini Black/Gold', flavours: ['Sambuca Lupini Black', 'Sambuca Lupini Gold'] },
+  { bundledName: 'Lime/Passion Fruit Cordial', flavours: ['Lime Cordial', 'Passion Fruit Cordial'] },
+  { bundledName: 'El Jimador Blanco/Reposado', flavours: ['El Jimador Blanco', 'El Jimador Reposado'] },
+  { bundledName: 'Ponchos Blanco/Caramel Tequila', flavours: ['Ponchos Blanco Tequila', 'Ponchos Caramel Tequila'] },
+  { bundledName: 'Absolut (Watermelon/Lime/Citron)', flavours: ['Absolut Watermelon', 'Absolut Lime', 'Absolut Citron'] },
+  { bundledName: 'Ciroc (Apple/Mango/Pineapple)', flavours: ['Ciroc Apple', 'Ciroc Mango', 'Ciroc Pineapple'] },
+  { bundledName: '4th Street Sweet Red/White', flavours: ['4th Street Sweet Red', '4th Street Sweet White'] },
+  { bundledName: '4th Street Sweet Red/Rose', flavours: ['4th Street Sweet Red', '4th Street Sweet Rosé'] },
 ];
 
 export async function splitBundledFlavourSkus() {
