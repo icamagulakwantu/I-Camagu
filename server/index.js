@@ -24,6 +24,7 @@ import { backfillBulkUnits, backfillVerifiedRetailPrices } from './scripts/backf
 import { backfillQuartGaps } from './scripts/backfill-quart-gaps.js';
 import { backfillExtractedBrandPhotos } from './scripts/backfill-extracted-brand-photos.js';
 import { clearBrokenBrandPhotos } from './scripts/clear-broken-brand-photos.js';
+import { backfillFormatSpecificPhotos } from './scripts/backfill-format-specific-photos.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -213,6 +214,9 @@ ensureCeremonyBudgetColumns()
       });
       await backfillExtractedBrandPhotos().catch((err) => {
         logBackfillError('Extracted brand photo backfill', err);
+      });
+      await backfillFormatSpecificPhotos().catch((err) => {
+        logBackfillError('Format-specific photo backfill', err);
       });
       await clearBrokenBrandPhotos().catch((err) => {
         logBackfillError('Broken brand photo clear', err);
