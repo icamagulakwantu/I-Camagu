@@ -24,6 +24,32 @@ const NEW_SKUS = [
   { name: 'Breezer Blueberry', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
   { name: 'Breezer Watermelon', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
   { name: 'Breezer Blackberry', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
+  // Hunter's Iced — a genuinely new line (not a Dry/Gold reformulation),
+  // confirmed by real bottle and can photos of both flavours.
+  { name: "Hunter's Iced Apple", category: 'CIDER_RTD', bottleFormat: 'Dumpy (340ml)', unitsPerCase: 24 },
+  { name: "Hunter's Iced Apple", category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
+  { name: "Hunter's Iced Watermelon", category: 'CIDER_RTD', bottleFormat: 'Dumpy (340ml)', unitsPerCase: 24 },
+  { name: "Hunter's Iced Watermelon", category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
+  // Kopparberg's 7% "Vintage" range is a distinct, stronger product line
+  // from the standard ~4% Kopparberg Pear already catalogued — not the same
+  // item, so it gets its own row rather than replacing Pear's photo.
+  { name: 'Kopparberg Sweet Vintage Pear', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
+  // Brutal Fruit "Spritzer" is a separate sub-line from the regular Brutal
+  // Fruit RTD range already catalogued (Ruby Apple included) — same
+  // flavour name, different product.
+  { name: 'Brutal Fruit Spritzer Ruby Apple', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
+];
+
+// Bernini Ruby Berry isn't a brand-new product — it was always the third
+// flavour bundled into the original "Bernini Classic/Blush/Ruby" row, split
+// out at the same time as Classic and Blush (split-bundled-flavour-skus.js)
+// with the same pricing, then wrongly deleted as fictional before its real
+// name was confirmed (remove-nonexistent-skus.js). Restoring it copies
+// Classic/Blush's exact pricing per format, not null — this is completing
+// that original split, not adding a new item with no known cost.
+const RESTORED_SKUS = [
+  { name: 'Bernini Ruby Berry', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24, casePriceZAR: 372.48, retailPriceZAR: 575.62, palletPackQty: 84, palletPriceZAR: 29998.08, supplierPortfolio: 'Heineken SA', bulkUnit: 'case', bulkUnitPlural: 'cases' },
+  { name: 'Bernini Ruby Berry', category: 'CIDER_RTD', bottleFormat: 'Dumpy (275ml)', unitsPerCase: 24, casePriceZAR: 325.92, retailPriceZAR: 501.68, palletPackQty: 84, palletPriceZAR: 26248.32, supplierPortfolio: 'Heineken SA', bulkUnit: 'case', bulkUnitPlural: 'cases' },
 ];
 
 export async function backfillFounderSourcedSkus() {
@@ -42,6 +68,11 @@ export async function backfillFounderSourcedSkus() {
       },
       {}
     );
+    if (!before) created++;
+  }
+  for (const item of RESTORED_SKUS) {
+    const before = await prisma.sku.findFirst({ where: { name: item.name, bottleFormat: item.bottleFormat } });
+    await upsertSkuByNameAndBottleFormat(prisma, { ...item, productType: 'ALCOHOL' }, {});
     if (!before) created++;
   }
   if (created > 0) console.log(`Founder-sourced SKU backfill: ${created} new row(s) created.`);

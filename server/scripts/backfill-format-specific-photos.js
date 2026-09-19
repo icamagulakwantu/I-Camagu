@@ -51,6 +51,15 @@ const FORMAT_SPECIFIC_IMAGES = [
   // Hunter's Dry's bottle shot (default, matched by name) was standing in
   // for the Can too until a real can photo arrived.
   { name: "Hunter's Dry", bottleFormat: 'Can (500ml)', slug: 'hunters-dry-can' },
+  // Renamed/new rows (rename-mislabeled-skus.js, backfill-founder-sourced-
+  // skus.js) — bottle shot is each name's default, Can/Dumpy formats get
+  // their own actual pack-format photo.
+  { name: "Hunter's Iced Apple", bottleFormat: 'Can (500ml)', slug: 'hunters-iced-apple-can' },
+  { name: "Hunter's Iced Watermelon", bottleFormat: 'Can (500ml)', slug: 'hunters-iced-watermelon-can' },
+  { name: 'Strongbow Gold Apple', bottleFormat: 'Can (500ml)', slug: 'strongbow-gold-apple-can' },
+  { name: 'Strongbow Red Berries', bottleFormat: 'Can (500ml)', slug: 'strongbow-red-berries-can' },
+  { name: 'Smirnoff Storm Pine Twist', bottleFormat: 'Dumpy (250ml)', slug: 'smirnoff-storm-pine-twist-dumpy' },
+  { name: 'Smirnoff Storm Citrus', bottleFormat: 'Dumpy (250ml)', slug: 'smirnoff-storm-citrus-dumpy' },
 ];
 
 export async function backfillFormatSpecificPhotos() {

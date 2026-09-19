@@ -103,6 +103,17 @@ const EXTRACTED_BRAND_IMAGES = {
   // flavour, so it stays with that row; the other flavours start bare.
   'Sambuca Lupini Black': 'sambuca-lupini-black-gold',
   'Absolut Watermelon': 'absolut-watermelon-lime-citron',
+  // Renamed rows (rename-mislabeled-skus.js) and their real photos.
+  'Strongbow Gold Apple': 'strongbow-gold-apple',
+  'Strongbow Red Berries': 'strongbow-red-berries',
+  'Smirnoff Storm Pine Twist': 'smirnoff-storm-pine-twist',
+  'Smirnoff Storm Citrus': 'smirnoff-storm-citrus',
+  // New products (backfill-founder-sourced-skus.js).
+  "Hunter's Iced Apple": 'hunters-iced-apple',
+  "Hunter's Iced Watermelon": 'hunters-iced-watermelon',
+  'Kopparberg Sweet Vintage Pear': 'kopparberg-sweet-vintage-pear',
+  'Brutal Fruit Spritzer Ruby Apple': 'brutal-fruit-spritzer-ruby-apple',
+  'Bernini Ruby Berry': 'bernini-ruby-berry',
 };
 
 export async function backfillExtractedBrandPhotos() {

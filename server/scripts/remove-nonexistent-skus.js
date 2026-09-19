@@ -9,7 +9,12 @@
 import prisma from '../config/db.js';
 
 const NONEXISTENT_SKU_NAMES = [
-  // Bernini only ships Classic and Blush — there's no Ruby variant.
+  // Correction: Bernini's third flavour turned out to be real after all — a
+  // photo showed it, just under its actual name "Ruby Berry", not the bare
+  // "Ruby" this list previously (and wrongly) called fictional. See
+  // backfill-founder-sourced-skus.js, which restores it under the right
+  // name. This entry stays only so a stray "Bernini Ruby" row — the wrong
+  // name — never lingers if something re-creates it.
   'Bernini Ruby',
 ];
 

@@ -30,6 +30,7 @@ import { fixSavannaDryFormat } from './scripts/fix-savanna-dry-format.js';
 import { backfillFounderSourcedSkus } from './scripts/backfill-founder-sourced-skus.js';
 import { splitBundledFlavourSkus } from './scripts/split-bundled-flavour-skus.js';
 import { removeNonexistentSkus } from './scripts/remove-nonexistent-skus.js';
+import { renameMislabeledSkus } from './scripts/rename-mislabeled-skus.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -198,6 +199,9 @@ ensureCeremonyBudgetColumns()
       });
       await removeNonexistentSkus().catch((err) => {
         logBackfillError('Nonexistent SKU removal', err);
+      });
+      await renameMislabeledSkus().catch((err) => {
+        logBackfillError('Mislabeled SKU rename', err);
       });
       await backfillBrandImages().catch((err) => {
         logBackfillError('Brand image backfill', err);
