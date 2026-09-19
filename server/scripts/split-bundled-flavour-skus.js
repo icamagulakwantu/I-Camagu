@@ -19,7 +19,9 @@ import prisma from '../config/db.js';
 import { upsertSkuByNameAndBottleFormat } from '../utils/upsertSku.js';
 
 const SPLITS = [
-  { bundledName: 'Bernini Classic/Blush/Ruby', flavours: ['Bernini Classic', 'Bernini Blush', 'Bernini Ruby'] },
+  // 'Ruby' isn't a real Bernini flavour — removed after the split by
+  // remove-nonexistent-skus.js, so it's left out of the split here too.
+  { bundledName: 'Bernini Classic/Blush/Ruby', flavours: ['Bernini Classic', 'Bernini Blush'] },
   { bundledName: 'Brutal Fruit Ruby/Litchi', flavours: ['Brutal Fruit Ruby Apple', 'Brutal Fruit Strawberry Rouge'] },
   { bundledName: 'Breezer (Red/Watermelon)', flavours: ['Breezer Blueberry', 'Breezer Watermelon', 'Breezer Blackberry'] },
   { bundledName: 'Belgravia G&T (Asstd)', flavours: ['Belgravia Gin & Dark Cherry', 'Belgravia Gin & Dry Lemon'] },

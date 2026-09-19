@@ -45,6 +45,9 @@ const FORMAT_SPECIFIC_IMAGES = [
   // from the Dumpy bottle shot that's the default for the name.
   { name: 'Savanna Dry', bottleFormat: 'Quart (500ml)', slug: 'savanna-dry-quart' },
   { name: 'Savanna Dry', bottleFormat: 'Can (500ml)', slug: 'savanna-dry-can' },
+  // Lion Lager's bottle shot (backfill-brand-images.js, matched by name)
+  // already covers the Quart; this gives the Can its own real can photo.
+  { name: 'Lion Lager', bottleFormat: 'Can (500ml)', slug: 'lion-lager-can' },
 ];
 
 export async function backfillFormatSpecificPhotos() {

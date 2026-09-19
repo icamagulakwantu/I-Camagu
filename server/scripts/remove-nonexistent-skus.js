@@ -1,0 +1,33 @@
+// Sku rows for products that turned out not to actually exist — caught
+// after the fact, usually once a real product photo showed the true
+// flavour range didn't include one of the names originally catalogued.
+// Unlike clear-broken-brand-photos.js (which only clears a bad imageUrl,
+// keeping the row), these rows are removed entirely: there's no real
+// product to catalogue at all.
+//
+// Idempotent — deleteMany on a name that's already gone is a no-op.
+import prisma from '../config/db.js';
+
+const NONEXISTENT_SKU_NAMES = [
+  // Bernini only ships Classic and Blush — there's no Ruby variant.
+  'Bernini Ruby',
+];
+
+export async function removeNonexistentSkus() {
+  const { count } = await prisma.sku.deleteMany({
+    where: { name: { in: NONEXISTENT_SKU_NAMES } },
+  });
+  if (count > 0) console.log(`Nonexistent SKU removal: ${count} row(s) deleted.`);
+  return count;
+}
+
+const isMain = process.argv[1] && import.meta.url === `file://${process.argv[1]}`;
+if (isMain) {
+  removeNonexistentSkus()
+    .then((count) => console.log(`Done. ${count} row(s) deleted.`))
+    .catch((err) => {
+      console.error(err);
+      process.exitCode = 1;
+    })
+    .finally(() => prisma.$disconnect());
+}
