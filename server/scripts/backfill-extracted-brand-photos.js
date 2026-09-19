@@ -51,6 +51,7 @@ const EXTRACTED_BRAND_IMAGES = {
   'Windhoek Lager/Light': 'windhoek-lager',
   'Amstel Lager': 'amstel-lager',
   'Castle Milk Stout': 'castle-milk-stout',
+  'Guinness Foreign Extra': 'guinness-foreign-extra',
 };
 
 export async function backfillExtractedBrandPhotos() {
