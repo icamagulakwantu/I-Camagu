@@ -27,6 +27,7 @@ import { clearBrokenBrandPhotos } from './scripts/clear-broken-brand-photos.js';
 import { backfillFormatSpecificPhotos } from './scripts/backfill-format-specific-photos.js';
 import { fixBeerQuartFormats } from './scripts/fix-beer-quart-formats.js';
 import { backfillFounderSourcedSkus } from './scripts/backfill-founder-sourced-skus.js';
+import { splitBundledFlavourSkus } from './scripts/split-bundled-flavour-skus.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -186,6 +187,9 @@ ensureCeremonyBudgetColumns()
     (async () => {
       await fixBeerQuartFormats().catch((err) => {
         logBackfillError('Beer quart format fix', err);
+      });
+      await splitBundledFlavourSkus().catch((err) => {
+        logBackfillError('Bundled flavour split', err);
       });
       await backfillBrandImages().catch((err) => {
         logBackfillError('Brand image backfill', err);

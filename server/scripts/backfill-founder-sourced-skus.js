@@ -13,14 +13,22 @@ import prisma from '../config/db.js';
 import { upsertSkuByNameAndBottleFormat } from '../utils/upsertSku.js';
 
 const NEW_SKUS = [
-  { name: 'Southern Comfort', category: 'LIQUEUR', bottleFormat: '750ml Bottle' },
-  { name: 'Captain Morgan Spiced Gold', category: 'RUM', bottleFormat: '750ml Bottle' },
-  { name: 'Klipdrift Premium', category: 'BRANDY', bottleFormat: '750ml Bottle' },
+  { name: 'Southern Comfort', category: 'LIQUEUR', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
+  { name: 'Captain Morgan Spiced Gold', category: 'RUM', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
+  { name: 'Klipdrift Premium', category: 'BRANDY', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
+  // New pack format, not just a new brand — the founder sent a can photo for
+  // each of these three Breezer flavours, but only a Dumpy (275ml) row
+  // existed for any of them (see split-bundled-flavour-skus.js, which
+  // created the Dumpy rows for these same three names). unitsPerCase: 24
+  // matches every other CIDER_RTD Can (500ml) in the catalogue.
+  { name: 'Breezer Blueberry', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
+  { name: 'Breezer Watermelon', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
+  { name: 'Breezer Blackberry', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
 ];
 
 export async function backfillFounderSourcedSkus() {
   let created = 0;
-  for (const { name, category, bottleFormat } of NEW_SKUS) {
+  for (const { name, category, bottleFormat, unitsPerCase } of NEW_SKUS) {
     const before = await prisma.sku.findFirst({ where: { name, bottleFormat } });
     await upsertSkuByNameAndBottleFormat(
       prisma,
@@ -29,7 +37,7 @@ export async function backfillFounderSourcedSkus() {
         category,
         productType: 'ALCOHOL',
         bottleFormat,
-        unitsPerCase: 12,
+        unitsPerCase,
         casePriceZAR: null,
       },
       {}

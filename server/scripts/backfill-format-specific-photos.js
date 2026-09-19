@@ -24,6 +24,15 @@ const FORMAT_SPECIFIC_IMAGES = [
   // name; these give their Can row its own actual can photo instead.
   { name: 'Windhoek Draught', bottleFormat: 'Can (500ml)', slug: 'windhoek-draught-can' },
   { name: 'Stella Artois', bottleFormat: 'Can (500ml)', slug: 'stella-artois-can' },
+  // Flavour-split products (split-bundled-flavour-skus.js) — their default
+  // photo (set by name in backfill-extracted-brand-photos.js) is the bottle
+  // shot; these give the Can row its own actual can photo where one exists.
+  { name: 'Brutal Fruit Ruby Apple', bottleFormat: 'Can (500ml)', slug: 'brutal-fruit-ruby-apple-can' },
+  { name: 'Brutal Fruit Strawberry Rouge', bottleFormat: 'Can (500ml)', slug: 'brutal-fruit-strawberry-rouge-can' },
+  { name: 'Breezer Watermelon', bottleFormat: 'Can (500ml)', slug: 'breezer-watermelon-can' },
+  { name: 'Breezer Blackberry', bottleFormat: 'Can (500ml)', slug: 'breezer-blackberry-can' },
+  { name: 'Bernini Classic', bottleFormat: 'Can (500ml)', slug: 'bernini-classic-can' },
+  { name: 'Bernini Blush', bottleFormat: 'Can (500ml)', slug: 'bernini-blush-can' },
 ];
 
 export async function backfillFormatSpecificPhotos() {

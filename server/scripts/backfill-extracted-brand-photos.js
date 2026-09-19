@@ -43,9 +43,7 @@ const EXTRACTED_BRAND_IMAGES = {
   'Hansa Pilsener': 'hansa-pilsener',
   'Lion Lager': 'lion-lager',
   'Extreme Energy': 'extreme-energy',
-  'Belgravia G&T (Asstd)': 'belgravia-gt',
   'Flying Fish Lemon/Apple': 'flying-fish-lemon-apple',
-  'Breezer (Red/Watermelon)': 'breezer',
   'Chillers Punch': 'chillers-punch',
   "Hunter's Chilled": 'hunters-chilled',
   'Windhoek Lager': 'windhoek-lager',
@@ -59,6 +57,22 @@ const EXTRACTED_BRAND_IMAGES = {
   'Southern Comfort': 'southern-comfort',
   'Captain Morgan Spiced Gold': 'captain-morgan-spiced-gold',
   'Klipdrift Premium': 'klipdrift-premium',
+  // Real bottle photos arrived after both were cleared earlier this session
+  // for having a promo banner/colored background baked into their only
+  // source photo — restored now with clean studio shots.
+  'Moet & Chandon Imperial Brut': 'moet-chandon',
+  'Veuve Clicquot Yellow Label': 'veuve-clicquot',
+  // Bundled-name splits (split-bundled-flavour-skus.js) — each flavour gets
+  // its own real photo instead of one shared across the old bundled name.
+  'Brutal Fruit Ruby Apple': 'brutal-fruit-ruby-apple',
+  'Brutal Fruit Strawberry Rouge': 'brutal-fruit-strawberry-rouge',
+  'Breezer Blueberry': 'breezer-blueberry',
+  'Breezer Watermelon': 'breezer-watermelon',
+  'Breezer Blackberry': 'breezer-blackberry',
+  'Bernini Classic': 'bernini-classic',
+  'Bernini Blush': 'bernini-blush',
+  'Belgravia Gin & Dark Cherry': 'belgravia-dark-cherry',
+  'Belgravia Gin & Dry Lemon': 'belgravia-dry-lemon',
 };
 
 export async function backfillExtractedBrandPhotos() {
