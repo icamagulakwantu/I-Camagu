@@ -1,4 +1,4 @@
-import { initiatePoolPayment, isOnlinePaymentConfigured, listPendingSupplierPayouts, markPayoutForwarded } from '../services/paymentService.js';
+import { initiatePoolPayment, isOnlinePaymentConfigured, listPendingSupplierPayouts, markPayoutForwarded, listPendingSupplierRefunds, markRefundProcessed } from '../services/paymentService.js';
 import prisma from '../config/db.js';
 import { isAdminEmail } from '../config/admin.js';
 
@@ -57,5 +57,35 @@ export async function forwardSupplierPayout(req, res) {
   } catch (error) {
     console.error('Forward supplier payout error:', error.message);
     res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not mark payout forwarded' });
+  }
+}
+
+// GET /api/basket/admin/pending-refunds — admin-only. Every refund request
+// on a PSP-collected payment — the supplier can't process these themselves
+// (see supplierService.processRefund), so without this list they'd have no
+// valid path to being resolved at all.
+export async function getPendingSupplierRefunds(req, res) {
+  if (!(await requireAdmin(req, res))) return;
+  try {
+    res.json(await listPendingSupplierRefunds());
+  } catch (error) {
+    console.error('List pending supplier refunds error:', error.message);
+    res.status(500).json({ error: 'Could not fetch pending refunds' });
+  }
+}
+
+// POST /api/basket/admin/pending-refunds/:paymentId/process — admin-only.
+// Records that the member was actually refunded (by hand, outside the app —
+// same "no live payout API yet" posture as forwardSupplierPayout above).
+export async function processSupplierRefund(req, res) {
+  if (!(await requireAdmin(req, res))) return;
+  const { paymentId } = req.params;
+  const { feeZAR, note } = req.body;
+  try {
+    const payment = await markRefundProcessed(paymentId, { feeZAR, note });
+    res.json({ payment, message: 'Refund marked as processed.' });
+  } catch (error) {
+    console.error('Process supplier refund error:', error.message);
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not process refund' });
   }
 }

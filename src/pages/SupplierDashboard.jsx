@@ -334,13 +334,19 @@ function SupplierDashboard({ onBack }) {
                             {p.refundRequestedAt && p.status !== 'REFUNDED' && (
                               <div className="flex items-center justify-between mt-2 pt-2 border-t border-terracotta/10">
                                 <span className="text-[10px] font-bold text-terracotta">Refund requested</span>
-                                <button
-                                  onClick={() => processRefund(p.id)}
-                                  disabled={refundingId === p.id}
-                                  className={`text-[11px] font-bold text-white bg-terracotta px-3 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
-                                >
-                                  {refundingId === p.id ? '...' : 'Process refund'}
-                                </button>
+                                {p.provider === 'MANUAL_EFT' ? (
+                                  <button
+                                    onClick={() => processRefund(p.id)}
+                                    disabled={refundingId === p.id}
+                                    className={`text-[11px] font-bold text-white bg-terracotta px-3 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
+                                  >
+                                    {refundingId === p.id ? '...' : 'Process refund'}
+                                  </button>
+                                ) : (
+                                  <span className="text-[10px] text-ink-muted flex-shrink-0 text-right">
+                                    Paid online — iCamagu will refund this directly
+                                  </span>
+                                )}
                               </div>
                             )}
                           </div>

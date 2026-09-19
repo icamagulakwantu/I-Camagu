@@ -238,4 +238,10 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "OrderLineConfirmation" ADD COLUMN IF NOT EXISTS "orderReference" TEXT;'
   );
+  // A PSP-collected refund is an admin-processed step (the supplier never
+  // held that money) — this is the admin's own note on how it actually got
+  // back to the member. Null for every manual-EFT refund.
+  await prisma.$executeRawUnsafe(
+    'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "refundNote" TEXT;'
+  );
 }

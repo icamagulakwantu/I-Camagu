@@ -36,12 +36,15 @@ export default function DemandDashboard({ onBack }) {
   const [unassigned, setUnassigned] = useState([])
   const [partners, setPartners] = useState([])
   const [pendingPayouts, setPendingPayouts] = useState([])
+  const [pendingRefunds, setPendingRefunds] = useState([])
   const [loading, setLoading] = useState(true)
   const [denied, setDenied] = useState(false)
   const [selectedPartner, setSelectedPartner] = useState({})
   const [assigningId, setAssigningId] = useState(null)
   const [forwardDrafts, setForwardDrafts] = useState({})
   const [forwardingId, setForwardingId] = useState(null)
+  const [refundDrafts, setRefundDrafts] = useState({})
+  const [refundingId, setRefundingId] = useState(null)
 
   const authedFetch = useCallback((url, options = {}) => fetch(url, {
     ...options,
@@ -51,18 +54,20 @@ export default function DemandDashboard({ onBack }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [overviewRes, unassignedRes, partnersRes, payoutsRes] = await Promise.all([
+      const [overviewRes, unassignedRes, partnersRes, payoutsRes, refundsRes] = await Promise.all([
         authedFetch('/api/supplier/admin/demand-overview'),
         authedFetch('/api/supplier/admin/unassigned-pools'),
         authedFetch('/api/supplier/admin/partners'),
         authedFetch('/api/basket/admin/pending-payouts'),
+        authedFetch('/api/basket/admin/pending-refunds'),
       ])
       if (overviewRes.status === 403) { setDenied(true); return }
-      if (!overviewRes.ok || !unassignedRes.ok || !partnersRes.ok || !payoutsRes.ok) throw new Error('Could not load demand data')
+      if (!overviewRes.ok || !unassignedRes.ok || !partnersRes.ok || !payoutsRes.ok || !refundsRes.ok) throw new Error('Could not load demand data')
       setOverview(await overviewRes.json())
       setUnassigned(await unassignedRes.json())
       setPartners(await partnersRes.json())
       setPendingPayouts(await payoutsRes.json())
+      setPendingRefunds(await refundsRes.json())
     } catch (err) {
       showToast(err.message, 'error')
     } finally {
@@ -90,6 +95,26 @@ export default function DemandDashboard({ onBack }) {
       showToast(err.message, 'error')
     } finally {
       setForwardingId(null)
+    }
+  }
+
+  const processRefundAdmin = async (paymentId) => {
+    const draft = refundDrafts[paymentId] || {}
+    setRefundingId(paymentId)
+    try {
+      const res = await authedFetch(`/api/basket/admin/pending-refunds/${paymentId}/process`, {
+        method: 'POST',
+        body: JSON.stringify({ feeZAR: draft.feeZAR?.trim() || undefined, note: draft.note?.trim() || undefined }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not process refund')
+      showToast(data.message || 'Refund marked as processed', 'success')
+      setRefundDrafts((prev) => ({ ...prev, [paymentId]: undefined }))
+      load()
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setRefundingId(null)
     }
   }
 
@@ -141,8 +166,8 @@ export default function DemandDashboard({ onBack }) {
             }`}
           >
             {t.label}
-            {t.id === 'payouts' && pendingPayouts.length > 0 && (
-              <span className={tab === t.id ? 'text-white/80' : 'text-terracotta'}> ({pendingPayouts.length})</span>
+            {t.id === 'payouts' && (pendingPayouts.length + pendingRefunds.length) > 0 && (
+              <span className={tab === t.id ? 'text-white/80' : 'text-terracotta'}> ({pendingPayouts.length + pendingRefunds.length})</span>
             )}
           </button>
         ))}
@@ -291,6 +316,60 @@ export default function DemandDashboard({ onBack }) {
                           className={`w-full bg-sage-500 text-white text-xs font-bold py-2 rounded-pill ${pressable}`}
                         >
                           {forwardingId === p.id ? 'Saving...' : 'Mark forwarded to supplier'}
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mt-6">
+              <p className="text-xs text-ink-muted leading-relaxed">
+                A refund on an online payment is the same story in reverse — iCamagu holds that
+                money, so the supplier has no way to pay it back themselves. Process it here once
+                the member has actually been refunded (by bank transfer), with a note for the record.
+              </p>
+            </div>
+
+            {pendingRefunds.length === 0 ? (
+              <EmptyState emoji="✅" title="No refunds outstanding" description="Every requested PayFast refund has been processed." />
+            ) : (
+              <div className="space-y-3">
+                {pendingRefunds.map((p) => {
+                  const draft = refundDrafts[p.id] || {}
+                  return (
+                    <div key={p.id} className="card-paper p-4">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="font-bold text-sm text-ink">{p.pool?.partner?.name || `${CATEGORY_LABEL[p.pool?.category] || p.pool?.category} pool`}</p>
+                        <p className="tabular font-display font-bold text-lg text-ink">{money(p.amountZAR)}</p>
+                      </div>
+                      <p className="text-xs text-ink-muted mb-1">
+                        Refund for {p.user?.firstName} {p.user?.lastName} ({p.user?.email}) · {p.provider}
+                      </p>
+                      <p className="text-xs text-ink-muted mb-3 font-mono">{p.paymentReference}</p>
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          placeholder="Processing fee deducted, R (optional)"
+                          value={draft.feeZAR || ''}
+                          onChange={(e) => setRefundDrafts((prev) => ({ ...prev, [p.id]: { ...prev[p.id], feeZAR: e.target.value } }))}
+                          className="w-full border border-cream-dark rounded-soft px-3 py-2 text-xs"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Note — e.g. how the member was refunded"
+                          value={draft.note || ''}
+                          onChange={(e) => setRefundDrafts((prev) => ({ ...prev, [p.id]: { ...prev[p.id], note: e.target.value } }))}
+                          className="w-full border border-cream-dark rounded-soft px-3 py-2 text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => processRefundAdmin(p.id)}
+                          disabled={refundingId === p.id}
+                          className={`w-full bg-terracotta text-white text-xs font-bold py-2 rounded-pill ${pressable}`}
+                        >
+                          {refundingId === p.id ? 'Saving...' : 'Mark refunded'}
                         </button>
                       </div>
                     </div>

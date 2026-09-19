@@ -37,10 +37,12 @@ import supplierRoutes from './routes/supplier.js';
 import identityRoutes from './routes/identity.js';
 import webhookRoutes from './routes/webhooks.js';
 import { checkRequiredEnvVars, envStatus } from './config/envCheck.js';
+import { initSentry, captureException } from './config/sentry.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 checkRequiredEnvVars();
+await initSentry();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -129,6 +131,7 @@ app.get('*', (req, res) => {
 // client in non-production. Log the detail, return a generic message.
 app.use((err, req, res, next) => {
   console.error(`Unhandled error on ${req.method} ${req.path}:`, err?.message, err?.stack);
+  captureException(err);
   if (res.headersSent) return next(err);
   res.status(500).json({ error: 'Something went wrong on our side. Please try again.' });
 });
@@ -138,9 +141,11 @@ app.use((err, req, res, next) => {
 // request. Log it and stay up; Render restarts on a real crash anyway.
 process.on('unhandledRejection', (reason) => {
   console.error('Unhandled promise rejection:', reason?.message || reason);
+  captureException(reason instanceof Error ? reason : new Error(String(reason)));
 });
 process.on('uncaughtException', (err) => {
   console.error('Uncaught exception:', err?.message, err?.stack);
+  captureException(err);
 });
 
 // budgetZAR/isPurchased are new columns the Prisma client's default SELECT

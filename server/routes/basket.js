@@ -4,7 +4,7 @@ import { getCatalogue, getCategories } from '../controllers/catalogueController.
 import { submitToPool, getMyOrderDocuments, confirmOrderLine, getMyPoolPayments, submitPoolPaymentReference, getMyPoolStatus, getPoolSummary, cancelParkedBasket, requestPoolPaymentRefund } from '../controllers/poolController.js';
 import { getMyBasket, addItem, updateItem, removeItem } from '../controllers/basketController.js';
 import { getCatalogueMargins, setSkuCostPrice, setSkuRetailPrice } from '../controllers/marginController.js';
-import { getOnlinePaymentStatus, initiatePoolPaymentOnline, getPendingSupplierPayouts, forwardSupplierPayout } from '../controllers/paymentController.js';
+import { getOnlinePaymentStatus, initiatePoolPaymentOnline, getPendingSupplierPayouts, forwardSupplierPayout, getPendingSupplierRefunds, processSupplierRefund } from '../controllers/paymentController.js';
 
 const router = express.Router();
 
@@ -38,5 +38,7 @@ router.patch('/margins/:skuId/retail', requireAuth, setSkuRetailPrice);
 // manual transfer to the supplier. Each handler checks admin itself.
 router.get('/admin/pending-payouts', requireAuth, getPendingSupplierPayouts);
 router.post('/admin/pending-payouts/:paymentId/forward', requireAuth, forwardSupplierPayout);
+router.get('/admin/pending-refunds', requireAuth, getPendingSupplierRefunds);
+router.post('/admin/pending-refunds/:paymentId/process', requireAuth, processSupplierRefund);
 
 export default router;

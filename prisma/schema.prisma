@@ -631,6 +631,13 @@ model PoolPayment {
   status            String   @default("PENDING")
   refundRequestedAt DateTime?
   refundFeeZAR      Decimal? @db.Decimal(10, 2)
+  // Set only when an admin processes a refund on a PSP-collected payment —
+  // the supplier never held that money (see processRefund in
+  // supplierService.js), so unlike a manual-EFT refund there's no
+  // supplier-side action to record; this is the admin's own note on how the
+  // money actually got back to the member (bank transfer reference, etc).
+  // Null for every manual-EFT refund, which the supplier processes directly.
+  refundNote        String?
   // The PSP's raw webhook payload for this payment, kept verbatim for
   // reconciliation/debugging — same pattern as RawBankLog.rawPayload for
   // manual EFT. Null for manual-EFT payments, which have no webhook.

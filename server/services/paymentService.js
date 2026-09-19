@@ -206,3 +206,69 @@ export async function markPayoutForwarded(paymentId, { reference, note }) {
     },
   });
 }
+
+// The refund-side mirror of the payout tracking above. A member's refund
+// request on a MANUAL_EFT payment is the supplier's to process directly
+// (see supplierService.processRefund) — they hold that money. A refund
+// request on a PAYFAST payment is different: iCamagu holds that money, so
+// the supplier has nothing to refund and nothing to click. Without this,
+// a PSP refund request had no valid path to actually being resolved.
+export async function listPendingSupplierRefunds() {
+  return prisma.poolPayment.findMany({
+    where: { provider: { not: 'MANUAL_EFT' }, refundRequestedAt: { not: null }, status: { not: 'REFUNDED' } },
+    include: {
+      pool: { include: { partner: true } },
+      user: { select: { firstName: true, lastName: true, email: true } },
+    },
+    orderBy: { refundRequestedAt: 'asc' },
+  });
+}
+
+export async function markRefundProcessed(paymentId, { feeZAR, note }) {
+  const payment = await prisma.poolPayment.findUnique({ where: { id: paymentId } });
+  if (!payment) {
+    const err = new Error('Payment not found');
+    err.status = 404;
+    throw err;
+  }
+  if (payment.provider === 'MANUAL_EFT') {
+    const err = new Error('Manual EFT refunds are the supplier\'s to process — see their dashboard');
+    err.status = 400;
+    throw err;
+  }
+  if (!payment.refundRequestedAt) {
+    const err = new Error('No refund has been requested for this payment');
+    err.status = 409;
+    throw err;
+  }
+  if (payment.status === 'REFUNDED') {
+    const err = new Error('This payment has already been refunded');
+    err.status = 409;
+    throw err;
+  }
+
+  let parsedFee = 0;
+  if (feeZAR !== undefined && feeZAR !== null && feeZAR !== '') {
+    parsedFee = parseFloat(feeZAR);
+    if (isNaN(parsedFee) || parsedFee < 0) {
+      const err = new Error('Refund fee must be a positive number');
+      err.status = 400;
+      throw err;
+    }
+  }
+
+  const updated = await prisma.poolPayment.update({
+    where: { id: paymentId },
+    data: { status: 'REFUNDED', refundFeeZAR: parsedFee, refundNote: note || null },
+  });
+
+  const { createNotification } = await import('./notificationDbService.js');
+  await createNotification(
+    payment.userId,
+    'REFUND_PROCESSED',
+    `Your refund of R${parseFloat(payment.amountZAR).toFixed(2)} has been processed.`,
+    'myorders'
+  );
+
+  return updated;
+}

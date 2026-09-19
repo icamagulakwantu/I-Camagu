@@ -23,6 +23,10 @@ const OPTIONAL = [
   // explicit 'false' points this at PayFast's live endpoint.
   { name: 'PAYFAST_MERCHANT_ID', breaks: 'online pool payments (falls back to manual EFT)' },
   { name: 'PAYFAST_MERCHANT_KEY', breaks: 'online pool payments (falls back to manual EFT)' },
+  // Free at sentry.io — create a project, set this to its DSN. Until then
+  // the app runs exactly as before; nothing breaks, there's just no
+  // dashboard visibility into server errors beyond Render's own logs.
+  { name: 'SENTRY_DSN', breaks: 'error monitoring (falls back to Render logs only)' },
 ];
 
 export function checkRequiredEnvVars() {

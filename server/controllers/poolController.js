@@ -74,7 +74,7 @@ export async function requestPoolPaymentRefund(req, res) {
   try {
     const payment = await prisma.poolPayment.findUnique({
       where: { id: paymentId },
-      include: { pool: { include: { partner: true } } },
+      include: { pool: { include: { partner: true } }, user: { select: { firstName: true, lastName: true } } },
     });
     if (!payment || payment.userId !== req.userId) return res.status(404).json({ error: 'Payment not found' });
     if (payment.status === 'REFUNDED') return res.status(409).json({ error: 'This payment has already been refunded' });
@@ -85,17 +85,27 @@ export async function requestPoolPaymentRefund(req, res) {
       data: { refundRequestedAt: new Date() },
     });
 
-    if (payment.pool.partner?.userId) {
-      const { createNotification } = await import('../services/notificationDbService.js');
-      await createNotification(
-        payment.pool.partner.userId,
-        'REFUND_REQUESTED',
-        `A member requested a refund of R${parseFloat(payment.amountZAR).toFixed(2)} on a pool order.`,
-        'supplier'
-      );
+    // Manual EFT: the supplier holds the money, so they're the one who can
+    // actually process this — notify them in-app, same as before. PayFast:
+    // iCamagu holds the money instead, so the supplier has nothing to
+    // process — email the admin, the only party who can (see
+    // notifyAdminOfPspRefundRequest / DemandDashboard's Refunds section).
+    if (payment.provider === 'MANUAL_EFT') {
+      if (payment.pool.partner?.userId) {
+        const { createNotification } = await import('../services/notificationDbService.js');
+        await createNotification(
+          payment.pool.partner.userId,
+          'REFUND_REQUESTED',
+          `A member requested a refund of R${parseFloat(payment.amountZAR).toFixed(2)} on a pool order.`,
+          'supplier'
+        );
+      }
+      res.json({ payment: updated, message: 'Refund requested — the supplier will process it from their dashboard.' });
+    } else {
+      const { notifyAdminOfPspRefundRequest } = await import('../services/notificationService.js');
+      await notifyAdminOfPspRefundRequest(payment, `${payment.user.firstName} ${payment.user.lastName}`);
+      res.json({ payment: updated, message: 'Refund requested — this was paid online, so iCamagu will process the refund directly.' });
     }
-
-    res.json({ payment: updated, message: 'Refund requested — the supplier will process it from their dashboard.' });
   } catch (error) {
     console.error('Request pool payment refund error:', error.message);
     res.status(500).json({ error: 'Could not request refund' });

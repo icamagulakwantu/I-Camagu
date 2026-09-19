@@ -182,6 +182,32 @@ export async function notifyAdminOfPaymentWebhookFailure(paymentId, errorMessage
   }
 }
 
+// A refund request on a PAYFAST payment has nowhere else to go — the
+// supplier never held that money, so unlike a manual-EFT refund (which
+// just notifies the supplier in-app, see poolController.js) there's no
+// in-app recipient for this one. This is it: the only notification that
+// tells anyone a PSP refund needs an admin to actually process it (see
+// DemandDashboard's Payouts tab, Refunds section).
+export async function notifyAdminOfPspRefundRequest(payment, memberName) {
+  try {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: ADMIN_EMAILS,
+      subject: `iCamagu: a PayFast refund needs processing — R${parseFloat(payment.amountZAR).toFixed(2)}`,
+      html: `
+        <h2>A member requested a refund on a PayFast-collected payment</h2>
+        <p>iCamagu holds this money, not the supplier — only an admin can process it (Payouts tab &rarr; Refunds).</p>
+        ${row('Member', memberName)}
+        ${row('Amount', `R${parseFloat(payment.amountZAR).toFixed(2)}`)}
+        ${row('Payment reference', payment.paymentReference)}
+        ${row('Payment ID', payment.id)}
+      `,
+    });
+  } catch (error) {
+    console.error('PSP refund admin notification failed:', error.message);
+  }
+}
+
 export async function notifyPayoutCleared(recipientEmail, recipientName, amount, stokvelName, contributionAmount) {
   try {
     await resend.emails.send({

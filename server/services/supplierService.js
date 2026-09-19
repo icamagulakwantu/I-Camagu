@@ -85,6 +85,16 @@ export async function confirmPoolPayment(userId, paymentId) {
  * Supplier processes a member's refund request — money already moved
  * outside the app (manual EFT), so this just records that it's been paid
  * back, optionally minus a processing fee.
+ *
+ * Only ever valid for a manual-EFT payment: the supplier physically holds
+ * that money because the member paid them directly, so "process refund"
+ * genuinely records something the supplier just did. A PAYFAST-collected
+ * payment never reached the supplier — it's sitting in iCamagu's own
+ * merchant account (see paymentService.js) — so a supplier clicking this
+ * for one would mark it REFUNDED while no money actually moved back to the
+ * member. See paymentService.listPendingSupplierRefunds /
+ * markRefundProcessed for the admin-side equivalent that PSP payments
+ * actually need.
  */
 export async function processRefund(userId, paymentId, feeZAR) {
   const payment = await prisma.poolPayment.findUnique({
@@ -99,6 +109,13 @@ export async function processRefund(userId, paymentId, feeZAR) {
   if (payment.pool.partner?.userId !== userId) {
     const err = new Error('Not your pool');
     err.status = 403;
+    throw err;
+  }
+  if (payment.provider !== 'MANUAL_EFT') {
+    const err = new Error(
+      'This was a PayFast payment — iCamagu holds that money, not you. An admin needs to process this refund.'
+    );
+    err.status = 409;
     throw err;
   }
   if (!payment.refundRequestedAt) {
@@ -267,6 +284,7 @@ export async function getSupplierPools(userId) {
         memberName: `${p.user.firstName} ${p.user.lastName}`,
         amountZAR: p.amountZAR,
         status: p.status,
+        provider: p.provider,
         paymentReference: p.paymentReference,
         providerReference: p.providerReference,
         refundRequestedAt: p.refundRequestedAt,

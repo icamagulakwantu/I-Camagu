@@ -1,0 +1,35 @@
+name: CI
+
+# Runs the automated test suite and a production build on every push and
+# pull request against main — the tests added this session (reference
+# generation, PayFast signatures, SmartMatch tiers, the PSP refund-gating
+# logic) previously existed but nothing enforced them. This closes that gap:
+# a broken money-critical change now fails loudly here instead of only
+# being caught by someone reading Render's logs after it's already live.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: yarn prisma:generate
+
+      - name: Run test suite
+        run: yarn test
+
+      - name: Build frontend
+        run: yarn build
