@@ -154,6 +154,8 @@ model User {
   poolPayments            PoolPayment[]
   sentClanConnections     ClanConnection[]      @relation("ClanConnectionRequester")
   receivedClanConnections ClanConnection[]      @relation("ClanConnectionRecipient")
+  sentMessages            Message[]             @relation("MessageSender")
+  receivedMessages        Message[]             @relation("MessageRecipient")
   partner                 Partner?
   createdVendors          Vendor[]
   directoryVotes          DirectoryVote[]
@@ -172,6 +174,27 @@ model ClanConnection {
 
   @@unique([requesterId, recipientId])
 }
+
+// In-app text messages — only ever sendable between two users with an
+// ACCEPTED ClanConnection between them (enforced in messageService.js, not
+// here — this app has no DB-level FK/check constraints added post-baseline,
+// same posture as every other model ensure-schema.js has extended). No
+// separate "conversation" table: a thread between two people is just every
+// Message where they're the sender/recipient pair, in either direction.
+model Message {
+  id          String    @id @default(cuid())
+  senderId    String
+  sender      User      @relation("MessageSender", fields: [senderId], references: [id])
+  recipientId String
+  recipient   User      @relation("MessageRecipient", fields: [recipientId], references: [id])
+  body        String
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([senderId, recipientId, createdAt])
+  @@index([recipientId, senderId, createdAt])
+}
+
 model UkusokaEntry {
   id              String    @id @default(cuid())
   recordedById    String

@@ -21,6 +21,8 @@ import FamilyContributions from './pages/FamilyContributions.jsx'
 import Ukugida from './pages/Ukugida.jsx'
 import Ukusoka from './pages/Ukusoka.jsx'
 import IzidukoNetwork from './pages/IzidukoNetwork.jsx'
+import IzidukoProfileView from './pages/IzidukoProfileView.jsx'
+import IzidukoChat from './pages/IzidukoChat.jsx'
 import Stokvels from './pages/Stokvels.jsx'
 import Portal from './pages/Portal.jsx'
 import Ekoyini from './pages/Ekoyini.jsx'
@@ -72,6 +74,8 @@ const MORE_SCREENS = [
   'ukugida',
   'ukusoka',
   'iziduko',
+  'izidukoprofile',
+  'izidukochat',
   'supplier',
   'portal',
   'ekoyini',
@@ -118,6 +122,8 @@ const SCREEN_TO_PATH = {
   ukugida: '/more/ukugida',
   ukusoka: '/more/ukusoka',
   iziduko: '/more/iziduko',
+  izidukoprofile: '/more/iziduko/profile',
+  izidukochat: '/more/iziduko/chat',
   supplier: '/more/supplier',
   portal: '/more/portal',
   ekoyini: '/more/ekoyini',
@@ -402,6 +408,10 @@ function MainApp() {
   // Profile clears this itself once read, so a later ordinary visit to
   // Profile (via More) doesn't get stuck reopening on the same tab.
   const [profileInitialTab, setProfileInitialTab] = useState(null)
+  // Which connected Iziduko match the profile-view/chat screens are for —
+  // set right before navigating there, same pattern as timelineType/
+  // budgetPlanId above.
+  const [izidukoTargetUserId, setIzidukoTargetUserId] = useState(null)
 
   const goHome = () => setScreen('home')
   const goMore = () => setScreen('more')
@@ -455,6 +465,16 @@ function MainApp() {
   const openExistingCeremony = (ceremonyId) => {
     setSelectedCeremonyId(ceremonyId)
     setScreen('ceremony')
+  }
+
+  const openIzidukoProfile = (userId) => {
+    setIzidukoTargetUserId(userId)
+    setScreen('izidukoprofile')
+  }
+
+  const openIzidukoChat = (userId) => {
+    setIzidukoTargetUserId(userId)
+    setScreen('izidukochat')
   }
 
   const [pendingApprovals, setPendingApprovals] = useState(0)
@@ -541,6 +561,24 @@ function MainApp() {
           <IzidukoNetwork
             onBack={goMore}
             onGoToClanLines={() => { setProfileInitialTab('clan'); setScreen('profile') }}
+            onViewProfile={openIzidukoProfile}
+            onMessage={openIzidukoChat}
+          />
+        )
+      case 'izidukoprofile':
+        return (
+          <IzidukoProfileView
+            userId={izidukoTargetUserId}
+            onBack={() => setScreen('iziduko')}
+            onMessage={openIzidukoChat}
+          />
+        )
+      case 'izidukochat':
+        return (
+          <IzidukoChat
+            userId={izidukoTargetUserId}
+            onBack={() => setScreen('iziduko')}
+            onViewProfile={openIzidukoProfile}
           />
         )
       case 'supplier':

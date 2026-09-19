@@ -36,6 +36,7 @@ import accountRoutes from './routes/account.js';
 import supplierRoutes from './routes/supplier.js';
 import identityRoutes from './routes/identity.js';
 import webhookRoutes from './routes/webhooks.js';
+import messageRoutes from './routes/message.js';
 import { checkRequiredEnvVars, envStatus } from './config/envCheck.js';
 import { initSentry, captureException } from './config/sentry.js';
 const __filename = fileURLToPath(import.meta.url);
@@ -118,6 +119,7 @@ app.use('/api/account', accountRoutes);
 app.use('/api/supplier', supplierRoutes);
 app.use('/api/identity', identityRoutes);
 app.use('/api/webhooks', webhookRoutes);
+app.use('/api/messages', messageRoutes);
 
 // Serve the built frontend
 app.use(express.static(path.join(__dirname, '..', 'dist')));

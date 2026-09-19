@@ -21,7 +21,7 @@ function Avatar({ src, size = 'w-12 h-12' }) {
   )
 }
 
-function IzidukoNetwork({ onBack, onGoToClanLines }) {
+function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
 
@@ -224,7 +224,23 @@ function IzidukoNetwork({ onBack, onGoToClanLines }) {
 
                       <div className="p-4">
                         {m.connectionStatus === 'connected' && (
-                          <span className="text-xs font-bold text-sage-600 flex items-center gap-1 justify-center py-2"><Icon name="check" size={12} color="#4a7a4a" /> Connected</span>
+                          <div className="space-y-2">
+                            <span className="text-xs font-bold text-sage-600 flex items-center gap-1 justify-center py-1"><Icon name="check" size={12} color="#4a7a4a" /> Connected</span>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => onViewProfile?.(m.id)}
+                                className={`flex-1 text-sm font-bold text-terracotta border-2 border-terracotta/30 py-2.5 rounded-pill flex items-center justify-center gap-1.5 ${pressable}`}
+                              >
+                                <Icon name="user" size={14} color="#b85042" /> View profile
+                              </button>
+                              <button
+                                onClick={() => onMessage?.(m.id)}
+                                className={`flex-1 text-sm font-bold text-white bg-terracotta py-2.5 rounded-pill flex items-center justify-center gap-1.5 ${pressable}`}
+                              >
+                                <Icon name="send" size={14} color="#fff" /> Message
+                              </button>
+                            </div>
+                          </div>
                         )}
                         {m.connectionStatus === 'pending_sent' && (
                           <span className="block text-xs font-bold text-ink-muted text-center py-2">Request sent — awaiting reply</span>
@@ -355,12 +371,28 @@ function IzidukoNetwork({ onBack, onGoToClanLines }) {
               ) : (
                 <div className="space-y-2">
                   {connections.map((c) => (
-                    <div key={c.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 flex items-center gap-3">
-                      <Avatar src={c.profileImage} />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-sm text-ink">{c.firstName} {c.lastName}</p>
-                        <p className="text-xs text-ink-muted">{c.paternalIziduko} · {c.maternalIziduko}</p>
-                        {c.phoneNumber && <p className="text-xs text-sage-600 font-bold mt-1 flex items-center gap-1"><Icon name="phone" size={11} color="#4a7a4a" /> {c.phoneNumber}</p>}
+                    <div key={c.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
+                      <div className="flex items-center gap-3">
+                        <Avatar src={c.profileImage} />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-sm text-ink">{c.firstName} {c.lastName}</p>
+                          <p className="text-xs text-ink-muted">{c.paternalIziduko} · {c.maternalIziduko}</p>
+                          {c.phoneNumber && <p className="text-xs text-sage-600 font-bold mt-1 flex items-center gap-1"><Icon name="phone" size={11} color="#4a7a4a" /> {c.phoneNumber}</p>}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          onClick={() => onViewProfile?.(c.id)}
+                          className={`flex-1 text-xs font-bold text-terracotta border-2 border-terracotta/30 py-2 rounded-pill flex items-center justify-center gap-1 ${pressable}`}
+                        >
+                          <Icon name="user" size={12} color="#b85042" /> View profile
+                        </button>
+                        <button
+                          onClick={() => onMessage?.(c.id)}
+                          className={`flex-1 text-xs font-bold text-white bg-terracotta py-2 rounded-pill flex items-center justify-center gap-1 ${pressable}`}
+                        >
+                          <Icon name="send" size={12} color="#fff" /> Message
+                        </button>
                       </div>
                     </div>
                   ))}

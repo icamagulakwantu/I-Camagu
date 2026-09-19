@@ -244,4 +244,25 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "refundNote" TEXT;'
   );
+  // Message is a wholly new table (everything above this point has been an
+  // ALTER on a table that already existed) — same idempotent posture, just
+  // CREATE TABLE IF NOT EXISTS instead. No DB-level FK to User, matching
+  // every other model added since the original baseline; Prisma's relation
+  // still works via app-level joins on senderId/recipientId.
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "Message" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "senderId" TEXT NOT NULL,
+      "recipientId" TEXT NOT NULL,
+      "body" TEXT NOT NULL,
+      "readAt" TIMESTAMP(3),
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  await prisma.$executeRawUnsafe(
+    'CREATE INDEX IF NOT EXISTS "Message_senderId_recipientId_createdAt_idx" ON "Message" ("senderId", "recipientId", "createdAt");'
+  );
+  await prisma.$executeRawUnsafe(
+    'CREATE INDEX IF NOT EXISTS "Message_recipientId_senderId_createdAt_idx" ON "Message" ("recipientId", "senderId", "createdAt");'
+  );
 }

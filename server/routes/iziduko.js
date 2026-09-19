@@ -7,6 +7,7 @@ import {
   withdrawConnectionRequest,
   listConnectionRequests,
   listConnections,
+  viewConnectionProfile,
 } from '../controllers/izidukoController.js';
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.get('/requests', requireAuth, listConnectionRequests);
 router.patch('/requests/:id', requireAuth, respondToConnectionRequest);
 router.delete('/requests/:id', requireAuth, withdrawConnectionRequest);
 router.get('/connections', requireAuth, listConnections);
+router.get('/connections/:userId/profile', requireAuth, viewConnectionProfile);
 
 export default router;

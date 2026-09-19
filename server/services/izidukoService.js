@@ -270,3 +270,49 @@ export async function getConnectionStatusesForUsers(userId, otherUserIds) {
   }
   return map;
 }
+
+// Whether two users have a mutually-accepted clan connection — the one gate
+// that decides both "can I view their full profile" and "can I message
+// them" (see getConnectedUserProfile below and messageService.js). Exported
+// since messageService needs the exact same check.
+export async function isAcceptedConnection(userAId, userBId) {
+  const connection = await prisma.clanConnection.findFirst({
+    where: {
+      status: 'ACCEPTED',
+      OR: [
+        { requesterId: userAId, recipientId: userBId },
+        { requesterId: userBId, recipientId: userAId },
+      ],
+    },
+  });
+  return !!connection;
+}
+
+// The same personal-detail fields a member sees on their own Profile
+// screen's "Personal" tab (address/age/phoneNumber) plus their photo, name
+// and four Iziduko lines — deliberately NOT identity-verification fields
+// (ID number, ID document, verification status), which Profile.jsx already
+// treats as never shown to other members, even connected ones.
+const FULL_PROFILE_SELECT = {
+  id: true, firstName: true, lastName: true, profileImage: true,
+  paternalIziduko: true, maternalIziduko: true,
+  paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true,
+  address: true, age: true, phoneNumber: true,
+};
+
+export async function getConnectedUserProfile(viewerId, targetId) {
+  const connected = await isAcceptedConnection(viewerId, targetId);
+  if (!connected) {
+    const err = new Error('You can only view the full profile of someone you are connected with');
+    err.status = 403;
+    throw err;
+  }
+
+  const profile = await prisma.user.findUnique({ where: { id: targetId }, select: FULL_PROFILE_SELECT });
+  if (!profile) {
+    const err = new Error('User not found');
+    err.status = 404;
+    throw err;
+  }
+  return profile;
+}

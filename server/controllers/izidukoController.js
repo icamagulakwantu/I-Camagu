@@ -6,6 +6,7 @@ import {
   getClanConnectionRequests,
   getClanConnections,
   getConnectionStatusesForUsers,
+  getConnectedUserProfile,
 } from '../services/izidukoService.js';
 import { createNotification } from '../services/notificationDbService.js';
 import prisma from '../config/db.js';
@@ -132,5 +133,19 @@ export async function listConnections(req, res) {
   } catch (error) {
     console.error('List clan connections error:', error.message);
     res.status(500).json({ error: 'Could not fetch connections' });
+  }
+}
+
+// GET /api/iziduko/connections/:userId/profile — the full profile view
+// behind Iziduko's "View profile" button. Gated inside
+// getConnectedUserProfile itself: a 403 for anyone who isn't an accepted
+// connection, not just a UI-level hide.
+export async function viewConnectionProfile(req, res) {
+  try {
+    const profile = await getConnectedUserProfile(req.userId, req.params.userId);
+    res.json(profile);
+  } catch (error) {
+    console.error('View connection profile error:', error.message);
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not fetch profile' });
   }
 }
