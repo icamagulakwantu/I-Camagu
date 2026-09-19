@@ -84,7 +84,16 @@ export async function splitBundledFlavourSkus() {
         );
         if (!before) created++;
       }
-      await prisma.sku.delete({ where: { id: row.id } });
+      // A rolling deploy can briefly run the old and new boot sequences at
+      // once, both racing this same delete — seen in production as a
+      // P2025 (record not found) that aborted the rest of this function.
+      // The row being already gone means another boot got there first,
+      // which is exactly the outcome this call wants, so it's safe to
+      // swallow and move on rather than let it abort every split still
+      // queued behind it.
+      await prisma.sku.delete({ where: { id: row.id } }).catch((err) => {
+        if (err?.code !== 'P2025') throw err;
+      });
     }
   }
   if (created > 0) console.log(`Bundled flavour split: ${created} new row(s) created.`);
