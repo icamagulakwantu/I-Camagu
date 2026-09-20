@@ -358,11 +358,11 @@ const skuItems = [
   // unitsPerCase is 1 — for these, one "case" is one unit.
   { name: 'Ikoto (Bentonite Clay)', category: 'RITUAL_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 65.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Traditional Supplier' },
   { name: 'Imphepho Bundle', category: 'RITUAL_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 45.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Traditional Supplier' },
-  { name: 'Plain Grey Blanket', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 350.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Retail' },
-  { name: 'White Blanket with Black Stripes', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 450.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Retail' },
+  { name: 'Plain Grey Blanket', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 170.10, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Retail' },
+  { name: 'White Blanket with Black Stripes', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 382.50, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Retail' },
   { name: 'Tarpaulin Sail', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 350.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Hardware' },
   { name: 'Ibhoma Pole Bundle', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 450.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Hardware' },
-  { name: '25L Water Container', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 180.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Retail' },
+  { name: '25L Water Container', category: 'ULWALUKO_SUPPLIES', productType: 'SUPPLIES', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 116.99, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Retail' },
   { name: 'Green Apples', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
   { name: 'Butter', category: 'GROCERY', productType: 'FOOD', bottleFormat: '1kg', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   { name: 'Sheep', category: 'LIVESTOCK_ANIMAL', productType: 'LIVESTOCK', bottleFormat: 'Inkabi (male)', unitsPerCase: 1, casePriceZAR: 2700.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Livestock Farmer' },
@@ -392,8 +392,8 @@ const skuItems = [
   { name: 'Spinach', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk Bunches)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
   { name: 'Yellow Peppers', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
   { name: 'Sweet Corn', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
-  { name: 'Cooking Oil', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '5L', unitsPerCase: 1, casePriceZAR: 190.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
-  { name: 'Sugar', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '10kg Bag', unitsPerCase: 1, casePriceZAR: 245.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Cooking Oil', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '5L', unitsPerCase: 1, casePriceZAR: 143.06, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
+  { name: 'Sugar', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '10kg Bag', unitsPerCase: 1, casePriceZAR: 209.03, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
   { name: 'Sugar', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '12.5kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Wholesaler' },
   { name: 'Beef Stock', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: 'Box', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   { name: 'Salt', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: 'Box', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
@@ -441,7 +441,7 @@ const skuItems = [
   // ---- Veggies: the ceremony vegetables and sides list — matches
   // ceremonyCostProfiles.js COST_RATES.food exactly (same real prices),
   // now actually purchasable in the Store instead of just an estimate.
-  { name: 'Onions', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: '10kg Sack', unitsPerCase: 1, casePriceZAR: 95.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
+  { name: 'Onions', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: '10kg Sack', unitsPerCase: 1, casePriceZAR: 83.08, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
   { name: 'Carrots', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: '10kg Sack', unitsPerCase: 1, casePriceZAR: 95.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
   { name: 'Green Peppers', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
   { name: 'Red Peppers', category: 'FRESH_PRODUCE', productType: 'FOOD', bottleFormat: 'Box (Bulk)', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Fresh Produce' },
@@ -451,13 +451,13 @@ const skuItems = [
   // ---- Dry goods / hospitality staples: already-researched prices that
   // were sitting in ceremonyCostProfiles.js but never turned into
   // purchasable Sku rows.
-  { name: 'Instant Coffee', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: '750g Big Tin', unitsPerCase: 1, casePriceZAR: 165.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Instant Coffee', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: '750g Big Tin', unitsPerCase: 1, casePriceZAR: 134.91, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   { name: 'Tea', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: '1kg Box', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   // Bread and peanut butter stay single-consumer-sized on purpose — the
   // founder's own exception for anything bought from a local vendor rather
   // than a bulk wholesaler.
   { name: 'Peanut Butter 400g', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 50.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
-  { name: 'Brown Bread Loaf', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 20.00, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
+  { name: 'Brown Bread Loaf', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: null, unitsPerCase: 1, casePriceZAR: 17.24, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   { name: 'Milk Long Life', category: 'DRY_GOODS', productType: 'FOOD', bottleFormat: '1L x 6-Pack', unitsPerCase: 6, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   { name: 'Flour', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '10kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },
   { name: 'Flour', category: 'GROCERY_BULK', productType: 'FOOD', bottleFormat: '12.5kg Bag', unitsPerCase: 1, casePriceZAR: null, palletPackQty: null, palletPriceZAR: null, supplierPortfolio: 'Local Grocery' },

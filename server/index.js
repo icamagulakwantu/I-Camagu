@@ -32,6 +32,7 @@ import { splitBundledFlavourSkus } from './scripts/split-bundled-flavour-skus.js
 import { removeNonexistentSkus } from './scripts/remove-nonexistent-skus.js';
 import { removeNonexistentFormats } from './scripts/remove-nonexistent-formats.js';
 import { renameMislabeledSkus } from './scripts/rename-mislabeled-skus.js';
+import { fixAboveRetailPricing } from './scripts/fix-above-retail-pricing.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -236,6 +237,9 @@ ensureCeremonyBudgetColumns()
       });
       await backfillVerifiedRetailPrices().catch((err) => {
         logBackfillError('Verified retail price backfill', err);
+      });
+      await fixAboveRetailPricing().catch((err) => {
+        logBackfillError('Above-retail pricing fix', err);
       });
       await backfillFounderSourcedSkus().catch((err) => {
         logBackfillError('Founder-sourced SKU backfill', err);
