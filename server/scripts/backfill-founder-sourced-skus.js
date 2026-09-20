@@ -52,6 +52,10 @@ const NEW_SKUS = [
   // unconfirmed format (remove-nonexistent-formats.js) — a real can photo
   // has since confirmed it exists after all, so it's restored here.
   { name: 'Flying Fish Dry Apple', category: 'BEER', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
+  // Real bottle photo shows a distinct Ponchos 1910 product — a tequila and
+  // coffee infusion liqueur — alongside the existing Caramel/Blanco tequila
+  // range, not a flavour of either.
+  { name: 'Ponchos Tequila Coffee', category: 'LIQUEUR', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
 ];
 
 // Bernini Ruby Berry isn't a brand-new product — it was always the third

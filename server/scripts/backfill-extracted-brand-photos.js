@@ -146,6 +146,23 @@ const EXTRACTED_BRAND_IMAGES = {
   'KEM Gin': 'kem-gin',
   'Gordons Pink Berry': 'gordons-pink-berry',
   "Hendrick's Original": 'hendricks-original',
+  // Tequila/vodka round: real bottle photos for names that had none yet,
+  // plus the new Ponchos Tequila Coffee row (backfill-founder-sourced-
+  // skus.js) above.
+  'Ponchos Caramel Tequila': 'ponchos-caramel-tequila',
+  'Ponchos Tequila Coffee': 'ponchos-tequila-coffee',
+  'Martell Blue Swift VSOP': 'martell-blue-swift',
+  'Patron Reposado': 'patron-reposado',
+  'Casamigos Blanco': 'casamigos-blanco',
+  'Olmeca Reposado': 'olmeca-reposado',
+  'El Jimador Reposado': 'el-jimador-reposado',
+  'El Jimador Blanco': 'el-jimador-blanco',
+  'Ciroc Pineapple': 'ciroc-pineapple',
+  'Ciroc Mango': 'ciroc-mango',
+  'Ciroc Apple': 'ciroc-apple',
+  'Count Pushkin Vodka': 'count-pushkin-vodka',
+  'Wyborowa Vodka': 'wyborowa-vodka',
+  'Smirnoff Red No. 21': 'smirnoff-red-no-21',
 };
 
 export async function backfillExtractedBrandPhotos() {
