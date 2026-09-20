@@ -180,6 +180,24 @@ const EXTRACTED_BRAND_IMAGES = {
   'Ginger Liqueur (Butlers)': 'butlers-ginger-liqueur',
   'Nachtmusik Chocolate Liqueur': 'nachtmusik-chocolate',
   'Tequila Rose Cream Liqueur': 'tequila-rose-cream',
+  // Mixer round: real bottle photos for the Monin syrup range and the
+  // Rose's cordials, plus Monin Cherry/Grenadine (backfill-monin-
+  // syrups.js) above.
+  'Passion Fruit Cordial': 'roses-passionfruit',
+  'Kola Tonic Cordial': 'roses-kola-tonic',
+  'Lime Cordial': 'roses-lime',
+  'Monin White Chocolate': 'monin-white-chocolate',
+  'Monin Lemon Tea / Citron': 'monin-lemon-tea',
+  'Monin Spicy Mango': 'monin-spicy-mango',
+  'Monin Melon': 'monin-melon',
+  'Monin Lemon Pie / Tarte Citron': 'monin-lemon-pie',
+  'Monin Crème Brûlée': 'monin-creme-brulee',
+  'Monin Agave': 'monin-agave',
+  'Monin Blue Curaçao Syrup': 'monin-curacao-bleu',
+  'Monin Almond Orgeat': 'monin-orgeat-almond',
+  'Monin Falernum': 'monin-falernum',
+  'Monin Cherry': 'monin-cherry',
+  'Monin Grenadine': 'monin-grenadine',
 };
 
 export async function backfillExtractedBrandPhotos() {

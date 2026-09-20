@@ -28,6 +28,12 @@ const MONIN_SYRUPS = [
   // not currently in its first-page SA assortment — keep, but check with
   // the founder if it turns out not to be genuinely orderable locally.
   'Monin Spicy Mango',
+  // Real bottle photos for two more flavours in the same range. Distinct
+  // from the existing 'Grenadine Syrup Cordial' row (a different, already-
+  // priced 1 Litre Jug product from Bar Mixer Supply) — this is Monin's own
+  // 700ml bottle, same as every other row here.
+  'Monin Cherry',
+  'Monin Grenadine',
 ];
 
 export async function backfillMoninSyrups() {
