@@ -90,6 +90,13 @@ const FORMAT_SPECIFIC_IMAGES = [
   { name: "Redd's MXD Guarana", bottleFormat: 'Can (500ml)', slug: 'redds-mxd-guarana-can' },
   { name: "Redd's MXD Pine", bottleFormat: 'Can (500ml)', slug: 'redds-mxd-pine-can' },
   { name: 'Sol', bottleFormat: 'Can (500ml)', slug: 'sol-can' },
+  // Third batch from the same full re-check.
+  { name: 'Castle Lager', bottleFormat: 'Can (500ml)', slug: 'castle-lager-can' },
+  { name: "Redd's Dry", bottleFormat: 'Can (500ml)', slug: 'redds-dry-can' },
+  // Belgravia Gin & Dark Cherry's default (backfill-extracted-brand-
+  // photos.js) is already its real Can photo; this gives the Dumpy row
+  // its own real bottle photo instead of sharing the can shot.
+  { name: 'Belgravia Gin & Dark Cherry', bottleFormat: 'Dumpy (275ml)', slug: 'belgravia-dark-cherry-bottle' },
 ];
 
 export async function backfillFormatSpecificPhotos() {
