@@ -45,6 +45,10 @@ const NEW_SKUS = [
   { name: 'Corona', category: 'BEER', bottleFormat: 'Quart (600ml)', unitsPerCase: 12 },
   // Bisquit & Dubouche's third tier alongside the existing VS/VSOP.
   { name: 'Bisquit & Dubouche XO', category: 'COGNAC', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
+  // Flying Fish Dry Apple's Can (500ml) row was removed earlier as an
+  // unconfirmed format (remove-nonexistent-formats.js) — a real can photo
+  // has since confirmed it exists after all, so it's restored here.
+  { name: 'Flying Fish Dry Apple', category: 'BEER', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
 ];
 
 // Bernini Ruby Berry isn't a brand-new product — it was always the third

@@ -66,6 +66,10 @@ const FORMAT_SPECIFIC_IMAGES = [
   // each get their own real, distinctly-shaped photo instead.
   { name: 'Corona', bottleFormat: 'Can (410ml)', slug: 'corona-can' },
   { name: 'Corona', bottleFormat: 'Quart (600ml)', slug: 'corona-600ml' },
+  // Flying Fish Dry Apple's default (bottle) photo is set by name above;
+  // its restored Can (500ml) row (backfill-founder-sourced-skus.js) gets
+  // its own real can photo instead.
+  { name: 'Flying Fish Dry Apple', bottleFormat: 'Can (500ml)', slug: 'flying-fish-dry-apple-can' },
 ];
 
 export async function backfillFormatSpecificPhotos() {

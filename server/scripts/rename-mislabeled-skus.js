@@ -20,6 +20,9 @@ const RENAMES = [
   { from: 'Strongbow Apple', to: 'Strongbow Red Berries' },
   { from: 'Smirnoff Storm', to: 'Smirnoff Storm Citrus' },
   { from: 'Smirnoff Spin', to: 'Smirnoff Storm Pine Twist' },
+  // Real bottle/can photos show the actual label is "Dry Apple", not bare
+  // "Apple" — same pattern as Strongbow/Smirnoff above.
+  { from: 'Flying Fish Apple', to: 'Flying Fish Dry Apple' },
 ];
 
 export async function renameMislabeledSkus() {

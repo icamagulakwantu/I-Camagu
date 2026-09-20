@@ -121,6 +121,7 @@ const EXTRACTED_BRAND_IMAGES = {
   'Courvoisier VSOP': 'courvoisier-vsop',
   'Bisquit & Dubouche VSOP': 'bisquit-dubouche-vsop',
   'Bisquit & Dubouche XO': 'bisquit-dubouche-xo',
+  'Flying Fish Dry Apple': 'flying-fish-dry-apple',
 };
 
 export async function backfillExtractedBrandPhotos() {

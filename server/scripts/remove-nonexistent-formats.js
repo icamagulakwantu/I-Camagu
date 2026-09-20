@@ -10,6 +10,12 @@
 // reasoning as remove-nonexistent-skus.js: there's no real product to
 // catalogue at that format.
 //
+// Correction: a real can photo later confirmed Flying Fish's Apple flavour
+// (renamed "Flying Fish Dry Apple" — see rename-mislabeled-skus.js) does
+// ship in a can after all. That entry stays below so a stray row under the
+// old name never lingers; the real Can (500ml) row is restored under the
+// correct name in backfill-founder-sourced-skus.js.
+//
 // Idempotent — deleteMany on a (name, bottleFormat) pair that's already
 // gone is a no-op.
 import prisma from '../config/db.js';
