@@ -103,6 +103,7 @@ const FORMAT_SPECIFIC_IMAGES = [
   { name: '4th Street Sweet Red', bottleFormat: '5 Litre Box', slug: '4th-street-sweet-red-box' },
   { name: '4th Street Sweet White', bottleFormat: '5 Litre Box', slug: '4th-street-sweet-white-box' },
   { name: 'Drostdy-Hof Adelpracht Sweet', bottleFormat: '3 Litre Box', slug: 'drostdy-hof-adelpracht-box' },
+  { name: "Sedgwick's Old Brown", bottleFormat: '2 Litre Box', slug: 'sedgwicks-old-brown-box' },
 ];
 
 export async function backfillFormatSpecificPhotos() {

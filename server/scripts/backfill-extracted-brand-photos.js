@@ -212,6 +212,12 @@ const EXTRACTED_BRAND_IMAGES = {
   'Nederburg Sauvignon Blanc': 'nederburg-sauvignon-blanc',
   'Robertson Winery Sweet Merlot': 'robertson-winery-merlot',
   'Saint Raphael Smooth Red': 'saint-raphael-smooth-red',
+  // These two only exist as a box (no bottle row), so their own box photo
+  // is the default, not a mismatched bottle photo from a different product.
+  '4th Street Sweet Rosé': '4th-street-sweet-rose-box',
+  'Robertson Winery Smooth Red': 'robertson-winery-smooth-red-box',
+  'Paarl Perle White': 'paarl-perle-white',
+  "Sedgwick's Old Brown": 'sedgwicks-old-brown',
 };
 
 export async function backfillExtractedBrandPhotos() {

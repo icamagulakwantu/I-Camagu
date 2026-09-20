@@ -33,6 +33,7 @@ import { removeNonexistentSkus } from './scripts/remove-nonexistent-skus.js';
 import { removeNonexistentFormats } from './scripts/remove-nonexistent-formats.js';
 import { renameMislabeledSkus } from './scripts/rename-mislabeled-skus.js';
 import { fixAboveRetailPricing } from './scripts/fix-above-retail-pricing.js';
+import { backfillSedgwicks } from './scripts/backfill-sedgwicks.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -243,6 +244,9 @@ ensureCeremonyBudgetColumns()
       });
       await backfillFounderSourcedSkus().catch((err) => {
         logBackfillError('Founder-sourced SKU backfill', err);
+      });
+      await backfillSedgwicks().catch((err) => {
+        logBackfillError("Sedgwick's backfill", err);
       });
       await backfillExtractedBrandPhotos().catch((err) => {
         logBackfillError('Extracted brand photo backfill', err);
