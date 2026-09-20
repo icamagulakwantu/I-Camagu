@@ -79,6 +79,8 @@ app.set('trust proxy', 1);
 const ALLOWED_ORIGINS = [
   'https://i-camagu-1.onrender.com',
   'https://i-camagu.onrender.com',
+  'https://i-camagu.co.za',
+  'https://www.i-camagu.co.za',
   'http://localhost:5173',
   'http://localhost:3000',
   ...(process.env.ALLOWED_ORIGINS || '').split(',').map((o) => o.trim()).filter(Boolean),
