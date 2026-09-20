@@ -14,15 +14,12 @@ const MONIN_SYRUPS = [
   'Monin Agave',
   'Monin Almond Orgeat',
   'Monin Blue Curaçao Syrup',
-  'Monin Chocolate',
   'Monin Crème Brûlée',
   'Monin Falernum',
-  'Monin Green Apple',
   'Monin Kiwi Syrup',
   'Monin Lemon Pie / Tarte Citron',
   'Monin Lemon Tea / Citron',
   'Monin Melon',
-  'Monin Popcorn',
   'Monin White Chocolate',
   // Confirmed present on the distributor's own site, but flagged there as
   // not currently in its first-page SA assortment — keep, but check with

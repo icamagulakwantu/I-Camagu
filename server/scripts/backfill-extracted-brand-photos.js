@@ -241,6 +241,16 @@ const EXTRACTED_BRAND_IMAGES = {
   // Clase Azul Plata.
   'Clase Azul Plata': 'clase-azul-plata',
   'Van Der Hum Tangerine (Butlers)': 'butlers-van-der-hum',
+  'Angostura Aromatic Bitters': 'angostura-aromatic-bitters',
+  'Ponchos Blanco Tequila': 'ponchos-blanco-tequila',
+  'Amarula Original Cream': 'amarula-original-cream',
+  'Smirnoff Infusions': 'smirnoff-infusions',
+  'Three Ships 5 Year Old': 'three-ships-5-year',
+  'KWV 12 Year': 'kwv-12-year',
+  // Founder asked to reuse the Monin Grenadine photo for this row too,
+  // rather than wait on a jug-specific photo for this differently-sized,
+  // differently-supplied product.
+  'Grenadine Syrup Cordial': 'monin-grenadine',
 };
 
 export async function backfillExtractedBrandPhotos() {

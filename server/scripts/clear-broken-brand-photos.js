@@ -13,11 +13,13 @@ const BROKEN_PHOTO_NAMES = [
   // Red/White' and '4th Street Sweet Red/Rose' themselves no longer exist —
   // all split into per-flavour rows (split-bundled-flavour-skus.js), which
   // now have their own real photos.
-  'Three Ships 5 Year Old',
-  'Amarula Original Cream',
-  // Skyy Vodka Original used to be here too — its old photo was a picture
-  // of someone's home bookshelf, not the product. A real bottle photo has
-  // since arrived and is wired in backfill-extracted-brand-photos.js.
+  //
+  // Skyy Vodka Original, Three Ships 5 Year Old and Amarula Original Cream
+  // used to be here too — each had a bad old photo (Skyy's was literally
+  // someone's home bookshelf). Real bottle photos have since arrived for
+  // all three and are wired in backfill-extracted-brand-photos.js; leaving
+  // any of them here would silently wipe that new photo back to null on
+  // every boot, the same bug once found with Count Pushkin Vodka.
 ];
 
 export async function clearBrokenBrandPhotos() {

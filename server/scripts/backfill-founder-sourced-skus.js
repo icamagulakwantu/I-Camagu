@@ -64,6 +64,9 @@ const NEW_SKUS = [
   // existing 4th Street Sweet Red/Rosé and Drostdy-Hof Claret Select boxes.
   { name: '4th Street Sweet White', category: 'WINE_BOX', bottleFormat: '5 Litre Box', unitsPerCase: 4 },
   { name: 'Drostdy-Hof Adelpracht Sweet', category: 'WINE_BOX', bottleFormat: '3 Litre Box', unitsPerCase: 4 },
+  // Wasn't in the catalogue at all — the founder sent a real bottle photo
+  // and asked for it to be added.
+  { name: 'KWV 12 Year', category: 'BRANDY', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
 ];
 
 // Bernini Ruby Berry isn't a brand-new product — it was always the third

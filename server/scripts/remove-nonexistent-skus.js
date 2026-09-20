@@ -33,6 +33,15 @@ const NONEXISTENT_SKU_NAMES = [
   // Founder confirmed this unbranded placeholder isn't a real product
   // iCamagu carries — same class as the other Generic removals above.
   'Sambuca Generic White',
+  // Founder sent real photos for every other remaining missing-photo
+  // alcohol/mixer item in one final round and explicitly asked that
+  // whatever wasn't included in that batch be dropped from the catalogue
+  // rather than left as a photo-less placeholder.
+  'Aljimardo Silver',
+  'Drambuie Honey/Scotch',
+  'Monin Chocolate',
+  'Monin Green Apple',
+  'Monin Popcorn',
 ];
 
 export async function removeNonexistentSkus() {
