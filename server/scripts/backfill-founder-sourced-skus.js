@@ -38,6 +38,9 @@ const NEW_SKUS = [
   // Fruit RTD range already catalogued (Ruby Apple included) — same
   // flavour name, different product.
   { name: 'Brutal Fruit Spritzer Ruby Apple', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
+  // Spritzer's second flavour, found in a full re-check of every photo
+  // sent this session.
+  { name: 'Brutal Fruit Spritzer Strawberry Rouge', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
   // A third, larger Corona bottle alongside the existing 355ml (Dumpy) and
   // 410ml (Can, see fix-beer-quart-formats.js) — confirmed by a real photo
   // showing a distinctly different bottle shape and label design from the

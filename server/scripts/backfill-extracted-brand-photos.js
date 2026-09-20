@@ -122,6 +122,7 @@ const EXTRACTED_BRAND_IMAGES = {
   'Bisquit & Dubouche VSOP': 'bisquit-dubouche-vsop',
   'Bisquit & Dubouche XO': 'bisquit-dubouche-xo',
   'Flying Fish Dry Apple': 'flying-fish-dry-apple',
+  'Brutal Fruit Spritzer Strawberry Rouge': 'brutal-fruit-spritzer-strawberry-rouge',
 };
 
 export async function backfillExtractedBrandPhotos() {

@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 
 const skuItems = [
   { name: 'Black Label', category: 'BEER', productType: 'ALCOHOL', imageUrl: '/images/brands/carling-black-label.png', bottleFormat: 'Quart (750ml)', unitsPerCase: 12, casePriceZAR: 279.36, palletPackQty: 60, palletPriceZAR: 16070.40, supplierPortfolio: 'SAB' },
-  { name: 'Black Label', category: 'BEER', productType: 'ALCOHOL', imageUrl: '/images/brands/carling-black-label.png', bottleFormat: 'Can (500ml)', unitsPerCase: 24, casePriceZAR: 349.20, palletPackQty: 84, palletPriceZAR: 28123.20, supplierPortfolio: 'SAB' },
+  { name: 'Black Label', category: 'BEER', productType: 'ALCOHOL', imageUrl: '/images/brands/carling-black-label-can.png', bottleFormat: 'Can (500ml)', unitsPerCase: 24, casePriceZAR: 349.20, palletPackQty: 84, palletPriceZAR: 28123.20, supplierPortfolio: 'SAB' },
   { name: 'Heineken', category: 'BEER', productType: 'ALCOHOL', bottleFormat: 'Quart (620ml)', unitsPerCase: 12, casePriceZAR: 325.92, palletPackQty: 60, palletPriceZAR: 18748.80, supplierPortfolio: 'Heineken SA' },
   { name: 'Heineken', category: 'BEER', productType: 'ALCOHOL', bottleFormat: 'Dumpy (340ml)', unitsPerCase: 24, casePriceZAR: 372.48, palletPackQty: 84, palletPriceZAR: 29998.08, supplierPortfolio: 'Heineken SA' },
   { name: 'Heineken', category: 'BEER', productType: 'ALCOHOL', bottleFormat: 'Can (500ml)', unitsPerCase: 24, casePriceZAR: 419.04, palletPackQty: 84, palletPriceZAR: 33747.84, supplierPortfolio: 'Heineken SA' },
@@ -66,6 +66,7 @@ const skuItems = [
   // "Spritzer" is a separate Brutal Fruit sub-line, not the same product as
   // Ruby Apple above despite the shared flavour name.
   { name: 'Brutal Fruit Spritzer Ruby Apple', category: 'CIDER_RTD', productType: 'ALCOHOL', imageUrl: '/images/brands/brutal-fruit-spritzer-ruby-apple.png', bottleFormat: 'Can (500ml)', unitsPerCase: 24, casePriceZAR: null },
+  { name: 'Brutal Fruit Spritzer Strawberry Rouge', category: 'CIDER_RTD', productType: 'ALCOHOL', imageUrl: '/images/brands/brutal-fruit-spritzer-strawberry-rouge.png', bottleFormat: 'Can (500ml)', unitsPerCase: 24, casePriceZAR: null },
   { name: 'Brutal Fruit Strawberry Rouge', category: 'CIDER_RTD', productType: 'ALCOHOL', bottleFormat: 'Quart (750ml)', unitsPerCase: 12, casePriceZAR: 407.40, palletPackQty: 60, palletPriceZAR: 23436.00, supplierPortfolio: 'SAB' },
   { name: 'Brutal Fruit Strawberry Rouge', category: 'CIDER_RTD', productType: 'ALCOHOL', bottleFormat: 'Dumpy (340ml)', unitsPerCase: 24, casePriceZAR: 372.48, palletPackQty: 84, palletPriceZAR: 29998.08, supplierPortfolio: 'SAB' },
   { name: 'Brutal Fruit Strawberry Rouge', category: 'CIDER_RTD', productType: 'ALCOHOL', bottleFormat: 'Can (500ml)', unitsPerCase: 24, casePriceZAR: 419.04, palletPackQty: 84, palletPriceZAR: 33747.84, supplierPortfolio: 'SAB' },

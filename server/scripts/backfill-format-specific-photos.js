@@ -70,6 +70,11 @@ const FORMAT_SPECIFIC_IMAGES = [
   // its restored Can (500ml) row (backfill-founder-sourced-skus.js) gets
   // its own real can photo instead.
   { name: 'Flying Fish Dry Apple', bottleFormat: 'Can (500ml)', slug: 'flying-fish-dry-apple-can' },
+  // Black Label's bottle shot (backfill-extracted-brand-photos.js, matched
+  // by name) was standing in for the Can too — a real can photo turned up
+  // in a full re-check of every photo sent this session, same fix as the
+  // other Can-format entries above.
+  { name: 'Black Label', bottleFormat: 'Can (500ml)', slug: 'carling-black-label-can' },
 ];
 
 export async function backfillFormatSpecificPhotos() {
