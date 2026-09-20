@@ -75,6 +75,21 @@ const FORMAT_SPECIFIC_IMAGES = [
   // in a full re-check of every photo sent this session, same fix as the
   // other Can-format entries above.
   { name: 'Black Label', bottleFormat: 'Can (500ml)', slug: 'carling-black-label-can' },
+  // Same class of fix, next batch of real can/bottle photos the founder
+  // sent after the Black Label check — each of these had its bottle shot
+  // (or, for Budweiser, its can shot) standing in for every format.
+  { name: 'Castle Lite', bottleFormat: 'Can (500ml)', slug: 'castle-lite-can' },
+  { name: 'Amstel Lager', bottleFormat: 'Can (500ml)', slug: 'amstel-lager-can' },
+  { name: 'Castle Milk Stout', bottleFormat: 'Can (500ml)', slug: 'castle-milk-stout-can' },
+  // Budweiser's default (backfill-extracted-brand-photos.js) used to be its
+  // Can photo, set outside any tracked backfill script — a real bottle
+  // photo arrived and became the new default, so the Can now needs this
+  // explicit override to keep its own real can photo.
+  { name: 'Budweiser', bottleFormat: 'Can (500ml)', slug: 'budweiser-can' },
+  { name: 'Belgravia Gin & Dry Lemon', bottleFormat: 'Can (500ml)', slug: 'belgravia-dry-lemon-can' },
+  { name: "Redd's MXD Guarana", bottleFormat: 'Can (500ml)', slug: 'redds-mxd-guarana-can' },
+  { name: "Redd's MXD Pine", bottleFormat: 'Can (500ml)', slug: 'redds-mxd-pine-can' },
+  { name: 'Sol', bottleFormat: 'Can (500ml)', slug: 'sol-can' },
 ];
 
 export async function backfillFormatSpecificPhotos() {

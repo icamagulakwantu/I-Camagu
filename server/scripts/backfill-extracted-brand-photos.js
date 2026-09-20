@@ -54,6 +54,12 @@ const EXTRACTED_BRAND_IMAGES = {
   "Hunter's Chilled": 'hunters-chilled',
   'Windhoek Lager': 'windhoek-lager',
   'Amstel Lager': 'amstel-lager',
+  // Previously set by a direct manual write outside any tracked backfill
+  // script (same anomaly class as Skyy Vodka/Absolut Watermelon earlier
+  // this session) — now tracked properly, pointing at the real bottle
+  // photo; the Can row's own photo lives in
+  // backfill-format-specific-photos.js.
+  'Budweiser': 'budweiser',
   'Castle Milk Stout': 'castle-milk-stout',
   'Guinness Foreign Extra': 'guinness-foreign-extra',
   'Wellington VO': 'wellington-vo',
