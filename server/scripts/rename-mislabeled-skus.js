@@ -23,6 +23,9 @@ const RENAMES = [
   // Real bottle/can photos show the actual label is "Dry Apple", not bare
   // "Apple" — same pattern as Strongbow/Smirnoff above.
   { from: 'Flying Fish Apple', to: 'Flying Fish Dry Apple' },
+  // The real bottle label reads "Gordon's Pink Berry", not the generic
+  // "Gordons Premium Pink" seeded before a photo arrived.
+  { from: 'Gordons Premium Pink', to: 'Gordons Pink Berry' },
 ];
 
 export async function renameMislabeledSkus() {

@@ -52,6 +52,10 @@ const SPLITS = [
   { bundledName: 'Ciroc (Apple/Mango/Pineapple)', flavours: ['Ciroc Apple', 'Ciroc Mango', 'Ciroc Pineapple'] },
   { bundledName: '4th Street Sweet Red/White', flavours: ['4th Street Sweet Red', '4th Street Sweet White'] },
   { bundledName: '4th Street Sweet Red/Rose', flavours: ['4th Street Sweet Red', '4th Street Sweet Rosé'] },
+  // Not a slash-bundled name, but the same underlying problem: real bottle
+  // photos show "Kwande Gin" is two distinct flavours, Rooibos and Witty,
+  // sold under one generic row with no photo.
+  { bundledName: 'Kwande Gin', flavours: ['Kwande Gin Rooibos', 'Kwande Gin Witty'] },
 ];
 
 export async function splitBundledFlavourSkus() {

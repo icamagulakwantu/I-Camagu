@@ -129,6 +129,23 @@ const EXTRACTED_BRAND_IMAGES = {
   'Bisquit & Dubouche XO': 'bisquit-dubouche-xo',
   'Flying Fish Dry Apple': 'flying-fish-dry-apple',
   'Brutal Fruit Spritzer Strawberry Rouge': 'brutal-fruit-spritzer-strawberry-rouge',
+  // Gin round: real bottle photos for names that had none yet, plus the
+  // Kwande split (split-bundled-flavour-skus.js) and Gordon's rename
+  // (rename-mislabeled-skus.js) above.
+  'Kwande Gin Rooibos': 'kwande-gin-rooibos',
+  'Kwande Gin Witty': 'kwande-gin-witty',
+  'Cruxland Gin': 'cruxland-gin',
+  'Flowstone African Bush Botanical': 'flowstone-african-bush-botanical',
+  'Wixworth Gin': 'wixworth-gin',
+  'Inverroche Amber': 'inverroche-amber',
+  'Royal Flush Premium': 'royal-flush-premium',
+  'Tanqueray Flor de Sevilla': 'tanqueray-flor-de-sevilla',
+  'Tanqueray No. TEN': 'tanqueray-no-ten',
+  'Bombay Sapphire': 'bombay-sapphire',
+  'Musgrave Pink': 'musgrave-pink',
+  'KEM Gin': 'kem-gin',
+  'Gordons Pink Berry': 'gordons-pink-berry',
+  "Hendrick's Original": 'hendricks-original',
 };
 
 export async function backfillExtractedBrandPhotos() {
