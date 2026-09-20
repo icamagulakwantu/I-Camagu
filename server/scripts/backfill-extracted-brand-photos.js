@@ -218,6 +218,9 @@ const EXTRACTED_BRAND_IMAGES = {
   'Robertson Winery Smooth Red': 'robertson-winery-smooth-red-box',
   'Paarl Perle White': 'paarl-perle-white',
   "Sedgwick's Old Brown": 'sedgwicks-old-brown',
+  'JC Le Roux La Fleurette': 'jc-le-roux-la-fleurette',
+  'JC Le Roux Le Domaine': 'jc-le-roux-le-domaine',
+  'Pongracz Brut': 'pongracz-brut',
 };
 
 export async function backfillExtractedBrandPhotos() {
