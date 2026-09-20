@@ -30,6 +30,9 @@ const NONEXISTENT_SKU_NAMES = [
   // Same pattern — redundant with 'Strawberry Liqueur (Butlers)', already
   // photographed and wired.
   'Strawberry Liqueur Generic',
+  // Founder confirmed this unbranded placeholder isn't a real product
+  // iCamagu carries — same class as the other Generic removals above.
+  'Sambuca Generic White',
 ];
 
 export async function removeNonexistentSkus() {
