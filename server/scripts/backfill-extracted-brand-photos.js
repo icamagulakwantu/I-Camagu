@@ -234,6 +234,12 @@ const EXTRACTED_BRAND_IMAGES = {
   'Absolut Original Blue': 'absolut-original-blue',
   'Absolut Lime': 'absolut-lime',
   'Absolut Citron': 'absolut-citron',
+  'Inverroche Classic': 'inverroche-classic',
+  'Inverroche Verdant': 'inverroche-verdant',
+  // The clear tequila with the small blue flower medallion and silver
+  // dome cap from an earlier round, since identified by the founder as
+  // Clase Azul Plata.
+  'Clase Azul Plata': 'clase-azul-plata',
 };
 
 export async function backfillExtractedBrandPhotos() {
