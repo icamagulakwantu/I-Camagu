@@ -56,6 +56,10 @@ const NEW_SKUS = [
   // coffee infusion liqueur — alongside the existing Caramel/Blanco tequila
   // range, not a flavour of either.
   { name: 'Ponchos Tequila Coffee', category: 'LIQUEUR', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
+  // Real bottle photo shows a distinct Amarula flavour — Raspberry
+  // Chocolate — alongside the existing Original Cream and Ethiopian
+  // Coffee, not a restyling of either.
+  { name: 'Amarula Raspberry Chocolate Cream', category: 'LIQUEUR', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
 ];
 
 // Bernini Ruby Berry isn't a brand-new product — it was always the third

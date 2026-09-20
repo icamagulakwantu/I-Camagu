@@ -163,6 +163,23 @@ const EXTRACTED_BRAND_IMAGES = {
   'Count Pushkin Vodka': 'count-pushkin-vodka',
   'Wyborowa Vodka': 'wyborowa-vodka',
   'Smirnoff Red No. 21': 'smirnoff-red-no-21',
+  // Liqueur round: real bottle photos for names that had none yet, the
+  // Lupini Blue rename (rename-mislabeled-skus.js) and the new Amarula
+  // Raspberry Chocolate Cream row (backfill-founder-sourced-skus.js) above.
+  'Amarula Ethiopian Coffee': 'amarula-ethiopian-coffee',
+  'Amarula Raspberry Chocolate Cream': 'amarula-raspberry-chocolate-cream',
+  "Blue Curacao (Peddler's)": 'peddlers-blue-curacao',
+  "Triple Sec (Peddler's)": 'peddlers-triple-sec',
+  'Sambuca Lupini Blue': 'sambuca-lupini-blue',
+  'Sambuca Lupini Gold': 'sambuca-lupini-gold',
+  'Peach Schnapps (Relic)': 'relic-peach-schnapps',
+  'Cape Velvet Cream': 'cape-velvet-cream',
+  'Cointreau Orange Liqueur': 'cointreau-orange-liqueur',
+  'Disaronno Amaretto Liqueur': 'disaronno-amaretto',
+  'Frangelico Hazelnut Liqueur': 'frangelico-hazelnut',
+  'Ginger Liqueur (Butlers)': 'butlers-ginger-liqueur',
+  'Nachtmusik Chocolate Liqueur': 'nachtmusik-chocolate',
+  'Tequila Rose Cream Liqueur': 'tequila-rose-cream',
 };
 
 export async function backfillExtractedBrandPhotos() {

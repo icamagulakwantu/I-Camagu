@@ -26,6 +26,10 @@ const RENAMES = [
   // The real bottle label reads "Gordon's Pink Berry", not the generic
   // "Gordons Premium Pink" seeded before a photo arrived.
   { from: 'Gordons Premium Pink', to: 'Gordons Pink Berry' },
+  // A real bottle photo shows the "generic" blue sambuca is actually the
+  // same Lupini brand as the existing Black and Gold rows — a third Lupini
+  // flavour, not an unbranded generic product.
+  { from: 'Sambuca Generic Blue', to: 'Sambuca Lupini Blue' },
 ];
 
 export async function renameMislabeledSkus() {

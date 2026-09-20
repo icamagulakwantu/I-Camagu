@@ -15,10 +15,7 @@ const BROKEN_PHOTO_NAMES = [
   // all split into per-flavour rows (split-bundled-flavour-skus.js), which
   // now have their own real photos.
   'Three Ships 5 Year Old',
-  'Cointreau Orange Liqueur',
   'Amarula Original Cream',
-  'Amarula Ethiopian Coffee',
-  'Count Pushkin Vodka',
   'Skyy Vodka Original',
 ];
 
