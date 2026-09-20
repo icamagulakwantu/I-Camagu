@@ -60,6 +60,12 @@ const FORMAT_SPECIFIC_IMAGES = [
   { name: 'Strongbow Red Berries', bottleFormat: 'Can (500ml)', slug: 'strongbow-red-berries-can' },
   { name: 'Smirnoff Storm Pine Twist', bottleFormat: 'Dumpy (250ml)', slug: 'smirnoff-storm-pine-twist-dumpy' },
   { name: 'Smirnoff Storm Citrus', bottleFormat: 'Dumpy (250ml)', slug: 'smirnoff-storm-citrus-dumpy' },
+  // Corona's default photo (backfill-extracted-brand-photos.js) is its
+  // 355ml Dumpy bottle; the corrected-size Can (fix-beer-quart-formats.js)
+  // and the newly added 600ml bottle (backfill-founder-sourced-skus.js)
+  // each get their own real, distinctly-shaped photo instead.
+  { name: 'Corona', bottleFormat: 'Can (410ml)', slug: 'corona-can' },
+  { name: 'Corona', bottleFormat: 'Quart (600ml)', slug: 'corona-600ml' },
 ];
 
 export async function backfillFormatSpecificPhotos() {

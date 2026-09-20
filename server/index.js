@@ -30,6 +30,7 @@ import { fixSavannaDryFormat } from './scripts/fix-savanna-dry-format.js';
 import { backfillFounderSourcedSkus } from './scripts/backfill-founder-sourced-skus.js';
 import { splitBundledFlavourSkus } from './scripts/split-bundled-flavour-skus.js';
 import { removeNonexistentSkus } from './scripts/remove-nonexistent-skus.js';
+import { removeNonexistentFormats } from './scripts/remove-nonexistent-formats.js';
 import { renameMislabeledSkus } from './scripts/rename-mislabeled-skus.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
@@ -199,6 +200,9 @@ ensureCeremonyBudgetColumns()
       });
       await removeNonexistentSkus().catch((err) => {
         logBackfillError('Nonexistent SKU removal', err);
+      });
+      await removeNonexistentFormats().catch((err) => {
+        logBackfillError('Nonexistent format removal', err);
       });
       await renameMislabeledSkus().catch((err) => {
         logBackfillError('Mislabeled SKU rename', err);

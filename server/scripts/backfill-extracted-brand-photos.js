@@ -114,6 +114,13 @@ const EXTRACTED_BRAND_IMAGES = {
   'Kopparberg Sweet Vintage Pear': 'kopparberg-sweet-vintage-pear',
   'Brutal Fruit Spritzer Ruby Apple': 'brutal-fruit-spritzer-ruby-apple',
   'Bernini Ruby Berry': 'bernini-ruby-berry',
+  'Savanna Angry Lemon': 'savanna-angry-lemon',
+  'Hennessy XO': 'hennessy-xo',
+  "D'USSE VSOP": 'dusse-vsop',
+  'Courvoisier VS': 'courvoisier-vs',
+  'Courvoisier VSOP': 'courvoisier-vsop',
+  'Bisquit & Dubouche VSOP': 'bisquit-dubouche-vsop',
+  'Bisquit & Dubouche XO': 'bisquit-dubouche-xo',
 };
 
 export async function backfillExtractedBrandPhotos() {

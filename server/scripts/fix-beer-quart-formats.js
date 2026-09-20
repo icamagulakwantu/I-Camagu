@@ -31,6 +31,13 @@ export async function fixBeerQuartFormats() {
     { name: 'Heineken', from: 'Quart (500ml)', to: 'Quart (620ml)' },
     { name: 'Windhoek Lager', from: 'Quart (500ml)', to: 'Quart (750ml)' },
     { name: 'Windhoek Draught', from: 'Quart (440ml)', to: 'Quart (750ml)' },
+    // Real can/bottle photos show these were wrong: Corona's can is 410ml,
+    // not 500ml (its Dumpy row is correctly 355ml already, per its own
+    // sharply legible label, and is left alone). Sol's only bottle photo
+    // was always this large returnable-style bottle, not a small 340ml
+    // dumpy — its shape doesn't match a dumpy at all.
+    { name: 'Corona', from: 'Can (500ml)', to: 'Can (410ml)' },
+    { name: 'Sol', from: 'Dumpy (340ml)', to: 'Quart (640ml)' },
   ];
   for (const { name, from, to } of fixes) {
     const { count } = await prisma.sku.updateMany({
