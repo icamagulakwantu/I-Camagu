@@ -16,6 +16,12 @@ const NONEXISTENT_SKU_NAMES = [
   // name. This entry stays only so a stray "Bernini Ruby" row — the wrong
   // name — never lingers if something re-creates it.
   'Bernini Ruby',
+  // The founder confirmed Peach Schnapps (Relic) is the only peach
+  // schnapps iCamagu actually carries — the unbranded "Generic" row was
+  // never a real product, and "Peach Schnapps (Butlers)" is dropped too
+  // rather than kept alongside Relic as a second real option.
+  'Peach Schnapps Generic',
+  'Peach Schnapps (Butlers)',
 ];
 
 export async function removeNonexistentSkus() {
