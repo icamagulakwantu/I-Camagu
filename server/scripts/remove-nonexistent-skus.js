@@ -22,6 +22,14 @@ const NONEXISTENT_SKU_NAMES = [
   // rather than kept alongside Relic as a second real option.
   'Peach Schnapps Generic',
   'Peach Schnapps (Butlers)',
+  // Redundant with the two real branded rows already photographed and
+  // wired — 'Blue Curacao (Butlers)' and 'Blue Curacao (Peddler's)'. This
+  // unbranded placeholder predates both and was never a real product on
+  // its own.
+  'Blue Curacao Generic',
+  // Same pattern — redundant with 'Strawberry Liqueur (Butlers)', already
+  // photographed and wired.
+  'Strawberry Liqueur Generic',
 ];
 
 export async function removeNonexistentSkus() {
