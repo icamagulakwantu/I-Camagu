@@ -240,6 +240,7 @@ const EXTRACTED_BRAND_IMAGES = {
   // dome cap from an earlier round, since identified by the founder as
   // Clase Azul Plata.
   'Clase Azul Plata': 'clase-azul-plata',
+  'Van Der Hum Tangerine (Butlers)': 'butlers-van-der-hum',
 };
 
 export async function backfillExtractedBrandPhotos() {
