@@ -31,6 +31,7 @@ import { backfillFounderSourcedSkus } from './scripts/backfill-founder-sourced-s
 import { splitBundledFlavourSkus } from './scripts/split-bundled-flavour-skus.js';
 import { removeNonexistentSkus } from './scripts/remove-nonexistent-skus.js';
 import { removeNonexistentFormats } from './scripts/remove-nonexistent-formats.js';
+import { remove375mlFormats } from './scripts/remove-375ml-formats.js';
 import { renameMislabeledSkus } from './scripts/rename-mislabeled-skus.js';
 import { fixAboveRetailPricing } from './scripts/fix-above-retail-pricing.js';
 import { backfillSedgwicks } from './scripts/backfill-sedgwicks.js';
@@ -205,6 +206,9 @@ ensureCeremonyBudgetColumns()
       });
       await removeNonexistentFormats().catch((err) => {
         logBackfillError('Nonexistent format removal', err);
+      });
+      await remove375mlFormats().catch((err) => {
+        logBackfillError('375ml format removal', err);
       });
       await renameMislabeledSkus().catch((err) => {
         logBackfillError('Mislabeled SKU rename', err);

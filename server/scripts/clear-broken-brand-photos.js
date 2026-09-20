@@ -1,8 +1,7 @@
 // Clears imageUrl back to null for Sku rows whose photo turned out, on
 // closer look, to be a plain text/wordmark logo card with no bottle in it
-// at all, or — Skyy Vodka Original — a photo of someone's home bookshelf
-// that isn't a product photo at all. Showing nothing (the app's generic
-// placeholder icon) is better than showing one of these.
+// at all. Showing nothing (the app's generic placeholder icon) is better
+// than showing one of these.
 //
 // Idempotent — only ever touches these specific known names, and setting
 // an already-null imageUrl to null again is a no-op.
@@ -16,7 +15,9 @@ const BROKEN_PHOTO_NAMES = [
   // now have their own real photos.
   'Three Ships 5 Year Old',
   'Amarula Original Cream',
-  'Skyy Vodka Original',
+  // Skyy Vodka Original used to be here too — its old photo was a picture
+  // of someone's home bookshelf, not the product. A real bottle photo has
+  // since arrived and is wired in backfill-extracted-brand-photos.js.
 ];
 
 export async function clearBrokenBrandPhotos() {

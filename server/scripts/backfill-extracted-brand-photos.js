@@ -221,6 +221,19 @@ const EXTRACTED_BRAND_IMAGES = {
   'JC Le Roux La Fleurette': 'jc-le-roux-la-fleurette',
   'JC Le Roux Le Domaine': 'jc-le-roux-le-domaine',
   'Pongracz Brut': 'pongracz-brut',
+  'Jameson Caskmates': 'jameson-caskmates',
+  'Chivas Regal 15 Year Old': 'chivas-regal-15',
+  'The Glenlivet 12 Year': 'the-glenlivet-12',
+  'Scottish Leader Original': 'scottish-leader-original',
+  'Johnnie Walker Double Black': 'johnnie-walker-double-black',
+  'Johnnie Walker Black Label': 'johnnie-walker-black-label',
+  'Firstwatch Whisky': 'firstwatch-whisky',
+  "Jack Daniel's Old No.7": 'jack-daniels-old-no7',
+  "Bain's Cape Mountain": 'bains-cape-mountain',
+  'Skyy Vodka Original': 'skyy-vodka-original',
+  'Absolut Original Blue': 'absolut-original-blue',
+  'Absolut Lime': 'absolut-lime',
+  'Absolut Citron': 'absolut-citron',
 };
 
 export async function backfillExtractedBrandPhotos() {
