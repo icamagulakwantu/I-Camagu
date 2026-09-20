@@ -97,6 +97,12 @@ const FORMAT_SPECIFIC_IMAGES = [
   // photos.js) is already its real Can photo; this gives the Dumpy row
   // its own real bottle photo instead of sharing the can shot.
   { name: 'Belgravia Gin & Dark Cherry', bottleFormat: 'Dumpy (275ml)', slug: 'belgravia-dark-cherry-bottle' },
+  // Wine-box formats — their default photo (backfill-extracted-brand-
+  // photos.js) is the bottle shot; these give the box its own real box
+  // photo instead of sharing the bottle image.
+  { name: '4th Street Sweet Red', bottleFormat: '5 Litre Box', slug: '4th-street-sweet-red-box' },
+  { name: '4th Street Sweet White', bottleFormat: '5 Litre Box', slug: '4th-street-sweet-white-box' },
+  { name: 'Drostdy-Hof Adelpracht Sweet', bottleFormat: '3 Litre Box', slug: 'drostdy-hof-adelpracht-box' },
 ];
 
 export async function backfillFormatSpecificPhotos() {

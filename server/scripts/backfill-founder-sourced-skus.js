@@ -60,6 +60,10 @@ const NEW_SKUS = [
   // Chocolate — alongside the existing Original Cream and Ethiopian
   // Coffee, not a restyling of either.
   { name: 'Amarula Raspberry Chocolate Cream', category: 'LIQUEUR', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
+  // Real box photos confirm two more wine-box formats, alongside the
+  // existing 4th Street Sweet Red/Rosé and Drostdy-Hof Claret Select boxes.
+  { name: '4th Street Sweet White', category: 'WINE_BOX', bottleFormat: '5 Litre Box', unitsPerCase: 4 },
+  { name: 'Drostdy-Hof Adelpracht Sweet', category: 'WINE_BOX', bottleFormat: '3 Litre Box', unitsPerCase: 4 },
 ];
 
 // Bernini Ruby Berry isn't a brand-new product — it was always the third

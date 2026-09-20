@@ -30,6 +30,8 @@ const RENAMES = [
   // same Lupini brand as the existing Black and Gold rows — a third Lupini
   // flavour, not an unbranded generic product.
   { from: 'Sambuca Generic Blue', to: 'Sambuca Lupini Blue' },
+  // The real label reads "Smooth Red", not "Sweet Red" as seeded.
+  { from: 'Saint Raphael Sweet Red', to: 'Saint Raphael Smooth Red' },
 ];
 
 export async function renameMislabeledSkus() {

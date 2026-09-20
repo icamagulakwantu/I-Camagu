@@ -198,6 +198,20 @@ const EXTRACTED_BRAND_IMAGES = {
   'Monin Falernum': 'monin-falernum',
   'Monin Cherry': 'monin-cherry',
   'Monin Grenadine': 'monin-grenadine',
+  // Wine round: real bottle photos for names that had none yet. Box-format
+  // rows (4th Street Sweet Red/White, Drostdy-Hof Adelpracht Sweet) get
+  // their own real box photo instead in backfill-format-specific-
+  // photos.js — these are their default (bottle) photo.
+  '4th Street Sweet Red': '4th-street-sweet-red',
+  '4th Street Sweet White': '4th-street-sweet-white',
+  'Beyerskloof Pinotage': 'beyerskloof-pinotage',
+  'Castillo de Liria Sweet Red': 'castillo-de-liria-sweet-red',
+  'Drostdy-Hof Adelpracht Sweet': 'drostdy-hof-adelpracht',
+  'Kanonkop Kadette Cabernet': 'kanonkop-kadette-cabernet',
+  'Nederburg Baronne': 'nederburg-baronne',
+  'Nederburg Sauvignon Blanc': 'nederburg-sauvignon-blanc',
+  'Robertson Winery Sweet Merlot': 'robertson-winery-merlot',
+  'Saint Raphael Smooth Red': 'saint-raphael-smooth-red',
 };
 
 export async function backfillExtractedBrandPhotos() {
