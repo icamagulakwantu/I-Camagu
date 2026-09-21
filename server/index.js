@@ -35,6 +35,7 @@ import { remove375mlFormats } from './scripts/remove-375ml-formats.js';
 import { renameMislabeledSkus } from './scripts/rename-mislabeled-skus.js';
 import { fixAboveRetailPricing } from './scripts/fix-above-retail-pricing.js';
 import { backfillSedgwicks } from './scripts/backfill-sedgwicks.js';
+import { backfillLaunchPricing } from './scripts/backfill-launch-pricing.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -262,6 +263,9 @@ ensureCeremonyBudgetColumns()
       });
       await clearBrokenBrandPhotos().catch((err) => {
         logBackfillError('Broken brand photo clear', err);
+      });
+      await backfillLaunchPricing().catch((err) => {
+        logBackfillError('Launch pricing backfill', err);
       });
     })();
   });
