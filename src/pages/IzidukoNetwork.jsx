@@ -32,6 +32,7 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
   const [message, setMessage] = useState('')
   const [requests, setRequests] = useState({ incoming: [], outgoing: [] })
   const [connections, setConnections] = useState([])
+  const [conversations, setConversations] = useState([])
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState(null)
   const [composerFor, setComposerFor] = useState(null)
@@ -45,16 +46,18 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
   const loadAll = useCallback(async () => {
     setLoading(true)
     try {
-      const [matchesRes, requestsRes, connectionsRes] = await Promise.all([
+      const [matchesRes, requestsRes, connectionsRes, conversationsRes] = await Promise.all([
         authedFetch('/api/iziduko/matches').then((r) => r.json()),
         authedFetch('/api/iziduko/requests').then((r) => r.json()),
         authedFetch('/api/iziduko/connections').then((r) => r.json()),
+        authedFetch('/api/messages').then((r) => r.json()),
       ])
       setMatches(matchesRes.matches || [])
       setProfileComplete(matchesRes.profileComplete !== false)
       setMessage(matchesRes.message || '')
       setRequests({ incoming: requestsRes.incoming || [], outgoing: requestsRes.outgoing || [] })
       setConnections(connectionsRes.connections || [])
+      setConversations(Array.isArray(conversationsRes) ? conversationsRes : [])
     } catch {
       showToast('Could not load your Iziduko Network', 'error')
     } finally {
@@ -124,10 +127,13 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
     }
   }
 
+  const totalUnread = conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0)
+
   const TABS = [
     { id: 'matches', label: 'Matches', count: matches.length },
     { id: 'requests', label: 'Requests', count: requests.incoming.length },
     { id: 'connected', label: 'Connected', count: connections.length },
+    { id: 'messages', label: 'Messages', count: totalUnread },
   ]
 
   return (
@@ -395,6 +401,43 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
                         </button>
                       </div>
                     </div>
+                  ))}
+                </div>
+              )
+            )}
+
+            {tab === 'messages' && (
+              conversations.length === 0 ? (
+                <EmptyState emoji="💬" title="No conversations yet" description="Message a connection and it'll show up here." />
+              ) : (
+                <div className="space-y-2">
+                  {conversations.map((c) => (
+                    <button
+                      key={c.user.id}
+                      type="button"
+                      onClick={() => onMessage?.(c.user.id)}
+                      className={`w-full bg-white border-2 rounded-soft p-4 flex items-center gap-3 text-left ${c.unreadCount > 0 ? 'border-terracotta/50' : 'border-terracotta/25'} ${pressable}`}
+                    >
+                      <Avatar src={c.user.profileImage} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-bold text-sm text-ink truncate">{c.user.firstName} {c.user.lastName}</p>
+                          {c.lastMessage && (
+                            <span className="text-[10px] text-ink-muted flex-shrink-0">
+                              {new Date(c.lastMessage.createdAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}
+                            </span>
+                          )}
+                        </div>
+                        <p className={`text-xs truncate ${c.unreadCount > 0 ? 'text-ink font-bold' : 'text-ink-muted'}`}>
+                          {c.lastMessage ? c.lastMessage.body : 'Say hello'}
+                        </p>
+                      </div>
+                      {c.unreadCount > 0 && (
+                        <span className="w-5 h-5 rounded-full bg-terracotta text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                          {c.unreadCount}
+                        </span>
+                      )}
+                    </button>
                   ))}
                 </div>
               )
