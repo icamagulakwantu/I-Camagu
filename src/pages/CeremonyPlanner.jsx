@@ -63,6 +63,9 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   const [newType, setNewType] = useState(defaultType || 'ULWALUKO')
   const [ceremonyTypes, setCeremonyTypes] = useState([])
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const [budgetEditorOpen, setBudgetEditorOpen] = useState(false)
+  const [budgetInput, setBudgetInput] = useState('')
+  const [savingBudget, setSavingBudget] = useState(false)
   const [newChecklistItem, setNewChecklistItem] = useState({ phase: 'CUSTOM', label: '', isOptional: true, actualCostZAR: '' })
 
   // ----- State for pledges (from File 1) -----
@@ -113,43 +116,16 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     e.preventDefault()
     try {
       const ceremonyRes = await fetch('/api/ceremonies/auto', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          type: newType,
-          title: newTitle,
-          eventDate: new Date().toISOString(),
-          budgetZAR: newBudget ? parseFloat(newBudget) : undefined,
-          guestCount: newGuestCount ? parseInt(newGuestCount, 10) : undefined,
-        }),
-      })
-      const ceremony = await ceremonyRes.json()
-      if (!ceremonyRes.ok) throw new Error(ceremony.error || 'Could not create ceremony')
-
-      const planRes = await fetch('/api/ceremonies/plans', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          title: newTitle,
-          ceremonyId: ceremony.id,
-          items: [],
-        }),
-      })
-      const plan = await planRes.json()
-      if (!planRes.ok) throw new Error(plan.error || 'Could not create ceremony plan')
-
-      const newPlan = {
-        ...plan,
-        ceremonyId: ceremony.id,
-        ceremony,
-        checklistItems: ceremony.checklistItems || [],
-      }
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+         body: JSON.stringify({ type: newType, title: newTitle, eventDate: new Date().toISOString(), budgetZAR: newBudget ? parseFloat(newBudget) : undefined, guestCount: newGuestCount ? parseInt(newGuestCount, 10) : undefined, createPlan: true }),
+       })
+       const response = await ceremonyRes.json()
+       if (!ceremonyRes.ok) throw new Error(response.error || 'Could not create ceremony')
+       const ceremony = response.ceremony || response
+       const plan = response.preparationPlan
+       if (!plan) throw new Error('Ceremony was created without a planning workspace')
+       const newPlan = { ...plan, ceremonyId: ceremony.id, ceremony, checklistItems: ceremony.checklistItems || [] }
       setPlans(prev => [newPlan, ...prev])
       setNewTitle('')
       setNewBudget('')
@@ -226,29 +202,29 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     }
   }
 
-  const editBudget = async () => {
+  const editBudget = () => {
     if (!activePlan?.ceremonyId) return
     const current = activePlan.ceremony?.budgetZAR
-    const input = prompt('Set your budget for this ceremony (ZAR):', current != null ? String(current) : '')
-    if (input === null) return
-    const parsed = input.trim() === '' ? null : parseFloat(input)
-    if (parsed !== null && (isNaN(parsed) || parsed < 0)) {
-      showToast('Please enter a valid amount', 'error')
-      return
-    }
+    setBudgetInput(current == null ? '' : String(current))
+    setBudgetEditorOpen(true)
+  }
+
+  const saveBudget = async (e) => {
+    e.preventDefault()
+    const trimmed = budgetInput.trim()
+    const parsed = trimmed === '' ? null : parseFloat(trimmed)
+    if (parsed !== null && (isNaN(parsed) || parsed < 0)) { showToast('Please enter a valid non-negative amount', 'error'); return }
+    setSavingBudget(true)
     try {
-      const res = await fetch(`/api/ceremonies/${activePlan.ceremonyId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ budgetZAR: parsed }),
-      })
+      const res = await fetch('/api/ceremonies/' + activePlan.ceremonyId, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + accessToken }, body: JSON.stringify({ budgetZAR: parsed }) })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Could not save budget')
       setActivePlan(prev => ({ ...prev, ceremony: { ...prev.ceremony, budgetZAR: data.budgetZAR } }))
+      setPlans(prev => prev.map(plan => plan.ceremonyId === activePlan.ceremonyId ? { ...plan, ceremony: { ...plan.ceremony, budgetZAR: data.budgetZAR } } : plan))
+      setBudgetEditorOpen(false)
       showToast('Budget updated', 'success')
-    } catch (err) {
-      showToast(err.message || 'Could not save budget', 'error')
-    }
+    } catch (err) { showToast(err.message || 'Could not save budget', 'error') }
+    finally { setSavingBudget(false) }
   }
 
   const updateItemActualCost = async (itemId, actualCostZAR) => {
@@ -302,23 +278,15 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     }
   }
 
-  const deletePlan = async (planId) => {
+  const deleteCeremonyWorkspace = async (ceremonyId) => {
     try {
-      const res = await fetch(`/api/ceremonies/plans/${planId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || 'Could not delete plan')
-      }
-      setPlans(plans.filter(p => p.id !== planId))
+      const res = await fetch('/api/ceremonies/' + ceremonyId, { method: 'DELETE', headers: { Authorization: 'Bearer ' + accessToken } })
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || 'Could not delete ceremony') }
+      setPlans(prev => prev.filter(plan => plan.ceremonyId !== ceremonyId))
       setActivePlan(null)
       setConfirmDelete(null)
-      showToast('Plan deleted', 'info')
-    } catch (err) {
-      showToast(err.message || 'Could not delete plan', 'error')
-    }
+      showToast('Ceremony deleted', 'info')
+    } catch (err) { showToast(err.message || 'Could not delete ceremony', 'error') }
   }
 
   const saveAsTemplate = async () => {
@@ -681,20 +649,32 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           </div>
 
           <button
-            onClick={() => setConfirmDelete(activePlan.id)}
+            onClick={() => setConfirmDelete(activePlan.ceremonyId)}
             className={`w-full text-center text-terracotta text-xs font-bold mt-3 py-1 ${pressable}`}
           >
-            Delete this plan
+            Delete ceremony
           </button>
         </div>
 
-        {/* Confirm Delete Modal (File 2 style but with File 1 design) */}
+        {budgetEditorOpen && (
+        <div className="mx-4 mt-3 bg-white border-2 border-sage-500 rounded-soft p-4 shadow-soft">
+          <form onSubmit={saveBudget}>
+            <h2 className="text-sm font-bold text-ink mb-1">Set ceremony budget</h2>
+            <p className="text-xs text-ink-muted mb-3">Enter the maximum amount you plan to spend. Leave blank to clear it.</p>
+            <label htmlFor="ceremony-budget" className="block text-xs font-bold text-ink-muted mb-1">Budget in ZAR</label>
+            <input id="ceremony-budget" type="number" min="0" step="0.01" inputMode="decimal" value={budgetInput} onChange={(e) => setBudgetInput(e.target.value)} className="w-full border-2 border-cream-dark rounded-soft px-3 py-2 text-ink" autoFocus />
+            <div className="flex gap-2 mt-3"><button type="submit" disabled={savingBudget} className={`flex-1 bg-sage-600 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>{savingBudget ? 'Saving…' : 'Save budget'}</button><button type="button" onClick={() => setBudgetEditorOpen(false)} className={`flex-1 border-2 border-sage-200 font-bold py-2 rounded-pill text-sm ${pressable}`}>Cancel</button></div>
+          </form>
+        </div>
+      )}
+
+      {/* Confirm Delete Modal (File 2 style but with File 1 design) */}
         {confirmDelete && (
           <div className="mx-4 mt-3 bg-white border-2 border-terracotta rounded-soft p-4 shadow-soft">
             <p className="text-sm font-bold text-ink mb-3">Delete this ceremony plan permanently?</p>
             <div className="flex gap-2">
               <button
-                onClick={() => deletePlan(activePlan.id)}
+                onClick={() => deleteCeremonyWorkspace(activePlan.ceremonyId)}
                 className={`flex-1 bg-terracotta text-white font-bold py-2 rounded-pill text-sm ${pressable}`}
               >
                 Yes, delete
