@@ -128,24 +128,25 @@ export const createCeremony = async (req, res) => {
 
 // DELETE /:ceremonyId - delete a ceremony
 export const deleteCeremony = async (req, res) => {
-      try {
-              const { ceremonyId } = req.params;
-                  const ceremony = await prisma.ceremony.findUnique({ where: { id: ceremonyId } });
-
-                      if (!ceremony) {
-                                return res.status(404).json({ error: 'Ceremony not found' });
-                      }
-
-                          if (ceremony.hostId !== req.user.id) {
-                                    return res.status(403).json({ error: 'Not your ceremony' });
-                          }
-
-                              await prisma.ceremony.delete({ where: { id: ceremonyId } });
-                                  res.status(204).send();
-      } catch (error) {
-              console.error('Error deleting ceremony:', error);
-                  res.status(500).json({ error: 'Internal server error' });
-      }
+  try {
+    const { ceremonyId } = req.params;
+    await prisma.$transaction(async (tx) => {
+      const ceremony = await tx.ceremony.findUnique({
+        where: { id: ceremonyId },
+        include: { barBookings: { select: { id: true } }, tourismPackage: { include: { bookings: { select: { id: true } } } } }, },
+      });
+      if (!ceremony) { const error = new Error('Ceremony not found'); error.statusCode = 404; throw error; }
+      if (ceremony.hostId !== req.user.id) { const error = new Error('Not your ceremony'); error.statusCode = 403; throw error; }
+      const hasExternalBookings = ceremony.barBookings.length > 0 || (ceremony.tourismPackage?.bookings?.length || 0) > 0;
+      if (hasExternalBookings) { const error = new Error('This ceremony has bookings and cannot be permanently deleted. Cancel or resolve those bookings first.'); error.statusCode = 409; throw error; }
+      await tx.preparationPlan.deleteMany({ where: { ceremonyId } });
+      await tx.ceremony.delete({ where: { id: ceremonyId } });
+    });
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting ceremony:', error.message);
+    res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
+  }
 };
 
 // ─── PREPARATION PLANS (existing separate model) ───────────────────────────
@@ -478,7 +479,7 @@ export const getPublicPlan = async (req, res) => {
 // POST /auto - create ceremony with auto‑generated checklist & cost items
 export const createAutoCeremony = async (req, res) => {
       try {
-              const { title, type, eventDate, notes, budgetZAR, guestCount } = req.body;
+              const { title, type, eventDate, notes, budgetZAR, guestCount, createPlan = false } = req.body;
                   const hostId = req.user.id;
 
                       if (!title || !type || !hostId) {
@@ -505,7 +506,7 @@ export const createAutoCeremony = async (req, res) => {
                                 }
                               }
 
-                                  const ceremony = await prisma.$transaction(async (tx) => {
+                                  const result = await prisma.$transaction(async (tx) => {
                                             const newCeremony = await tx.ceremony.create({
                                                         data: {
                                                                       title,
@@ -567,18 +568,14 @@ export const createAutoCeremony = async (req, res) => {
                                                                                     }
                                                         }
 
-                                                              return newCeremony;
-                                  });
-
-                                      const fullCeremony = await prisma.ceremony.findUnique({
-                                                where: { id: ceremony.id },
-                                                      include: {
-                                                                  checklistItems: true,
-                                                                          costItems: true,
-                                                      },
-                                      });
-
-                                          res.status(201).json(fullCeremony);
+                                                              let preparationPlan = null;
+    if (createPlan) {
+      preparationPlan = await tx.preparationPlan.create({ data: { title, hostId, ceremonyId: newCeremony.id, ceremonyType: type } });
+    }
+    return { ceremony: newCeremony, preparationPlan };
+  });
+  const fullCeremony = await prisma.ceremony.findUnique({ where: { id: result.ceremony.id }, include: { checklistItems: true, costItems: true, preparationPlans: true } });
+  res.status(201).json(createPlan ? { ...fullCeremony, preparationPlan: result.preparationPlan } : fullCeremony);
       } catch (error) {
               console.error('Error creating auto ceremony:', error);
                   res.status(500).json({ error: 'Internal server error' });
