@@ -5,19 +5,30 @@ export async function getPlanBudget(req, res) {
   try {
     const plan = await prisma.preparationPlan.findUnique({
       where: { id: planId },
-      include: { checklistItems: true, pledges: true },
+      include: { pledges: true, ceremony: { include: { costItems: true } } },
     });
     if (!plan || plan.hostId !== req.userId) return res.status(403).json({ error: 'Not your plan' });
 
-    const totalEstimated = plan.checklistItems.reduce((sum, i) => sum + parseFloat(i.targetCostZAR || 0), 0);
-    const totalActual = plan.checklistItems.reduce((sum, i) => sum + parseFloat(i.actualCostZAR || 0), 0);
-    const totalPledged = plan.pledges.reduce((sum, p) => sum + parseFloat(p.pledgedAmountZAR || 0), 0);
+    const budgetZAR = plan.ceremony?.budgetZAR == null ? null : Number(plan.ceremony.budgetZAR);
+    const costItems = plan.ceremony?.costItems || [];
+    const totalEstimated = costItems.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.unitCost || 0), 0);
+    const totalActual = costItems.filter((item) => item.isPurchased).reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.unitCost || 0), 0);
+    const totalPledged = plan.pledges.reduce((sum, pledge) => sum + Number(pledge.pledgedAmountZAR || 0), 0);
 
     res.json({
-      totalEstimated, totalActual, totalPledged,
+      budgetZAR,
+      totalEstimated,
+      totalActual,
+      totalPledged,
+      remaining: budgetZAR == null ? null : budgetZAR - totalActual,
+      pledgeShortfall: budgetZAR == null ? null : Math.max(0, budgetZAR - totalPledged),
       shortfall: totalEstimated - totalPledged,
-      itemBreakdown: plan.checklistItems.map(i => ({
-        label: i.label, phase: i.phase, targetCostZAR: i.targetCostZAR, actualCostZAR: i.actualCostZAR,
+      itemBreakdown: costItems.map((item) => ({
+        id: item.id, label: item.label, phase: item.phase,
+        quantity: Number(item.quantity || 0), unit: item.unit,
+        unitCost: Number(item.unitCost || 0),
+        total: Number(item.quantity || 0) * Number(item.unitCost || 0),
+        isPurchased: item.isPurchased,
       })),
     });
   } catch (error) {
