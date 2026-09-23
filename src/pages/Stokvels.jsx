@@ -55,6 +55,10 @@ function Stokvels({ onBack, onOpenShrineFund }) {
   const [isJoining, setIsJoining] = useState(false)
   const [confirmingId, setConfirmingId] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [pinModal, setPinModal] = useState(null)
+  const [pinInput, setPinInput] = useState('')
+  const [pinError, setPinError] = useState('')
+  const [submittingPin, setSubmittingPin] = useState(false)
 
   // Detail action states
   const [contribAmount, setContribAmount] = useState('')
@@ -354,23 +358,11 @@ function Stokvels({ onBack, onOpenShrineFund }) {
     }
   }
 
-  const confirmContribution = async (contributionId) => {
-  const pin = prompt('Enter your security PIN to confirm this contribution:')
-  if (!pin) return
-  try {
-    const res = await fetch('/api/stokvels/contributions/confirm', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({ contributionId, pin }),
-    })
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.error)
-    showToast('Contribution confirmed', 'success')
-    fetchDetail(detail.stokvel.id)
-  } catch (err) {
-    showToast(err.message, 'error')
+  const confirmContribution = (contributionId) => {
+    setPinModal({ kind: 'contribution', id: contributionId, label: 'Confirm this contribution' })
+    setPinInput('')
+    setPinError('')
   }
-}
 
   const requestPayout = async (e) => {
     e.preventDefault()
@@ -449,27 +441,39 @@ function Stokvels({ onBack, onOpenShrineFund }) {
     }
   }
 
-  const approvePayout = async (payoutId) => {
-    const pin = prompt('Enter your security PIN to approve this payout:')
-    if (pin === null) return
-    if (!pin.trim()) {
-      showToast('Security PIN is required', 'error')
-      return
-    }
+  const approvePayout = (payoutId) => {
+    setPinModal({ kind: 'payout', id: payoutId, label: 'Approve this payout' })
+    setPinInput('')
+    setPinError('')
+  }
 
+  const submitPin = async (e) => {
+    e.preventDefault()
+    if (!pinModal || submittingPin) return
+    const pin = pinInput.trim()
+    if (!pin) { setPinError('Security PIN is required'); return }
+    setSubmittingPin(true)
+    setPinError('')
     try {
-      const res = await fetch('/api/stokvels/payouts/approve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ payoutId, pin }),
-      })
+      const isContribution = pinModal.kind === 'contribution'
+      const res = await fetch(
+        isContribution ? '/api/stokvels/contributions/confirm' : '/api/stokvels/payouts/approve',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+          body: JSON.stringify(isContribution ? { contributionId: pinModal.id, pin } : { payoutId: pinModal.id, pin }),
+        }
+      )
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Payout approval failed')
-
-      showToast(data.message || 'Payout approved', 'success')
+      if (!res.ok) throw new Error(data.error || (isContribution ? 'Confirmation failed' : 'Payout approval failed'))
+      setPinModal(null)
+      setPinInput('')
+      showToast(data.message || (isContribution ? 'Contribution confirmed' : 'Payout approved'), 'success')
       await fetchDetail(detail.stokvel.id)
     } catch (err) {
-      showToast(err.message, 'error')
+      setPinError(err.message || 'Incorrect PIN, please try again')
+    } finally {
+      setSubmittingPin(false)
     }
   }
 
@@ -1132,6 +1136,38 @@ function Stokvels({ onBack, onOpenShrineFund }) {
           </>
           )}
         </div>
+
+        {pinModal && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 px-4 pb-6">
+            <div className="w-full max-w-sm bg-white border-2 border-sage-500 rounded-soft p-4 shadow-lg animate-fade-in">
+              <form onSubmit={submitPin}>
+                <h2 className="text-sm font-bold text-ink mb-1">{pinModal.label}</h2>
+                <p className="text-xs text-ink-muted mb-3">Enter your security PIN to authorise this action.</p>
+                <label htmlFor="stokvel-pin" className="block text-xs font-bold text-ink-muted mb-1">Security PIN</label>
+                <input
+                  id="stokvel-pin"
+                  type="password"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="off"
+                  value={pinInput}
+                  onChange={(e) => { setPinInput(e.target.value); setPinError('') }}
+                  className="w-full border-2 border-cream-dark rounded-soft px-3 py-2 text-ink tracking-widest"
+                  autoFocus
+                />
+                {pinError && <p className="text-xs text-terracotta font-bold mt-1.5">{pinError}</p>}
+                <div className="flex gap-2 mt-3">
+                  <button type="submit" disabled={submittingPin} className={`flex-1 bg-sage-600 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
+                    {submittingPin ? 'Submitting…' : 'Confirm'}
+                  </button>
+                  <button type="button" onClick={() => { setPinModal(null); setPinInput(''); setPinError('') }} disabled={submittingPin} className={`flex-1 border-2 border-sage-200 font-bold py-2 rounded-pill text-sm ${pressable}`}>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
