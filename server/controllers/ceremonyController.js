@@ -133,7 +133,7 @@ export const deleteCeremony = async (req, res) => {
     await prisma.$transaction(async (tx) => {
       const ceremony = await tx.ceremony.findUnique({
         where: { id: ceremonyId },
-        include: { barBookings: { select: { id: true } }, tourismPackage: { include: { bookings: { select: { id: true } } } } }, },
+        include: { barBookings: { select: { id: true } }, tourismPackage: { include: { bookings: { select: { id: true } } } } },
       });
       if (!ceremony) { const error = new Error('Ceremony not found'); error.statusCode = 404; throw error; }
       if (ceremony.hostId !== req.user.id) { const error = new Error('Not your ceremony'); error.statusCode = 403; throw error; }
