@@ -66,6 +66,9 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   const [budgetEditorOpen, setBudgetEditorOpen] = useState(false)
   const [budgetInput, setBudgetInput] = useState('')
   const [savingBudget, setSavingBudget] = useState(false)
+  const [templateEditorOpen, setTemplateEditorOpen] = useState(false)
+  const [templateTitleInput, setTemplateTitleInput] = useState('')
+  const [savingTemplate, setSavingTemplate] = useState(false)
   const [newChecklistItem, setNewChecklistItem] = useState({ phase: 'CUSTOM', label: '', isOptional: true, actualCostZAR: '' })
 
   // ----- State for pledges (from File 1) -----
@@ -289,9 +292,17 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     } catch (err) { showToast(err.message || 'Could not delete ceremony', 'error') }
   }
 
-  const saveAsTemplate = async () => {
-    const templateTitle = prompt('Name this template:', `${activePlan.title} Template`)
-    if (!templateTitle) return
+  const saveAsTemplate = () => {
+    if (!activePlan) return
+    setTemplateTitleInput(`${activePlan.title} Template`)
+    setTemplateEditorOpen(true)
+  }
+
+  const confirmSaveTemplate = async (e) => {
+    e.preventDefault()
+    const templateTitle = templateTitleInput.trim()
+    if (!templateTitle) { showToast('Please enter a template name', 'error'); return }
+    setSavingTemplate(true)
     try {
       const res = await fetch('/api/ceremonies/templates/save', {
         method: 'POST',
@@ -303,9 +314,12 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
+      setTemplateEditorOpen(false)
       showToast('Saved as template', 'success')
     } catch (err) {
       showToast(err.message, 'error')
+    } finally {
+      setSavingTemplate(false)
     }
   }
 
@@ -668,10 +682,22 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         </div>
       )}
 
-      {/* Confirm Delete Modal (File 2 style but with File 1 design) */}
+        {templateEditorOpen && (
+        <div className="mx-4 mt-3 bg-white border-2 border-sage-500 rounded-soft p-4 shadow-soft">
+          <form onSubmit={confirmSaveTemplate}>
+            <h2 className="text-sm font-bold text-ink mb-1">Name this template</h2>
+            <p className="text-xs text-ink-muted mb-3">You can reuse this template to start future ceremonies faster.</p>
+            <label htmlFor="template-title" className="block text-xs font-bold text-ink-muted mb-1">Template name</label>
+            <input id="template-title" type="text" value={templateTitleInput} onChange={(e) => setTemplateTitleInput(e.target.value)} className="w-full border-2 border-cream-dark rounded-soft px-3 py-2 text-ink" autoFocus />
+            <div className="flex gap-2 mt-3"><button type="submit" disabled={savingTemplate} className={`flex-1 bg-sage-600 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>{savingTemplate ? 'Saving…' : 'Save template'}</button><button type="button" onClick={() => setTemplateEditorOpen(false)} className={`flex-1 border-2 border-sage-200 font-bold py-2 rounded-pill text-sm ${pressable}`}>Cancel</button></div>
+          </form>
+        </div>
+      )}
+
         {confirmDelete && (
           <div className="mx-4 mt-3 bg-white border-2 border-terracotta rounded-soft p-4 shadow-soft">
-            <p className="text-sm font-bold text-ink mb-3">Delete this ceremony plan permanently?</p>
+            <p className="text-sm font-bold text-ink mb-1">Delete this ceremony permanently?</p>
+            <p className="text-xs text-ink/70 mb-3">This removes the ceremony, checklist, budget, cost items and pledges. This cannot be undone.</p>
             <div className="flex gap-2">
               <button
                 onClick={() => deleteCeremonyWorkspace(activePlan.ceremonyId)}
