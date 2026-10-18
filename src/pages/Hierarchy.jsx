@@ -41,7 +41,9 @@ function matchSku(itemName, catalogue) {
   )
 }
 
-function Hierarchy({ onBack }) {
+// initialCeremonyId: optional — passed from CeremonyHub when the user taps
+// "Allocate items per group" directly on a specific ceremony card.
+function Hierarchy({ onBack, initialCeremonyId }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   const [ceremonies, setCeremonies] = useState([])
@@ -71,6 +73,11 @@ function Hierarchy({ onBack }) {
       .then((d) => setCatalogue(Array.isArray(d) ? d : []))
       .catch(() => setCatalogue([]))
   }, [accessToken])
+
+  // Pre-select the ceremony when opened from CeremonyHub
+  useEffect(() => {
+    if (initialCeremonyId) setCeremonyId(initialCeremonyId)
+  }, [initialCeremonyId])
 
   const applyStorePrices = useCallback((loadedGroups, cat) => {
     setUnitPriceMap((prev) => {
@@ -171,7 +178,6 @@ function Hierarchy({ onBack }) {
     setBasketAdded(false)
   }
 
-  // ── Add grand total items directly to basket ───────────────
   const addAllToBasket = async () => {
     if (!summary) return
     setAddingToBasket(true)
@@ -185,7 +191,6 @@ function Hierarchy({ onBack }) {
       const qty = data.totalQty
 
       if (!skuId || qty < 1) {
-        // No matched SKU — can't add to basket automatically
         failed++
         continue
       }
@@ -430,7 +435,6 @@ function Hierarchy({ onBack }) {
                   </div>
                 )}
 
-                {/* ── Add all to basket ─────────────────────────────── */}
                 <div className="mt-4 space-y-2">
                   <button
                     type="button"
