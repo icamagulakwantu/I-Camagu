@@ -8,6 +8,10 @@ import MeetingMinutes from './stokvel/MeetingMinutes.jsx'
 import FinesPenalties from './stokvel/FinesPenalties.jsx'
 import BankInterestCalc from './stokvel/BankInterestCalc.jsx'
 import Constitution from './stokvel/Constitution.jsx'
+import LoanBoard from './stokvel/LoanBoard.jsx'
+import Statement from './stokvel/Statement.jsx'
+import TradeCredit from './stokvel/TradeCredit.jsx'
+import SmartMatchLink from './stokvel/SmartMatchLink.jsx'
 
 const STOKVEL_TYPES = [
   'ALCOHOL_BULK_POOL',
@@ -29,6 +33,10 @@ const DETAIL_TABS = [
   { id: 'announcements', label: 'Announcements' },
   { id: 'minutes', label: 'Minutes' },
   { id: 'fines', label: 'Fines' },
+  { id: 'loans', label: 'Loans' },
+  { id: 'statement', label: 'Statement' },
+  { id: 'smartmatch', label: 'SmartMatch' },
+  { id: 'tradecredit', label: 'Trade credit' },
   { id: 'calculator', label: 'Calculator' },
   { id: 'rules', label: 'Rules' },
   { id: 'settings', label: 'Settings' },
@@ -681,6 +689,18 @@ function Stokvels({ onBack, onOpenShrineFund }) {
           )}
           {detailTab === 'fines' && (
             <FinesPenalties stokvelId={stokvel.id} members={stokvel.members} isOrganiser={showSettingsTab} />
+          )}
+          {detailTab === 'loans' && (
+            <LoanBoard stokvelId={stokvel.id} groupBalance={balance} />
+          )}
+          {detailTab === 'statement' && (
+            <Statement stokvelId={stokvel.id} stokvelName={stokvel.name} />
+          )}
+          {detailTab === 'smartmatch' && (
+            <SmartMatchLink groupBalance={balance} memberCount={stokvel.members.length} />
+          )}
+          {detailTab === 'tradecredit' && (
+            <TradeCredit stokvelId={stokvel.id} isOfficial={showSettingsTab} groupBalance={balance} />
           )}
           {detailTab === 'calculator' && (
             <BankInterestCalc groupBalance={balance} />
