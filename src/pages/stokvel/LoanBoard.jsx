@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
 import { Skeleton } from '../../components/ui/Skeleton.jsx'
-import { SubEmpty, ConfirmSheet } from './Ui.jsx'
+import { SubEmpty, ConfirmSheet, primaryBtn, secondaryBtn } from './Ui.jsx'
+import BorrowerAgreement from './BorrowerAgreement.jsx'
 import { pressable, inp, money, fmtDate, api } from './shared.js'
 
 const STATUS_STYLE = {
@@ -24,10 +25,12 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
   const [saving, setSaving] = useState(false)
   const [amount, setAmount] = useState('')
   const [months, setMonths] = useState('3')
-  const [interest, setInterest] = useState('5')
+  const [interest, setInterest] = useState('30')
   const [reason, setReason] = useState('')
   const [repayDraft, setRepayDraft] = useState({})
   const [pendingVote, setPendingVote] = useState(null)
+  const [agreement, setAgreement] = useState({})
+  const [viewAgreement, setViewAgreement] = useState(null)
 
   const base = `/api/stokvels/${stokvelId}/loans`
   const load = useCallback(async () => {
@@ -60,9 +63,9 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
     e.preventDefault()
     const ok = await run(() => api(base, accessToken, {
       method: 'POST',
-      body: JSON.stringify({ amount, repayMonths: months, interestPercent: interest, reason }),
+      body: JSON.stringify({ amount, repayMonths: months, interestPercent: interest, reason, ...agreement }),
     }), 'Loan request sent to officials')
-    if (ok) { setRequesting(false); setAmount(''); setReason('') }
+    if (ok) { setRequesting(false); setAmount(''); setReason(''); setAgreement({}) }
   }
 
   const vote = (loanId, approve) => run(() => api(`${base}/${loanId}/vote`, accessToken, {
@@ -94,13 +97,13 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
           <p className="font-display font-bold text-xl text-ink mt-0.5">{money(groupBalance)}</p>
         </div>
         <p className="col-span-2 text-xs text-ink-muted">
-          Each loan needs {requiredApprovals} official vote{requiredApprovals === 1 ? '' : 's'} to be approved. Interest goes back into the group pot.
+          Group loans carry 30% interest by default. Each loan needs {requiredApprovals} official vote{requiredApprovals === 1 ? '' : 's'} to be approved. Interest goes back into the group pot.
         </p>
       </div>
 
       {!requesting ? (
         <button type="button" onClick={() => setRequesting(true)}
-          className={`w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
+          className={`w-full py-2.5 ${primaryBtn}`}>
           Ask the group for a loan
         </button>
       ) : (
@@ -119,17 +122,21 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
           <textarea rows={2} placeholder="What is the loan for? (e.g. school fees)" value={reason}
             onChange={(e) => setReason(e.target.value)} className={`${inp} resize-none`} />
           {preview > 0 && (
+            <BorrowerAgreement amount={Number(amount)} interest={Number(interest || 0)} months={Number(months) || 1}
+              totalDue={preview} value={agreement} onChange={setAgreement} />
+          )}
+          {preview > 0 && (
             <p className="text-xs text-ink">
               You will repay <strong>{money(preview)}</strong>, about <strong>{money(preview / Math.max(1, Number(months) || 1))}</strong> a month.
             </p>
           )}
           <div className="flex gap-2">
-            <button type="submit" disabled={saving}
-              className={`flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
+            <button type="submit" disabled={saving || !agreement.borrowerPhoto || !agreement.signature || !agreement.agreed}
+              className={`flex-1 py-2 ${primaryBtn}`}>
               {saving ? 'Sending...' : 'Send request'}
             </button>
             <button type="button" onClick={() => setRequesting(false)}
-              className={`flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm ${pressable}`}>
+              className={`flex-1 py-2 ${secondaryBtn}`}>
               Cancel
             </button>
           </div>
@@ -143,7 +150,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
         const canVote = isOfficial && l.status === 'PENDING' && l.borrowerId !== user?.id
         const progress = Math.min(100, (l.repaid / l.totalDue) * 100)
         return (
-          <div key={l.id} className="bg-white border border-terracotta/15 rounded-soft p-4 space-y-2">
+          <div key={l.id} className="bg-white border-2 border-terracotta/20 rounded-soft p-4 space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="font-bold text-sm text-ink truncate">{l.borrowerName}</p>
@@ -153,6 +160,11 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
             </div>
             <p className="font-display font-bold text-lg text-ink">{money(l.amount)}</p>
             {l.reason && <p className="text-xs text-ink-muted">{l.reason}</p>}
+            {l.agreement ? (
+              <button type="button" onClick={() => setViewAgreement(l)} className="flex items-center gap-1.5 text-xs font-bold text-sage-700">
+                <span className="text-[10px] bg-sage-100 px-2 py-0.5 rounded-pill">Signed agreement</span> View photo and signature
+              </button>
+            ) : !l.agreedAt && <p className="text-[11px] text-brand-ochre font-bold">No signed agreement on file</p>}
 
             {l.status === 'PENDING' && (
               <p className="text-xs text-ink">{yes} of {requiredApprovals} approvals{l.votes.length ? ` · voted: ${l.votes.map((v) => v.name).join(', ')}` : ''}</p>
@@ -160,7 +172,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
             {canVote && (
               <div className="flex gap-2">
                 <button type="button" disabled={saving} onClick={() => setPendingVote({ loan: l, approve: true })}
-                  className={`flex-1 py-2 rounded-pill text-xs font-bold ${l.myVote === true ? 'bg-sage-500 text-white' : 'bg-sage-50 text-sage-700'} ${pressable}`}>
+                  className={`flex-1 py-2 rounded-pill text-xs font-bold ${l.myVote === true ? 'bg-terracotta text-white' : 'bg-sage-50 text-sage-700'} ${pressable}`}>
                   Approve
                 </button>
                 <button type="button" disabled={saving} onClick={() => setPendingVote({ loan: l, approve: false })}
@@ -186,7 +198,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
                 <input type="number" min="0" step="0.01" placeholder="Repayment (R)" value={repayDraft[l.id] || ''}
                   onChange={(e) => setRepayDraft((d) => ({ ...d, [l.id]: e.target.value }))} className={inp} />
                 <button type="button" disabled={saving || !repayDraft[l.id]} onClick={() => repay(l.id)}
-                  className={`bg-sage-500 text-white font-bold px-4 rounded-pill text-sm ${pressable}`}>
+                  className={`bg-terracotta text-white font-bold px-4 rounded-pill text-sm ${pressable}`}>
                   Record
                 </button>
               </div>
@@ -194,6 +206,22 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
           </div>
         )
       })}
+      {viewAgreement?.agreement && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 px-4 pb-6" onClick={() => setViewAgreement(null)}>
+          <div role="dialog" aria-modal="true" className="w-full max-w-sm bg-white rounded-soft p-5 shadow-lg space-y-3 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <p className="font-display font-bold text-lg text-ink">{viewAgreement.borrowerName}</p>
+            <p className="text-xs text-ink-muted">Signed {fmtDate(viewAgreement.agreedAt)}{viewAgreement.agreement.phone ? ` · ${viewAgreement.agreement.phone}` : ''}</p>
+            <div className="grid grid-cols-2 gap-2">
+              <img src={viewAgreement.agreement.photo} alt="Borrower" className="w-full aspect-square object-cover rounded-[12px]" />
+              {viewAgreement.agreement.idPhoto
+                ? <img src={viewAgreement.agreement.idPhoto} alt="ID document" className="w-full aspect-square object-cover rounded-[12px]" />
+                : <div className="aspect-square rounded-[12px] bg-cream flex items-center justify-center text-xs text-ink-muted">No ID photo</div>}
+            </div>
+            <img src={viewAgreement.agreement.signature} alt="Signature" className="w-full h-28 object-contain bg-cream rounded-[12px]" />
+            <button type="button" onClick={() => setViewAgreement(null)} className={`w-full py-2.5 ${secondaryBtn}`}>Close</button>
+          </div>
+        </div>
+      )}
       <ConfirmSheet
         open={Boolean(pendingVote)}
         title={pendingVote?.approve ? 'Approve this loan?' : 'Decline this loan?'}

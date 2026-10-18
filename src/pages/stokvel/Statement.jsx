@@ -8,6 +8,15 @@ import { pressable, inp, money, fmtDate, api } from './shared.js'
 const today = () => new Date().toISOString().slice(0, 10)
 const startOfYear = () => `${new Date().getFullYear()}-01-01`
 
+const iso = (d) => d.toISOString().slice(0, 10)
+const monthsAgo = (n) => { const d = new Date(); d.setMonth(d.getMonth() - n); return iso(d) }
+// Quick ranges so most people never need the date pickers.
+const PRESETS = [
+  { label: 'This month', range: () => [`${today().slice(0, 7)}-01`, today()] },
+  { label: 'Last 3 months', range: () => [monthsAgo(3), today()] },
+  { label: 'This year', range: () => [startOfYear(), today()] },
+]
+
 // Quote a CSV cell so commas and quotes in names do not break the columns.
 const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
 
@@ -61,13 +70,25 @@ export default function Statement({ stokvelId, stokvelName }) {
   ] : []
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 print-area">
       <div className="hidden print:block">
         <p className="font-display font-bold text-xl">{stokvelName} statement</p>
         <p className="text-sm">{fmtDate(from)} to {fmtDate(to)}</p>
       </div>
       <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3 print:hidden">
         <p className="text-xs font-black uppercase text-ink-muted">Statement period</p>
+        <div className="flex gap-2 overflow-x-auto pb-0.5">
+          {PRESETS.map((p) => {
+            const [pf, pt] = p.range()
+            const active = pf === from && pt === to
+            return (
+              <button key={p.label} type="button" onClick={() => { setFrom(pf); setTo(pt) }}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[12px] font-bold ${active ? 'bg-ink text-white' : 'bg-cream border-2 border-terracotta/15 text-ink-muted'} ${pressable}`}>
+                {p.label}
+              </button>
+            )
+          })}
+        </div>
         <div className="grid grid-cols-2 gap-2">
           <label className="text-xs text-ink-muted">From
             <input type="date" value={from} max={to} onChange={(e) => setFrom(e.target.value)} className={`${inp} mt-1`} />
@@ -78,11 +99,11 @@ export default function Statement({ stokvelId, stokvelName }) {
         </div>
         <div className="flex gap-2">
           <button type="button" onClick={downloadCsv} disabled={!data?.entries?.length}
-            className={`flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
+            className={`flex-1 bg-terracotta text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
             Download spreadsheet
           </button>
           <button type="button" onClick={() => window.print()} disabled={!data?.entries?.length}
-            className={`flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm ${pressable}`}>
+            className={`flex-1 border-2 border-terracotta/25 text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}>
             Print
           </button>
         </div>
@@ -92,7 +113,7 @@ export default function Statement({ stokvelId, stokvelName }) {
         <div className="space-y-2"><Skeleton className="h-32 w-full" /><Skeleton className="h-16 w-full" /></div>
       ) : !data ? null : (
         <>
-          <div className="bg-white border border-terracotta/15 rounded-soft p-4">
+          <div className="bg-white border-2 border-terracotta/20 rounded-soft p-4">
             {summary.map((s) => (
               <div key={s.label} className="flex justify-between text-sm py-1">
                 <span className="text-ink-muted">{s.label}</span>
@@ -108,7 +129,7 @@ export default function Statement({ stokvelId, stokvelName }) {
           {data.entries.length === 0 ? (
             <SubEmpty icon="file" title="Nothing in this period" description="No confirmed money moved between these dates. Try a wider date range." />
           ) : (
-            <div className="bg-white border border-terracotta/15 rounded-soft divide-y divide-cream-dark">
+            <div className="bg-white border-2 border-terracotta/20 rounded-soft divide-y divide-cream-dark">
               {data.entries.map((e, i) => (
                 <div key={i} className="flex items-center justify-between gap-3 px-4 py-2.5">
                   <div className="min-w-0">

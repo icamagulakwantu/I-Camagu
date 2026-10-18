@@ -1,11 +1,14 @@
 import { cn } from '../../lib/utils'
+import Icon from '../Icon.jsx'
 
-export function EmptyState({ emoji = '📦', proverb, title, description, primaryLabel, onPrimary, secondaryLabel, onSecondary, className }) {
+// Empty screen with an icon (not an emoji) and up to two actions. The
+// `emoji` prop is still accepted so older screens keep working.
+export function EmptyState({ icon, emoji, proverb, title, description, primaryLabel, onPrimary, secondaryLabel, onSecondary, className }) {
   return (
     <div className={cn('card-paper grain wash-clay overflow-hidden animate-fade-in', className)}>
       <div className="flex flex-col items-center px-6 py-8 text-center">
         <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-3xl shadow-soft flex-shrink-0">
-          {emoji}
+          {icon ? <Icon name={icon} size={28} color="#c45c26" /> : (emoji || <Icon name="package" size={28} color="#c45c26" />)}
         </span>
 
         {proverb && (
@@ -23,7 +26,7 @@ export function EmptyState({ emoji = '📦', proverb, title, description, primar
           <button
             type="button"
             onClick={onPrimary}
-            className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill pressable mb-2"
+            className="w-full bg-terracotta text-white font-bold py-3 rounded-pill pressable mb-2"
           >
             {primaryLabel}
           </button>

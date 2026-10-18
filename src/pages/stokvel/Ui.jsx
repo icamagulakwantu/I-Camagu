@@ -3,7 +3,7 @@ import { pressable } from './shared.js'
 
 // Shared UI for stokvel sub-pages: one primary button style, an empty state
 // with an icon and optional action, and a bottom-sheet confirmation.
-export const primaryBtn = `bg-sage-500 text-white font-bold rounded-pill text-sm ${pressable}`
+export const primaryBtn = `bg-terracotta text-white font-bold rounded-pill text-sm ${pressable}`
 export const secondaryBtn = `border-2 border-terracotta/25 text-ink font-bold rounded-pill text-sm ${pressable}`
 
 export function SubEmpty({ icon, title, description, actionLabel, onAction }) {

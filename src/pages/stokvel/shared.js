@@ -1,6 +1,6 @@
 // Shared helpers for the stokvel sub-pages (Loans, Statement, Trade Credit, SmartMatch).
 export const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
-export const inp = 'w-full border border-ink/20 rounded-2xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-terracotta/60'
+export const inp = 'w-full border-2 border-terracotta/20 rounded-2xl px-3 py-2.5 text-sm text-ink bg-cream/40 accent-terracotta focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:cursor-pointer'
 export const money = (n) => `R${Number(n || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 export const fmtDate = (iso) => new Date(iso).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })
 
