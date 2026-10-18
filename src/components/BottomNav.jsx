@@ -4,7 +4,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
   const tabs = [
     { id: 'home', label: 'Home', icon: 'home', badge: unreadNotifications },
     { id: 'ceremonyhub', label: 'Ceremonies', icon: 'calendar' },
-    { id: 'store', label: 'Store', icon: 'cart', badge: basketCount },
+    { id: 'store', label: 'SmartMatch', icon: 'cart', badge: basketCount },
     { id: 'stokvels', label: 'Stokvels', icon: 'users', badge: pendingApprovals },
     { id: 'more', label: 'More', icon: 'menu' },
   ]
@@ -30,7 +30,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
                       {active && <span className="absolute inset-[-4px] rounded-full border border-brand-ochre/45" />}
                       <Icon name={tab.icon} size={18} color={active ? '#fff' : 'rgba(245,243,238,0.6)'} strokeWidth={active ? 2 : 1.6} />
                       {tab.badge > 0 && (
-                        <span className="absolute -top-1.5 -right-1.5 bg-brand-ochre text-white text-[9px] font-black w-4 h-4 rounded-pill flex items-center justify-center">{tab.badge}</span>
+                        <span className="absolute -top-1.5 -right-1.5 bg-terracotta text-white text-[9px] font-black w-4 h-4 rounded-pill flex items-center justify-center">{tab.badge}</span>
                       )}
                     </span>
                     <span className={`text-[10px] leading-none tracking-wide ${active ? 'font-bold text-cream' : 'text-cream/55'}`}>
