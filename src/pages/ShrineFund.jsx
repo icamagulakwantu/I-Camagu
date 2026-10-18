@@ -7,7 +7,6 @@ import Icon from '../components/Icon.jsx'
 const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
-// ── Roadmap phases — from grassroots to legacy ─────────────────
 const PHASES = [
   {
     icon: 'store',
@@ -32,7 +31,6 @@ const PHASES = [
   },
 ]
 
-// ── Community pillars the fund will build ─────────────────────
 const PILLARS = [
   { icon: 'shield', label: 'Safety & Security', desc: 'Community-employed private security to combat extortion and crime in our streets.' },
   { icon: 'bookOpen', label: 'Libraries & Education', desc: 'Community libraries where knowledge is free and every child has a place to study.' },
@@ -96,17 +94,19 @@ function ShrineFund({ onBack }) {
   }
 
   return (
-    <div className="min-h-screen pb-24 bg-cream">
+    // Solid cream background + isolate prevents hero gradient from bleeding
+    // over whatever page was rendered underneath this one
+    <div className="relative isolate min-h-screen pb-24" style={{ backgroundColor: '#f7f2eb' }}>
 
-      {/* ── Hero ──────────────────────────────────────────────── */}
-      <div className="wash-ember rings text-white px-5 pt-12 pb-10 rounded-b-[2.5rem] relative overflow-hidden">
-        <div className="relative">
+      {/* Hero — explicit solid bg so it never bleeds through */}
+      <div className="relative" style={{ background: 'linear-gradient(135deg, #c45c26 0%, #a34a1e 100%)' }}>
+        <div className="px-5 pt-12 pb-10">
           <button type="button" onClick={onBack} className="text-sm text-white/80 mb-3 flex items-center gap-1.5">
             <Icon name="arrowRight" size={14} color="#ffffff" className="rotate-180" /> Back
           </button>
           <div className="flex items-center gap-2.5 mb-3">
             <Icon name="flame" size={26} color="#ffffff" strokeWidth={1.5} />
-            <h1 className="font-display font-bold text-3xl leading-tight">Ubuhlanti bakwa Xhosa</h1>
+            <h1 className="font-display font-bold text-3xl leading-tight text-white">Ubuhlanti bakwa Xhosa</h1>
           </div>
           <p className="text-white/90 text-sm font-bold">The Sovereign Xhosa Development Fund</p>
           <p className="text-white/75 text-sm mt-2 leading-relaxed">
@@ -117,7 +117,7 @@ function ShrineFund({ onBack }) {
 
       <div className="px-4 -mt-6 space-y-4">
 
-        {/* ── Fund total ─────────────────────────────────────── */}
+        {/* Fund total */}
         <div className="bg-white border-2 border-terracotta/25 rounded-soft p-6 shadow-card text-center">
           {loading ? (
             <Skeleton className="h-12 w-48 mx-auto" />
@@ -145,13 +145,13 @@ function ShrineFund({ onBack }) {
               <p className="text-[9px] font-bold text-ink-muted uppercase tracking-wide mt-0.5 leading-tight">Public donations</p>
             </div>
             <div className="bg-white border border-terracotta/15 rounded-soft p-3 text-center">
-              <p className="font-display font-bold text-lg text-ink">{data?.suggestedRate ? `${(data.suggestedRate * 100).toFixed(0)}%` : '—'}</p>
+              <p className="font-display font-bold text-lg text-ink">{data?.suggestedRate ? `${(data.suggestedRate * 100).toFixed(0)}%` : '3%'}</p>
               <p className="text-[9px] font-bold text-ink-muted uppercase tracking-wide mt-0.5 leading-tight">Suggested contribution rate</p>
             </div>
           </div>
         )}
 
-        {/* ── Allocations ────────────────────────────────────── */}
+        {/* Allocations */}
         {!loading && !loadFailed && (
           <div className="bg-white border border-terracotta/15 rounded-soft p-4">
             <p className="text-[11px] font-black uppercase tracking-widest text-ink-muted mb-2">Where the fund has been invested</p>
@@ -178,33 +178,24 @@ function ShrineFund({ onBack }) {
           </div>
         )}
 
-        {/* ── Donate ─────────────────────────────────────────── */}
+        {/* Donate button */}
         <button
           type="button"
           onClick={() => setDonateOpen((v) => !v)}
-          className={`w-full bg-terracotta text-white font-bold py-3.5 rounded-pill shadow-terracotta flex items-center justify-center gap-2 ${pressable}`}
+          className={`w-full font-bold py-3.5 rounded-pill flex items-center justify-center gap-2 text-white ${pressable}`}
+          style={{ background: 'linear-gradient(135deg, #c45c26 0%, #a34a1e 100%)' }}
         >
           <Icon name="heart" size={17} color="#fff" /> {donateOpen ? 'Cancel' : 'Donate — from R1'}
         </button>
 
         {donateOpen && (
-          <form onSubmit={submitDonation} className="bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft space-y-2.5">
-            <input
-              type="number" min="1" step="any" placeholder="Amount (ZAR) — R1 or more"
-              value={donateAmount} onChange={(e) => setDonateAmount(e.target.value)}
-              className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta"
-              required
-            />
-            <input
-              type="text" placeholder="Your name (optional — you may stay anonymous)"
-              value={donorName} onChange={(e) => setDonorName(e.target.value)}
-              className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta"
-            />
-            <input
-              type="email" placeholder="Email (optional, so we can follow up)"
-              value={donorEmail} onChange={(e) => setDonorEmail(e.target.value)}
-              className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta"
-            />
+          <form onSubmit={submitDonation} className="bg-white border-2 border-terracotta/25 rounded-soft p-5 space-y-2.5">
+            <input type="number" min="1" step="any" placeholder="Amount (ZAR) — R1 or more" value={donateAmount} onChange={(e) => setDonateAmount(e.target.value)}
+              className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta" required />
+            <input type="text" placeholder="Your name (optional — you may stay anonymous)" value={donorName} onChange={(e) => setDonorName(e.target.value)}
+              className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta" />
+            <input type="email" placeholder="Email (optional, so we can follow up)" value={donorEmail} onChange={(e) => setDonorEmail(e.target.value)}
+              className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta" />
             <p className="text-[11px] text-ink-muted leading-relaxed">
               We don't yet have a live payment gateway — submitting this records your pledge, and someone from iCamagu will personally follow up to complete the transfer.
             </p>
@@ -214,7 +205,7 @@ function ShrineFund({ onBack }) {
           </form>
         )}
 
-        {/* ── What this is ───────────────────────────────────── */}
+        {/* What this is */}
         <div className="bg-white border border-terracotta/15 rounded-soft p-5">
           <p className="eyebrow text-ink-muted mb-3">What this is</p>
           <p className="text-sm text-ink leading-relaxed">
@@ -228,7 +219,7 @@ function ShrineFund({ onBack }) {
           </p>
         </div>
 
-        {/* ── Governance ─────────────────────────────────────── */}
+        {/* Governance */}
         <div className="bg-white border border-terracotta/15 rounded-soft p-5">
           <p className="eyebrow text-ink-muted mb-3">How it is governed</p>
           <p className="text-sm text-ink leading-relaxed">
@@ -245,12 +236,12 @@ function ShrineFund({ onBack }) {
           </div>
         </div>
 
-        {/* ── Roadmap phases ─────────────────────────────────── */}
+        {/* Roadmap */}
         <div>
           <p className="eyebrow text-ink-muted px-1 mb-3">Where we invest — the roadmap</p>
           <div className="space-y-3">
             {PHASES.map((p) => (
-              <div key={p.phase} className="bg-white border border-terracotta/15 rounded-soft p-4 card-spine">
+              <div key={p.phase} className="bg-white border border-terracotta/15 rounded-soft p-4">
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: p.accent + '18' }}>
                     <Icon name={p.icon} size={18} color={p.accent} />
@@ -266,7 +257,7 @@ function ShrineFund({ onBack }) {
           </div>
         </div>
 
-        {/* ── Community pillars ──────────────────────────────── */}
+        {/* Pillars */}
         <div>
           <p className="eyebrow text-ink-muted px-1 mb-3">What we are building in our communities</p>
           <div className="grid grid-cols-2 gap-3">
@@ -282,7 +273,7 @@ function ShrineFund({ onBack }) {
           </div>
         </div>
 
-        {/* ── Inspiration ────────────────────────────────────── */}
+        {/* Inspiration */}
         <div className="bg-white border border-terracotta/15 rounded-soft p-5">
           <p className="eyebrow text-ink-muted mb-3">Standing on shoulders</p>
           <p className="text-sm text-ink leading-relaxed">
@@ -293,7 +284,7 @@ function ShrineFund({ onBack }) {
           </p>
         </div>
 
-        {/* ── Disclaimer ─────────────────────────────────────── */}
+        {/* Disclaimer */}
         <div className="pb-4">
           <p className="text-[11px] text-ink-muted italic leading-relaxed">
             The exact governance process and how the fund is eventually deployed are still being finalised — this page will grow more detailed as those decisions are made.
