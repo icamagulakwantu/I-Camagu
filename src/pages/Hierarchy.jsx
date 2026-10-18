@@ -5,12 +5,8 @@ import { useToast } from '../components/ui/Toast.jsx'
 const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
-// ── Client-side calculator ─────────────────────────────────────
-// Aggregates allocations across all groups.
-// unitPrices: { 'commando brandy': { price: 189, source: 'store' | 'manual' } }
 function buildSummary(groups, unitPriceMap) {
   const grandByItem = {}
-
   const groupSummaries = groups.map((g) => {
     let groupTotal = 0
     const items = (g.allocations || []).map((a) => {
@@ -29,14 +25,10 @@ function buildSummary(groups, unitPriceMap) {
     })
     return { groupLabel: g.groupLabel, items, groupTotal }
   })
-
   const grandTotal = Object.values(grandByItem).reduce((s, v) => s + v.totalAmount, 0)
   return { groupSummaries, grandByItem, grandTotal }
 }
 
-// ── Fuzzy name matching ────────────────────────────────────────
-// Returns the best-matching SKU from the catalogue for a given item name.
-// Tries: exact, starts-with, includes (both directions).
 function matchSku(itemName, catalogue) {
   const needle = itemName.trim().toLowerCase()
   return (
@@ -57,18 +49,17 @@ function Hierarchy({ onBack }) {
   const [groups, setGroups] = useState([])
   const [error, setError] = useState('')
   const [catalogue, setCatalogue] = useState([])
-
-  // unitPriceMap: { [lowerCaseName]: { price: number, source: 'store'|'manual' } }
   const [unitPriceMap, setUnitPriceMap] = useState({})
   const [showCalculator, setShowCalculator] = useState(false)
   const [summary, setSummary] = useState(null)
+  const [addingToBasket, setAddingToBasket] = useState(false)
+  const [basketAdded, setBasketAdded] = useState(false)
 
   const [activeGroupId, setActiveGroupId] = useState('')
   const [itemDescription, setItemDescription] = useState('')
   const [quantity, setQuantity] = useState('')
   const [unitType, setUnitType] = useState('CASE')
 
-  // Load ceremonies and catalogue in parallel
   useEffect(() => {
     fetch('/api/ceremonies/my', { headers: { Authorization: `Bearer ${accessToken}` } })
       .then((r) => (r.ok ? r.json() : []))
@@ -81,23 +72,20 @@ function Hierarchy({ onBack }) {
       .catch(() => setCatalogue([]))
   }, [accessToken])
 
-  // Pre-populate prices from catalogue — called whenever groups or catalogue change
   const applyStorePrices = useCallback((loadedGroups, cat) => {
     setUnitPriceMap((prev) => {
       const next = { ...prev }
       loadedGroups.forEach((g) => {
         (g.allocations || []).forEach((a) => {
           const key = a.itemDescription.trim().toLowerCase()
-          // Only auto-fill if not already manually set
           if (next[key] && next[key].source === 'manual') return
           const sku = matchSku(a.itemDescription, cat)
           if (sku) {
             const casePrice = sku.casePriceZAR != null ? parseFloat(sku.casePriceZAR) : null
             const units = sku.unitsPerCase || 1
             if (casePrice != null) {
-              // If this allocation is in BOTTLEs, give per-bottle price; if CASEs, case price
               const priceToUse = a.unitType === 'BOTTLE' ? casePrice / units : casePrice
-              next[key] = { price: priceToUse, source: 'store', skuName: sku.name, units }
+              next[key] = { price: priceToUse, source: 'store', skuName: sku.name, units, skuId: sku.id }
             }
           } else if (!(key in next)) {
             next[key] = { price: '', source: 'manual' }
@@ -123,17 +111,15 @@ function Hierarchy({ onBack }) {
     }
   }, [accessToken, showToast, catalogue, applyStorePrices])
 
-  // Re-apply prices if catalogue loads after groups
   useEffect(() => {
-    if (groups.length > 0 && catalogue.length > 0) {
-      applyStorePrices(groups, catalogue)
-    }
+    if (groups.length > 0 && catalogue.length > 0) applyStorePrices(groups, catalogue)
   }, [catalogue, groups, applyStorePrices])
 
   useEffect(() => {
     setGroups([])
     setSummary(null)
     setShowCalculator(false)
+    setBasketAdded(false)
     if (ceremonyId) loadGroups(ceremonyId)
   }, [ceremonyId, loadGroups])
 
@@ -172,18 +158,61 @@ function Hierarchy({ onBack }) {
     }
   }
 
-  // All unique item keys across all groups
   const allItemKeys = [...new Set(
     groups.flatMap((g) => (g.allocations || []).map((a) => a.itemDescription.trim().toLowerCase()))
   )]
 
-  // Check how many prices were auto-matched from the store
   const storeMatchCount = allItemKeys.filter((k) => unitPriceMap[k]?.source === 'store').length
 
   const handleCalculate = () => {
     const result = buildSummary(groups, unitPriceMap)
     setSummary(result)
     setShowCalculator(false)
+    setBasketAdded(false)
+  }
+
+  // ── Add grand total items directly to basket ───────────────
+  const addAllToBasket = async () => {
+    if (!summary) return
+    setAddingToBasket(true)
+    let added = 0
+    let failed = 0
+
+    for (const [name, data] of Object.entries(summary.grandByItem)) {
+      const key = name.trim().toLowerCase()
+      const entry = unitPriceMap[key]
+      const skuId = entry?.skuId
+      const qty = data.totalQty
+
+      if (!skuId || qty < 1) {
+        // No matched SKU — can't add to basket automatically
+        failed++
+        continue
+      }
+
+      try {
+        const res = await fetch('/api/basket/items', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+          body: JSON.stringify({ skuId, quantity: qty }),
+        })
+        if (!res.ok) failed++
+        else added++
+      } catch {
+        failed++
+      }
+    }
+
+    setAddingToBasket(false)
+    setBasketAdded(true)
+
+    if (added > 0 && failed === 0) {
+      showToast(`${added} item${added > 1 ? 's' : ''} added to your SmartMatch basket`, 'success')
+    } else if (added > 0) {
+      showToast(`${added} added. ${failed} item${failed > 1 ? 's' : ''} had no store match — add manually.`, 'info')
+    } else {
+      showToast('None of these items matched store products yet. Add them manually from SmartMatch.', 'error')
+    }
   }
 
   return (
@@ -194,7 +223,6 @@ function Hierarchy({ onBack }) {
       <h2 className="text-2xl font-extrabold text-brand-black mb-1">Umgidi Hierarchy</h2>
       <p className="text-xs text-brand-black/50 mb-4">The 14 traditional groups, and what each one needs.</p>
 
-      {/* Ceremony selector */}
       <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 space-y-2">
         {ceremonies.length === 0 ? (
           <p className="text-xs text-brand-black/50">You don't have any ceremonies yet — create one in Ceremony Preparation first.</p>
@@ -212,7 +240,7 @@ function Hierarchy({ onBack }) {
         {error && <p className="text-brand-ochre text-xs">{error}</p>}
         <form onSubmit={generateGroups}>
           <button type="submit" disabled={!ceremonyId}
-            className={`w-full bg-brand-blue text-brand-cream font-bold py-2 rounded-pill disabled:opacity-50 ${pressable}`}>
+            className={`w-full bg-terracotta text-white font-bold py-2 rounded-pill disabled:opacity-50 ${pressable}`}>
             Generate the 14 Groups
           </button>
         </form>
@@ -220,7 +248,6 @@ function Hierarchy({ onBack }) {
 
       {groups.length > 0 && (
         <>
-          {/* Add allocation */}
           <div className="bg-white border border-terracotta/20 rounded-soft p-4 mb-4">
             <p className="text-xs font-black uppercase text-brand-black/40 mb-2">Set an allocation</p>
             <form onSubmit={addAllocation} className="space-y-2">
@@ -242,11 +269,10 @@ function Hierarchy({ onBack }) {
                   <option value="BOTTLE">Bottle(s)</option>
                 </select>
               </div>
-              <button type="submit" className={`w-full bg-brand-ochre text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>Add</button>
+              <button type="submit" className={`w-full bg-terracotta text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>Add</button>
             </form>
           </div>
 
-          {/* Group list */}
           <div className="space-y-2 mb-4">
             {groups.map((g) => (
               <div key={g.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-3">
@@ -263,7 +289,7 @@ function Hierarchy({ onBack }) {
                           {a.quantity} {a.unitType.toLowerCase()}(s) of {a.itemDescription}
                           {entry?.source === 'store' && (
                             <span className="ml-1.5 text-[9px] font-bold bg-sage-100 text-sage-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide">
-                              {money(Number(entry.price))} / {a.unitType.toLowerCase()} in-app
+                              {money(Number(entry.price))} in-app
                             </span>
                           )}
                         </p>
@@ -275,19 +301,17 @@ function Hierarchy({ onBack }) {
             ))}
           </div>
 
-          {/* Smart Match in-app pricing callout */}
           {storeMatchCount > 0 && (
             <div className="bg-sage-50 border border-sage-200 rounded-soft px-4 py-3 mb-3">
               <p className="text-xs font-black text-sage-700 mb-1">
                 {storeMatchCount} item{storeMatchCount > 1 ? 's' : ''} matched to live iCamagu store prices
               </p>
               <p className="text-[10px] text-sage-600 leading-relaxed">
-                These prices and bulk discounts are only available when you order through iCamagu SmartMatch. Ordering outside the app will cost more. Prices shown per bottle are the case price divided by units in the case.
+                These prices and bulk discounts are only available when you order through iCamagu SmartMatch. Ordering outside the app will cost more.
               </p>
             </div>
           )}
 
-          {/* Price input panel — shows auto-matched + manual override */}
           {allItemKeys.length > 0 && (
             <div className="mb-3">
               <button
@@ -303,7 +327,7 @@ function Hierarchy({ onBack }) {
                   <div>
                     <p className="text-xs font-black uppercase text-ink-muted">Price per unit (ZAR)</p>
                     <p className="text-[10px] text-ink-muted leading-relaxed mt-0.5">
-                      Store prices are auto-filled from iCamagu. You can override any price manually.
+                      Store prices are auto-filled. You can override any price manually.
                     </p>
                   </div>
                   {allItemKeys.map((key) => {
@@ -322,16 +346,10 @@ function Hierarchy({ onBack }) {
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-ink-muted font-bold">R</span>
                           <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            placeholder="0.00"
+                            type="number" min="0" step="0.01" placeholder="0.00"
                             value={entry.price || ''}
                             onChange={(e) =>
-                              setUnitPriceMap((prev) => ({
-                                ...prev,
-                                [key]: { ...prev[key], price: e.target.value, source: 'manual' },
-                              }))
+                              setUnitPriceMap((prev) => ({ ...prev, [key]: { ...prev[key], price: e.target.value, source: 'manual' } }))
                             }
                             className={`w-full border rounded-2xl pl-7 pr-3 py-2 text-sm focus:outline-none focus:border-terracotta/60 ${
                               isStore ? 'border-sage-200 bg-sage-50/50' : 'border-ink/20'
@@ -340,8 +358,7 @@ function Hierarchy({ onBack }) {
                         </div>
                         {isStore && entry.skuName && (
                           <p className="text-[10px] text-sage-600">
-                            Matched to "{entry.skuName}" in store
-                            {entry.units > 1 ? ` — case price divided by ${entry.units} units` : ''}
+                            Matched to "{entry.skuName}" in store{entry.units > 1 ? ` — case price divided by ${entry.units} units` : ''}
                           </p>
                         )}
                       </div>
@@ -359,18 +376,13 @@ function Hierarchy({ onBack }) {
             Calculate Total Shopping List
           </button>
 
-          {/* Summary results */}
           {summary && (
             <div className="space-y-3 mb-4">
-
-              {/* Per-group breakdown */}
               {summary.groupSummaries.filter((g) => g.items.length > 0).map((g) => (
                 <div key={g.groupLabel} className="bg-white border border-terracotta/20 rounded-soft p-4">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-xs font-black uppercase text-ink-muted">{g.groupLabel}</p>
-                    {g.groupTotal > 0 && (
-                      <p className="text-sm font-bold text-terracotta">{money(g.groupTotal)}</p>
-                    )}
+                    {g.groupTotal > 0 && <p className="text-sm font-bold text-terracotta">{money(g.groupTotal)}</p>}
                   </div>
                   <div className="space-y-1">
                     {g.items.map((item, idx) => (
@@ -382,12 +394,8 @@ function Hierarchy({ onBack }) {
                           )}
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <span className="text-sm font-bold text-ink">
-                            {item.quantity} {item.unitType.toLowerCase()}(s)
-                          </span>
-                          {item.unitPrice > 0 && (
-                            <p className="text-[10px] text-ink-muted">{money(item.lineTotal)}</p>
-                          )}
+                          <span className="text-sm font-bold text-ink">{item.quantity} {item.unitType.toLowerCase()}(s)</span>
+                          {item.unitPrice > 0 && <p className="text-[10px] text-ink-muted">{money(item.lineTotal)}</p>}
                         </div>
                       </div>
                     ))}
@@ -395,7 +403,6 @@ function Hierarchy({ onBack }) {
                 </div>
               ))}
 
-              {/* Grand total */}
               <div className="bg-white border-2 border-terracotta rounded-soft p-4">
                 <p className="text-xs font-black uppercase text-terracotta mb-3">
                   Grand Total — All {groups.length} Groups
@@ -410,29 +417,41 @@ function Hierarchy({ onBack }) {
                         )}
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-sm font-bold text-ink">
-                          {data.totalQty} {data.unitType.toLowerCase()}(s)
-                        </p>
-                        {data.totalAmount > 0 && (
-                          <p className="text-xs text-terracotta font-bold">{money(data.totalAmount)}</p>
-                        )}
+                        <p className="text-sm font-bold text-ink">{data.totalQty} {data.unitType.toLowerCase()}(s)</p>
+                        {data.totalAmount > 0 && <p className="text-xs text-terracotta font-bold">{money(data.totalAmount)}</p>}
                       </div>
                     </div>
                   ))}
                 </div>
                 {summary.grandTotal > 0 && (
-                  <>
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t-2 border-terracotta/30">
-                      <p className="font-black text-sm text-ink uppercase tracking-wide">Total Cost</p>
-                      <p className="font-display font-extrabold text-xl text-terracotta">{money(summary.grandTotal)}</p>
-                    </div>
-                    <div className="mt-3 bg-sage-50 border border-sage-200 rounded-2xl px-3 py-2.5">
-                      <p className="text-[10px] font-bold text-sage-700 leading-relaxed">
-                        These prices and discounts are only available by ordering through iCamagu SmartMatch. Pool your order with other community members to unlock bulk supplier pricing — it cannot be matched at retail or individual purchase.
-                      </p>
-                    </div>
-                  </>
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t-2 border-terracotta/30">
+                    <p className="font-black text-sm text-ink uppercase tracking-wide">Total Cost</p>
+                    <p className="font-display font-extrabold text-xl text-terracotta">{money(summary.grandTotal)}</p>
+                  </div>
                 )}
+
+                {/* ── Add all to basket ─────────────────────────────── */}
+                <div className="mt-4 space-y-2">
+                  <button
+                    type="button"
+                    onClick={addAllToBasket}
+                    disabled={addingToBasket || basketAdded}
+                    className={`w-full font-bold py-3 rounded-pill text-sm text-white ${pressable} ${
+                      basketAdded ? 'bg-sage-500' : 'bg-terracotta'
+                    }`}
+                  >
+                    {addingToBasket
+                      ? 'Adding to basket...'
+                      : basketAdded
+                      ? 'Added to SmartMatch basket'
+                      : 'Add all to SmartMatch basket'}
+                  </button>
+                  <div className="bg-sage-50 border border-sage-200 rounded-2xl px-3 py-2.5">
+                    <p className="text-[10px] font-bold text-sage-700 leading-relaxed">
+                      These prices and discounts are only available by ordering through iCamagu SmartMatch. Pool your order with other community members to unlock bulk supplier pricing.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
