@@ -1,0 +1,337 @@
+import { randomUUID } from 'crypto';
+import prisma from '../config/db.js';
+import { logAudit } from './stokvelRecordsController.js';
+
+// Loans, trade credit and statements for a stokvel. Like the records
+// controller, there is no migration history, so tables are created lazily
+// with IF NOT EXISTS guards and queried with raw SQL.
+
+async function createTables() {
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "StokvelLoan" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "stokvelId" TEXT NOT NULL,
+      "borrowerId" TEXT NOT NULL,
+      "amount" DECIMAL(12,2) NOT NULL,
+      "interestPercent" DECIMAL(5,2) NOT NULL DEFAULT 0,
+      "repayMonths" INTEGER NOT NULL,
+      "reason" TEXT,
+      "status" TEXT NOT NULL DEFAULT 'PENDING',
+      "decidedAt" TIMESTAMP(3),
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  await prisma.$executeRawUnsafe(
+    'CREATE INDEX IF NOT EXISTS "StokvelLoan_stokvelId_idx" ON "StokvelLoan" ("stokvelId", "createdAt");'
+  );
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "StokvelLoanVote" (
+      "loanId" TEXT NOT NULL,
+      "officialId" TEXT NOT NULL,
+      "approve" BOOLEAN NOT NULL,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY ("loanId", "officialId")
+    );
+  `);
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "StokvelLoanRepayment" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "loanId" TEXT NOT NULL,
+      "stokvelId" TEXT NOT NULL,
+      "amount" DECIMAL(12,2) NOT NULL,
+      "recordedById" TEXT NOT NULL,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  await prisma.$executeRawUnsafe(
+    'CREATE INDEX IF NOT EXISTS "StokvelLoanRepayment_loanId_idx" ON "StokvelLoanRepayment" ("loanId");'
+  );
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "StokvelTradeCredit" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "stokvelId" TEXT NOT NULL,
+      "retailer" TEXT NOT NULL,
+      "amount" DECIMAL(12,2) NOT NULL,
+      "discountPercent" DECIMAL(5,2) NOT NULL DEFAULT 0,
+      "months" INTEGER NOT NULL DEFAULT 12,
+      "purpose" TEXT,
+      "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+      "createdById" TEXT NOT NULL,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  await prisma.$executeRawUnsafe(
+    'CREATE INDEX IF NOT EXISTS "StokvelTradeCredit_stokvelId_idx" ON "StokvelTradeCredit" ("stokvelId", "createdAt");'
+  );
+}
+
+let tablesReady = null;
+function ensureTables() {
+  if (!tablesReady) tablesReady = createTables().catch((err) => { tablesReady = null; throw err; });
+  return tablesReady;
+}
+
+async function guard(req, res, { officialOnly = false } = {}) {
+  await ensureTables();
+  const { stokvelId } = req.params;
+  const [stokvel, member, official] = await Promise.all([
+    prisma.stokvel.findUnique({ where: { id: stokvelId }, select: { organiserId: true, requiredApprovals: true } }),
+    prisma.stokvelMember.findFirst({ where: { stokvelId, userId: req.userId } }),
+    prisma.stokvelOfficial.findFirst({ where: { stokvelId, userId: req.userId } }),
+  ]);
+  if (!stokvel) { res.status(404).json({ error: 'Stokvel not found' }); return null; }
+  const isOfficial = Boolean(official) || stokvel.organiserId === req.userId;
+  if (!member && !isOfficial) { res.status(403).json({ error: 'Not a member of this stokvel' }); return null; }
+  if (officialOnly && !isOfficial) { res.status(403).json({ error: 'Only officials can do this' }); return null; }
+  return { isOfficial, requiredApprovals: stokvel.requiredApprovals || 2 };
+}
+
+const money = (n) => `R${Number(n).toFixed(2)}`;
+const fullName = (u) => (u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Member' : 'Member');
+
+async function namesFor(ids) {
+  const unique = [...new Set(ids.filter(Boolean))];
+  if (unique.length === 0) return {};
+  const users = await prisma.user.findMany({ where: { id: { in: unique } }, select: { id: true, firstName: true, lastName: true } });
+  return Object.fromEntries(users.map((u) => [u.id, fullName(u)]));
+}
+
+// ---------- Loans ----------
+
+export async function listLoans(req, res) {
+  try {
+    const role = await guard(req, res);
+    if (!role) return;
+    const { stokvelId } = req.params;
+    const loans = await prisma.$queryRaw`
+      SELECT * FROM "StokvelLoan" WHERE "stokvelId" = ${stokvelId} ORDER BY "createdAt" DESC LIMIT 100`;
+    const ids = loans.map((l) => l.id);
+    const votes = ids.length ? await prisma.$queryRaw`
+      SELECT "loanId", "officialId", "approve" FROM "StokvelLoanVote" WHERE "loanId" = ANY(${ids})` : [];
+    const repaid = ids.length ? await prisma.$queryRaw`
+      SELECT "loanId", SUM("amount") AS total FROM "StokvelLoanRepayment" WHERE "loanId" = ANY(${ids}) GROUP BY "loanId"` : [];
+    const repaidMap = Object.fromEntries(repaid.map((r) => [r.loanId, Number(r.total)]));
+    const names = await namesFor([...loans.map((l) => l.borrowerId), ...votes.map((v) => v.officialId)]);
+    res.json({
+      requiredApprovals: role.requiredApprovals,
+      isOfficial: role.isOfficial,
+      loans: loans.map((l) => {
+        const amount = Number(l.amount);
+        const totalDue = amount * (1 + Number(l.interestPercent) / 100);
+        const loanVotes = votes.filter((v) => v.loanId === l.id);
+        return {
+          id: l.id, borrowerId: l.borrowerId, borrowerName: names[l.borrowerId] || 'Member',
+          amount, interestPercent: Number(l.interestPercent), repayMonths: l.repayMonths,
+          reason: l.reason, status: l.status, createdAt: l.createdAt, decidedAt: l.decidedAt,
+          totalDue, repaid: repaidMap[l.id] || 0,
+          monthlyInstalment: totalDue / Math.max(1, l.repayMonths),
+          votes: loanVotes.map((v) => ({ officialId: v.officialId, name: names[v.officialId] || 'Official', approve: v.approve })),
+          myVote: loanVotes.find((v) => v.officialId === req.userId)?.approve ?? null,
+        };
+      }),
+    });
+  } catch (error) {
+    console.error('List loans error:', error.message);
+    res.status(500).json({ error: 'Could not load loans' });
+  }
+}
+
+export async function requestLoan(req, res) {
+  try {
+    if (!(await guard(req, res))) return;
+    const { stokvelId } = req.params;
+    const amount = Number(req.body?.amount);
+    const repayMonths = parseInt(req.body?.repayMonths, 10);
+    const interestPercent = Number(req.body?.interestPercent || 0);
+    if (!(amount > 0)) return res.status(400).json({ error: 'Enter a loan amount above zero' });
+    if (!(repayMonths >= 1 && repayMonths <= 36)) return res.status(400).json({ error: 'Repayment period must be 1 to 36 months' });
+    if (!(interestPercent >= 0 && interestPercent <= 100)) return res.status(400).json({ error: 'Interest must be between 0 and 100%' });
+    const open = await prisma.$queryRaw`
+      SELECT 1 FROM "StokvelLoan" WHERE "stokvelId" = ${stokvelId} AND "borrowerId" = ${req.userId}
+      AND "status" IN ('PENDING', 'APPROVED') LIMIT 1`;
+    if (open.length) return res.status(409).json({ error: 'You already have an open loan or request in this stokvel' });
+    const id = randomUUID();
+    const reason = String(req.body?.reason || '').slice(0, 1000) || null;
+    await prisma.$executeRaw`
+      INSERT INTO "StokvelLoan" ("id", "stokvelId", "borrowerId", "amount", "interestPercent", "repayMonths", "reason")
+      VALUES (${id}, ${stokvelId}, ${req.userId}, ${amount}, ${interestPercent}, ${repayMonths}, ${reason})`;
+    await logAudit(stokvelId, req.userId, 'Requested a loan', `${money(amount)} over ${repayMonths} month(s)`);
+    res.status(201).json({ id });
+  } catch (error) {
+    console.error('Request loan error:', error.message);
+    res.status(500).json({ error: 'Could not request loan' });
+  }
+}
+
+export async function voteLoan(req, res) {
+  try {
+    const role = await guard(req, res, { officialOnly: true });
+    if (!role) return;
+    const { stokvelId, loanId } = req.params;
+    const approve = Boolean(req.body?.approve);
+    const rows = await prisma.$queryRaw`
+      SELECT "borrowerId", "status", "amount" FROM "StokvelLoan" WHERE "id" = ${loanId} AND "stokvelId" = ${stokvelId}`;
+    if (!rows.length) return res.status(404).json({ error: 'Loan not found' });
+    if (rows[0].status !== 'PENDING') return res.status(409).json({ error: 'Voting on this loan has closed' });
+    if (rows[0].borrowerId === req.userId) return res.status(403).json({ error: 'You cannot vote on your own loan' });
+    await prisma.$executeRaw`
+      INSERT INTO "StokvelLoanVote" ("loanId", "officialId", "approve") VALUES (${loanId}, ${req.userId}, ${approve})
+      ON CONFLICT ("loanId", "officialId") DO UPDATE SET "approve" = EXCLUDED."approve", "createdAt" = CURRENT_TIMESTAMP`;
+    const tally = await prisma.$queryRaw`
+      SELECT COUNT(*) FILTER (WHERE "approve") AS yes, COUNT(*) FILTER (WHERE NOT "approve") AS no
+      FROM "StokvelLoanVote" WHERE "loanId" = ${loanId}`;
+    const yes = Number(tally[0].yes);
+    const no = Number(tally[0].no);
+    let status = 'PENDING';
+    if (yes >= role.requiredApprovals) status = 'APPROVED';
+    else if (no >= role.requiredApprovals) status = 'REJECTED';
+    if (status !== 'PENDING') {
+      await prisma.$executeRaw`UPDATE "StokvelLoan" SET "status" = ${status}, "decidedAt" = CURRENT_TIMESTAMP WHERE "id" = ${loanId}`;
+    }
+    await logAudit(stokvelId, req.userId, approve ? 'Voted to approve a loan' : 'Voted to reject a loan', money(rows[0].amount));
+    res.json({ status, yes, no });
+  } catch (error) {
+    console.error('Vote loan error:', error.message);
+    res.status(500).json({ error: 'Could not record vote' });
+  }
+}
+
+export async function repayLoan(req, res) {
+  try {
+    if (!(await guard(req, res, { officialOnly: true }))) return;
+    const { stokvelId, loanId } = req.params;
+    const amount = Number(req.body?.amount);
+    if (!(amount > 0)) return res.status(400).json({ error: 'Enter a repayment amount above zero' });
+    const rows = await prisma.$queryRaw`
+      SELECT "status", "amount", "interestPercent", "borrowerId" FROM "StokvelLoan" WHERE "id" = ${loanId} AND "stokvelId" = ${stokvelId}`;
+    if (!rows.length) return res.status(404).json({ error: 'Loan not found' });
+    if (rows[0].status !== 'APPROVED') return res.status(409).json({ error: 'Only approved, unpaid loans can take repayments' });
+    await prisma.$executeRaw`
+      INSERT INTO "StokvelLoanRepayment" ("id", "loanId", "stokvelId", "amount", "recordedById")
+      VALUES (${randomUUID()}, ${loanId}, ${stokvelId}, ${amount}, ${req.userId})`;
+    const sum = await prisma.$queryRaw`SELECT COALESCE(SUM("amount"), 0) AS total FROM "StokvelLoanRepayment" WHERE "loanId" = ${loanId}`;
+    const totalDue = Number(rows[0].amount) * (1 + Number(rows[0].interestPercent) / 100);
+    const settled = Number(sum[0].total) >= totalDue - 0.005;
+    if (settled) await prisma.$executeRaw`UPDATE "StokvelLoan" SET "status" = 'REPAID' WHERE "id" = ${loanId}`;
+    const names = await namesFor([rows[0].borrowerId]);
+    await logAudit(stokvelId, req.userId, 'Recorded a loan repayment', `${money(amount)} from ${names[rows[0].borrowerId] || 'Member'}`);
+    res.json({ message: settled ? 'Loan fully repaid' : 'Repayment recorded', settled });
+  } catch (error) {
+    console.error('Repay loan error:', error.message);
+    res.status(500).json({ error: 'Could not record repayment' });
+  }
+}
+
+// ---------- Trade credit ----------
+
+export async function listTradeCredit(req, res) {
+  try {
+    if (!(await guard(req, res))) return;
+    const rows = await prisma.$queryRaw`
+      SELECT * FROM "StokvelTradeCredit" WHERE "stokvelId" = ${req.params.stokvelId} ORDER BY "createdAt" DESC LIMIT 100`;
+    res.json(rows.map((r) => ({
+      id: r.id, retailer: r.retailer, amount: Number(r.amount), discountPercent: Number(r.discountPercent),
+      months: r.months, purpose: r.purpose, status: r.status, createdAt: r.createdAt,
+    })));
+  } catch (error) {
+    console.error('List trade credit error:', error.message);
+    res.status(500).json({ error: 'Could not load trade credit' });
+  }
+}
+
+export async function createTradeCredit(req, res) {
+  try {
+    if (!(await guard(req, res, { officialOnly: true }))) return;
+    const { stokvelId } = req.params;
+    const retailer = String(req.body?.retailer || '').trim().slice(0, 200);
+    const amount = Number(req.body?.amount);
+    const discountPercent = Number(req.body?.discountPercent || 0);
+    const months = parseInt(req.body?.months, 10) || 12;
+    if (!retailer) return res.status(400).json({ error: 'Retailer name is required' });
+    if (!(amount > 0)) return res.status(400).json({ error: 'Enter an amount above zero' });
+    if (!(discountPercent >= 0 && discountPercent <= 90)) return res.status(400).json({ error: 'Discount must be between 0 and 90%' });
+    const purpose = String(req.body?.purpose || '').slice(0, 1000) || null;
+    const id = randomUUID();
+    await prisma.$executeRaw`
+      INSERT INTO "StokvelTradeCredit" ("id", "stokvelId", "retailer", "amount", "discountPercent", "months", "purpose", "createdById")
+      VALUES (${id}, ${stokvelId}, ${retailer}, ${amount}, ${discountPercent}, ${months}, ${purpose}, ${req.userId})`;
+    await logAudit(stokvelId, req.userId, 'Committed trade credit', `${money(amount)} with ${retailer} at ${discountPercent}% off`);
+    res.status(201).json({ id });
+  } catch (error) {
+    console.error('Create trade credit error:', error.message);
+    res.status(500).json({ error: 'Could not save trade credit' });
+  }
+}
+
+const CREDIT_STATUSES = ['ACTIVE', 'USED', 'CANCELLED'];
+
+export async function updateTradeCredit(req, res) {
+  try {
+    if (!(await guard(req, res, { officialOnly: true }))) return;
+    const { stokvelId, creditId } = req.params;
+    const status = req.body?.status;
+    if (!CREDIT_STATUSES.includes(status)) return res.status(400).json({ error: 'Unknown status' });
+    const rows = await prisma.$queryRaw`
+      UPDATE "StokvelTradeCredit" SET "status" = ${status} WHERE "id" = ${creditId} AND "stokvelId" = ${stokvelId}
+      RETURNING "retailer"`;
+    if (!rows.length) return res.status(404).json({ error: 'Trade credit not found' });
+    await logAudit(stokvelId, req.userId, 'Updated trade credit', `${rows[0].retailer}: ${status.toLowerCase()}`);
+    res.json({ message: 'Updated' });
+  } catch (error) {
+    console.error('Update trade credit error:', error.message);
+    res.status(500).json({ error: 'Could not update trade credit' });
+  }
+}
+
+// ---------- Statement ----------
+
+// Every money movement in a date range, oldest first, with a running total.
+export async function getStatement(req, res) {
+  try {
+    if (!(await guard(req, res))) return;
+    const { stokvelId } = req.params;
+    const from = req.query.from ? new Date(`${req.query.from}T00:00:00.000Z`) : new Date(Date.UTC(new Date().getUTCFullYear(), 0, 1));
+    const to = req.query.to ? new Date(`${req.query.to}T23:59:59.999Z`) : new Date();
+    if (isNaN(from) || isNaN(to)) return res.status(400).json({ error: 'Invalid date range' });
+
+    const [contributions, payouts, fines, loans, repayments] = await Promise.all([
+      prisma.contribution.findMany({ where: { stokvelId, status: 'CONFIRMED', createdAt: { gte: from, lte: to } }, take: 2000 }),
+      prisma.payout.findMany({ where: { stokvelId, status: 'CLEARED', createdAt: { gte: from, lte: to } }, take: 2000 }),
+      prisma.$queryRaw`SELECT "memberId", "amount", "fineType", "paidAt" FROM "StokvelFine"
+        WHERE "stokvelId" = ${stokvelId} AND "paid" = true AND "paidAt" BETWEEN ${from} AND ${to}`.catch(() => []),
+      prisma.$queryRaw`SELECT "borrowerId", "amount", "decidedAt" FROM "StokvelLoan"
+        WHERE "stokvelId" = ${stokvelId} AND "status" IN ('APPROVED', 'REPAID') AND "decidedAt" BETWEEN ${from} AND ${to}`,
+      prisma.$queryRaw`SELECT r."amount", r."createdAt", l."borrowerId" FROM "StokvelLoanRepayment" r
+        JOIN "StokvelLoan" l ON l."id" = r."loanId"
+        WHERE r."stokvelId" = ${stokvelId} AND r."createdAt" BETWEEN ${from} AND ${to}`,
+    ]);
+
+    const names = await namesFor([
+      ...contributions.map((c) => c.memberId), ...payouts.map((p) => p.recipientId),
+      ...fines.map((f) => f.memberId), ...loans.map((l) => l.borrowerId), ...repayments.map((r) => r.borrowerId),
+    ]);
+
+    const entries = [
+      ...contributions.map((c) => ({ date: c.createdAt, type: 'Contribution', who: names[c.memberId], amount: Number(c.amount) })),
+      ...payouts.map((p) => ({ date: p.clearedAt || p.createdAt, type: 'Payout', who: names[p.recipientId], amount: -Number(p.amount) })),
+      ...fines.map((f) => ({ date: f.paidAt, type: 'Fine paid', who: names[f.memberId], amount: Number(f.amount) })),
+      ...loans.map((l) => ({ date: l.decidedAt, type: 'Loan issued', who: names[l.borrowerId], amount: -Number(l.amount) })),
+      ...repayments.map((r) => ({ date: r.createdAt, type: 'Loan repayment', who: names[r.borrowerId], amount: Number(r.amount) })),
+    ].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    let running = 0;
+    const withRunning = entries.map((e) => { running += e.amount; return { ...e, who: e.who || 'Member', running }; });
+    const sumOf = (type) => entries.filter((e) => e.type === type).reduce((s, e) => s + e.amount, 0);
+
+    res.json({
+      from: from.toISOString(), to: to.toISOString(), entries: withRunning,
+      totals: {
+        contributions: sumOf('Contribution'), payouts: sumOf('Payout'), fines: sumOf('Fine paid'),
+        loansIssued: sumOf('Loan issued'), repayments: sumOf('Loan repayment'), net: running,
+      },
+    });
+  } catch (error) {
+    console.error('Statement error:', error.message);
+    res.status(500).json({ error: 'Could not build statement' });
+  }
+}

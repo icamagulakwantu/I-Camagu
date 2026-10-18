@@ -26,6 +26,10 @@ import {
   getConstitution, saveConstitution, getAuditLog,
 } from '../controllers/stokvelRecordsController.js';
 import {
+  listLoans, requestLoan, voteLoan, repayLoan,
+  listTradeCredit, createTradeCredit, updateTradeCredit, getStatement,
+} from '../controllers/stokvelFinanceController.js';
+import {
   requestPayout,
   approvePayout,
   getShrineFundTotal,
@@ -69,6 +73,14 @@ router.get('/:stokvelId/constitution', requireAuth, getConstitution);
 router.post('/:stokvelId/constitution', requireAuth, saveConstitution);
 router.put('/:stokvelId/constitution', requireAuth, saveConstitution);
 router.get('/:stokvelId/audit', requireAuth, getAuditLog);
+router.get('/:stokvelId/loans', requireAuth, listLoans);
+router.post('/:stokvelId/loans', requireAuth, requestLoan);
+router.post('/:stokvelId/loans/:loanId/vote', requireAuth, voteLoan);
+router.post('/:stokvelId/loans/:loanId/repay', requireAuth, repayLoan);
+router.get('/:stokvelId/trade-credit', requireAuth, listTradeCredit);
+router.post('/:stokvelId/trade-credit', requireAuth, createTradeCredit);
+router.patch('/:stokvelId/trade-credit/:creditId', requireAuth, updateTradeCredit);
+router.get('/:stokvelId/statement', requireAuth, getStatement);
 
 // Both of these check a PIN (see pinService.verifyPin) before releasing real
 // money — a 4-6 digit PIN is only up to a million combinations, so without a
