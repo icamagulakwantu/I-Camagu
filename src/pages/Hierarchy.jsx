@@ -6,12 +6,9 @@ const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigi
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
 // ── Client-side calculator ─────────────────────────────────────
-// Aggregates allocations across all groups into:
-//   1. Per-group totals with R amounts (using unit prices keyed by item name)
-//   2. A grand total per item across all groups
-//   3. An overall grand total in rands
-function buildSummary(groups, unitPrices) {
-  // Collect grand totals per item
+// Aggregates allocations across all groups.
+// unitPrices: { 'commando brandy': { price: 189, source: 'store' | 'manual' } }
+function buildSummary(groups, unitPriceMap) {
   const grandByItem = {}
 
   const groupSummaries = groups.map((g) => {
@@ -19,23 +16,37 @@ function buildSummary(groups, unitPrices) {
     const items = (g.allocations || []).map((a) => {
       const qty = Number(a.quantity) || 0
       const key = a.itemDescription.trim().toLowerCase()
-      const unitPrice = Number(unitPrices[key]) || 0
+      const entry = unitPriceMap[key] || {}
+      const unitPrice = Number(entry.price) || 0
       const lineTotal = qty * unitPrice
       groupTotal += lineTotal
-      // Accumulate into grand totals
       if (!grandByItem[a.itemDescription]) {
-        grandByItem[a.itemDescription] = { totalQty: 0, unitType: a.unitType, totalAmount: 0 }
+        grandByItem[a.itemDescription] = { totalQty: 0, unitType: a.unitType, totalAmount: 0, source: entry.source }
       }
       grandByItem[a.itemDescription].totalQty += qty
       grandByItem[a.itemDescription].totalAmount += lineTotal
-      return { itemDescription: a.itemDescription, quantity: qty, unitType: a.unitType, unitPrice, lineTotal }
+      return { itemDescription: a.itemDescription, quantity: qty, unitType: a.unitType, unitPrice, lineTotal, source: entry.source }
     })
     return { groupLabel: g.groupLabel, items, groupTotal }
   })
 
   const grandTotal = Object.values(grandByItem).reduce((s, v) => s + v.totalAmount, 0)
-
   return { groupSummaries, grandByItem, grandTotal }
+}
+
+// ── Fuzzy name matching ────────────────────────────────────────
+// Returns the best-matching SKU from the catalogue for a given item name.
+// Tries: exact, starts-with, includes (both directions).
+function matchSku(itemName, catalogue) {
+  const needle = itemName.trim().toLowerCase()
+  return (
+    catalogue.find((s) => s.name.trim().toLowerCase() === needle) ||
+    catalogue.find((s) => s.name.trim().toLowerCase().startsWith(needle)) ||
+    catalogue.find((s) => needle.startsWith(s.name.trim().toLowerCase())) ||
+    catalogue.find((s) => s.name.trim().toLowerCase().includes(needle)) ||
+    catalogue.find((s) => needle.includes(s.name.trim().toLowerCase())) ||
+    null
+  )
 }
 
 function Hierarchy({ onBack }) {
@@ -45,10 +56,10 @@ function Hierarchy({ onBack }) {
   const [ceremonyId, setCeremonyId] = useState('')
   const [groups, setGroups] = useState([])
   const [error, setError] = useState('')
+  const [catalogue, setCatalogue] = useState([])
 
-  // Unit prices keyed by item name (lowercased) — user fills these in
-  // so the calculator can multiply qty x price and give R totals
-  const [unitPrices, setUnitPrices] = useState({})
+  // unitPriceMap: { [lowerCaseName]: { price: number, source: 'store'|'manual' } }
+  const [unitPriceMap, setUnitPriceMap] = useState({})
   const [showCalculator, setShowCalculator] = useState(false)
   const [summary, setSummary] = useState(null)
 
@@ -57,12 +68,45 @@ function Hierarchy({ onBack }) {
   const [quantity, setQuantity] = useState('')
   const [unitType, setUnitType] = useState('CASE')
 
+  // Load ceremonies and catalogue in parallel
   useEffect(() => {
     fetch('/api/ceremonies/my', { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => setCeremonies(Array.isArray(data) ? data : []))
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d) => setCeremonies(Array.isArray(d) ? d : []))
       .catch(() => setCeremonies([]))
+
+    fetch('/api/basket/catalogue')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d) => setCatalogue(Array.isArray(d) ? d : []))
+      .catch(() => setCatalogue([]))
   }, [accessToken])
+
+  // Pre-populate prices from catalogue — called whenever groups or catalogue change
+  const applyStorePrices = useCallback((loadedGroups, cat) => {
+    setUnitPriceMap((prev) => {
+      const next = { ...prev }
+      loadedGroups.forEach((g) => {
+        (g.allocations || []).forEach((a) => {
+          const key = a.itemDescription.trim().toLowerCase()
+          // Only auto-fill if not already manually set
+          if (next[key] && next[key].source === 'manual') return
+          const sku = matchSku(a.itemDescription, cat)
+          if (sku) {
+            const casePrice = sku.casePriceZAR != null ? parseFloat(sku.casePriceZAR) : null
+            const units = sku.unitsPerCase || 1
+            if (casePrice != null) {
+              // If this allocation is in BOTTLEs, give per-bottle price; if CASEs, case price
+              const priceToUse = a.unitType === 'BOTTLE' ? casePrice / units : casePrice
+              next[key] = { price: priceToUse, source: 'store', skuName: sku.name, units }
+            }
+          } else if (!(key in next)) {
+            next[key] = { price: '', source: 'manual' }
+          }
+        })
+      })
+      return next
+    })
+  }, [])
 
   const loadGroups = useCallback(async (id) => {
     if (!id) return
@@ -72,22 +116,19 @@ function Hierarchy({ onBack }) {
       if (!res.ok) throw new Error(data.error || 'Could not load groups')
       const loaded = Array.isArray(data) ? data : []
       setGroups(loaded)
-      // Pre-populate unit price keys for all unique items found in allocations
-      setUnitPrices((prev) => {
-        const next = { ...prev }
-        loaded.forEach((g) => {
-          (g.allocations || []).forEach((a) => {
-            const key = a.itemDescription.trim().toLowerCase()
-            if (!(key in next)) next[key] = ''
-          })
-        })
-        return next
-      })
+      applyStorePrices(loaded, catalogue)
     } catch (err) {
       showToast(err.message, 'error')
       setGroups([])
     }
-  }, [accessToken, showToast])
+  }, [accessToken, showToast, catalogue, applyStorePrices])
+
+  // Re-apply prices if catalogue loads after groups
+  useEffect(() => {
+    if (groups.length > 0 && catalogue.length > 0) {
+      applyStorePrices(groups, catalogue)
+    }
+  }, [catalogue, groups, applyStorePrices])
 
   useEffect(() => {
     setGroups([])
@@ -131,13 +172,16 @@ function Hierarchy({ onBack }) {
     }
   }
 
-  // Derive all unique item names across all groups for the price inputs
+  // All unique item keys across all groups
   const allItemKeys = [...new Set(
     groups.flatMap((g) => (g.allocations || []).map((a) => a.itemDescription.trim().toLowerCase()))
   )]
 
+  // Check how many prices were auto-matched from the store
+  const storeMatchCount = allItemKeys.filter((k) => unitPriceMap[k]?.source === 'store').length
+
   const handleCalculate = () => {
-    const result = buildSummary(groups, unitPrices)
+    const result = buildSummary(groups, unitPriceMap)
     setSummary(result)
     setShowCalculator(false)
   }
@@ -185,7 +229,7 @@ function Hierarchy({ onBack }) {
                 <option value="">Choose a group</option>
                 {groups.map(g => <option key={g.id} value={g.id}>{g.groupLabel}</option>)}
               </select>
-              <input type="text" placeholder="Item (e.g. Brandy)" value={itemDescription}
+              <input type="text" placeholder="Item (e.g. Commando Brandy)" value={itemDescription}
                 onChange={(e) => setItemDescription(e.target.value)}
                 className="w-full border border-brand-black/30 rounded-soft px-3 py-2 text-sm" required />
               <div className="flex gap-2">
@@ -211,18 +255,39 @@ function Hierarchy({ onBack }) {
                   <p className="text-xs text-brand-black/40">No allocation set</p>
                 ) : (
                   <div className="mt-1 space-y-0.5">
-                    {g.allocations.map((a) => (
-                      <p key={a.id} className="text-xs text-brand-black/60">
-                        {a.quantity} {a.unitType.toLowerCase()}(s) of {a.itemDescription}
-                      </p>
-                    ))}
+                    {g.allocations.map((a) => {
+                      const key = a.itemDescription.trim().toLowerCase()
+                      const entry = unitPriceMap[key]
+                      return (
+                        <p key={a.id} className="text-xs text-brand-black/60">
+                          {a.quantity} {a.unitType.toLowerCase()}(s) of {a.itemDescription}
+                          {entry?.source === 'store' && (
+                            <span className="ml-1.5 text-[9px] font-bold bg-sage-100 text-sage-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide">
+                              {money(Number(entry.price))} / {a.unitType.toLowerCase()} in-app
+                            </span>
+                          )}
+                        </p>
+                      )
+                    })}
                   </div>
                 )}
               </div>
             ))}
           </div>
 
-          {/* Price input panel (shown before calculating) */}
+          {/* Smart Match in-app pricing callout */}
+          {storeMatchCount > 0 && (
+            <div className="bg-sage-50 border border-sage-200 rounded-soft px-4 py-3 mb-3">
+              <p className="text-xs font-black text-sage-700 mb-1">
+                {storeMatchCount} item{storeMatchCount > 1 ? 's' : ''} matched to live iCamagu store prices
+              </p>
+              <p className="text-[10px] text-sage-600 leading-relaxed">
+                These prices and bulk discounts are only available when you order through iCamagu SmartMatch. Ordering outside the app will cost more. Prices shown per bottle are the case price divided by units in the case.
+              </p>
+            </div>
+          )}
+
+          {/* Price input panel — shows auto-matched + manual override */}
           {allItemKeys.length > 0 && (
             <div className="mb-3">
               <button
@@ -230,32 +295,58 @@ function Hierarchy({ onBack }) {
                 onClick={() => setShowCalculator((v) => !v)}
                 className={`w-full border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm bg-white mb-2 ${pressable}`}
               >
-                {showCalculator ? 'Hide price inputs' : 'Enter item prices to calculate totals'}
+                {showCalculator ? 'Hide price review' : 'Review & adjust prices'}
               </button>
 
               {showCalculator && (
-                <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-2 mb-2">
-                  <p className="text-xs font-black uppercase text-ink-muted mb-1">Price per unit for each item (ZAR)</p>
-                  <p className="text-[10px] text-ink-muted leading-relaxed mb-2">
-                    Enter the price per bottle or case from your store or supplier. Leave blank to calculate quantities only.
-                  </p>
-                  {allItemKeys.map((key) => (
-                    <div key={key} className="flex items-center gap-2">
-                      <label className="text-xs text-ink font-semibold flex-1 capitalize">{key}</label>
-                      <div className="relative w-32">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-ink-muted font-bold">R</span>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={unitPrices[key] || ''}
-                          onChange={(e) => setUnitPrices((prev) => ({ ...prev, [key]: e.target.value }))}
-                          className="w-full border border-ink/20 rounded-2xl pl-7 pr-3 py-2 text-sm focus:outline-none focus:border-terracotta/60"
-                        />
+                <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3 mb-2">
+                  <div>
+                    <p className="text-xs font-black uppercase text-ink-muted">Price per unit (ZAR)</p>
+                    <p className="text-[10px] text-ink-muted leading-relaxed mt-0.5">
+                      Store prices are auto-filled from iCamagu. You can override any price manually.
+                    </p>
+                  </div>
+                  {allItemKeys.map((key) => {
+                    const entry = unitPriceMap[key] || {}
+                    const isStore = entry.source === 'store'
+                    return (
+                      <div key={key} className="space-y-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <label className="text-xs text-ink font-semibold flex-1 capitalize">{key}</label>
+                          {isStore && (
+                            <span className="text-[9px] font-bold bg-sage-100 text-sage-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide flex-shrink-0">
+                              iCamagu price
+                            </span>
+                          )}
+                        </div>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-ink-muted font-bold">R</span>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            value={entry.price || ''}
+                            onChange={(e) =>
+                              setUnitPriceMap((prev) => ({
+                                ...prev,
+                                [key]: { ...prev[key], price: e.target.value, source: 'manual' },
+                              }))
+                            }
+                            className={`w-full border rounded-2xl pl-7 pr-3 py-2 text-sm focus:outline-none focus:border-terracotta/60 ${
+                              isStore ? 'border-sage-200 bg-sage-50/50' : 'border-ink/20'
+                            }`}
+                          />
+                        </div>
+                        {isStore && entry.skuName && (
+                          <p className="text-[10px] text-sage-600">
+                            Matched to "{entry.skuName}" in store
+                            {entry.units > 1 ? ` — case price divided by ${entry.units} units` : ''}
+                          </p>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -284,7 +375,12 @@ function Hierarchy({ onBack }) {
                   <div className="space-y-1">
                     {g.items.map((item, idx) => (
                       <div key={idx} className="flex items-center justify-between gap-2">
-                        <span className="text-sm text-ink">{item.itemDescription}</span>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-sm text-ink truncate">{item.itemDescription}</span>
+                          {item.source === 'store' && (
+                            <span className="text-[8px] font-bold bg-sage-100 text-sage-700 px-1 py-0.5 rounded-full uppercase flex-shrink-0">app</span>
+                          )}
+                        </div>
                         <div className="text-right flex-shrink-0">
                           <span className="text-sm font-bold text-ink">
                             {item.quantity} {item.unitType.toLowerCase()}(s)
@@ -299,7 +395,7 @@ function Hierarchy({ onBack }) {
                 </div>
               ))}
 
-              {/* Grand total per item across all groups */}
+              {/* Grand total */}
               <div className="bg-white border-2 border-terracotta rounded-soft p-4">
                 <p className="text-xs font-black uppercase text-terracotta mb-3">
                   Grand Total — All {groups.length} Groups
@@ -307,7 +403,12 @@ function Hierarchy({ onBack }) {
                 <div className="space-y-2">
                   {Object.entries(summary.grandByItem).map(([name, data]) => (
                     <div key={name} className="flex items-center justify-between gap-2 border-b border-terracotta/10 pb-2 last:border-0 last:pb-0">
-                      <span className="text-sm text-ink">{name}</span>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="text-sm text-ink">{name}</span>
+                        {data.source === 'store' && (
+                          <span className="text-[8px] font-bold bg-sage-100 text-sage-700 px-1 py-0.5 rounded-full uppercase flex-shrink-0">app price</span>
+                        )}
+                      </div>
                       <div className="text-right flex-shrink-0">
                         <p className="text-sm font-bold text-ink">
                           {data.totalQty} {data.unitType.toLowerCase()}(s)
@@ -320,10 +421,17 @@ function Hierarchy({ onBack }) {
                   ))}
                 </div>
                 {summary.grandTotal > 0 && (
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t-2 border-terracotta/30">
-                    <p className="font-black text-sm text-ink uppercase tracking-wide">Total Cost</p>
-                    <p className="font-display font-extrabold text-xl text-terracotta">{money(summary.grandTotal)}</p>
-                  </div>
+                  <>
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t-2 border-terracotta/30">
+                      <p className="font-black text-sm text-ink uppercase tracking-wide">Total Cost</p>
+                      <p className="font-display font-extrabold text-xl text-terracotta">{money(summary.grandTotal)}</p>
+                    </div>
+                    <div className="mt-3 bg-sage-50 border border-sage-200 rounded-2xl px-3 py-2.5">
+                      <p className="text-[10px] font-bold text-sage-700 leading-relaxed">
+                        These prices and discounts are only available by ordering through iCamagu SmartMatch. Pool your order with other community members to unlock bulk supplier pricing — it cannot be matched at retail or individual purchase.
+                      </p>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
