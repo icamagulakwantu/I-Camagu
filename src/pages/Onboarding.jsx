@@ -6,10 +6,6 @@ import Icon from '../components/Icon.jsx'
 
 const STEPS = ['welcome', 'ancestry', 'details']
 
-// Each card tells one story for one real person.
-// "A mother planning umgidi" is not a persona — it's the majority user.
-// Every line of copy earns its place by removing a real doubt or lighting
-// up a real desire.
 const FEATURES = [
   {
     icon: 'calendarRange',
@@ -45,7 +41,7 @@ const FEATURES = [
     border: 'border-sage-200',
     label: 'Iziduko Network',
     headline: 'Find your bloodline across SA.',
-    desc: 'Enter your clan names and connect with relatives you've never met. The digital umuntu ngumntu ngabantu.',
+    desc: 'Enter your clan names and connect with relatives you have never met. The digital umuntu ngumntu ngabantu.',
   },
 ]
 
@@ -144,10 +140,7 @@ function Onboarding({ onDone }) {
       (paternalGrandmotherIziduko && paternalGrandmotherIziduko !== user?.paternalGrandmotherIziduko) ||
       (maternalGrandmotherIziduko && maternalGrandmotherIziduko !== user?.maternalGrandmotherIziduko)
 
-    if (!hasNewLine) {
-      setStep('details')
-      return
-    }
+    if (!hasNewLine) { setStep('details'); return }
 
     if (!paternalIziduko || !maternalIziduko) {
       setError('Paternal and maternal Iziduko are both needed to save your clan lines')
@@ -159,12 +152,7 @@ function Onboarding({ onDone }) {
       const res = await fetch('/api/user/iziduko', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({
-          paternalIziduko,
-          maternalIziduko,
-          paternalGrandmotherIziduko,
-          maternalGrandmotherIziduko,
-        }),
+        body: JSON.stringify({ paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Could not save your clan lines')
@@ -180,10 +168,7 @@ function Onboarding({ onDone }) {
   const saveDetailsAndFinish = async () => {
     setError('')
     const hasDetails = address || phoneNumber || age || coords
-    if (!hasDetails) {
-      finishOnboarding()
-      return
-    }
+    if (!hasDetails) { finishOnboarding(); return }
 
     setSaving(true)
     try {
@@ -206,19 +191,11 @@ function Onboarding({ onDone }) {
   return (
     <div className="min-h-screen icamagu-bg flex flex-col items-center justify-center px-4 py-8">
 
-      {/* ── WELCOME STEP ─────────────────────────────────────── */}
       {step === 'welcome' && (
         <div className="w-full max-w-sm animate-slide-up">
-
-          {/* Hero header — full-bleed terracotta, sets the tone immediately */}
           <div className="wash-ember rings rounded-t-soft px-6 pt-7 pb-6">
             <div className="flex items-center gap-2.5 mb-4">
-              <img
-                src="/icons/source/gateway-mark-1024.png"
-                alt="iCamagu"
-                className="w-9 h-9"
-                style={{ filter: 'brightness(0) invert(1)' }}
-              />
+              <img src="/icons/source/gateway-mark-1024.png" alt="iCamagu" className="w-9 h-9" style={{ filter: 'brightness(0) invert(1)' }} />
               <span className="font-display font-bold text-2xl text-white">iCamagu</span>
             </div>
             <p className="eyebrow text-white/60 mb-1.5">Molo, {user?.firstName || 'friend'}</p>
@@ -230,61 +207,40 @@ function Onboarding({ onDone }) {
             </p>
           </div>
 
-          {/* Feature cards — stacked, not a 2×2 grid, so each one gets
-              the space to tell a complete story rather than a label + two words */}
           <div className="bg-white/95 backdrop-blur-md border-x-2 border-terracotta/20 px-4 pt-5 pb-4 space-y-3">
             {FEATURES.map((f, i) => (
               <button
                 key={f.label}
                 type="button"
                 onClick={() => setActiveCard(i === activeCard ? -1 : i)}
-                className={`w-full text-left rounded-2xl border px-4 py-3.5 transition-all duration-200 ${f.bg} ${f.border} ${
-                  activeCard === i ? 'shadow-card' : ''
-                }`}
+                className={`w-full text-left rounded-2xl border px-4 py-3.5 transition-all duration-200 ${f.bg} ${f.border} ${activeCard === i ? 'shadow-card' : ''}`}
               >
                 <div className="flex items-start gap-3">
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-                    style={{ backgroundColor: f.accent + '18' }}
-                  >
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: f.accent + '18' }}>
                     <Icon name={f.icon} size={18} color={f.accent} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <p className="font-bold text-sm text-ink">{f.label}</p>
-                      <Icon
-                        name="chevronDown"
-                        size={14}
-                        color="#8a8278"
-                        className={`flex-shrink-0 transition-transform duration-200 ${activeCard === i ? 'rotate-180' : ''}`}
-                      />
+                      <Icon name="chevronDown" size={14} color="#8a8278" className={`flex-shrink-0 transition-transform duration-200 ${activeCard === i ? 'rotate-180' : ''}`} />
                     </div>
                     <p className="text-xs font-semibold mt-0.5" style={{ color: f.accent }}>{f.headline}</p>
-                    {activeCard === i && (
-                      <p className="text-xs text-ink-muted leading-relaxed mt-1.5">{f.desc}</p>
-                    )}
+                    {activeCard === i && <p className="text-xs text-ink-muted leading-relaxed mt-1.5">{f.desc}</p>}
                   </div>
                 </div>
               </button>
             ))}
           </div>
 
-          {/* CTA — rounded bottom, matches hero top */}
           <div className="bg-white/95 backdrop-blur-md border-x-2 border-b-2 border-terracotta/20 rounded-b-soft px-4 pb-6 pt-2">
-            <button
-              onClick={() => setStep('ancestry')}
-              className="w-full wash-ember text-white font-bold py-3.5 rounded-pill shadow-terracotta text-[15px] pressable"
-            >
-              Start setting up my profile →
+            <button onClick={() => setStep('ancestry')} className="w-full wash-ember text-white font-bold py-3.5 rounded-pill shadow-terracotta text-[15px] pressable">
+              Start setting up my profile &rarr;
             </button>
-            <p className="text-center text-[10px] text-ink-muted mt-2.5">
-              Two quick steps • Takes under a minute
-            </p>
+            <p className="text-center text-[10px] text-ink-muted mt-2.5">Two quick steps &bull; Takes under a minute</p>
           </div>
         </div>
       )}
 
-      {/* ── ANCESTRY STEP ────────────────────────────────────── */}
       {step === 'ancestry' && (
         <div className="w-full max-w-sm bg-white/90 backdrop-blur-md border-2 border-terracotta/25 rounded-soft p-8 shadow-elevated animate-slide-up">
           <ProgressDots step={step} />
@@ -298,12 +254,8 @@ function Onboarding({ onDone }) {
           </div>
 
           <div className="flex flex-col items-center gap-2 mb-5">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="w-20 h-20 rounded-full bg-sage-50 border-2 border-dashed border-sage-300 flex items-center justify-center overflow-hidden pressable"
-            >
+            <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
+              className="w-20 h-20 rounded-full bg-sage-50 border-2 border-dashed border-sage-300 flex items-center justify-center overflow-hidden pressable">
               {localPreview || user?.profileImage ? (
                 <img src={localPreview || user.profileImage} alt="" className={`w-full h-full object-cover ${uploading ? 'opacity-60' : ''}`} />
               ) : (
@@ -319,110 +271,58 @@ function Onboarding({ onDone }) {
               <>
                 <div>
                   <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Paternal Iziduko</label>
-                  <input
-                    type="text" placeholder="Optional"
-                    value={paternalIziduko}
-                    onChange={(e) => setPaternalIziduko(e.target.value)}
-                    className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1"
-                  />
+                  <input type="text" placeholder="Optional" value={paternalIziduko} onChange={(e) => setPaternalIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
                 </div>
                 <div>
                   <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Maternal Iziduko</label>
-                  <input
-                    type="text" placeholder="Optional"
-                    value={maternalIziduko}
-                    onChange={(e) => setMaternalIziduko(e.target.value)}
-                    className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1"
-                  />
+                  <input type="text" placeholder="Optional" value={maternalIziduko} onChange={(e) => setMaternalIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
                 </div>
               </>
             )}
             <div>
               <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Paternal grandmother's Iziduko</label>
-              <input
-                type="text" placeholder="Optional"
-                value={paternalGrandmotherIziduko}
-                onChange={(e) => setPaternalGrandmotherIziduko(e.target.value)}
-                className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1"
-              />
+              <input type="text" placeholder="Optional" value={paternalGrandmotherIziduko} onChange={(e) => setPaternalGrandmotherIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
             </div>
             <div>
               <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Maternal grandmother's Iziduko</label>
-              <input
-                type="text" placeholder="Optional"
-                value={maternalGrandmotherIziduko}
-                onChange={(e) => setMaternalGrandmotherIziduko(e.target.value)}
-                className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1"
-              />
+              <input type="text" placeholder="Optional" value={maternalGrandmotherIziduko} onChange={(e) => setMaternalGrandmotherIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
             </div>
           </div>
 
           {error && <p className="text-terracotta text-sm mt-3">{error}</p>}
 
-          <button
-            onClick={saveAncestryAndContinue}
-            disabled={saving}
-            className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill disabled:opacity-50 mt-5 pressable"
-          >
+          <button onClick={saveAncestryAndContinue} disabled={saving} className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill disabled:opacity-50 mt-5 pressable">
             {saving ? 'Saving...' : 'Continue'}
           </button>
-          <button type="button" onClick={() => setStep('details')} className="w-full text-xs text-ink-muted underline mt-2.5">
-            Skip for now
-          </button>
+          <button type="button" onClick={() => setStep('details')} className="w-full text-xs text-ink-muted underline mt-2.5">Skip for now</button>
         </div>
       )}
 
-      {/* ── DETAILS STEP ─────────────────────────────────────── */}
       {step === 'details' && (
         <div className="w-full max-w-sm bg-white/90 backdrop-blur-md border-2 border-terracotta/25 rounded-soft p-8 shadow-elevated animate-slide-up">
           <ProgressDots step={step} />
           <div className="mb-5">
             <h2 className="font-display font-bold text-xl text-ink mb-1">How can people reach you?</h2>
-            <p className="text-ink-muted text-xs leading-relaxed">
-              Used for ceremony bookings and stokvel notifications. All optional — add later from your profile anytime.
-            </p>
+            <p className="text-ink-muted text-xs leading-relaxed">Used for ceremony bookings and stokvel notifications. All optional — add later from your profile anytime.</p>
           </div>
 
           <div className="space-y-2">
-            <input
-              type="text" placeholder="Phone number" value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm"
-            />
-            <input
-              type="text" placeholder="Address / area" value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm"
-            />
-            <button
-              type="button" onClick={useMyLocation} disabled={locating}
-              className="text-xs font-bold text-sage-600 flex items-center gap-1 pressable"
-            >
+            <input type="text" placeholder="Phone number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm" />
+            <input type="text" placeholder="Address / area" value={address} onChange={(e) => setAddress(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm" />
+            <button type="button" onClick={useMyLocation} disabled={locating} className="text-xs font-bold text-sage-600 flex items-center gap-1 pressable">
               <Icon name="mapPin" size={12} />
               {locating ? 'Locating...' : coords ? <><span>Location captured</span><Icon name="check" size={12} /></> : 'Use my current location'}
             </button>
-            <p className="text-[10px] text-ink-muted -mt-1">
-              Helps us match you with the nearest suppliers and pools — not shared with other members.
-            </p>
-            <input
-              type="number" placeholder="Age" value={age}
-              onChange={(e) => setAge(e.target.value)}
-              className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm"
-            />
+            <p className="text-[10px] text-ink-muted -mt-1">Helps us match you with the nearest suppliers and pools — not shared with other members.</p>
+            <input type="number" placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm" />
           </div>
 
           {error && <p className="text-terracotta text-sm mt-3">{error}</p>}
 
-          <button
-            onClick={saveDetailsAndFinish}
-            disabled={saving}
-            className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 mt-5 pressable shadow-terracotta"
-          >
-            {saving ? 'Saving...' : 'Finish & enter iCamagu →'}
+          <button onClick={saveDetailsAndFinish} disabled={saving} className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 mt-5 pressable shadow-terracotta">
+            {saving ? 'Saving...' : 'Finish & enter iCamagu \u2192'}
           </button>
-          <button type="button" onClick={finishOnboarding} className="w-full text-xs text-ink-muted underline mt-2.5">
-            Skip for now
-          </button>
+          <button type="button" onClick={finishOnboarding} className="w-full text-xs text-ink-muted underline mt-2.5">Skip for now</button>
         </div>
       )}
     </div>
