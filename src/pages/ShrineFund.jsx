@@ -7,6 +7,39 @@ import Icon from '../components/Icon.jsx'
 const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
+// ── Roadmap phases — from grassroots to legacy ─────────────────
+const PHASES = [
+  {
+    icon: 'store',
+    accent: '#c45c26',
+    phase: 'Phase 1 — Township & Rural Economy',
+    headline: 'Keep the rand circulating in our communities.',
+    body: 'We start where the money already flows daily. Spaza shops, taverns, car washes, garages, school uniform manufacturing, and community banks. These are businesses our communities spend money in every single day — yet the profits leave. The fund takes a 40% community stake in these businesses, with 60% remaining in private Xhosa hands. Our rand stays home longer before it leaves.',
+  },
+  {
+    icon: 'calendarRange',
+    accent: '#c1922f',
+    phase: 'Phase 2 — Food & Secondary Industries',
+    headline: 'Own the food value chain.',
+    body: 'From township food access to farming, processing, and distribution. Every community deserves nutritious food at fair prices. We model what schools in Japan have shown the world — that when children eat well, communities thrive. We move into food production, packaging, and local supply networks, targeting the Eastern Cape and beyond.',
+  },
+  {
+    icon: 'coins',
+    accent: '#4a7a4a',
+    phase: 'Phase 3 — Primary Industries & Legacy',
+    headline: 'Mining, property, and nation-scale investment.',
+    body: 'Once the foundation is solid, the fund moves into primary industries — mining, agriculture, fisheries, property, and livestock economies of scale across the Eastern Cape's arable land and coastline. No single family or stokvel could build this alone. Together, we can.',
+  },
+]
+
+// ── Community pillars the fund will build ─────────────────────
+const PILLARS = [
+  { icon: 'shield', label: 'Safety & Security', desc: 'Community-employed private security to combat extortion and crime in our streets.' },
+  { icon: 'bookOpen', label: 'Libraries & Education', desc: 'Community libraries where knowledge is free and every child has a place to study.' },
+  { icon: 'users', label: 'Parks, Gyms & Playgrounds', desc: 'Healthy, beautiful spaces — trees, playgrounds, gyms, and weekend activities that keep communities united.' },
+  { icon: 'heart', label: 'Nutrition & Food Access', desc: 'Ensuring every household has access to healthy, nutritious food starting from public schools outward.' },
+]
+
 function ShrineFund({ onBack }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
@@ -64,33 +97,34 @@ function ShrineFund({ onBack }) {
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white px-5 pt-12 pb-10 rounded-b-[2.5rem] relative overflow-hidden">
-        <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/10 rounded-full" />
+
+      {/* ── Hero ──────────────────────────────────────────────── */}
+      <div className="wash-ember rings text-white px-5 pt-12 pb-10 rounded-b-[2.5rem] relative overflow-hidden">
         <div className="relative">
           <button type="button" onClick={onBack} className="text-sm text-white/80 mb-3 flex items-center gap-1.5">
             <Icon name="arrowRight" size={14} color="#ffffff" className="rotate-180" /> Back
           </button>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 mb-3">
             <Icon name="flame" size={26} color="#ffffff" strokeWidth={1.5} />
             <h1 className="font-display font-bold text-3xl leading-tight">Ubuhlanti bakwa Xhosa</h1>
           </div>
-          <p className="text-white/85 text-sm font-bold mt-1.5">The Sovereign Xhosa Shrine &amp; Development Fund</p>
-          <p className="text-white/80 text-sm mt-2 leading-relaxed">
-            Built together, one voluntary contribution at a time — visible to everyone, owned by no one alone.
+          <p className="text-white/90 text-sm font-bold">The Sovereign Xhosa Development Fund</p>
+          <p className="text-white/75 text-sm mt-2 leading-relaxed">
+            A community-owned investment fund that starts at grass roots — township and rural economies — and grows into a legacy that serves the Xhosa nation for generations to come.
           </p>
         </div>
       </div>
 
-      <div className="px-4 -mt-6">
+      <div className="px-4 -mt-6 space-y-4">
+
+        {/* ── Fund total ─────────────────────────────────────── */}
         <div className="bg-white border-2 border-terracotta/25 rounded-soft p-6 shadow-card text-center">
           {loading ? (
             <Skeleton className="h-12 w-48 mx-auto" />
           ) : loadFailed ? (
             <>
               <p className="text-sm text-ink-muted">Could not load the fund total — not R0, just not loaded yet.</p>
-              <button type="button" onClick={fetchTotal} className="text-xs font-bold text-terracotta mt-2 underline">
-                Try again
-              </button>
+              <button type="button" onClick={fetchTotal} className="text-xs font-bold text-terracotta mt-2 underline">Try again</button>
             </>
           ) : (
             <>
@@ -101,7 +135,7 @@ function ShrineFund({ onBack }) {
         </div>
 
         {!loading && !loadFailed && (
-          <div className="grid grid-cols-3 gap-2 mt-4">
+          <div className="grid grid-cols-3 gap-2">
             <div className="bg-white border border-terracotta/15 rounded-soft p-3 text-center">
               <p className="font-display font-bold text-lg text-ink">{data?.payoutContributionCount || 0}</p>
               <p className="text-[9px] font-bold text-ink-muted uppercase tracking-wide mt-0.5 leading-tight">Payout contributions</p>
@@ -117,14 +151,10 @@ function ShrineFund({ onBack }) {
           </div>
         )}
 
-        {/* Where the fund's money has actually gone. Only real, recorded
-            allocations appear — until then this says so plainly rather than
-            showing a row of zeros that looks like activity. */}
+        {/* ── Allocations ────────────────────────────────────── */}
         {!loading && !loadFailed && (
-          <div className="bg-white border border-terracotta/15 rounded-soft p-4 mt-4">
-            <p className="text-[11px] font-black uppercase tracking-widest text-ink-muted mb-2">
-              Where the fund has been invested
-            </p>
+          <div className="bg-white border border-terracotta/15 rounded-soft p-4">
+            <p className="text-[11px] font-black uppercase tracking-widest text-ink-muted mb-2">Where the fund has been invested</p>
             {data?.allocationsBySector?.length ? (
               <>
                 <div className="space-y-2">
@@ -142,86 +172,131 @@ function ShrineFund({ onBack }) {
               </>
             ) : (
               <p className="text-sm text-ink-muted leading-relaxed">
-                Nothing has been committed out of the fund yet. Every allocation will be listed here
-                with what it funded, as it happens.
+                Nothing has been committed out of the fund yet. Every allocation will be listed here with what it funded, as it happens.
               </p>
             )}
           </div>
         )}
 
+        {/* ── Donate ─────────────────────────────────────────── */}
         <button
           type="button"
           onClick={() => setDonateOpen((v) => !v)}
-          className={`w-full mt-4 bg-terracotta text-white font-bold py-3.5 rounded-pill shadow-glow flex items-center justify-center gap-2 ${pressable}`}
+          className={`w-full bg-terracotta text-white font-bold py-3.5 rounded-pill shadow-terracotta flex items-center justify-center gap-2 ${pressable}`}
         >
           <Icon name="heart" size={17} color="#fff" /> {donateOpen ? 'Cancel' : 'Donate — from R1'}
         </button>
 
         {donateOpen && (
-          <form onSubmit={submitDonation} className="bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft mt-3 space-y-2.5">
+          <form onSubmit={submitDonation} className="bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft space-y-2.5">
             <input
-              type="number"
-              min="1"
-              step="any"
-              placeholder="Amount (ZAR) — R1 or more"
-              value={donateAmount}
-              onChange={(e) => setDonateAmount(e.target.value)}
+              type="number" min="1" step="any" placeholder="Amount (ZAR) — R1 or more"
+              value={donateAmount} onChange={(e) => setDonateAmount(e.target.value)}
               className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta"
               required
             />
             <input
-              type="text"
-              placeholder="Your name (optional — you may stay anonymous)"
-              value={donorName}
-              onChange={(e) => setDonorName(e.target.value)}
+              type="text" placeholder="Your name (optional — you may stay anonymous)"
+              value={donorName} onChange={(e) => setDonorName(e.target.value)}
               className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta"
             />
             <input
-              type="email"
-              placeholder="Email (optional, so we can follow up)"
-              value={donorEmail}
-              onChange={(e) => setDonorEmail(e.target.value)}
+              type="email" placeholder="Email (optional, so we can follow up)"
+              value={donorEmail} onChange={(e) => setDonorEmail(e.target.value)}
               className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta"
             />
             <p className="text-[11px] text-ink-muted leading-relaxed">
-              We don't yet have a live payment gateway or bank details on file — submitting this records your
-              pledge, and someone from iCamagu will personally follow up to complete the transfer.
+              We don't yet have a live payment gateway — submitting this records your pledge, and someone from iCamagu will personally follow up to complete the transfer.
             </p>
-            <button
-              type="submit"
-              disabled={submitting}
-              className={`w-full bg-ink text-white font-bold py-3 rounded-pill ${pressable}`}
-            >
+            <button type="submit" disabled={submitting} className={`w-full bg-ink text-white font-bold py-3 rounded-pill ${pressable}`}>
               {submitting ? 'Submitting...' : 'Pledge this donation'}
             </button>
           </form>
         )}
 
-        <div className="bg-white border border-terracotta/15 rounded-soft p-4 mt-4">
-          <p className="text-xs font-black uppercase text-ink-muted mb-2">What this is</p>
+        {/* ── What this is ───────────────────────────────────── */}
+        <div className="bg-white border border-terracotta/15 rounded-soft p-5">
+          <p className="eyebrow text-ink-muted mb-3">What this is</p>
           <p className="text-sm text-ink leading-relaxed">
-            This is not a fee — it is the sovereign seed capital of the Xhosa nation, a sacred sanctuary in the
-            spirit of a homestead kraal, and long-term investment in agricultural research, fisheries, and
-            livestock economies of scale across the Eastern Cape's arable land and coastline that no single
-            family or stokvel could build alone.
+            This is not a fee. It is the sovereign seed capital of the Xhosa nation — a long-term, community-owned investment fund dedicated to building economies that keep our rand circulating within our communities for longer before it leaves.
           </p>
-          <p className="text-sm text-ink leading-relaxed mt-2">
-            Every contribution is voluntary: a stokvel member may choose to add a suggested share when they
-            request their own payout, or anyone can donate directly from R1 upward. iCamagu also commits a
-            share of its own platform profit to the fund as it grows.
+          <p className="text-sm text-ink leading-relaxed mt-3">
+            Every contribution is voluntary: a stokvel member may choose to add a suggested share when they request their own payout, or anyone can donate directly from R1 upward. iCamagu also commits a share of its own platform profit to the fund as it grows.
           </p>
-          <p className="text-sm text-ink leading-relaxed mt-2">
-            What the fund builds next is decided by the community, not by iCamagu alone — put to a majority
-            vote, with a standing committee drawn from churches, Amaqhirha and Amaxhwele (traditional healers),
-            and community leaders, visionaries, thinkers, and academics weighing each opportunity.
+          <p className="text-sm font-bold text-ink leading-relaxed mt-3">
+            A fund built by the people, protected by the cloud, and dedicated to the advancement of the Xhosa nation for generations to come.
           </p>
-          <p className="text-sm text-ink font-bold leading-relaxed mt-2">
-            A fund built by the people, protected by the cloud, and dedicated to the advancement of the Xhosa
-            nation for generations to come.
+        </div>
+
+        {/* ── Governance ─────────────────────────────────────── */}
+        <div className="bg-white border border-terracotta/15 rounded-soft p-5">
+          <p className="eyebrow text-ink-muted mb-3">How it is governed</p>
+          <p className="text-sm text-ink leading-relaxed">
+            What the fund builds is decided by the community — not by iCamagu alone. A standing committee is drawn from the structures where our communities already gather: imibutho, schools, community organisations, local social media pages, and WhatsApp groups that represent real neighbourhoods.
           </p>
-          <p className="text-[11px] text-ink-muted mt-3 italic">
-            The exact governance process and how the fund is eventually deployed are still being finalised —
-            this page will grow more detailed as those decisions are made.
+          <p className="text-sm text-ink leading-relaxed mt-3">
+            Committee members are selected on merit and willingness to serve — not through elections that can be manipulated. Projects put to the community must pass two tests: they must have majority support, and they must be demonstrably profitable or carry a clear, measurable impact milestone that benefits the broader community.
+          </p>
+          <div className="bg-terracotta/5 border border-terracotta/20 rounded-2xl px-4 py-3 mt-4">
+            <p className="text-xs font-bold text-terracotta mb-1">The 60/40 ownership model</p>
+            <p className="text-xs text-ink-muted leading-relaxed">
+              Every business the fund invests in is 60% privately owned and 40% community-owned — but private owners must be Xhosa people. Profit stays black. Ownership stays local. Community wealth grows with every business that succeeds.
+            </p>
+          </div>
+        </div>
+
+        {/* ── Roadmap phases ─────────────────────────────────── */}
+        <div>
+          <p className="eyebrow text-ink-muted px-1 mb-3">Where we invest — the roadmap</p>
+          <div className="space-y-3">
+            {PHASES.map((p) => (
+              <div key={p.phase} className="bg-white border border-terracotta/15 rounded-soft p-4 card-spine">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: p.accent + '18' }}>
+                    <Icon name={p.icon} size={18} color={p.accent} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest mb-0.5" style={{ color: p.accent }}>{p.phase}</p>
+                    <p className="font-bold text-sm text-ink leading-snug">{p.headline}</p>
+                    <p className="text-xs text-ink-muted leading-relaxed mt-1.5">{p.body}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Community pillars ──────────────────────────────── */}
+        <div>
+          <p className="eyebrow text-ink-muted px-1 mb-3">What we are building in our communities</p>
+          <div className="grid grid-cols-2 gap-3">
+            {PILLARS.map((p) => (
+              <div key={p.label} className="bg-white border border-sage-200 rounded-soft p-3.5">
+                <div className="w-8 h-8 rounded-xl bg-sage-50 flex items-center justify-center mb-2">
+                  <Icon name={p.icon} size={16} color="#4a7a4a" />
+                </div>
+                <p className="font-bold text-xs text-ink leading-snug">{p.label}</p>
+                <p className="text-[10px] text-ink-muted leading-relaxed mt-1">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Inspiration ────────────────────────────────────── */}
+        <div className="bg-white border border-terracotta/15 rounded-soft p-5">
+          <p className="eyebrow text-ink-muted mb-3">Standing on shoulders</p>
+          <p className="text-sm text-ink leading-relaxed">
+            This fund draws inspiration from models that have already changed lives. The Seminole Tribe of Florida built sovereign economic power through community-owned enterprise. The Grameen Bank proved that communities lending to themselves — without traditional collateral — can eliminate poverty at scale. Japan's public school meal programmes showed the world that community nutrition is a policy choice, not a luxury.
+          </p>
+          <p className="text-sm text-ink leading-relaxed mt-3">
+            We are not reinventing the wheel. We are taking what works, rooting it in Xhosa values, and building it here — starting in our townships and rural areas, growing into every community that is ready to build together.
+          </p>
+        </div>
+
+        {/* ── Disclaimer ─────────────────────────────────────── */}
+        <div className="pb-4">
+          <p className="text-[11px] text-ink-muted italic leading-relaxed">
+            The exact governance process and how the fund is eventually deployed are still being finalised — this page will grow more detailed as those decisions are made.
           </p>
         </div>
       </div>
