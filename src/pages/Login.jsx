@@ -12,6 +12,10 @@ const STEP_META = {
   'otp-verify': { title: 'Enter code', depth: 3 },
 }
 
+// Who can join bulk buying. Many people think you must belong to a stokvel,
+// so the login page says plainly that Matchmaker pools orders for everyone.
+const WHO_CAN_JOIN = ['On your own', 'With your stokvel', 'Tavern owners']
+
 function ErrorBanner({ message }) {
   if (!message) return null
   return (
@@ -178,22 +182,37 @@ function Login() {
             />
             <span className="font-display font-bold text-2xl text-white">iCamagu</span>
           </div>
-          <h1 className="font-display font-bold text-[1.55rem] leading-tight text-white">
-            {step === 'email' && 'Plan your ceremony. Buy in bulk. Save together.'}
+          <h1 className="font-display font-bold text-[1.55rem] leading-tight text-white text-balance">
+            {step === 'email' && 'Buy together. Save more.'}
             {step === 'register' && 'Join iCamagu'}
             {step === 'password-login' && 'Welcome back'}
             {step === 'forgot-password' && 'Reset your password'}
             {step === 'otp-login' && 'Welcome back'}
             {step === 'otp-verify' && 'Check your inbox'}
           </h1>
-          <p className="text-white/70 text-sm mt-1.5">
-            {step === 'email' && 'Culture before capital.'}
+          <p className="text-white/80 text-sm mt-1.5 leading-snug">
+            {step === 'email' && 'Save up to 20% on Mgidi drinks and groceries. Matchmaker joins your order with others nearby so you pay the bulk price. No stokvel needed.'}
             {step === 'register' && 'Create your account below.'}
             {step === 'password-login' && email}
             {step === 'forgot-password' && `We'll send a reset link to ${email}`}
             {step === 'otp-login' && 'This account uses a one-time login code.'}
             {step === 'otp-verify' && `Enter the 6-digit code sent to ${email}`}
           </p>
+          {step === 'email' && (
+            <>
+              <div className="flex flex-wrap gap-1.5 mt-4">
+                {WHO_CAN_JOIN.map((label) => (
+                  <span key={label} className="flex items-center gap-1 bg-white/15 border border-white/25 text-white text-[11px] font-bold px-2.5 py-1 rounded-pill">
+                    <Icon name="check" size={11} color="#ffffff" />
+                    {label}
+                  </span>
+                ))}
+              </div>
+              <p className="text-white/60 text-[11px] font-semibold uppercase tracking-[0.16em] mt-4">
+                Plan your ceremony · Culture before capital
+              </p>
+            </>
+          )}
         </div>
 
         {/* Form card */}
@@ -222,7 +241,7 @@ function Login() {
                   placeholder="Your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border border-ink/20 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
+                  className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
                   required
                   autoFocus
                 />
@@ -233,7 +252,7 @@ function Login() {
                 disabled={loading}
                 className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 text-[15px] pressable shadow-terracotta"
               >
-                {loading ? 'Checking...' : 'Continue →'}
+                {loading ? 'Checking...' : 'Join or sign in →'}
               </button>
               <div className="flex items-center gap-3 my-1">
                 <div className="flex-1 h-px bg-cream-dark" />
@@ -241,7 +260,7 @@ function Login() {
                 <div className="flex-1 h-px bg-cream-dark" />
               </div>
               <div ref={googleBtnRef} className="flex justify-center" />
-              <p className="text-center text-[10px] text-ink-muted pt-1">
+              <p className="text-center text-[11px] text-ink-muted pt-1">
                 Free to join. No card required.
               </p>
             </form>
@@ -253,20 +272,20 @@ function Login() {
                 <input
                   type="text" placeholder="First name" value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full border border-ink/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
+                  className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
                   required
                 />
                 <input
                   type="text" placeholder="Surname" value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full border border-ink/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
+                  className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
                   required
                 />
               </div>
               <input
                 type="password" placeholder="Create a password (min 8 characters)" value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-ink/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
+                className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
                 required minLength={8}
               />
               <ErrorBanner message={error} />
@@ -287,7 +306,7 @@ function Login() {
               <input
                 type="password" placeholder="Your password" value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-ink/20 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
+                className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
                 required autoFocus
               />
               <ErrorBanner message={error} />
@@ -362,7 +381,7 @@ function Login() {
               <input
                 type="text" placeholder="123456" value={code}
                 onChange={(e) => setCode(e.target.value)} maxLength={6}
-                className="w-full border border-ink/20 rounded-2xl px-4 py-4 text-center text-2xl tracking-[0.4em] font-bold focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
+                className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-4 text-center text-2xl tracking-[0.4em] font-bold focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
                 required autoFocus
               />
               <ErrorBanner message={error} />

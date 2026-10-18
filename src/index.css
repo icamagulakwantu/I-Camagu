@@ -46,6 +46,29 @@
   }
 }
 
+/* When a screen marks a block with .print-area (e.g. the stokvel statement),
+   printing shows only that block instead of the whole app with its tabs and
+   navigation. Pages without a .print-area print normally. */
+@media print {
+  body:has(.print-area) * {
+    visibility: hidden;
+  }
+  body:has(.print-area) .print-area,
+  body:has(.print-area) .print-area * {
+    visibility: visible;
+  }
+  body:has(.print-area) .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 16px;
+  }
+  body {
+    background: #fff !important;
+  }
+}
+
 @layer utilities {
   .icamagu-bg {
     background-color: #f0e4d3;
