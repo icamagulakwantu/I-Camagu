@@ -21,6 +21,12 @@ async function createTables() {
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
   `);
+  // Borrower agreement: loans are unsecured, so every request carries a photo
+  // of the borrower, an optional ID photo, a finger-drawn signature and the
+  // time they accepted the terms. Officials can see these; other members cannot.
+  for (const col of ['"borrowerPhone" TEXT', '"borrowerPhoto" TEXT', '"idPhoto" TEXT', '"signature" TEXT', '"agreedAt" TIMESTAMP(3)']) {
+    await prisma.$executeRawUnsafe(`ALTER TABLE "StokvelLoan" ADD COLUMN IF NOT EXISTS ${col};`);
+  }
   await prisma.$executeRawUnsafe(
     'CREATE INDEX IF NOT EXISTS "StokvelLoan_stokvelId_idx" ON "StokvelLoan" ("stokvelId", "createdAt");'
   );
@@ -127,6 +133,10 @@ export async function listLoans(req, res) {
           monthlyInstalment: totalDue / Math.max(1, l.repayMonths),
           votes: loanVotes.map((v) => ({ officialId: v.officialId, name: names[v.officialId] || 'Official', approve: v.approve })),
           myVote: loanVotes.find((v) => v.officialId === req.userId)?.approve ?? null,
+          agreedAt: l.agreedAt,
+          agreement: (role.isOfficial || l.borrowerId === req.userId) && l.agreedAt
+            ? { phone: l.borrowerPhone, photo: l.borrowerPhoto, idPhoto: l.idPhoto, signature: l.signature }
+            : null,
         };
       }),
     });
@@ -142,7 +152,15 @@ export async function requestLoan(req, res) {
     const { stokvelId } = req.params;
     const amount = Number(req.body?.amount);
     const repayMonths = parseInt(req.body?.repayMonths, 10);
-    const interestPercent = Number(req.body?.interestPercent || 0);
+    // Township umbutho loans usually carry 30% interest, so that is the default.
+    const interestPercent = req.body?.interestPercent === undefined || req.body?.interestPercent === '' ? 30 : Number(req.body.interestPercent);
+    const isImage = (v) => typeof v === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(v) && v.length < 1_500_000;
+    const { borrowerPhoto, idPhoto, signature } = req.body || {};
+    const borrowerPhone = String(req.body?.borrowerPhone || '').replace(/[^0-9+ ]/g, '').slice(0, 20) || null;
+    if (!isImage(borrowerPhoto)) return res.status(400).json({ error: 'Take a photo of the borrower before sending the request' });
+    if (!isImage(signature)) return res.status(400).json({ error: 'The borrower must sign the agreement' });
+    if (idPhoto && !isImage(idPhoto)) return res.status(400).json({ error: 'The ID photo could not be read. Please retake it' });
+    if (req.body?.agreed !== true) return res.status(400).json({ error: 'The borrower must accept the loan terms' });
     if (!(amount > 0)) return res.status(400).json({ error: 'Enter a loan amount above zero' });
     if (!(repayMonths >= 1 && repayMonths <= 36)) return res.status(400).json({ error: 'Repayment period must be 1 to 36 months' });
     if (!(interestPercent >= 0 && interestPercent <= 100)) return res.status(400).json({ error: 'Interest must be between 0 and 100%' });
@@ -153,9 +171,11 @@ export async function requestLoan(req, res) {
     const id = randomUUID();
     const reason = String(req.body?.reason || '').slice(0, 1000) || null;
     await prisma.$executeRaw`
-      INSERT INTO "StokvelLoan" ("id", "stokvelId", "borrowerId", "amount", "interestPercent", "repayMonths", "reason")
-      VALUES (${id}, ${stokvelId}, ${req.userId}, ${amount}, ${interestPercent}, ${repayMonths}, ${reason})`;
-    await logAudit(stokvelId, req.userId, 'Requested a loan', `${money(amount)} over ${repayMonths} month(s)`);
+      INSERT INTO "StokvelLoan" ("id", "stokvelId", "borrowerId", "amount", "interestPercent", "repayMonths", "reason",
+        "borrowerPhone", "borrowerPhoto", "idPhoto", "signature", "agreedAt")
+      VALUES (${id}, ${stokvelId}, ${req.userId}, ${amount}, ${interestPercent}, ${repayMonths}, ${reason},
+        ${borrowerPhone}, ${borrowerPhoto}, ${idPhoto || null}, ${signature}, CURRENT_TIMESTAMP)`;
+    await logAudit(stokvelId, req.userId, 'Requested a loan and signed the agreement', `${money(amount)} at ${interestPercent}% over ${repayMonths} month(s)`);
     res.status(201).json({ id });
   } catch (error) {
     console.error('Request loan error:', error.message);
