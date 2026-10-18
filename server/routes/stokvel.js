@@ -22,6 +22,10 @@ import {
 } from '../controllers/contributionController.js';
 import { postAnnouncement, getAnnouncements } from '../controllers/announcementController.js';
 import {
+  listMinutes, createMinutes, listFines, issueFine, payFine,
+  getConstitution, saveConstitution, getAuditLog,
+} from '../controllers/stokvelRecordsController.js';
+import {
   requestPayout,
   approvePayout,
   getShrineFundTotal,
@@ -56,6 +60,15 @@ router.get('/id/:stokvelId', requireAuth, getStokvelsById);
 router.post('/bereavement/toggle', requireAuth, toggleBereavementProtocol);
 router.post('/announcements', requireAuth, postAnnouncement);
 router.get('/:stokvelId/announcements', requireAuth, getAnnouncements);
+router.get('/:stokvelId/minutes', requireAuth, listMinutes);
+router.post('/:stokvelId/minutes', requireAuth, createMinutes);
+router.get('/:stokvelId/fines', requireAuth, listFines);
+router.post('/:stokvelId/fines', requireAuth, issueFine);
+router.post('/:stokvelId/fines/:fineId/pay', requireAuth, payFine);
+router.get('/:stokvelId/constitution', requireAuth, getConstitution);
+router.post('/:stokvelId/constitution', requireAuth, saveConstitution);
+router.put('/:stokvelId/constitution', requireAuth, saveConstitution);
+router.get('/:stokvelId/audit', requireAuth, getAuditLog);
 
 // Both of these check a PIN (see pinService.verifyPin) before releasing real
 // money — a 4-6 digit PIN is only up to a million combinations, so without a

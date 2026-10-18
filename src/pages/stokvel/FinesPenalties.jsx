@@ -131,7 +131,7 @@ export default function FinesPenalties({ stokvelId, members = [], isOrganiser })
           <select value={memberId} onChange={(e) => setMemberId(e.target.value)} className={inp} required>
             <option value="">Select member</option>
             {members.map((m) => (
-              <option key={m.id} value={m.id}>{m.name || m.user?.name || m.id}</option>
+              <option key={m.userId || m.id} value={m.userId || m.id}>{m.user?.firstName ? `${m.user.firstName} ${m.user.lastName || ''}`.trim() : (m.name || 'Member')}</option>
             ))}
           </select>
           <div className="grid grid-cols-2 gap-2">
