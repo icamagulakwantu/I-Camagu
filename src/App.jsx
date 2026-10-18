@@ -56,6 +56,7 @@ import DidYouKnow from './components/DidYouKnow.jsx'
 import Icon from './components/Icon.jsx'
 import NotificationBell from './components/NotificationBell.jsx'
 import PinReminder from './components/PinReminder.jsx'
+import FirstVisitExplainer from './components/FirstVisitExplainer.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
@@ -225,6 +226,14 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
             ))}
           </div>
         </div>
+      )}
+
+      {/* First-visit explainer: how-it-works + sample ceremony, shown only
+          to brand-new users with no ceremonies or stokvels of their own yet.
+          Gives people something to look at and tap on without needing a
+          real ceremony to plan first. */}
+      {!loadingStokvels && !loadingCeremonies && stokvels.length === 0 && ceremonies.length === 0 && (
+        <FirstVisitExplainer onNavigate={onNavigate} />
       )}
 
       <DidYouKnow />
