@@ -31,7 +31,9 @@ const FEATURES = [
     bg: 'bg-sage-50',
     border: 'border-sage-200',
     label: 'Stokvels',
+    // Xhosa headline + English subtext shown in the expanded card body
     headline: 'Siza ndawonye, sihlawula ngobulungisa.',
+    headlineEn: 'Save together, pay out fairly.',
     desc: 'Run your pool digitally — track who paid, send reminders, and pay out with a full paper trail.',
   },
   {
@@ -41,6 +43,7 @@ const FEATURES = [
     border: 'border-sage-200',
     label: 'Iziduko Network',
     headline: 'Fumana isiduko sakho ebuhlanti.',
+    headlineEn: 'Find your clan across South Africa.',
     desc: 'Enter your clan names and connect with relatives you have never met. The digital umuntu ngumntu ngabantu.',
   },
 ]
@@ -199,9 +202,11 @@ function Onboarding({ onDone }) {
               <span className="font-display font-bold text-2xl text-white">iCamagu</span>
             </div>
             <p className="eyebrow text-white/60 mb-1.5">Molo, {user?.firstName || 'mhlobo'}</p>
+            {/* Xhosa headline with English subtext */}
             <h1 className="font-display font-bold text-[1.65rem] leading-tight text-white">
               Konke okufunwa ngumsebenzi wakho. Ndawonye.
             </h1>
+            <p className="text-white/55 text-xs mt-1">Everything your ceremony needs. All in one place.</p>
             <p className="text-white/75 text-sm mt-2 leading-relaxed">
               From the first planning conversation to the last bottle ordered — iCamagu runs alongside you.
             </p>
@@ -224,7 +229,12 @@ function Onboarding({ onDone }) {
                       <p className="font-bold text-sm text-ink">{f.label}</p>
                       <Icon name="chevronDown" size={14} color="#8a8278" className={`flex-shrink-0 transition-transform duration-200 ${activeCard === i ? 'rotate-180' : ''}`} />
                     </div>
+                    {/* Xhosa headline */}
                     <p className="text-xs font-semibold mt-0.5" style={{ color: f.accent }}>{f.headline}</p>
+                    {/* English subtext for Xhosa headlines */}
+                    {f.headlineEn && (
+                      <p className="text-[10px] text-ink-muted mt-0.5">{f.headlineEn}</p>
+                    )}
                     {activeCard === i && <p className="text-xs text-ink-muted leading-relaxed mt-1.5">{f.desc}</p>}
                   </div>
                 </div>
@@ -236,7 +246,7 @@ function Onboarding({ onDone }) {
             <button onClick={() => setStep('ancestry')} className="w-full wash-ember text-white font-bold py-3.5 rounded-pill shadow-terracotta text-[15px] pressable">
               Start setting up my profile &rarr;
             </button>
-            <p className="text-center text-[10px] text-ink-muted mt-2.5">Amanyathelo amabini · Takes under a minute</p>
+            <p className="text-center text-[10px] text-ink-muted mt-2.5">Amanyathelo amabini · Two quick steps · Under a minute</p>
           </div>
         </div>
       )}
@@ -245,7 +255,9 @@ function Onboarding({ onDone }) {
         <div className="w-full max-w-sm bg-white/90 backdrop-blur-md border-2 border-terracotta/25 rounded-soft p-8 shadow-elevated animate-slide-up">
           <ProgressDots step={step} />
           <div className="mb-5">
-            <h2 className="font-display font-bold text-xl text-ink mb-1">Ubuso bakho neziduko zakho</h2>
+            {/* Corrected Xhosa heading with English subtext */}
+            <h2 className="font-display font-bold text-xl text-ink mb-0.5">Izinyanya neminyanya yakho neziduko zakho</h2>
+            <p className="text-xs text-ink-muted mb-2">Your ancestors, lineage and clan names</p>
             <p className="text-ink-muted text-xs leading-relaxed">
               {user?.paternalIziduko
                 ? "A photo helps clan matches recognise you. Your grandmothers' Iziduko sharpen those matches further — both are optional."
@@ -271,7 +283,7 @@ function Onboarding({ onDone }) {
               <>
                 <div>
                   <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Isiduko sikaTata (Paternal)</label>
-                  <input type="text" placeholder="Umzekelo: Mbeki, Zulu, Cele" value={paternalIziduko} onChange={(e) => setPaternalIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
+                  <input type="text" placeholder="e.g. Mbeki, Zulu, Cele" value={paternalIziduko} onChange={(e) => setPaternalIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
                 </div>
                 <div>
                   <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Isiduko sikaMama (Maternal)</label>
@@ -302,7 +314,9 @@ function Onboarding({ onDone }) {
         <div className="w-full max-w-sm bg-white/90 backdrop-blur-md border-2 border-terracotta/25 rounded-soft p-8 shadow-elevated animate-slide-up">
           <ProgressDots step={step} />
           <div className="mb-5">
-            <h2 className="font-display font-bold text-xl text-ink mb-1">Banganifumana njani?</h2>
+            {/* Xhosa heading with English subtext */}
+            <h2 className="font-display font-bold text-xl text-ink mb-0.5">Banganifumana njani?</h2>
+            <p className="text-xs text-ink-muted mb-2">How can people reach you?</p>
             <p className="text-ink-muted text-xs leading-relaxed">Used for ceremony bookings and stokvel notifications. All optional — add later from your profile anytime.</p>
           </div>
 

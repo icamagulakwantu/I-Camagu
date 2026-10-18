@@ -12,8 +12,6 @@ const STEP_META = {
   'otp-verify': { title: 'Enter code', depth: 3 },
 }
 
-// Who can join bulk buying. Many people think you must belong to a stokvel,
-// so the login page says plainly that Matchmaker pools orders for everyone.
 const WHO_CAN_JOIN = ['On your own', 'With your stokvel', 'Tavern owners']
 
 function ErrorBanner({ message }) {
@@ -171,7 +169,6 @@ function Login() {
     <div className="min-h-screen icamagu-bg flex flex-col items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm animate-slide-up">
 
-        {/* Hero header — matches the onboarding welcome tone */}
         <div className="wash-ember rings rounded-t-soft px-6 pt-7 pb-6">
           <div className="flex items-center gap-2.5 mb-4">
             <img
@@ -185,11 +182,19 @@ function Login() {
           <h1 className="font-display font-bold text-[1.55rem] leading-tight text-white text-balance">
             {step === 'email' && 'Buy together. Save more.'}
             {step === 'register' && 'Joyina iCamagu'}
+            {step === 'register' && ''}
             {step === 'password-login' && 'Wamkelekile'}
             {step === 'forgot-password' && 'Reset your password'}
             {step === 'otp-login' && 'Wamkelekile'}
             {step === 'otp-verify' && 'Check your inbox'}
           </h1>
+          {/* English subtext for Xhosa headings */}
+          {(step === 'register') && (
+            <p className="text-white/60 text-xs mt-0.5">Join iCamagu</p>
+          )}
+          {(step === 'password-login' || step === 'otp-login') && (
+            <p className="text-white/60 text-xs mt-0.5">Welcome back</p>
+          )}
           <p className="text-white/80 text-sm mt-1.5 leading-snug">
             {step === 'email' && 'Save up to 20% on Mgidi drinks and groceries. Matchmaker joins your order with others nearby so you pay the bulk price. No stokvel needed.'}
             {step === 'register' && 'Create your account below.'}
@@ -208,18 +213,19 @@ function Login() {
                   </span>
                 ))}
               </div>
-              {/* Xhosa tagline — familiar to city speakers, not dictionary */}
-              <p className="text-white/60 text-[11px] font-semibold uppercase tracking-[0.16em] mt-4">
-                Lungisa umsebenzi · Inkcubeko ngaphambi kwemali
+              {/* Tagline: Xhosa with English subtext */}
+              <p className="text-white/70 text-[11px] font-semibold uppercase tracking-[0.14em] mt-4">
+                Lungiselela isiko/umcimbi · Incubeko ngaphambi kwemali
+              </p>
+              <p className="text-white/45 text-[10px] tracking-wide mt-0.5">
+                Plan your ceremony · Culture before capital
               </p>
             </>
           )}
         </div>
 
-        {/* Form card */}
         <div className="bg-white/95 backdrop-blur-md border-x-2 border-b-2 border-terracotta/20 rounded-b-soft px-6 py-6 shadow-elevated">
 
-          {/* Depth indicator for sub-steps */}
           {meta && step !== 'email' && (
             <div className="flex items-center gap-1.5 mb-5">
               {Array.from({ length: meta.depth }).map((_, i) => (

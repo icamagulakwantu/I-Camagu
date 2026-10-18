@@ -57,18 +57,23 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
   return (
     <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
       <button onClick={onBack} className="text-sm text-ink-muted mb-4 block">← Back</button>
-      <p className="eyebrow mb-1">Imisebenzi</p>
+      <p className="eyebrow mb-0.5">Imisebenzi</p>
       <h1 className="font-display font-bold text-3xl text-ink">Ceremonies</h1>
-      <p className="text-ink-muted text-sm mt-2 mb-4">Yonke inkonzo inengoma yayo — qala kulowo oyenzayo.</p>
+      {/* Xhosa subtitle with English below */}
+      <p className="text-ink-muted text-sm mt-1">Yonke inkonzo inengoma yayo — qala kulowo oyenzayo.</p>
+      <p className="text-ink-muted/70 text-xs mb-4">Every rite has its own rhythm — start from the one you're holding.</p>
 
       <div className="flex rounded-pill border-2 border-terracotta/20 bg-white p-1 mb-5">
+        {/* Tab: Xhosa label + English subtext */}
         <button type="button" onClick={() => setTab('types')}
-          className={`flex-1 rounded-pill py-2 text-[13px] font-bold transition-colors ${tab === 'types' ? 'bg-terracotta text-white' : 'text-ink-muted'}`}>
-          Yonke imisebenzi
+          className={`flex-1 rounded-pill py-2 px-2 transition-colors ${tab === 'types' ? 'bg-terracotta text-white' : 'text-ink-muted'}`}>
+          <span className="block text-[13px] font-bold">Yonke imisebenzi</span>
+          <span className={`block text-[9px] font-normal ${tab === 'types' ? 'text-white/70' : 'text-ink-muted/70'}`}>All rites</span>
         </button>
         <button type="button" onClick={() => setTab('mine')}
-          className={`flex-1 rounded-pill py-2 text-[13px] font-bold transition-colors ${tab === 'mine' ? 'bg-terracotta text-white' : 'text-ink-muted'}`}>
-          Eyam ({ceremonies.length})
+          className={`flex-1 rounded-pill py-2 px-2 transition-colors ${tab === 'mine' ? 'bg-terracotta text-white' : 'text-ink-muted'}`}>
+          <span className="block text-[13px] font-bold">Eyam ({ceremonies.length})</span>
+          <span className={`block text-[9px] font-normal ${tab === 'mine' ? 'text-white/70' : 'text-ink-muted/70'}`}>Mine</span>
         </button>
       </div>
 
@@ -122,7 +127,6 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
         <div className="space-y-2.5">
           {ceremonies.map((c) => (
             <div key={c.id} className="card-paper grain overflow-hidden">
-              {/* Ceremony summary row */}
               <button
                 type="button"
                 onClick={() => onSelectCeremony && onSelectCeremony(c.id)}
@@ -137,8 +141,6 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
                 </span>
               </button>
 
-              {/* Hierarchy prompt — the missing connective tissue between
-                  planning a ceremony and allocating items to each group */}
               {onGoToHierarchy && (
                 <div className="border-t border-terracotta/10 px-4 py-3 flex items-center justify-between gap-3 bg-terracotta/3">
                   <div className="min-w-0">
@@ -161,7 +163,8 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
         </div>
       ) : (
         <div className="text-center text-ink-muted py-8">
-          Akukho misebenzi. Switch to "Yonke imisebenzi" to start planning one.
+          <p>Akukho misebenzi.</p>
+          <p className="text-xs mt-1">No ceremonies yet. Switch to "Yonke imisebenzi" to start planning one.</p>
         </div>
       )}
     </div>
