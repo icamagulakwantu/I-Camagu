@@ -36,6 +36,8 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('types')
   const [leadImageFailed, setLeadImageFailed] = useState(false)
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
 
   useEffect(() => {
     setLoading(true)
@@ -55,6 +57,20 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
   }, [accessToken])
 
   const getStatusStyle = (status) => STATUS_STYLE[status?.toUpperCase()] || 'bg-ink/10 text-ink-muted'
+
+  const deleteCeremony = async (id) => {
+    setDeletingId(id)
+    try {
+      const res = await fetch('/api/ceremonies/' + id, { method: 'DELETE', headers: { Authorization: `Bearer ${accessToken}` } })
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || 'Could not delete ceremony') }
+      setCeremonies(prev => prev.filter(c => c.id !== id))
+      setConfirmDeleteId(null)
+    } catch (err) {
+      console.error('Error deleting ceremony:', err)
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   const [leadType, ...restTypes] = ceremonyTypes
   const leadMeta = leadType ? (CEREMONY_META[leadType] || {}) : null
@@ -132,19 +148,51 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
         <div className="space-y-2.5">
           {ceremonies.map((c) => (
             <div key={c.id} className="card-paper grain overflow-hidden">
-              <button
-                type="button"
-                onClick={() => onSelectCeremony && onSelectCeremony(c.id)}
-                className={`w-full text-left p-4 flex items-center justify-between gap-3 ${pressable}`}
-              >
-                <div className="min-w-0">
+              <div className="w-full text-left p-4 flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => onSelectCeremony && onSelectCeremony(c.id)}
+                  className={`flex-1 min-w-0 text-left ${pressable}`}
+                >
                   <p className="font-display font-bold text-sm text-ink">{c.title}</p>
                   <p className="text-xs text-ink-muted mt-0.5">{c.type.replace(/_/g, ' ')}</p>
-                </div>
+                </button>
                 <span className={`text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-pill flex-shrink-0 ${getStatusStyle(c.status)}`}>
                   {c.status || 'PLANNING'}
                 </span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmDeleteId(c.id)}
+                  className={`flex-shrink-0 text-rose-500 bg-rose-50 hover:bg-rose-100 p-1.5 rounded-pill ${pressable}`}
+                  title="Delete ceremony"
+                >
+                  <Icon name="trash" size={14} color="#f43f5e" />
+                </button>
+              </div>
+
+              {confirmDeleteId === c.id && (
+                <div className="border-t border-terracotta/10 px-4 py-3 bg-rose-50/60">
+                  <p className="text-xs font-bold text-ink mb-1">Delete this ceremony permanently?</p>
+                  <p className="text-[11px] text-ink-muted mb-2.5">This removes the ceremony, checklist, budget and pledges. This cannot be undone.</p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => deleteCeremony(c.id)}
+                      disabled={deletingId === c.id}
+                      className={`flex-1 bg-rose-500 text-white font-bold py-1.5 rounded-pill text-xs ${pressable} disabled:opacity-50`}
+                    >
+                      {deletingId === c.id ? 'Deleting…' : 'Yes, delete'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDeleteId(null)}
+                      className={`flex-1 border-2 border-terracotta/25 font-bold py-1.5 rounded-pill text-xs ${pressable}`}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {onGoToHierarchy && (
                 <div className="border-t border-terracotta/10 px-4 py-3 flex items-center justify-between gap-3 bg-terracotta/3">
