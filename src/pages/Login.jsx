@@ -3,10 +3,6 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import Icon from '../components/Icon.jsx'
 
-// A small step counter, not literal progress dots — this flow branches
-// (password vs. OTP vs. new account) rather than running one fixed
-// sequence, so a dot-per-step indicator would misrepresent it. This just
-// answers "how far in am I, and is there a way back" at a glance.
 const STEP_META = {
   email: { title: 'Sign in', depth: 1 },
   register: { title: 'Create account', depth: 2 },
@@ -19,7 +15,7 @@ const STEP_META = {
 function ErrorBanner({ message }) {
   if (!message) return null
   return (
-    <div className="flex items-start gap-2 bg-terracotta/10 border border-terracotta/30 rounded-soft px-3 py-2.5">
+    <div className="flex items-start gap-2 bg-terracotta/10 border border-terracotta/30 rounded-2xl px-3 py-2.5">
       <Icon name="close" size={13} color="#c45c26" className="mt-0.5 flex-shrink-0" />
       <p className="text-terracotta text-xs font-bold leading-snug">{message}</p>
     </div>
@@ -70,9 +66,6 @@ function Login() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.detail || data.error || 'Google sign-in failed')
-      // A first-time Google sign-in has no Iziduko yet — that's collected
-      // as part of Onboarding's ancestry step once they're actually in,
-      // not blocking sign-in itself.
       login(data.accessToken, data.user)
     } catch (err) {
       setError(err.message)
@@ -127,9 +120,6 @@ function Login() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Registration failed')
-      // Iziduko (clan names) is asked in Onboarding's ancestry step now,
-      // once someone is actually signed in and there's a reason to give
-      // for wanting it — not blocking account creation itself.
       login(data.accessToken, data.user)
     } catch (err) {
       setError(err.message)
@@ -174,133 +164,224 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen icamagu-bg flex flex-col items-center justify-center px-6 py-10">
-      <div className="w-full max-w-sm bg-white/90 backdrop-blur-md border-2 border-terracotta/25 rounded-soft p-8 shadow-elevated">
-        <div className="flex items-center gap-3 mb-1">
-          <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-10 h-10 flex-shrink-0" />
-          <h1 className="font-display font-bold text-3xl text-ink">iCamagu</h1>
+    <div className="min-h-screen icamagu-bg flex flex-col items-center justify-center px-4 py-10">
+      <div className="w-full max-w-sm animate-slide-up">
+
+        {/* Hero header — matches the onboarding welcome tone */}
+        <div className="wash-ember rings rounded-t-soft px-6 pt-7 pb-6">
+          <div className="flex items-center gap-2.5 mb-4">
+            <img
+              src="/icons/source/gateway-mark-1024.png"
+              alt="iCamagu"
+              className="w-9 h-9"
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
+            <span className="font-display font-bold text-2xl text-white">iCamagu</span>
+          </div>
+          <h1 className="font-display font-bold text-[1.55rem] leading-tight text-white">
+            {step === 'email' && 'Plan your ceremony. Buy in bulk. Save together.'}
+            {step === 'register' && 'Join iCamagu'}
+            {step === 'password-login' && 'Welcome back'}
+            {step === 'forgot-password' && 'Reset your password'}
+            {step === 'otp-login' && 'Welcome back'}
+            {step === 'otp-verify' && 'Check your inbox'}
+          </h1>
+          <p className="text-white/70 text-sm mt-1.5">
+            {step === 'email' && 'Culture before capital.'}
+            {step === 'register' && 'Create your account below.'}
+            {step === 'password-login' && email}
+            {step === 'forgot-password' && `We'll send a reset link to ${email}`}
+            {step === 'otp-login' && 'This account uses a one-time login code.'}
+            {step === 'otp-verify' && `Enter the 6-digit code sent to ${email}`}
+          </p>
         </div>
-        <p className="text-ink-muted text-xs mb-4">Culture before capital.</p>
 
-        {/* Where you are in the flow, and how deep — this screen branches
-            (password vs. code vs. new account) rather than running one
-            fixed sequence, so this reads as depth-so-far, not a literal
-            step-N-of-M count. */}
-        {meta && (
-          <div className="flex items-center gap-1.5 mb-4">
-            {Array.from({ length: meta.depth }).map((_, i) => (
-              <div key={i} className={`h-1.5 rounded-pill transition-all ${i === meta.depth - 1 ? 'w-8 bg-terracotta' : 'w-4 bg-terracotta/30'}`} />
-            ))}
-            <span className="text-[10px] font-bold text-ink-muted uppercase tracking-wide ml-1">{meta.title}</span>
-          </div>
-        )}
+        {/* Form card */}
+        <div className="bg-white/95 backdrop-blur-md border-x-2 border-b-2 border-terracotta/20 rounded-b-soft px-6 py-6 shadow-elevated">
 
-        {step === 'email' && (
-          <form onSubmit={handleEmailSubmit} className="space-y-4">
-            <p className="font-bold text-sm text-ink">Sign Up or Log In</p>
-            <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-ink/30 rounded-soft px-4 py-3" required />
-            <ErrorBanner message={error} />
-            <button type="submit" disabled={loading} className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill disabled:opacity-50">
-              {loading ? 'Checking...' : 'Continue'}
-            </button>
-            <div className="flex items-center gap-3 my-2">
-              <div className="flex-1 h-px bg-cream-dark" /><span className="text-xs text-ink-muted">or</span><div className="flex-1 h-px bg-cream-dark" />
+          {/* Depth indicator for sub-steps */}
+          {meta && step !== 'email' && (
+            <div className="flex items-center gap-1.5 mb-5">
+              {Array.from({ length: meta.depth }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-1.5 rounded-pill transition-all ${
+                    i === meta.depth - 1 ? 'w-8 bg-terracotta' : 'w-4 bg-terracotta/30'
+                  }`}
+                />
+              ))}
+              <span className="text-[10px] font-bold text-ink-muted uppercase tracking-wide ml-1">{meta.title}</span>
             </div>
-            <div ref={googleBtnRef} className="flex justify-center" />
-          </form>
-        )}
+          )}
 
-        {step === 'register' && (
-          <form onSubmit={handleRegister} className="space-y-3">
-            <p className="font-bold text-sm text-ink">Create your account</p>
-            <input type="text" placeholder="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)}
-              className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm" required />
-            <input type="text" placeholder="Surname" value={lastName} onChange={(e) => setLastName(e.target.value)}
-              className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm" required />
-            <input type="password" placeholder="Create a password (min 8 characters)" value={password} onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm" required minLength={8} />
-            <ErrorBanner message={error} />
-            <button type="submit" disabled={loading} className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill disabled:opacity-50">
-              {loading ? 'Creating account...' : 'Create Account'}
-            </button>
-            <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">← Back</button>
-          </form>
-        )}
+          {step === 'email' && (
+            <form onSubmit={handleEmailSubmit} className="space-y-4">
+              <div className="relative">
+                <input
+                  type="email"
+                  placeholder="Your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full border border-ink/20 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
+                  required
+                  autoFocus
+                />
+              </div>
+              <ErrorBanner message={error} />
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 text-[15px] pressable shadow-terracotta"
+              >
+                {loading ? 'Checking...' : 'Continue →'}
+              </button>
+              <div className="flex items-center gap-3 my-1">
+                <div className="flex-1 h-px bg-cream-dark" />
+                <span className="text-xs text-ink-muted">or sign in with</span>
+                <div className="flex-1 h-px bg-cream-dark" />
+              </div>
+              <div ref={googleBtnRef} className="flex justify-center" />
+              <p className="text-center text-[10px] text-ink-muted pt-1">
+                Free to join. No card required.
+              </p>
+            </form>
+          )}
 
-        {step === 'password-login' && (
-          <form onSubmit={handlePasswordLogin} className="space-y-3">
-            <p className="font-bold text-sm text-ink">Welcome back</p>
-            <p className="text-xs text-ink-muted">{email}</p>
-            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm" required />
-            <ErrorBanner message={error} />
-            <button type="submit" disabled={loading} className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill disabled:opacity-50">
-              {loading ? 'Signing in...' : 'Sign In'}
-            </button>
-            <button type="button" onClick={() => setStep('forgot-password')} className="w-full text-xs text-sage-600 underline">Forgot password?</button>
-            <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">← Back</button>
-          </form>
-        )}
+          {step === 'register' && (
+            <form onSubmit={handleRegister} className="space-y-3">
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="text" placeholder="First name" value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full border border-ink/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
+                  required
+                />
+                <input
+                  type="text" placeholder="Surname" value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full border border-ink/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
+                  required
+                />
+              </div>
+              <input
+                type="password" placeholder="Create a password (min 8 characters)" value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-ink/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
+                required minLength={8}
+              />
+              <ErrorBanner message={error} />
+              <button
+                type="submit" disabled={loading}
+                className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 pressable shadow-terracotta"
+              >
+                {loading ? 'Creating account...' : 'Create Account →'}
+              </button>
+              <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">
+                ← Back
+              </button>
+            </form>
+          )}
 
-        {step === 'forgot-password' && (
-          <div className="space-y-3">
-            <p className="font-bold text-sm text-ink">Reset your password</p>
-            <p className="text-xs text-ink-muted">We'll email a reset link to {email}</p>
-            <ErrorBanner message={error} />
-            <button
-              onClick={async () => {
-                setLoading(true); setError('')
-                try {
-                  const res = await fetch('/api/auth/forgot-password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email }),
-                  })
-                  const data = await res.json()
-                  if (!res.ok) throw new Error(data.error || 'Could not process request')
-                  showToast(data.message, 'info')
-                  setStep('email')
-                } catch (err) {
-                  setError(err.message)
-                } finally {
-                  setLoading(false)
-                }
-              }}
-              disabled={loading || !email}
-              className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill disabled:opacity-50"
-            >
-              {loading ? 'Sending...' : 'Send Reset Link'}
-            </button>
-            <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">← Back</button>
-          </div>
-        )}
+          {step === 'password-login' && (
+            <form onSubmit={handlePasswordLogin} className="space-y-3">
+              <input
+                type="password" placeholder="Your password" value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-ink/20 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
+                required autoFocus
+              />
+              <ErrorBanner message={error} />
+              <button
+                type="submit" disabled={loading}
+                className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 pressable shadow-terracotta"
+              >
+                {loading ? 'Signing in...' : 'Sign In →'}
+              </button>
+              <button
+                type="button" onClick={() => setStep('forgot-password')}
+                className="w-full text-xs text-terracotta font-semibold underline"
+              >
+                Forgot password?
+              </button>
+              <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">
+                ← Back
+              </button>
+            </form>
+          )}
 
-        {step === 'otp-login' && (
-          <div className="space-y-3">
-            <p className="font-bold text-sm text-ink">Welcome back</p>
-            <p className="text-xs text-ink-muted">This account uses a login code, not a password.</p>
-            <ErrorBanner message={error} />
-            <button onClick={handleOtpLogin} disabled={loading} className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill disabled:opacity-50">
-              {loading ? 'Sending...' : 'Send me a login code'}
-            </button>
-            <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">← Back</button>
-          </div>
-        )}
+          {step === 'forgot-password' && (
+            <div className="space-y-3">
+              <ErrorBanner message={error} />
+              <button
+                onClick={async () => {
+                  setLoading(true); setError('')
+                  try {
+                    const res = await fetch('/api/auth/forgot-password', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email }),
+                    })
+                    const data = await res.json()
+                    if (!res.ok) throw new Error(data.error || 'Could not process request')
+                    showToast(data.message, 'info')
+                    setStep('email')
+                  } catch (err) {
+                    setError(err.message)
+                  } finally {
+                    setLoading(false)
+                  }
+                }}
+                disabled={loading || !email}
+                className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 pressable shadow-terracotta"
+              >
+                {loading ? 'Sending...' : 'Send Reset Link'}
+              </button>
+              <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">
+                ← Back
+              </button>
+            </div>
+          )}
 
-        {step === 'otp-verify' && (
-          <form onSubmit={handleVerifyOtp} className="space-y-3">
-            <p className="text-ink-muted text-sm">Enter the 6-digit code sent to <strong>{email}</strong></p>
-            <input type="text" placeholder="123456" value={code} onChange={(e) => setCode(e.target.value)} maxLength={6}
-              className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest" required />
-            <ErrorBanner message={error} />
-            <button type="submit" disabled={loading} className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill disabled:opacity-50">
-              {loading ? 'Verifying...' : 'Verify & Log In'}
-            </button>
-            <button type="button" onClick={() => { setCode(''); setError(''); setStep('otp-login') }} className="w-full text-xs text-ink-muted underline">← Back</button>
-          </form>
-        )}
+          {step === 'otp-login' && (
+            <div className="space-y-3">
+              <ErrorBanner message={error} />
+              <button
+                onClick={handleOtpLogin} disabled={loading}
+                className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 pressable shadow-terracotta"
+              >
+                {loading ? 'Sending...' : 'Send me a login code →'}
+              </button>
+              <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">
+                ← Back
+              </button>
+            </div>
+          )}
 
+          {step === 'otp-verify' && (
+            <form onSubmit={handleVerifyOtp} className="space-y-3">
+              <input
+                type="text" placeholder="123456" value={code}
+                onChange={(e) => setCode(e.target.value)} maxLength={6}
+                className="w-full border border-ink/20 rounded-2xl px-4 py-4 text-center text-2xl tracking-[0.4em] font-bold focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
+                required autoFocus
+              />
+              <ErrorBanner message={error} />
+              <button
+                type="submit" disabled={loading}
+                className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 pressable shadow-terracotta"
+              >
+                {loading ? 'Verifying...' : 'Verify & Log In →'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setCode(''); setError(''); setStep('otp-login') }}
+                className="w-full text-xs text-ink-muted underline"
+              >
+                ← Back
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   )
