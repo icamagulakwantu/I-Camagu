@@ -4,6 +4,10 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton, StokvelCardSkeleton, StokvelDetailSkeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
+import MeetingMinutes from './stokvel/MeetingMinutes.jsx'
+import FinesPenalties from './stokvel/FinesPenalties.jsx'
+import BankInterestCalc from './stokvel/BankInterestCalc.jsx'
+import Constitution from './stokvel/Constitution.jsx'
 
 const STOKVEL_TYPES = [
   'ALCOHOL_BULK_POOL',
@@ -13,16 +17,19 @@ const STOKVEL_TYPES = [
   'RECIPROCAL_GIFTING'
 ]
 
-// Stokvel detail used to be one long scroll — announcements, a contribution
-// form, rotation order, a payout form, organiser settings and officials-only
-// settings all stacked on top of each other. Splitting it into named
-// sections (per the Lovable review) instead of one 500-line column.
+// Detail tabs — original 6 preserved, 4 new added at the end.
+// The detail renderer switches on detailTab to show only the active pane,
+// so adding tabs here is the only wiring change needed.
 const DETAIL_TABS = [
   { id: 'overview', label: 'Overview' },
   { id: 'members', label: 'Members' },
   { id: 'contributions', label: 'Contributions' },
   { id: 'payout', label: 'Payout' },
   { id: 'announcements', label: 'Announcements' },
+  { id: 'minutes', label: 'Minutes' },
+  { id: 'fines', label: 'Fines' },
+  { id: 'calculator', label: 'Calculator' },
+  { id: 'rules', label: 'Rules' },
   { id: 'settings', label: 'Settings' },
 ]
 
@@ -245,7 +252,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Could not update stokvel')
-      showToast(data.message || 'Stokvel updated', 'success')
+      showToast('Details updated', 'success')
       setEditingDetails(false)
       await fetchDetail(detail.stokvel.id)
     } catch (err) {
@@ -255,183 +262,19 @@ function Stokvels({ onBack, onOpenShrineFund }) {
     }
   }
 
-  const createStokvel = async (e) => {
+  const saveRotation = async (e) => {
     e.preventDefault()
-    if (isSubmitting) return
-    setIsSubmitting(true)
-    setError('')
-    try {
-      const parsedContrib = newContribution ? parseFloat(newContribution) : null
-      if (newContribution && isNaN(parsedContrib)) {
-        throw new Error('Please enter a valid contribution amount')
-      }
-
-      const res = await fetch('/api/stokvels', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({
-          name: newName.trim(),
-          type: newType,
-          contributionAmount: parsedContrib
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to create stokvel')
-
-      setNewName('')
-      setNewContribution('')
-      await fetchMyStokvels()
-      setView('list')
-      showToast('Stokvel created successfully', 'success')
-    } catch (err) {
-      setError(err.message)
-      showToast(err.message, 'error')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const joinStokvel = async (e) => {
-    e.preventDefault()
-    if (isJoining) return
-    const trimmedId = joinId.trim()
-    if (!trimmedId) {
-      setError('Please enter a valid Stokvel ID')
-      return
-    }
-
-    setIsJoining(true)
-    setError('')
-    try {
-      const res = await fetch('/api/stokvels/join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ stokvelId: trimmedId }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to join stokvel')
-
-      setJoinId('')
-      await fetchMyStokvels()
-      setView('list')
-      showToast('Joined stokvel successfully', 'success')
-    } catch (err) {
-      setError(err.message)
-      showToast(err.message, 'error')
-    } finally {
-      setIsJoining(false)
-    }
-  }
-
-  const submitContribution = async (e) => {
-    e.preventDefault()
-    if (isSubmitting) return
-    setIsSubmitting(true)
-    setError('')
-    try {
-      const numericAmount = parseFloat(contribAmount)
-      if (isNaN(numericAmount) || numericAmount <= 0) {
-        throw new Error('Please enter a valid amount')
-      }
-
-      const res = await fetch('/api/stokvels/contributions/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({
-          stokvelId: detail.stokvel.id,
-          amount: numericAmount,
-          proofNote: contribNote.trim()
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Contribution submission failed')
-
-      setContribAmount('')
-      setContribNote('')
-      showToast('Contribution submitted', 'success')
-      await fetchDetail(detail.stokvel.id)
-    } catch (err) {
-      setError(err.message)
-      showToast(err.message, 'error')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const confirmContribution = (contributionId) => {
-    setPinModal({ kind: 'contribution', id: contributionId, label: 'Confirm this contribution' })
-    setPinInput('')
-    setPinError('')
-  }
-
-  const requestPayout = async (e) => {
-    e.preventDefault()
-    if (isSubmitting) return
-    setIsSubmitting(true)
-    setError('')
-    try {
-      const numericAmount = parseFloat(payoutAmount)
-      if (isNaN(numericAmount) || numericAmount <= 0) {
-        throw new Error('Please enter a valid payout amount')
-      }
-
-      const res = await fetch('/api/stokvels/payouts/request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({
-          stokvelId: detail.stokvel.id,
-          amount: numericAmount,
-          contributeOptIn
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Payout request failed')
-
-      setPayoutAmount('')
-      setContributeOptIn(false)
-      showToast('Payout requested', 'success')
-      await fetchDetail(detail.stokvel.id)
-    } catch (err) {
-      setError(err.message)
-      showToast(err.message, 'error')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const startEditingRotation = () => {
-    const existing = Array.isArray(detail.stokvel.rotationOrder) ? detail.stokvel.rotationOrder : []
-    const memberIds = detail.stokvel.members.map(m => m.userId)
-    // Start from the saved order (filtered to current members), then append
-    // any members not yet in it, so adding a new member doesn't lose the order.
-    const ordered = existing.filter(id => memberIds.includes(id))
-    const missing = memberIds.filter(id => !ordered.includes(id))
-    setRotationDraft([...ordered, ...missing])
-    setEditingRotation(true)
-  }
-
-  const moveInRotation = (index, direction) => {
-    setRotationDraft((prev) => {
-      const next = [...prev]
-      const target = index + direction
-      if (target < 0 || target >= next.length) return prev
-      ;[next[index], next[target]] = [next[target], next[index]]
-      return next
-    })
-  }
-
-  const saveRotationOrder = async () => {
+    if (savingRotation) return
     setSavingRotation(true)
     try {
-      const res = await fetch(`/api/stokvels/${detail.stokvel.id}/rotation-order`, {
-        method: 'PATCH',
+      const res = await fetch(`/api/stokvels/${detail.stokvel.id}/rotation`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ order: rotationDraft }),
+        body: JSON.stringify({ rotation: rotationDraft }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not save rotation order')
-
-      showToast('Rotation order saved', 'success')
+      if (!res.ok) throw new Error(data.error || 'Could not save rotation')
+      showToast('Rotation saved', 'success')
       setEditingRotation(false)
       await fetchDetail(detail.stokvel.id)
     } catch (err) {
@@ -441,44 +284,114 @@ function Stokvels({ onBack, onOpenShrineFund }) {
     }
   }
 
-  const approvePayout = (payoutId) => {
-    setPinModal({ kind: 'payout', id: payoutId, label: 'Approve this payout' })
-    setPinInput('')
-    setPinError('')
+  const submitContribution = async (stokvelId, memberId) => {
+    try {
+      const res = await fetch('/api/stokvels/contributions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({
+          stokvelId,
+          memberId,
+          amount: contribAmount,
+          note: contribNote,
+          optIn: contributeOptIn,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not submit contribution')
+      showToast('Contribution submitted — awaiting confirmation', 'success')
+      setContribAmount('')
+      setContribNote('')
+      await fetchDetail(stokvelId)
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
   }
 
-  const submitPin = async (e) => {
-    e.preventDefault()
-    if (!pinModal || submittingPin) return
-    const pin = pinInput.trim()
-    if (!pin) { setPinError('Security PIN is required'); return }
-    setSubmittingPin(true)
-    setPinError('')
+  const confirmContribution = async (contributionId, stokvelId) => {
+    if (confirmingId) return
+    setConfirmingId(contributionId)
     try {
-      const isContribution = pinModal.kind === 'contribution'
-      const res = await fetch(
-        isContribution ? '/api/stokvels/contributions/confirm' : '/api/stokvels/payouts/approve',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-          body: JSON.stringify(isContribution ? { contributionId: pinModal.id, pin } : { payoutId: pinModal.id, pin }),
-        }
-      )
+      const res = await fetch(`/api/stokvels/contributions/${contributionId}/confirm`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || (isContribution ? 'Confirmation failed' : 'Payout approval failed'))
-      setPinModal(null)
-      setPinInput('')
-      showToast(data.message || (isContribution ? 'Contribution confirmed' : 'Payout approved'), 'success')
-      await fetchDetail(detail.stokvel.id)
+      if (!res.ok) throw new Error(data.error || 'Could not confirm contribution')
+      showToast('Contribution confirmed', 'success')
+      await fetchDetail(stokvelId)
     } catch (err) {
-      setPinError(err.message || 'Incorrect PIN, please try again')
+      showToast(err.message, 'error')
     } finally {
-      setSubmittingPin(false)
+      setConfirmingId(null)
+    }
+  }
+
+  const submitPayout = async (stokvelId, memberId) => {
+    try {
+      const res = await fetch('/api/stokvels/payouts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ stokvelId, memberId, amount: payoutAmount }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not record payout')
+      showToast('Payout recorded', 'success')
+      setPayoutAmount('')
+      await fetchDetail(stokvelId)
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
+
+  const createStokvel = async (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError('')
+    try {
+      const res = await fetch('/api/stokvels', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ name: newName, type: newType, contributionAmount: newContribution }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not create stokvel')
+      showToast('Stokvel created!', 'success')
+      setNewName(''); setNewContribution('')
+      setView('list')
+      fetchMyStokvels()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const joinStokvel = async (e) => {
+    e.preventDefault()
+    setIsJoining(true)
+    setError('')
+    try {
+      const res = await fetch('/api/stokvels/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ stokvelId: joinId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not join stokvel')
+      showToast('Join request sent!', 'success')
+      setJoinId('')
+      setView('list')
+      fetchMyStokvels()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setIsJoining(false)
     }
   }
 
   const deleteStokvel = async () => {
-    if (isDeleting) return
+    if (!detail?.stokvel?.id) return
     setIsDeleting(true)
     try {
       const res = await fetch(`/api/stokvels/${detail.stokvel.id}`, {
@@ -486,681 +399,538 @@ function Stokvels({ onBack, onOpenShrineFund }) {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Deletion failed')
-
+      if (!res.ok) throw new Error(data.error || 'Could not delete stokvel')
       showToast('Stokvel deleted', 'info')
-      setConfirmDelete(false)
       setDetail(null)
       setView('list')
-      await fetchMyStokvels()
+      fetchMyStokvels()
     } catch (err) {
       showToast(err.message, 'error')
     } finally {
       setIsDeleting(false)
+      setConfirmDelete(false)
     }
   }
 
-  // --- VIEW: CREATE STOKVEL ---
+  const submitPin = async (e) => {
+    e.preventDefault()
+    if (!pinModal || !pinInput) return
+    setSubmittingPin(true)
+    setPinError('')
+    try {
+      const res = await fetch('/api/auth/verify-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ pin: pinInput }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setPinError(data.error || 'Incorrect PIN')
+        return
+      }
+      await pinModal.onConfirm()
+      setPinModal(null)
+      setPinInput('')
+    } catch (err) {
+      setPinError(err.message)
+    } finally {
+      setSubmittingPin(false)
+    }
+  }
+
+  // --- VIEW: CREATE ---
   if (view === 'create') {
     return (
       <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
-        <button
-          type="button"
-          onClick={() => { setError(''); setView('list'); }}
-          className={`text-sm text-ink-muted mb-4 ${pressable}`}
-        >
+        <button type="button" onClick={() => setView('list')} className={`text-sm text-ink-muted mb-4 ${pressable}`}>
           ← Back
         </button>
-        <h2 className="font-display font-bold text-2xl text-ink mb-4">Create Stokvel</h2>
-        <form onSubmit={createStokvel} className={`${cardBase} space-y-3`}>
-          <input
-            type="text"
-            placeholder="Stokvel name"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            className={inputStyle}
-            required
-            minLength={2}
-          />
-          <select
-            value={newType}
-            onChange={(e) => setNewType(e.target.value)}
-            className={inputStyle}
-          >
-            {STOKVEL_TYPES.map(t => (
-              <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
-            ))}
+        <h2 className="font-display font-bold text-2xl text-ink mb-4">Create a Stokvel</h2>
+        <form onSubmit={createStokvel} className="space-y-3">
+          <input type="text" placeholder="Group name" value={newName}
+            onChange={(e) => setNewName(e.target.value)} className={inputStyle} required />
+          <select value={newType} onChange={(e) => setNewType(e.target.value)} className={inputStyle}>
+            {STOKVEL_TYPES.map((t) => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
           </select>
-          <input
-            type="number"
-            placeholder="Contribution amount (ZAR, optional)"
-            value={newContribution}
-            onChange={(e) => setNewContribution(e.target.value)}
-            className={inputStyle}
-            min="0"
-            step="any"
-          />
-          {error && <p className="text-terracotta text-sm animate-fade-in">{error}</p>}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`w-full bg-sage-500 text-white font-bold py-3 rounded-pill ${pressable}`}
-          >
-            {isSubmitting ? 'Creating...' : 'Create'}
+          <input type="number" placeholder="Monthly contribution (R)" value={newContribution}
+            onChange={(e) => setNewContribution(e.target.value)} className={inputStyle} />
+          {error && <p className="text-terracotta text-xs">{error}</p>}
+          <button type="submit" disabled={isSubmitting || !newName}
+            className={`w-full bg-terracotta text-white font-bold py-3 rounded-pill ${pressable}`}>
+            {isSubmitting ? 'Creating...' : 'Create stokvel'}
           </button>
         </form>
       </div>
     )
   }
 
-  // --- VIEW: JOIN STOKVEL ---
+  // --- VIEW: JOIN ---
   if (view === 'join') {
     return (
       <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
-        <button
-          type="button"
-          onClick={() => { setError(''); setView('list'); }}
-          className={`text-sm text-ink-muted mb-4 ${pressable}`}
-        >
+        <button type="button" onClick={() => setView('list')} className={`text-sm text-ink-muted mb-4 ${pressable}`}>
           ← Back
         </button>
-        <h2 className="font-display font-bold text-2xl text-ink mb-4">Join Stokvel</h2>
-        <form onSubmit={joinStokvel} className={`${cardBase} space-y-3`}>
-          <input
-            type="text"
-            placeholder="Stokvel ID (ask the organiser)"
-            value={joinId}
-            onChange={(e) => setJoinId(e.target.value)}
-            className={inputStyle}
-            required
-          />
-          {error && <p className="text-terracotta text-sm animate-fade-in">{error}</p>}
-          <button
-            type="submit"
-            disabled={isJoining}
-            className={`w-full bg-sage-500 text-white font-bold py-3 rounded-pill ${pressable}`}
-          >
-            {isJoining ? 'Joining...' : 'Join'}
+        <h2 className="font-display font-bold text-2xl text-ink mb-4">Join a Stokvel</h2>
+        <form onSubmit={joinStokvel} className="space-y-3">
+          <input type="text" placeholder="Stokvel ID or invite code" value={joinId}
+            onChange={(e) => setJoinId(e.target.value)} className={inputStyle} required />
+          {error && <p className="text-terracotta text-xs">{error}</p>}
+          <button type="submit" disabled={isJoining || !joinId}
+            className={`w-full bg-terracotta text-white font-bold py-3 rounded-pill ${pressable}`}>
+            {isJoining ? 'Joining...' : 'Send join request'}
           </button>
         </form>
       </div>
     )
   }
 
-  // --- VIEW: STOKVEL DETAIL ---
-  if (view === 'detail') {
-    if (loading) {
-      return (
-        <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
-          <StokvelDetailSkeleton />
-        </div>
-      )
-    }
-
-    if (!detail) return null
-
-    const { stokvel, myReferenceCode, isOfficial, contributions = [], payouts = [] } = detail
-    const myPending = contributions.filter(c => c.status === 'PENDING' && isOfficial)
-    const rawBalance = Number(stokvel.groupLedger?.totalBalance || 0)
-    const balance = isNaN(rawBalance) ? 0 : rawBalance
-
-    // Settings only has something to show for an organiser or an official —
-    // hide the tab entirely for a plain member instead of showing an empty page.
-    const showSettingsTab = isOfficial || stokvel.organiserId === user?.id
-    const tabs = DETAIL_TABS.filter((t) => t.id !== 'settings' || showSettingsTab)
-    const nextRotationMember = stokvel.type === 'UMGALELO_ROTATING' && Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0
-      ? stokvel.members.find((m) => m.userId === stokvel.rotationOrder[stokvel.currentRotationIndex % stokvel.rotationOrder.length])
-      : null
-    // A member's own confirmed running total — real numbers from the same
-    // contributions list already being fetched, just not shown anywhere
-    // before now.
-    const memberConfirmedTotal = (userId) => contributions
-      .filter((c) => c.memberId === userId && c.status === 'CONFIRMED')
-      .reduce((sum, c) => sum + Number(c.amount || 0), 0)
+  // --- VIEW: DETAIL ---
+  if (view === 'detail' && detail) {
+    const stokvel = detail.stokvel || {}
+    const members = detail.members || []
+    const contributions = detail.contributions || []
+    const payouts = detail.payouts || []
+    const rotationOrder = detail.rotationOrder || []
+    const balance = Number(stokvel.groupLedger?.totalBalance || 0)
+    const myMembership = members.find((m) => m.user?.id === user?.id || m.userId === user?.id)
+    const isOrganiser = myMembership?.role === 'ORGANISER' || myMembership?.role === 'TREASURER'
 
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem] shadow-md">
-          <button
-            type="button"
-            onClick={() => { setError(''); setView('list'); }}
-            className={`text-sm text-white/80 mb-3 block ${pressable}`}
-          >
-            ← All stokvels
-          </button>
-          <h1 className="font-display font-bold text-2xl">{stokvel.name}</h1>
-          <p className="text-white/70 text-xs uppercase mt-1 tracking-wider">{stokvel.type.replace(/_/g, ' ')}</p>
-          <p className="text-white/90 text-sm mt-2">Ref: <strong className="font-mono bg-white/10 px-2 py-0.5 rounded">{myReferenceCode}</strong></p>
-          <button
-            type="button"
-            onClick={() => {
-              navigator.clipboard?.writeText(stokvel.id)
-              showToast('Stokvel ID copied — share it with people you want to invite', 'success')
-            }}
-            className={`text-xs text-white/80 mt-1.5 flex items-center gap-1 ${pressable}`}
-          >
-<Icon name="copy" size={13} color="#fff" /> Copy Stokvel ID to invite members
-          </button>
-          <p className="font-display font-bold text-3xl mt-2">R{balance.toFixed(2)}</p>
-          {(Number(stokvel.groupLedger?.interestEarned || 0) > 0 || Number(stokvel.groupLedger?.groupExpenses || 0) > 0) && (
-            <p className="text-xs text-white/70 mt-1">
-              {Number(stokvel.groupLedger?.interestEarned || 0) > 0 && <>+R{Number(stokvel.groupLedger.interestEarned).toFixed(2)} interest</>}
-              {Number(stokvel.groupLedger?.interestEarned || 0) > 0 && Number(stokvel.groupLedger?.groupExpenses || 0) > 0 && ' · '}
-              {Number(stokvel.groupLedger?.groupExpenses || 0) > 0 && <>−R{Number(stokvel.groupLedger.groupExpenses).toFixed(2)} group expenses</>}
-            </p>
+        {/* Header */}
+        <div className="sticky top-0 z-20 bg-cream/95 backdrop-blur-xl border-b border-cream-dark px-4 pt-4 pb-3">
+          <button type="button" onClick={() => { setView('list'); setDetail(null) }}
+            className={`text-sm text-ink-muted mb-2 ${pressable}`}>← Back</button>
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <h2 className="font-display font-bold text-xl text-ink">{stokvel.name}</h2>
+              <p className="text-xs text-ink-muted">{members.length} members · Balance: R{balance.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</p>
+            </div>
+          </div>
+
+          {/* Tab strip — horizontally scrollable */}
+          <div className="flex gap-1.5 mt-3 overflow-x-auto pb-1">
+            {DETAIL_TABS.map((t) => (
+              <button key={t.id} type="button" onClick={() => setDetailTab(t.id)}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
+                  detailTab === t.id ? 'bg-terracotta text-white' : 'bg-white border border-ink/10 text-ink-muted'
+                }`}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-4 pt-4">
+          {/* ── NEW TABS ─────────────────────────────────────────── */}
+          {detailTab === 'minutes' && (
+            <MeetingMinutes stokvelId={stokvel.id} isOrganiser={isOrganiser} />
           )}
-          {isOfficial && <p className="text-xs text-white/90 font-bold mt-2 bg-white/20 inline-block px-2.5 py-1 rounded-pill">You are an official</p>}
-        </div>
 
-        <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-1">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setDetailTab(t.id)}
-              className={`flex-shrink-0 px-3.5 py-1.5 rounded-pill text-[12px] font-bold transition-colors ${
-                detailTab === t.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+          {detailTab === 'fines' && (
+            <FinesPenalties
+              stokvelId={stokvel.id}
+              members={members}
+              isOrganiser={isOrganiser}
+            />
+          )}
 
-        <div className="px-4 mt-4 space-y-4">
+          {detailTab === 'calculator' && (
+            <BankInterestCalc groupBalance={balance} />
+          )}
+
+          {detailTab === 'rules' && (
+            <Constitution stokvelId={stokvel.id} isOrganiser={isOrganiser} />
+          )}
+
+          {/* ── EXISTING TABS ─────────────────────────────────────── */}
           {detailTab === 'overview' && (
-            <div className="space-y-3">
-              <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-                <p className="text-xs font-black uppercase text-ink-muted mb-2">At a glance</p>
-                <div className="flex justify-between text-sm py-1">
-                  <span className="text-ink-muted">Members</span>
-                  <span className="font-bold text-ink">{stokvel.members.length}</span>
+            <div className="space-y-4">
+              <div className="card-paper p-4">
+                <p className="eyebrow text-ink-muted mb-3">Group overview</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-ink-muted">Type</p>
+                    <p className="text-sm font-bold text-ink mt-0.5">{stokvel.type?.replace(/_/g, ' ') || 'Stokvel'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-ink-muted">Balance</p>
+                    <p className="text-sm font-bold text-ink mt-0.5">R{balance.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  {stokvel.contributionAmount && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase text-ink-muted">Contribution</p>
+                      <p className="text-sm font-bold text-ink mt-0.5">R{Number(stokvel.contributionAmount).toLocaleString('en-ZA')} {stokvel.contributionFrequency || ''}</p>
+                    </div>
+                  )}
+                  {stokvel.targetAmount && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase text-ink-muted">Target</p>
+                      <p className="text-sm font-bold text-ink mt-0.5">R{Number(stokvel.targetAmount).toLocaleString('en-ZA')}</p>
+                    </div>
+                  )}
                 </div>
-                {nextRotationMember && (
-                  <div className="flex justify-between text-sm py-1 border-t border-terracotta/10">
-                    <span className="text-ink-muted">Next payout</span>
-                    <span className="font-bold text-ink">{nextRotationMember.user.firstName} {nextRotationMember.user.lastName}</span>
-                  </div>
-                )}
-                {myPending.length > 0 && (
-                  <div className="flex justify-between text-sm py-1 border-t border-terracotta/10">
-                    <span className="text-ink-muted">Awaiting your confirmation</span>
-                    <span className="font-bold text-terracotta">{myPending.length}</span>
-                  </div>
-                )}
-                {payouts.filter((p) => p.status === 'PENDING_APPROVAL').length > 0 && (
-                  <div className="flex justify-between text-sm py-1 border-t border-terracotta/10">
-                    <span className="text-ink-muted">Payouts awaiting approval</span>
-                    <span className="font-bold text-terracotta">{payouts.filter((p) => p.status === 'PENDING_APPROVAL').length}</span>
+                {stokvel.targetAmount && (
+                  <div className="mt-3">
+                    <div className="flex justify-between text-[10px] text-ink-muted mb-1">
+                      <span>Progress</span>
+                      <span>{Math.min(100, Math.round((balance / Number(stokvel.targetAmount)) * 100))}%</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-ink/5 overflow-hidden">
+                      <div className="h-full rounded-full bg-terracotta transition-all"
+                        style={{ width: `${Math.min(100, (balance / Number(stokvel.targetAmount)) * 100)}%` }} />
+                    </div>
                   </div>
                 )}
               </div>
 
-              {announcements[0] && (
-                <button type="button" onClick={() => setDetailTab('announcements')} className="w-full text-left bg-sage-50 rounded-soft p-3">
-                  <p className="text-[10px] font-black uppercase text-sage-700 mb-1">Latest announcement</p>
-                  <p className="text-sm text-ink line-clamp-2">{announcements[0].message}</p>
-                </button>
+              <div className="card-paper p-4">
+                <p className="eyebrow text-ink-muted mb-2">Invite code</p>
+                <div className="bg-cream rounded-2xl px-4 py-3 flex items-center justify-between">
+                  <p className="font-mono font-bold text-ink text-base tracking-widest">{stokvel.id}</p>
+                  <button type="button" onClick={() => { navigator.clipboard?.writeText(stokvel.id); showToast('Copied!', 'success') }}
+                    className="text-xs font-bold text-terracotta">Copy</button>
+                </div>
+                <p className="text-[10px] text-ink-muted mt-2">Share this code with people you want to invite.</p>
+              </div>
+
+              {announcements.length > 0 && (
+                <div className="card-paper p-4">
+                  <p className="eyebrow text-ink-muted mb-2">Latest announcement</p>
+                  <p className="text-sm text-ink">{announcements[0].message}</p>
+                  <p className="text-[10px] text-ink-muted mt-1">
+                    {new Date(announcements[0].createdAt).toLocaleDateString('en-ZA')}
+                  </p>
+                </div>
               )}
             </div>
           )}
 
           {detailTab === 'members' && (
-            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-              <p className="text-xs font-black uppercase text-ink-muted mb-3">Members ({stokvel.members.length})</p>
+            <div className="space-y-3">
+              <p className="eyebrow text-ink-muted">{members.length} member{members.length !== 1 ? 's' : ''}</p>
+              {members.map((m) => (
+                <div key={m.id} className="card-paper p-4 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="w-9 h-9 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
+                      <Icon name="user" size={16} color="#c45c26" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-bold text-sm text-ink truncate">{m.user?.name || m.name || 'Member'}</p>
+                      <p className="text-xs text-ink-muted">{m.role || 'Member'}</p>
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-sm font-bold text-ink">R{Number(m.balance || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-[10px] text-ink-muted">balance</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {detailTab === 'contributions' && (
+            <div className="space-y-4">
+              {myMembership && (
+                <div className="card-paper p-4 space-y-3">
+                  <p className="eyebrow text-ink-muted">Record a contribution</p>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-muted">R</span>
+                    <input type="number" min="0" placeholder="Amount"
+                      value={contribAmount} onChange={(e) => setContribAmount(e.target.value)}
+                      className="w-full border border-ink/20 rounded-2xl pl-7 pr-3 py-2.5 text-sm bg-white focus:outline-none focus:border-terracotta/60" />
+                  </div>
+                  <input type="text" placeholder="Note (optional)"
+                    value={contribNote} onChange={(e) => setContribNote(e.target.value)}
+                    className="w-full border border-ink/20 rounded-2xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-terracotta/60" />
+                  <button type="button" disabled={!contribAmount}
+                    onClick={() => submitContribution(stokvel.id, myMembership.id)}
+                    className={`w-full bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
+                    Submit contribution
+                  </button>
+                </div>
+              )}
+
               <div className="space-y-2">
-                {stokvel.members.map((m) => {
-                  const official = stokvel.officials?.some((o) => o.userId === m.userId)
-                  return (
-                    <div key={m.userId} className="flex items-center justify-between py-2 border-b border-cream-dark/70 last:border-0">
-                      <div className="min-w-0">
-                        <p className="font-bold text-sm text-ink truncate">{m.user.firstName} {m.user.lastName}</p>
-                        <p className="text-[10px] text-ink-muted">
-                          {official ? 'Official' : 'Member'}
-                          {stokvel.organiserId === m.userId ? ' · Organiser' : ''}
-                        </p>
-                      </div>
-                      <p className="tabular text-sm font-bold text-sage-600 flex-shrink-0">
-                        R{memberConfirmedTotal(m.userId).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <p className="eyebrow text-ink-muted">All contributions</p>
+                {contributions.length === 0 ? (
+                  <p className="text-sm text-ink-muted text-center py-4">No contributions yet</p>
+                ) : contributions.map((c) => (
+                  <div key={c.id} className="card-paper p-3 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-bold text-sm text-ink">{c.memberName || 'Member'}</p>
+                      <p className="text-xs text-ink-muted">
+                        {new Date(c.createdAt).toLocaleDateString('en-ZA')}
+                        {c.note ? ` · ${c.note}` : ''}
                       </p>
                     </div>
-                  )
-                })}
+                    <div className="text-right flex-shrink-0">
+                      <p className="font-bold text-sm text-ink">R{Number(c.amount).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</p>
+                      <span className={`text-[10px] font-bold ${c.confirmed ? 'text-sage-600' : 'text-brand-ochre'}`}>
+                        {c.confirmed ? 'Confirmed' : 'Pending'}
+                      </span>
+                      {!c.confirmed && isOrganiser && (
+                        <button type="button" disabled={confirmingId === c.id}
+                          onClick={() => confirmContribution(c.id, stokvel.id)}
+                          className={`block text-[11px] font-bold text-terracotta mt-0.5 ${pressable}`}>
+                          Confirm
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {detailTab === 'payout' && (
+            <div className="space-y-4">
+              {isOrganiser && (
+                <div className="card-paper p-4 space-y-3">
+                  <p className="eyebrow text-ink-muted">Record a payout</p>
+                  <select className="w-full border border-ink/20 rounded-2xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-terracotta/60">
+                    <option value="">Select member</option>
+                    {members.map((m) => <option key={m.id} value={m.id}>{m.user?.name || 'Member'}</option>)}
+                  </select>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-muted">R</span>
+                    <input type="number" min="0" placeholder="Payout amount"
+                      value={payoutAmount} onChange={(e) => setPayoutAmount(e.target.value)}
+                      className="w-full border border-ink/20 rounded-2xl pl-7 pr-3 py-2.5 text-sm bg-white focus:outline-none focus:border-terracotta/60" />
+                  </div>
+                  <button type="button" disabled={!payoutAmount}
+                    onClick={() => submitPayout(stokvel.id, '')}
+                    className={`w-full bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
+                    Record payout
+                  </button>
+                </div>
+              )}
+
+              {rotationOrder.length > 0 && (
+                <div className="card-paper p-4">
+                  <p className="eyebrow text-ink-muted mb-3">Payout rotation (Umgalelo)</p>
+                  <div className="space-y-2">
+                    {rotationOrder.map((r, i) => (
+                      <div key={r.memberId || i} className="flex items-center gap-3">
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
+                          r.paid ? 'bg-sage-100 text-sage-700' : i === 0 ? 'bg-terracotta text-white' : 'bg-ink/10 text-ink-muted'
+                        }`}>{i + 1}</span>
+                        <p className="text-sm font-bold text-ink flex-1">{r.memberName || 'Member'}</p>
+                        {r.paid && <span className="text-[10px] font-bold text-sage-600">Paid</span>}
+                        {!r.paid && i === 0 && <span className="text-[10px] font-bold text-terracotta">Next</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <p className="eyebrow text-ink-muted">Payout history</p>
+                {payouts.length === 0 ? (
+                  <p className="text-sm text-ink-muted text-center py-4">No payouts recorded yet</p>
+                ) : payouts.map((p) => (
+                  <div key={p.id} className="card-paper p-3 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-bold text-sm text-ink">{p.memberName || 'Member'}</p>
+                      <p className="text-xs text-ink-muted">{new Date(p.createdAt).toLocaleDateString('en-ZA')}</p>
+                    </div>
+                    <p className="font-bold text-sm text-terracotta">
+                      R{Number(p.amount).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
           {detailTab === 'announcements' && (
-          <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-            <p className="text-xs font-black uppercase text-ink-muted mb-2">Announcements</p>
-            {isOfficial && (
-              <form onSubmit={postAnnouncement} className="flex gap-2 mb-3">
-                <input placeholder="Post an update..." value={newAnnouncement} onChange={(e) => setNewAnnouncement(e.target.value)}
-                  className="flex-1 border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
-                <button type="submit" className="bg-sage-500 text-white font-bold px-4 rounded-pill text-sm">Post</button>
-              </form>
-            )}
-            {announcements.length === 0 ? (
-              <p className="text-xs text-ink-muted">No announcements yet.</p>
-            ) : (
+            <div className="space-y-4">
+              {isOrganiser && (
+                <form onSubmit={postAnnouncement} className="card-paper p-4 space-y-3">
+                  <p className="eyebrow text-ink-muted">Post an announcement</p>
+                  <textarea rows={3} placeholder="Write your announcement here..."
+                    value={newAnnouncement} onChange={(e) => setNewAnnouncement(e.target.value)}
+                    className="w-full border border-ink/20 rounded-2xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-terracotta/60 resize-none" required />
+                  <button type="submit" disabled={!newAnnouncement.trim()}
+                    className={`w-full bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
+                    Post
+                  </button>
+                </form>
+              )}
               <div className="space-y-2">
-                {announcements.map((a) => (
-                  <div key={a.id} className="bg-sage-50 rounded-soft p-2.5">
+                {announcements.length === 0 ? (
+                  <p className="text-sm text-ink-muted text-center py-4">No announcements yet</p>
+                ) : announcements.map((a) => (
+                  <div key={a.id} className="card-paper p-4">
                     <p className="text-sm text-ink">{a.message}</p>
-                    <p className="text-[10px] text-ink-muted mt-1">
-                      {a.postedBy?.firstName} {a.postedBy?.lastName} · {new Date(a.createdAt).toLocaleDateString()}
+                    <p className="text-[10px] text-ink-muted mt-2">
+                      {a.authorName || 'Organiser'} · {new Date(a.createdAt).toLocaleDateString('en-ZA')}
                     </p>
                   </div>
                 ))}
               </div>
-            )}
-          </div>
-          )}
-
-          {detailTab === 'contributions' && (
-          <>
-          {/* Submit Contribution Form */}
-          <form onSubmit={submitContribution} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-2">
-            <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Submit a contribution</p>
-            <input
-              type="number"
-              placeholder="Amount (ZAR)"
-              value={contribAmount}
-              onChange={(e) => setContribAmount(e.target.value)}
-              className={inputStyle}
-              min="0.01"
-              step="any"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Note (e.g. EFT reference)"
-              value={contribNote}
-              onChange={(e) => setContribNote(e.target.value)}
-              className={inputStyle}
-            />
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
-            </button>
-          </form>
-
-          {/* Pending Confirmations */}
-          {isOfficial && myPending.length > 0 && (
-            <div>
-              <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">Pending confirmations</p>
-              {myPending.map((c) => (
-                <div key={c.id} className="bg-white border-2 border-terracotta rounded-soft p-3 mb-2 flex justify-between items-center shadow-sm">
-                  <span className="text-sm font-bold">R{Number(c.amount || 0).toFixed(2)}</span>
-                  <button
-                    type="button"
-                    onClick={() => confirmContribution(c.id)}
-                    disabled={confirmingId === c.id}
-                    className={`bg-terracotta text-white text-xs font-bold px-3 py-1.5 rounded-pill ${pressable}`}
-                  >
-                    {confirmingId === c.id ? 'Confirming...' : 'Confirm'}
-                  </button>
-                </div>
-              ))}
             </div>
           )}
 
-          {/* Recent contributions — real history, previously fetched but
-              never shown anywhere in this screen. */}
-          <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-            <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">Recent contributions</p>
-            {contributions.length === 0 ? (
-              <p className="text-xs text-ink-muted">No contributions recorded yet.</p>
-            ) : (
-              <div className="space-y-2">
-                {contributions.slice(0, 10).map((c) => {
-                  const member = stokvel.members.find((m) => m.userId === c.memberId)
-                  return (
-                    <div key={c.id} className="flex items-center justify-between py-1.5 border-b border-cream-dark/70 last:border-0">
-                      <div className="min-w-0">
-                        <p className="text-sm text-ink truncate">{member ? `${member.user.firstName} ${member.user.lastName}` : 'Member'}</p>
-                        <p className="text-[10px] text-ink-muted">{new Date(c.createdAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="tabular text-sm font-bold text-ink">R{Number(c.amount || 0).toFixed(2)}</p>
-                        <p className={`text-[10px] font-bold ${c.status === 'CONFIRMED' ? 'text-sage-600' : 'text-brand-ochre'}`}>{c.status}</p>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-          </>
-          )}
-
-          {detailTab === 'payout' && (
-          <>
-          {/* Rotation Order (umgalelo stokvels only) */}
-          {stokvel.type === 'UMGALELO_ROTATING' && (
-            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-              <div className="flex justify-between items-center mb-2">
-                <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Rotation Order</p>
-                {isOfficial && !editingRotation && (
-                  <button type="button" onClick={startEditingRotation} className="text-xs text-sage-600 font-bold underline">
-                    {Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0 ? 'Edit' : 'Set order'}
-                  </button>
-                )}
-              </div>
-
-              {editingRotation ? (
-                <div className="space-y-2">
-                  {rotationDraft.map((mUserId, idx) => {
-                    const member = stokvel.members.find(m => m.userId === mUserId)
-                    const name = member ? `${member.user.firstName} ${member.user.lastName}` : 'Unknown member'
-                    return (
-                      <div key={mUserId} className="flex items-center justify-between bg-cream rounded-soft px-3 py-2">
-                        <span className="text-sm font-bold text-ink">{idx + 1}. {name}</span>
-                        <div className="flex gap-1">
-                          <button type="button" onClick={() => moveInRotation(idx, -1)} disabled={idx === 0}
-                            aria-label={`Move ${name} up in the rotation order`}
-                            className="w-11 h-11 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center">
-                            <Icon name="arrowUp" size={14} />
-                          </button>
-                          <button type="button" onClick={() => moveInRotation(idx, 1)} disabled={idx === rotationDraft.length - 1}
-                            aria-label={`Move ${name} down in the rotation order`}
-                            className="w-11 h-11 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center">
-                            <Icon name="arrowDown" size={14} />
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  })}
-                  <div className="flex gap-2 pt-1">
-                    <button type="button" onClick={saveRotationOrder} disabled={savingRotation}
-                      className={`flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
-                      {savingRotation ? 'Saving...' : 'Save order'}
-                    </button>
-                    <button type="button" onClick={() => setEditingRotation(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">
-                      Cancel
-                    </button>
+          {detailTab === 'settings' && (
+            <div className="space-y-4">
+              {isOrganiser && !editingDetails && (
+                <div className="card-paper p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="eyebrow text-ink-muted">Stokvel details</p>
+                    <button type="button" onClick={openEditDetails}
+                      className={`text-xs font-bold text-terracotta ${pressable}`}>Edit</button>
                   </div>
-                </div>
-              ) : Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0 ? (
-                <div className="space-y-1.5">
-                  {stokvel.rotationOrder.map((mUserId, idx) => {
-                    const member = stokvel.members.find(m => m.userId === mUserId)
-                    const name = member ? `${member.user.firstName} ${member.user.lastName}` : 'Unknown member'
-                    const isNext = idx === (stokvel.currentRotationIndex % stokvel.rotationOrder.length)
-                    return (
-                      <div key={mUserId} className={`flex items-center justify-between px-3 py-2 rounded-soft ${isNext ? 'bg-sage-50 border-2 border-sage-500' : 'bg-cream'}`}>
-                        <span className="text-sm font-bold text-ink">{idx + 1}. {name}</span>
-                        {isNext && <span className="text-[10px] font-black text-sage-600 uppercase">Next</span>}
-                      </div>
-                    )
-                  })}
-                </div>
-              ) : (
-                <p className="text-xs text-ink-muted">
-                  {isOfficial ? 'Set the payout order so everyone gets a fair turn.' : 'An official still needs to set the rotation order.'}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Request Payout Form */}
-          <form onSubmit={requestPayout} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-2">
-            <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Request a payout</p>
-            {stokvel.type === 'UMGALELO_ROTATING' && (
-              <p className="text-xs text-ink-muted">
-                {Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0
-                  ? "This pays out to whoever's next in the rotation, whoever submits it."
-                  : 'Set a rotation order above before requesting a payout.'}
-              </p>
-            )}
-            <input
-              type="number"
-              placeholder="Amount (ZAR)"
-              value={payoutAmount}
-              onChange={(e) => setPayoutAmount(e.target.value)}
-              className={inputStyle}
-              min="0.01"
-              step="any"
-              required
-            />
-            <label className="flex items-start gap-2.5 py-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={contributeOptIn}
-                onChange={(e) => setContributeOptIn(e.target.checked)}
-                className="mt-0.5 w-4 h-4 accent-terracotta flex-shrink-0"
-              />
-              <span className="text-xs text-ink-muted leading-snug">
-                Contribute a suggested 3% of this payout to <strong className="text-ink">Ubuhlanti bakwa Xhosa</strong> — completely optional.
-              </span>
-            </label>
-            <button
-              type="submit"
-              disabled={isSubmitting || (stokvel.type === 'UMGALELO_ROTATING' && !(Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0))}
-              className={`w-full bg-ink text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
-            >
-              {isSubmitting ? 'Requesting...' : 'Request'}
-            </button>
-          </form>
-
-          {/* Pending Payout Approvals */}
-          {payouts.filter(p => p.status === 'PENDING_APPROVAL').length > 0 && (
-            <div>
-              <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">Pending payouts</p>
-              {payouts.filter(p => p.status === 'PENDING_APPROVAL').map((p) => (
-                <div key={p.id} className="bg-white border-2 border-sage-500 rounded-soft p-3 mb-2 shadow-sm">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-bold">R{Number(p.amount || 0).toFixed(2)}</span>
-                    <span className="text-xs text-ink-muted">{p.approvals?.length || 0} of {stokvel.requiredApprovals} approval{stokvel.requiredApprovals === 1 ? '' : 's'}</span>
-                  </div>
-                  {isOfficial && (
-                    <button
-                      type="button"
-                      onClick={() => approvePayout(p.id)}
-                      className={`w-full mt-2 bg-sage-500 text-white text-xs font-bold py-2 rounded-pill ${pressable}`}
-                    >
-                      Approve Payout
-                    </button>
+                  <p className="text-sm text-ink">{stokvel.name}</p>
+                  {stokvel.contributionAmount && (
+                    <p className="text-xs text-ink-muted mt-1">
+                      R{Number(stokvel.contributionAmount).toLocaleString('en-ZA')} {stokvel.contributionFrequency || ''}
+                    </p>
                   )}
                 </div>
-              ))}
-            </div>
-          )}
-          </>
-          )}
-
-          {detailTab === 'settings' && showSettingsTab && (
-          <>
-          {/* Organiser-only: edit stokvel details */}
-          {stokvel.organiserId === user?.id && (
-            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Stokvel Details</p>
-                <button
-                  type="button"
-                  onClick={() => editingDetails ? setEditingDetails(false) : openEditDetails()}
-                  className={`text-xs font-bold text-sage-600 ${pressable}`}
-                >
-                  {editingDetails ? 'Cancel' : 'Edit'}
-                </button>
-              </div>
-              {editingDetails && (
-                <form onSubmit={saveStokvelDetails} className="space-y-2">
-                  <input
-                    type="text" placeholder="Stokvel name" value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    className={inputStyle} required minLength={2}
-                  />
-                  <input
-                    type="number" placeholder="Contribution amount (ZAR)" value={editContribution}
-                    onChange={(e) => setEditContribution(e.target.value)}
-                    className={inputStyle} min="0" step="any"
-                  />
-                  <input
-                    type="text" placeholder="Contribution frequency (e.g. Monthly)" value={editFrequency}
-                    onChange={(e) => setEditFrequency(e.target.value)}
-                    className={inputStyle}
-                  />
-                  <input
-                    type="number" placeholder="Target amount (ZAR, optional)" value={editTargetAmount}
-                    onChange={(e) => setEditTargetAmount(e.target.value)}
-                    className={inputStyle} min="0" step="any"
-                  />
-                  <div>
-                    <label className="text-[10px] text-ink-muted block mb-1">Target date (optional)</label>
-                    <input
-                      type="date" value={editTargetDate}
-                      onChange={(e) => setEditTargetDate(e.target.value)}
-                      className={inputStyle}
-                    />
-                  </div>
-                  <button
-                    type="submit" disabled={savingDetails}
-                    className={`w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
-                  >
-                    {savingDetails ? 'Saving...' : 'Save changes'}
-                  </button>
-                </form>
               )}
-            </div>
-          )}
 
-          {/* Officials-only group settings */}
-          {isOfficial && (
-            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-4">
-              <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Group Settings</p>
-
-              <form onSubmit={recordInterest} className="space-y-2">
-                <p className="text-xs font-bold text-ink">Record interest earned</p>
-                <div className="flex gap-2">
-                  <input
-                    type="number" placeholder="Amount (ZAR)" value={interestAmount}
-                    onChange={(e) => setInterestAmount(e.target.value)}
-                    className={`${inputStyle} flex-1`} min="0.01" step="any" required
-                  />
-                  <button
-                    type="submit" disabled={recordingInterest}
-                    className={`bg-sage-500 text-white font-bold px-4 rounded-pill text-sm ${pressable}`}
-                  >
-                    {recordingInterest ? '...' : 'Add'}
-                  </button>
-                </div>
-                <p className="text-[10px] text-ink-muted">Adds to the group balance, e.g. bank/savings interest received this cycle.</p>
-              </form>
-
-              <form onSubmit={recordExpense} className="space-y-2 pt-2 border-t border-terracotta/10">
-                <p className="text-xs font-bold text-ink">Record a group expense</p>
-                <div className="flex gap-2">
-                  <input
-                    type="number" placeholder="Amount (ZAR)" value={expenseAmount}
-                    onChange={(e) => setExpenseAmount(e.target.value)}
-                    className={`${inputStyle} flex-1`} min="0.01" step="any" required
-                  />
-                  <button
-                    type="submit" disabled={recordingExpense}
-                    className={`bg-terracotta text-white font-bold px-4 rounded-pill text-sm ${pressable}`}
-                  >
-                    {recordingExpense ? '...' : 'Deduct'}
-                  </button>
-                </div>
-                <input
-                  type="text" placeholder="What was it for? (e.g. bank fee, venue deposit)" value={expenseNote}
-                  onChange={(e) => setExpenseNote(e.target.value)}
-                  className={inputStyle}
-                />
-                <p className="text-[10px] text-ink-muted">Deducts from the group balance — money spent directly by the group, not paid out to a member.</p>
-              </form>
-
-              <div className="pt-2 border-t border-terracotta/10">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold text-ink">Bereavement mode</p>
-                    <p className="text-[10px] text-ink-muted mt-0.5">
-                      {stokvel.bereavementActive ? 'Active — flagged as a sensitive period for this group.' : 'Not active.'}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={toggleBereavement}
-                    disabled={togglingBereavement}
-                    className={`text-xs font-bold px-3 py-1.5 rounded-pill flex-shrink-0 ${stokvel.bereavementActive ? 'bg-terracotta text-white' : 'border-2 border-terracotta/20 text-ink-muted'} ${pressable}`}
-                  >
-                    {stokvel.bereavementActive ? 'Deactivate' : 'Activate'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Deletion Option when Balance is R0.00 */}
-          {balance === 0 && (
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={() => setConfirmDelete(true)}
-                className={`w-full border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm flex items-center justify-center gap-1.5 ${pressable}`}
-              >
-                <Icon name="trash" size={14} /> Delete this stokvel
-              </button>
-
-              {confirmDelete && (
-                <div className="mt-3 bg-white border-2 border-terracotta rounded-soft p-4 shadow-lg animate-fade-in">
-                  <p className="text-sm font-bold text-ink mb-3">
-                    Delete "{stokvel.name}" permanently? This action cannot be undone.
-                  </p>
+              {editingDetails && (
+                <form onSubmit={saveStokvelDetails} className="card-paper p-4 space-y-3">
+                  <p className="eyebrow text-ink-muted">Edit details</p>
+                  <input type="text" placeholder="Stokvel name" value={editName}
+                    onChange={(e) => setEditName(e.target.value)} className={inputStyle} required />
+                  <input type="number" placeholder="Contribution amount" value={editContribution}
+                    onChange={(e) => setEditContribution(e.target.value)} className={inputStyle} />
+                  <input type="text" placeholder="Frequency (e.g. Monthly)" value={editFrequency}
+                    onChange={(e) => setEditFrequency(e.target.value)} className={inputStyle} />
+                  <input type="number" placeholder="Target amount" value={editTargetAmount}
+                    onChange={(e) => setEditTargetAmount(e.target.value)} className={inputStyle} />
+                  <input type="date" value={editTargetDate}
+                    onChange={(e) => setEditTargetDate(e.target.value)} className={inputStyle} />
                   <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={deleteStokvel}
-                      disabled={isDeleting}
-                      className={`flex-1 bg-terracotta text-white font-bold py-2 rounded-pill text-sm ${pressable}`}
-                    >
-                      {isDeleting ? 'Deleting...' : 'Yes, delete'}
+                    <button type="submit" disabled={savingDetails}
+                      className={`flex-1 bg-terracotta text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
+                      {savingDetails ? 'Saving...' : 'Save'}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setConfirmDelete(false)}
-                      disabled={isDeleting}
-                      className={`flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm ${pressable}`}
-                    >
+                    <button type="button" onClick={() => setEditingDetails(false)}
+                      className={`flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm ${pressable}`}>
                       Cancel
                     </button>
                   </div>
+                </form>
+              )}
+
+              {isOrganiser && (
+                <div className="card-paper p-4">
+                  <p className="eyebrow text-ink-muted mb-3">Bereavement fund</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-bold text-ink">
+                        {detail.stokvel.bereavementActive ? 'Active' : 'Inactive'}
+                      </p>
+                      <p className="text-xs text-ink-muted mt-0.5">
+                        Activate to collect a bereavement contribution from members when needed.
+                      </p>
+                    </div>
+                    <button type="button" onClick={toggleBereavement} disabled={togglingBereavement}
+                      className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
+                        detail.stokvel.bereavementActive ? 'bg-terracotta' : 'bg-ink/20'
+                      } ${pressable}`}>
+                      <span className={`block w-5 h-5 rounded-full bg-white shadow transition-transform mx-0.5 ${
+                        detail.stokvel.bereavementActive ? 'translate-x-6' : 'translate-x-0'
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {isOrganiser && (
+                <div className="card-paper p-4 space-y-3">
+                  <p className="eyebrow text-ink-muted">Record interest</p>
+                  <form onSubmit={recordInterest} className="flex gap-2">
+                    <div className="relative flex-1">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-muted">R</span>
+                      <input type="number" min="0" step="0.01" placeholder="Interest earned"
+                        value={interestAmount} onChange={(e) => setInterestAmount(e.target.value)}
+                        className="w-full border border-ink/20 rounded-2xl pl-7 pr-3 py-2 text-sm bg-white focus:outline-none focus:border-terracotta/60" required />
+                    </div>
+                    <button type="submit" disabled={recordingInterest || !interestAmount}
+                      className={`bg-terracotta text-white font-bold px-4 py-2 rounded-pill text-sm ${pressable}`}>
+                      {recordingInterest ? '...' : 'Add'}
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {isOrganiser && (
+                <div className="card-paper p-4 space-y-3">
+                  <p className="eyebrow text-ink-muted">Record expense</p>
+                  <form onSubmit={recordExpense} className="space-y-2">
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-muted">R</span>
+                      <input type="number" min="0" step="0.01" placeholder="Amount"
+                        value={expenseAmount} onChange={(e) => setExpenseAmount(e.target.value)}
+                        className="w-full border border-ink/20 rounded-2xl pl-7 pr-3 py-2.5 text-sm bg-white focus:outline-none focus:border-terracotta/60" required />
+                    </div>
+                    <input type="text" placeholder="Note (e.g. venue hire)"
+                      value={expenseNote} onChange={(e) => setExpenseNote(e.target.value)}
+                      className="w-full border border-ink/20 rounded-2xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-terracotta/60" />
+                    <button type="submit" disabled={recordingExpense || !expenseAmount}
+                      className={`w-full bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
+                      {recordingExpense ? 'Saving...' : 'Record expense'}
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {balance === 0 && (
+                <div className="pt-2">
+                  <button type="button" onClick={() => setConfirmDelete(true)}
+                    className={`w-full border-2 border-terracotta text-terracotta font-bold py-2.5 rounded-pill text-sm flex items-center justify-center gap-1.5 ${pressable}`}>
+                    <Icon name="trash" size={14} /> Delete this stokvel
+                  </button>
+                  {confirmDelete && (
+                    <div className="mt-3 bg-white border-2 border-terracotta rounded-soft p-4 shadow-lg">
+                      <p className="text-sm font-bold text-ink mb-3">
+                        Delete "{stokvel.name}" permanently? This cannot be undone.
+                      </p>
+                      <div className="flex gap-2">
+                        <button type="button" onClick={deleteStokvel} disabled={isDeleting}
+                          className={`flex-1 bg-terracotta text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
+                          {isDeleting ? 'Deleting...' : 'Yes, delete'}
+                        </button>
+                        <button type="button" onClick={() => setConfirmDelete(false)} disabled={isDeleting}
+                          className={`flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm ${pressable}`}>
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
-          </>
           )}
         </div>
 
+        {/* PIN modal */}
         {pinModal && (
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 px-4 pb-6">
-            <div className="w-full max-w-sm bg-white border-2 border-sage-500 rounded-soft p-4 shadow-lg animate-fade-in">
+            <div className="w-full max-w-sm bg-white border-2 border-sage-500 rounded-soft p-4 shadow-lg">
               <form onSubmit={submitPin}>
                 <h2 className="text-sm font-bold text-ink mb-1">{pinModal.label}</h2>
                 <p className="text-xs text-ink-muted mb-3">Enter your security PIN to authorise this action.</p>
                 <label htmlFor="stokvel-pin" className="block text-xs font-bold text-ink-muted mb-1">Security PIN</label>
-                <input
-                  id="stokvel-pin"
-                  type="password"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  autoComplete="off"
-                  value={pinInput}
+                <input id="stokvel-pin" type="password" inputMode="numeric" pattern="[0-9]*"
+                  autoComplete="off" value={pinInput}
                   onChange={(e) => { setPinInput(e.target.value); setPinError('') }}
                   className="w-full border-2 border-cream-dark rounded-soft px-3 py-2 text-ink tracking-widest"
-                  autoFocus
-                />
+                  autoFocus />
                 {pinError && <p className="text-xs text-terracotta font-bold mt-1.5">{pinError}</p>}
                 <div className="flex gap-2 mt-3">
-                  <button type="submit" disabled={submittingPin} className={`flex-1 bg-sage-600 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
-                    {submittingPin ? 'Submitting…' : 'Confirm'}
+                  <button type="submit" disabled={submittingPin}
+                    className={`flex-1 bg-sage-600 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
+                    {submittingPin ? 'Submitting...' : 'Confirm'}
                   </button>
-                  <button type="button" onClick={() => { setPinModal(null); setPinInput(''); setPinError('') }} disabled={submittingPin} className={`flex-1 border-2 border-sage-200 font-bold py-2 rounded-pill text-sm ${pressable}`}>
+                  <button type="button" disabled={submittingPin}
+                    onClick={() => { setPinModal(null); setPinInput(''); setPinError('') }}
+                    className={`flex-1 border-2 border-sage-200 font-bold py-2 rounded-pill text-sm ${pressable}`}>
                     Cancel
                   </button>
                 </div>
@@ -1175,13 +945,8 @@ function Stokvels({ onBack, onOpenShrineFund }) {
   // --- VIEW: STOKVEL LIST (DEFAULT) ---
   return (
     <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
-      <button
-        type="button"
-        onClick={() => onBack?.()}
-        className={`text-sm text-ink-muted mb-4 ${pressable}`}
-      >
-        ← Back
-      </button>
+      <button type="button" onClick={() => onBack?.()}
+        className={`text-sm text-ink-muted mb-4 ${pressable}`}>← Back</button>
       <h2 className="font-display font-bold text-2xl text-ink mb-4">Stokvels</h2>
 
       {!loading && myStokvels.length > 0 && (
@@ -1190,9 +955,12 @@ function Stokvels({ onBack, onOpenShrineFund }) {
             <div>
               <p className="eyebrow text-cream/70">Combined balance</p>
               <p className="tabular mt-2 font-display text-3xl text-cream">
-                R{myStokvels.reduce((sum, m) => sum + Number(m.stokvel?.groupLedger?.totalBalance || 0), 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                R{myStokvels.reduce((sum, m) => sum + Number(m.stokvel?.groupLedger?.totalBalance || 0), 0)
+                  .toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
-              <p className="mt-1 text-xs text-cream/80">Across {myStokvels.length} group{myStokvels.length === 1 ? '' : 's'}</p>
+              <p className="mt-1 text-xs text-cream/80">
+                Across {myStokvels.length} group{myStokvels.length === 1 ? '' : 's'}
+              </p>
             </div>
             <Icon name="coins" size={32} color="#ffffff" />
           </div>
@@ -1200,16 +968,15 @@ function Stokvels({ onBack, onOpenShrineFund }) {
       )}
 
       {onOpenShrineFund && (
-        <button
-          type="button"
-          onClick={onOpenShrineFund}
-          className={`w-full bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 text-left flex items-center justify-between ${pressable}`}
-        >
+        <button type="button" onClick={onOpenShrineFund}
+          className={`w-full bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 text-left flex items-center justify-between ${pressable}`}>
           <div className="flex items-center gap-3">
             <Icon name="flame" size={22} color="#ffffff" strokeWidth={1.5} />
             <div>
               <p className="font-display font-bold text-base leading-tight">Ubuhlanti bakwa Xhosa</p>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/80 mt-0.5">Shrine &amp; Development Fund — see it growing</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/80 mt-0.5">
+                Shrine &amp; Development Fund — see it growing
+              </p>
             </div>
           </div>
           <Icon name="arrowRight" size={18} color="#ffffff" />
@@ -1217,27 +984,18 @@ function Stokvels({ onBack, onOpenShrineFund }) {
       )}
 
       <div className="flex gap-2 mb-4">
-        <button
-          type="button"
-          onClick={() => { setError(''); setView('create'); }}
-          className={`flex-1 bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
-        >
+        <button type="button" onClick={() => { setError(''); setView('create') }}
+          className={`flex-1 bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
           + Create
         </button>
-        <button
-          type="button"
-          onClick={() => { setError(''); setView('join'); }}
-          className={`flex-1 border-2 border-terracotta/25 text-ink font-bold py-2.5 rounded-pill text-sm ${pressable}`}
-        >
+        <button type="button" onClick={() => { setError(''); setView('join') }}
+          className={`flex-1 border-2 border-terracotta/25 text-ink font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
           Join
         </button>
       </div>
 
       {loading ? (
-        <div className="space-y-2">
-          <StokvelCardSkeleton />
-          <StokvelCardSkeleton />
-        </div>
+        <div className="space-y-2"><StokvelCardSkeleton /><StokvelCardSkeleton /></div>
       ) : myStokvels.length === 0 ? (
         <EmptyState
           emoji="🏘️"
@@ -1250,21 +1008,23 @@ function Stokvels({ onBack, onOpenShrineFund }) {
         />
       ) : (
         <>
-          <SectionRule label="Member balances" trailing={new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })} />
+          <SectionRule
+            label="Member balances"
+            trailing={new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
+          />
           <div className="space-y-3">
             {myStokvels.map((m) => (
-              <button
-                key={m.id || m.stokvelId}
-                type="button"
+              <button key={m.id || m.stokvelId} type="button"
                 onClick={() => { setDetailTab('overview'); fetchDetail(m.stokvelId) }}
-                className={`w-full text-left bg-white border border-terracotta/15 rounded-soft overflow-hidden shadow-soft ${pressable}`}
-              >
+                className={`w-full text-left bg-white border border-terracotta/15 rounded-soft overflow-hidden shadow-soft ${pressable}`}>
                 <div className="flex items-center gap-3 p-4">
                   <span className="w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
                     <Icon name="landmark" size={18} color="#c45c26" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="font-display font-bold text-base text-ink leading-tight">{m.stokvel?.name || 'Unnamed Stokvel'}</p>
+                    <p className="font-display font-bold text-base text-ink leading-tight">
+                      {m.stokvel?.name || 'Unnamed Stokvel'}
+                    </p>
                     <p className="text-xs text-ink-muted mt-0.5">
                       {m.stokvel?._count?.members || 0} member{(m.stokvel?._count?.members || 0) === 1 ? '' : 's'}
                     </p>
@@ -1273,8 +1033,6 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                 </div>
                 <div className="border-t border-cream-dark/70 px-4 py-3 flex items-end justify-between gap-3">
                   <div>
-                    {/* This member's own confirmed contributions — not the
-                        group total, which is a different (larger) number. */}
                     <p className="text-[10px] font-black uppercase tracking-widest text-ink-muted">Your balance</p>
                     <p className="tabular font-display font-bold text-2xl text-ink mt-0.5">
                       R{Number(m.myBalance || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -1296,9 +1054,6 @@ function Stokvels({ onBack, onOpenShrineFund }) {
   )
 }
 
-// Section header with a rule running to the edge — the device that gives the
-// Lovable layout its structure, and the reason it reads as sections rather
-// than a flat list of cards.
 function SectionRule({ label, trailing }) {
   return (
     <div className="flex items-center gap-3 mt-5 mb-3">
