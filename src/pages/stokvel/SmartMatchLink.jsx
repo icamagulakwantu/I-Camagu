@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
 import { Skeleton } from '../../components/ui/Skeleton.jsx'
+import { SubEmpty } from './Ui.jsx'
 import { pressable, inp, money, api } from './shared.js'
 
 // SmartMatchLink: turns group savings into a SmartMatch bulk order. The member
@@ -37,16 +38,11 @@ export default function SmartMatchLink({ groupBalance, memberCount }) {
 
   const sendToBasket = async () => {
     setSending(true)
-    let added = 0
-    let failed = 0
-    for (const s of picked) {
-      try {
-        await api('/api/basket/items', accessToken, { method: 'POST', body: JSON.stringify({ skuId: s.id, quantity: qty[s.id] }) })
-        added++
-      } catch {
-        failed++
-      }
-    }
+    // Send all items at once instead of one after another.
+    const outcomes = await Promise.allSettled(picked.map((s) =>
+      api('/api/basket/items', accessToken, { method: 'POST', body: JSON.stringify({ skuId: s.id, quantity: qty[s.id] }) })))
+    const added = outcomes.filter((r) => r.status === 'fulfilled').length
+    const failed = outcomes.length - added
     setSending(false)
     if (added) {
       showToast(`${added} item(s) added. Open SmartMatch to check out.`, 'success')
@@ -71,7 +67,7 @@ export default function SmartMatchLink({ groupBalance, memberCount }) {
       {catalogue === null ? (
         <div className="space-y-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-14 w-full" />)}</div>
       ) : results.length === 0 ? (
-        <p className="text-sm text-ink-muted text-center py-4">No priced items match that search.</p>
+        <SubEmpty icon="search" title={search ? 'No matches' : 'Catalogue unavailable'} description={search ? 'Try a shorter word, like the brand name.' : 'SmartMatch prices could not be loaded right now.'} />
       ) : (
         <div className="bg-white border border-terracotta/15 rounded-soft divide-y divide-cream-dark">
           {results.map((s) => (
@@ -82,10 +78,10 @@ export default function SmartMatchLink({ groupBalance, memberCount }) {
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button type="button" onClick={() => change(s.id, -1)} disabled={!qty[s.id]}
-                  className={`w-7 h-7 rounded-full bg-ink/5 font-bold text-ink ${pressable}`}>-</button>
+                  aria-label={`Remove one case of ${s.name}`} className={`w-9 h-9 rounded-full bg-ink/5 font-bold text-ink ${pressable}`}>-</button>
                 <span className="w-5 text-center text-sm font-bold">{qty[s.id] || 0}</span>
                 <button type="button" onClick={() => change(s.id, 1)}
-                  className={`w-7 h-7 rounded-full bg-terracotta text-white font-bold ${pressable}`}>+</button>
+                  aria-label={`Add one case of ${s.name}`} className={`w-9 h-9 rounded-full bg-sage-500 text-white font-bold ${pressable}`}>+</button>
               </div>
             </div>
           ))}
@@ -103,7 +99,7 @@ export default function SmartMatchLink({ groupBalance, memberCount }) {
           </div>
           {overBudget && <p className="text-xs font-bold text-terracotta">This is {money(total - groupBalance)} more than the group holds.</p>}
           <button type="button" onClick={sendToBasket} disabled={sending}
-            className={`w-full bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
+            className={`w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
             {sending ? 'Adding...' : 'Add to SmartMatch basket'}
           </button>
         </div>

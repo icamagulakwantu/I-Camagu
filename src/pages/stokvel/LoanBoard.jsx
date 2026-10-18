@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
 import { Skeleton } from '../../components/ui/Skeleton.jsx'
+import { SubEmpty, ConfirmSheet } from './Ui.jsx'
 import { pressable, inp, money, fmtDate, api } from './shared.js'
 
 const STATUS_STYLE = {
@@ -26,6 +27,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
   const [interest, setInterest] = useState('5')
   const [reason, setReason] = useState('')
   const [repayDraft, setRepayDraft] = useState({})
+  const [pendingVote, setPendingVote] = useState(null)
 
   const base = `/api/stokvels/${stokvelId}/loans`
   const load = useCallback(async () => {
@@ -98,7 +100,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
 
       {!requesting ? (
         <button type="button" onClick={() => setRequesting(true)}
-          className={`w-full bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
+          className={`w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
           Ask the group for a loan
         </button>
       ) : (
@@ -123,7 +125,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
           )}
           <div className="flex gap-2">
             <button type="submit" disabled={saving}
-              className={`flex-1 bg-terracotta text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
+              className={`flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
               {saving ? 'Sending...' : 'Send request'}
             </button>
             <button type="button" onClick={() => setRequesting(false)}
@@ -135,7 +137,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
       )}
 
       {loans.length === 0 ? (
-        <p className="text-sm text-ink-muted text-center py-6">No loans yet. Members can borrow from the group pot instead of a mashonisa.</p>
+        <SubEmpty icon="coins" title="No loans yet" description="Members can borrow from the group pot instead of a mashonisa. Interest comes back to the group." actionLabel={requesting ? undefined : 'Ask for a loan'} onAction={() => setRequesting(true)} />
       ) : loans.map((l) => {
         const yes = l.votes.filter((v) => v.approve).length
         const canVote = isOfficial && l.status === 'PENDING' && l.borrowerId !== user?.id
@@ -157,11 +159,11 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
             )}
             {canVote && (
               <div className="flex gap-2">
-                <button type="button" disabled={saving} onClick={() => vote(l.id, true)}
-                  className={`flex-1 py-2 rounded-pill text-xs font-bold ${l.myVote === true ? 'bg-terracotta text-white' : 'bg-terracotta/10 text-terracotta'} ${pressable}`}>
+                <button type="button" disabled={saving} onClick={() => setPendingVote({ loan: l, approve: true })}
+                  className={`flex-1 py-2 rounded-pill text-xs font-bold ${l.myVote === true ? 'bg-sage-500 text-white' : 'bg-sage-50 text-sage-700'} ${pressable}`}>
                   Approve
                 </button>
-                <button type="button" disabled={saving} onClick={() => vote(l.id, false)}
+                <button type="button" disabled={saving} onClick={() => setPendingVote({ loan: l, approve: false })}
                   className={`flex-1 py-2 rounded-pill text-xs font-bold ${l.myVote === false ? 'bg-ink text-white' : 'bg-ink/5 text-ink-muted'} ${pressable}`}>
                   Decline
                 </button>
@@ -175,7 +177,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
                   <span>{money(l.monthlyInstalment)}/month</span>
                 </div>
                 <div className="h-2 rounded-full bg-ink/5 overflow-hidden">
-                  <div className="h-full bg-terracotta rounded-full" style={{ width: `${progress}%` }} />
+                  <div className="h-full bg-sage-500 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
                 </div>
               </div>
             )}
@@ -184,7 +186,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
                 <input type="number" min="0" step="0.01" placeholder="Repayment (R)" value={repayDraft[l.id] || ''}
                   onChange={(e) => setRepayDraft((d) => ({ ...d, [l.id]: e.target.value }))} className={inp} />
                 <button type="button" disabled={saving || !repayDraft[l.id]} onClick={() => repay(l.id)}
-                  className={`bg-terracotta text-white font-bold px-4 rounded-pill text-sm ${pressable}`}>
+                  className={`bg-sage-500 text-white font-bold px-4 rounded-pill text-sm ${pressable}`}>
                   Record
                 </button>
               </div>
@@ -192,6 +194,16 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
           </div>
         )
       })}
+      <ConfirmSheet
+        open={Boolean(pendingVote)}
+        title={pendingVote?.approve ? 'Approve this loan?' : 'Decline this loan?'}
+        message={pendingVote ? `${pendingVote.loan.borrowerName} asked for ${money(pendingVote.loan.amount)}. You can change your vote until voting closes.` : ''}
+        confirmLabel={pendingVote?.approve ? 'Approve' : 'Decline'}
+        danger={pendingVote ? !pendingVote.approve : false}
+        busy={saving}
+        onCancel={() => setPendingVote(null)}
+        onConfirm={async () => { await vote(pendingVote.loan.id, pendingVote.approve); setPendingVote(null) }}
+      />
     </div>
   )
 }

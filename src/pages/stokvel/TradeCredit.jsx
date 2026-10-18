@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
 import { Skeleton } from '../../components/ui/Skeleton.jsx'
+import { SubEmpty, ConfirmSheet } from './Ui.jsx'
 import { pressable, inp, money, fmtDate, api } from './shared.js'
 
 // A typical savings rate, used only to compare bank interest with a retailer
@@ -24,6 +25,7 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
   const [discount, setDiscount] = useState('10')
   const [months, setMonths] = useState('12')
   const [purpose, setPurpose] = useState('')
+  const [pendingStatus, setPendingStatus] = useState(null)
 
   const base = `/api/stokvels/${stokvelId}/trade-credit`
   const load = useCallback(async () => {
@@ -104,7 +106,7 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
 
       {isOfficial && !adding && (
         <button type="button" onClick={() => setAdding(true)}
-          className={`w-full bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
+          className={`w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}>
           Record a retailer deal
         </button>
       )}
@@ -131,7 +133,7 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
                 onChange={(e) => setPurpose(e.target.value)} className={inp} />
               <div className="flex gap-2">
                 <button type="submit" disabled={saving}
-                  className={`flex-1 bg-terracotta text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
+                  className={`flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
                   {saving ? 'Saving...' : 'Save deal'}
                 </button>
                 <button type="button" onClick={() => setAdding(false)}
@@ -147,7 +149,7 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
       {credits === null ? (
         <Skeleton className="h-20 w-full" />
       ) : credits.length === 0 ? (
-        <p className="text-sm text-ink-muted text-center py-4">No retailer deals yet.</p>
+        <SubEmpty icon="store" title="No retailer deals yet" description="Pre-pay a wholesaler or butcher you already use in exchange for a discount." actionLabel={isOfficial && !adding ? 'Record a deal' : undefined} onAction={() => setAdding(true)} />
       ) : credits.map((c) => (
         <div key={c.id} className="bg-white border border-terracotta/15 rounded-soft p-4 space-y-1">
           <div className="flex items-start justify-between gap-2">
@@ -159,12 +161,21 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
           <p className="font-display font-bold text-lg text-ink">{money(c.amount)} <span className="text-xs text-sage-700 font-sans">saves {money(c.amount * c.discountPercent / 100)}</span></p>
           {isOfficial && c.status === 'ACTIVE' && (
             <div className="flex gap-3 pt-1">
-              <button type="button" onClick={() => setStatus(c.id, 'USED')} className={`text-xs font-bold text-terracotta ${pressable}`}>Mark used</button>
-              <button type="button" onClick={() => setStatus(c.id, 'CANCELLED')} className={`text-xs font-bold text-ink-muted ${pressable}`}>Cancel</button>
+              <button type="button" onClick={() => setPendingStatus({ credit: c, status: 'USED' })} className={`text-xs font-bold text-sage-700 py-1 ${pressable}`}>Mark used</button>
+              <button type="button" onClick={() => setPendingStatus({ credit: c, status: 'CANCELLED' })} className={`text-xs font-bold text-ink-muted py-1 ${pressable}`}>Cancel deal</button>
             </div>
           )}
         </div>
       ))}
+      <ConfirmSheet
+        open={Boolean(pendingStatus)}
+        title={pendingStatus?.status === 'USED' ? 'Mark this deal as used?' : 'Cancel this deal?'}
+        message={pendingStatus ? `${pendingStatus.credit.retailer}, ${money(pendingStatus.credit.amount)}. This is saved to the group record.` : ''}
+        confirmLabel={pendingStatus?.status === 'USED' ? 'Mark used' : 'Cancel deal'}
+        danger={pendingStatus?.status === 'CANCELLED'}
+        onCancel={() => setPendingStatus(null)}
+        onConfirm={async () => { await setStatus(pendingStatus.credit.id, pendingStatus.status); setPendingStatus(null) }}
+      />
     </div>
   )
 }

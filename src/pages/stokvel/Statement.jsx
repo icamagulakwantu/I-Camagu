@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
 import { Skeleton } from '../../components/ui/Skeleton.jsx'
+import { SubEmpty } from './Ui.jsx'
 import { pressable, inp, money, fmtDate, api } from './shared.js'
 
 const today = () => new Date().toISOString().slice(0, 10)
@@ -61,7 +62,11 @@ export default function Statement({ stokvelId, stokvelName }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
+      <div className="hidden print:block">
+        <p className="font-display font-bold text-xl">{stokvelName} statement</p>
+        <p className="text-sm">{fmtDate(from)} to {fmtDate(to)}</p>
+      </div>
+      <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3 print:hidden">
         <p className="text-xs font-black uppercase text-ink-muted">Statement period</p>
         <div className="grid grid-cols-2 gap-2">
           <label className="text-xs text-ink-muted">From
@@ -73,7 +78,7 @@ export default function Statement({ stokvelId, stokvelName }) {
         </div>
         <div className="flex gap-2">
           <button type="button" onClick={downloadCsv} disabled={!data?.entries?.length}
-            className={`flex-1 bg-terracotta text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
+            className={`flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
             Download spreadsheet
           </button>
           <button type="button" onClick={() => window.print()} disabled={!data?.entries?.length}
@@ -101,7 +106,7 @@ export default function Statement({ stokvelId, stokvelName }) {
           </div>
 
           {data.entries.length === 0 ? (
-            <p className="text-sm text-ink-muted text-center py-6">No confirmed transactions in this period.</p>
+            <SubEmpty icon="file" title="Nothing in this period" description="No confirmed money moved between these dates. Try a wider date range." />
           ) : (
             <div className="bg-white border border-terracotta/15 rounded-soft divide-y divide-cream-dark">
               {data.entries.map((e, i) => (
