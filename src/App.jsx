@@ -1,9 +1,7 @@
-// ===================== IMPORTS =====================
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import { ToastProvider, useToast } from './components/ui/Toast.jsx'
-import { EmptyState } from './components/ui/EmptyState.jsx'
 import { Skeleton } from './components/ui/Skeleton.jsx'
 import OfflineBanner from './components/OfflineBanner.jsx'
 
@@ -44,7 +42,7 @@ import PublicPlanView from './pages/PublicPlanView.jsx'
 import PublicUbuhlanti from './pages/PublicUbuhlanti.jsx'
 import More from './pages/More.jsx'
 import Activity from './pages/Activity.jsx'
-import Notifications from './pages/Notifications.jsx'           // ✅ NEW
+import Notifications from './pages/Notifications.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
 import AccountSettings from './pages/AccountSettings.jsx'
 import Help from './pages/Help.jsx'
@@ -56,96 +54,22 @@ import EkoyiniBooking from './pages/EkoyiniBooking.jsx'
 import BottomNav from './components/BottomNav.jsx'
 import DidYouKnow from './components/DidYouKnow.jsx'
 import Icon from './components/Icon.jsx'
-import NotificationBell from './components/NotificationBell.jsx'  // ✅ NEW
+import NotificationBell from './components/NotificationBell.jsx'
 import PinReminder from './components/PinReminder.jsx'
 
-// Touch feedback utility (from second file)
-const pressable =
-  'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
+const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
 const MORE_SCREENS = [
-  'more',
-  'ceremony',
-  'timeline',
-  'budget',
-  'ekoyinibooking',
-  'templates',
-  'family',
-  'ukugida',
-  'ukusoka',
-  'iziduko',
-  'izidukoprofile',
-  'izidukochat',
-  'supplier',
-  'portal',
-  'ekoyini',
-  'ekoyiniadmin',
-  'identityadmin',
-  'marginadmin',
-  'demandadmin',
-  'privacy',
-  'hierarchy',
-  'myorders',
-  'expenditure',
-  'shrinefund',
-  'legends',
-  'directory',
-  'umqombothi',
-  'pin',
-  'profile',
-  'notifications',   // ✅ NEW
-  'account',
-  'help',
-  'activity',
+  'more', 'ceremony', 'timeline', 'budget', 'ekoyinibooking',
+  'templates', 'family', 'ukugida', 'ukusoka', 'iziduko',
+  'izidukoprofile', 'izidukochat', 'supplier', 'portal', 'ekoyini',
+  'ekoyiniadmin', 'identityadmin', 'marginadmin', 'demandadmin',
+  'privacy', 'hierarchy', 'myorders', 'expenditure', 'shrinefund',
+  'legends', 'directory', 'umqombothi', 'pin', 'profile',
+  'notifications', 'account', 'help', 'activity',
 ]
 
-// Real, addressable URLs for every screen — replaces the old
-// useState('home') + manual pushState/popstate history hack. Each screen
-// now has a bookmarkable, shareable path and the browser/Android back
-// button works via ordinary history, not a hand-rolled listener.
-const SCREEN_TO_PATH = {
-  home: '/home',
-  ceremonyhub: '/ceremonies',
-  store: '/store',
-  basket: '/store/basket',
-  myorders: '/store/orders',
-  ceremony: '/ceremonies/plan',
-  timeline: '/ceremonies/timeline',
-  budget: '/ceremonies/budget',
-  ekoyinibooking: '/ceremonies/booking',
-  stokvels: '/stokvels',
-  notifications: '/notifications',
-  more: '/more',
-  profile: '/more/profile',
-  templates: '/more/templates',
-  family: '/more/family',
-  ukugida: '/more/ukugida',
-  ukusoka: '/more/ukusoka',
-  iziduko: '/more/iziduko',
-  izidukoprofile: '/more/iziduko/profile',
-  izidukochat: '/more/iziduko/chat',
-  supplier: '/more/supplier',
-  portal: '/more/portal',
-  ekoyini: '/more/ekoyini',
-  ekoyiniadmin: '/more/ekoyini-admin',
-  identityadmin: '/more/identity-admin',
-  marginadmin: '/more/margin-admin',
-  demandadmin: '/more/demand-admin',
-  privacy: '/more/privacy',
-  hierarchy: '/more/hierarchy',
-  expenditure: '/more/spending',
-  shrinefund: '/more/ubuhlanti',
-  legends: '/more/legends',
-  directory: '/more/directory',
-  umqombothi: '/more/umqombothi',
-  pin: '/more/pin',
-  account: '/more/account',
-  help: '/more/help',
-  activity: '/more/activity',
-}
-const PATH_TO_SCREEN = Object.fromEntries(Object.entries(SCREEN_TO_PATH).map(([s, p]) => [p, s]))
-
-// ---------- Dashboard (enhanced with loading, errors, empty states) ----------
+// ---------- Dashboard ----------
 function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
   const { user, accessToken } = useAuth()
   const { showToast } = useToast()
@@ -157,30 +81,18 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
   useEffect(() => {
     if (!accessToken) return
 
-    // Fetch stokvels
     setLoadingStokvels(true)
-    fetch('/api/stokvels/my', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
+    fetch('/api/stokvels/my', { headers: { Authorization: `Bearer ${accessToken}` } })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('Failed to load stokvels'))))
       .then((data) => setStokvels(Array.isArray(data) ? data : []))
-      .catch((err) => {
-        showToast(err.message, 'error')
-        setStokvels([])
-      })
+      .catch((err) => { showToast(err.message, 'error'); setStokvels([]) })
       .finally(() => setLoadingStokvels(false))
 
-    // Fetch ceremonies
     setLoadingCeremonies(true)
-    fetch('/api/ceremonies/my', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
+    fetch('/api/ceremonies/my', { headers: { Authorization: `Bearer ${accessToken}` } })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('Failed to load ceremonies'))))
       .then((data) => setCeremonies(Array.isArray(data) ? data : []))
-      .catch((err) => {
-        showToast(err.message, 'error')
-        setCeremonies([])
-      })
+      .catch((err) => { showToast(err.message, 'error'); setCeremonies([]) })
       .finally(() => setLoadingCeremonies(false))
   }, [accessToken, showToast])
 
@@ -201,23 +113,13 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
         <NotificationBell onOpen={() => onNavigate('notifications')} />
       </div>
 
-      {/* Home hero — ONE contextual card instead of a decorative photo, a
-          separate greeting, and a separate "Ceremonies" pitch card. It
-          leads with whatever's actually happening (an in-progress
-          ceremony) rather than a generic photo, since that's the one
-          thing worth a household seeing first when they open the app —
-          Ceremonies and Store already have their own bottom-nav tab, so
-          this screen doesn't need to re-pitch either of them. */}
+      {/* Home hero — contextual ceremony card or generic entry point */}
       <button
         type="button"
         onClick={() => (leadCeremony?.id ? onSelectCeremony?.(leadCeremony.id) : onNavigate('ceremonyhub'))}
         className={`relative w-full text-left overflow-hidden rounded-soft mb-5 shadow-soft ${pressable}`}
       >
-        <img
-          src="/images/home-hero.jpg"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center"
-        />
+        <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/45 to-ink/10" />
         <div className="relative p-5 pt-16">
           <p className="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide text-cream">
@@ -241,212 +143,135 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
         </div>
       </button>
 
-      {/* Ukugida — the featured action on this screen. It has no bottom-nav
-          tab of its own, and it prevents a real loss families feel today:
-          physical reciprocity books lost, or gone with the person who kept
-          them, so nobody knows what was given or is still owed. */}
-      <p className="eyebrow text-terracotta mb-1">Never lose the record again</p>
-      <h2 className="font-display font-bold text-2xl leading-tight text-brand-black mb-4">Ukugida — your family's reciprocity ledger.</h2>
-      <button
-        type="button"
-        onClick={() => onNavigate('ukugida')}
-        className={`w-full text-left card-paper overflow-hidden px-5 py-6 mb-4 ${pressable}`}
-      >
-        <div className="flex items-center justify-between">
-          <span className="w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
-            <Icon name="book" size={18} color="#c45c26" />
-          </span>
-          <Icon name="arrowRight" size={18} color="#c45c26" />
-        </div>
-        <p className="mt-3 text-sm leading-relaxed text-brand-black/60">
-          Who gave what, and what's still owed back — so it doesn't disappear with a lost book, or with the person who kept it.
-        </p>
-        <span className="mt-3 inline-block text-sm font-bold text-brand-black">Open Ukugida</span>
-      </button>
-
-      {/* ClanMatch — also without a bottom-nav tab, kept visible but lighter
-          weight than Ukugida since it's a discovery feature, not something
-          most people open every day. */}
-      <button
-        type="button"
-        onClick={() => onNavigate('iziduko')}
-        className={`w-full text-left card-paper flex items-center gap-3.5 p-4 mb-6 ${pressable}`}
-      >
-        <span className="w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
-          <Icon name="link" size={18} color="#c45c26" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="font-bold text-sm text-brand-black">ClanMatch</p>
-          <p className="text-xs text-brand-black/50 truncate">Find the family name between you and someone you haven't met</p>
-        </div>
-        <Icon name="arrowRight" size={16} color="#8a8278" />
-      </button>
-
-      <div className="text-center mb-6">
-        <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-6 h-6 mx-auto opacity-40" />
-        <p className="mt-2 font-display italic text-sm text-brand-black/50">Umntu, ngumntu ngabantu.</p>
-      </div>
-
-      {/* Did You Know */}
-      <div className="card-paper grain wash-clay overflow-hidden mb-5">
-        <div className="p-4">
-          <DidYouKnow />
-        </div>
-      </div>
-
-      <PinReminder onNavigate={onNavigate} />
-
-      {/* Your Ceremonies */}
-      <div className="mb-6">
-        <p className="eyebrow mb-2">
-          Your Ceremonies
-        </p>
-
-        {loadingCeremonies ? (
-          <div className="space-y-2">
-            <Skeleton className="h-16 w-full rounded-soft" />
-            <Skeleton className="h-16 w-full rounded-soft" />
+      {/* Ukugida */}
+      <p className="eyebrow text-ink-muted mb-2">Quick actions</p>
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <button
+          type="button"
+          onClick={() => onNavigate('ukugida')}
+          className={`bg-white border-2 border-terracotta/25 rounded-soft p-4 text-left shadow-soft ${pressable}`}
+        >
+          <div className="w-9 h-9 rounded-xl bg-terracotta/10 flex items-center justify-center mb-2">
+            <Icon name="send" size={18} color="#c45c26" />
           </div>
-        ) : ceremonies.length === 0 ? (
-          <EmptyState
-            emoji="📋"
-            title="No ceremonies yet"
-            description="Plan your next Umgidi, Ulwaluko, or Ukukhapha with step-by-step cultural checklists."
-            primaryLabel="Plan Ceremony"
-            onPrimary={() => onNavigate('ceremonyhub')}
-          />
-        ) : (
+          <p className="font-bold text-sm text-ink">Ukugida</p>
+          <p className="text-[11px] text-ink-muted mt-0.5">Gift records & reciprocity</p>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onNavigate('store')}
+          className={`bg-white border-2 border-terracotta/25 rounded-soft p-4 text-left shadow-soft ${pressable}`}
+        >
+          <div className="w-9 h-9 rounded-xl bg-terracotta/10 flex items-center justify-center mb-2">
+            <Icon name="cart" size={18} color="#c45c26" />
+          </div>
+          <p className="font-bold text-sm text-ink">SmartMatch</p>
+          <p className="text-[11px] text-ink-muted mt-0.5">Bulk alcohol, groceries & more</p>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onNavigate('stokvels')}
+          className={`bg-white border-2 border-terracotta/25 rounded-soft p-4 text-left shadow-soft ${pressable}`}
+        >
+          <div className="w-9 h-9 rounded-xl bg-terracotta/10 flex items-center justify-center mb-2">
+            <Icon name="users" size={18} color="#c45c26" />
+          </div>
+          <p className="font-bold text-sm text-ink">Stokvels</p>
+          <p className="text-[11px] text-ink-muted mt-0.5">Pools & payout tracking</p>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onNavigate('shrinefund')}
+          className={`text-left rounded-soft p-4 shadow-soft ${pressable}`}
+          style={{ background: 'linear-gradient(135deg, #c45c26 0%, #8c3b1a 100%)' }}
+        >
+          <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center mb-2">
+            <Icon name="flame" size={18} color="#ffffff" strokeWidth={1.5} />
+          </div>
+          <p className="font-bold text-sm text-white">Ubuhlanti</p>
+          <p className="text-[11px] text-white/75 mt-0.5">Community dev fund</p>
+        </button>
+      </div>
+
+      {/* Stokvels strip */}
+      {loadingStokvels ? (
+        <Skeleton className="h-20 w-full rounded-soft mb-6" />
+      ) : stokvels.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <p className="eyebrow text-ink-muted">Your stokvels</p>
+            <button type="button" onClick={() => onNavigate('stokvels')} className="text-xs font-bold text-terracotta">View all</button>
+          </div>
           <div className="space-y-2">
-            {ceremonies.map((c, idx) => (
+            {stokvels.slice(0, 2).map((s) => (
               <button
-                key={c?.id || idx}
-                type="button"
-                onClick={() => c?.id ? onSelectCeremony?.(c.id) : onNavigate('ceremonyhub')}
-                className={`w-full text-left bg-white/90 backdrop-blur-md border-2 border-terracotta/15 rounded-soft p-3.5 shadow-sm ${pressable}`}
-              >
-                <p className="font-display font-semibold text-base text-brand-black">{c?.title || 'Untitled Ceremony'}</p>
-                <p className="text-xs text-brand-black/50 capitalize mt-0.5">
-                  {c?.type ? c.type.replace(/_/g, ' ') : 'General'} • {c?.preparationPlans?.length || 0} plan(s)
-                </p>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Your Stokvels */}
-      <div>
-        <p className="eyebrow mb-2">
-          Your Stokvels
-        </p>
-
-        {loadingStokvels ? (
-          <div className="space-y-2">
-            <Skeleton className="h-16 w-full rounded-soft" />
-            <Skeleton className="h-16 w-full rounded-soft" />
-          </div>
-        ) : stokvels.length === 0 ? (
-          <EmptyState
-            emoji="🏘️"
-            title="No stokvels yet"
-            description="Join a community savings group or start your own. Pool resources for the next Umgidi or Ulwaluko."
-            primaryLabel="Create Stokvel"
-            onPrimary={() => onNavigate('stokvels')}
-            secondaryLabel="Join with Code"
-            onSecondary={() => onNavigate('stokvels')}
-          />
-        ) : (
-          <div className="space-y-2">
-            {stokvels.map((m, idx) => (
-              <button
-                key={m?.id || idx}
+                key={s.id}
                 type="button"
                 onClick={() => onNavigate('stokvels')}
-                className={`w-full text-left bg-white/90 backdrop-blur-md border-2 border-terracotta/15 rounded-soft p-3.5 shadow-sm ${pressable}`}
+                className={`w-full bg-white border-2 border-terracotta/15 rounded-soft p-3.5 flex items-center justify-between gap-3 shadow-soft text-left ${pressable}`}
               >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-display font-semibold text-base text-brand-black">{m?.stokvel?.name || 'Stokvel'}</p>
-                    <p className="text-xs text-brand-black/50">
-                      {m?.stokvel?.type ? m.stokvel.type.replace(/_/g, ' ') : ''}
-                    </p>
-                  </div>
-                  <span className="tabular font-bold text-xs text-brand-ochre bg-brand-ochre/10 px-2.5 py-1 rounded-pill">
-                    R{parseFloat(m?.stokvel?.groupLedger?.totalBalance || 0).toFixed(2)}
-                  </span>
+                <div className="min-w-0">
+                  <p className="font-bold text-sm text-ink truncate">{s.name}</p>
+                  <p className="text-[11px] text-ink-muted mt-0.5">
+                    {s.memberCount || 0} member{s.memberCount !== 1 ? 's' : ''}
+                    {s.totalBalance != null ? ` · R${Number(s.totalBalance).toLocaleString('en-ZA')}` : ''}
+                  </p>
                 </div>
+                <Icon name="arrowRight" size={16} color="#8a8278" />
               </button>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      <DidYouKnow />
+      <PinReminder onNavigate={onNavigate} />
     </div>
   )
 }
 
 // ---------- MainApp ----------
 function MainApp() {
-  const { accessToken, user } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const screen = PATH_TO_SCREEN[location.pathname] || 'home'
-  // setScreen still takes the same screen-name strings every page/BottomNav
-  // already calls it with — it just now pushes a real URL instead of
-  // flipping a local state variable, so the browser/Android back button
-  // and shareable links come from ordinary history, not a hand-rolled stack.
-  const setScreen = (s) => navigate(SCREEN_TO_PATH[s] || '/home')
+  const { accessToken } = useAuth()
+  const [screen, setScreen] = useState('home')
   const [basketCount, setBasketCount] = useState(0)
+
+  // Ceremony planning state
+  const [selectedCeremonyId, setSelectedCeremonyId] = useState(null)
   const [ceremonyHubType, setCeremonyHubType] = useState(null)
   const [timelineType, setTimelineType] = useState(null)
-  const [selectedCeremonyId, setSelectedCeremonyId] = useState(null)
   const [budgetPlanId, setBudgetPlanId] = useState(null)
   const [budgetPlanTitle, setBudgetPlanTitle] = useState('')
   const [ekoyiniBookingCeremonyId, setEkoyiniBookingCeremonyId] = useState(null)
   const [ekoyiniBookingCeremonyTitle, setEkoyiniBookingCeremonyTitle] = useState('')
-  // Lets IzidukoNetwork send someone straight to Profile's Clan Lines tab
-  // to add a missing Iziduko, instead of just telling them it's missing.
-  // Profile clears this itself once read, so a later ordinary visit to
-  // Profile (via More) doesn't get stuck reopening on the same tab.
   const [profileInitialTab, setProfileInitialTab] = useState(null)
-  // Which connected Iziduko match the profile-view/chat screens are for —
-  // set right before navigating there, same pattern as timelineType/
-  // budgetPlanId above.
   const [izidukoTargetUserId, setIzidukoTargetUserId] = useState(null)
+  // Hierarchy: optionally pre-select a ceremony from CeremonyHub
+  const [hierarchyCeremonyId, setHierarchyCeremonyId] = useState(null)
+
+  // Basket count
+  useEffect(() => {
+    if (!accessToken) return
+    fetch('/api/basket', { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data?.items) setBasketCount(data.items.length) })
+      .catch(() => {})
+  }, [accessToken])
 
   const goHome = () => setScreen('home')
   const goMore = () => setScreen('more')
 
-  // Land on a real /home URL instead of the bare "/" the auth wall opens on
-  // — unless a pool-invite link (see PoolJoinRoute) just stashed a pending
-  // join, in which case go straight to the cart, where the join banner
-  // and the actual submit action live, instead of leaving the member to
-  // find their own way there.
-  useEffect(() => {
-    if (location.pathname === '/' || location.pathname === '') {
-      const pendingJoinPoolId = localStorage.getItem('icamagu_join_pool_id')
-      navigate(pendingJoinPoolId ? SCREEN_TO_PATH.basket : '/home', { replace: true })
-    }
-  }, [location.pathname, navigate])
-
-  const refreshBasketCount = () => {
-    if (!accessToken) return
-    fetch('/api/basket', { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((res) => (res.ok ? res.json() : { totalCases: 0 }))
-      .then((data) => setBasketCount(data?.totalCases || 0))
-      .catch(() => setBasketCount(0))
-  }
-
-  useEffect(() => {
-    refreshBasketCount()
-  }, [screen, accessToken])
-
   const openCeremonyType = (type) => {
     setCeremonyHubType(type)
+    setSelectedCeremonyId(null)
     setScreen('ceremony')
   }
 
-  const openTimeline = (ceremonyType) => {
-    setTimelineType(ceremonyType)
+  const openTimeline = (type) => {
+    setTimelineType(type)
     setScreen('timeline')
   }
 
@@ -477,24 +302,23 @@ function MainApp() {
     setScreen('izidukochat')
   }
 
+  // Open Hierarchy, optionally with a pre-selected ceremony
+  const openHierarchyForCeremony = (ceremonyId) => {
+    setHierarchyCeremonyId(ceremonyId || null)
+    setScreen('hierarchy')
+  }
+
   const [pendingApprovals, setPendingApprovals] = useState(0)
-
   const refreshPendingApprovals = () => {
+    if (!accessToken) return
     fetch('/api/stokvels/pending-approvals/count', { headers: { Authorization: `Bearer ${accessToken}` } })
-        .then(res => res.json())
-            .then(data => setPendingApprovals(data.count || 0))
-                .catch(() => {})
-                }
+      .then(res => res.json())
+      .then(data => setPendingApprovals(data.count || 0))
+      .catch(() => {})
+  }
+  useEffect(() => { refreshPendingApprovals() }, [screen])
 
-                useEffect(() => { refreshPendingApprovals() }, [screen])
-
-  // NotificationBell only lives in the Home header, so anyone on Store,
-  // Ceremonies, Stokvels or More has no way to see an unread notification
-  // exists until they happen to go back to Home. Mirror it on the Home tab
-  // of BottomNav — visible on every screen — same pattern as the basket and
-  // pending-approval badges above.
   const [unreadNotifications, setUnreadNotifications] = useState(0)
-
   const refreshUnreadNotifications = () => {
     if (!accessToken) return
     fetch('/api/notifications/unread-count', { headers: { Authorization: `Bearer ${accessToken}` } })
@@ -502,19 +326,24 @@ function MainApp() {
       .then((data) => setUnreadNotifications(data.count || 0))
       .catch(() => {})
   }
-
   useEffect(() => {
     refreshUnreadNotifications()
     const interval = setInterval(refreshUnreadNotifications, 30000)
     return () => clearInterval(interval)
   }, [accessToken])
-
   useEffect(() => { refreshUnreadNotifications() }, [screen])
 
   const renderScreen = () => {
     switch (screen) {
       case 'ceremonyhub':
-        return <CeremonyHub onBack={goHome} onOpenType={openCeremonyType} onSelectCeremony={openExistingCeremony} />
+        return (
+          <CeremonyHub
+            onBack={goHome}
+            onOpenType={openCeremonyType}
+            onSelectCeremony={openExistingCeremony}
+            onGoToHierarchy={openHierarchyForCeremony}
+          />
+        )
       case 'store':
         return <Store onGoToBasket={() => setScreen('basket')} basketCount={basketCount} />
       case 'basket':
@@ -533,21 +362,9 @@ function MainApp() {
       case 'timeline':
         return <CeremonyTimeline ceremonyType={timelineType} onBack={() => setScreen('ceremony')} />
       case 'budget':
-        return (
-          <BudgetDashboard
-            planId={budgetPlanId}
-            planTitle={budgetPlanTitle}
-            onBack={() => setScreen('ceremony')}
-          />
-        )
+        return <BudgetDashboard planId={budgetPlanId} planTitle={budgetPlanTitle} onBack={() => setScreen('ceremony')} />
       case 'ekoyinibooking':
-        return (
-          <EkoyiniBooking
-            ceremonyId={ekoyiniBookingCeremonyId}
-            ceremonyTitle={ekoyiniBookingCeremonyTitle}
-            onBack={() => setScreen('ceremony')}
-          />
-        )
+        return <EkoyiniBooking ceremonyId={ekoyiniBookingCeremonyId} ceremonyTitle={ekoyiniBookingCeremonyTitle} onBack={() => setScreen('ceremony')} />
       case 'templates':
         return <Templates onBack={goMore} />
       case 'family':
@@ -566,21 +383,9 @@ function MainApp() {
           />
         )
       case 'izidukoprofile':
-        return (
-          <IzidukoProfileView
-            userId={izidukoTargetUserId}
-            onBack={() => setScreen('iziduko')}
-            onMessage={openIzidukoChat}
-          />
-        )
+        return <IzidukoProfileView userId={izidukoTargetUserId} onBack={() => setScreen('iziduko')} onMessage={openIzidukoChat} />
       case 'izidukochat':
-        return (
-          <IzidukoChat
-            userId={izidukoTargetUserId}
-            onBack={() => setScreen('iziduko')}
-            onViewProfile={openIzidukoProfile}
-          />
-        )
+        return <IzidukoChat userId={izidukoTargetUserId} onBack={() => setScreen('iziduko')} onViewProfile={openIzidukoProfile} />
       case 'supplier':
         return <SupplierDashboard onBack={goMore} />
       case 'portal':
@@ -596,7 +401,7 @@ function MainApp() {
       case 'demandadmin':
         return <DemandDashboard onBack={goMore} />
       case 'hierarchy':
-        return <Hierarchy onBack={goMore} />
+        return <Hierarchy onBack={goMore} initialCeremonyId={hierarchyCeremonyId} />
       case 'myorders':
         return <MyOrders onBack={() => setScreen('store')} />
       case 'expenditure':
@@ -613,7 +418,7 @@ function MainApp() {
         return <PinSetup onBack={goMore} />
       case 'stokvels':
         return <Stokvels onBack={goHome} onOpenShrineFund={() => setScreen('shrinefund')} />
-      case 'notifications':                                 // ✅ NEW
+      case 'notifications':
         return <Notifications onBack={goHome} onNavigate={setScreen} />
       case 'activity':
         return <Activity onBack={goMore} />
@@ -626,30 +431,19 @@ function MainApp() {
       case 'more':
         return <More onNavigate={setScreen} onBack={goHome} />
       case 'profile':
-        return (
-          <Profile
-            onNavigate={setScreen}
-            initialTab={profileInitialTab}
-            onConsumeInitialTab={() => setProfileInitialTab(null)}
-          />
-        )
+        return <Profile onNavigate={setScreen} initialTab={profileInitialTab} onConsumeInitialTab={() => setProfileInitialTab(null)} />
       default:
         return <Dashboard onNavigate={setScreen} basketCount={basketCount} onSelectCeremony={openExistingCeremony} />
     }
   }
 
   const activeTab =
-    screen === 'home'
-      ? 'home'
-      : screen === 'ceremonyhub'
-        ? 'ceremonyhub'
-        : screen === 'store' || screen === 'basket'
-          ? 'store'
-          : screen === 'stokvels'
-            ? 'stokvels'
-            : MORE_SCREENS.includes(screen)
-              ? 'more'
-              : 'home'
+    screen === 'home' ? 'home'
+    : screen === 'ceremonyhub' ? 'ceremonyhub'
+    : screen === 'store' || screen === 'basket' ? 'store'
+    : screen === 'stokvels' ? 'stokvels'
+    : MORE_SCREENS.includes(screen) ? 'more'
+    : 'home'
 
   return (
     <div className="icamagu-bg min-h-screen">
@@ -665,9 +459,9 @@ function MainApp() {
   )
 }
 
-// ---------- AuthenticatedApp (enhanced loading spinner) ----------
+// ---------- AuthenticatedApp ----------
 function AuthenticatedApp() {
-  const { accessToken, user, checkingSession, debugInfo } = useAuth()
+  const { accessToken, user, checkingSession } = useAuth()
   const [onboardingComplete, setOnboardingComplete] = useState(false)
 
   if (checkingSession) {
@@ -681,23 +475,14 @@ function AuthenticatedApp() {
     )
   }
 
-  // Debugging fallback: If accessToken is null, ensure Login actually renders
-  if (!accessToken) {
-    return <Login />
-  }
-
-  if (!user?.username) {
-    return <Username />
-  }
+  if (!accessToken) return <Login />
+  if (!user?.username) return <Username />
 
   const onboardingDone = onboardingComplete || (user?.id && localStorage.getItem(`icamagu_onboarding_done:${user.id}`) === '1')
-  if (!onboardingDone) {
-    return <Onboarding onDone={() => setOnboardingComplete(true)} />
-  }
+  if (!onboardingDone) return <Onboarding onDone={() => setOnboardingComplete(true)} />
 
   return <MainApp />
 }
-
 
 function ShareRoute() {
   const { token } = useParams()
@@ -709,11 +494,6 @@ function ResetPasswordRoute() {
   return <ResetPassword token={token} />
 }
 
-// A real "join this pool" invite link (see Basket.jsx / inviteToSmartMatch).
-// Stashes the target pool id where Basket.jsx can pick it up once the
-// member is signed in — works whether they're already logged in or not,
-// since AuthenticatedApp's own login/username/onboarding gate runs
-// normally after this redirect, and localStorage survives all of it.
 function PoolJoinRoute() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -724,7 +504,6 @@ function PoolJoinRoute() {
   return null
 }
 
-// ---------- App Entry ----------
 export default function App() {
   return (
     <BrowserRouter>
@@ -733,8 +512,6 @@ export default function App() {
         <Route path="/share/:token" element={<ShareRoute />} />
         <Route path="/reset-password/:token" element={<ResetPasswordRoute />} />
         <Route path="/pool/:id" element={<PoolJoinRoute />} />
-        {/* Ubuhlanti bakwa Xhosa is a public fund — anyone can see what it
-            has raised and pledge a donation without an iCamagu account. */}
         <Route path="/ubuhlanti" element={<PublicUbuhlanti />} />
         <Route path="/ubuhlanti/" element={<PublicUbuhlanti />} />
         <Route
