@@ -2,15 +2,16 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import CeremonyIcon from '../components/CeremonyIcon.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
+import Icon from '../components/Icon.jsx'
 
 const CEREMONY_META = {
   ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', image: '/images/ceremonies/ulwaluko.jpg' },
   UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', image: '/images/ceremonies/umgidi.jpg' },
   INTAMBO_ENKULU: { label: 'Intambo Enkulu', english: 'The great bond', desc: 'The ceremony that binds two families together.', image: '/images/ceremonies/intambo-enkulu.jpg' },
   UKUKHAPHA: { label: 'Ukukhapha', english: 'Accompanying the departed', desc: 'The rite that walks a loved one to the ancestors.', image: '/images/ceremonies/ukukhapha.jpg' },
-  INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: 'A thanksgiving rite honouring a mother\'s provision.', image: '/images/ceremonies/inkobe-zika-mama.jpg' },
+  INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: "A thanksgiving rite honouring a mother's provision.", image: '/images/ceremonies/inkobe-zika-mama.jpg' },
   UKUBUYISA: { label: 'Ukubuyisa', english: 'Bringing the spirit home', desc: 'A year on, the departed is called back to the homestead.', image: '/images/ceremonies/ukubuyisa.jpg' },
-  UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', english: "Healer's ritual", desc: 'A ceremony marking a traditional healer\'s calling.', image: '/images/ceremonies/umsebenzi.jpg' },
+  UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', english: "Healer's ritual", desc: "A ceremony marking a traditional healer's calling.", image: '/images/ceremonies/umsebenzi.jpg' },
   WEDDING: { label: 'Wedding', english: 'Umtshato', desc: "Lobola talks, the handing over, and the two families' feast.", image: '/images/ceremonies/wedding.jpg' },
   GENERAL_EVENT: { label: 'General Event', english: 'Any occasion', desc: 'A gathering the family must mark, on your own terms.' },
 }
@@ -21,16 +22,14 @@ const STATUS_STYLE = {
   COMPLETED: 'bg-sage-100 text-sage-700',
 }
 
-function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
+const pressable = 'transition-transform duration-100 ease-out active:scale-[0.97]'
+
+function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) {
   const { accessToken } = useAuth()
   const [ceremonies, setCeremonies] = useState([])
   const [ceremonyTypes, setCeremonyTypes] = useState([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('types')
-  // The hero card's photo isn't guaranteed to actually load — a missing file,
-  // a bad deploy, being offline — so track a real load failure and fall back
-  // to the same gradient treatment used when a type has no photo at all,
-  // rather than showing a broken image with text stamped over it.
   const [leadImageFailed, setLeadImageFailed] = useState(false)
 
   useEffect(() => {
@@ -91,7 +90,7 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
                 </h3>
                 <p className="mt-2 text-[13px] leading-relaxed text-cream/85 max-w-[85%]">{leadMeta.desc}</p>
                 <span className="mt-4 inline-block rounded-pill bg-white/15 px-4 py-2 text-[13px] font-bold text-white">
-                  Start planning {leadMeta.label} →
+                  Start planning {leadMeta.label} &rarr;
                 </span>
               </div>
             </button>
@@ -122,19 +121,42 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony }) {
       ) : ceremonies.length > 0 ? (
         <div className="space-y-2.5">
           {ceremonies.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => onSelectCeremony && onSelectCeremony(c.id)}
-              className="card-paper grain w-full text-left overflow-hidden p-4 flex items-center justify-between gap-3"
-            >
-              <div className="min-w-0">
-                <p className="font-display font-bold text-sm text-ink">{c.title}</p>
-                <p className="text-xs text-ink-muted mt-0.5">{c.type.replace(/_/g, ' ')}</p>
-              </div>
-              <span className={`text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-pill flex-shrink-0 ${getStatusStyle(c.status)}`}>
-                {c.status || 'PLANNING'}
-              </span>
-            </button>
+            <div key={c.id} className="card-paper grain overflow-hidden">
+              {/* Ceremony summary row */}
+              <button
+                type="button"
+                onClick={() => onSelectCeremony && onSelectCeremony(c.id)}
+                className={`w-full text-left p-4 flex items-center justify-between gap-3 ${pressable}`}
+              >
+                <div className="min-w-0">
+                  <p className="font-display font-bold text-sm text-ink">{c.title}</p>
+                  <p className="text-xs text-ink-muted mt-0.5">{c.type.replace(/_/g, ' ')}</p>
+                </div>
+                <span className={`text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-pill flex-shrink-0 ${getStatusStyle(c.status)}`}>
+                  {c.status || 'PLANNING'}
+                </span>
+              </button>
+
+              {/* Hierarchy prompt — the missing connective tissue between
+                  planning a ceremony and allocating items to each group */}
+              {onGoToHierarchy && (
+                <div className="border-t border-terracotta/10 px-4 py-3 flex items-center justify-between gap-3 bg-terracotta/3">
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-ink leading-tight">Allocate items per group</p>
+                    <p className="text-[10px] text-ink-muted mt-0.5">Assign alcohol, food & supplies to each of the 14 groups</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onGoToHierarchy(c.id)}
+                    className={`flex-shrink-0 bg-terracotta text-white text-[11px] font-bold px-3 py-1.5 rounded-pill ${pressable}`}
+                  >
+                    <span className="flex items-center gap-1">
+                      Open <Icon name="arrowRight" size={11} color="#fff" />
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       ) : (
