@@ -49,7 +49,7 @@ export async function createStokvel(req, res) {
         name,
         type,
         organiserId: userId,
-        bankingTrack: 'AFRICAN_BANK', // placeholder value; not actually used until ManualEFT is swapped for a real adapter
+        bankingTrack: 'AFRICAN_BANK',
         contributionAmount: contributionAmount ? parseFloat(contributionAmount) : null,
         contributionFrequency: contributionFrequency || null,
         targetAmount: targetAmount ? parseFloat(targetAmount) : null,
@@ -78,36 +78,24 @@ export async function createStokvel(req, res) {
   }
 }
 
-// src/controllers/stokvelController.js
-
 export async function getPendingApprovalCount(req, res) {
   const userId = req.userId;
-
-    try {
-        // Find all stokvels where this user is an official
-            const officials = await prisma.stokvelOfficial.findMany({
-                  where: { userId },
-                        select: { stokvelId: true },
-                            });
-
-                                const stokvelIds = officials.map(o => o.stokvelId);
-
-                                    if (stokvelIds.length === 0) {
-                                          return res.json({ count: 0 });
-                                              }
-
-                                                  // Count pending contributions across all those stokvels
-                                                      const count = await prisma.contribution.count({
-                                                            where: {
-                                                                    stokvelId: { in: stokvelIds },
-                                                                            status: 'PENDING',
-                                                                                  },
-                                                                                      });
-
-                                                                                          res.json({ count });
-                                                                                            } catch (error) {
-                                                                                                console.error('Get pending approval count error:', error.message);
-                                                                                                    res.status(500).json({ error: 'Could not fetch pending approval count'  });                           }                                  }
+  try {
+    const officials = await prisma.stokvelOfficial.findMany({
+      where: { userId },
+      select: { stokvelId: true },
+    });
+    const stokvelIds = officials.map(o => o.stokvelId);
+    if (stokvelIds.length === 0) return res.json({ count: 0 });
+    const count = await prisma.contribution.count({
+      where: { stokvelId: { in: stokvelIds }, status: 'PENDING' },
+    });
+    res.json({ count });
+  } catch (error) {
+    console.error('Get pending approval count error:', error.message);
+    res.status(500).json({ error: 'Could not fetch pending approval count' });
+  }
+}
 
 export async function joinStokvel(req, res) {
   const userId = req.userId;
@@ -137,19 +125,99 @@ export async function joinStokvel(req, res) {
   }
 }
 
+/**
+ * Leave a stokvel — for non-organiser members only.
+ * Blocks if there is an open loan or pending payout tied to this member.
+ */
+export async function leaveStokvel(req, res) {
+  const { stokvelId } = req.params;
+  const userId = req.userId;
+  try {
+    const stokvel = await prisma.stokvel.findUnique({ where: { id: stokvelId }, select: { organiserId: true, name: true } });
+    if (!stokvel) return res.status(404).json({ error: 'Stokvel not found' });
+    if (stokvel.organiserId === userId) {
+      return res.status(400).json({ error: 'The organiser cannot leave — transfer ownership or delete the stokvel instead' });
+    }
+    const membership = await prisma.stokvelMember.findFirst({ where: { stokvelId, userId } });
+    if (!membership) return res.status(400).json({ error: 'You are not a member of this stokvel' });
+
+    // Block if the member has an open loan in this stokvel.
+    const openLoans = await prisma.$queryRaw`
+      SELECT 1 FROM "StokvelLoan"
+      WHERE "stokvelId" = ${stokvelId} AND "borrowerId" = ${userId}
+        AND "status" IN ('PENDING','APPROVED') LIMIT 1`.catch(() => []);
+    if (openLoans.length) {
+      return res.status(400).json({ error: 'You have an open loan in this stokvel. Repay it before leaving.' });
+    }
+
+    // Block if there is a pending payout for this member.
+    const openPayout = await prisma.payout.findFirst({
+      where: { stokvelId, recipientId: userId, status: 'PENDING_APPROVAL' },
+    });
+    if (openPayout) {
+      return res.status(400).json({ error: 'You have a pending payout in this stokvel. Wait for it to clear before leaving.' });
+    }
+
+    await prisma.stokvelMember.delete({ where: { id: membership.id } });
+    await prisma.stokvelOfficial.deleteMany({ where: { stokvelId, userId } });
+
+    res.json({ message: `You have left ${stokvel.name}` });
+  } catch (error) {
+    console.error('Leave stokvel error:', error.message);
+    res.status(500).json({ error: 'Could not leave stokvel' });
+  }
+}
+
 export async function deleteStokvel(req, res) {
   const { stokvelId } = req.params;
   try {
     const stokvel = await prisma.stokvel.findUnique({ where: { id: stokvelId } });
-    if (!stokvel || stokvel.organiserId !== req.userId) return res.status(403).json({ error: 'Only the organiser can delete this stokvel' });
+    if (!stokvel || stokvel.organiserId !== req.userId) {
+      return res.status(403).json({ error: 'Only the organiser can delete this stokvel' });
+    }
 
     const ledger = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
     if (ledger && parseFloat(ledger.totalBalance) > 0) {
       return res.status(400).json({ error: 'Cannot delete a stokvel with real funds in its ledger — this protects real money. Contact support if this stokvel genuinely needs to close.' });
     }
 
-    // Payout -> PayoutApproval/ShrineContribution cascade in schema; delete Payout/Contribution
-    // before RawBankLog since they hold an optional FK to it.
+    // ── Raw-SQL tables (no Prisma cascade) ─────────────────────────────────
+    // Delete child tables before parent tables to avoid FK violations.
+    // Use $executeRawUnsafe so the table name is literal (not a param),
+    // but the stokvelId value is still a bound parameter via interpolation.
+    const wipeRaw = async (table) => {
+      await prisma.$executeRawUnsafe(
+        `DELETE FROM "${table}" WHERE "stokvelId" = $1`,
+        stokvelId
+      );
+    };
+
+    // Loan repayments reference loans — delete them first.
+    await prisma.$executeRawUnsafe(
+      `DELETE FROM "StokvelLoanRepayment" WHERE "loanId" IN (
+         SELECT "id" FROM "StokvelLoan" WHERE "stokvelId" = $1
+       )`,
+      stokvelId
+    );
+    await prisma.$executeRawUnsafe(
+      `DELETE FROM "StokvelLoanVote" WHERE "loanId" IN (
+         SELECT "id" FROM "StokvelLoan" WHERE "stokvelId" = $1
+       )`,
+      stokvelId
+    );
+    await wipeRaw('StokvelLoan');
+    await wipeRaw('StokvelTradeCredit');
+    await wipeRaw('StokvelMinutes');
+    await wipeRaw('StokvelFine');
+    await wipeRaw('StokvelConstitution');
+    await wipeRaw('StokvelAuditLog');
+    await wipeRaw('StokvelLendingEntry');
+    await wipeRaw('StokvelLendingTarget');
+
+    // ── Prisma-managed tables ───────────────────────────────────────────────
+    // Payout -> PayoutApproval/ShrineContribution cascade in schema; delete
+    // Payout/Contribution before RawBankLog since they hold an optional FK to it.
+    await prisma.stokvelAnnouncement.deleteMany({ where: { stokvelId } });
     await prisma.payout.deleteMany({ where: { stokvelId } });
     await prisma.contribution.deleteMany({ where: { stokvelId } });
     await prisma.rawBankLog.deleteMany({ where: { stokvelId } });
@@ -157,6 +225,7 @@ export async function deleteStokvel(req, res) {
     await prisma.stokvelOfficial.deleteMany({ where: { stokvelId } });
     await prisma.stokvelGroupLedger.deleteMany({ where: { stokvelId } });
     await prisma.stokvel.delete({ where: { id: stokvelId } });
+
     res.json({ message: 'Stokvel deleted' });
   } catch (error) {
     console.error('Delete stokvel error:', error.message);
@@ -198,10 +267,6 @@ export async function getMyStokvels(req, res) {
       orderBy: { joinedAt: 'desc' },
     });
 
-    // groupLedger.totalBalance is what the whole group holds — it is NOT this
-    // member's money, and showing it under "your balance" would overstate what
-    // a person actually has in the group. Their own balance is the sum of
-    // their own confirmed contributions, so compute it properly.
     const memberIds = memberships.map((m) => m.id);
     const sums = memberIds.length
       ? await prisma.contribution.groupBy({
@@ -266,12 +331,6 @@ export async function getStokvel(req, res) {
   }
 }
 
-/**
- * Officials set (or reset) the payout rotation order for an UMGALELO_ROTATING
- * stokvel — must include every current member exactly once. Saving a new
- * order always restarts the rotation at position 0, since a partial reorder
- * mid-cycle would be ambiguous about who's already had their turn.
- */
 export async function setRotationOrder(req, res) {
   const { stokvelId } = req.params;
   const { order } = req.body;
@@ -305,8 +364,6 @@ export async function setRotationOrder(req, res) {
   }
 }
 
-// Additional handlers required for complete route balance
-
 export async function getStokvelsById(req, res) {
   const { stokvelId } = req.params;
   const userId = req.userId;
@@ -322,9 +379,7 @@ export async function getStokvelsById(req, res) {
       },
     });
 
-    if (!stokvel) {
-      return res.status(404).json({ error: 'Stokvel not found' });
-    }
+    if (!stokvel) return res.status(404).json({ error: 'Stokvel not found' });
 
     res.json(stokvel);
   } catch (error) {
