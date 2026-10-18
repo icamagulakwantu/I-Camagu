@@ -10,7 +10,7 @@ import ScrollableLabel from '../components/ScrollableLabel.jsx'
 import CeremonyIcon from '../components/CeremonyIcon.jsx'
 
 // --------------------------------------------------------------
-// Display‑ready ceremony types (from File 1)
+// Display‑ready ceremony types (from File 1)
 // --------------------------------------------------------------
 // titleExample is the placeholder shown when naming a plan. It is not a name
 // swap: isiXhosa builds the possessive from the noun class of the ceremony
@@ -52,7 +52,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   const { accessToken } = useAuth()
   const { showToast } = useToast()
 
-  // ----- State from File 2 (multi‑plan) -----
+  // ----- State from File 2 (multi‑plan) -----
   const [plans, setPlans] = useState([])
   const [activePlan, setActivePlan] = useState(null)
   const [planTab, setPlanTab] = useState('overview')
@@ -71,13 +71,13 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   const [savingTemplate, setSavingTemplate] = useState(false)
   const [newChecklistItem, setNewChecklistItem] = useState({ phase: 'CUSTOM', label: '', isOptional: true, actualCostZAR: '' })
 
-  // ----- State for pledges (from File 1) -----
+  // ----- State for pledges (from File 1) -----
   const [pledges, setPledges] = useState([])
   const [showPledgeForm, setShowPledgeForm] = useState(false)
   const [newPledge, setNewPledge] = useState({ contributorName: '', pledgeItem: '', pledgeValue: '' })
 
   // --------------------------------------------------------------
-  // API calls (all from File 2, pledges from File 1)
+  // API calls (all from File 2, pledges from File 1)
   // --------------------------------------------------------------
   const fetchPlans = () => {
     fetch('/api/ceremonies/plans/my', {
@@ -404,12 +404,12 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   }
 
   // --------------------------------------------------------------
-  // Helper: pressable class (from File 1)
+  // Helper: pressable class (from File 1)
   // --------------------------------------------------------------
   const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
   // --------------------------------------------------------------
-  // Render: Active Plan View (polished UI from File 1)
+  // Render: Active Plan View (polished UI from File 1)
   // --------------------------------------------------------------
   if (activePlan) {
     const items = activePlan.checklistItems || []
@@ -424,10 +424,14 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     const remaining = budgetZAR != null ? budgetZAR - spent : null
     const spentPercent = budgetZAR ? Math.min(100, Math.round((spent / budgetZAR) * 100)) : (estimatedTotal ? Math.min(100, Math.round((spent / estimatedTotal) * 100)) : 0)
     const overBudget = budgetZAR != null && spent > budgetZAR
+    // Family pledges counted the same way the separate Budget dashboard
+    // counts them (see getPlanBudget), so the two screens never disagree.
+    const totalPledged = pledges.reduce((sum, p) => sum + (p.pledgedAmountZAR != null ? parseFloat(p.pledgedAmountZAR) : 0), 0)
+    const pledgeShortfall = budgetZAR != null ? Math.max(0, budgetZAR - totalPledged) : null
 
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        {/* Header (File 1 style) */}
+        {/* Header (File 1 style) */}
         <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-8 rounded-b-[2.5rem] relative overflow-hidden">
           <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
           <div className="relative">
@@ -496,6 +500,32 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
               )}
               <span>{costItems.filter(i => i.isPurchased).length}/{costItems.length} bought</span>
             </div>
+          </div>
+        )}
+
+        {/* Family pledges, counted the same way as the main Budget dashboard
+            screen, so this ceremony never shows two different "money raised"
+            numbers depending on which screen you're looking at. */}
+        {pledges.length > 0 && (
+          <div className="mx-4 mt-4 card-paper p-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs font-black uppercase text-ink-muted">Pledged by family</p>
+                <p className="font-display font-bold text-2xl text-ink mt-0.5 tabular">
+                  R{totalPledged.toLocaleString('en-ZA', { maximumFractionDigits: 0 })}
+                </p>
+              </div>
+              <button type="button" onClick={() => setPlanTab('contributions')} className={`text-xs font-bold text-sage-600 ${pressable}`}>
+                View pledges
+              </button>
+            </div>
+            {pledgeShortfall != null && (
+              <p className="text-xs text-ink-muted font-medium mt-2">
+                {pledgeShortfall > 0
+                  ? `R${pledgeShortfall.toLocaleString('en-ZA', { maximumFractionDigits: 0 })} of the budget still needs to be pledged`
+                  : 'Pledges cover the full budget'}
+              </p>
+            )}
           </div>
         )}
 
@@ -592,7 +622,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         {planTab === 'overview' && (
         <>
 
-        {/* Progress Card (File 1 style) */}
+        {/* Progress Card (File 1 style) */}
         <div className="mx-4 mt-5 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-display font-bold text-lg text-ink">Planning Progress</h3>
@@ -612,7 +642,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           </div>
         </div>
 
-        {/* Action Buttons (File 1 style) */}
+        {/* Action Buttons (File 1 style) */}
         <div className="mx-4 mt-4">
           <div className={`grid ${activePlan.ceremonyId ? 'grid-cols-4' : 'grid-cols-3'} gap-2`}>
           <button
@@ -715,7 +745,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           </div>
         )}
 
-        {/* Checklist (File 1 UI, using File 2 data) */}
+        {/* Checklist (File 1 UI, using File 2 data) */}
         </>
         )}
 
@@ -777,7 +807,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           </div>
         </div>
 
-        {/* Family Contributions (Pledges) – from File 1 */}
+        {/* Family Contributions (Pledges) – from File 1 */}
         </>
         )}
 
@@ -843,20 +873,28 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             />
           ) : (
             <div className="space-y-2">
-              {pledges.map((p) => (
+              {pledges.map((p) => {
+                // The server returns pledgerName / pledgedItem / pledgedAmountZAR
+                // (see ContributionPledge in the schema), not contributorName /
+                // pledgeItem / pledgeValue / status — those older field names
+                // never matched, so every pledge used to render blank.
+                const pledgedAmount = p.pledgedAmountZAR != null ? parseFloat(p.pledgedAmountZAR) : null
+                const paidAmount = p.paidAmountZAR != null ? parseFloat(p.paidAmountZAR) : 0
+                const isPaid = pledgedAmount != null && paidAmount >= pledgedAmount && pledgedAmount > 0
+                return (
                 <div
                   key={p.id}
                   className="bg-white border-2 border-terracotta/25 rounded-soft p-4 flex justify-between items-center shadow-soft"
                 >
                   <div>
-                    <p className="font-bold text-sm text-ink">{p.contributorName}</p>
+                    <p className="font-bold text-sm text-ink">{p.pledgerName}{p.relationship ? ` · ${p.relationship}` : ''}</p>
                     <p className="text-xs text-ink-muted">
-                      {p.pledgeItem} {p.pledgeValue && `· ${p.pledgeValue}`}
+                      {p.pledgedItem} {pledgedAmount != null && `· R${pledgedAmount.toLocaleString('en-ZA', { maximumFractionDigits: 0 })}`}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold px-2.5 py-1 bg-sage-50 text-sage-700 rounded-pill">
-                      {p.status || 'Pledged'}
+                    <span className={cn('text-xs font-bold px-2.5 py-1 rounded-pill', isPaid ? 'bg-sage-100 text-sage-700' : 'bg-sage-50 text-sage-700')}>
+                      {isPaid ? 'Received' : 'Pledged'}
                     </span>
                     <button
                       type="button"
@@ -868,7 +906,8 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
                     </button>
                   </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
@@ -881,11 +920,11 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   }
 
   // --------------------------------------------------------------
-  // Render: Plan List / Create View (polished File 1 UI)
+  // Render: Plan List / Create View (polished File 1 UI)
   // --------------------------------------------------------------
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      {/* Header (File 1 style) */}
+      {/* Header (File 1 style) */}
       <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-8 rounded-b-[2.5rem] relative overflow-hidden">
         <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
         <div className="relative">
@@ -901,7 +940,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         </div>
       </div>
 
-      {/* Ceremony Type Selector (File 1 style) */}
+      {/* Ceremony Type Selector (File 1 style) */}
       <div className="flex gap-2 px-4 mt-5 overflow-x-auto no-scrollbar pb-2">
         {ceremonyTypes.map((typeId) => {
           const type = CEREMONY_META[typeId] || {}
@@ -936,7 +975,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         })}
       </div>
 
-      {/* Create Plan Form (styled like File 1) */}
+      {/* Create Plan Form (styled like File 1) */}
       <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft">
         <h3 className="font-display font-bold text-lg text-ink mb-3">Create New Plan</h3>
         <form onSubmit={createPlan} className="space-y-3">
@@ -989,7 +1028,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         </form>
       </div>
 
-      {/* List of existing plans (styled like File 1’s cards) */}
+      {/* List of existing plans (styled like File 1’s cards) */}
       <div className="px-4 mt-4">
         {loading ? (
           <div className="space-y-2">
