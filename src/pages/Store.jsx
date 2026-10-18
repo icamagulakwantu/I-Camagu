@@ -78,7 +78,10 @@ function Store({ onGoToBasket, basketCount }) {
       {/* Sticky Header */}
       <div className="sticky top-0 z-30 bg-cream/95 backdrop-blur-xl border-b border-cream-dark px-5 py-4">
         <div className="flex items-center justify-between gap-2">
-          <h1 className="font-display font-bold text-2xl text-ink">Store</h1>
+          <div>
+            <h1 className="font-display font-bold text-2xl text-ink leading-tight">SmartMatch</h1>
+            <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wide -mt-0.5">Bulk buying</p>
+          </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
@@ -116,33 +119,28 @@ function Store({ onGoToBasket, basketCount }) {
         )}
       </div>
 
-      {/* Smart Match Explainer */}
+      {/* SmartMatch explainer */}
       <div className="wash-ember grain card-paper mx-4 mt-4 p-4">
-        <p className="eyebrow text-cream/75 mb-1">Smart Match — Bulk Buying</p>
+        <p className="eyebrow text-cream/75 mb-1">How SmartMatch works</p>
         <p className="text-sm font-bold leading-snug text-cream">
-          Add items to your cart and iCamagu pools your order with other members — even from other stokvels — buying meat, livestock, alcohol, drinks or dry goods from the same supplier. Once the group hits the minimum, everyone unlocks bulk pricing.
+          Add items to your cart and iCamagu pools your order with other members — alcohol, groceries, meat, or livestock from the same supplier. Once the group hits the minimum, everyone unlocks bulk pricing.
         </p>
       </div>
 
       {!isSearching && (
         <>
-          {/* Level 1 — departments, in order: Drinks, Meat, Groceries, Supplies, Clothing.
-              No "All" tile: every item lives under exactly one department, so
-              browsing "everything" is just the whole heavy catalogue with no
-              extra value over picking a department first. */}
           <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-1">
             {DEPARTMENTS.map((d) => (
               <DeptTile key={d.id} label={d.short} xhosa={d.xhosa} active={activeDept === d.id} onClick={() => pickDept(d.id)} />
             ))}
           </div>
 
-          {/* Level 2 — aisles, scoped to the selected department only */}
           {activeDepartment && (
             <div className="flex gap-2 px-4 mt-3 overflow-x-auto pb-1">
               <button
                 onClick={() => setActiveAisle('all')}
                 className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
-                  activeAisle === 'all' ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
+                  activeAisle === 'all' ? 'bg-terracotta text-white' : 'bg-white border border-ink/10 text-ink-muted'
                 }`}
               >
                 All {activeDepartment.short.toLowerCase()}
@@ -152,7 +150,7 @@ function Store({ onGoToBasket, basketCount }) {
                   key={a.id}
                   onClick={() => setActiveAisle(a.id)}
                   className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
-                    activeAisle === a.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
+                    activeAisle === a.id ? 'bg-terracotta text-white' : 'bg-white border border-ink/10 text-ink-muted'
                   }`}
                 >
                   {a.name}
@@ -169,7 +167,6 @@ function Store({ onGoToBasket, basketCount }) {
         </p>
       )}
 
-      {/* Product List */}
       <div className="px-4 mt-4">
         {loading ? (
           <div className="space-y-3">
