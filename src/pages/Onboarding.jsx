@@ -31,7 +31,7 @@ const FEATURES = [
     bg: 'bg-sage-50',
     border: 'border-sage-200',
     label: 'Stokvels',
-    headline: 'Save together, pay out fairly.',
+    headline: 'Siza ndawonye, sihlawula ngobulungisa.',
     desc: 'Run your pool digitally — track who paid, send reminders, and pay out with a full paper trail.',
   },
   {
@@ -40,7 +40,7 @@ const FEATURES = [
     bg: 'bg-[#f4f7f4]',
     border: 'border-sage-200',
     label: 'Iziduko Network',
-    headline: 'Find your bloodline across SA.',
+    headline: 'Fumana isiduko sakho ebuhlanti.',
     desc: 'Enter your clan names and connect with relatives you have never met. The digital umuntu ngumntu ngabantu.',
   },
 ]
@@ -198,9 +198,9 @@ function Onboarding({ onDone }) {
               <img src="/icons/source/gateway-mark-1024.png" alt="iCamagu" className="w-9 h-9" style={{ filter: 'brightness(0) invert(1)' }} />
               <span className="font-display font-bold text-2xl text-white">iCamagu</span>
             </div>
-            <p className="eyebrow text-white/60 mb-1.5">Molo, {user?.firstName || 'friend'}</p>
+            <p className="eyebrow text-white/60 mb-1.5">Molo, {user?.firstName || 'mhlobo'}</p>
             <h1 className="font-display font-bold text-[1.65rem] leading-tight text-white">
-              Everything your ceremony needs. All in one place.
+              Konke okufunwa ngumsebenzi wakho. Ndawonye.
             </h1>
             <p className="text-white/75 text-sm mt-2 leading-relaxed">
               From the first planning conversation to the last bottle ordered — iCamagu runs alongside you.
@@ -236,7 +236,7 @@ function Onboarding({ onDone }) {
             <button onClick={() => setStep('ancestry')} className="w-full wash-ember text-white font-bold py-3.5 rounded-pill shadow-terracotta text-[15px] pressable">
               Start setting up my profile &rarr;
             </button>
-            <p className="text-center text-[10px] text-ink-muted mt-2.5">Two quick steps &bull; Takes under a minute</p>
+            <p className="text-center text-[10px] text-ink-muted mt-2.5">Amanyathelo amabini · Takes under a minute</p>
           </div>
         </div>
       )}
@@ -245,7 +245,7 @@ function Onboarding({ onDone }) {
         <div className="w-full max-w-sm bg-white/90 backdrop-blur-md border-2 border-terracotta/25 rounded-soft p-8 shadow-elevated animate-slide-up">
           <ProgressDots step={step} />
           <div className="mb-5">
-            <h2 className="font-display font-bold text-xl text-ink mb-1">A face and a fuller line</h2>
+            <h2 className="font-display font-bold text-xl text-ink mb-1">Ubuso bakho neziduko zakho</h2>
             <p className="text-ink-muted text-xs leading-relaxed">
               {user?.paternalIziduko
                 ? "A photo helps clan matches recognise you. Your grandmothers' Iziduko sharpen those matches further — both are optional."
@@ -270,11 +270,11 @@ function Onboarding({ onDone }) {
             {!user?.paternalIziduko && (
               <>
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Paternal Iziduko</label>
-                  <input type="text" placeholder="Optional" value={paternalIziduko} onChange={(e) => setPaternalIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
+                  <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Isiduko sikaTata (Paternal)</label>
+                  <input type="text" placeholder="Umzekelo: Mbeki, Zulu, Cele" value={paternalIziduko} onChange={(e) => setPaternalIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Maternal Iziduko</label>
+                  <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Isiduko sikaMama (Maternal)</label>
                   <input type="text" placeholder="Optional" value={maternalIziduko} onChange={(e) => setMaternalIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
                 </div>
               </>
@@ -302,7 +302,7 @@ function Onboarding({ onDone }) {
         <div className="w-full max-w-sm bg-white/90 backdrop-blur-md border-2 border-terracotta/25 rounded-soft p-8 shadow-elevated animate-slide-up">
           <ProgressDots step={step} />
           <div className="mb-5">
-            <h2 className="font-display font-bold text-xl text-ink mb-1">How can people reach you?</h2>
+            <h2 className="font-display font-bold text-xl text-ink mb-1">Banganifumana njani?</h2>
             <p className="text-ink-muted text-xs leading-relaxed">Used for ceremony bookings and stokvel notifications. All optional — add later from your profile anytime.</p>
           </div>
 
@@ -320,7 +320,7 @@ function Onboarding({ onDone }) {
           {error && <p className="text-terracotta text-sm mt-3">{error}</p>}
 
           <button onClick={saveDetailsAndFinish} disabled={saving} className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 mt-5 pressable shadow-terracotta">
-            {saving ? 'Saving...' : 'Finish & enter iCamagu \u2192'}
+            {saving ? 'Saving...' : 'Finish & enter iCamagu →'}
           </button>
           <button type="button" onClick={finishOnboarding} className="w-full text-xs text-ink-muted underline mt-2.5">Skip for now</button>
         </div>

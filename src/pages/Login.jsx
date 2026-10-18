@@ -184,10 +184,10 @@ function Login() {
           </div>
           <h1 className="font-display font-bold text-[1.55rem] leading-tight text-white text-balance">
             {step === 'email' && 'Buy together. Save more.'}
-            {step === 'register' && 'Join iCamagu'}
-            {step === 'password-login' && 'Welcome back'}
+            {step === 'register' && 'Joyina iCamagu'}
+            {step === 'password-login' && 'Wamkelekile'}
             {step === 'forgot-password' && 'Reset your password'}
-            {step === 'otp-login' && 'Welcome back'}
+            {step === 'otp-login' && 'Wamkelekile'}
             {step === 'otp-verify' && 'Check your inbox'}
           </h1>
           <p className="text-white/80 text-sm mt-1.5 leading-snug">
@@ -208,8 +208,9 @@ function Login() {
                   </span>
                 ))}
               </div>
+              {/* Xhosa tagline — familiar to city speakers, not dictionary */}
               <p className="text-white/60 text-[11px] font-semibold uppercase tracking-[0.16em] mt-4">
-                Plan your ceremony · Culture before capital
+                Lungisa umsebenzi · Inkcubeko ngaphambi kwemali
               </p>
             </>
           )}

@@ -7,7 +7,7 @@ import AncestralRites from './AncestralRites.jsx'
 
 const SECTIONS = [
   {
-    title: 'My Culture',
+    title: 'Inkcubeko yam',
     items: [
       { id: 'rites', icon: 'footprints', label: 'Ancestral Rites List', hint: 'Rites still owed to our ancestors' },
       { id: 'ceremony', icon: 'clipboard', label: 'Ceremony Preparation', hint: 'Plan a ceremony step by step' },
@@ -21,7 +21,7 @@ const SECTIONS = [
     ],
   },
   {
-    title: 'My Money & Orders',
+    title: 'Imali & Iiodolo zam',
     items: [
       { id: 'ukugida', icon: 'send', label: 'Ukugida' },
       { id: 'myorders', icon: 'package', label: 'My Orders' },
@@ -29,7 +29,7 @@ const SECTIONS = [
     ],
   },
   {
-    title: 'Community Services',
+    title: 'Iinkonzo Zoluntu',
     items: [
       { id: 'ekoyini', icon: 'cocktail', label: 'Ekoyini Mobile Bar' },
       { id: 'supplier', icon: 'store', label: 'Supplier Dashboard' },
@@ -107,8 +107,8 @@ export default function More({ onNavigate }) {
   return (
     <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
       <div className="mb-6 px-1">
-        <h1 className="font-display font-bold text-3xl text-ink mb-1">More</h1>
-        <p className="text-xs font-bold text-ink-muted uppercase tracking-wider">All features & settings</p>
+        <p className="eyebrow text-ink-muted mb-1">Konke okukhoyo</p>
+        <h1 className="font-display font-bold text-3xl text-ink">More</h1>
       </div>
 
       {user && (
@@ -162,7 +162,7 @@ export default function More({ onNavigate }) {
             A blessed kraal where families without a homestead can perform rites for their ancestors, supported by community tithes, and a fund building township prosperity.
           </p>
           <div className="mt-3 flex items-center gap-1.5">
-            <span className="text-xs font-bold text-white">View Ubuhlanti</span>
+            <span className="text-xs font-bold text-white">Jonga Ubuhlanti</span>
             <Icon name="arrowRight" size={13} color="#ffffff" />
           </div>
         </div>
@@ -214,7 +214,7 @@ export default function More({ onNavigate }) {
             pressable
           )}
         >
-          <Icon name="logout" size={18} /> Log Out
+          <Icon name="logout" size={18} /> Phuma — Log Out
         </button>
       </div>
     </div>

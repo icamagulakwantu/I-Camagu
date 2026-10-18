@@ -13,7 +13,7 @@ const CEREMONY_META = {
   UKUBUYISA: { label: 'Ukubuyisa', english: 'Bringing the spirit home', desc: 'A year on, the departed is called back to the homestead.', image: '/images/ceremonies/ukubuyisa.jpg' },
   UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', english: "Healer's ritual", desc: "A ceremony marking a traditional healer's calling.", image: '/images/ceremonies/umsebenzi.jpg' },
   WEDDING: { label: 'Wedding', english: 'Umtshato', desc: "Lobola talks, the handing over, and the two families' feast.", image: '/images/ceremonies/wedding.jpg' },
-  GENERAL_EVENT: { label: 'General Event', english: 'Any occasion', desc: 'A gathering the family must mark, on your own terms.' },
+  GENERAL_EVENT: { label: 'General Event', english: 'Nayiphi na', desc: 'A gathering the family must mark, on your own terms.' },
 }
 
 const STATUS_STYLE = {
@@ -59,16 +59,16 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
       <button onClick={onBack} className="text-sm text-ink-muted mb-4 block">← Back</button>
       <p className="eyebrow mb-1">Imisebenzi</p>
       <h1 className="font-display font-bold text-3xl text-ink">Ceremonies</h1>
-      <p className="text-ink-muted text-sm mt-2 mb-4">Every rite has its own rhythm — start from the one you're holding.</p>
+      <p className="text-ink-muted text-sm mt-2 mb-4">Yonke inkonzo inengoma yayo — qala kulowo oyenzayo.</p>
 
       <div className="flex rounded-pill border-2 border-terracotta/20 bg-white p-1 mb-5">
         <button type="button" onClick={() => setTab('types')}
           className={`flex-1 rounded-pill py-2 text-[13px] font-bold transition-colors ${tab === 'types' ? 'bg-terracotta text-white' : 'text-ink-muted'}`}>
-          All rites
+          Yonke imisebenzi
         </button>
         <button type="button" onClick={() => setTab('mine')}
           className={`flex-1 rounded-pill py-2 text-[13px] font-bold transition-colors ${tab === 'mine' ? 'bg-terracotta text-white' : 'text-ink-muted'}`}>
-          Mine ({ceremonies.length})
+          Eyam ({ceremonies.length})
         </button>
       </div>
 
@@ -161,7 +161,7 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
         </div>
       ) : (
         <div className="text-center text-ink-muted py-8">
-          No ceremonies yet. Switch to "All rites" to start planning one.
+          Akukho misebenzi. Switch to "Yonke imisebenzi" to start planning one.
         </div>
       )}
     </div>
