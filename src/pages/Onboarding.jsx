@@ -21,9 +21,9 @@ const FEATURES = [
     accent: '#c1922f',
     bg: 'bg-[#fdf9ee]',
     border: 'border-ochre/20',
-    label: 'Alcohol Bulk Buying',
-    headline: 'Get the best price on bulk alcohol.',
-    desc: 'Order umqombothi ingredients, brandy, beer & more at ceremony prices. Delivered or collected before your event.',
+    label: 'SmartMatch',
+    headline: 'Pool your order. Unlock bulk prices.',
+    desc: 'iCamagu groups your order with other members buying the same things — alcohol, groceries, meat, or livestock — so everyone hits the bulk minimum together. Cases of Commando, Old Buck, maize meal, or a beast: you pay supplier prices, not retail.',
   },
   {
     icon: 'coins',
