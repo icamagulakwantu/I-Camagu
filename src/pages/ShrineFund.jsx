@@ -28,7 +28,7 @@ const PHASES = [
     accent: '#4a7a4a',
     phase: 'Phase 3 — Primary Industries & Legacy',
     headline: 'Mining, property, and nation-scale investment.',
-    body: 'Once the foundation is solid, the fund moves into primary industries — mining, agriculture, fisheries, property, and livestock economies of scale across the Eastern Cape's arable land and coastline. No single family or stokvel could build this alone. Together, we can.',
+    body: "Once the foundation is solid, the fund moves into primary industries — mining, agriculture, fisheries, property, and livestock economies of scale across the Eastern Cape's arable land and coastline. No single family or stokvel could build this alone. Together, we can.",
   },
 ]
 
