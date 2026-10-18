@@ -3,20 +3,14 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { cn } from '../lib/utils'
 import Icon from '../components/Icon.jsx'
 
-// Grouped per the Lovable review's suggested More-menu structure: My
-// culture / My money and orders / Community services / Profile and
-// security / Help and legal — plus a separate Admin Tools section that
-// only renders for an actual admin (section-level, not just per-item),
-// since scattering four admin-only screens into "Services" was exactly
-// the kind of un-role-gated menu the review flagged.
 const SECTIONS = [
   {
     title: 'My Culture',
     items: [
       { id: 'ceremony', icon: 'clipboard', label: 'Ceremony Preparation' },
+      { id: 'hierarchy', icon: 'users', label: 'Umgidi Hierarchy' },
       { id: 'templates', icon: 'template', label: 'Ceremony Templates' },
       { id: 'family', icon: 'heart', label: 'Family Contributions' },
-      { id: 'hierarchy', icon: 'users', label: 'Umgidi Hierarchy' },
       { id: 'legends', icon: 'landmark', label: 'House of AmaXhosa' },
       { id: 'ukusoka', icon: 'gift', label: 'Ukusoka' },
       { id: 'umqombothi', icon: 'beer', label: 'Umqombothi Brewing' },
@@ -29,7 +23,6 @@ const SECTIONS = [
       { id: 'ukugida', icon: 'send', label: 'Ukugida' },
       { id: 'myorders', icon: 'package', label: 'My Orders' },
       { id: 'expenditure', icon: 'coins', label: 'My Spending' },
-      { id: 'shrinefund', icon: 'flame', label: 'Ubuhlanti' },
     ],
   },
   {
@@ -96,7 +89,7 @@ export default function More({ onNavigate }) {
       </div>
 
       {user && (
-        <div className="wash-ember grain mb-6 flex items-center gap-4 rounded-soft px-5 py-5">
+        <div className="wash-ember grain mb-4 flex items-center gap-4 rounded-soft px-5 py-5">
           <span className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
             <Icon name="user" size={22} color="#ffffff" />
           </span>
@@ -107,18 +100,39 @@ export default function More({ onNavigate }) {
         </div>
       )}
 
+      {/* ── Ubuhlanti featured card ─────────────────────────── */}
+      <button
+        type="button"
+        onClick={() => handleNav('shrinefund')}
+        className={`w-full mb-5 rounded-soft overflow-hidden text-left ${pressable}`}
+        style={{ background: 'linear-gradient(135deg, #c45c26 0%, #8c3b1a 100%)' }}
+      >
+        <div className="px-5 py-4">
+          <div className="flex items-center gap-2.5 mb-2">
+            <Icon name="flame" size={20} color="#ffffff" strokeWidth={1.5} />
+            <p className="eyebrow text-white/70">Ubuhlanti bakwa Xhosa</p>
+          </div>
+          <p className="font-display font-bold text-xl text-white leading-tight mb-1">
+            The Sovereign Xhosa Development Fund
+          </p>
+          <p className="text-white/75 text-xs leading-relaxed">
+            A community-owned investment fund building township economies, food security, and generational wealth — starting now.
+          </p>
+          <div className="mt-3 flex items-center gap-1.5">
+            <span className="text-xs font-bold text-white">View the fund</span>
+            <Icon name="arrowRight" size={13} color="#ffffff" />
+          </div>
+        </div>
+      </button>
+
       {SECTIONS.filter((section) => !section.adminOnly || user?.isAdmin).map((section, sectionIndex) => {
         const alt = sectionIndex % 2 === 1
-        // Per-item adminOnly still applies within an otherwise-visible
-        // section — a screen that leads nowhere for anyone else (the
-        // backend already 403s it) shouldn't advertise a door with no
-        // room behind it.
         const items = section.items.filter((item) => !item.adminOnly || user?.isAdmin)
         if (items.length === 0) return null
         return (
           <div key={section.title} className="mb-6">
             <div className="flex items-center gap-3 mb-2 px-1">
-              <p className={`text-xs font-black uppercase ${alt ? 'text-brand-ochre' : 'text-terracotta'}`}>{section.title}</p>
+              <p className="text-xs font-black uppercase text-terracotta">{section.title}</p>
               <span className="h-px flex-1 bg-terracotta/10" />
             </div>
             <div className={cn('card-paper divide-y divide-terracotta/10 overflow-hidden', alt && 'wash-clay')}>
@@ -132,8 +146,8 @@ export default function More({ onNavigate }) {
                     pressable
                   )}
                 >
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${alt ? 'bg-brand-ochre/12' : 'bg-terracotta/10'}`}>
-                    <Icon name={item.icon} size={18} color={alt ? '#c1922f' : '#c45c26'} />
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 bg-terracotta/10">
+                    <Icon name={item.icon} size={18} color="#c45c26" />
                   </div>
                   <span className="font-bold text-sm text-ink flex-1">{item.label}</span>
                   <Icon name="arrowRight" size={16} color="#8a8278" />
