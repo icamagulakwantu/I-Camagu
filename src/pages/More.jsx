@@ -1,20 +1,23 @@
+import { useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { cn } from '../lib/utils'
 import Icon from '../components/Icon.jsx'
+import AncestralRites from './AncestralRites.jsx'
 
 const SECTIONS = [
   {
     title: 'My Culture',
     items: [
-      { id: 'ceremony', icon: 'clipboard', label: 'Ceremony Preparation' },
+      { id: 'rites', icon: 'footprints', label: 'Ancestral Rites List', hint: 'Rites still owed to our ancestors' },
+      { id: 'ceremony', icon: 'clipboard', label: 'Ceremony Preparation', hint: 'Plan a ceremony step by step' },
       { id: 'hierarchy', icon: 'users', label: 'Umgidi Hierarchy' },
       { id: 'templates', icon: 'template', label: 'Ceremony Templates' },
       { id: 'family', icon: 'heart', label: 'Family Contributions' },
+      { id: 'iziduko', icon: 'link', label: 'Iziduko Network', hint: 'Find relatives by clan name' },
       { id: 'legends', icon: 'landmark', label: 'House of AmaXhosa' },
       { id: 'ukusoka', icon: 'gift', label: 'Ukusoka' },
       { id: 'umqombothi', icon: 'beer', label: 'Umqombothi Brewing' },
-      { id: 'iziduko', icon: 'link', label: 'Iziduko Network' },
     ],
   },
   {
@@ -46,8 +49,8 @@ const SECTIONS = [
   {
     title: 'Help & Legal',
     items: [
-      { id: 'privacy', icon: 'file', label: 'Privacy Policy' },
       { id: 'help', icon: 'help', label: 'Help & Support' },
+      { id: 'privacy', icon: 'file', label: 'Privacy Policy' },
     ],
   },
   {
@@ -62,13 +65,23 @@ const SECTIONS = [
   },
 ]
 
+// "Road signs" for people who feel lost: the four main jobs and where they live.
+const SIGNPOSTS = [
+  { icon: 'cart', text: 'Buy in bulk and save', where: 'SmartMatch tab at the bottom' },
+  { icon: 'users', text: 'Save, lend and pay out together', where: 'Stokvels tab at the bottom' },
+  { icon: 'calendar', text: 'Plan a ceremony', where: 'Ceremonies tab at the bottom' },
+  { icon: 'footprints', text: 'List rites owed to ancestors', where: 'Ancestral Rites List below' },
+]
+
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.98]'
 
 export default function More({ onNavigate }) {
   const { user, logout } = useAuth()
   const { showToast } = useToast()
+  const [showRites, setShowRites] = useState(false)
 
   const handleNav = (screen) => {
+    if (screen === 'rites') { setShowRites(true); window.scrollTo(0, 0); return }
     if (typeof onNavigate === 'function') onNavigate(screen)
   }
 
@@ -79,6 +92,16 @@ export default function More({ onNavigate }) {
     } catch {
       showToast('Failed to log out', 'error')
     }
+  }
+
+  if (showRites) {
+    return (
+      <AncestralRites
+        onBack={() => setShowRites(false)}
+        onOpenUbuhlanti={() => handleNav('shrinefund')}
+        onOpenProfile={() => handleNav('profile')}
+      />
+    )
   }
 
   return (
@@ -100,6 +123,26 @@ export default function More({ onNavigate }) {
         </div>
       )}
 
+      {/* Lost? Road signs to the main jobs */}
+      <div className="mb-5 rounded-soft border-2 border-brand-ochre/40 bg-brand-ochre/10 p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <Icon name="mapPin" size={16} color="#c45c26" />
+          <p className="text-xs font-black uppercase text-terracotta">Lost? Start here</p>
+        </div>
+        <ul className="space-y-2">
+          {SIGNPOSTS.map((s) => (
+            <li key={s.text} className="flex items-start gap-2.5">
+              <Icon name={s.icon} size={15} color="#c45c26" className="mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-ink leading-snug">
+                <span className="font-bold">{s.text}</span>
+                <span className="text-ink-muted"> → {s.where}</span>
+              </p>
+            </li>
+          ))}
+        </ul>
+        <p className="text-[11px] text-ink-muted mt-3">Saved screens still open without internet. Changes are sent once you are back online.</p>
+      </div>
+
       {/* ── Ubuhlanti featured card ─────────────────────────── */}
       <button
         type="button"
@@ -113,13 +156,13 @@ export default function More({ onNavigate }) {
             <p className="eyebrow text-white/70">Ubuhlanti bakwa Xhosa</p>
           </div>
           <p className="font-display font-bold text-xl text-white leading-tight mb-1">
-            The Sovereign Xhosa Development Fund
+            A sacred sanctuary for the Xhosa nation
           </p>
           <p className="text-white/75 text-xs leading-relaxed">
-            A community-owned investment fund building township economies, food security, and generational wealth — starting now.
+            A blessed kraal where families without a homestead can perform rites for their ancestors, supported by community tithes, and a fund building township prosperity.
           </p>
           <div className="mt-3 flex items-center gap-1.5">
-            <span className="text-xs font-bold text-white">View the fund</span>
+            <span className="text-xs font-bold text-white">View Ubuhlanti</span>
             <Icon name="arrowRight" size={13} color="#ffffff" />
           </div>
         </div>
@@ -149,7 +192,10 @@ export default function More({ onNavigate }) {
                   <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 bg-terracotta/10">
                     <Icon name={item.icon} size={18} color="#c45c26" />
                   </div>
-                  <span className="font-bold text-sm text-ink flex-1">{item.label}</span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block font-bold text-sm text-ink">{item.label}</span>
+                    {item.hint && <span className="block text-[11px] text-ink-muted mt-0.5">{item.hint}</span>}
+                  </span>
                   <Icon name="arrowRight" size={16} color="#8a8278" />
                 </button>
               ))}
