@@ -4,6 +4,7 @@ import { useToast } from '../../components/ui/Toast.jsx'
 import { Skeleton } from '../../components/ui/Skeleton.jsx'
 import { SubEmpty, ConfirmSheet, primaryBtn, secondaryBtn } from './Ui.jsx'
 import BorrowerAgreement from './BorrowerAgreement.jsx'
+import LendingTargets from './LendingTargets.jsx'
 import { pressable, inp, money, fmtDate, api } from './shared.js'
 
 const STATUS_STYLE = {
@@ -101,6 +102,18 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
         </p>
       </div>
 
+      {/* Signpost: the loan steps, so nobody gets lost halfway */}
+      <div className="rounded-soft border-2 border-brand-ochre/40 bg-brand-ochre/10 px-4 py-3">
+        <p className="text-xs font-bold text-ink">How a group loan works</p>
+        <ol className="text-[11px] text-ink-muted mt-1 space-y-0.5 list-decimal pl-4">
+          <li>Borrower asks, takes a photo and signs on this phone.</li>
+          <li>Officials vote. {requiredApprovals} approval{requiredApprovals === 1 ? '' : 's'} release the loan.</li>
+          <li>Officials record each repayment until it is paid back.</li>
+        </ol>
+      </div>
+
+      <LendingTargets stokvelId={stokvelId} />
+
       {!requesting ? (
         <button type="button" onClick={() => setRequesting(true)}
           className={`w-full py-2.5 ${primaryBtn}`}>
@@ -129,6 +142,9 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
             <p className="text-xs text-ink">
               You will repay <strong>{money(preview)}</strong>, about <strong>{money(preview / Math.max(1, Number(months) || 1))}</strong> a month.
             </p>
+          )}
+          {preview > 0 && !(agreement.borrowerPhoto && agreement.signature && agreement.agreed) && (
+            <p className="text-[11px] font-bold text-brand-ochre">To send: take the photo, sign, and tick that you agree.</p>
           )}
           <div className="flex gap-2">
             <button type="submit" disabled={saving || !agreement.borrowerPhoto || !agreement.signature || !agreement.agreed}

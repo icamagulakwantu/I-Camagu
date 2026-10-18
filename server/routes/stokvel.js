@@ -29,6 +29,7 @@ import {
   listLoans, requestLoan, voteLoan, repayLoan,
   listTradeCredit, createTradeCredit, updateTradeCredit, getStatement,
 } from '../controllers/stokvelFinanceController.js';
+import { listLendingTargets, setLendingTarget, recordLendingRound } from '../controllers/stokvelLendingController.js';
 import {
   requestPayout,
   approvePayout,
@@ -77,6 +78,9 @@ router.get('/:stokvelId/loans', requireAuth, listLoans);
 router.post('/:stokvelId/loans', requireAuth, requestLoan);
 router.post('/:stokvelId/loans/:loanId/vote', requireAuth, voteLoan);
 router.post('/:stokvelId/loans/:loanId/repay', requireAuth, repayLoan);
+router.get('/:stokvelId/lending', requireAuth, listLendingTargets);
+router.put('/:stokvelId/lending/target', requireAuth, setLendingTarget);
+router.post('/:stokvelId/lending/rounds', requireAuth, recordLendingRound);
 router.get('/:stokvelId/trade-credit', requireAuth, listTradeCredit);
 router.post('/:stokvelId/trade-credit', requireAuth, createTradeCredit);
 router.patch('/:stokvelId/trade-credit/:creditId', requireAuth, updateTradeCredit);
