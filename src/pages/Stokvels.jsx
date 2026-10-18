@@ -769,6 +769,12 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                   )
                 })}
               </div>
+              <LeaveStokvelButton
+  stokvelId={stokvel.id}
+  stokvelName={stokvel.name}
+  isOrganiser={stokvel.organiserId === user?.id}
+  onLeft={() => { setView('list'); fetchMyStokvels() }}
+/>
             </div>
           )}
 
