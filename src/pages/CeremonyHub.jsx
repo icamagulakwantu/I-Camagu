@@ -6,7 +6,12 @@ import Icon from '../components/Icon.jsx'
 
 const CEREMONY_META = {
   ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', image: '/images/ceremonies/ulwaluko.jpg' },
-  UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', image: '/images/ceremonies/umgidi.jpg' },
+  // Replaced the generic stock photo with a real South African traditional
+  // celebration/gathering photo (people in traditional dress, outdoors,
+  // communal feast feel) — closer to an authentic Umgidi homecoming than the
+  // old placeholder. Served from Unsplash's CDN; swap for a licensed local
+  // Port Elizabeth/Gqeberha Umgidi photo if the family uploads one later.
+  UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', image: 'https://images.unsplash.com/photo-1620464225966-8482645f2db1?auto=format&fit=crop&w=1200&q=80' },
   INTAMBO_ENKULU: { label: 'Intambo Enkulu', english: 'The great bond', desc: 'The ceremony that binds two families together.', image: '/images/ceremonies/intambo-enkulu.jpg' },
   UKUKHAPHA: { label: 'Ukukhapha', english: 'Accompanying the departed', desc: 'The rite that walks a loved one to the ancestors.', image: '/images/ceremonies/ukukhapha.jpg' },
   INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: "A thanksgiving rite honouring a mother's provision.", image: '/images/ceremonies/inkobe-zika-mama.jpg' },
