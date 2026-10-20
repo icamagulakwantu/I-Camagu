@@ -238,6 +238,18 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "OrderLineConfirmation" ADD COLUMN IF NOT EXISTS "orderReference" TEXT;'
   );
+  // One open (DRAFT) basket per member, enforced by the database so two
+  // simultaneous requests can't each create one (basketController handles
+  // the resulting P2002). If old duplicate drafts already exist the index
+  // can't be built yet — log and carry on rather than block boot.
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      CREATE UNIQUE INDEX IF NOT EXISTS "Basket_one_draft_per_user"
+        ON "Basket" ("userId") WHERE "status" = 'DRAFT';
+    EXCEPTION WHEN unique_violation THEN
+      RAISE NOTICE 'Basket_one_draft_per_user not created: duplicate DRAFT baskets exist';
+    END $$;
+  `);
   // A PSP-collected refund is an admin-processed step (the supplier never
   // held that money) — this is the admin's own note on how it actually got
   // back to the member. Null for every manual-EFT refund.

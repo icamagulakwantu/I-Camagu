@@ -1,12 +1,28 @@
 import prisma from '../config/db.js';
 import { PUBLIC_SKU_SELECT, toPublicItem, isOrderable } from '../utils/skuVisibility.js';
 
+// One open (DRAFT) basket per member. Two tabs/requests racing here could
+// otherwise each create one; the partial unique index added in
+// ensure-schema.js (Basket_one_draft_per_user) makes the second create fail
+// with P2002, and we simply re-read the winner's basket.
 async function getOrCreateDraftBasket(userId) {
-      let basket = await prisma.basket.findFirst({ where: { userId, status: 'DRAFT' } });
-        if (!basket) {
-                basket = await prisma.basket.create({ data: { userId, status: 'DRAFT' } });
-        }
-          return basket;
+  const existing = await prisma.basket.findFirst({
+    where: { userId, status: 'DRAFT' },
+    orderBy: { createdAt: 'asc' },
+  });
+  if (existing) return existing;
+  try {
+    return await prisma.basket.create({ data: { userId, status: 'DRAFT' } });
+  } catch (error) {
+    if (error.code === 'P2002') {
+      const winner = await prisma.basket.findFirst({
+        where: { userId, status: 'DRAFT' },
+        orderBy: { createdAt: 'asc' },
+      });
+      if (winner) return winner;
+    }
+    throw error;
+  }
 }
 
 export async function getMyBasket(req, res) {
@@ -105,24 +121,21 @@ export async function removeItem(req, res) {
     });
     if (!item) return res.status(404).json({ error: 'Item not found in your basket' });
 
-    await prisma.basketItem.delete({ where: { id: itemId } });
-
-    // Section 6 rule: if this basket is PARKED in a shared pool, notify other
-    // contributing members that the pool composition changed.
-    if (item.basket.status === 'PARKED' && item.basket.poolId) {
-      const { createNotification } = await import('../services/notificationDbService.js');
-      const otherBaskets = await prisma.basket.findMany({
-        where: { poolId: item.basket.poolId, userId: { not: req.userId } },
+    // Only an open (DRAFT) basket can shrink. Once a basket is committed to
+    // a pool (PARKED) its amount is the member's pledge to the group, and
+    // removing items would drop it below that committed amount; once
+    // MATCHED/FULFILLED it is a real supplier order. A parked member who
+    // needs out withdraws the whole basket (POST /pool/cancel-basket).
+    if (item.basket.status === 'PARKED') {
+      return res.status(409).json({
+        error: 'This basket is already committed to a pool, so it can\'t go below the amount you pledged. Withdraw the basket instead if you need to change it.',
       });
-      for (const b of otherBaskets) {
-        await createNotification(
-          b.userId, 'POOL_CHANGED',
-          'Someone in your bulk order pool changed their basket — check the group total.',
-          'store'
-        );
-      }
+    }
+    if (item.basket.status !== 'DRAFT') {
+      return res.status(409).json({ error: `This basket is ${item.basket.status.toLowerCase()} and can no longer be changed.` });
     }
 
+    await prisma.basketItem.delete({ where: { id: itemId } });
     res.json({ message: 'Item removed' });
   } catch (error) {
     console.error('Remove item error:', error.message);
