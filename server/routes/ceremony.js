@@ -2,6 +2,7 @@ import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { getCeremonyTimeline } from '../controllers/ceremonyController.js';
 import { getPlanBudget } from '../controllers/budgetController.js';
+import { getCeremonyCosts, setCostActual } from '../controllers/ceremonyCostController.js';
 import { saveAsTemplate, getMyTemplates, useTemplate } from '../controllers/templateController.js';
 import {
   generateShareLink,
@@ -68,6 +69,11 @@ router.patch('/ceremony-checklist/:id/toggle', requireAuth, toggleCeremonyCheckl
 
 // Update a cost item (quantity, unitCost, etc.)
 router.patch('/cost/:id', requireAuth, updateCostItem);
+// Record what was really paid for a priced item (deducted from the budget)
+router.patch('/cost/:id/actual', requireAuth, setCostActual);
+
+// Everything the combined Checklist & Budget tab shows
+router.get('/:id/costs', requireAuth, getCeremonyCosts);
 
 // Get cost estimate (sum of all cost items)
 router.get('/:id/estimate', requireAuth, getCostEstimate);
