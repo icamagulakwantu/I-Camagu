@@ -15,6 +15,23 @@ const STATUS_STYLE = {
 }
 const STATUS_LABEL = { PENDING: 'Awaiting votes', APPROVED: 'Repaying', REJECTED: 'Declined', REPAID: 'Repaid' }
 
+// Must match server/utils/loanTerms.js. The group chooses how interest is charged.
+const RATE_BASIS_OPTIONS = [
+  { value: 'ONE_TIME_FLAT', label: 'One-time, on the amount borrowed' },
+  { value: 'MONTHLY_FLAT', label: 'Every month, on the amount borrowed' },
+  { value: 'MONTHLY_REDUCING', label: 'Every month, on what is still owed' },
+]
+
+// Same maths as the server, only to show the borrower an estimate before they sign.
+function estimateTotal(amount, rate, basis, months) {
+  if (!(amount > 0) || rate === '' || !basis) return 0
+  const r = Number(rate) / 100
+  if (basis === 'ONE_TIME_FLAT') return amount * (1 + r)
+  if (basis === 'MONTHLY_FLAT') return amount * (1 + r * months)
+  if (r === 0) return amount
+  return ((amount * r) / (1 - Math.pow(1 + r, -months))) * months
+}
+
 // LoanBoard: any member can ask the group for a loan. Officials vote; once
 // enough approve (the stokvel's required approvals), it is issued and officials
 // record repayments until it is settled. Borrowers cannot vote on their own.
@@ -26,7 +43,8 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
   const [saving, setSaving] = useState(false)
   const [amount, setAmount] = useState('')
   const [months, setMonths] = useState('3')
-  const [interest, setInterest] = useState('30')
+  const [interest, setInterest] = useState('')
+  const [rateBasis, setRateBasis] = useState('')
   const [reason, setReason] = useState('')
   const [repayDraft, setRepayDraft] = useState({})
   const [pendingVote, setPendingVote] = useState(null)
@@ -49,7 +67,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
     setSaving(true)
     try {
       const out = await fn()
-      showToast(out?.message || okMsg, 'success')
+      showToast(out?.ledgerWarning || out?.message || okMsg, out?.ledgerWarning ? 'error' : 'success')
       await load()
       return true
     } catch (err) {
@@ -64,9 +82,9 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
     e.preventDefault()
     const ok = await run(() => api(base, accessToken, {
       method: 'POST',
-      body: JSON.stringify({ amount, repayMonths: months, interestPercent: interest, reason, ...agreement }),
+      body: JSON.stringify({ amount, repayMonths: months, interestPercent: interest, rateBasis, reason, ...agreement }),
     }), 'Loan request sent to officials')
-    if (ok) { setRequesting(false); setAmount(''); setReason(''); setAgreement({}) }
+    if (ok) { setRequesting(false); setAmount(''); setReason(''); setInterest(''); setRateBasis(''); setAgreement({}) }
   }
 
   const vote = (loanId, approve) => run(() => api(`${base}/${loanId}/vote`, accessToken, {
@@ -84,7 +102,9 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
 
   const { loans, requiredApprovals, isOfficial } = data
   const outstanding = loans.filter((l) => l.status === 'APPROVED').reduce((s, l) => s + (l.totalDue - l.repaid), 0)
-  const preview = Number(amount) > 0 ? Number(amount) * (1 + Number(interest || 0) / 100) : 0
+  const needsBasis = interest !== '' && Number(interest) > 0
+  const termsReady = interest !== '' && (!needsBasis || rateBasis)
+  const preview = termsReady ? estimateTotal(Number(amount), interest, needsBasis ? rateBasis : 'ONE_TIME_FLAT', Number(months) || 1) : 0
 
   return (
     <div className="space-y-4">
@@ -98,7 +118,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
           <p className="font-display font-bold text-xl text-ink mt-0.5">{money(groupBalance)}</p>
         </div>
         <p className="col-span-2 text-xs text-ink-muted">
-          Group loans carry 30% interest by default. Each loan needs {requiredApprovals} official vote{requiredApprovals === 1 ? '' : 's'} to be approved. Interest goes back into the group pot.
+          The interest rate is whatever your group agreed. Enter it for each loan and say how it is charged, so the borrower sees the full amount before signing. Each loan needs {requiredApprovals} official vote{requiredApprovals === 1 ? '' : 's'} to be approved. Interest goes back into the group pot.
         </p>
       </div>
 
@@ -128,10 +148,19 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
             <label className="text-xs text-ink-muted">Repay over (months)
               <input type="number" min="1" max="36" value={months} onChange={(e) => setMonths(e.target.value)} className={`${inp} mt-1`} required />
             </label>
-            <label className="text-xs text-ink-muted">Group interest (%)
-              <input type="number" min="0" max="100" step="0.5" value={interest} onChange={(e) => setInterest(e.target.value)} className={`${inp} mt-1`} />
+            <label className="text-xs text-ink-muted">Agreed interest (%)
+              <input type="number" min="0" max="100" step="0.5" placeholder="e.g. 30, or 0" value={interest}
+                onChange={(e) => setInterest(e.target.value)} className={`${inp} mt-1`} required />
             </label>
           </div>
+          {needsBasis && (
+            <label className="text-xs text-ink-muted block">How is the interest charged?
+              <select value={rateBasis} onChange={(e) => setRateBasis(e.target.value)} className={`${inp} mt-1`} required>
+                <option value="">Choose one</option>
+                {RATE_BASIS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </label>
+          )}
           <textarea rows={2} placeholder="What is the loan for? (e.g. school fees)" value={reason}
             onChange={(e) => setReason(e.target.value)} className={`${inp} resize-none`} />
           {preview > 0 && (
@@ -140,14 +169,14 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
           )}
           {preview > 0 && (
             <p className="text-xs text-ink">
-              You will repay <strong>{money(preview)}</strong>, about <strong>{money(preview / Math.max(1, Number(months) || 1))}</strong> a month.
+              You will repay about <strong>{money(preview)}</strong>, around <strong>{money(preview / Math.max(1, Number(months) || 1))}</strong> a month. The exact total is confirmed when you send.
             </p>
           )}
           {preview > 0 && !(agreement.borrowerPhoto && agreement.signature && agreement.agreed) && (
             <p className="text-[11px] font-bold text-brand-ochre">To send: take the photo, sign, and tick that you agree.</p>
           )}
           <div className="flex gap-2">
-            <button type="submit" disabled={saving || !agreement.borrowerPhoto || !agreement.signature || !agreement.agreed}
+            <button type="submit" disabled={saving || !termsReady || !agreement.borrowerPhoto || !agreement.signature || !agreement.agreed}
               className={`flex-1 py-2 ${primaryBtn}`}>
               {saving ? 'Sending...' : 'Send request'}
             </button>
@@ -170,7 +199,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="font-bold text-sm text-ink truncate">{l.borrowerName}</p>
-                <p className="text-xs text-ink-muted">{fmtDate(l.createdAt)} · {l.repayMonths} month(s) · {l.interestPercent}% interest</p>
+                <p className="text-xs text-ink-muted">{fmtDate(l.createdAt)} · {l.repayMonths} month(s) · {l.interestPercent}% interest{l.rateBasis ? ` (${RATE_BASIS_OPTIONS.find((o) => o.value === l.rateBasis)?.label.toLowerCase() || ''})` : ''}</p>
               </div>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-pill flex-shrink-0 ${STATUS_STYLE[l.status]}`}>{STATUS_LABEL[l.status]}</span>
             </div>
@@ -209,7 +238,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
                 </div>
               </div>
             )}
-            {isOfficial && l.status === 'APPROVED' && (
+            {isOfficial && l.status === 'APPROVED' && l.borrowerId !== user?.id && (
               <div className="flex gap-2 pt-1">
                 <input type="number" min="0" step="0.01" placeholder="Repayment (R)" value={repayDraft[l.id] || ''}
                   onChange={(e) => setRepayDraft((d) => ({ ...d, [l.id]: e.target.value }))} className={inp} />

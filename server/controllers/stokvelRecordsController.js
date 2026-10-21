@@ -1,5 +1,7 @@
 import { randomUUID } from 'crypto';
 import prisma from '../config/db.js';
+import { postEntry } from '../services/ledgerService.js';
+import { toCents } from '../utils/money.js';
 
 // Meeting minutes, fines, constitution and the audit trail for a stokvel.
 // This project has no migration history, so these tables are created here
@@ -200,6 +202,13 @@ export async function payFine(req, res) {
   try {
     if (!(await guard(req, res, { officialOnly: true }))) return;
     const { stokvelId, fineId } = req.params;
+    const existing = await prisma.$queryRaw`
+      SELECT "memberId" FROM "StokvelFine" WHERE "id" = ${fineId} AND "stokvelId" = ${stokvelId} AND "paid" = false`;
+    if (existing.length === 0) return res.status(404).json({ error: 'Fine not found or already paid' });
+    // Nobody marks their own fine as paid.
+    if (existing[0].memberId === req.userId) {
+      return res.status(403).json({ error: 'You cannot mark your own fine as paid. Another official must do it.' });
+    }
     const rows = await prisma.$queryRaw`
       UPDATE "StokvelFine" SET "paid" = true, "paidAt" = CURRENT_TIMESTAMP
       WHERE "id" = ${fineId} AND "stokvelId" = ${stokvelId} AND "paid" = false
@@ -207,7 +216,21 @@ export async function payFine(req, res) {
     if (rows.length === 0) return res.status(404).json({ error: 'Fine not found or already paid' });
     const name = await actorName(rows[0].memberId);
     await logAudit(stokvelId, req.userId, 'Marked a fine as paid', `${money(rows[0].amount)} from ${name}`);
-    res.json({ message: 'Fine marked as paid' });
+
+    // Put the fine on the books. A failure here must not undo the payment record.
+    let ledgerWarning = null;
+    try {
+      const cents = toCents(String(rows[0].amount));
+      await postEntry({
+        stokvelId, kind: 'FINE_PAID', memo: `Fine paid by ${name}`,
+        lines: [{ account: 'BANK', amountCents: cents }, { account: 'FINES_INCOME', amountCents: -cents }],
+        idempotencyKey: `fine:${fineId}`, createdById: rows[0].memberId, approvedById: req.userId,
+      });
+    } catch (err) {
+      console.error('LEDGER POST FAILED fine', fineId, err.message);
+      ledgerWarning = 'The fine was marked paid but the books entry could not be saved. Tell your treasurer so it can be corrected.';
+    }
+    res.json({ message: 'Fine marked as paid', ledgerWarning });
   } catch (error) {
     console.error('Pay fine error:', error.message);
     res.status(500).json({ error: 'Could not update fine' });
