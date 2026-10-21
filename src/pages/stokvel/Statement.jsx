@@ -4,6 +4,7 @@ import { useToast } from '../../components/ui/Toast.jsx'
 import { Skeleton } from '../../components/ui/Skeleton.jsx'
 import { SubEmpty } from './Ui.jsx'
 import { pressable, inp, money, fmtDate, api } from './shared.js'
+import Books from './Books.jsx'
 
 const today = () => new Date().toISOString().slice(0, 10)
 const startOfYear = () => `${new Date().getFullYear()}-01-01`
@@ -20,10 +21,34 @@ const PRESETS = [
 // Quote a CSV cell so commas and quotes in names do not break the columns.
 const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
 
+// The Statement tab holds two views: the dated statement members can download
+// or print, and the Books, the group's tamper-evident record of every movement.
+const VIEWS = [
+  { id: 'statement', label: 'Statement' },
+  { id: 'books', label: 'The books' },
+]
+
+export default function Statement({ stokvelId, stokvelName }) {
+  const [view, setView] = useState('statement')
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2 print:hidden">
+        {VIEWS.map((v) => (
+          <button key={v.id} type="button" onClick={() => setView(v.id)}
+            className={`flex-1 py-2 rounded-pill text-sm font-bold ${view === v.id ? 'bg-ink text-white' : 'bg-cream border-2 border-terracotta/15 text-ink-muted'} ${pressable}`}>
+            {v.label}
+          </button>
+        ))}
+      </div>
+      {view === 'books' ? <Books stokvelId={stokvelId} /> : <StatementReport stokvelId={stokvelId} stokvelName={stokvelName} />}
+    </div>
+  )
+}
+
 // Statement: a ledger of every confirmed money movement in a date range
 // (contributions, payouts, fines paid, loans and repayments) with a running
 // total. Members can download it as a spreadsheet or print it.
-export default function Statement({ stokvelId, stokvelName }) {
+function StatementReport({ stokvelId, stokvelName }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   const [from, setFrom] = useState(startOfYear())
