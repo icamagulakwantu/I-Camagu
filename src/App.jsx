@@ -57,6 +57,8 @@ import Icon from './components/Icon.jsx'
 import NotificationBell from './components/NotificationBell.jsx'
 import PinReminder from './components/PinReminder.jsx'
 import FirstVisitExplainer from './components/FirstVisitExplainer.jsx'
+import PendingStokvelJoin from './components/PendingStokvelJoin.jsx'
+import { PENDING_STOKVEL_KEY } from './lib/inviteLinks.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
@@ -456,6 +458,8 @@ function MainApp() {
 
   return (
     <div className="icamagu-bg min-h-screen">
+      {/* Acts on a stokvel invite link the person arrived with, then shows them the stokvels */}
+      <PendingStokvelJoin onJoined={() => setScreen('stokvels')} />
       {renderScreen()}
       <BottomNav
         activeScreen={activeTab}
@@ -513,6 +517,19 @@ function PoolJoinRoute() {
   return null
 }
 
+// A stokvel invite link: remember which stokvel, then open the app. Signed-in
+// people are joined straight away; new people see the sign-in/register screen
+// first and are joined as soon as they are inside.
+function StokvelJoinRoute() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (id) localStorage.setItem(PENDING_STOKVEL_KEY, id)
+    navigate('/', { replace: true })
+  }, [id, navigate])
+  return null
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -521,6 +538,7 @@ export default function App() {
         <Route path="/share/:token" element={<ShareRoute />} />
         <Route path="/reset-password/:token" element={<ResetPasswordRoute />} />
         <Route path="/pool/:id" element={<PoolJoinRoute />} />
+        <Route path="/join/stokvel/:id" element={<StokvelJoinRoute />} />
         <Route path="/ubuhlanti" element={<PublicUbuhlanti />} />
         <Route path="/ubuhlanti/" element={<PublicUbuhlanti />} />
         <Route
