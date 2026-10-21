@@ -14,6 +14,7 @@ import {
   updateStokvel,
   setRotationOrder
 } from '../controllers/stokvelController.js';
+import { listOfficials, setOfficial, removeOfficial } from '../controllers/stokvelOfficialsController.js';
 import {
   submitContribution,
   confirmContribution,
@@ -63,6 +64,9 @@ router.get('/id/:stokvelId', requireAuth, getStokvelsById);
 router.post('/bereavement/toggle', requireAuth, toggleBereavementProtocol);
 router.post('/announcements', requireAuth, postAnnouncement);
 router.get('/:stokvelId/announcements', requireAuth, getAnnouncements);
+router.get('/:stokvelId/officials', requireAuth, listOfficials);
+router.put('/:stokvelId/officials', requireAuth, setOfficial);
+router.delete('/:stokvelId/officials/:memberUserId', requireAuth, removeOfficial);
 router.get('/:stokvelId/minutes', requireAuth, listMinutes);
 router.post('/:stokvelId/minutes', requireAuth, createMinutes);
 router.get('/:stokvelId/fines', requireAuth, listFines);
