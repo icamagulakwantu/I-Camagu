@@ -6,8 +6,9 @@ import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { shareToWhatsApp } from '../lib/whatsapp.js'
 import { cn } from '../lib/utils'
 import Icon from '../components/Icon.jsx'
-import ScrollableLabel from '../components/ScrollableLabel.jsx'
 import CeremonyIcon from '../components/CeremonyIcon.jsx'
+import CostsTab from './ceremony/CostsTab.jsx'
+import { UNFORESEEN_PHASE } from '../../shared/ceremonyCosts.js'
 
 // --------------------------------------------------------------
 // Display‑ready ceremony types (from File 1)
@@ -33,15 +34,13 @@ const CEREMONY_META = {
 
 const mapDisplayTypeToBackend = (displayId) => displayId.toUpperCase()
 
-// An open plan used to be one long scroll — budget summary, provisioning
-// costs, an add-item form, a progress card, action buttons, share/delete,
-// the checklist, then family pledges, all stacked on top of each other.
-// Split into named sections instead, the same pattern used for the
-// Stokvel detail screen.
+// An open plan used to be one long scroll. It is split into named sections,
+// the same pattern used for the Stokvel detail screen. The old separate
+// Checklist and Budget & Costs tabs overlapped and drifted out of step (prices
+// typed on one never reached the other), so they are now one tab.
 const PLAN_TABS = [
   { id: 'overview', label: 'Overview' },
-  { id: 'checklist', label: 'Checklist' },
-  { id: 'budget', label: 'Budget & Costs' },
+  { id: 'costs', label: 'Checklist & Budget' },
   { id: 'contributions', label: 'Contributions' },
 ]
 
@@ -69,7 +68,6 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   const [templateEditorOpen, setTemplateEditorOpen] = useState(false)
   const [templateTitleInput, setTemplateTitleInput] = useState('')
   const [savingTemplate, setSavingTemplate] = useState(false)
-  const [newChecklistItem, setNewChecklistItem] = useState({ phase: 'CUSTOM', label: '', isOptional: true, actualCostZAR: '' })
 
   // ----- State for pledges (from File 1) -----
   const [pledges, setPledges] = useState([])
@@ -141,68 +139,14 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     }
   }
 
-  const toggleItem = async (itemId) => {
-    try {
-      const item = (activePlan.checklistItems || []).find(i => i.id === itemId)
-      const endpoint = item?.ceremonyId
-        ? `/api/ceremonies/ceremony-checklist/${itemId}/toggle`
-        : `/api/ceremonies/plans/items/${itemId}/toggle`
-
-      const res = await fetch(endpoint, {
-        method: 'PATCH',
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not update item')
-
-      setActivePlan(prev => ({
-        ...prev,
-        checklistItems: prev.checklistItems.map(i => i.id === itemId ? data : i),
-      }))
-      showToast(data.isCompleted || data.isChecked ? 'Task completed! 🎉' : 'Task unchecked', data.isCompleted || data.isChecked ? 'success' : 'info')
-    } catch (err) {
-      showToast(err.message || 'Could not toggle item', 'error')
-    }
-  }
-
-  const toggleCostItem = async (itemId) => {
-    try {
-      const item = (activePlan.ceremony?.costItems || []).find(i => i.id === itemId)
-      if (!item) return
-      const res = await fetch(`/api/ceremonies/cost/${itemId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ isPurchased: !item.isPurchased }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not update item')
-
-      setActivePlan(prev => ({
-        ...prev,
-        ceremony: {
-          ...prev.ceremony,
-          costItems: prev.ceremony.costItems.map(i => i.id === itemId ? data : i),
-        },
-      }))
-    } catch (err) {
-      showToast(err.message || 'Could not update item', 'error')
-    }
-  }
-
-  const buyItem = async (item) => {
-    if (!item.skuId) return
-    try {
-      const res = await fetch('/api/basket/items', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ skuId: item.skuId, quantity: Math.max(1, Math.ceil(item.quantity || 1)) }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not add to basket')
-      showToast(data.message || 'Added to basket', 'success')
-    } catch (err) {
-      showToast(err.message || 'Could not add to basket', 'error')
-    }
+  // The Checklist & Budget tab owns its own edits. It reports back here so the
+  // progress bar and overview stay in step with what was just changed.
+  const syncPlanItems = ({ costItems, checklistItems }) => {
+    const apply = (plan) => (plan.id === activePlan?.id
+      ? { ...plan, checklistItems, ceremony: plan.ceremony ? { ...plan.ceremony, costItems, checklistItems } : plan.ceremony }
+      : plan)
+    setActivePlan((prev) => (prev ? apply(prev) : prev))
+    setPlans((prev) => prev.map(apply))
   }
 
   const editBudget = () => {
@@ -228,57 +172,6 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
       showToast('Budget updated', 'success')
     } catch (err) { showToast(err.message || 'Could not save budget', 'error') }
     finally { setSavingBudget(false) }
-  }
-
-  const updateItemActualCost = async (itemId, actualCostZAR) => {
-    try {
-      const item = (activePlan.checklistItems || []).find(i => i.id === itemId)
-      const endpoint = item?.ceremonyId
-        ? `/api/ceremonies/checklist/${itemId}`
-        : `/api/ceremonies/plans/items/${itemId}/cost`
-
-      const res = await fetch(endpoint, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ actualCostZAR: actualCostZAR === '' ? null : parseFloat(actualCostZAR) }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not save cost')
-      setActivePlan(prev => ({
-        ...prev,
-        checklistItems: prev.checklistItems.map(i => i.id === itemId ? data : i),
-      }))
-      showToast('Cost saved', 'success')
-    } catch (err) {
-      showToast(err.message || 'Could not save cost', 'error')
-    }
-  }
-
-  const addChecklistItem = async (e) => {
-    e.preventDefault()
-    if (!newChecklistItem.label.trim() || !activePlan?.ceremonyId) return
-
-    try {
-      const res = await fetch(`/api/ceremonies/${activePlan.ceremonyId}/checklist`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({
-          ...newChecklistItem,
-          actualCostZAR: newChecklistItem.actualCostZAR === '' ? null : parseFloat(newChecklistItem.actualCostZAR),
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not add checklist item')
-
-      setActivePlan(prev => ({
-        ...prev,
-        checklistItems: [...(prev.checklistItems || []), data],
-      }))
-      setNewChecklistItem({ phase: 'CUSTOM', label: '', isOptional: true, actualCostZAR: '' })
-      showToast('Custom checklist item added', 'success')
-    } catch (err) {
-      showToast(err.message || 'Could not add checklist item', 'error')
-    }
   }
 
   const deleteCeremonyWorkspace = async (ceremonyId) => {
@@ -412,22 +305,16 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   // Render: Active Plan View (polished UI from File 1)
   // --------------------------------------------------------------
   if (activePlan) {
-    const items = activePlan.checklistItems || []
+    // Unforeseen expenses are costs, not tasks, so they do not count towards progress.
+    const items = (activePlan.checklistItems || []).filter(i => i.phase !== UNFORESEEN_PHASE)
     const doneCount = items.filter(i => i.isChecked || i.isCompleted).length
     const total = items.length
     const progress = total ? Math.round((doneCount / total) * 100) : 0
 
-    const costItems = activePlan.ceremony?.costItems || []
-    const estimatedTotal = costItems.reduce((sum, i) => sum + (i.quantity || 0) * (i.unitCost || 0), 0)
-    const spent = costItems.filter(i => i.isPurchased).reduce((sum, i) => sum + (i.quantity || 0) * (i.unitCost || 0), 0)
     const budgetZAR = activePlan.ceremony?.budgetZAR != null ? parseFloat(activePlan.ceremony.budgetZAR) : null
-    const remaining = budgetZAR != null ? budgetZAR - spent : null
-    const spentPercent = budgetZAR ? Math.min(100, Math.round((spent / budgetZAR) * 100)) : (estimatedTotal ? Math.min(100, Math.round((spent / estimatedTotal) * 100)) : 0)
-    const overBudget = budgetZAR != null && spent > budgetZAR
     // Family pledges counted the same way the separate Budget dashboard
     // counts them (see getPlanBudget), so the two screens never disagree.
     const totalPledged = pledges.reduce((sum, p) => sum + (p.pledgedAmountZAR != null ? parseFloat(p.pledgedAmountZAR) : 0), 0)
-    const pledgeShortfall = budgetZAR != null ? Math.max(0, budgetZAR - totalPledged) : null
 
     return (
       <div className="min-h-screen pb-24 bg-cream">
@@ -464,159 +351,31 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           ))}
         </div>
 
-        {planTab === 'budget' && (
-        <>
-        {costItems.length > 0 && (
-          <div className={cn('mx-4 mt-4 card-paper p-4', overBudget && 'border-2 border-terracotta')}>
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <p className="text-xs font-black uppercase text-ink-muted">
-                  {budgetZAR != null ? 'Spent of your budget' : 'Spent so far'}
-                </p>
-                <p className="font-display font-bold text-2xl text-ink mt-0.5 tabular">
-                  R{spent.toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                  {budgetZAR != null && (
-                    <span className="text-sm font-normal text-ink-muted"> of R{budgetZAR.toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-                  )}
-                </p>
-              </div>
-              <button type="button" onClick={editBudget} className={`text-xs font-bold text-sage-600 ${pressable}`}>
-                {budgetZAR != null ? 'Edit budget' : 'Set budget'}
-              </button>
-            </div>
-            <div className="w-full h-2.5 bg-cream-dark rounded-full overflow-hidden">
-              <div
-                className={cn('h-full rounded-full transition-all duration-500', overBudget ? 'bg-terracotta' : 'bg-sage-500')}
-                style={{ width: `${spentPercent}%` }}
-              />
-            </div>
-            <div className="flex justify-between mt-2 text-xs text-ink-muted font-medium">
-              {budgetZAR != null ? (
-                <span className={overBudget ? 'text-terracotta font-bold' : ''}>
-                  {overBudget ? `R${Math.abs(remaining).toLocaleString('en-ZA', { maximumFractionDigits: 0 })} over budget` : `R${remaining.toLocaleString('en-ZA', { maximumFractionDigits: 0 })} remaining`}
-                </span>
-              ) : (
-                <span>Estimated total: R{estimatedTotal.toLocaleString('en-ZA', { maximumFractionDigits: 0 })}</span>
-              )}
-              <span>{costItems.filter(i => i.isPurchased).length}/{costItems.length} bought</span>
-            </div>
-          </div>
+        {planTab === 'costs' && (
+          <CostsTab
+            key={activePlan.id}
+            ceremonyId={activePlan.ceremonyId}
+            accessToken={accessToken}
+            budgetZAR={budgetZAR}
+            legacyItems={activePlan.checklistItems || []}
+            totalPledged={totalPledged}
+            pledgeCount={pledges.length}
+            onEditBudget={editBudget}
+            onViewPledges={() => setPlanTab('contributions')}
+            onItemsChanged={syncPlanItems}
+          />
         )}
 
-        {/* Family pledges, counted the same way as the main Budget dashboard
-            screen, so this ceremony never shows two different "money raised"
-            numbers depending on which screen you're looking at. */}
-        {pledges.length > 0 && (
-          <div className="mx-4 mt-4 card-paper p-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-black uppercase text-ink-muted">Pledged by family</p>
-                <p className="font-display font-bold text-2xl text-ink mt-0.5 tabular">
-                  R{totalPledged.toLocaleString('en-ZA', { maximumFractionDigits: 0 })}
-                </p>
-              </div>
-              <button type="button" onClick={() => setPlanTab('contributions')} className={`text-xs font-bold text-sage-600 ${pressable}`}>
-                View pledges
-              </button>
-            </div>
-            {pledgeShortfall != null && (
-              <p className="text-xs text-ink-muted font-medium mt-2">
-                {pledgeShortfall > 0
-                  ? `R${pledgeShortfall.toLocaleString('en-ZA', { maximumFractionDigits: 0 })} of the budget still needs to be pledged`
-                  : 'Pledges cover the full budget'}
-              </p>
-            )}
+        {budgetEditorOpen && planTab === 'costs' && (
+          <div className="mx-4 mt-3 bg-white border-2 border-sage-500 rounded-soft p-4 shadow-soft">
+            <form onSubmit={saveBudget}>
+              <h2 className="text-sm font-bold text-ink mb-1">Set ceremony budget</h2>
+              <p className="text-xs text-ink-muted mb-3">Enter the maximum amount you plan to spend. Leave blank to clear it.</p>
+              <label htmlFor="ceremony-budget-costs" className="block text-xs font-bold text-ink-muted mb-1">Budget in ZAR</label>
+              <input id="ceremony-budget-costs" type="number" min="0" step="0.01" inputMode="decimal" value={budgetInput} onChange={(e) => setBudgetInput(e.target.value)} className="w-full border-2 border-cream-dark rounded-soft px-3 py-2 text-ink" autoFocus />
+              <div className="flex gap-2 mt-3"><button type="submit" disabled={savingBudget} className={`flex-1 bg-sage-600 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>{savingBudget ? 'Saving…' : 'Save budget'}</button><button type="button" onClick={() => setBudgetEditorOpen(false)} className={`flex-1 border-2 border-sage-200 font-bold py-2 rounded-pill text-sm ${pressable}`}>Cancel</button></div>
+            </form>
           </div>
-        )}
-
-        {costItems.length > 0 && (
-          <div className="mx-4 mt-4 card-paper p-4">
-            <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider mb-3">Provisioning &amp; Costs</h3>
-            <div className="divide-y divide-cream-dark/50">
-              {costItems.map((item) => {
-                const lineTotal = (item.quantity || 0) * (item.unitCost || 0)
-                return (
-                  <div key={item.id} className="flex items-center gap-3 py-3">
-                    <button
-                      type="button"
-                      onClick={() => toggleCostItem(item.id)}
-                      className="flex-1 min-w-0 flex items-center gap-3 text-left group"
-                    >
-                      <div
-                        className={cn(
-                          'w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all',
-                          item.isPurchased ? 'bg-sage-500 border-sage-500' : 'border-cream-dark group-hover:border-sage-300'
-                        )}
-                      >
-                        {item.isPurchased && <Icon name="check" size={13} color="#fff" strokeWidth={2.5} />}
-                      </div>
-                      <ScrollableLabel className={cn('flex-1 min-w-0 text-sm font-medium', item.isPurchased ? 'text-ink-muted line-through' : 'text-ink')}>
-                        {item.label}
-                      </ScrollableLabel>
-                    </button>
-                    {lineTotal > 0 && (
-                      <span className={cn('tabular text-sm font-bold flex-shrink-0', item.isPurchased ? 'text-sage-600' : 'text-ink-muted')}>
-                        R{lineTotal.toLocaleString('en-ZA', { maximumFractionDigits: 0 })}
-                      </span>
-                    )}
-                    {item.skuId && !item.isPurchased && (
-                      <button
-                        type="button"
-                        onClick={() => buyItem(item)}
-                        className={`text-[11px] font-bold text-white bg-terracotta px-2.5 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
-                      >
-                        Buy
-                      </button>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-        </>
-        )}
-
-        {planTab === 'checklist' && (
-        <>
-        <div className="mx-4 mt-4 bg-white border-2 border-sage-200 rounded-soft p-4">
-          <p className="text-xs font-black uppercase text-ink-muted mb-2">Add to this ceremony</p>
-          <form onSubmit={addChecklistItem} className="space-y-2">
-            <div className="flex gap-2">
-              <select value={newChecklistItem.phase} onChange={(e) => setNewChecklistItem({ ...newChecklistItem, phase: e.target.value })}
-                className="w-1/3 border border-terracotta/20 rounded-soft px-2 py-2 text-xs">
-                <option value="CUSTOM">Custom</option>
-                <option value="FOOD">Food</option>
-                <option value="FAMILY">Family</option>
-                <option value="LOGISTICS">Logistics</option>
-                <option value="SEATING">Seating</option>
-                <option value="SPEAKERS">Speakers</option>
-              </select>
-              <input placeholder="e.g. Add chicken for kitchen meal" value={newChecklistItem.label}
-                onChange={(e) => setNewChecklistItem({ ...newChecklistItem, label: e.target.value })}
-                className="flex-1 border border-terracotta/20 rounded-soft px-3 py-2 text-sm" required />
-            </div>
-            {/* Not every real cost is a priced item in the app — a lift to the
-                mountain in a friend's bakkie for exactly R200 of petrol has no
-                SKU, so this is a free-form real amount, not a computed line
-                item. Optional: plenty of checklist items genuinely cost nothing
-                or aren't known yet. */}
-            <input
-              type="number" inputMode="decimal" step="0.01" min="0"
-              placeholder="What did this actually cost you? (R, optional)"
-              value={newChecklistItem.actualCostZAR}
-              onChange={(e) => setNewChecklistItem({ ...newChecklistItem, actualCostZAR: e.target.value })}
-              className="w-full border border-terracotta/20 rounded-soft px-3 py-2 text-sm"
-            />
-            <label className="flex items-center gap-2 text-xs text-ink-muted">
-              <input type="checkbox" checked={newChecklistItem.isOptional}
-                onChange={(e) => setNewChecklistItem({ ...newChecklistItem, isOptional: e.target.checked })} />
-              Household-specific / optional item
-            </label>
-            <button type="submit" className="w-full bg-sage-500 text-white font-bold py-2 rounded-pill text-sm">+ Add Item</button>
-          </form>
-        </div>
-        </>
         )}
 
         {planTab === 'overview' && (
@@ -700,18 +459,6 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
           </button>
         </div>
 
-        {budgetEditorOpen && (
-        <div className="mx-4 mt-3 bg-white border-2 border-sage-500 rounded-soft p-4 shadow-soft">
-          <form onSubmit={saveBudget}>
-            <h2 className="text-sm font-bold text-ink mb-1">Set ceremony budget</h2>
-            <p className="text-xs text-ink-muted mb-3">Enter the maximum amount you plan to spend. Leave blank to clear it.</p>
-            <label htmlFor="ceremony-budget" className="block text-xs font-bold text-ink-muted mb-1">Budget in ZAR</label>
-            <input id="ceremony-budget" type="number" min="0" step="0.01" inputMode="decimal" value={budgetInput} onChange={(e) => setBudgetInput(e.target.value)} className="w-full border-2 border-cream-dark rounded-soft px-3 py-2 text-ink" autoFocus />
-            <div className="flex gap-2 mt-3"><button type="submit" disabled={savingBudget} className={`flex-1 bg-sage-600 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>{savingBudget ? 'Saving…' : 'Save budget'}</button><button type="button" onClick={() => setBudgetEditorOpen(false)} className={`flex-1 border-2 border-sage-200 font-bold py-2 rounded-pill text-sm ${pressable}`}>Cancel</button></div>
-          </form>
-        </div>
-      )}
-
         {templateEditorOpen && (
         <div className="mx-4 mt-3 bg-white border-2 border-sage-500 rounded-soft p-4 shadow-soft">
           <form onSubmit={confirmSaveTemplate}>
@@ -744,70 +491,6 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             </div>
           </div>
         )}
-
-        {/* Checklist (File 1 UI, using File 2 data) */}
-        </>
-        )}
-
-        {planTab === 'checklist' && (
-        <>
-        <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-soft">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Checklist</h3>
-            {items.some(i => i.actualCostZAR != null) && (
-              <span className="text-xs font-bold text-sage-600">
-                R{items.reduce((sum, i) => sum + (i.actualCostZAR != null ? parseFloat(i.actualCostZAR) : 0), 0).toLocaleString('en-ZA', { maximumFractionDigits: 0 })} logged
-              </span>
-            )}
-          </div>
-          <div className="divide-y divide-cream-dark/50">
-            {items.map((item) => (
-              <div key={item.id} className="flex items-center gap-3 py-3">
-                <button
-                  onClick={() => toggleItem(item.id)}
-                  className="flex-1 flex items-center gap-3 text-left group transition-colors hover:bg-sage-50/50 -mx-2 px-2 py-1 rounded-xl min-w-0"
-                >
-                  <div
-                    className={cn(
-                      'w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all duration-300 ease-bounce-subtle',
-                      (item.isCompleted || item.isChecked)
-                        ? 'bg-sage-500 border-sage-500 scale-110'
-                        : 'border-cream-dark group-hover:border-sage-300'
-                    )}
-                  >
-                    {(item.isCompleted || item.isChecked) && <Icon name="check" size={13} color="#fff" strokeWidth={2.5} />}
-                  </div>
-                  <ScrollableLabel
-                    className={cn(
-                      'flex-1 min-w-0 text-sm font-medium transition-all duration-200',
-                      (item.isCompleted || item.isChecked) ? 'text-ink-muted line-through' : 'text-ink'
-                    )}
-                  >
-                    {item.label}
-                  </ScrollableLabel>
-                </button>
-                <div className="flex-shrink-0 text-right">
-                  {item.targetCostZAR != null && (
-                    <p className="text-[9px] text-ink-muted uppercase">Est. R{parseFloat(item.targetCostZAR).toFixed(0)}</p>
-                  )}
-                  <input
-                    type="number"
-                    placeholder="Actual R"
-                    defaultValue={item.actualCostZAR != null ? parseFloat(item.actualCostZAR) : ''}
-                    onBlur={(e) => {
-                      const val = e.target.value
-                      if (val !== '' && parseFloat(val) === parseFloat(item.actualCostZAR)) return
-                      updateItemActualCost(item.id, val)
-                    }}
-                    className="w-20 border border-cream-dark rounded-soft px-2 py-1 text-xs text-right"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Family Contributions (Pledges) – from File 1 */}
         </>
         )}
 
@@ -1044,8 +727,9 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         ) : (
           <div className="space-y-2">
             {plans.map((plan) => {
-              const done = plan.checklistItems?.filter(i => i.isChecked || i.isCompleted).length || 0
-              const total = plan.checklistItems?.length || 0
+              const planItems = (plan.checklistItems || []).filter(i => i.phase !== UNFORESEEN_PHASE)
+              const done = planItems.filter(i => i.isChecked || i.isCompleted).length
+              const total = planItems.length
               return (
                 <button
                   key={plan.id}
