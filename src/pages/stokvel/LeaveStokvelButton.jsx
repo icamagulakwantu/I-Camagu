@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
+import StokvelInvite from './StokvelInvite.jsx'
 
 const pressable = "transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none"
 
 /**
- * Leave Stokvel button — shown to non-organiser members only.
+ * Bottom of the Members tab: the invite link for everyone, and the Leave
+ * button for non-organisers only.
  * On success, calls onLeft() so the parent can navigate back to the list.
  */
 function LeaveStokvelButton({ stokvelId, stokvelName, isOrganiser, onLeft }) {
@@ -14,7 +16,14 @@ function LeaveStokvelButton({ stokvelId, stokvelName, isOrganiser, onLeft }) {
   const [confirm, setConfirm] = useState(false)
   const [isLeaving, setIsLeaving] = useState(false)
 
-  if (isOrganiser) return null
+  // Organisers cannot leave, but they are the people who most need to invite.
+  if (isOrganiser) {
+    return (
+      <div className="mt-6 pt-4 border-t border-terracotta/15">
+        <StokvelInvite stokvelId={stokvelId} stokvelName={stokvelName} />
+      </div>
+    )
+  }
 
   const leaveStokvel = async () => {
     setIsLeaving(true)
@@ -37,6 +46,7 @@ function LeaveStokvelButton({ stokvelId, stokvelName, isOrganiser, onLeft }) {
 
   return (
     <div className="mt-6 pt-4 border-t border-terracotta/15">
+      <StokvelInvite stokvelId={stokvelId} stokvelName={stokvelName} />
       <p className="text-[10px] font-black uppercase tracking-wider text-terracotta mb-2">Leave group</p>
       {!confirm ? (
         <button
