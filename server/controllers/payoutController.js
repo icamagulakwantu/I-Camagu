@@ -1,5 +1,7 @@
 // src/controllers/payoutController.js
 import prisma from '../config/db.js';
+import { postEntry } from '../services/ledgerService.js';
+import { toCents } from '../utils/money.js';
 
 // Suggested contribution rate, shown to a stokvel member when they request
 // a payout — never forced. 3% is confirmed as the suggested figure; the
@@ -256,6 +258,30 @@ export async function requestPayout(req, res) {
   }
 }
 
+// The books entry is written after the payout has cleared. If it fails the
+// payout itself still succeeded, so we log loudly and warn the caller.
+// Re-running is safe: the same idempotency key never counts the money twice.
+async function postPayoutToLedger(payout, approverId) {
+  try {
+    const cents = toCents(String(payout.amount));
+    await postEntry({
+      stokvelId: payout.stokvelId,
+      kind: 'PAYOUT',
+      memo: 'Stokvel payout',
+      lines: [
+        { account: 'PAYOUTS', amountCents: cents },
+        { account: 'BANK', amountCents: -cents },
+      ],
+      idempotencyKey: `payout:${payout.id}`,
+      createdById: approverId,
+    });
+    return null;
+  } catch (error) {
+    console.error('LEDGER POST FAILED', 'PAYOUT', payout.id, error.message);
+    return 'The payout cleared but the books entry could not be saved. Tell your treasurer so it can be corrected.';
+  }
+}
+
 export async function approvePayout(req, res) {
   const userId = req.userId;
   const { payoutId, pin } = req.body;
@@ -284,6 +310,11 @@ export async function approvePayout(req, res) {
       where: { stokvelId: payout.stokvelId, userId },
     });
     if (!official) return res.status(403).json({ error: 'Only stokvel officials can approve payouts' });
+
+    // Nobody approves money going to themselves.
+    if (payout.recipientId === userId) {
+      return res.status(403).json({ error: 'You cannot approve your own payout. Another official must do it.' });
+    }
 
     try {
       await prisma.payoutApproval.create({
@@ -360,6 +391,8 @@ export async function approvePayout(req, res) {
         }
       });
 
+      const ledgerWarning = await postPayoutToLedger(payout, userId);
+
       const recipient = await prisma.user.findUnique({ where: { id: payout.recipientId } });
       const { notifyPayoutCleared } = await import('../services/notificationService.js');
       if (recipient?.email) {
@@ -387,6 +420,7 @@ export async function approvePayout(req, res) {
         contributionNote: contributionAmount
           ? 'Includes a voluntary Ubuhlanti bakwa Xhosa contribution, as chosen when this payout was requested.'
           : null,
+        ledgerWarning,
       });
     }
 
