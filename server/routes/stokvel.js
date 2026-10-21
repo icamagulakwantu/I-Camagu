@@ -14,6 +14,11 @@ import {
   updateStokvel,
   setRotationOrder
 } from '../controllers/stokvelController.js';
+import { listOfficials, setOfficial, removeOfficial } from '../controllers/stokvelOfficialsController.js';
+import {
+  searchPeople, sendInvite, listSentInvites, listMyInvites, respondToInvite,
+} from '../controllers/stokvelInvitesController.js';
+import { getListing, saveListing, listNearby, askToJoin } from '../controllers/stokvelListingController.js';
 import {
   submitContribution,
   confirmContribution,
@@ -48,6 +53,15 @@ router.post('/interest/record', requireAuth, recordInterest);
 router.post('/expense/record', requireAuth, recordGroupExpense);
 router.get('/pending-approvals/count', requireAuth, getPendingApprovalCount);
 router.get('/my', requireAuth, getMyStokvels);
+// In-app invitations (declared before the /:stokvelId routes so "invites" is never read as an id)
+router.get('/invites/mine', requireAuth, listMyInvites);
+router.get('/invites/search', requireAuth, searchPeople);
+router.post('/invites/:inviteId/respond', requireAuth, respondToInvite);
+// Opt-in public listing: "stokvels near you" (also before the /:stokvelId routes)
+router.get('/nearby', requireAuth, listNearby);
+router.post('/:stokvelId/ask-to-join', requireAuth, rateLimit({ windowMs: 15 * 60 * 1000, max: 10 }), askToJoin);
+router.get('/:stokvelId/listing', requireAuth, getListing);
+router.put('/:stokvelId/listing', requireAuth, saveListing);
 router.get('/shrine-fund/total', optionalAuth, getShrineFundTotal);
 router.post(
   '/shrine-fund/donate',
@@ -63,6 +77,11 @@ router.get('/id/:stokvelId', requireAuth, getStokvelsById);
 router.post('/bereavement/toggle', requireAuth, toggleBereavementProtocol);
 router.post('/announcements', requireAuth, postAnnouncement);
 router.get('/:stokvelId/announcements', requireAuth, getAnnouncements);
+router.get('/:stokvelId/officials', requireAuth, listOfficials);
+router.put('/:stokvelId/officials', requireAuth, setOfficial);
+router.delete('/:stokvelId/officials/:memberUserId', requireAuth, removeOfficial);
+router.get('/:stokvelId/invites', requireAuth, listSentInvites);
+router.post('/:stokvelId/invites', requireAuth, rateLimit({ windowMs: 15 * 60 * 1000, max: 40 }), sendInvite);
 router.get('/:stokvelId/minutes', requireAuth, listMinutes);
 router.post('/:stokvelId/minutes', requireAuth, createMinutes);
 router.get('/:stokvelId/fines', requireAuth, listFines);
