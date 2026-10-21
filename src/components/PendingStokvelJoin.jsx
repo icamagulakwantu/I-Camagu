@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from './ui/Toast.jsx'
+import PendingPledge from './PendingPledge.jsx'
 import { PENDING_STOKVEL_KEY } from '../lib/inviteLinks.js'
 
-// Runs once the person is signed in, registered and past onboarding. If they
-// arrived through a stokvel invite link, join them to that stokvel and take
-// them to it. Renders nothing.
+// Runs once the person is signed in, registered and past onboarding. Acts on
+// any invite link they arrived with:
+//  - a stokvel link: joins them to that stokvel and shows them the stokvels
+//  - a ceremony pledge link: opens the pledge form (PendingPledge)
 export default function PendingStokvelJoin({ onJoined }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
@@ -34,5 +36,5 @@ export default function PendingStokvelJoin({ onJoined }) {
       .finally(() => onJoined?.())
   }, [accessToken, showToast, onJoined])
 
-  return null
+  return <PendingPledge />
 }

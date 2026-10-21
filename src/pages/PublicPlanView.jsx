@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import Icon from '../components/Icon.jsx'
+import { PENDING_PLEDGE_KEY } from '../lib/inviteLinks.js'
 
 // Public, view-only copy of a ceremony checklist. Anyone with the link can read
-// it; the call to action at the top sends people into the app, where new people
-// register and can plan their own ceremony.
+// it. The buttons at the top send people into the app: new people register,
+// then are asked what they would like to pledge to this ceremony.
 function PublicPlanView({ token }) {
   const [plan, setPlan] = useState(null)
   const [error, setError] = useState('')
@@ -19,6 +20,13 @@ function PublicPlanView({ token }) {
       })
       .catch(() => { setError('Could not load this checklist'); setLoading(false) })
   }, [token])
+
+  // Remember the ceremony, then go to the app. Signed-in people get the pledge
+  // form straight away; new people register first.
+  const startPledge = () => {
+    localStorage.setItem(PENDING_PLEDGE_KEY, token)
+    window.location.assign('/')
+  }
 
   if (loading) return <div className="min-h-screen bg-cream flex items-center justify-center"><p className="text-ink-muted">Loading...</p></div>
 
@@ -47,9 +55,11 @@ function PublicPlanView({ token }) {
 
       <div className="px-4 mt-4 pb-10">
         <div className="bg-sage-50 border border-sage-200 rounded-soft p-4 mb-4 text-center">
-          <p className="text-sm font-bold text-ink">Planning a ceremony of your own?</p>
-          <p className="text-xs text-ink-muted mt-1">This is a <strong>view-only</strong> copy. Register free on iCamagu to build your own checklist, budget and family contributions.</p>
-          <a href="/" className="inline-block mt-3 bg-sage-500 text-white text-sm font-bold px-5 py-2.5 rounded-pill">Register or sign in</a>
+          <p className="text-sm font-bold text-ink">Want to help with this ceremony?</p>
+          <p className="text-xs text-ink-muted mt-1">Pledge what you would like to give. New to iCamagu? You will register first, free, and your pledge is added for {plan.host.firstName}.</p>
+          <button type="button" onClick={startPledge} className="mt-3 bg-sage-500 text-white text-sm font-bold px-5 py-2.5 rounded-pill w-full">Pledge a contribution</button>
+          <a href="/" className="inline-block mt-3 text-xs text-sage-600 underline">Or plan your own ceremony: register or sign in</a>
+          <p className="text-[11px] text-ink-muted mt-2">This page is view-only.</p>
         </div>
 
         {phases.map((phase) => (
