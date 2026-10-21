@@ -1,6 +1,9 @@
 import { randomUUID } from 'crypto';
 import prisma from '../config/db.js';
 import { logAudit } from './stokvelRecordsController.js';
+import { postEntry } from '../services/ledgerService.js';
+import { toCents } from '../utils/money.js';
+import { parseTerms, buildSchedule, totalDueFor } from '../utils/loanTerms.js';
 
 // Loans, trade credit and statements for a stokvel. Like the records
 // controller, there is no migration history, so tables are created lazily
@@ -24,7 +27,8 @@ async function createTables() {
   // Borrower agreement: loans are unsecured, so every request carries a photo
   // of the borrower, an optional ID photo, a finger-drawn signature and the
   // time they accepted the terms. Officials can see these; other members cannot.
-  for (const col of ['"borrowerPhone" TEXT', '"borrowerPhoto" TEXT', '"idPhoto" TEXT', '"signature" TEXT', '"agreedAt" TIMESTAMP(3)']) {
+  // rateBasis and termsSnapshot freeze the agreed terms on each loan.
+  for (const col of ['"borrowerPhone" TEXT', '"borrowerPhoto" TEXT', '"idPhoto" TEXT', '"signature" TEXT', '"agreedAt" TIMESTAMP(3)', '"rateBasis" TEXT', '"termsSnapshot" JSONB']) {
     await prisma.$executeRawUnsafe(`ALTER TABLE "StokvelLoan" ADD COLUMN IF NOT EXISTS ${col};`);
   }
   await prisma.$executeRawUnsafe(
@@ -102,6 +106,18 @@ async function namesFor(ids) {
   return Object.fromEntries(users.map((u) => [u.id, fullName(u)]));
 }
 
+// The books entry is written after the loan record. If it fails the loan flow
+// still succeeded, so we log loudly and warn the caller. Re-running is safe.
+async function postToLedger(entry) {
+  try {
+    await postEntry(entry);
+    return null;
+  } catch (error) {
+    console.error('LEDGER POST FAILED', entry.kind, entry.idempotencyKey, error.message);
+    return 'The loan was updated but the books entry could not be saved. Tell your treasurer so it can be corrected.';
+  }
+}
+
 // ---------- Loans ----------
 
 export async function listLoans(req, res) {
@@ -123,11 +139,12 @@ export async function listLoans(req, res) {
       isOfficial: role.isOfficial,
       loans: loans.map((l) => {
         const amount = Number(l.amount);
-        const totalDue = amount * (1 + Number(l.interestPercent) / 100);
+        const totalDue = totalDueFor(l);
         const loanVotes = votes.filter((v) => v.loanId === l.id);
         return {
           id: l.id, borrowerId: l.borrowerId, borrowerName: names[l.borrowerId] || 'Member',
-          amount, interestPercent: Number(l.interestPercent), repayMonths: l.repayMonths,
+          amount, interestPercent: Number(l.interestPercent), rateBasis: l.rateBasis || null,
+          repayMonths: l.repayMonths,
           reason: l.reason, status: l.status, createdAt: l.createdAt, decidedAt: l.decidedAt,
           totalDue, repaid: repaidMap[l.id] || 0,
           monthlyInstalment: totalDue / Math.max(1, l.repayMonths),
@@ -150,10 +167,18 @@ export async function requestLoan(req, res) {
   try {
     if (!(await guard(req, res))) return;
     const { stokvelId } = req.params;
-    const amount = Number(req.body?.amount);
-    const repayMonths = parseInt(req.body?.repayMonths, 10);
-    // Township umbutho loans usually carry 30% interest, so that is the default.
-    const interestPercent = req.body?.interestPercent === undefined || req.body?.interestPercent === '' ? 30 : Number(req.body.interestPercent);
+    let amountCents;
+    try { amountCents = toCents(String(req.body?.amount ?? '')); } catch { amountCents = 0; }
+    if (!(amountCents > 0)) return res.status(400).json({ error: 'Enter a loan amount above zero (at most 2 decimals)' });
+    // No default interest: the borrower and group must see and agree the rate.
+    const parsed = parseTerms({
+      interestPercent: req.body?.interestPercent,
+      rateBasis: req.body?.rateBasis,
+      months: req.body?.repayMonths,
+    });
+    if (!parsed.ok) return res.status(400).json({ error: parsed.error });
+    const { interestPercent, rateBasis, months: repayMonths } = parsed.terms;
+
     const isImage = (v) => typeof v === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(v) && v.length < 1_500_000;
     const { borrowerPhoto, idPhoto, signature } = req.body || {};
     const borrowerPhone = String(req.body?.borrowerPhone || '').replace(/[^0-9+ ]/g, '').slice(0, 20) || null;
@@ -161,22 +186,26 @@ export async function requestLoan(req, res) {
     if (!isImage(signature)) return res.status(400).json({ error: 'The borrower must sign the agreement' });
     if (idPhoto && !isImage(idPhoto)) return res.status(400).json({ error: 'The ID photo could not be read. Please retake it' });
     if (req.body?.agreed !== true) return res.status(400).json({ error: 'The borrower must accept the loan terms' });
-    if (!(amount > 0)) return res.status(400).json({ error: 'Enter a loan amount above zero' });
-    if (!(repayMonths >= 1 && repayMonths <= 36)) return res.status(400).json({ error: 'Repayment period must be 1 to 36 months' });
-    if (!(interestPercent >= 0 && interestPercent <= 100)) return res.status(400).json({ error: 'Interest must be between 0 and 100%' });
     const open = await prisma.$queryRaw`
       SELECT 1 FROM "StokvelLoan" WHERE "stokvelId" = ${stokvelId} AND "borrowerId" = ${req.userId}
       AND "status" IN ('PENDING', 'APPROVED') LIMIT 1`;
     if (open.length) return res.status(409).json({ error: 'You already have an open loan or request in this stokvel' });
+
+    const schedule = buildSchedule({ principalCents: amountCents, ratePercent: interestPercent, rateBasis, months: repayMonths });
+    const snapshot = JSON.stringify({
+      interestPercent, rateBasis, months: repayMonths, principalCents: amountCents,
+      totalInterestCents: schedule.totalInterestCents, totalDueCents: schedule.totalDueCents,
+    });
+    const amount = amountCents / 100;
     const id = randomUUID();
     const reason = String(req.body?.reason || '').slice(0, 1000) || null;
     await prisma.$executeRaw`
-      INSERT INTO "StokvelLoan" ("id", "stokvelId", "borrowerId", "amount", "interestPercent", "repayMonths", "reason",
+      INSERT INTO "StokvelLoan" ("id", "stokvelId", "borrowerId", "amount", "interestPercent", "rateBasis", "termsSnapshot", "repayMonths", "reason",
         "borrowerPhone", "borrowerPhoto", "idPhoto", "signature", "agreedAt")
-      VALUES (${id}, ${stokvelId}, ${req.userId}, ${amount}, ${interestPercent}, ${repayMonths}, ${reason},
+      VALUES (${id}, ${stokvelId}, ${req.userId}, ${amount}, ${interestPercent}, ${rateBasis}, ${snapshot}::jsonb, ${repayMonths}, ${reason},
         ${borrowerPhone}, ${borrowerPhoto}, ${idPhoto || null}, ${signature}, CURRENT_TIMESTAMP)`;
-    await logAudit(stokvelId, req.userId, 'Requested a loan and signed the agreement', `${money(amount)} at ${interestPercent}% over ${repayMonths} month(s)`);
-    res.status(201).json({ id });
+    await logAudit(stokvelId, req.userId, 'Requested a loan and signed the agreement', `${money(amount)} at ${interestPercent}% (${rateBasis}) over ${repayMonths} month(s)`);
+    res.status(201).json({ id, totalDue: schedule.totalDueCents / 100 });
   } catch (error) {
     console.error('Request loan error:', error.message);
     res.status(500).json({ error: 'Could not request loan' });
@@ -190,7 +219,7 @@ export async function voteLoan(req, res) {
     const { stokvelId, loanId } = req.params;
     const approve = Boolean(req.body?.approve);
     const rows = await prisma.$queryRaw`
-      SELECT "borrowerId", "status", "amount" FROM "StokvelLoan" WHERE "id" = ${loanId} AND "stokvelId" = ${stokvelId}`;
+      SELECT "borrowerId", "status", "amount", "termsSnapshot" FROM "StokvelLoan" WHERE "id" = ${loanId} AND "stokvelId" = ${stokvelId}`;
     if (!rows.length) return res.status(404).json({ error: 'Loan not found' });
     if (rows[0].status !== 'PENDING') return res.status(409).json({ error: 'Voting on this loan has closed' });
     if (rows[0].borrowerId === req.userId) return res.status(403).json({ error: 'You cannot vote on your own loan' });
@@ -205,11 +234,21 @@ export async function voteLoan(req, res) {
     let status = 'PENDING';
     if (yes >= role.requiredApprovals) status = 'APPROVED';
     else if (no >= role.requiredApprovals) status = 'REJECTED';
+    let ledgerWarning = null;
     if (status !== 'PENDING') {
       await prisma.$executeRaw`UPDATE "StokvelLoan" SET "status" = ${status}, "decidedAt" = CURRENT_TIMESTAMP WHERE "id" = ${loanId}`;
     }
+    if (status === 'APPROVED') {
+      // Money leaves the group pot and becomes an amount owed back by the borrower.
+      const principalCents = toCents(String(rows[0].amount));
+      ledgerWarning = await postToLedger({
+        stokvelId, kind: 'LOAN_DISBURSEMENT', memo: 'Loan approved and paid out',
+        lines: [{ account: 'LOANS_RECEIVABLE', amountCents: principalCents }, { account: 'BANK', amountCents: -principalCents }],
+        idempotencyKey: `loan:${loanId}`, createdById: rows[0].borrowerId, approvedById: req.userId,
+      });
+    }
     await logAudit(stokvelId, req.userId, approve ? 'Voted to approve a loan' : 'Voted to reject a loan', money(rows[0].amount));
-    res.json({ status, yes, no });
+    res.json({ status, yes, no, ledgerWarning });
   } catch (error) {
     console.error('Vote loan error:', error.message);
     res.status(500).json({ error: 'Could not record vote' });
@@ -220,22 +259,49 @@ export async function repayLoan(req, res) {
   try {
     if (!(await guard(req, res, { officialOnly: true }))) return;
     const { stokvelId, loanId } = req.params;
-    const amount = Number(req.body?.amount);
-    if (!(amount > 0)) return res.status(400).json({ error: 'Enter a repayment amount above zero' });
+    let amountCents;
+    try { amountCents = toCents(String(req.body?.amount ?? '')); } catch { amountCents = 0; }
+    if (!(amountCents > 0)) return res.status(400).json({ error: 'Enter a repayment amount above zero (at most 2 decimals)' });
     const rows = await prisma.$queryRaw`
-      SELECT "status", "amount", "interestPercent", "borrowerId" FROM "StokvelLoan" WHERE "id" = ${loanId} AND "stokvelId" = ${stokvelId}`;
+      SELECT "status", "amount", "interestPercent", "termsSnapshot", "borrowerId" FROM "StokvelLoan" WHERE "id" = ${loanId} AND "stokvelId" = ${stokvelId}`;
     if (!rows.length) return res.status(404).json({ error: 'Loan not found' });
     if (rows[0].status !== 'APPROVED') return res.status(409).json({ error: 'Only approved, unpaid loans can take repayments' });
+    // Nobody records repayments on their own loan.
+    if (rows[0].borrowerId === req.userId) return res.status(403).json({ error: 'You cannot record repayments on your own loan. Another official must do it.' });
+
+    const totalDueCents = Math.round(totalDueFor(rows[0]) * 100);
+    const before = await prisma.$queryRaw`SELECT COALESCE(SUM("amount"), 0) AS total FROM "StokvelLoanRepayment" WHERE "loanId" = ${loanId}`;
+    const paidBeforeCents = Math.round(Number(before[0].total) * 100);
+    if (amountCents > totalDueCents - paidBeforeCents) {
+      return res.status(400).json({ error: `That is more than is still owed (${money((totalDueCents - paidBeforeCents) / 100)})` });
+    }
+
+    const repaymentId = randomUUID();
     await prisma.$executeRaw`
       INSERT INTO "StokvelLoanRepayment" ("id", "loanId", "stokvelId", "amount", "recordedById")
-      VALUES (${randomUUID()}, ${loanId}, ${stokvelId}, ${amount}, ${req.userId})`;
-    const sum = await prisma.$queryRaw`SELECT COALESCE(SUM("amount"), 0) AS total FROM "StokvelLoanRepayment" WHERE "loanId" = ${loanId}`;
-    const totalDue = Number(rows[0].amount) * (1 + Number(rows[0].interestPercent) / 100);
-    const settled = Number(sum[0].total) >= totalDue - 0.005;
+      VALUES (${repaymentId}, ${loanId}, ${stokvelId}, ${amountCents / 100}, ${req.userId})`;
+    const settled = paidBeforeCents + amountCents >= totalDueCents;
     if (settled) await prisma.$executeRaw`UPDATE "StokvelLoan" SET "status" = 'REPAID' WHERE "id" = ${loanId}`;
+
+    // Loans made before agreed terms were stored were never put on the books
+    // when issued, so their repayments are not added either (no half records).
+    let ledgerWarning = null;
+    if (rows[0].termsSnapshot) {
+      const principalCents = toCents(String(rows[0].amount));
+      const principalLeft = Math.max(0, principalCents - paidBeforeCents);
+      const principalPart = Math.min(amountCents, principalLeft);
+      const interestPart = amountCents - principalPart;
+      const lines = [{ account: 'BANK', amountCents }];
+      if (principalPart > 0) lines.push({ account: 'LOANS_RECEIVABLE', amountCents: -principalPart });
+      if (interestPart > 0) lines.push({ account: 'INTEREST_INCOME', amountCents: -interestPart });
+      ledgerWarning = await postToLedger({
+        stokvelId, kind: 'LOAN_REPAYMENT', memo: 'Loan repayment',
+        lines, idempotencyKey: `repayment:${repaymentId}`, createdById: req.userId,
+      });
+    }
     const names = await namesFor([rows[0].borrowerId]);
-    await logAudit(stokvelId, req.userId, 'Recorded a loan repayment', `${money(amount)} from ${names[rows[0].borrowerId] || 'Member'}`);
-    res.json({ message: settled ? 'Loan fully repaid' : 'Repayment recorded', settled });
+    await logAudit(stokvelId, req.userId, 'Recorded a loan repayment', `${money(amountCents / 100)} from ${names[rows[0].borrowerId] || 'Member'}`);
+    res.json({ message: settled ? 'Loan fully repaid' : 'Repayment recorded', settled, ledgerWarning });
   } catch (error) {
     console.error('Repay loan error:', error.message);
     res.status(500).json({ error: 'Could not record repayment' });
