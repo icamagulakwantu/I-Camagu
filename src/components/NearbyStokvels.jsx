@@ -12,16 +12,20 @@ const TYPE_LABEL = {
   RECIPROCAL_GIFTING: 'Gift sharing',
 }
 
-// Stokvels that chose to be shown, with the ones in the person's own area
-// first. "Ask to join" tells the creator, who then sends an invitation.
+// A closed "Find stokvels near you" bar. Opening it shows stokvels that chose
+// to be shown, with the ones in the person's own area first. "Ask to join"
+// tells the creator, who then sends an invitation.
 export default function NearbyStokvels() {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
+  const [open, setOpen] = useState(false)
   const [data, setData] = useState(null)
   const [busyId, setBusyId] = useState(null)
   const [asked, setAsked] = useState({})
 
+  // Only asks the server once the person opens the bar.
   useEffect(() => {
+    if (!open || data) return
     let cancelled = false
     const load = async () => {
       const res = await fetch('/api/stokvels/nearby', { headers: { Authorization: `Bearer ${accessToken}` } }).catch(() => null)
@@ -30,7 +34,7 @@ export default function NearbyStokvels() {
     }
     load()
     return () => { cancelled = true }
-  }, [accessToken])
+  }, [open, data, accessToken])
 
   const ask = async (stokvel) => {
     setBusyId(stokvel.id)
@@ -49,38 +53,47 @@ export default function NearbyStokvels() {
     }
   }
 
-  if (!data) return null
-  if (data.stokvels.length === 0 && data.hasAddress) return null
-
   return (
-    <div className="px-4 pt-2 pb-4 bg-cream">
-      <p className="text-[11px] font-black uppercase tracking-widest text-ink-muted mb-2">Stokvels near you</p>
+    <div className="px-4 pt-3 bg-cream">
+      <button type="button" onClick={() => setOpen((o) => !o)}
+        className={`w-full bg-white border-2 border-sage-500/40 rounded-pill py-3 px-4 text-left font-bold text-ink flex items-center justify-between ${pressable}`}>
+        <span>Find stokvels near you</span>
+        <span className="text-sage-600 text-sm">{open ? 'Hide' : 'Show'}</span>
+      </button>
 
-      {!data.hasAddress && (
-        <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-3">
-          <p className="font-bold text-ink">Add your area to see stokvels close to you</p>
-          <p className="text-sm text-ink-muted mt-1">Open More, then Profile, and fill in your address. We only use it to show groups in your area.</p>
+      {open && !data && <p className="text-sm text-ink-muted mt-3">Looking...</p>}
+
+      {open && data && (
+        <div className="mt-3 pb-2">
+          {!data.hasAddress && (
+            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-3">
+              <p className="font-bold text-ink">Add your area to see stokvels close to you</p>
+              <p className="text-sm text-ink-muted mt-1">Open More, then Profile, and fill in your address. We only use it to put groups in your area first.</p>
+            </div>
+          )}
+          {data.stokvels.length === 0 && (
+            <p className="text-sm text-ink-muted">No stokvels are shown to the public yet. Creators can switch this on in the Members tab.</p>
+          )}
+          <div className="space-y-3">
+            {data.stokvels.map((s) => (
+              <div key={s.id} className="bg-white border-2 border-terracotta/15 rounded-soft p-4 shadow-soft">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-display font-bold text-lg text-ink">{s.name}</p>
+                  {s.isNearYou && (
+                    <span className="text-[10px] font-black uppercase bg-sage-50 text-sage-700 px-2 py-1 rounded-pill flex-shrink-0">Near you</span>
+                  )}
+                </div>
+                <p className="text-xs text-ink-muted mt-0.5">{TYPE_LABEL[s.type] || 'Stokvel'} · {s.area} · {s.memberCount} member{s.memberCount === 1 ? '' : 's'}</p>
+                <p className="text-sm text-ink mt-2">{s.purpose}</p>
+                <button type="button" disabled={busyId === s.id || asked[s.id]} onClick={() => ask(s)}
+                  className={`mt-3 w-full bg-sage-500 text-white font-bold py-3 rounded-pill text-base ${pressable}`}>
+                  {asked[s.id] ? 'Request sent' : 'Ask to join'}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
-
-      <div className="space-y-3">
-        {data.stokvels.map((s) => (
-          <div key={s.id} className="bg-white border-2 border-terracotta/15 rounded-soft p-4 shadow-soft">
-            <div className="flex items-start justify-between gap-2">
-              <p className="font-display font-bold text-lg text-ink">{s.name}</p>
-              {s.isNearYou && (
-                <span className="text-[10px] font-black uppercase bg-sage-50 text-sage-700 px-2 py-1 rounded-pill flex-shrink-0">Near you</span>
-              )}
-            </div>
-            <p className="text-xs text-ink-muted mt-0.5">{TYPE_LABEL[s.type] || 'Stokvel'} · {s.area} · {s.memberCount} member{s.memberCount === 1 ? '' : 's'}</p>
-            <p className="text-sm text-ink mt-2">{s.purpose}</p>
-            <button type="button" disabled={busyId === s.id || asked[s.id]} onClick={() => ask(s)}
-              className={`mt-3 w-full bg-sage-500 text-white font-bold py-3 rounded-pill text-base ${pressable}`}>
-              {asked[s.id] ? 'Request sent' : 'Ask to join'}
-            </button>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }
