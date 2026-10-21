@@ -60,7 +60,9 @@ export async function confirmContribution(req, res) {
     // Separation of duties: nobody confirms their own money.
     const payer = await prisma.stokvelMember.findUnique({ where: { id: contribution.memberId } });
     if (payer?.userId === userId) {
-      return res.status(403).json({ error: 'You cannot confirm your own contribution. Another official must do it.' });
+      return res.status(403).json({
+        error: 'You cannot confirm your own payment. Ask another official to confirm it. If there is no other official yet, open the Members tab and tap "Make an official" next to another member.',
+      });
     }
 
     const amountCents = parseAmount(contribution.amount.toString());
