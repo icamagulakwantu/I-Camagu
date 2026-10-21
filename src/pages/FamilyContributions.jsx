@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
+import PledgeShareCard from '../components/PledgeShareCard.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
@@ -115,6 +116,8 @@ export default function FamilyContributions({ onBack }) {
         </div>
 
         <div className="px-4 mt-5">
+          <PledgeShareCard planId={activePlan.id} planTitle={activePlan.title} />
+
           <button
             type="button"
             onClick={() => setShowForm(!showForm)}
