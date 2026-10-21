@@ -96,9 +96,7 @@ export async function setOfficial(req, res) {
   }
 }
 
-// Take the official role away. The creator always keeps theirs, and a
-// stokvel always keeps at least two officials once it has more than one
-// member, so someone other than the payer can always confirm.
+// Take the official role away. The creator always keeps theirs.
 export async function removeOfficial(req, res) {
   const { stokvelId, memberUserId } = req.params;
   const userId = req.userId;
