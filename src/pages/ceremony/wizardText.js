@@ -1,7 +1,7 @@
 // All the words for the step-by-step ceremony flow live here, isiXhosa first
-// with English underneath. Keep the isiXhosa short and plain; longer
-// explanations stay in English so nothing is guessed. A first-language speaker
-// should read these once before launch.
+// with English underneath. Keep the isiXhosa short and plain; where there is
+// no confident isiXhosa wording the entry has only an English line. A
+// first-language speaker should read every xh line once before launch.
 export const STEPS = [
   { id: 'what', xh: 'Ngowuphi umsebenzi?', en: 'What kind of ceremony is it?' },
   { id: 'when', xh: 'Igama nomhla', en: 'Name and date' },
@@ -17,10 +17,16 @@ export const BUTTONS = {
   save: { xh: 'Gcina', en: 'Save' },
   create: { xh: 'Qala', en: 'Create my plan' },
   change: { xh: 'Guqula', en: 'Change' },
-  done: { xh: 'Kugqityiwe', en: 'Done' },
   add: { xh: 'Ongeza', en: 'Add' },
-  summary: { xh: 'Isishwankathelo', en: 'Summary' },
+  summary: { xh: 'Isishwankathelo', en: 'See summary' },
   cancel: { xh: 'Rhoxisa', en: 'Cancel' },
+  buy: { xh: 'Thenga', en: 'Buy' },
+  startNew: { xh: 'Qala umsebenzi omtsha', en: 'Start a new ceremony' },
+  share: { xh: 'Yabelana', en: 'Share' },
+  remove: { xh: 'Cima', en: 'Delete ceremony' },
+  template: { en: 'Save as template' },
+  timeline: { en: 'Timeline' },
+  bar: { en: 'Ekoyini Bar' },
 }
 
 export const LABELS = {
@@ -33,4 +39,11 @@ export const LABELS = {
   over: { xh: 'Ugqithile', en: 'Over your budget' },
   stillToBuy: { xh: 'Okusele ukuthengwa', en: 'Still to buy (guide price)' },
   paid: { xh: 'Ndihlawulile', en: 'I paid' },
+  guide: { xh: 'Isikhokelo', en: 'Guide price' },
+  onList: { en: 'On your list' },
+  unexpected: { en: 'Unexpected' },
+  tapToChange: { xh: 'Cofa ukuguqula', en: 'Tap to change' },
+  family: { en: 'Family pledges' },
 }
+
+export const EXPLAIN_MONEY = 'Guide prices are only a help. Only what you really paid comes off your budget.'
