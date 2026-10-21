@@ -243,18 +243,22 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
   const submissions = [];
 
   for (const [category, items] of groups) {
-    // Each group gets its own basket row so it can be parked against its
-    // own pool independently of the others.
-    const groupBasket = await prisma.basket.create({ data: { userId, status: 'DRAFT' } });
+    const isInvitedCategory = Boolean(joinPoolId) && category === joinPoolCategory;
+    const invitedPoolStillJoinable = isInvitedCategory && invitedPool.status === 'OPEN';
+    const pool = invitedPoolStillJoinable ? invitedPool : (await findOrCreateOpenPool(category, area, parsedTargetDate));
+
+    // Each group gets its own basket row so it can be parked against its own
+    // pool independently of the others. It is created already PARKED, never
+    // as a second DRAFT: the database allows exactly one DRAFT basket per
+    // member (the member's open cart, which is still `basket` here), so
+    // creating another DRAFT is what failed with "Unique constraint failed
+    // on the fields: (userId)".
+    const groupBasket = await prisma.basket.create({ data: { userId, status: 'PARKED', poolId: pool.id } });
     await prisma.basketItem.updateMany({
       where: { id: { in: items.map((it) => it.id) } },
       data: { basketId: groupBasket.id },
     });
 
-    const isInvitedCategory = Boolean(joinPoolId) && category === joinPoolCategory;
-    const invitedPoolStillJoinable = isInvitedCategory && invitedPool.status === 'OPEN';
-    const pool = invitedPoolStillJoinable ? invitedPool : (await findOrCreateOpenPool(category, area, parsedTargetDate));
-    await prisma.basket.update({ where: { id: groupBasket.id }, data: { status: 'PARKED', poolId: pool.id } });
     const result = await checkAndMatchPool(pool.id);
     submissions.push({
       category,
@@ -275,6 +279,10 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
       joinedInvitedPool: isInvitedCategory ? invitedPoolStillJoinable : undefined,
     });
   }
+
+  // Every item has now moved into its own parked basket, so the original
+  // open cart is empty. Remove it so the member starts a fresh cart next time.
+  await prisma.basket.deleteMany({ where: { id: basket.id, status: 'DRAFT', items: { none: {} } } });
 
   return { submissions };
 }
