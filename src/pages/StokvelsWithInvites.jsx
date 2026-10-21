@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useState } from 'react'
 import Stokvels from './Stokvels.jsx'
 import MyStokvelInvites from '../components/MyStokvelInvites.jsx'
+import NearbyStokvels from '../components/NearbyStokvels.jsx'
+import ProfileCompletionCard from '../components/ProfileCompletionCard.jsx'
 import StokvelWelcomeTour from '../components/StokvelWelcomeTour.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 
 const seenKey = (userId, stokvelId) => `icamagu_tour_seen:${userId}:${stokvelId}`
 const baselineKey = (userId) => `icamagu_tour_baseline:${userId}`
 
-// The Stokvels screen with two extras on top: invitations waiting for the
-// person, and a one-time welcome tour for any stokvel they have just joined.
+// The Stokvels screen with extras on top: invitations waiting for the person,
+// a "complete your profile" card, a "find stokvels near you" bar, and a
+// one-time welcome tour for any stokvel they have just joined.
 export default function StokvelsWithInvites(props) {
   const { accessToken, user } = useAuth()
   const [refreshKey, setRefreshKey] = useState(0)
@@ -53,6 +56,8 @@ export default function StokvelsWithInvites(props) {
       <div className="px-4 pt-6 bg-cream empty:hidden">
         <MyStokvelInvites onJoined={() => setRefreshKey((k) => k + 1)} />
       </div>
+      <ProfileCompletionCard />
+      <NearbyStokvels />
       <Stokvels key={refreshKey} {...props} />
       {tourStokvelId && <StokvelWelcomeTour stokvelId={tourStokvelId} onClose={closeTour} />}
     </>

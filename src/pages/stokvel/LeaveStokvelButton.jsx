@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
 import OfficialsPanel from '../../components/OfficialsPanel.jsx'
+import ListingPanel from '../../components/ListingPanel.jsx'
 import AddMemberPanel from './AddMemberPanel.jsx'
 import StokvelInvite from './StokvelInvite.jsx'
 
@@ -24,6 +25,7 @@ function LeaveStokvelButton({ stokvelId, stokvelName, isOrganiser, onLeft }) {
       <div className="mt-6 pt-4 border-t border-terracotta/15">
         <AddMemberPanel stokvelId={stokvelId} />
         <OfficialsPanel stokvelId={stokvelId} />
+        <ListingPanel stokvelId={stokvelId} />
         <StokvelInvite stokvelId={stokvelId} stokvelName={stokvelName} />
       </div>
     )
