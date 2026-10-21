@@ -111,7 +111,7 @@ router.post('/contributions/submit', requireAuth, submitContribution);
 router.post('/contributions/confirm', requireAuth, pinLimiter, confirmContribution);
 router.get('/:stokvelId/contributions/pending', requireAuth, getPendingContributions);
 
-router.post('/payouts/request', requireAuth, payFineGuard, requestPayout);
+router.post('/payouts/request', requireAuth, requestPayout);
 router.delete('/:stokvelId', requireAuth, deleteStokvel);
 router.delete('/:stokvelId/leave', requireAuth, leaveStokvel);
 router.post('/payouts/approve', requireAuth, pinLimiter, approvePayout);
