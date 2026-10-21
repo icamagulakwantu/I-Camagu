@@ -10,6 +10,7 @@ import {
   viewConnectionProfile,
 } from '../controllers/izidukoController.js';
 import { listRites, addRite, updateRite, deleteRite } from '../controllers/ancestralRitesController.js';
+import clanGroupRoutes from './clanGroups.js';
 
 const router = express.Router();
 
@@ -26,5 +27,8 @@ router.get('/rites', requireAuth, listRites);
 router.post('/rites', requireAuth, addRite);
 router.patch('/rites/:id', requireAuth, updateRite);
 router.delete('/rites/:id', requireAuth, deleteRite);
+
+// Clan groups (start one, join with a link, bring a WhatsApp group over)
+router.use('/groups', clanGroupRoutes);
 
 export default router;
