@@ -18,6 +18,7 @@ import { listOfficials, setOfficial, removeOfficial } from '../controllers/stokv
 import {
   searchPeople, sendInvite, listSentInvites, listMyInvites, respondToInvite,
 } from '../controllers/stokvelInvitesController.js';
+import { getListing, saveListing, listNearby, askToJoin } from '../controllers/stokvelListingController.js';
 import {
   submitContribution,
   confirmContribution,
@@ -56,6 +57,11 @@ router.get('/my', requireAuth, getMyStokvels);
 router.get('/invites/mine', requireAuth, listMyInvites);
 router.get('/invites/search', requireAuth, searchPeople);
 router.post('/invites/:inviteId/respond', requireAuth, respondToInvite);
+// Opt-in public listing: "stokvels near you" (also before the /:stokvelId routes)
+router.get('/nearby', requireAuth, listNearby);
+router.post('/:stokvelId/ask-to-join', requireAuth, rateLimit({ windowMs: 15 * 60 * 1000, max: 10 }), askToJoin);
+router.get('/:stokvelId/listing', requireAuth, getListing);
+router.put('/:stokvelId/listing', requireAuth, saveListing);
 router.get('/shrine-fund/total', optionalAuth, getShrineFundTotal);
 router.post(
   '/shrine-fund/donate',
@@ -105,7 +111,7 @@ router.post('/contributions/submit', requireAuth, submitContribution);
 router.post('/contributions/confirm', requireAuth, pinLimiter, confirmContribution);
 router.get('/:stokvelId/contributions/pending', requireAuth, getPendingContributions);
 
-router.post('/payouts/request', requireAuth, requestPayout);
+router.post('/payouts/request', requireAuth, payFineGuard, requestPayout);
 router.delete('/:stokvelId', requireAuth, deleteStokvel);
 router.delete('/:stokvelId/leave', requireAuth, leaveStokvel);
 router.post('/payouts/approve', requireAuth, pinLimiter, approvePayout);
