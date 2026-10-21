@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useDebounce } from 'use-debounce'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
 
@@ -12,30 +11,40 @@ export default function AddMemberPanel({ stokvelId }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   const [query, setQuery] = useState('')
-  const [debounced] = useDebounce(query, 400)
   const [people, setPeople] = useState(null)
   const [waiting, setWaiting] = useState([])
   const [busyId, setBusyId] = useState(null)
-  const auth = { Authorization: `Bearer ${accessToken}` }
 
   const loadWaiting = useCallback(async () => {
-    const res = await fetch(`/api/stokvels/${stokvelId}/invites`, { headers: auth }).catch(() => null)
+    const res = await fetch(`/api/stokvels/${stokvelId}/invites`, { headers: { Authorization: `Bearer ${accessToken}` } }).catch(() => null)
     if (res?.ok) setWaiting(await res.json())
   }, [stokvelId, accessToken])
 
-  const search = useCallback(async (text) => {
-    const res = await fetch(`/api/stokvels/invites/search?stokvelId=${encodeURIComponent(stokvelId)}&q=${encodeURIComponent(text)}`, { headers: auth }).catch(() => null)
-    setPeople(res?.ok ? await res.json() : [])
-  }, [stokvelId, accessToken])
-
   useEffect(() => { loadWaiting() }, [loadWaiting])
-  useEffect(() => { search(debounced.trim()) }, [debounced, search])
+
+  // Waits for a pause in typing before asking the server, and ignores a
+  // slow answer that arrives after a newer search.
+  useEffect(() => {
+    let cancelled = false
+    const timer = setTimeout(async () => {
+      const text = query.trim()
+      const res = await fetch(
+        `/api/stokvels/invites/search?stokvelId=${encodeURIComponent(stokvelId)}&q=${encodeURIComponent(text)}`,
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      ).catch(() => null)
+      const data = res?.ok ? await res.json() : []
+      if (!cancelled) setPeople(data)
+    }, query ? 400 : 0)
+    return () => { cancelled = true; clearTimeout(timer) }
+  }, [query, stokvelId, accessToken])
 
   const invite = async (person) => {
     setBusyId(person.userId)
     try {
       const res = await fetch(`/api/stokvels/${stokvelId}/invites`, {
-        method: 'POST', headers: { ...auth, 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: person.userId }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ userId: person.userId }),
       })
       const body = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(body.error || 'Could not send the invitation')
