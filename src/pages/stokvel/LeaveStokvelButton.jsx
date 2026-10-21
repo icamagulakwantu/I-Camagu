@@ -2,13 +2,15 @@ import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
 import OfficialsPanel from '../../components/OfficialsPanel.jsx'
+import ListingPanel from '../../components/ListingPanel.jsx'
+import AddMemberPanel from './AddMemberPanel.jsx'
 import StokvelInvite from './StokvelInvite.jsx'
 
 const pressable = "transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none"
 
 /**
- * Bottom of the Members tab: who can confirm payments, the invite link for
- * everyone, and the Leave button for non-organisers only.
+ * Bottom of the Members tab: add people, who can confirm payments, the invite
+ * link for everyone, and the Leave button for non-organisers only.
  * On success, calls onLeft() so the parent can navigate back to the list.
  */
 function LeaveStokvelButton({ stokvelId, stokvelName, isOrganiser, onLeft }) {
@@ -21,7 +23,9 @@ function LeaveStokvelButton({ stokvelId, stokvelName, isOrganiser, onLeft }) {
   if (isOrganiser) {
     return (
       <div className="mt-6 pt-4 border-t border-terracotta/15">
+        <AddMemberPanel stokvelId={stokvelId} />
         <OfficialsPanel stokvelId={stokvelId} />
+        <ListingPanel stokvelId={stokvelId} />
         <StokvelInvite stokvelId={stokvelId} stokvelName={stokvelName} />
       </div>
     )
