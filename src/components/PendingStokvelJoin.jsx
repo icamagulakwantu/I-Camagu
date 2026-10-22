@@ -4,8 +4,8 @@ import { useToast } from './ui/Toast.jsx'
 import { PENDING_STOKVEL_KEY } from '../lib/inviteLinks.js'
 
 // Runs once the person is signed in, registered and past onboarding. If they
-// arrived through a stokvel invite link, join them to that stokvel and take
-// them to it. Renders nothing.
+// arrived through a stokvel invite link, join them to that stokvel (or send
+// a request an official must accept) and take them to it. Renders nothing.
 export default function PendingStokvelJoin({ onJoined }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
@@ -26,6 +26,11 @@ export default function PendingStokvelJoin({ onJoined }) {
     })
       .then(async (res) => {
         const data = await res.json().catch(() => ({}))
+        // Asking to join is good news, not a failure: an official will answer.
+        if (data.requested) {
+          showToast(data.error || 'Request sent. An official must accept you first.', 'info')
+          return
+        }
         if (!res.ok) throw new Error(data.error || 'Could not join that stokvel')
         showToast('You have joined the stokvel', 'success')
       })
