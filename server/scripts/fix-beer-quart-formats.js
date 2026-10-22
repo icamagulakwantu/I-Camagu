@@ -4,12 +4,14 @@
 //    sells Lager and Draught in South Africa/Namibia, never a "Light"
 //    variant. Renamed to plain "Windhoek Lager".
 //
-// 2. Several quart-format rows had the wrong bottle size. The rule: an
-//    international brand's big bottle is 620ml (matches Stella Artois,
-//    already correct), a South African or Namibian brand's is 750ml.
-//    Heineken (international) was wrongly at 500ml; Windhoek Lager and
+// 2. Several quart-format rows had the wrong bottle size. The rule: a South
+//    African or Namibian brand's big bottle is 750ml. Windhoek Lager and
 //    Windhoek Draught (both Namibian) were wrongly at 500ml/440ml. 500ml on
 //    its own is a can size, not a quart, in every one of these cases.
+//    Heineken's quart is a 650ml returnable (heineken.com/za, Oct 2026). It
+//    was first stored as 500ml, then wrongly "corrected" to 620ml by a
+//    generic international-brand rule; both steps below are kept so a row on
+//    either old size ends up at 650ml.
 //
 // Flying Fish's 660ml quart is deliberately NOT "corrected" to 750ml here —
 // that size is verified against Shoprite's own listing (which itself calls
@@ -28,7 +30,8 @@ export async function fixBeerQuartFormats() {
   changed += renamed.count;
 
   const fixes = [
-    { name: 'Heineken', from: 'Quart (500ml)', to: 'Quart (620ml)' },
+    { name: 'Heineken', from: 'Quart (500ml)', to: 'Quart (650ml)' },
+    { name: 'Heineken', from: 'Quart (620ml)', to: 'Quart (650ml)' },
     { name: 'Windhoek Lager', from: 'Quart (500ml)', to: 'Quart (750ml)' },
     { name: 'Windhoek Draught', from: 'Quart (440ml)', to: 'Quart (750ml)' },
     // Real can/bottle photos show these were wrong: Corona's can is 410ml,
