@@ -6,6 +6,8 @@ import { toCents } from '../utils/money.js';
 // Every confirmed money movement is also written to the tamper-evident ledger
 // (server/services/ledgerService.js). The older running balance is still updated
 // so existing screens keep working while the books are phased in.
+// Group expenses now live in stokvelApprovalsController.js, because they need
+// a second official to approve them.
 
 // Writes the ledger entry. If it fails the money flow has already succeeded, so
 // we do not undo it; we log loudly and tell the caller so it can be fixed.
@@ -163,65 +165,6 @@ export async function getPendingContributions(req, res) {
   } catch (error) {
     console.error('Get pending contributions error:', error.message);
     res.status(500).json({ error: 'Could not fetch pending contributions' });
-  }
-}
-
-export async function recordGroupExpense(req, res) {
-  const userId = req.userId;
-  const { stokvelId, amount, note } = req.body;
-
-  if (!stokvelId || !amount) return res.status(400).json({ error: 'stokvelId and amount are required' });
-
-  const requestedAmount = parseFloat(amount);
-  const amountCents = parseAmount(amount);
-  if (isNaN(requestedAmount) || requestedAmount <= 0 || !amountCents) {
-    return res.status(400).json({ error: 'Amount must be a positive number with at most 2 decimals' });
-  }
-  // An expense with no reason is how money disappears. Always ask for one.
-  if (!String(note || '').trim()) {
-    return res.status(400).json({ error: 'Say what the money was spent on' });
-  }
-
-  try {
-    const official = await prisma.stokvelOfficial.findFirst({ where: { stokvelId, userId } });
-    if (!official) return res.status(403).json({ error: 'Only stokvel officials can record a group expense' });
-
-    const ledger = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
-    if (!ledger) return res.status(409).json({ error: 'This stokvel has no group ledger yet — contact support' });
-    if (parseFloat(ledger.totalBalance) < requestedAmount) {
-      return res.status(400).json({ error: 'Expense amount exceeds the group balance' });
-    }
-
-    const updated = await prisma.stokvelGroupLedger.update({
-      where: { stokvelId },
-      data: {
-        totalBalance: { decrement: requestedAmount },
-        groupExpenses: { increment: requestedAmount },
-      },
-    });
-
-    const ledgerWarning = await postToLedger({
-      stokvelId,
-      kind: 'EXPENSE',
-      memo: `Expense: ${String(note).trim().slice(0, 300)}`,
-      lines: [{ account: 'EXPENSES', amountCents }, { account: 'BANK', amountCents: -amountCents }],
-      idempotencyKey: `expense:${randomUUID()}`,
-      createdById: userId,
-    });
-
-    const { notifyMany } = await import('../services/notificationDbService.js');
-    const members = await prisma.stokvelMember.findMany({ where: { stokvelId }, select: { userId: true } });
-    await notifyMany(
-      members.map((m) => m.userId),
-      'GROUP_EXPENSE_RECORDED',
-      `A group expense of R${requestedAmount.toFixed(2)} was recorded: ${String(note).trim()}.`,
-      'stokvels'
-    );
-
-    res.json({ ledger: updated, ledgerWarning, message: 'Expense recorded and deducted from the group balance.' });
-  } catch (error) {
-    console.error('Record group expense error:', error.message);
-    res.status(500).json({ error: 'Could not record group expense' });
   }
 }
 
