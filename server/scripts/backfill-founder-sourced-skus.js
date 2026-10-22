@@ -25,10 +25,11 @@ const NEW_SKUS = [
   { name: 'Breezer Watermelon', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
   { name: 'Breezer Blackberry', category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
   // Hunter's Iced — a genuinely new line (not a Dry/Gold reformulation),
-  // confirmed by real bottle and can photos of both flavours.
-  { name: "Hunter's Iced Apple", category: 'CIDER_RTD', bottleFormat: 'Dumpy (340ml)', unitsPerCase: 24 },
+  // confirmed by real bottle and can photos of both flavours. Dumpy is the
+  // 330ml bottle (fix-pack-sizes-oct-2026.js); 340ml was a data error.
+  { name: "Hunter's Iced Apple", category: 'CIDER_RTD', bottleFormat: 'Dumpy (330ml)', unitsPerCase: 24 },
   { name: "Hunter's Iced Apple", category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
-  { name: "Hunter's Iced Watermelon", category: 'CIDER_RTD', bottleFormat: 'Dumpy (340ml)', unitsPerCase: 24 },
+  { name: "Hunter's Iced Watermelon", category: 'CIDER_RTD', bottleFormat: 'Dumpy (330ml)', unitsPerCase: 24 },
   { name: "Hunter's Iced Watermelon", category: 'CIDER_RTD', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
   // Kopparberg's 7% "Vintage" range is a distinct, stronger product line
   // from the standard ~4% Kopparberg Pear already catalogued — not the same
