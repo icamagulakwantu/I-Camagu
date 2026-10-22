@@ -10,12 +10,12 @@
 import prisma from '../config/db.js';
 
 const FORMAT_SPECIFIC_IMAGES = [
-  // The founder already sent a bottle shot for Heineken's Quart (500ml),
-  // applied to all three formats when it arrived. These two replace the
-  // Can and Dumpy rows with their own actual pack-format photo; Quart keeps
-  // the original bottle shot untouched.
+  // The founder already sent a bottle shot for Heineken's Quart, applied to
+  // all three formats when it arrived. These two replace the Can and Dumpy
+  // rows with their own actual pack-format photo; Quart keeps the original
+  // bottle shot untouched. Dumpy is 330ml (fix-pack-sizes-oct-2026.js).
   { name: 'Heineken', bottleFormat: 'Can (500ml)', slug: 'heineken-can' },
-  { name: 'Heineken', bottleFormat: 'Dumpy (340ml)', slug: 'heineken-dumpy' },
+  { name: 'Heineken', bottleFormat: 'Dumpy (330ml)', slug: 'heineken-dumpy' },
   // Windhoek Lager's can; the bottle shot (windhoek-lager.png, matched by
   // name in backfill-extracted-brand-photos.js) already covers Quart/Dumpy.
   { name: 'Windhoek Lager', bottleFormat: 'Can (500ml)', slug: 'windhoek-lager-can' },
