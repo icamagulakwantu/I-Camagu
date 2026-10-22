@@ -3,7 +3,6 @@ import { requireAuth, optionalAuth } from '../middleware/auth.js';
 import { rateLimit } from '../middleware/rateLimiter.js';
 import {
   createStokvel,
-  joinStokvel,
   leaveStokvel,
   getMyStokvels,
   getStokvel,
@@ -14,6 +13,10 @@ import {
   updateStokvel,
   setRotationOrder
 } from '../controllers/stokvelController.js';
+import {
+  joinOrRequest, listApprovals, decideJoinRequest,
+  requestExpense, approveExpense, declineExpense,
+} from '../controllers/stokvelApprovalsController.js';
 import { listOfficials, setOfficial, removeOfficial } from '../controllers/stokvelOfficialsController.js';
 import {
   searchPeople, sendInvite, listSentInvites, listMyInvites, respondToInvite,
@@ -24,7 +27,6 @@ import {
   confirmContribution,
   getPendingContributions,
   recordInterest,
-  recordGroupExpense,
 } from '../controllers/contributionController.js';
 import { postAnnouncement, getAnnouncements } from '../controllers/announcementController.js';
 import {
@@ -46,11 +48,14 @@ import {
 } from '../controllers/payoutController.js';
 
 const router = express.Router();
+const pinLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
 
 router.post('/', requireAuth, createStokvel);
-router.post('/join', requireAuth, joinStokvel);
+// Joining now sends a request an official must accept (unless they were invited).
+router.post('/join', requireAuth, rateLimit({ windowMs: 15 * 60 * 1000, max: 20 }), joinOrRequest);
 router.post('/interest/record', requireAuth, recordInterest);
-router.post('/expense/record', requireAuth, recordGroupExpense);
+// An expense is only a request until a second official approves it with their PIN.
+router.post('/expense/record', requireAuth, requestExpense);
 router.get('/pending-approvals/count', requireAuth, getPendingApprovalCount);
 router.get('/my', requireAuth, getMyStokvels);
 // In-app invitations (declared before the /:stokvelId routes so "invites" is never read as an id)
@@ -80,6 +85,11 @@ router.get('/:stokvelId/announcements', requireAuth, getAnnouncements);
 router.get('/:stokvelId/officials', requireAuth, listOfficials);
 router.put('/:stokvelId/officials', requireAuth, setOfficial);
 router.delete('/:stokvelId/officials/:memberUserId', requireAuth, removeOfficial);
+// Requests waiting for an official: people asking to join, expenses to approve.
+router.get('/:stokvelId/approvals', requireAuth, listApprovals);
+router.post('/:stokvelId/join-requests/:requestId', requireAuth, decideJoinRequest);
+router.post('/:stokvelId/expenses/:requestId/approve', requireAuth, pinLimiter, approveExpense);
+router.post('/:stokvelId/expenses/:requestId/decline', requireAuth, declineExpense);
 router.get('/:stokvelId/invites', requireAuth, listSentInvites);
 router.post('/:stokvelId/invites', requireAuth, rateLimit({ windowMs: 15 * 60 * 1000, max: 40 }), sendInvite);
 router.get('/:stokvelId/minutes', requireAuth, listMinutes);
@@ -104,8 +114,6 @@ router.get('/:stokvelId/trade-credit', requireAuth, listTradeCredit);
 router.post('/:stokvelId/trade-credit', requireAuth, createTradeCredit);
 router.patch('/:stokvelId/trade-credit/:creditId', requireAuth, updateTradeCredit);
 router.get('/:stokvelId/statement', requireAuth, getStatement);
-
-const pinLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
 
 router.post('/contributions/submit', requireAuth, submitContribution);
 router.post('/contributions/confirm', requireAuth, pinLimiter, confirmContribution);

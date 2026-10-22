@@ -16,6 +16,14 @@ export function extractReferenceCode(narration) {
   return match ? match[0] : null;
 }
 
+// An official typed this bank entry in by hand, and the reference code on it
+// is their own. Matching it automatically would let one person confirm their
+// own payment, so it waits in the review queue for a different official.
+function isSelfEnteredDeposit(rawLog, member) {
+  const payload = rawLog.rawPayload && typeof rawLog.rawPayload === 'object' ? rawLog.rawPayload : {};
+  return Boolean(payload.manuallyEntered && payload.enteredBy && payload.enteredBy === member.userId);
+}
+
 // Puts a bank-matched contribution on the tamper-evident books. The bank
 // entry itself is the second check (money really arrived), so automatic
 // matches have no human approver; manual matches record the official.
@@ -57,6 +65,10 @@ export async function processRawLog(rawLogId) {
     const member = await prisma.stokvelMember.findFirst({
       where: { stokvelId: rawLog.stokvelId, referenceCode: refCode },
     });
+
+    if (member && isSelfEnteredDeposit(rawLog, member)) {
+      return { status: 'NEEDS_REVIEW', reason: 'SELF_ENTERED', narration: rawLog.narration, amount: rawLog.amount };
+    }
 
     if (member) {
       // A manual "run reconciliation" trigger and the auto-run that follows
@@ -102,7 +114,7 @@ export async function runReconciliation(stokvelId) {
     orderBy: { receivedAt: 'asc' },
   });
 
-  const results = { matched: 0, unmatched: 0, errors: [] };
+  const results = { matched: 0, unmatched: 0, needsReview: 0, errors: [] };
 
   for (const log of unmatched) {
     try {
@@ -110,8 +122,13 @@ export async function runReconciliation(stokvelId) {
       // null means a concurrent call already claimed this exact log — not an
       // error, just nothing left for this call to do for it.
       if (!result) continue;
-      if (result.status === 'MATCHED') results.matched++;
-      else results.unmatched++;
+      if (result.status === 'MATCHED') {
+        results.matched++;
+      } else {
+        // Self-entered deposits stay in the review queue like any unmatched one.
+        results.unmatched++;
+        if (result.status === 'NEEDS_REVIEW') results.needsReview++;
+      }
     } catch (error) {
       results.errors.push({ logId: log.id, error: error.message });
     }
@@ -122,7 +139,7 @@ export async function runReconciliation(stokvelId) {
 
 // Manual assignment by officials (for unmatched entries). Only for CREDIT
 // entries — a bank entry a member paid in. Record an outgoing (DEBIT)
-// transaction as a group expense instead (see recordGroupExpense).
+// transaction as a group expense instead (see stokvelApprovalsController).
 export async function manualAssign(rawLogId, memberId, officialId) {
   const rawLog = await prisma.rawBankLog.findUnique({ where: { id: rawLogId } });
   if (!rawLog) throw new Error('Raw log not found');
