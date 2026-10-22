@@ -631,8 +631,13 @@ function Stokvels({ onBack, onOpenShrineFund }) {
     // A member's own confirmed running total — real numbers from the same
     // contributions list already being fetched, just not shown anywhere
     // before now.
-    const memberConfirmedTotal = (userId) => contributions
-      .filter((c) => c.memberId === userId && c.status === 'CONFIRMED')
+    // Contribution.memberId is the membership id (m.id), not the user id.
+    const memberName = (membershipId) => {
+      const m = stokvel.members.find((x) => x.id === membershipId)
+      return m ? `${m.user.firstName} ${m.user.lastName}` : 'Former member'
+    }
+    const memberConfirmedTotal = (membershipId) => contributions
+      .filter((c) => c.memberId === membershipId && c.status === 'CONFIRMED')
       .reduce((sum, c) => sum + Number(c.amount || 0), 0)
 
     return (
@@ -763,7 +768,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                         </p>
                       </div>
                       <p className="tabular text-sm font-bold text-sage-600 flex-shrink-0">
-                        R{memberConfirmedTotal(m.userId).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        R{memberConfirmedTotal(m.id).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                     </div>
                   )
@@ -842,7 +847,10 @@ function Stokvels({ onBack, onOpenShrineFund }) {
               <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">Pending confirmations</p>
               {myPending.map((c) => (
                 <div key={c.id} className="bg-white border-2 border-terracotta rounded-soft p-3 mb-2 flex justify-between items-center shadow-sm">
-                  <span className="text-sm font-bold">R{Number(c.amount || 0).toFixed(2)}</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold">R{Number(c.amount || 0).toFixed(2)}</p>
+                    <p className="text-[11px] text-ink-muted truncate">{memberName(c.memberId)}</p>
+                  </div>
                   <button
                     type="button"
                     onClick={() => confirmContribution(c.id)}
@@ -865,11 +873,10 @@ function Stokvels({ onBack, onOpenShrineFund }) {
             ) : (
               <div className="space-y-2">
                 {contributions.slice(0, 10).map((c) => {
-                  const member = stokvel.members.find((m) => m.userId === c.memberId)
                   return (
                     <div key={c.id} className="flex items-center justify-between py-1.5 border-b border-cream-dark/70 last:border-0">
                       <div className="min-w-0">
-                        <p className="text-sm text-ink truncate">{member ? `${member.user.firstName} ${member.user.lastName}` : 'Member'}</p>
+                        <p className="text-sm text-ink truncate">{memberName(c.memberId)}</p>
                         <p className="text-[10px] text-ink-muted">{new Date(c.createdAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
