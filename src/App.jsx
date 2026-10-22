@@ -21,6 +21,7 @@ import Ukusoka from './pages/Ukusoka.jsx'
 import IzidukoNetwork from './pages/IzidukoNetwork.jsx'
 import IzidukoProfileView from './pages/IzidukoProfileView.jsx'
 import IzidukoChat from './pages/IzidukoChat.jsx'
+import ClanGroups from './pages/ClanGroups.jsx'
 import Stokvels from './pages/StokvelsWithInvites.jsx'
 import Portal from './pages/Portal.jsx'
 import Ekoyini from './pages/Ekoyini.jsx'
@@ -58,14 +59,15 @@ import NotificationBell from './components/NotificationBell.jsx'
 import PinReminder from './components/PinReminder.jsx'
 import FirstVisitExplainer from './components/FirstVisitExplainer.jsx'
 import PendingStokvelJoin from './components/PendingStokvelJoin.jsx'
-import { PENDING_STOKVEL_KEY } from './lib/inviteLinks.js'
+import PendingClanJoin from './components/PendingClanJoin.jsx'
+import { PENDING_STOKVEL_KEY, PENDING_CLAN_KEY } from './lib/inviteLinks.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
 const MORE_SCREENS = [
   'more', 'ceremony', 'timeline', 'budget', 'ekoyinibooking',
   'templates', 'family', 'ukugida', 'ukusoka', 'iziduko',
-  'izidukoprofile', 'izidukochat', 'supplier', 'portal', 'ekoyini',
+  'izidukoprofile', 'izidukochat', 'clangroups', 'supplier', 'portal', 'ekoyini',
   'ekoyiniadmin', 'identityadmin', 'marginadmin', 'demandadmin',
   'privacy', 'hierarchy', 'myorders', 'expenditure', 'shrinefund',
   'legends', 'directory', 'umqombothi', 'pin', 'profile',
@@ -260,6 +262,8 @@ function MainApp() {
   const [ekoyiniBookingCeremonyTitle, setEkoyiniBookingCeremonyTitle] = useState('')
   const [profileInitialTab, setProfileInitialTab] = useState(null)
   const [izidukoTargetUserId, setIzidukoTargetUserId] = useState(null)
+  // Clan group to open straight away (e.g. after joining through a link)
+  const [clanGroupId, setClanGroupId] = useState(null)
   // Hierarchy: optionally pre-select a ceremony from CeremonyHub
   const [hierarchyCeremonyId, setHierarchyCeremonyId] = useState(null)
 
@@ -311,6 +315,11 @@ function MainApp() {
   const openIzidukoChat = (userId) => {
     setIzidukoTargetUserId(userId)
     setScreen('izidukochat')
+  }
+
+  const openClanGroup = (groupId) => {
+    setClanGroupId(groupId || null)
+    setScreen('clangroups')
   }
 
   // Open Hierarchy, optionally with a pre-selected ceremony
@@ -397,6 +406,15 @@ function MainApp() {
         return <IzidukoProfileView userId={izidukoTargetUserId} onBack={() => setScreen('iziduko')} onMessage={openIzidukoChat} />
       case 'izidukochat':
         return <IzidukoChat userId={izidukoTargetUserId} onBack={() => setScreen('iziduko')} onViewProfile={openIzidukoProfile} />
+      case 'clangroups':
+        return (
+          <ClanGroups
+            onBack={goMore}
+            onGoToClanLines={() => { setProfileInitialTab('clan'); setScreen('profile') }}
+            initialGroupId={clanGroupId}
+            onConsumeInitialGroup={() => setClanGroupId(null)}
+          />
+        )
       case 'supplier':
         return <SupplierDashboard onBack={goMore} />
       case 'portal':
@@ -460,6 +478,8 @@ function MainApp() {
     <div className="icamagu-bg min-h-screen">
       {/* Acts on a stokvel invite link the person arrived with, then shows them the stokvels */}
       <PendingStokvelJoin onJoined={() => setScreen('stokvels')} />
+      {/* Same for a clan group invite link, e.g. one shared into a family WhatsApp group */}
+      <PendingClanJoin onJoined={openClanGroup} />
       {renderScreen()}
       <BottomNav
         activeScreen={activeTab}
@@ -530,6 +550,18 @@ function StokvelJoinRoute() {
   return null
 }
 
+// A clan group invite link, usually tapped from a family WhatsApp group.
+// Works the same way as the stokvel link above.
+function ClanJoinRoute() {
+  const { code } = useParams()
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (code) localStorage.setItem(PENDING_CLAN_KEY, code)
+    navigate('/', { replace: true })
+  }, [code, navigate])
+  return null
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -539,6 +571,7 @@ export default function App() {
         <Route path="/reset-password/:token" element={<ResetPasswordRoute />} />
         <Route path="/pool/:id" element={<PoolJoinRoute />} />
         <Route path="/join/stokvel/:id" element={<StokvelJoinRoute />} />
+        <Route path="/join/clan/:code" element={<ClanJoinRoute />} />
         <Route path="/ubuhlanti" element={<PublicUbuhlanti />} />
         <Route path="/ubuhlanti/" element={<PublicUbuhlanti />} />
         <Route

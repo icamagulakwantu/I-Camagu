@@ -16,6 +16,7 @@ const SECTIONS = [
       { id: 'templates', icon: 'template', label: 'Ceremony Templates' },
       { id: 'family', icon: 'heart', label: 'Family Contributions' },
       { id: 'iziduko', icon: 'link', label: 'Iziduko Network', hint: 'Find relatives by clan name' },
+      { id: 'clangroups', icon: 'users', label: 'Clan Groups', hint: 'Bring your clan or WhatsApp group here' },
       { id: 'legends', icon: 'landmark', label: 'House of AmaXhosa' },
       { id: 'ukusoka', icon: 'gift', label: 'Ukusoka' },
       { id: 'umqombothi', icon: 'beer', label: 'Umqombothi Brewing' },
