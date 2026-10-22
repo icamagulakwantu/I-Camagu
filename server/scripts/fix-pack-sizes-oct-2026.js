@@ -3,10 +3,12 @@
 //
 // 1. PACK SIZES. The catalogue was first built by a different AI and got
 //    several sizes wrong. The founder's rules:
-//    - Every beer/cider can in iCamagu's range is 500ml. Any can row still on
-//      another size (330ml, 440ml) moves to Can (500ml). Corona's 410ml can
-//      is the one exception, confirmed from a real can photo (see
-//      fix-beer-quart-formats.js), so it is left alone.
+//    - Beer/cider cans are 500ml by default. Any can row on another size
+//      (330ml, 440ml) moves to Can (500ml), with these real-size exceptions:
+//        - Windhoek Draught and every Hunter's cider: 440ml cans (Checkers,
+//          Ultra listings; founder confirmed, Oct 2026).
+//        - Corona: 410ml can, confirmed from a real can photo (see
+//          fix-beer-quart-formats.js) — left alone.
 //    - "Dumpy (340ml)" was always meant to be the 330ml dumpy. South African
 //      24-packs are sold as 24 x 330ml (Ultra, Woolworths, liquor.co.za).
 //    - Heineken's quart is 650ml (heineken.com/za) — fixed in
@@ -18,24 +20,32 @@
 // 2. PRICES. Shop prices read off October 2026 catalogues, each naming the
 //    shop and the dates, so they meet the VERIFIED rule in
 //    docs/pricing/README.md. Only exact matches (same product, same size,
-//    same pack) are recorded. Near misses, like Hunter's 24 x 440ml cans
-//    against our 500ml cans, are deliberately left out.
+//    same pack) are recorded.
 //    Founder's rule for prices that are too low: raise by R40 a bottle, as
 //    long as we stay at or below the cheapest shop. Jameson Original was
 //    R268.80 a bottle against R349.99 at Prestons, so it goes to R308.80.
 //    The new price is written as a fixed number, not "current + R40", so
 //    re-running on every boot never keeps stacking the increase.
+//    Hennessy VS, JW Gold and Amarula are dearer than the shop; the founder
+//    chose to leave their prices as they are for now (Oct 2026).
 //
 // Idempotent — safe to run on every boot.
 import prisma from '../config/db.js';
 
 const CAN_CATEGORIES = ['BEER', 'CIDER_RTD'];
-const CAN_TARGET = 'Can (500ml)';
-const CAN_EXCEPTIONS = [{ name: 'Corona', bottleFormat: 'Can (410ml)' }];
+const CAN_DEFAULT = 'Can (500ml)';
+const CAN_440 = 'Can (440ml)';
 const DUMPY_FROM = 'Dumpy (340ml)';
 const DUMPY_TO = 'Dumpy (330ml)';
 
 const ROW_SELECT = { id: true, name: true, bottleFormat: true };
+
+// The correct can size for a product, or null to leave it untouched.
+function canTargetFor(name) {
+  if (name === 'Corona') return null;
+  if (name === 'Windhoek Draught' || name.startsWith("Hunter's")) return CAN_440;
+  return CAN_DEFAULT;
+}
 
 async function moveFormat(row, to) {
   const clash = await prisma.sku.findFirst({
@@ -50,9 +60,6 @@ async function moveFormat(row, to) {
   return 1;
 }
 
-const isCanException = (row) =>
-  CAN_EXCEPTIONS.some((e) => e.name === row.name && e.bottleFormat === row.bottleFormat);
-
 export async function fixPackSizes() {
   let changed = 0;
 
@@ -60,16 +67,13 @@ export async function fixPackSizes() {
   for (const row of dumpies) changed += await moveFormat(row, DUMPY_TO);
 
   const cans = await prisma.sku.findMany({
-    where: {
-      category: { in: CAN_CATEGORIES },
-      bottleFormat: { startsWith: 'Can (' },
-      NOT: { bottleFormat: CAN_TARGET },
-    },
+    where: { category: { in: CAN_CATEGORIES }, bottleFormat: { startsWith: 'Can (' } },
     select: ROW_SELECT,
   });
   for (const row of cans) {
-    if (isCanException(row)) continue;
-    changed += await moveFormat(row, CAN_TARGET);
+    const target = canTargetFor(row.name);
+    if (!target || row.bottleFormat === target) continue;
+    changed += await moveFormat(row, target);
   }
 
   if (changed > 0) console.log(`Pack size fix: ${changed} row(s) corrected.`);
