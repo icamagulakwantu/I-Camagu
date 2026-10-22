@@ -106,6 +106,15 @@ async function namesFor(ids) {
   return Object.fromEntries(users.map((u) => [u.id, fullName(u)]));
 }
 
+// Contribution.memberId is a StokvelMember id, not a User id. Map each
+// membership to its user so names can be looked up like everything else.
+async function usersForMemberships(membershipIds) {
+  const unique = [...new Set(membershipIds.filter(Boolean))];
+  if (unique.length === 0) return {};
+  const rows = await prisma.stokvelMember.findMany({ where: { id: { in: unique } }, select: { id: true, userId: true } });
+  return Object.fromEntries(rows.map((m) => [m.id, m.userId]));
+}
+
 // The books entry is written after the loan record. If it fails the loan flow
 // still succeeded, so we log loudly and warn the caller. Re-running is safe.
 async function postToLedger(entry) {
@@ -392,13 +401,18 @@ export async function getStatement(req, res) {
         WHERE r."stokvelId" = ${stokvelId} AND r."createdAt" BETWEEN ${from} AND ${to}`,
     ]);
 
+    // Contributions point at a membership; payouts, fines and loans already
+    // point at the user. Resolve contributions to users first.
+    const userOfMembership = await usersForMemberships(contributions.map((c) => c.memberId));
+    const contributorOf = (c) => userOfMembership[c.memberId];
+
     const names = await namesFor([
-      ...contributions.map((c) => c.memberId), ...payouts.map((p) => p.recipientId),
+      ...contributions.map(contributorOf), ...payouts.map((p) => p.recipientId),
       ...fines.map((f) => f.memberId), ...loans.map((l) => l.borrowerId), ...repayments.map((r) => r.borrowerId),
     ]);
 
     const entries = [
-      ...contributions.map((c) => ({ date: c.createdAt, type: 'Contribution', who: names[c.memberId], amount: Number(c.amount) })),
+      ...contributions.map((c) => ({ date: c.createdAt, type: 'Contribution', who: names[contributorOf(c)], amount: Number(c.amount) })),
       ...payouts.map((p) => ({ date: p.clearedAt || p.createdAt, type: 'Payout', who: names[p.recipientId], amount: -Number(p.amount) })),
       ...fines.map((f) => ({ date: f.paidAt, type: 'Fine paid', who: names[f.memberId], amount: Number(f.amount) })),
       ...loans.map((l) => ({ date: l.decidedAt, type: 'Loan issued', who: names[l.borrowerId], amount: -Number(l.amount) })),
@@ -406,7 +420,8 @@ export async function getStatement(req, res) {
     ].sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let running = 0;
-    const withRunning = entries.map((e) => { running += e.amount; return { ...e, who: e.who || 'Member', running }; });
+    // Only someone whose account no longer exists falls back to this label.
+    const withRunning = entries.map((e) => { running += e.amount; return { ...e, who: e.who || 'Former member', running }; });
     const sumOf = (type) => entries.filter((e) => e.type === type).reduce((s, e) => s + e.amount, 0);
 
     res.json({
