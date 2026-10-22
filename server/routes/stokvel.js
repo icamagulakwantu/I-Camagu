@@ -35,8 +35,10 @@ import {
 } from '../controllers/stokvelRecordsController.js';
 import {
   listLoans, requestLoan, voteLoan, repayLoan,
-  listTradeCredit, createTradeCredit, updateTradeCredit, getStatement,
+  listTradeCredit, createTradeCredit, updateTradeCredit,
 } from '../controllers/stokvelFinanceController.js';
+// The statement lives in its own file; it resolves member names correctly.
+import { getStatement } from '../controllers/stokvelStatementController.js';
 import { listLendingTargets, setLendingTarget, recordLendingRound } from '../controllers/stokvelLendingController.js';
 import { getLedger, verifyLedgerChain } from '../controllers/ledgerController.js';
 import {
