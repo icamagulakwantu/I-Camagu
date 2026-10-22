@@ -22,7 +22,8 @@ const FORMAT_SPECIFIC_IMAGES = [
   // Windhoek Draught and Stella Artois already had a real bottle photo
   // (windhoek-draught.png / stella-artois.png) covering every format by
   // name; these give their Can row its own actual can photo instead.
-  { name: 'Windhoek Draught', bottleFormat: 'Can (500ml)', slug: 'windhoek-draught-can' },
+  // Windhoek Draught's can is 440ml (fix-pack-sizes-oct-2026.js).
+  { name: 'Windhoek Draught', bottleFormat: 'Can (440ml)', slug: 'windhoek-draught-can' },
   { name: 'Stella Artois', bottleFormat: 'Can (500ml)', slug: 'stella-artois-can' },
   // Flavour-split products (split-bundled-flavour-skus.js) — their default
   // photo (set by name in backfill-extracted-brand-photos.js) is the bottle
@@ -37,7 +38,8 @@ const FORMAT_SPECIFIC_IMAGES = [
   { name: 'Kopparberg Strawberry & Lime', bottleFormat: 'Can (500ml)', slug: 'kopparberg-strawberry-lime-can' },
   { name: "Redd's Original", bottleFormat: 'Can (500ml)', slug: 'redds-original-can' },
   { name: "Redd's Berry", bottleFormat: 'Can (500ml)', slug: 'redds-berry-can' },
-  { name: "Hunter's Gold", bottleFormat: 'Can (500ml)', slug: 'hunters-gold-can' },
+  // Every Hunter's can is 440ml (fix-pack-sizes-oct-2026.js).
+  { name: "Hunter's Gold", bottleFormat: 'Can (440ml)', slug: 'hunters-gold-can' },
   { name: 'Flying Fish Chill', bottleFormat: 'Can (500ml)', slug: 'flying-fish-chill-can' },
   { name: 'Extreme Energy', bottleFormat: 'Can (500ml)', slug: 'extreme-energy-can' },
   // Savanna Dry's big returnable bottle (fix-savanna-dry-format.js corrected
@@ -50,12 +52,12 @@ const FORMAT_SPECIFIC_IMAGES = [
   { name: 'Lion Lager', bottleFormat: 'Can (500ml)', slug: 'lion-lager-can' },
   // Hunter's Dry's bottle shot (default, matched by name) was standing in
   // for the Can too until a real can photo arrived.
-  { name: "Hunter's Dry", bottleFormat: 'Can (500ml)', slug: 'hunters-dry-can' },
+  { name: "Hunter's Dry", bottleFormat: 'Can (440ml)', slug: 'hunters-dry-can' },
   // Renamed/new rows (rename-mislabeled-skus.js, backfill-founder-sourced-
   // skus.js) — bottle shot is each name's default, Can/Dumpy formats get
   // their own actual pack-format photo.
-  { name: "Hunter's Iced Apple", bottleFormat: 'Can (500ml)', slug: 'hunters-iced-apple-can' },
-  { name: "Hunter's Iced Watermelon", bottleFormat: 'Can (500ml)', slug: 'hunters-iced-watermelon-can' },
+  { name: "Hunter's Iced Apple", bottleFormat: 'Can (440ml)', slug: 'hunters-iced-apple-can' },
+  { name: "Hunter's Iced Watermelon", bottleFormat: 'Can (440ml)', slug: 'hunters-iced-watermelon-can' },
   { name: 'Strongbow Gold Apple', bottleFormat: 'Can (500ml)', slug: 'strongbow-gold-apple-can' },
   { name: 'Strongbow Red Berries', bottleFormat: 'Can (500ml)', slug: 'strongbow-red-berries-can' },
   { name: 'Smirnoff Storm Pine Twist', bottleFormat: 'Dumpy (250ml)', slug: 'smirnoff-storm-pine-twist-dumpy' },
