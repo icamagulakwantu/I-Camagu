@@ -1,6 +1,6 @@
 import prisma from '../config/db.js';
 import crypto from 'crypto';
-import resend from '../config/email.js';
+import resend, { FROM_ADDRESS } from '../config/email.js';
 import { createOtp, verifyOtp as checkOtp } from '../services/otpService.js';
 import { generateTokenPair, rotateToken } from '../services/tokenService.js';
 import { hashPassword, verifyPassword } from '../services/passwordService.js';
@@ -38,6 +38,9 @@ function serializeUser(user) {
     isAdmin: isAdminEmail(user.email),
   };
 }
+
+const otpEmail = (code) =>
+  `<p>Your iCamagu verification code is:</p><h2>${code}</h2><p>Expires in 10 minutes. Never share this code with anyone.</p>`;
 
 export async function checkEmail(req, res) {
   const { email } = req.body;
@@ -121,19 +124,38 @@ export async function loginWithPassword(req, res) {
   }
 }
 
-// NEW: Google Sign-In
+// Google Sign-In. Google must confirm the person owns the email, and an
+// existing account is never taken over silently: if it already has a
+// password or a different Google account, the person signs in the usual way.
 export async function googleAuth(req, res) {
   const { idToken } = req.body;
   if (!idToken) return res.status(400).json({ error: 'idToken is required' });
 
+  let googleData;
   try {
-    const googleData = await verifyGoogleToken(idToken);
+    googleData = await verifyGoogleToken(idToken);
+  } catch (error) {
+    console.error('Google auth error:', error.message);
+    return res.status(401).json({ error: 'Could not verify Google sign-in' });
+  }
 
+  if (!googleData.email || !googleData.emailVerified) {
+    return res.status(401).json({ error: 'Google has not confirmed this email address. Sign in with your email instead.' });
+  }
+
+  try {
     let user = await prisma.user.findUnique({ where: { googleId: googleData.googleId } });
     if (!user) {
-      user = await prisma.user.findUnique({ where: { email: googleData.email } });
-      if (user) {
-        user = await prisma.user.update({ where: { id: user.id }, data: { googleId: googleData.googleId } });
+      const existing = await prisma.user.findUnique({ where: { email: googleData.email } });
+      if (existing) {
+        if (existing.passwordHash || (existing.googleId && existing.googleId !== googleData.googleId)) {
+          return res.status(409).json({
+            error: 'An iCamagu account already uses this email. Sign in with your email and password first.',
+            code: 'ACCOUNT_EXISTS',
+          });
+        }
+        // Account made with email codes only: Google has proved the person owns this email.
+        user = await prisma.user.update({ where: { id: existing.id }, data: { googleId: googleData.googleId } });
       } else {
         user = await prisma.user.create({
           data: {
@@ -149,11 +171,11 @@ export async function googleAuth(req, res) {
     res.json({ accessToken, user: serializeUser(user), needsIziduko: !user.paternalIziduko });
   } catch (error) {
     console.error('Google auth error:', error.message);
-    res.status(401).json({ error: 'Could not verify Google sign-in', detail: error.message });
+    res.status(500).json({ error: 'Could not sign in with Google' });
   }
 }
 
-// OTP flow — kept fully intact as a fallback, unchanged from before
+// OTP flow — kept as a fallback
 export async function register(req, res) {
   const { email, firstName, lastName, paternalIziduko, maternalIziduko } = req.body;
   if (!email || !firstName || !lastName || !paternalIziduko || !maternalIziduko) {
@@ -169,8 +191,7 @@ export async function register(req, res) {
 
     const code = await createOtp(user.id);
     const { error: sendError } = await resend.emails.send({
-      from: 'onboarding@resend.dev', to: email, subject: 'Your iCamagu login code',
-      html: `<p>Your iCamagu verification code is:</p><h2>${code}</h2><p>Expires in 10 minutes.</p>`,
+      from: FROM_ADDRESS, to: email, subject: 'Your iCamagu login code', html: otpEmail(code),
     });
     if (sendError) return res.status(422).json({ error: 'Could not send the code to this email.' });
     res.json({ message: 'OTP sent', userId: user.id });
@@ -189,8 +210,7 @@ export async function login(req, res) {
 
     const code = await createOtp(user.id);
     const { error: sendError } = await resend.emails.send({
-      from: 'onboarding@resend.dev', to: email, subject: 'Your iCamagu login code',
-      html: `<p>Your iCamagu verification code is:</p><h2>${code}</h2><p>Expires in 10 minutes.</p>`,
+      from: FROM_ADDRESS, to: email, subject: 'Your iCamagu login code', html: otpEmail(code),
     });
     if (sendError) return res.status(422).json({ error: 'Could not send the code.' });
     res.json({ message: 'OTP sent', userId: user.id });
@@ -204,8 +224,14 @@ export async function verifyOtp(req, res) {
   const { userId, code } = req.body;
   if (!userId || !code) return res.status(400).json({ error: 'userId and code are required' });
   try {
-    const isValid = await checkOtp(userId, code);
-    if (!isValid) return res.status(401).json({ error: 'Invalid or expired code' });
+    const result = await checkOtp(userId, code);
+    if (!result.ok) {
+      if (result.locked) {
+        return res.status(429).json({ error: 'Too many wrong codes. Wait 15 minutes, then ask for a new code.' });
+      }
+      const left = result.attemptsLeft ? ` You have ${result.attemptsLeft} tries left.` : '';
+      return res.status(401).json({ error: `Wrong or expired code.${left}` });
+    }
 
     const { accessToken, refreshToken } = await generateTokenPair(userId);
     res.cookie('jid', refreshToken, REFRESH_COOKIE_OPTIONS);
@@ -258,7 +284,7 @@ export async function requestPasswordReset(req, res) {
 
     const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${rawToken}`;
     await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: FROM_ADDRESS,
       to: email,
       subject: 'Reset your iCamagu password',
       html: `<p>Someone requested a password reset for your iCamagu account.</p>
