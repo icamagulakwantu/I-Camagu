@@ -36,6 +36,7 @@ import { renameMislabeledSkus } from './scripts/rename-mislabeled-skus.js';
 import { fixAboveRetailPricing } from './scripts/fix-above-retail-pricing.js';
 import { backfillSedgwicks } from './scripts/backfill-sedgwicks.js';
 import { backfillLaunchPricing } from './scripts/backfill-launch-pricing.js';
+import { fixPackSizes, applyOctober2026Prices } from './scripts/fix-pack-sizes-oct-2026.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -216,6 +217,11 @@ ensureCeremonyBudgetColumns()
       await renameMislabeledSkus().catch((err) => {
         logBackfillError('Mislabeled SKU rename', err);
       });
+      // After splits and renames (so it sees final names), before any
+      // backfill that matches rows by their corrected pack size.
+      await fixPackSizes().catch((err) => {
+        logBackfillError('Pack size fix', err);
+      });
       await backfillBrandImages().catch((err) => {
         logBackfillError('Brand image backfill', err);
       });
@@ -266,6 +272,12 @@ ensureCeremonyBudgetColumns()
       });
       await backfillLaunchPricing().catch((err) => {
         logBackfillError('Launch pricing backfill', err);
+      });
+      // Last, deliberately: backfillVerifiedRetailPrices above rewrites
+      // Hennessy VS to an older Makro shelf price on every boot, so the
+      // newer dated October prices must be applied after it.
+      await applyOctober2026Prices().catch((err) => {
+        logBackfillError('October 2026 prices', err);
       });
     })();
   });
