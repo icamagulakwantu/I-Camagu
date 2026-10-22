@@ -1,23 +1,9 @@
 import prisma from '../config/db.js';
-import { generateUniqueReference } from '../utils/referenceGenerator.js';
+import { generateReferenceCode } from '../utils/memberReference.js';
+import { countOpenRequests } from './stokvelApprovalsController.js';
 
-// STK-XXX-### is a per-account code, not a per-transaction one: a member
-// keeps the SAME code across every one of their own contributions (that
-// stability is what lets reconciliationService match a recurring bank
-// narration back to them), so reusing it for its own owner is correct, not
-// a collision. It was previously only unique per-stokvel by construction
-// (@@unique([stokvelId, referenceCode])) — checked globally here so two
-// different stokvels' first members can't both land on STK-THA-001. A
-// genuine collision falls back to a random suffix instead of silently
-// colliding with someone else's reference.
-async function generateReferenceCode(firstName, sequenceNumber) {
-  const initials = (firstName || 'MEM').slice(0, 3).toUpperCase().padEnd(3, 'X');
-  const number = String(sequenceNumber).padStart(3, '0');
-  const base = `STK-${initials}-${number}`;
-  const exists = async (code) => !!(await prisma.stokvelMember.findFirst({ where: { referenceCode: code } }));
-  if (!(await exists(base))) return base;
-  return generateUniqueReference(`STK-${initials}`, exists);
-}
+// Joining a stokvel now lives in stokvelApprovalsController.joinOrRequest,
+// because an official has to accept new people.
 
 export async function createStokvel(req, res) {
   const userId = req.userId;
@@ -78,6 +64,8 @@ export async function createStokvel(req, res) {
   }
 }
 
+// Badge count: payments to confirm, people asking to join, and expenses
+// another official asked for that still need approval.
 export async function getPendingApprovalCount(req, res) {
   const userId = req.userId;
   try {
@@ -85,43 +73,16 @@ export async function getPendingApprovalCount(req, res) {
       where: { userId },
       select: { stokvelId: true },
     });
-    const stokvelIds = officials.map(o => o.stokvelId);
+    const stokvelIds = [...new Set(officials.map(o => o.stokvelId))];
     if (stokvelIds.length === 0) return res.json({ count: 0 });
-    const count = await prisma.contribution.count({
-      where: { stokvelId: { in: stokvelIds }, status: 'PENDING' },
-    });
-    res.json({ count });
+    const [contributions, requests] = await Promise.all([
+      prisma.contribution.count({ where: { stokvelId: { in: stokvelIds }, status: 'PENDING' } }),
+      countOpenRequests(stokvelIds, userId),
+    ]);
+    res.json({ count: contributions + requests });
   } catch (error) {
     console.error('Get pending approval count error:', error.message);
     res.status(500).json({ error: 'Could not fetch pending approval count' });
-  }
-}
-
-export async function joinStokvel(req, res) {
-  const userId = req.userId;
-  const { stokvelId } = req.body;
-
-  if (!stokvelId) return res.status(400).json({ error: 'stokvelId is required' });
-
-  try {
-    const stokvel = await prisma.stokvel.findUnique({ where: { id: stokvelId } });
-    if (!stokvel) return res.status(404).json({ error: 'Stokvel not found' });
-
-    const existing = await prisma.stokvelMember.findFirst({ where: { stokvelId, userId } });
-    if (existing) return res.status(409).json({ error: 'You are already a member of this stokvel' });
-
-    const memberCount = await prisma.stokvelMember.count({ where: { stokvelId } });
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    const referenceCode = await generateReferenceCode(user.firstName, memberCount + 1);
-
-    const membership = await prisma.stokvelMember.create({
-      data: { stokvelId, userId, referenceCode },
-    });
-
-    res.status(201).json({ membership, message: `Joined ${stokvel.name}. Your reference code is ${referenceCode}.` });
-  } catch (error) {
-    console.error('Join stokvel error:', error.message);
-    res.status(500).json({ error: 'Could not join stokvel' });
   }
 }
 
