@@ -3,15 +3,17 @@ import { OAuth2Client } from 'google-auth-library';
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export async function verifyGoogleToken(idToken) {
-      const ticket = await client.verifyIdToken({
-              idToken,
-                  audience: process.env.GOOGLE_CLIENT_ID,
-      });
-        const payload = ticket.getPayload();
-          return {
-                  googleId: payload.sub,
-                      email: payload.email,
-                          firstName: payload.given_name || '',
-                              lastName: payload.family_name || '',
-          };
+  const ticket = await client.verifyIdToken({
+    idToken,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+  const payload = ticket.getPayload();
+  return {
+    googleId: payload.sub,
+    email: payload.email,
+    // Google only proves the person owns this email when it says so.
+    emailVerified: payload.email_verified === true || payload.email_verified === 'true',
+    firstName: payload.given_name || '',
+    lastName: payload.family_name || '',
+  };
 }
