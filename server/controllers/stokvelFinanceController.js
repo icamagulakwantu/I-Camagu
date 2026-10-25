@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import prisma from '../config/db.js';
-import { logAudit } from './stokvelRecordsController.js';
-import { postEntry } from '../services/ledgerService.js';
+import { logAudit, logAuditQuietly } from './stokvelRecordsController.js';
+import { ensureLedgerTables, lockStokvelLedger, postEntryTx } from '../services/ledgerService.js';
 import { toCents } from '../utils/money.js';
 import { parseTerms, buildSchedule, totalDueFor } from '../utils/loanTerms.js';
 
@@ -115,16 +115,28 @@ async function usersForMemberships(membershipIds) {
   return Object.fromEntries(rows.map((m) => [m.id, m.userId]));
 }
 
-// The books entry is written after the loan record. If it fails the loan flow
-// still succeeded, so we log loudly and warn the caller. Re-running is safe.
-async function postToLedger(entry) {
-  try {
-    await postEntry(entry);
-    return null;
-  } catch (error) {
-    console.error('LEDGER POST FAILED', entry.kind, entry.idempotencyKey, error.message);
-    return 'The loan was updated but the books entry could not be saved. Tell your treasurer so it can be corrected.';
+// A refusal raised inside a transaction; it rolls everything back and is
+// returned to the caller with its own status code.
+class RequestRefused extends Error {
+  constructor(status, message) {
+    super(message);
+    this.status = status;
   }
+}
+
+// Decides a loan from its votes. Exported for unit tests.
+export function decideLoanStatus({ yes, no, requiredApprovals }) {
+  if (yes >= requiredApprovals) return 'APPROVED';
+  if (no >= requiredApprovals) return 'REJECTED';
+  return 'PENDING';
+}
+
+// Splits a repayment into principal first, then interest, in whole cents.
+// Exported for unit tests.
+export function splitRepayment({ amountCents, principalCents, paidBeforeCents }) {
+  const principalLeft = Math.max(0, principalCents - paidBeforeCents);
+  const principalPart = Math.min(amountCents, principalLeft);
+  return { principalPart, interestPart: amountCents - principalPart };
 }
 
 // ---------- Loans ----------
@@ -221,49 +233,64 @@ export async function requestLoan(req, res) {
   }
 }
 
+// The vote, the loan decision and (on approval) the books entry are ONE
+// transaction (FIN-01c). The loan row is locked, so two officials voting at
+// the same moment are counted one after the other and the loan is paid out
+// on the books exactly once.
 export async function voteLoan(req, res) {
   try {
     const role = await guard(req, res, { officialOnly: true });
     if (!role) return;
     const { stokvelId, loanId } = req.params;
     const approve = Boolean(req.body?.approve);
-    const rows = await prisma.$queryRaw`
-      SELECT "borrowerId", "status", "amount", "termsSnapshot" FROM "StokvelLoan" WHERE "id" = ${loanId} AND "stokvelId" = ${stokvelId}`;
-    if (!rows.length) return res.status(404).json({ error: 'Loan not found' });
-    if (rows[0].status !== 'PENDING') return res.status(409).json({ error: 'Voting on this loan has closed' });
-    if (rows[0].borrowerId === req.userId) return res.status(403).json({ error: 'You cannot vote on your own loan' });
-    await prisma.$executeRaw`
-      INSERT INTO "StokvelLoanVote" ("loanId", "officialId", "approve") VALUES (${loanId}, ${req.userId}, ${approve})
-      ON CONFLICT ("loanId", "officialId") DO UPDATE SET "approve" = EXCLUDED."approve", "createdAt" = CURRENT_TIMESTAMP`;
-    const tally = await prisma.$queryRaw`
-      SELECT COUNT(*) FILTER (WHERE "approve") AS yes, COUNT(*) FILTER (WHERE NOT "approve") AS no
-      FROM "StokvelLoanVote" WHERE "loanId" = ${loanId}`;
-    const yes = Number(tally[0].yes);
-    const no = Number(tally[0].no);
-    let status = 'PENDING';
-    if (yes >= role.requiredApprovals) status = 'APPROVED';
-    else if (no >= role.requiredApprovals) status = 'REJECTED';
-    let ledgerWarning = null;
-    if (status !== 'PENDING') {
-      await prisma.$executeRaw`UPDATE "StokvelLoan" SET "status" = ${status}, "decidedAt" = CURRENT_TIMESTAMP WHERE "id" = ${loanId}`;
-    }
-    if (status === 'APPROVED') {
-      // Money leaves the group pot and becomes an amount owed back by the borrower.
-      const principalCents = toCents(String(rows[0].amount));
-      ledgerWarning = await postToLedger({
-        stokvelId, kind: 'LOAN_DISBURSEMENT', memo: 'Loan approved and paid out',
-        lines: [{ account: 'LOANS_RECEIVABLE', amountCents: principalCents }, { account: 'BANK', amountCents: -principalCents }],
-        idempotencyKey: `loan:${loanId}`, createdById: rows[0].borrowerId, approvedById: req.userId,
-      });
-    }
-    await logAudit(stokvelId, req.userId, approve ? 'Voted to approve a loan' : 'Voted to reject a loan', money(rows[0].amount));
-    res.json({ status, yes, no, ledgerWarning });
+    await ensureLedgerTables();
+
+    const result = await prisma.$transaction(async (tx) => {
+      await lockStokvelLedger(tx, stokvelId);
+      const rows = await tx.$queryRaw`
+        SELECT "borrowerId", "status", "amount", "termsSnapshot" FROM "StokvelLoan"
+        WHERE "id" = ${loanId} AND "stokvelId" = ${stokvelId} FOR UPDATE`;
+      if (!rows.length) throw new RequestRefused(404, 'Loan not found');
+      if (rows[0].status !== 'PENDING') throw new RequestRefused(409, 'Voting on this loan has closed');
+      if (rows[0].borrowerId === req.userId) throw new RequestRefused(403, 'You cannot vote on your own loan');
+
+      await tx.$executeRaw`
+        INSERT INTO "StokvelLoanVote" ("loanId", "officialId", "approve") VALUES (${loanId}, ${req.userId}, ${approve})
+        ON CONFLICT ("loanId", "officialId") DO UPDATE SET "approve" = EXCLUDED."approve", "createdAt" = CURRENT_TIMESTAMP`;
+      const tally = await tx.$queryRaw`
+        SELECT COUNT(*) FILTER (WHERE "approve") AS yes, COUNT(*) FILTER (WHERE NOT "approve") AS no
+        FROM "StokvelLoanVote" WHERE "loanId" = ${loanId}`;
+      const yes = Number(tally[0].yes);
+      const no = Number(tally[0].no);
+      const status = decideLoanStatus({ yes, no, requiredApprovals: role.requiredApprovals });
+
+      if (status !== 'PENDING') {
+        await tx.$executeRaw`UPDATE "StokvelLoan" SET "status" = ${status}, "decidedAt" = CURRENT_TIMESTAMP WHERE "id" = ${loanId}`;
+      }
+      if (status === 'APPROVED') {
+        // Money leaves the group pot and becomes an amount owed back by the borrower.
+        const principalCents = toCents(String(rows[0].amount));
+        await postEntryTx(tx, {
+          stokvelId, kind: 'LOAN_DISBURSEMENT', memo: 'Loan approved and paid out',
+          lines: [{ account: 'LOANS_RECEIVABLE', amountCents: principalCents }, { account: 'BANK', amountCents: -principalCents }],
+          idempotencyKey: `loan:${loanId}`, createdById: rows[0].borrowerId, approvedById: req.userId,
+        });
+      }
+      return { status, yes, no, amount: rows[0].amount };
+    });
+
+    await logAuditQuietly(stokvelId, req.userId, approve ? 'Voted to approve a loan' : 'Voted to reject a loan', money(result.amount));
+    res.json({ status: result.status, yes: result.yes, no: result.no, ledgerWarning: null });
   } catch (error) {
+    if (error instanceof RequestRefused) return res.status(error.status).json({ error: error.message });
     console.error('Vote loan error:', error.message);
-    res.status(500).json({ error: 'Could not record vote' });
+    res.status(500).json({ error: 'Could not record your vote. Nothing was changed, so it is safe to try again.' });
   }
 }
 
+// The repayment record, the REPAID status and the books entry are ONE
+// transaction (FIN-01c). The loan row is locked, so two repayments recorded
+// at the same moment cannot together go over what is owed.
 export async function repayLoan(req, res) {
   try {
     if (!(await guard(req, res, { officialOnly: true }))) return;
@@ -271,49 +298,61 @@ export async function repayLoan(req, res) {
     let amountCents;
     try { amountCents = toCents(String(req.body?.amount ?? '')); } catch { amountCents = 0; }
     if (!(amountCents > 0)) return res.status(400).json({ error: 'Enter a repayment amount above zero (at most 2 decimals)' });
-    const rows = await prisma.$queryRaw`
-      SELECT "status", "amount", "interestPercent", "termsSnapshot", "borrowerId" FROM "StokvelLoan" WHERE "id" = ${loanId} AND "stokvelId" = ${stokvelId}`;
-    if (!rows.length) return res.status(404).json({ error: 'Loan not found' });
-    if (rows[0].status !== 'APPROVED') return res.status(409).json({ error: 'Only approved, unpaid loans can take repayments' });
-    // Nobody records repayments on their own loan.
-    if (rows[0].borrowerId === req.userId) return res.status(403).json({ error: 'You cannot record repayments on your own loan. Another official must do it.' });
+    await ensureLedgerTables();
 
-    const totalDueCents = Math.round(totalDueFor(rows[0]) * 100);
-    const before = await prisma.$queryRaw`SELECT COALESCE(SUM("amount"), 0) AS total FROM "StokvelLoanRepayment" WHERE "loanId" = ${loanId}`;
-    const paidBeforeCents = Math.round(Number(before[0].total) * 100);
-    if (amountCents > totalDueCents - paidBeforeCents) {
-      return res.status(400).json({ error: `That is more than is still owed (${money((totalDueCents - paidBeforeCents) / 100)})` });
-    }
+    const result = await prisma.$transaction(async (tx) => {
+      await lockStokvelLedger(tx, stokvelId);
+      const rows = await tx.$queryRaw`
+        SELECT "status", "amount", "interestPercent", "termsSnapshot", "borrowerId" FROM "StokvelLoan"
+        WHERE "id" = ${loanId} AND "stokvelId" = ${stokvelId} FOR UPDATE`;
+      if (!rows.length) throw new RequestRefused(404, 'Loan not found');
+      const loan = rows[0];
+      if (loan.status !== 'APPROVED') throw new RequestRefused(409, 'Only approved, unpaid loans can take repayments');
+      // Nobody records repayments on their own loan.
+      if (loan.borrowerId === req.userId) {
+        throw new RequestRefused(403, 'You cannot record repayments on your own loan. Another official must do it.');
+      }
 
-    const repaymentId = randomUUID();
-    await prisma.$executeRaw`
-      INSERT INTO "StokvelLoanRepayment" ("id", "loanId", "stokvelId", "amount", "recordedById")
-      VALUES (${repaymentId}, ${loanId}, ${stokvelId}, ${amountCents / 100}, ${req.userId})`;
-    const settled = paidBeforeCents + amountCents >= totalDueCents;
-    if (settled) await prisma.$executeRaw`UPDATE "StokvelLoan" SET "status" = 'REPAID' WHERE "id" = ${loanId}`;
+      const totalDueCents = Math.round(totalDueFor(loan) * 100);
+      const before = await tx.$queryRaw`
+        SELECT COALESCE(SUM("amount"), 0) AS total FROM "StokvelLoanRepayment" WHERE "loanId" = ${loanId}`;
+      const paidBeforeCents = toCents(Number(before[0].total).toFixed(2));
+      const owedCents = totalDueCents - paidBeforeCents;
+      if (amountCents > owedCents) {
+        throw new RequestRefused(400, `That is more than is still owed (${money(owedCents / 100)})`);
+      }
 
-    // Loans made before agreed terms were stored were never put on the books
-    // when issued, so their repayments are not added either (no half records).
-    let ledgerWarning = null;
-    if (rows[0].termsSnapshot) {
-      const principalCents = toCents(String(rows[0].amount));
-      const principalLeft = Math.max(0, principalCents - paidBeforeCents);
-      const principalPart = Math.min(amountCents, principalLeft);
-      const interestPart = amountCents - principalPart;
-      const lines = [{ account: 'BANK', amountCents }];
-      if (principalPart > 0) lines.push({ account: 'LOANS_RECEIVABLE', amountCents: -principalPart });
-      if (interestPart > 0) lines.push({ account: 'INTEREST_INCOME', amountCents: -interestPart });
-      ledgerWarning = await postToLedger({
-        stokvelId, kind: 'LOAN_REPAYMENT', memo: 'Loan repayment',
-        lines, idempotencyKey: `repayment:${repaymentId}`, createdById: req.userId,
-      });
-    }
-    const names = await namesFor([rows[0].borrowerId]);
-    await logAudit(stokvelId, req.userId, 'Recorded a loan repayment', `${money(amountCents / 100)} from ${names[rows[0].borrowerId] || 'Member'}`);
-    res.json({ message: settled ? 'Loan fully repaid' : 'Repayment recorded', settled, ledgerWarning });
+      const repaymentId = randomUUID();
+      await tx.$executeRaw`
+        INSERT INTO "StokvelLoanRepayment" ("id", "loanId", "stokvelId", "amount", "recordedById")
+        VALUES (${repaymentId}, ${loanId}, ${stokvelId}, ${amountCents / 100}, ${req.userId})`;
+      const settled = paidBeforeCents + amountCents >= totalDueCents;
+      if (settled) await tx.$executeRaw`UPDATE "StokvelLoan" SET "status" = 'REPAID' WHERE "id" = ${loanId}`;
+
+      // Loans made before agreed terms were stored were never put on the books
+      // when issued, so their repayments are not added either (no half records).
+      if (loan.termsSnapshot) {
+        const { principalPart, interestPart } = splitRepayment({
+          amountCents, principalCents: toCents(String(loan.amount)), paidBeforeCents,
+        });
+        const lines = [{ account: 'BANK', amountCents }];
+        if (principalPart > 0) lines.push({ account: 'LOANS_RECEIVABLE', amountCents: -principalPart });
+        if (interestPart > 0) lines.push({ account: 'INTEREST_INCOME', amountCents: -interestPart });
+        await postEntryTx(tx, {
+          stokvelId, kind: 'LOAN_REPAYMENT', memo: 'Loan repayment',
+          lines, idempotencyKey: `repayment:${repaymentId}`, createdById: req.userId,
+        });
+      }
+      return { settled, borrowerId: loan.borrowerId };
+    });
+
+    const names = await namesFor([result.borrowerId]).catch(() => ({}));
+    await logAuditQuietly(stokvelId, req.userId, 'Recorded a loan repayment', `${money(amountCents / 100)} from ${names[result.borrowerId] || 'Member'}`);
+    res.json({ message: result.settled ? 'Loan fully repaid' : 'Repayment recorded', settled: result.settled, ledgerWarning: null });
   } catch (error) {
+    if (error instanceof RequestRefused) return res.status(error.status).json({ error: error.message });
     console.error('Repay loan error:', error.message);
-    res.status(500).json({ error: 'Could not record repayment' });
+    res.status(500).json({ error: 'Could not record the repayment. Nothing was saved, so it is safe to try again.' });
   }
 }
 

@@ -13,30 +13,6 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import prisma from './config/db.js';
-import { backfillBrandImages } from './scripts/backfill-brand-images.js';
-import { backfillSpiritPricing } from './scripts/backfill-spirit-pricing.js';
-import { backfillCeremonySkus } from './scripts/backfill-ceremony-skus.js';
-import { backfillCatalogueExpansion } from './scripts/backfill-catalogue-expansion.js';
-import { backfillGroceryBulkCatalog } from './scripts/backfill-grocery-bulk-catalog.js';
-import { backfillClothingSkus } from './scripts/backfill-clothing-skus.js';
-import { backfillMoninSyrups } from './scripts/backfill-monin-syrups.js';
-import { backfillBulkUnits, backfillVerifiedRetailPrices } from './scripts/backfill-bulk-units.js';
-import { backfillQuartGaps } from './scripts/backfill-quart-gaps.js';
-import { backfillExtractedBrandPhotos } from './scripts/backfill-extracted-brand-photos.js';
-import { clearBrokenBrandPhotos } from './scripts/clear-broken-brand-photos.js';
-import { backfillFormatSpecificPhotos } from './scripts/backfill-format-specific-photos.js';
-import { fixBeerQuartFormats } from './scripts/fix-beer-quart-formats.js';
-import { fixSavannaDryFormat } from './scripts/fix-savanna-dry-format.js';
-import { backfillFounderSourcedSkus } from './scripts/backfill-founder-sourced-skus.js';
-import { splitBundledFlavourSkus } from './scripts/split-bundled-flavour-skus.js';
-import { removeNonexistentSkus } from './scripts/remove-nonexistent-skus.js';
-import { removeNonexistentFormats } from './scripts/remove-nonexistent-formats.js';
-import { remove375mlFormats } from './scripts/remove-375ml-formats.js';
-import { renameMislabeledSkus } from './scripts/rename-mislabeled-skus.js';
-import { fixAboveRetailPricing } from './scripts/fix-above-retail-pricing.js';
-import { backfillSedgwicks } from './scripts/backfill-sedgwicks.js';
-import { backfillLaunchPricing } from './scripts/backfill-launch-pricing.js';
-import { fixPackSizes, applyOctober2026Prices } from './scripts/fix-pack-sizes-oct-2026.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -54,15 +30,25 @@ import identityRoutes from './routes/identity.js';
 import webhookRoutes from './routes/webhooks.js';
 import messageRoutes from './routes/message.js';
 import { checkRequiredEnvVars, envStatus } from './config/envCheck.js';
-import { initSentry, captureException } from './config/sentry.js';
+import { initSentry, captureException, flush as flushSentry } from './config/sentry.js';
+import { installFatalHandlers } from './config/processHandlers.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 checkRequiredEnvVars();
 await initSentry();
 
+// DB-03: an uncaught error leaves the process in an unknown state (it may be
+// half-way through a change). Report it and exit so Render starts a clean one.
+installFatalHandlers({ captureException, flush: flushSentry });
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// DB-02: set once the start-up schema check has finished. Until then, or if
+// it failed, /api/health answers 503 so Render does not treat a broken new
+// deploy as healthy (the previous deploy keeps serving instead).
+const startup = { schemaReady: false, schemaError: null };
 
 // Render terminates TLS and proxies every request through its own edge —
 // without this, req.ip (and the rate limiter keyed on it, see
@@ -102,6 +88,14 @@ app.use('/api/activity', activityRoutes);
 
 // API routes
 app.get('/api/health', async (req, res) => {
+  if (!startup.schemaReady) {
+    return res.status(503).json({
+      status: 'starting',
+      message: startup.schemaError
+        ? 'Server running, but the start-up database check failed. See server logs.'
+        : 'Server starting, database check still running',
+    });
+  }
   try {
     await prisma.$queryRaw`SELECT 1`;
     res.json({ status: 'ok', message: 'iCamagu server running, database connected' });
@@ -156,128 +150,36 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong on our side. Please try again.' });
 });
 
-// A rejected promise nobody caught would otherwise terminate the process on
-// modern Node — taking the whole app down for every user over one bad
-// request. Log it and stay up; Render restarts on a real crash anyway.
-process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled promise rejection:', reason?.message || reason);
-  captureException(reason instanceof Error ? reason : new Error(String(reason)));
-});
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught exception:', err?.message, err?.stack);
-  captureException(err);
+// Start listening straight away so Render sees the port, but report
+// "not ready" until the schema check passes.
+//
+// NOT a retry loop, deliberately: boot-time DB failures here have been real
+// bad-credentials errors against Supabase's pooler, and retrying trips its
+// circuit breaker ("too many authentication failures"), which can take down
+// ordinary request traffic too. Fix DATABASE_URL at the source instead.
+app.listen(PORT, () => {
+  console.log(`iCamagu server listening on port ${PORT}`);
 });
 
-// budgetZAR/isPurchased are new columns the Prisma client's default SELECT
-// now expects on every Ceremony/CeremonyCostItem query — must exist before
-// the app accepts traffic, not just before the routes that use them.
-//
-// NOT a retry loop, deliberately: every boot-time DB call has been failing
-// with "Authentication failed... the provided database credentials for
-// `postgres` are not valid" against Supabase's pooler — a real bad-
-// credentials error, not a transient cold-start blip. Retrying it hammers
-// the pooler and trips its circuit breaker ("too many authentication
-// failures, new connections are temporarily blocked"), which risks taking
-// down ordinary request traffic too. This needs DATABASE_URL fixed at the
-// source (Render env var / Supabase DB password), not client-side retries.
-function logBackfillError(label, err) {
-  console.error(`${label} failed — name=${err?.name} code=${err?.code} message=${err?.message}`);
+try {
+  // budgetZAR/isPurchased and friends are columns the Prisma client expects
+  // on every query — they must exist before the app is reported healthy.
+  await ensureCeremonyBudgetColumns();
+  startup.schemaReady = true;
+  console.log('Start-up database check passed.');
+} catch (err) {
+  startup.schemaError = err;
+  console.error(`Start-up database check FAILED — name=${err?.name} code=${err?.code} message=${err?.message}`);
+  captureException(err);
 }
 
-ensureCeremonyBudgetColumns()
-  .catch((err) => {
-    logBackfillError('Ceremony budget schema check', err);
-  })
-  .finally(() => {
-    app.listen(PORT, () => {
-      console.log(`iCamagu server listening on port ${PORT}`);
-    });
-
-    // Idempotent — safe to run on every boot, once DATABASE_URL is fixed.
-    // Sequential, not concurrent, so they don't pile onto the pooler at once.
-    (async () => {
-      await fixBeerQuartFormats().catch((err) => {
-        logBackfillError('Beer quart format fix', err);
-      });
-      await fixSavannaDryFormat().catch((err) => {
-        logBackfillError('Savanna Dry format fix', err);
-      });
-      await splitBundledFlavourSkus().catch((err) => {
-        logBackfillError('Bundled flavour split', err);
-      });
-      await removeNonexistentSkus().catch((err) => {
-        logBackfillError('Nonexistent SKU removal', err);
-      });
-      await removeNonexistentFormats().catch((err) => {
-        logBackfillError('Nonexistent format removal', err);
-      });
-      await remove375mlFormats().catch((err) => {
-        logBackfillError('375ml format removal', err);
-      });
-      await renameMislabeledSkus().catch((err) => {
-        logBackfillError('Mislabeled SKU rename', err);
-      });
-      // After splits and renames (so it sees final names), before any
-      // backfill that matches rows by their corrected pack size.
-      await fixPackSizes().catch((err) => {
-        logBackfillError('Pack size fix', err);
-      });
-      await backfillBrandImages().catch((err) => {
-        logBackfillError('Brand image backfill', err);
-      });
-      await backfillSpiritPricing().catch((err) => {
-        logBackfillError('Spirit pricing backfill', err);
-      });
-      await backfillCeremonySkus().catch((err) => {
-        logBackfillError('Ceremony SKU backfill', err);
-      });
-      await backfillCatalogueExpansion().catch((err) => {
-        logBackfillError('Catalogue expansion SKU backfill', err);
-      });
-      await backfillGroceryBulkCatalog().catch((err) => {
-        logBackfillError('Grocery bulk catalogue backfill', err);
-      });
-      await backfillClothingSkus().catch((err) => {
-        logBackfillError('Clothing SKU backfill', err);
-      });
-      await backfillMoninSyrups().catch((err) => {
-        logBackfillError('Monin syrup backfill', err);
-      });
-      await backfillQuartGaps().catch((err) => {
-        logBackfillError('Quart gap backfill', err);
-      });
-      await backfillBulkUnits().catch((err) => {
-        logBackfillError('Bulk unit backfill', err);
-      });
-      await backfillVerifiedRetailPrices().catch((err) => {
-        logBackfillError('Verified retail price backfill', err);
-      });
-      await fixAboveRetailPricing().catch((err) => {
-        logBackfillError('Above-retail pricing fix', err);
-      });
-      await backfillFounderSourcedSkus().catch((err) => {
-        logBackfillError('Founder-sourced SKU backfill', err);
-      });
-      await backfillSedgwicks().catch((err) => {
-        logBackfillError("Sedgwick's backfill", err);
-      });
-      await backfillExtractedBrandPhotos().catch((err) => {
-        logBackfillError('Extracted brand photo backfill', err);
-      });
-      await backfillFormatSpecificPhotos().catch((err) => {
-        logBackfillError('Format-specific photo backfill', err);
-      });
-      await clearBrokenBrandPhotos().catch((err) => {
-        logBackfillError('Broken brand photo clear', err);
-      });
-      await backfillLaunchPricing().catch((err) => {
-        logBackfillError('Launch pricing backfill', err);
-      });
-      // Last, deliberately: backfillVerifiedRetailPrices above rewrites
-      // Hennessy VS to an older Makro shelf price on every boot, so the
-      // newer dated October prices must be applied after it.
-      await applyOctober2026Prices().catch((err) => {
-        logBackfillError('October 2026 prices', err);
-      });
-    })();
-  });
+// DB-02: the ~25 catalogue data repairs no longer run on every start. Run
+// them by hand (node server/scripts/run-maintenance.js) or set
+// RUN_BOOT_MAINTENANCE=true for a single deploy, then remove it.
+if (startup.schemaReady && process.env.RUN_BOOT_MAINTENANCE === 'true') {
+  console.warn('RUN_BOOT_MAINTENANCE=true: running catalogue maintenance. Remove this setting after this deploy.');
+  const { runMaintenance } = await import('./scripts/maintenance.js');
+  runMaintenance()
+    .then((failed) => console.log(`Boot maintenance finished${failed.length ? ` with failures: ${failed.join(', ')}` : ''}.`))
+    .catch((err) => console.error('Boot maintenance crashed:', err?.message));
+}

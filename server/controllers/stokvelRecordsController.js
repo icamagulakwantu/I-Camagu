@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import prisma from '../config/db.js';
-import { postEntry } from '../services/ledgerService.js';
+import { ensureLedgerTables, lockStokvelLedger, postEntryTx } from '../services/ledgerService.js';
 import { toCents } from '../utils/money.js';
 
 // Meeting minutes, fines, constitution and the audit trail for a stokvel.
@@ -92,8 +92,9 @@ async function guard(req, res, { officialOnly = false } = {}) {
   return role;
 }
 
-async function actorName(userId) {
-  const u = await prisma.user.findUnique({ where: { id: userId }, select: { firstName: true, lastName: true } });
+// db can be a transaction client, so a name can be read inside a transaction.
+async function actorName(userId, db = prisma) {
+  const u = await db.user.findUnique({ where: { id: userId }, select: { firstName: true, lastName: true } });
   return u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Official' : 'Official';
 }
 
@@ -105,7 +106,26 @@ export async function logAudit(stokvelId, userId, action, details = null) {
     VALUES (${randomUUID()}, ${stokvelId}, ${userId}, ${name}, ${action}, ${details})`;
 }
 
+// For audit lines written AFTER money has already been saved: a failure here
+// is logged, never allowed to turn a saved payment into an error response.
+export async function logAuditQuietly(stokvelId, userId, action, details = null) {
+  try {
+    await logAudit(stokvelId, userId, action, details);
+  } catch (error) {
+    console.error('Audit log write failed:', stokvelId, action, error.message);
+  }
+}
+
 const money = (n) => `R${Number(n).toFixed(2)}`;
+
+// A refusal raised inside a transaction; it rolls everything back and is
+// returned to the caller with its own status code.
+class RequestRefused extends Error {
+  constructor(status, message) {
+    super(message);
+    this.status = status;
+  }
+}
 
 // ---------- Minutes ----------
 
@@ -179,12 +199,17 @@ export async function issueFine(req, res) {
     if (!(await guard(req, res, { officialOnly: true }))) return;
     const { stokvelId } = req.params;
     const { memberId, fineType, note, date } = req.body || {};
-    const amount = Number(req.body?.amount);
-    if (!memberId || !(amount > 0)) return res.status(400).json({ error: 'Member and a positive amount are required' });
+    // Exact cents (FIN-04): refuse more than 2 decimals instead of rounding.
+    let amountCents;
+    try { amountCents = toCents(String(req.body?.amount ?? '')); } catch { amountCents = 0; }
+    if (!memberId || !(amountCents > 0)) {
+      return res.status(400).json({ error: 'Member and a positive amount (at most 2 decimals) are required' });
+    }
     if (!FINE_TYPES.includes(fineType)) return res.status(400).json({ error: 'Unknown fine type' });
     // memberId is the member's user id; make sure they really belong to this stokvel.
     const member = await prisma.stokvelMember.findFirst({ where: { stokvelId, userId: memberId } });
     if (!member) return res.status(400).json({ error: 'That person is not a member of this stokvel' });
+    const amount = amountCents / 100;
     const id = randomUUID();
     await prisma.$executeRaw`
       INSERT INTO "StokvelFine" ("id", "stokvelId", "memberId", "fineType", "amount", "note", "fineDate", "issuedById")
@@ -198,42 +223,49 @@ export async function issueFine(req, res) {
   }
 }
 
+// Marking a fine paid and putting it on the books is ONE transaction (FIN-01c):
+// either both are saved or neither is, so a paid fine can never be missing
+// from the books.
 export async function payFine(req, res) {
   try {
     if (!(await guard(req, res, { officialOnly: true }))) return;
     const { stokvelId, fineId } = req.params;
-    const existing = await prisma.$queryRaw`
-      SELECT "memberId" FROM "StokvelFine" WHERE "id" = ${fineId} AND "stokvelId" = ${stokvelId} AND "paid" = false`;
-    if (existing.length === 0) return res.status(404).json({ error: 'Fine not found or already paid' });
-    // Nobody marks their own fine as paid.
-    if (existing[0].memberId === req.userId) {
-      return res.status(403).json({ error: 'You cannot mark your own fine as paid. Another official must do it.' });
-    }
-    const rows = await prisma.$queryRaw`
-      UPDATE "StokvelFine" SET "paid" = true, "paidAt" = CURRENT_TIMESTAMP
-      WHERE "id" = ${fineId} AND "stokvelId" = ${stokvelId} AND "paid" = false
-      RETURNING "amount", "memberId"`;
-    if (rows.length === 0) return res.status(404).json({ error: 'Fine not found or already paid' });
-    const name = await actorName(rows[0].memberId);
-    await logAudit(stokvelId, req.userId, 'Marked a fine as paid', `${money(rows[0].amount)} from ${name}`);
+    await ensureLedgerTables();
 
-    // Put the fine on the books. A failure here must not undo the payment record.
-    let ledgerWarning = null;
-    try {
+    const paid = await prisma.$transaction(async (tx) => {
+      // Ledger lock first, the same lock order as every other money flow.
+      await lockStokvelLedger(tx, stokvelId);
+      const rows = await tx.$queryRaw`
+        SELECT "memberId", "amount" FROM "StokvelFine"
+        WHERE "id" = ${fineId} AND "stokvelId" = ${stokvelId} AND "paid" = false
+        FOR UPDATE`;
+      if (rows.length === 0) throw new RequestRefused(404, 'Fine not found or already paid');
+      // Nobody marks their own fine as paid.
+      if (rows[0].memberId === req.userId) {
+        throw new RequestRefused(403, 'You cannot mark your own fine as paid. Another official must do it.');
+      }
+
+      await tx.$executeRaw`
+        UPDATE "StokvelFine" SET "paid" = true, "paidAt" = CURRENT_TIMESTAMP
+        WHERE "id" = ${fineId} AND "stokvelId" = ${stokvelId}`;
+
       const cents = toCents(String(rows[0].amount));
-      await postEntry({
+      const name = await actorName(rows[0].memberId, tx);
+      await postEntryTx(tx, {
         stokvelId, kind: 'FINE_PAID', memo: `Fine paid by ${name}`,
         lines: [{ account: 'BANK', amountCents: cents }, { account: 'FINES_INCOME', amountCents: -cents }],
         idempotencyKey: `fine:${fineId}`, createdById: rows[0].memberId, approvedById: req.userId,
       });
-    } catch (err) {
-      console.error('LEDGER POST FAILED fine', fineId, err.message);
-      ledgerWarning = 'The fine was marked paid but the books entry could not be saved. Tell your treasurer so it can be corrected.';
-    }
-    res.json({ message: 'Fine marked as paid', ledgerWarning });
+      return { amount: rows[0].amount, name };
+    });
+
+    await logAuditQuietly(stokvelId, req.userId, 'Marked a fine as paid', `${money(paid.amount)} from ${paid.name}`);
+    // ledgerWarning stays in the response for older screens; it is always null now.
+    res.json({ message: 'Fine marked as paid', ledgerWarning: null });
   } catch (error) {
+    if (error instanceof RequestRefused) return res.status(error.status).json({ error: error.message });
     console.error('Pay fine error:', error.message);
-    res.status(500).json({ error: 'Could not update fine' });
+    res.status(500).json({ error: 'Could not mark the fine as paid. Nothing was changed, so it is safe to try again.' });
   }
 }
 

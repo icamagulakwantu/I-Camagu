@@ -29,3 +29,10 @@ export async function initSentry() {
 export function captureException(err) {
   if (Sentry) Sentry.captureException(err);
 }
+
+// Waits (up to timeoutMs) for queued reports to be sent. Used before the
+// process exits after a fatal error, so the report is not lost.
+export async function flush(timeoutMs = 2000) {
+  if (!Sentry) return true;
+  return Sentry.flush(timeoutMs);
+}
