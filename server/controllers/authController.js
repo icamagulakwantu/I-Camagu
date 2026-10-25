@@ -21,6 +21,11 @@ const REFRESH_COOKIE_OPTIONS = {
   maxAge: 30 * 24 * 60 * 60 * 1000,
 };
 
+// SEC-02: sign-in must not tell a stranger whether an email has an account.
+// Every "send me a code" request gets this same reply, whether or not a code
+// was actually sent.
+export const OTP_SENT_MESSAGE = 'If an iCamagu account uses this email, we have sent it a 6-digit login code.';
+
 function serializeUser(user) {
   return {
     id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName,
@@ -42,29 +47,34 @@ function serializeUser(user) {
 const otpEmail = (code) =>
   `<p>Your iCamagu verification code is:</p><h2>${code}</h2><p>Expires in 10 minutes. Never share this code with anyone.</p>`;
 
+const cleanEmail = (value) => (typeof value === 'string' ? value.trim() : '');
+
+// Sends an email without making the caller wait for it. Waiting would make
+// "account exists" replies measurably slower than "no account" replies, and
+// a failed send must not change the reply either. Failures are logged.
+function sendQuietly(message, label) {
+  Promise.resolve()
+    .then(() => resend.emails.send(message))
+    .then((result) => {
+      if (result?.error) console.error(`${label} email failed:`, result.error.message);
+    })
+    .catch((error) => console.error(`${label} email failed:`, error?.message));
+}
+
+// A real bcrypt hash of a random password, so a sign-in attempt for an email
+// with no account does the same slow check as one with an account.
+let dummyHashPromise = null;
+function dummyHash() {
+  if (!dummyHashPromise) dummyHashPromise = hashPassword(crypto.randomBytes(16).toString('hex'));
+  return dummyHashPromise;
+}
+
+// Retired (SEC-02): this used to answer "does this email have an account,
+// and does it have a password?" to anyone who asked. The sign-in screen no
+// longer calls it. Kept only so a browser tab still showing the old screen
+// gets a clear message instead of a broken page.
 export async function checkEmail(req, res) {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
-  }
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    res.json({
-      exists: !!user,
-      hasPassword: !!user?.passwordHash,
-    });
-  } catch (error) {
-    console.error('CHECK EMAIL ERROR:', error);
-    res.status(500).json({
-      error: 'Could not check email',
-      details: error.message,
-    });
-  }
+  res.status(410).json({ error: 'The sign-in screen has been updated. Please refresh the page and try again.' });
 }
 
 // NEW: full registration with a real password, replacing the OTP-only flow as primary
@@ -83,8 +93,10 @@ export async function registerWithPassword(req, res) {
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
 
   try {
+    // Still reveals that an account exists (SEC-02 residual): fixing that needs
+    // an email-confirmation step on sign-up. Rate limited by authLimiter.
     const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) return res.status(409).json({ error: 'An account with this email already exists' });
+    if (existing) return res.status(409).json({ error: 'An account with this email already exists. Go back and sign in instead.' });
 
     const passwordHash = await hashPassword(password);
     const user = await prisma.user.create({
@@ -110,7 +122,11 @@ export async function loginWithPassword(req, res) {
 
   try {
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || !user.passwordHash) return res.status(401).json({ error: 'Invalid email or password' });
+    if (!user || !user.passwordHash) {
+      // Same slow check as a real account, so the reply time gives nothing away.
+      await verifyPassword(password, await dummyHash());
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
 
     const valid = await verifyPassword(password, user.passwordHash);
     if (!valid) return res.status(401).json({ error: 'Invalid email or password' });
@@ -127,6 +143,8 @@ export async function loginWithPassword(req, res) {
 // Google Sign-In. Google must confirm the person owns the email, and an
 // existing account is never taken over silently: if it already has a
 // password or a different Google account, the person signs in the usual way.
+// (The ACCOUNT_EXISTS reply is fine for SEC-02: only someone Google has
+// confirmed owns this email can see it.)
 export async function googleAuth(req, res) {
   const { idToken } = req.body;
   if (!idToken) return res.status(400).json({ error: 'idToken is required' });
@@ -175,7 +193,8 @@ export async function googleAuth(req, res) {
   }
 }
 
-// OTP flow — kept as a fallback
+// OTP flow — kept as a fallback. The screen does not use this endpoint, but
+// it no longer hands back an internal user id.
 export async function register(req, res) {
   const { email, firstName, lastName, paternalIziduko, maternalIziduko } = req.body;
   if (!email || !firstName || !lastName || !paternalIziduko || !maternalIziduko) {
@@ -190,42 +209,43 @@ export async function register(req, res) {
     await syncUserClanGroups(user);
 
     const code = await createOtp(user.id);
-    const { error: sendError } = await resend.emails.send({
-      from: FROM_ADDRESS, to: email, subject: 'Your iCamagu login code', html: otpEmail(code),
-    });
-    if (sendError) return res.status(422).json({ error: 'Could not send the code to this email.' });
-    res.json({ message: 'OTP sent', userId: user.id });
+    sendQuietly({ from: FROM_ADDRESS, to: email, subject: 'Your iCamagu login code', html: otpEmail(code) }, 'Register code');
+    res.json({ message: OTP_SENT_MESSAGE });
   } catch (error) {
     console.error('Register error:', error.message);
     res.status(500).json({ error: 'Could not register' });
   }
 }
 
+// "Email me a login code". Same reply whether or not the email has an account.
 export async function login(req, res) {
-  const { email } = req.body;
+  const email = cleanEmail(req.body?.email);
   if (!email) return res.status(400).json({ error: 'Email is required' });
   try {
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(404).json({ error: 'No account found with this email' });
-
-    const code = await createOtp(user.id);
-    const { error: sendError } = await resend.emails.send({
-      from: FROM_ADDRESS, to: email, subject: 'Your iCamagu login code', html: otpEmail(code),
-    });
-    if (sendError) return res.status(422).json({ error: 'Could not send the code.' });
-    res.json({ message: 'OTP sent', userId: user.id });
+    if (user) {
+      const code = await createOtp(user.id);
+      sendQuietly({ from: FROM_ADDRESS, to: email, subject: 'Your iCamagu login code', html: otpEmail(code) }, 'Login code');
+    }
+    res.json({ message: OTP_SENT_MESSAGE });
   } catch (error) {
     console.error('Login error:', error.message);
-    res.status(500).json({ error: 'Could not log in' });
+    res.status(500).json({ error: 'Could not send a code. Please try again.' });
   }
 }
 
+// Checks a login code, by email (not by internal user id). Wrong guesses for
+// an email with no account are counted exactly like real ones, under a
+// stand-in key, so the replies ("N tries left", then the lock) are the same.
 export async function verifyOtp(req, res) {
-  const { userId, code } = req.body;
-  if (!userId || !code) return res.status(400).json({ error: 'userId and code are required' });
+  const email = cleanEmail(req.body?.email);
+  const code = req.body?.code;
+  if (!email || !code) return res.status(400).json({ error: 'Email and code are required' });
   try {
-    const result = await checkOtp(userId, code);
-    if (!result.ok) {
+    const user = await prisma.user.findUnique({ where: { email } });
+    const attemptKey = user ? user.id : `no-account:${email.toLowerCase()}`;
+    const result = await checkOtp(attemptKey, code);
+    if (!user || !result.ok) {
       if (result.locked) {
         return res.status(429).json({ error: 'Too many wrong codes. Wait 15 minutes, then ask for a new code.' });
       }
@@ -233,9 +253,8 @@ export async function verifyOtp(req, res) {
       return res.status(401).json({ error: `Wrong or expired code.${left}` });
     }
 
-    const { accessToken, refreshToken } = await generateTokenPair(userId);
+    const { accessToken, refreshToken } = await generateTokenPair(user.id);
     res.cookie('jid', refreshToken, REFRESH_COOKIE_OPTIONS);
-    const user = await prisma.user.findUnique({ where: { id: userId } });
     res.json({ accessToken, user: serializeUser(user) });
   } catch (error) {
     console.error('Verify OTP error:', error.message);
@@ -266,12 +285,11 @@ export async function logout(req, res) {
 export async function requestPasswordReset(req, res) {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email is required' });
+  const genericReply = { message: 'If an account exists with this email, a reset link has been sent.' };
 
   try {
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || !user.passwordHash) {
-      return res.json({ message: 'If an account exists with this email, a reset link has been sent.' });
-    }
+    if (!user || !user.passwordHash) return res.json(genericReply);
 
     const rawToken = crypto.randomBytes(32).toString('hex');
     const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
@@ -283,16 +301,16 @@ export async function requestPasswordReset(req, res) {
     });
 
     const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${rawToken}`;
-    await resend.emails.send({
+    sendQuietly({
       from: FROM_ADDRESS,
       to: email,
       subject: 'Reset your iCamagu password',
       html: `<p>Someone requested a password reset for your iCamagu account.</p>
              <p><a href="${resetUrl}">Click here to reset your password</a> — this link expires in 30 minutes.</p>
              <p>If you didn't request this, you can safely ignore this email.</p>`,
-    });
+    }, 'Password reset');
 
-    res.json({ message: 'If an account exists with this email, a reset link has been sent.' });
+    res.json(genericReply);
   } catch (error) {
     console.error('Request password reset error:', error.message);
     res.status(500).json({ error: 'Could not process request' });

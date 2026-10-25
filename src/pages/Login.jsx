@@ -3,12 +3,14 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import Icon from '../components/Icon.jsx'
 
+// SEC-02: the screen no longer asks the server whether an email has an
+// account. After the email step everyone sees the same choices: sign in with
+// a password, get a login code by email, or create an account.
 const STEP_META = {
   email: { title: 'Sign in', depth: 1 },
   register: { title: 'Create account', depth: 2 },
   'password-login': { title: 'Sign in', depth: 2 },
   'forgot-password': { title: 'Reset password', depth: 3 },
-  'otp-login': { title: 'Sign in', depth: 2 },
   'otp-verify': { title: 'Enter code', depth: 3 },
 }
 
@@ -31,7 +33,6 @@ function Login() {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [code, setCode] = useState('')
-  const [userId, setUserId] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const googleBtnRef = useRef(null)
@@ -40,6 +41,8 @@ function Login() {
   const { showToast } = useToast()
 
   const meta = STEP_META[step]
+
+  const goTo = (next) => { setError(''); setStep(next) }
 
   useEffect(() => {
     const renderGoogleButton = () => {
@@ -76,23 +79,11 @@ function Login() {
     }
   }
 
-  const handleEmailSubmit = async (e) => {
-    e.preventDefault(); setError(''); setLoading(true)
-    try {
-      const res = await fetch('/api/auth/check-email', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to verify email')
-      if (data.exists && data.hasPassword) setStep('password-login')
-      else if (data.exists) setStep('otp-login')
-      else setStep('register')
-    } catch (err) {
-      setError(err.message || 'Something went wrong checking email')
-    } finally {
-      setLoading(false)
-    }
+  // No server call here, on purpose: the next step is the same for everyone.
+  const handleEmailSubmit = (e) => {
+    e.preventDefault()
+    setEmail(email.trim())
+    goTo('password-login')
   }
 
   const handlePasswordLogin = async (e) => {
@@ -103,7 +94,7 @@ function Login() {
         credentials: 'include', body: JSON.stringify({ email, password }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Invalid credentials')
+      if (!res.ok) throw new Error(data.error || 'Invalid email or password')
       login(data.accessToken, data.user)
     } catch (err) {
       setError(err.message)
@@ -130,16 +121,16 @@ function Login() {
     }
   }
 
-  const handleOtpLogin = async (e) => {
-    e.preventDefault(); setError(''); setLoading(true)
+  const handleOtpLogin = async () => {
+    setError(''); setLoading(true)
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not send verification code')
-      setUserId(data.userId)
+      if (!res.ok) throw new Error(data.error || 'Could not send a login code')
+      setCode('')
       setStep('otp-verify')
     } catch (err) {
       setError(err.message)
@@ -153,7 +144,7 @@ function Login() {
     try {
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', body: JSON.stringify({ userId, code }),
+        credentials: 'include', body: JSON.stringify({ email, code }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Invalid or expired code')
@@ -182,26 +173,23 @@ function Login() {
           <h1 className="font-display font-bold text-[1.55rem] leading-tight text-white text-balance">
             {step === 'email' && 'Buy together. Save more.'}
             {step === 'register' && 'Joyina iCamagu'}
-            {step === 'register' && ''}
             {step === 'password-login' && 'Wamkelekile'}
             {step === 'forgot-password' && 'Reset your password'}
-            {step === 'otp-login' && 'Wamkelekile'}
             {step === 'otp-verify' && 'Check your inbox'}
           </h1>
           {/* English subtext for Xhosa headings */}
-          {(step === 'register') && (
+          {step === 'register' && (
             <p className="text-white/60 text-xs mt-0.5">Join iCamagu</p>
           )}
-          {(step === 'password-login' || step === 'otp-login') && (
-            <p className="text-white/60 text-xs mt-0.5">Welcome back</p>
+          {step === 'password-login' && (
+            <p className="text-white/60 text-xs mt-0.5">Welcome</p>
           )}
-          <p className="text-white/80 text-sm mt-1.5 leading-snug">
+          <p className="text-white/80 text-sm mt-1.5 leading-snug break-words">
             {step === 'email' && 'Save up to 20% on Mgidi drinks and groceries. Matchmaker joins your order with others nearby so you pay the bulk price. No stokvel needed.'}
-            {step === 'register' && 'Create your account below.'}
+            {step === 'register' && `Create your account for ${email}.`}
             {step === 'password-login' && email}
             {step === 'forgot-password' && `We'll send a reset link to ${email}`}
-            {step === 'otp-login' && 'This account uses a one-time login code.'}
-            {step === 'otp-verify' && `Enter the 6-digit code sent to ${email}`}
+            {step === 'otp-verify' && `If an iCamagu account uses ${email}, we've sent it a 6-digit code.`}
           </p>
           {step === 'email' && (
             <>
@@ -259,7 +247,7 @@ function Login() {
                 disabled={loading}
                 className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 text-[15px] pressable shadow-terracotta"
               >
-                {loading ? 'Checking...' : 'Join or sign in →'}
+                Join or sign in →
               </button>
               <div className="flex items-center gap-3 my-1">
                 <div className="flex-1 h-px bg-cream-dark" />
@@ -302,37 +290,56 @@ function Login() {
               >
                 {loading ? 'Creating account...' : 'Create Account →'}
               </button>
-              <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">
-                ← Back
+              <button type="button" onClick={() => goTo('password-login')} className="w-full text-xs text-ink-muted underline">
+                ← I already have an account
               </button>
             </form>
           )}
 
           {step === 'password-login' && (
-            <form onSubmit={handlePasswordLogin} className="space-y-3">
-              <input
-                type="password" placeholder="Your password" value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
-                required autoFocus
-              />
-              <ErrorBanner message={error} />
+            <div className="space-y-3">
+              <form onSubmit={handlePasswordLogin} className="space-y-3">
+                <input
+                  type="password" placeholder="Your password" value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
+                  required autoFocus
+                />
+                <ErrorBanner message={error} />
+                <button
+                  type="submit" disabled={loading}
+                  className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 pressable shadow-terracotta"
+                >
+                  {loading ? 'Signing in...' : 'Sign In →'}
+                </button>
+              </form>
               <button
-                type="submit" disabled={loading}
-                className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 pressable shadow-terracotta"
+                type="button" onClick={handleOtpLogin} disabled={loading}
+                className="w-full border-2 border-terracotta/30 text-terracotta font-bold py-3 rounded-pill disabled:opacity-50 pressable text-sm"
               >
-                {loading ? 'Signing in...' : 'Sign In →'}
+                {loading ? 'Sending...' : 'No password? Email me a login code'}
               </button>
               <button
-                type="button" onClick={() => setStep('forgot-password')}
+                type="button" onClick={() => goTo('forgot-password')}
                 className="w-full text-xs text-terracotta font-semibold underline"
               >
                 Forgot password?
               </button>
-              <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">
-                ← Back
+              <div className="flex items-center gap-3 pt-1">
+                <div className="flex-1 h-px bg-cream-dark" />
+                <span className="text-xs text-ink-muted">New to iCamagu?</span>
+                <div className="flex-1 h-px bg-cream-dark" />
+              </div>
+              <button
+                type="button" onClick={() => { setPassword(''); goTo('register') }}
+                className="w-full text-sm text-terracotta font-bold underline"
+              >
+                Create an account
               </button>
-            </form>
+              <button type="button" onClick={() => goTo('email')} className="w-full text-xs text-ink-muted underline">
+                ← Use a different email
+              </button>
+            </div>
           )}
 
           {step === 'forgot-password' && (
@@ -362,22 +369,7 @@ function Login() {
               >
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </button>
-              <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">
-                ← Back
-              </button>
-            </div>
-          )}
-
-          {step === 'otp-login' && (
-            <div className="space-y-3">
-              <ErrorBanner message={error} />
-              <button
-                onClick={handleOtpLogin} disabled={loading}
-                className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 pressable shadow-terracotta"
-              >
-                {loading ? 'Sending...' : 'Send me a login code →'}
-              </button>
-              <button type="button" onClick={() => setStep('email')} className="w-full text-xs text-ink-muted underline">
+              <button type="button" onClick={() => goTo('password-login')} className="w-full text-xs text-ink-muted underline">
                 ← Back
               </button>
             </div>
@@ -386,7 +378,8 @@ function Login() {
           {step === 'otp-verify' && (
             <form onSubmit={handleVerifyOtp} className="space-y-3">
               <input
-                type="text" placeholder="123456" value={code}
+                type="text" inputMode="numeric" autoComplete="one-time-code"
+                placeholder="123456" value={code}
                 onChange={(e) => setCode(e.target.value)} maxLength={6}
                 className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-4 text-center text-2xl tracking-[0.4em] font-bold focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
                 required autoFocus
@@ -398,9 +391,12 @@ function Login() {
               >
                 {loading ? 'Verifying...' : 'Verify & Log In →'}
               </button>
+              <p className="text-center text-[11px] text-ink-muted">
+                No email after a few minutes? Check your spam folder, or create an account if you are new.
+              </p>
               <button
                 type="button"
-                onClick={() => { setCode(''); setError(''); setStep('otp-login') }}
+                onClick={() => { setCode(''); goTo('password-login') }}
                 className="w-full text-xs text-ink-muted underline"
               >
                 ← Back
