@@ -68,47 +68,61 @@ export function ensureLedgerTables() {
   return tablesReady;
 }
 
-// Records one balanced entry. Safe to call twice with the same idempotencyKey:
-// the second call returns the first entry instead of counting the money again.
-export async function postEntry({
+// One writer per stokvel at a time, so sequence numbers and the hash chain
+// never fork. Money flows take this lock FIRST, before touching any balance
+// row, so every transaction acquires locks in the same order (no deadlocks).
+// Postgres advisory locks are re-entrant inside one transaction.
+export async function lockStokvelLedger(tx, stokvelId) {
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${stokvelId}))`;
+}
+
+// Records one balanced entry inside the CALLER's transaction, so the books
+// entry and the balance change it describes commit or roll back together.
+// Call ensureLedgerTables() before opening the transaction.
+// Safe to call twice with the same idempotencyKey: the second call returns
+// the first entry instead of counting the money again.
+export async function postEntryTx(tx, {
   stokvelId, kind, memo = null, lines, idempotencyKey, createdById, approvedById = null, reversesEntryId = null,
 }) {
   if (!stokvelId || !kind || !idempotencyKey || !createdById) throw new LedgerError('Missing entry details');
   validateLines(lines);
   assertDistinctDuties({ createdById, approvedById });
-  await ensureLedgerTables();
 
-  return prisma.$transaction(async (tx) => {
-    // One writer per stokvel at a time, so sequence numbers and the hash chain never fork.
-    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${stokvelId}))`;
+  await lockStokvelLedger(tx, stokvelId);
 
-    const existing = await tx.$queryRaw`
-      SELECT "id", "seq", "hash" FROM "LedgerEntry" WHERE "stokvelId" = ${stokvelId} AND "idempotencyKey" = ${idempotencyKey}`;
-    if (existing.length) return { id: existing[0].id, seq: existing[0].seq, hash: existing[0].hash, duplicate: true };
+  const existing = await tx.$queryRaw`
+    SELECT "id", "seq", "hash" FROM "LedgerEntry" WHERE "stokvelId" = ${stokvelId} AND "idempotencyKey" = ${idempotencyKey}`;
+  if (existing.length) return { id: existing[0].id, seq: existing[0].seq, hash: existing[0].hash, duplicate: true };
 
-    const last = await tx.$queryRaw`
-      SELECT "seq", "hash" FROM "LedgerEntry" WHERE "stokvelId" = ${stokvelId} ORDER BY "seq" DESC LIMIT 1`;
-    const seq = (last[0]?.seq ?? 0) + 1;
-    const prevHash = last[0]?.hash ?? GENESIS_HASH;
-    const createdAt = new Date();
-    const id = randomUUID();
-    const hash = computeEntryHash({
-      prevHash, stokvelId, seq, kind, memo, createdById, approvedById, reversesEntryId,
-      createdAt: createdAt.toISOString(), lines,
-    });
-
-    await tx.$executeRaw`
-      INSERT INTO "LedgerEntry" ("id", "stokvelId", "seq", "kind", "memo", "idempotencyKey", "reversesEntryId",
-        "createdById", "approvedById", "createdAt", "prevHash", "hash")
-      VALUES (${id}, ${stokvelId}, ${seq}, ${kind}, ${memo}, ${idempotencyKey}, ${reversesEntryId},
-        ${createdById}, ${approvedById}, ${createdAt}, ${prevHash}, ${hash})`;
-    for (const line of lines) {
-      await tx.$executeRaw`
-        INSERT INTO "LedgerLine" ("id", "entryId", "stokvelId", "account", "amountCents")
-        VALUES (${randomUUID()}, ${id}, ${stokvelId}, ${line.account}, ${line.amountCents})`;
-    }
-    return { id, seq, hash, duplicate: false };
+  const last = await tx.$queryRaw`
+    SELECT "seq", "hash" FROM "LedgerEntry" WHERE "stokvelId" = ${stokvelId} ORDER BY "seq" DESC LIMIT 1`;
+  const seq = (last[0]?.seq ?? 0) + 1;
+  const prevHash = last[0]?.hash ?? GENESIS_HASH;
+  const createdAt = new Date();
+  const id = randomUUID();
+  const hash = computeEntryHash({
+    prevHash, stokvelId, seq, kind, memo, createdById, approvedById, reversesEntryId,
+    createdAt: createdAt.toISOString(), lines,
   });
+
+  await tx.$executeRaw`
+    INSERT INTO "LedgerEntry" ("id", "stokvelId", "seq", "kind", "memo", "idempotencyKey", "reversesEntryId",
+      "createdById", "approvedById", "createdAt", "prevHash", "hash")
+    VALUES (${id}, ${stokvelId}, ${seq}, ${kind}, ${memo}, ${idempotencyKey}, ${reversesEntryId},
+      ${createdById}, ${approvedById}, ${createdAt}, ${prevHash}, ${hash})`;
+  for (const line of lines) {
+    await tx.$executeRaw`
+      INSERT INTO "LedgerLine" ("id", "entryId", "stokvelId", "account", "amountCents")
+      VALUES (${randomUUID()}, ${id}, ${stokvelId}, ${line.account}, ${line.amountCents})`;
+  }
+  return { id, seq, hash, duplicate: false };
+}
+
+// Records one balanced entry in its own transaction. Use postEntryTx instead
+// whenever the entry describes a balance change made in the same request.
+export async function postEntry(entry) {
+  await ensureLedgerTables();
+  return prisma.$transaction((tx) => postEntryTx(tx, entry));
 }
 
 // Mistakes are corrected by a linked reversal with a stated reason, never by editing.

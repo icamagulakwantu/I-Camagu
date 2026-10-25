@@ -1,26 +1,17 @@
 import { randomUUID } from 'crypto';
 import prisma from '../config/db.js';
-import { postEntry } from '../services/ledgerService.js';
-import { toCents } from '../utils/money.js';
+import { ensureLedgerTables, lockStokvelLedger, postEntryTx } from '../services/ledgerService.js';
+import { verifyPin, pinFailureResponse } from '../services/pinService.js';
+import { toCents, fromCents } from '../utils/money.js';
 
 // Every confirmed money movement is also written to the tamper-evident ledger
 // (server/services/ledgerService.js). The older running balance is still updated
 // so existing screens keep working while the books are phased in.
+// The balance change and the books entry are written in ONE database
+// transaction: either both are saved or neither is, so the running balance
+// can never move without a matching books entry.
 // Group expenses now live in stokvelApprovalsController.js, because they need
 // a second official to approve them.
-
-// Writes the ledger entry. If it fails the money flow has already succeeded, so
-// we do not undo it; we log loudly and tell the caller so it can be fixed.
-// Repeating the same call is safe because of the idempotency key.
-async function postToLedger(entry) {
-  try {
-    await postEntry(entry);
-    return null;
-  } catch (error) {
-    console.error('LEDGER POST FAILED', entry.kind, entry.idempotencyKey, error.message);
-    return 'The balance was updated but the books entry could not be saved. Tell your treasurer so it can be corrected.';
-  }
-}
 
 function parseAmount(raw) {
   try {
@@ -40,16 +31,13 @@ export async function confirmContribution(req, res) {
   if (!contributionId) return res.status(400).json({ error: 'contributionId is required' });
   if (!pin) return res.status(400).json({ error: 'PIN is required to confirm a contribution' });
 
-  const { verifyPin } = await import('../services/pinService.js');
-  const pinCheck = await verifyPin(userId, pin);
-  if (!pinCheck.valid) {
-    const message = pinCheck.reason === 'NO_PIN_SET'
-      ? 'You need to set a security PIN first — go to More → Security PIN.'
-      : 'Incorrect PIN';
-    return res.status(401).json({ error: message });
-  }
-
   try {
+    const pinCheck = await verifyPin(userId, pin);
+    if (!pinCheck.valid) {
+      const failure = pinFailureResponse(pinCheck);
+      return res.status(failure.status).json({ error: failure.error });
+    }
+
     const contribution = await prisma.contribution.findUnique({ where: { id: contributionId } });
     if (!contribution) return res.status(404).json({ error: 'Contribution not found' });
     if (contribution.status === 'CONFIRMED') return res.status(409).json({ error: 'Already confirmed' });
@@ -70,9 +58,11 @@ export async function confirmContribution(req, res) {
     const amountCents = parseAmount(contribution.amount.toString());
     if (!amountCents) return res.status(400).json({ error: 'This contribution has an invalid amount' });
 
-    // Gate the update on status still being PENDING so two officials confirming
-    // at once cannot both add the same contribution to the balance.
+    await ensureLedgerTables();
+    // The status gate (still PENDING) stops two officials confirming at once
+    // from both adding the money. Balance and books entry commit together.
     const updated = await prisma.$transaction(async (tx) => {
+      await lockStokvelLedger(tx, contribution.stokvelId);
       const claim = await tx.contribution.updateMany({
         where: { id: contributionId, status: 'PENDING' },
         data: { status: 'CONFIRMED' },
@@ -82,29 +72,28 @@ export async function confirmContribution(req, res) {
         where: { stokvelId: contribution.stokvelId },
         data: { totalBalance: { increment: contribution.amount } },
       });
+      await postEntryTx(tx, {
+        stokvelId: contribution.stokvelId,
+        kind: 'CONTRIBUTION',
+        memo: contribution.note ? `Contribution: ${contribution.note}` : 'Member contribution',
+        lines: [{ account: 'BANK', amountCents }, { account: 'CONTRIBUTIONS', amountCents: -amountCents }],
+        idempotencyKey: `contribution:${contributionId}`,
+        createdById: payer?.userId || userId,
+        approvedById: userId,
+      });
       return tx.contribution.findUnique({ where: { id: contributionId } });
     });
 
     if (!updated) return res.status(409).json({ error: 'Already confirmed' });
 
-    const ledgerWarning = await postToLedger({
-      stokvelId: contribution.stokvelId,
-      kind: 'CONTRIBUTION',
-      memo: contribution.note ? `Contribution: ${contribution.note}` : 'Member contribution',
-      lines: [{ account: 'BANK', amountCents }, { account: 'CONTRIBUTIONS', amountCents: -amountCents }],
-      idempotencyKey: `contribution:${contributionId}`,
-      createdById: payer?.userId || userId,
-      approvedById: userId,
-    });
-
     res.json({
       contribution: updated,
-      ledgerWarning,
+      ledgerWarning: null,
       message: 'Contribution confirmed and added to the group ledger.',
     });
   } catch (error) {
     console.error('Confirm contribution error:', error.message);
-    res.status(500).json({ error: 'Could not confirm contribution' });
+    res.status(500).json({ error: 'Could not confirm the contribution. Nothing was changed, so it is safe to try again.' });
   }
 }
 
@@ -116,8 +105,9 @@ export async function submitContribution(req, res) {
   if (!stokvelId || !amount) {
     return res.status(400).json({ error: 'stokvelId and amount are required' });
   }
-  if (isNaN(amount) || amount <= 0) {
-    return res.status(400).json({ error: 'Amount must be a positive number' });
+  const amountCents = parseAmount(amount);
+  if (!amountCents) {
+    return res.status(400).json({ error: 'Amount must be a positive number with at most 2 decimals' });
   }
 
   try {
@@ -132,7 +122,7 @@ export async function submitContribution(req, res) {
       data: {
         stokvelId,
         memberId: membership.id,
-        amount: parseFloat(amount),
+        amount: fromCents(amountCents),
         status: 'PENDING',
         note: note || proofNote || null,
       },
@@ -174,36 +164,40 @@ export async function recordInterest(req, res) {
 
   if (!stokvelId || !amount) return res.status(400).json({ error: 'stokvelId and amount are required' });
 
-  const requestedAmount = parseFloat(amount);
   const amountCents = parseAmount(amount);
-  if (isNaN(requestedAmount) || requestedAmount <= 0 || !amountCents) {
+  if (!amountCents) {
     return res.status(400).json({ error: 'Amount must be a positive number with at most 2 decimals' });
   }
+  const exactAmount = fromCents(amountCents);
 
   try {
     const official = await prisma.stokvelOfficial.findFirst({ where: { stokvelId, userId } });
     if (!official) return res.status(403).json({ error: 'Only stokvel officials can record interest' });
 
-    const ledger = await prisma.stokvelGroupLedger.update({
-      where: { stokvelId },
-      data: {
-        totalBalance: { increment: requestedAmount },
-        interestEarned: { increment: requestedAmount },
-      },
+    await ensureLedgerTables();
+    const ledger = await prisma.$transaction(async (tx) => {
+      await lockStokvelLedger(tx, stokvelId);
+      const updatedLedger = await tx.stokvelGroupLedger.update({
+        where: { stokvelId },
+        data: {
+          totalBalance: { increment: exactAmount },
+          interestEarned: { increment: exactAmount },
+        },
+      });
+      await postEntryTx(tx, {
+        stokvelId,
+        kind: 'INTEREST',
+        memo: note ? `Interest: ${String(note).slice(0, 300)}` : 'Interest recorded',
+        lines: [{ account: 'BANK', amountCents }, { account: 'INTEREST_INCOME', amountCents: -amountCents }],
+        idempotencyKey: `interest:${randomUUID()}`,
+        createdById: userId,
+      });
+      return updatedLedger;
     });
 
-    const ledgerWarning = await postToLedger({
-      stokvelId,
-      kind: 'INTEREST',
-      memo: note ? `Interest: ${String(note).slice(0, 300)}` : 'Interest recorded',
-      lines: [{ account: 'BANK', amountCents }, { account: 'INTEREST_INCOME', amountCents: -amountCents }],
-      idempotencyKey: `interest:${randomUUID()}`,
-      createdById: userId,
-    });
-
-    res.json({ ledger, ledgerWarning, message: 'Interest recorded and added to the group balance.' });
+    res.json({ ledger, ledgerWarning: null, message: 'Interest recorded and added to the group balance.' });
   } catch (error) {
     console.error('Record interest error:', error.message);
-    res.status(500).json({ error: 'Could not record interest' });
+    res.status(500).json({ error: 'Could not record interest. Nothing was changed, so it is safe to try again.' });
   }
 }
