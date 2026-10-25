@@ -10,6 +10,7 @@ import { toCents, fromCents } from '../utils/money.js';
 const SUGGESTED_CONTRIBUTION_RATE = 0.03;
 const SUGGESTED_CONTRIBUTION_BASIS_POINTS = 300; // 3.00%, in whole numbers for exact cents
 const MIN_DONATION_ZAR = 1;
+const MIN_DONATION_CENTS = MIN_DONATION_ZAR * 100;
 
 // Real development sectors the fund can commit money to. Labels are shown
 // as-is on the public page — no sector appears there until real money has
@@ -33,10 +34,18 @@ function parsePositiveCents(raw) {
   }
 }
 
+// A database DECIMAL sum (or null) to exact whole cents.
+export function decimalToCents(value) {
+  if (value === null || value === undefined) return 0;
+  return toCents(Number(value).toFixed(2));
+}
+
 // 3% of a payout in exact cents, rounded half-up to the nearest cent.
 export function suggestedContributionCents(payoutCents) {
   return Math.floor((payoutCents * SUGGESTED_CONTRIBUTION_BASIS_POINTS + 5000) / 10000);
 }
+
+const randText = (cents) => `R${fromCents(cents)}`;
 
 export async function getShrineFundTotal(req, res) {
   try {
@@ -59,19 +68,20 @@ export async function getShrineFundTotal(req, res) {
         }),
       ]);
 
-    const totalRaised = parseFloat(aggregate._sum.amount || 0);
-    const totalAllocated = parseFloat(allocAggregate._sum.amount || 0);
+    // Worked out in whole cents (FIN-04) so the reserve never drifts by a cent.
+    const raisedCents = decimalToCents(aggregate._sum.amount);
+    const allocatedCents = decimalToCents(allocAggregate._sum.amount);
 
     res.json({
-      totalAmount: totalRaised,
+      totalAmount: raisedCents / 100,
       contributionCount: aggregate._count,
       payoutContributionCount: payoutCount,
       donationCount,
       sinceDate: earliest?.createdAt || null,
       suggestedRate: SUGGESTED_CONTRIBUTION_RATE,
       minDonation: MIN_DONATION_ZAR,
-      totalAllocated,
-      liquidReserve: totalRaised - totalAllocated,
+      totalAllocated: allocatedCents / 100,
+      liquidReserve: (raisedCents - allocatedCents) / 100,
       // Only sectors with real allocations appear — an empty array genuinely
       // means nothing has been committed yet, not that data is missing.
       allocationsBySector: allocBySector
@@ -79,7 +89,7 @@ export async function getShrineFundTotal(req, res) {
         .map((row) => ({
           sector: row.sector,
           label: ALLOCATION_SECTORS[row.sector] || row.sector,
-          amount: parseFloat(row._sum.amount || 0),
+          amount: decimalToCents(row._sum.amount) / 100,
           count: row._count,
         }))
         .sort((a, b) => b.amount - a.amount),
@@ -91,13 +101,16 @@ export async function getShrineFundTotal(req, res) {
   }
 }
 
+class AllocationRefused extends Error {}
+
 // Admin-only: records that real money has been committed out of the fund to
 // a real project. Nothing here moves money — it's a transparency record of a
 // decision already taken, entered by hand with a reference document, the
 // same manual-review posture as every other money flow in this app.
 export async function recordShrineAllocation(req, res) {
-  const { amount, sector, description, referenceUrl } = req.body;
-  const numericAmount = parseFloat(amount);
+  const { sector, description, referenceUrl } = req.body;
+  // Exact cents (FIN-04): refuse more than 2 decimals instead of rounding.
+  const amountCents = parsePositiveCents(req.body?.amount);
 
   try {
     const admin = await prisma.user.findUnique({ where: { id: req.userId }, select: { email: true } });
@@ -106,8 +119,8 @@ export async function recordShrineAllocation(req, res) {
       return res.status(403).json({ error: 'Admin access required' });
     }
 
-    if (!numericAmount || isNaN(numericAmount) || numericAmount <= 0) {
-      return res.status(400).json({ error: 'A positive amount is required' });
+    if (!amountCents) {
+      return res.status(400).json({ error: 'A positive amount with at most 2 decimals is required' });
     }
     if (!sector || !ALLOCATION_SECTORS[sector]) {
       return res.status(400).json({ error: `sector must be one of: ${Object.keys(ALLOCATION_SECTORS).join(', ')}` });
@@ -116,32 +129,37 @@ export async function recordShrineAllocation(req, res) {
       return res.status(400).json({ error: 'A description of what this funds is required' });
     }
 
-    // Can't commit more than the fund actually holds.
-    const [raised, allocated] = await Promise.all([
-      prisma.shrineContribution.aggregate({ where: { status: 'CONFIRMED', entryType: 'CONTRIBUTION' }, _sum: { amount: true } }),
-      prisma.shrineContribution.aggregate({ where: { status: 'CONFIRMED', entryType: 'ALLOCATION' }, _sum: { amount: true } }),
-    ]);
-    const reserve = parseFloat(raised._sum.amount || 0) - parseFloat(allocated._sum.amount || 0);
-    if (numericAmount > reserve) {
-      return res.status(400).json({
-        error: `The fund's uncommitted reserve is R${reserve.toFixed(2)} — cannot allocate R${numericAmount.toFixed(2)}.`,
+    // The reserve check and the new record are ONE transaction, under a
+    // fund-wide lock, so two admins recording at the same moment cannot
+    // together commit more than the fund holds.
+    const allocation = await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('shrine-fund'))`;
+      const [raised, allocated] = await Promise.all([
+        tx.shrineContribution.aggregate({ where: { status: 'CONFIRMED', entryType: 'CONTRIBUTION' }, _sum: { amount: true } }),
+        tx.shrineContribution.aggregate({ where: { status: 'CONFIRMED', entryType: 'ALLOCATION' }, _sum: { amount: true } }),
+      ]);
+      const reserveCents = decimalToCents(raised._sum.amount) - decimalToCents(allocated._sum.amount);
+      if (amountCents > reserveCents) {
+        throw new AllocationRefused(
+          `The fund's uncommitted reserve is ${randText(reserveCents)} — cannot allocate ${randText(amountCents)}.`
+        );
+      }
+      return tx.shrineContribution.create({
+        data: {
+          amount: fromCents(amountCents),
+          entryType: 'ALLOCATION',
+          sector,
+          description: description.trim(),
+          referenceUrl: referenceUrl?.trim() || null,
+          source: 'FUND_ALLOCATION',
+          status: 'CONFIRMED',
+        },
       });
-    }
-
-    const allocation = await prisma.shrineContribution.create({
-      data: {
-        amount: numericAmount,
-        entryType: 'ALLOCATION',
-        sector,
-        description: description.trim(),
-        referenceUrl: referenceUrl?.trim() || null,
-        source: 'FUND_ALLOCATION',
-        status: 'CONFIRMED',
-      },
     });
 
     res.status(201).json({ allocation, message: 'Allocation recorded on the public fund ledger.' });
   } catch (error) {
+    if (error instanceof AllocationRefused) return res.status(400).json({ error: error.message });
     console.error('Record shrine allocation error:', error.message);
     res.status(500).json({ error: 'Could not record allocation' });
   }
@@ -153,34 +171,42 @@ export async function recordShrineAllocation(req, res) {
 // or bank details on file yet, so a real person follows up to confirm the
 // actual transfer rather than the app claiming money it hasn't received.
 export async function donateToShrineFund(req, res) {
-  const { amount, donorName, donorEmail } = req.body;
-  const numericAmount = parseFloat(amount);
+  const { donorName, donorEmail } = req.body;
+  // Exact cents (FIN-04): "10.005" is refused rather than silently rounded.
+  const amountCents = parsePositiveCents(req.body?.amount);
 
-  if (!numericAmount || isNaN(numericAmount) || numericAmount < MIN_DONATION_ZAR) {
-    return res.status(400).json({ error: `Donations start from R${MIN_DONATION_ZAR}` });
+  if (!amountCents || amountCents < MIN_DONATION_CENTS) {
+    return res.status(400).json({ error: `Donations start from R${MIN_DONATION_ZAR}, with at most 2 decimals` });
   }
 
   try {
     const donation = await prisma.shrineContribution.create({
       data: {
-        amount: numericAmount,
+        amount: fromCents(amountCents),
         source: 'PUBLIC_DONATION',
         status: 'PENDING',
-        donorName: donorName || null,
-        donorEmail: donorEmail || null,
+        donorName: typeof donorName === 'string' ? donorName.trim().slice(0, 200) || null : null,
+        donorEmail: typeof donorEmail === 'string' ? donorEmail.trim().slice(0, 320) || null : null,
       },
     });
 
-    // Anyone may donate, signed in or not — only look up an account when
-    // there actually is one, so an anonymous public donation doesn't fail.
-    const donor = req.userId
-      ? await prisma.user.findUnique({
-          where: { id: req.userId },
-          select: { firstName: true, lastName: true, email: true },
-        })
-      : null;
-    const { notifyAdminOfShrineDonationPledge } = await import('../services/notificationService.js');
-    await notifyAdminOfShrineDonationPledge(donation, donor);
+    // The pledge is already saved. A failed admin notification is logged,
+    // never turned into an error that makes the donor think it failed (and
+    // pledge twice).
+    try {
+      // Anyone may donate, signed in or not — only look up an account when
+      // there actually is one, so an anonymous public donation doesn't fail.
+      const donor = req.userId
+        ? await prisma.user.findUnique({
+            where: { id: req.userId },
+            select: { firstName: true, lastName: true, email: true },
+          })
+        : null;
+      const { notifyAdminOfShrineDonationPledge } = await import('../services/notificationService.js');
+      await notifyAdminOfShrineDonationPledge(donation, donor);
+    } catch (notifyError) {
+      console.error('Donation pledge notification failed:', donation.id, notifyError.message);
+    }
 
     res.status(201).json({
       donation,
