@@ -2,9 +2,10 @@
 
 Verified against `main` by reading the source. First pass at commit `894ece0`
 (22 Oct 2026); second pass (fines, loans, crash handling, start-up) on top of
-`838e7ba`; third pass (sign-in) on top of `4784360` (25 Oct 2026). No live
-database, staging environment or full `node_modules` were available, so
-nothing below was verified by running the app against PostgreSQL. Statuses:
+`838e7ba`; third pass (sign-in) on top of `4784360`; fourth pass (donations
+and fund allocations) on top of `f4469f4` (25 Oct 2026). No live database,
+staging environment or full `node_modules` were available, so nothing below
+was verified by running the app against PostgreSQL. Statuses:
 Confirmed / Partially confirmed / Not reproduced / Blocked / Not yet reviewed.
 
 ## Fixed
@@ -19,7 +20,7 @@ Confirmed / Partially confirmed / Not reproduced / Blocked / Not yet reviewed.
 | SEC-02 Account enumeration | Confirmed, mostly fixed | `check-email` returned `exists`/`hasPassword` and leaked `error.message`; OTP `login` returned 404 "No account found" plus the internal `userId`; `verify-otp` took that `userId`. | `check-email` retired (410, reads nothing). `/login` returns the same reply for every email; code created and emailed (without waiting) only for real accounts; no `userId` returned. `/verify-otp` takes `{ email, code }`; wrong guesses for unknown emails counted under a stand-in key so replies and locks match. Password sign-in does a dummy bcrypt check when there is no account. `Login.jsx` shows the same choices to everyone after the email step. 8 unit tests. **Residual:** `register-password` still says "account already exists"; closing that needs an email-confirmation step on sign-up. |
 | DB-03 Crash handling | Confirmed, fixed | `uncaughtException` handler logged and kept running. | Log, report to Sentry, flush up to 2 s, `process.exit(1)`. Unhandled rejections logged/reported only (no exit) to avoid restart loops from fire-and-forget sends. Unit tested. |
 | DB-02 Startup | Confirmed, fixed | Server served traffic even if the schema check failed, then ran ~25 catalogue backfills every boot. | `/api/health` returns 503 until the schema check passes. Backfills moved to `server/scripts/maintenance.js`; run with `node server/scripts/run-maintenance.js` or `RUN_BOOT_MAINTENANCE=true` for one deploy. |
-| FIN-04 Money precision | Partially confirmed, partly fixed | `parseFloat`/`Number` used for money amounts and `amount * 0.03`. | Contribution, interest, payout, loan, repayment and fine amounts now exact cents. Still open: shrine donations and fund allocations (`payoutController`), trade credit and lending rounds. |
+| FIN-04 Money precision | Confirmed, mostly fixed | `parseFloat`/`Number` used for money amounts and `amount * 0.03`; shrine fund reserve worked out by subtracting floats; allocation reserve check ran separately from the insert, so two admins at once could over-allocate. | Contribution, interest, payout, loan, repayment, fine, shrine donation and fund allocation amounts now exact cents (more than 2 decimals refused, never rounded). Fund totals, reserve and per-sector sums summed in cents. Allocation reserve check + insert now ONE transaction under a fund-wide advisory lock. A failed donation notification no longer turns a saved pledge into HTTP 500. Response shapes unchanged. 11 unit tests in `payoutController.test.js`. **Still open:** trade credit (`createTradeCredit` in `stokvelFinanceController`) and lending rounds (`stokvelLendingController`). |
 
 ## Confirmed, NOT yet fixed
 
@@ -47,4 +48,6 @@ FIN-03 (balance source of truth), SEC-03 (full authorisation audit), SEC-04, COM
 7. Restart the server: "Start-up database check passed", no backfill lines.
 8. Sign in: enter a registered email and an unregistered one. Both show the same next screen; "Email me a login code" shows the same message for both; only the registered inbox gets a code.
 9. Password-only member, OTP-only member and a new person can each still sign in / sign up.
-10. Ledger verify for a stokvel: chain still valid.
+10. Donate R10.50: stored as exactly 10.50. Donate R10.005 or R0.99: refused.
+11. Two admins allocate the last of the fund at the same moment: only one succeeds; the other is told the reserve is too low.
+12. Ledger verify for a stokvel: chain still valid.
