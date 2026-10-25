@@ -1,7 +1,8 @@
 import { randomUUID } from 'crypto';
 import prisma from '../config/db.js';
-import { postEntry } from '../services/ledgerService.js';
-import { toCents } from '../utils/money.js';
+import { ensureLedgerTables, lockStokvelLedger, postEntryTx } from '../services/ledgerService.js';
+import { verifyPin, pinFailureResponse } from '../services/pinService.js';
+import { toCents, fromCents } from '../utils/money.js';
 import { createNotification, notifyMany } from '../services/notificationDbService.js';
 import { generateReferenceCode } from '../utils/memberReference.js';
 
@@ -70,7 +71,7 @@ function parseCents(raw) {
 }
 
 const rand = (cents) => `R${(cents / 100).toFixed(2)}`;
-const balanceCents = (ledger) => Math.round(parseFloat(ledger.totalBalance) * 100);
+const balanceCents = (ledger) => toCents(ledger.totalBalance.toFixed(2));
 
 async function getOfficial(stokvelId, userId) {
   return prisma.stokvelOfficial.findFirst({ where: { stokvelId, userId } });
@@ -330,6 +331,8 @@ export async function requestExpense(req, res) {
   }
 }
 
+class ExpenseBlocked extends Error {}
+
 // POST /api/stokvels/:stokvelId/expenses/:requestId/approve  { pin }
 export async function approveExpense(req, res) {
   const { stokvelId, requestId } = req.params;
@@ -337,16 +340,13 @@ export async function approveExpense(req, res) {
   const { pin } = req.body;
   if (!pin) return res.status(400).json({ error: 'Enter your security PIN to approve' });
 
-  const { verifyPin } = await import('../services/pinService.js');
-  const pinCheck = await verifyPin(userId, pin);
-  if (!pinCheck.valid) {
-    const message = pinCheck.reason === 'NO_PIN_SET'
-      ? 'You need to set a security PIN first — go to More → Security PIN.'
-      : 'Incorrect PIN';
-    return res.status(401).json({ error: message });
-  }
-
   try {
+    const pinCheck = await verifyPin(userId, pin);
+    if (!pinCheck.valid) {
+      const failure = pinFailureResponse(pinCheck);
+      return res.status(failure.status).json({ error: failure.error });
+    }
+
     await ensureTables();
     if (!(await getOfficial(stokvelId, userId))) {
       return res.status(403).json({ error: 'Only stokvel officials can approve expenses' });
@@ -362,11 +362,14 @@ export async function approveExpense(req, res) {
     }
 
     const amountCents = Number(request.amountCents);
-    const amount = amountCents / 100;
+    const amount = fromCents(amountCents);
 
+    // Approval, balance debit and books entry are one transaction: all saved or none.
+    await ensureLedgerTables();
     let outcome;
     try {
       outcome = await prisma.$transaction(async (tx) => {
+        await lockStokvelLedger(tx, stokvelId);
         const claimed = await tx.$executeRaw`
           UPDATE "StokvelExpenseRequest"
           SET "status" = 'APPROVED', "decidedAt" = NOW(), "decidedById" = ${userId}
@@ -378,32 +381,25 @@ export async function approveExpense(req, res) {
           where: { stokvelId, totalBalance: { gte: amount } },
           data: { totalBalance: { decrement: amount }, groupExpenses: { increment: amount } },
         });
-        if (paid.count === 0) throw new Error('INSUFFICIENT');
+        if (paid.count === 0) throw new ExpenseBlocked('INSUFFICIENT');
+        await postEntryTx(tx, {
+          stokvelId,
+          kind: 'EXPENSE',
+          memo: `Expense: ${String(request.note).slice(0, 300)}`,
+          lines: [{ account: 'EXPENSES', amountCents }, { account: 'BANK', amountCents: -amountCents }],
+          idempotencyKey: `expense:${requestId}`,
+          createdById: request.requestedById,
+          approvedById: userId,
+        });
         return 'OK';
       });
     } catch (err) {
-      if (err.message === 'INSUFFICIENT') {
+      if (err instanceof ExpenseBlocked) {
         return res.status(400).json({ error: 'The group balance is now too low for this expense' });
       }
       throw err;
     }
     if (outcome === 'TAKEN') return res.status(409).json({ error: 'This expense was already answered' });
-
-    let ledgerWarning = null;
-    try {
-      await postEntry({
-        stokvelId,
-        kind: 'EXPENSE',
-        memo: `Expense: ${String(request.note).slice(0, 300)}`,
-        lines: [{ account: 'EXPENSES', amountCents }, { account: 'BANK', amountCents: -amountCents }],
-        idempotencyKey: `expense:${requestId}`,
-        createdById: request.requestedById,
-        approvedById: userId,
-      });
-    } catch (error) {
-      console.error('LEDGER POST FAILED expense', requestId, error.message);
-      ledgerWarning = 'The balance was updated but the books entry could not be saved. Tell your treasurer so it can be corrected.';
-    }
 
     const members = await prisma.stokvelMember.findMany({ where: { stokvelId }, select: { userId: true } });
     await notifyMany(
@@ -413,10 +409,10 @@ export async function approveExpense(req, res) {
       'stokvels'
     ).catch((err) => console.error('Expense notification failed:', err.message));
 
-    res.json({ ledgerWarning, message: 'Approved. The expense has come off the group balance.' });
+    res.json({ ledgerWarning: null, message: 'Approved. The expense has come off the group balance.' });
   } catch (error) {
     console.error('Approve expense error:', error.message);
-    res.status(500).json({ error: 'Could not approve the expense' });
+    res.status(500).json({ error: 'Could not approve the expense. Nothing was taken, so it is safe to try again.' });
   }
 }
 
