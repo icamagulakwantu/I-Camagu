@@ -17,6 +17,7 @@ This is a living engineering plan based on source review of the repository. It i
 - Added tests for invalid fractional-cent bank amounts, non-positive amounts, and valid amounts.
 - Made stokvel departure remove membership and official status in one transaction; added a regression test so a failed role cleanup cannot leave a departed member with finance privileges.
 - Changed the in-process rate limiter to key by Express route template, HTTP method, base URL and IP rather than the concrete path. This closes the easy bypass where changing an invite or other path ID created a fresh counter; added focused tests. The limiter is still process-local and is not a substitute for shared/edge throttling in multi-instance production.
+- Loan voting now requires an actual JSON boolean for `approve`; strings such as `"false"` are rejected rather than coerced to `true`. Added a regression test for the malformed approval input.
 - Existing route review confirms reconciliation queue and raw-log creation check official membership in the target stokvel; manual assignment is scoped to the raw log's stokvel, requires an official, requires the target member to belong to that stokvel, and blocks self-assignment. Added unit tests for cross-stokvel member-ID substitution, self-assignment, and DEBIT-vs-CREDIT assignment boundaries. These are unit tests, not PostgreSQL integration tests.
 
 ## Security and correctness backlog
