@@ -226,7 +226,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
 
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-6 rounded-b-[2.5rem] relative overflow-hidden">
+        <div className="bg-gradient-to-br from-terracotta to-ochre text-white px-5 pt-12 pb-6 rounded-b-[2.5rem] relative overflow-hidden">
           <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
           <div className="relative">
             <button type="button" onClick={goBack} className={cn('text-sm text-white/80 mb-3 block text-left', pressable)}>
@@ -279,10 +279,10 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
 
         {stepId !== 'summary' && (
           <div className="grid grid-cols-2 gap-3 px-4 mt-8">
-            <button type="button" onClick={goBack} className={cn('h-16 rounded-pill bg-white border-2 border-sage-200 text-ink', pressable)}>
+            <button type="button" onClick={goBack} className={cn('h-16 rounded-pill bg-white border-2 border-terracotta/25 text-ink', pressable)}>
               <Bi {...BUTTONS.back} />
             </button>
-            <button type="button" disabled={saving} onClick={goNext} className={cn('h-16 rounded-pill bg-sage-600 text-white', pressable)}>
+            <button type="button" disabled={saving} onClick={goNext} className={cn('h-16 rounded-pill bg-terracotta text-white', pressable)}>
               <Bi {...nextLabel} />
             </button>
           </div>
@@ -294,7 +294,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   // ----- My ceremonies -----
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-8 rounded-b-[2.5rem] relative overflow-hidden">
+      <div className="bg-gradient-to-br from-terracotta to-ochre text-white px-5 pt-12 pb-8 rounded-b-[2.5rem] relative overflow-hidden">
         <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
         <div className="relative">
           <button type="button" onClick={onBack} className={cn('text-sm text-white/80 mb-3 block text-left', pressable)}>
@@ -306,7 +306,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
       </div>
 
       <div className="px-4 mt-5">
-        <button type="button" onClick={startNew} className={cn('w-full h-16 rounded-pill bg-sage-600 text-white', pressable)}>
+        <button type="button" onClick={startNew} className={cn('w-full h-16 rounded-pill bg-terracotta text-white', pressable)}>
           <Bi {...BUTTONS.startNew} />
         </button>
       </div>
