@@ -153,4 +153,19 @@ describe('leaveStokvel obligation checks', () => {
     expect(res.statusCode).toBe(500);
     expect(prisma.stokvelMember.delete).not.toHaveBeenCalled();
   });
+
+  it('removes membership and official status in the same transaction', async () => {
+    prisma.stokvel.findUnique.mockResolvedValue({ organiserId: 'organiser-1', name: 'Family group' });
+    prisma.stokvelMember.findFirst.mockResolvedValue({ id: 'member-row-1' });
+    prisma.$queryRaw.mockResolvedValue([{ tableExists: false }]);
+    prisma.payout.findFirst.mockResolvedValue(null);
+
+    const res = response();
+    await leaveStokvel({ params: { stokvelId: 'group-1' }, userId: 'member-1' }, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(prisma.$transaction).toHaveBeenCalled();
+    expect(prisma.stokvelMember.delete).toHaveBeenCalledWith({ where: { id: 'member-row-1' } });
+    expect(prisma.stokvelOfficial.deleteMany).toHaveBeenCalledWith({ where: { stokvelId: 'group-1', userId: 'member-1' } });
+  });
 });
