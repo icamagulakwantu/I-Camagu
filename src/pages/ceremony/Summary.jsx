@@ -21,7 +21,7 @@ function SectionCard({ label, onClick, children }) {
         <span className="block text-xs text-ink-muted"><Bi {...label} /></span>
         <span className="block mt-1.5">{children}</span>
       </span>
-      <span className="text-xs text-sage-600 flex-shrink-0 pt-0.5"><Bi {...BUTTONS.change} /></span>
+      <span className="text-xs text-terracotta flex-shrink-0 pt-0.5"><Bi {...BUTTONS.change} /></span>
     </button>
   )
 }
@@ -74,7 +74,7 @@ export default function Summary({ plan, pledges, accessToken, onEditStep, onOpen
       <SectionCard label={stepLabel('list')} onClick={() => onEditStep('list')}>
         <span className="block text-base font-bold text-ink">{done} / {total} done</span>
         <span className="block w-full h-3 bg-cream-dark rounded-full overflow-hidden mt-2">
-          <span className="block h-full bg-sage-500 rounded-full transition-all duration-500" style={{ width: `${percent}%` }} />
+          <span className="block h-full bg-terracotta rounded-full transition-all duration-500" style={{ width: `${percent}%` }} />
         </span>
       </SectionCard>
 
