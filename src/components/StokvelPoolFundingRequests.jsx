@@ -15,7 +15,9 @@ export default function StokvelPoolFundingRequests() {
       const response = await fetch('/api/stokvels/my', { headers: { Authorization: `Bearer ${accessToken}` } });
       const stokvels = await response.json();
       if (!response.ok || !Array.isArray(stokvels)) throw new Error('Could not load your stokvels');
-      const results = await Promise.all(stokvels.map(async (stokvel) => {
+      const results = await Promise.all(stokvels.map(async (membership) => {
+        const stokvel = membership.stokvel || membership;
+        if (!stokvel?.id) return [];
         const res = await fetch(`/api/stokvels/${stokvel.id}/pool-funding`, { headers: { Authorization: `Bearer ${accessToken}` } });
         if (!res.ok) return [];
         const data = await res.json();
