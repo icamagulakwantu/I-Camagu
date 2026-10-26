@@ -715,6 +715,7 @@ model StokvelPoolFunding {
   requiredApprovals Int  @default(2)
   approvedAt    DateTime?
   declinedAt    DateTime?
+  reviewNote    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
