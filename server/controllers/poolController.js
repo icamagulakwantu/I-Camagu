@@ -1,9 +1,19 @@
 import prisma from '../config/db.js';
 import { submitBasketToPool } from '../services/matchmakerService.js';
-import { findSuggestedPoolsForItem, joinPoolWithItem, getNearbyDemandSignal } from '../services/poolDiscoveryService.js';
+import { findSuggestedPoolsForItem, joinPoolWithItem, getNearbyDemandSignal, getCommunityFeed } from '../services/poolDiscoveryService.js';
 import { PALLET_CASES, palletsForCases, resolveTierLadder, getTierForMetric, getNextTierForMetric, amountToReachTier } from '../utils/smartMatchTiers.js';
 
 export const CATEGORY_LABEL = { TAVERN: 'Drinks', BUTCHERY: 'Meat & livestock', GROCERY: 'Groceries & other items', PRODUCE: 'Fresh produce' };
+
+export async function getSmartMatchCommunityFeed(req, res) {
+  try {
+    const feed = await getCommunityFeed(req.userId);
+    res.json(feed);
+  } catch (error) {
+    console.error('Community feed error:', error.message);
+    res.status(500).json({ error: 'Could not load the community feed' });
+  }
+}
 
 export async function suggestPoolsForItem(req, res) {
   try {
