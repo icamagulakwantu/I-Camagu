@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import { matchClan } from './clanMatchService.js';
+import { matchClan, clearClanIndexCache } from './clanMatchService.js';
 
 // Resolves any registered alias to its canonical clan name. If no alias is
 // registered, treats the input as already canonical — we never fuzzy-match.
@@ -111,11 +111,13 @@ export async function findClanMatches(userId) {
 
 export async function registerClanAlias(aliasForm, canonicalClanName) {
   const clanGroup = await findOrCreateClanGroup(canonicalClanName);
-  return prisma.clanAlias.upsert({
+  const alias = await prisma.clanAlias.upsert({
     where: { aliasForm },
     update: { clanGroupId: clanGroup.id },
     create: { aliasForm, clanGroupId: clanGroup.id },
   });
+  clearClanIndexCache();
+  return alias;
 }
 
 // ---------- CLAN CONNECTIONS (request -> accept, never raw broadcast) ----------
