@@ -54,6 +54,11 @@ export async function decidePoolFundingRequest(req, res) {
     if (!funding) return res.status(404).json({ error: 'Funding request not found' });
     if (funding.status !== 'PENDING_APPROVAL') return res.status(409).json({ error: 'This funding request has already been decided' });
     if (funding.requestedById === req.userId) return res.status(403).json({ error: 'The person who requested funding cannot approve their own request' });
+    const priorVote = await prisma.stokvelPoolFundingApproval.findFirst({
+      where: { fundingId, approverId: req.userId },
+      select: { id: true },
+    });
+    if (priorVote) return res.status(409).json({ error: 'Each official account can vote only once on a funding request' });
 
     const result = await prisma.$transaction(async (tx) => {
       await tx.stokvelPoolFundingApproval.create({
