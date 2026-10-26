@@ -202,8 +202,17 @@ export async function joinPoolWithItem(userId, input) {
     if (!stokvelId) throw new Error('Choose a stokvel to fund this order');
     const member = await prisma.stokvelMember.findFirst({ where: { userId, stokvelId } });
     if (!member) throw new Error('You must be a member of this stokvel');
-    const ledger = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
-    if (!ledger || Number(ledger.totalBalance) - Number(ledger.groupExpenses) < Number(sku.casePriceZAR) * amount) {
+    const [ledger, commitments] = await Promise.all([
+      prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } }),
+      prisma.stokvelPoolFunding.aggregate({
+        where: { stokvelId, status: { in: ['PENDING_APPROVAL', 'APPROVED'] } },
+        _sum: { amountZAR: true },
+      }),
+    ]);
+    const available = ledger
+      ? Number(ledger.totalBalance) - Number(ledger.groupExpenses) - Number(commitments._sum.amountZAR || 0)
+      : 0;
+    if (available < Number(sku.casePriceZAR) * amount) {
       throw new Error('This stokvel does not have enough available funds for this item');
     }
   } else if (stokvelId) {
