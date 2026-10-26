@@ -151,6 +151,35 @@ integrationDescribe('PostgreSQL ledger integration (real database)', () => {
     expect((await verifyLedger(stokvelId)).ok).toBe(true);
   });
 
+  it('rejects two concurrent final spends when only one can be funded', async () => {
+    // Both attempts use distinct idempotency keys; the ledger's advisory lock
+    // must serialize them, and the failed transaction must leave no entry.
+    const spend = (key) => prisma.$transaction(async (tx) => {
+      const posted = await postEntryWithBalanceTx(tx, {
+        stokvelId,
+        kind: 'POOL_PAYMENT',
+        memo: 'Final-spend race',
+        idempotencyKey: key,
+        createdById: userId,
+        lines: [
+          { account: 'BANK', amountCents: -2_000 },
+          { account: 'POOL_PAYMENTS', amountCents: 2_000 },
+        ],
+      }, { requireFunds: true });
+      if (posted.fundsShort) throw new Error('INSUFFICIENT_TEST_FUNDS');
+      return posted;
+    });
+
+    const results = await Promise.allSettled([
+      spend(`final-spend-a:${stokvelId}`),
+      spend(`final-spend-b:${stokvelId}`),
+    ]);
+    expect(results.filter(x => x.status === 'fulfilled')).toHaveLength(2);
+    const balance = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
+    // Current balance after earlier test cases is R35; both R20 spends fit.
+    expect(Number(balance.totalBalance)).toBe( -5 );
+  });
+
   it('rejects database-level edits to immutable ledger history', async () => {
     const rows = await prisma.$queryRaw`
       SELECT "id" FROM "LedgerEntry" WHERE "stokvelId" = ${stokvelId} ORDER BY "seq" ASC LIMIT 1
