@@ -5,8 +5,37 @@ vi.mock('../services/ledgerService.js', () => ({}));
 vi.mock('./stokvelRecordsController.js', () => ({}));
 
 const {
-  decideLoanStatus, splitRepayment, parseTradeCredit, tradeCreditSavingCents, canChangeCreditStatus, voteLoan,
+  decideLoanStatus, splitRepayment, parseTradeCredit, tradeCreditSavingCents, canChangeCreditStatus, voteLoan, parseStatementDateRange,
 } = await import('./stokvelFinanceController.js');
+
+
+describe('parseStatementDateRange', () => {
+  const now = new Date('2026-10-26T12:00:00.000Z');
+
+  it('accepts valid UTC calendar days and includes the full end date', () => {
+    const result = parseStatementDateRange({ from: '2026-02-01', to: '2026-02-28' }, now);
+    expect(result.ok).toBe(true);
+    expect(result.from.toISOString()).toBe('2026-02-01T00:00:00.000Z');
+    expect(result.to.toISOString()).toBe('2026-02-28T23:59:59.999Z');
+  });
+
+  it('rejects impossible dates and non-calendar input', () => {
+    expect(parseStatementDateRange({ from: '2026-02-31', to: '2026-03-01' }, now).ok).toBe(false);
+    expect(parseStatementDateRange({ from: '01/02/2026', to: '2026-03-01' }, now).ok).toBe(false);
+    expect(parseStatementDateRange({ from: '2026-01-01T00:00:00Z', to: '2026-03-01' }, now).ok).toBe(false);
+  });
+
+  it('rejects a start date after the end date', () => {
+    expect(parseStatementDateRange({ from: '2026-10-27', to: '2026-10-26' }, now).ok).toBe(false);
+  });
+
+  it('defaults to the current UTC year and current instant', () => {
+    const result = parseStatementDateRange({}, now);
+    expect(result.ok).toBe(true);
+    expect(result.from.toISOString()).toBe('2026-01-01T00:00:00.000Z');
+    expect(result.to.toISOString()).toBe(now.toISOString());
+  });
+});
 
 describe('decideLoanStatus', () => {
   it('stays pending until enough officials agree', () => {
