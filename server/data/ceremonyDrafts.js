@@ -115,8 +115,8 @@ export const DRAFT_CEREMONY_TYPES = Object.freeze({
     questions: ['What is the correct order in your family?', 'Who gives and receives umembeso?', 'Is umbondo part of your practice?'],
   },
   UMSINDLEKO: {
-    name: 'Umsindleko', english: 'Meaning to be confirmed locally', status: 'DRAFT_FOR_FOUNDER_REVIEW',
-    basis: 'Do not publish the birth-thanksgiving meaning as general fact; published accounts also describe another context.',
+    name: 'Umsindleko', english: 'A family/community thanksgiving or homecoming gathering (local meaning must be confirmed)', status: 'DRAFT_FOR_FOUNDER_REVIEW',
+    basis: 'Published ethnographic accounts for Gcaleka communities describe umsindleko/umhlinzeko in connection with a migrant worker returning home; another recent study describes thanksgiving and gifts after a purchase. The available evidence does not establish birth or recovery as a general meaning. Keep the founder’s local account as a possible variant, but do not publish birth-specific steps until a local source or community reviewer confirms it.',
     phases: [{ phase: 'PLANNING', items: [
       { label: 'Founder/community reviewer records the meaning and context', quantity: 1, unit: 'task', rateKey: null },
       { label: 'Only after confirmation, add family-specific supplies and steps', quantity: 1, unit: 'task', rateKey: null },
@@ -124,8 +124,8 @@ export const DRAFT_CEREMONY_TYPES = Object.freeze({
     questions: ['What does the term mean in your community?', 'Is it connected with childbirth, recovery, or another event?', 'Who may confirm the meaning?'],
   },
   UMHLONYANE: {
-    name: 'Umhlonyane', english: 'Young woman’s first-menstruation rite', status: 'DRAFT_FOR_FOUNDER_REVIEW',
-    basis: 'Potentially overlaps with Intonjane; senior women must define whether it is separate in this community.',
+    name: 'Umhlonyane', english: 'Meaning and community context to be confirmed', status: 'DRAFT_FOR_FOUNDER_REVIEW',
+    basis: 'Search results describe umhlonyane mainly in Zulu-community contexts, while academic work identifies Intonjane as the AmaXhosa coming-of-age rite. Keep this candidate separate from Intonjane and do not import a Zulu checklist into the Xhosa ceremony catalogue unless the founder and senior women confirm this name and practice for their own community.',
     phases: [
       { phase: 'PLANNING_WOMEN_ELDERS', items: [{ label: 'Senior women decide whether this is distinct from Intonjane and set any steps', quantity: 1, unit: 'task', rateKey: null }]},
       { phase: 'SUPPLIES', items: [
