@@ -161,8 +161,6 @@ export async function deleteStokvel(req, res) {
       'StokvelTradeCredit',
       'StokvelLendingEntry',
       'StokvelLendingTarget',
-      'StokvelLoanRepayment',
-      'StokvelLoanVote',
     ];
 
     let legacyHistoryExists = false;
