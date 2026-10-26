@@ -5,6 +5,23 @@
 @tailwind utilities;
 
 @layer base {
+  :root { color-scheme: light; }
+
+  input, textarea, select {
+    color: #2b2620;
+    background-color: #ffffff;
+    -webkit-text-fill-color: #2b2620;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: #6b645a;
+    opacity: 1;
+  }
+
+  input:-webkit-autofill {
+    -webkit-text-fill-color: #2b2620;
+  }
+
   html {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
