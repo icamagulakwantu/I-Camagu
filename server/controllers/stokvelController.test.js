@@ -20,7 +20,7 @@ vi.mock('../config/db.js', () => ({ default: prisma }));
 vi.mock('../utils/memberReference.js', () => ({ generateReferenceCode: vi.fn() }));
 vi.mock('./stokvelApprovalsController.js', () => ({ countOpenRequests: vi.fn() }));
 
-const { deleteStokvel } = await import('./stokvelController.js');
+const { deleteStokvel, createStokvel, updateStokvel } = await import('./stokvelController.js');
 
 function response() {
   const res = { statusCode: 200, body: undefined };
@@ -84,5 +84,43 @@ describe('deleteStokvel financial-history protection', () => {
 
     expect(res.statusCode).toBe(200);
     expect(prisma.$queryRawUnsafe).not.toHaveBeenCalled();
+  });
+});
+
+describe('stokvel budget amount validation', () => {
+  it('rejects fractional-cent amounts when creating a stokvel', async () => {
+    const res = response();
+    await createStokvel({
+      userId: 'organiser-1',
+      body: { name: 'Family savings', type: 'CEREMONY_SAVINGS', contributionAmount: '10.005' },
+    }, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(prisma.stokvel.findUnique).not.toHaveBeenCalled();
+    expect(prisma.stokvel.delete).not.toHaveBeenCalled();
+  });
+
+  it('rejects fractional-cent amounts when updating a stokvel', async () => {
+    const res = response();
+    await updateStokvel({
+      userId: 'organiser-1',
+      params: { stokvelId: 'group-1' },
+      body: { targetAmount: '100.005' },
+    }, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(prisma.stokvel.findUnique).not.toHaveBeenCalled();
+    expect(prisma.stokvel.delete).not.toHaveBeenCalled();
+  });
+
+  it('rejects invalid target dates before database writes', async () => {
+    const res = response();
+    await createStokvel({
+      userId: 'organiser-1',
+      body: { name: 'Family savings', type: 'CEREMONY_SAVINGS', targetDate: 'not-a-date' },
+    }, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(prisma.stokvel.delete).not.toHaveBeenCalled();
   });
 });
