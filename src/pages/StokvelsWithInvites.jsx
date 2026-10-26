@@ -4,6 +4,7 @@ import MyStokvelInvites from '../components/MyStokvelInvites.jsx'
 import NearbyStokvels from '../components/NearbyStokvels.jsx'
 import ProfileCompletionCard from '../components/ProfileCompletionCard.jsx'
 import StokvelWelcomeTour from '../components/StokvelWelcomeTour.jsx'
+import StokvelPoolFundingRequests from '../components/StokvelPoolFundingRequests.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 
 const seenKey = (userId, stokvelId) => `icamagu_tour_seen:${userId}:${stokvelId}`
@@ -59,6 +60,7 @@ export default function StokvelsWithInvites(props) {
       <ProfileCompletionCard />
       <NearbyStokvels />
       <Stokvels key={refreshKey} {...props} />
+      <StokvelPoolFundingRequests />
       {tourStokvelId && <StokvelWelcomeTour stokvelId={tourStokvelId} onClose={closeTour} />}
     </>
   )
