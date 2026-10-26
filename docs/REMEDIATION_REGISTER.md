@@ -40,8 +40,17 @@ used the older books-only path.
 | DB-01 Migrations | No `prisma/migrations` folder. Schema changed at runtime by `ensure-schema.js` and lazy `CREATE TABLE` in many controllers/services. | Baseline with `prisma migrate diff`, move runtime DDL into versioned migrations, `prisma migrate deploy` before start, restrict app role. Needs staging DB. |
 | SEC-01b Distributed throttling | `middleware/rateLimiter.js` is in-memory per process. | Shared store or edge throttling. |
 
+## Security review update (26 Oct 2026)
+
+| ID | Status | Evidence / change | Remaining work |
+|---|---|---|---|
+| SEC-03 Stokvel deletion and authorization | Partially reviewed; targeted mitigation in PR | Hard deletion is now blocked when a ledger, members, contributions, payouts, bank imports or existing legacy finance rows are found. Added deletion guard tests. Manual bank-log entry now rejects fractional-cent amounts, with tests. | Full route-by-route IDOR/role audit and PostgreSQL integration/concurrency tests remain open. Hard deletion still exists for a strictly empty group; verify every legacy table and race before considering this closed. |
+| FIN-04b Manual bank-entry precision | Targeted fix in PR | `createRawLog` now uses exact-cent parsing and refuses fractions of a cent rather than accepting them via `parseFloat`. | Run unit tests and PostgreSQL integration tests on the PR head. |
+
+The broader prioritised security, reliability, migration and product roadmap is in `docs/SECURITY_AND_DELIVERY_PLAN.md`.
+
 ## Not yet reviewed
-SEC-03 (full authorisation audit), SEC-04, COM-01, COM-02, UX-01..03, Q-01..04.
+SEC-03 (remaining authorization routes), SEC-04, COM-01, COM-02, UX-01..03, Q-01..04. The P0/P1 items in `docs/SECURITY_AND_DELIVERY_PLAN.md` are not signed off merely because targeted changes have been made.
 
 ## Not verified here (needs owner/staging)
 - Clean `yarn install`, `yarn test`, `yarn build` on this commit (CI runs these on push).
