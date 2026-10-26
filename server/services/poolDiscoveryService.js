@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import { checkAndMatchPool } from './matchmakerService.js';
+import { checkAndMatchPool, parkItemsIntoPool } from './matchmakerService.js';
 import { getNextTierForMetric, getTierForMetric, palletsForCases, resolveTierLadder, amountToReachTier } from '../utils/smartMatchTiers.js';
 
 const TAVERN_CATEGORIES = new Set([
@@ -226,20 +226,10 @@ export async function joinPoolWithItem(userId, input) {
     throw new Error('ceremonyId is required when linking a shopping-list item');
   }
 
-  const basket = await prisma.basket.create({
-    data: {
-      userId,
-      status: 'PARKED',
-      poolId,
-      ceremonyId,
-      checklistItemId,
-      ceremonyCostItemId,
-      fundingSource,
-      fundingStokvelId: fundingSource === 'STOKVEL' ? stokvelId : null,
-      stokvelId: fundingSource === 'STOKVEL' ? stokvelId : null,
-      items: { create: { skuId, quantity: amount } },
-    },
-    include: { items: { include: { sku: true } } },
+  const basket = await parkItemsIntoPool({
+    userId, poolId, ceremonyId, checklistItemId, ceremonyCostItemId,
+    fundingSource, fundingStokvelId: stokvelId,
+    itemSpecs: [{ skuId, quantity: amount }],
   });
   try {
     const match = await checkAndMatchPool(poolId);
