@@ -30,7 +30,7 @@ describe('conservative isiduko matching', () => {
     expect(normaliseIsiduko('OoNcibane')).toBe('ncibane');
   });
 
-  it('matches an exact registered praise/alias name to its canonical head', async () => {
+  it('rejects oversized queries before fuzzy matching', async () => {\n    const result = await matchClan('x'.repeat(10000));\n    expect(result.results).toEqual([]);\n    expect(result.autoSelect).toBe(false);\n    expect(result.advice).toContain('120 characters');\n    expect(prisma.clanGroup.findMany).not.toHaveBeenCalled();\n  });\n\n  it('matches an exact registered praise/alias name to its canonical head', async () => {
     const result = await matchClan('Mdange');
     expect(result.results[0].head).toBe('Tshawe');
     expect(result.results[0].matchedAs).toBe('alias');
