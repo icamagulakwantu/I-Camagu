@@ -122,6 +122,7 @@ model User {
   maternalIziduko        String?
   paternalGrandmotherIziduko String?
   maternalGrandmotherIziduko String?
+  nationLabel            String?
   pinHash                String?
 
   // Identity verification — the ID number is encrypted at rest (AES-256-GCM,
