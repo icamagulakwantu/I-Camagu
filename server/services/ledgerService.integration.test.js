@@ -1,4 +1,5 @@
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { randomUUID } from 'node:crypto';
 import prisma from '../config/db.js';
 import {
   ensureLedgerTables,
@@ -17,7 +18,7 @@ integrationDescribe('PostgreSQL ledger integration (real database)', () => {
     await ensureLedgerTables();
     const user = await prisma.user.create({
       data: {
-        email: `ledger-integration-${crypto.randomUUID()}@example.invalid`,
+        email: `ledger-integration-${randomUUID()}@example.invalid`,
         firstName: 'Integration',
         lastName: 'Test',
       },
@@ -89,7 +90,7 @@ integrationDescribe('PostgreSQL ledger integration (real database)', () => {
     expect(Number(balance.totalBalance)).toBe(30);
 
     const check = await checkStokvelBalance(stokvelId);
-    expect(check.ok).toBe(true);
+    expect(check.agrees).toBe(true);
     expect(check.storedCents).toBe(3_000);
     expect(check.bookBankCents).toBe(3_000);
 
