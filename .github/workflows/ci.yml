@@ -73,4 +73,4 @@ jobs:
         run: yarn prisma db push --schema=prisma/schema.prisma
 
       - name: Run real PostgreSQL financial integrity tests
-        run: yarn vitest run server/services/ledgerService.integration.test.js server/controllers/stokvelFinanceController.integration.test.js
+        run: yarn vitest run server/services/ledgerService.integration.test.js server/controllers/stokvelFinanceController.integration.test.js server/controllers/stokvelPoolFundingController.integration.test.js
