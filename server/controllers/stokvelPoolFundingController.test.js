@@ -115,4 +115,32 @@ describe('stokvel pool funding approval rules', () => {
     expect(tx.stokvelPoolFunding.update).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ status: 'APPROVED' }) }));
     expect(tx.poolPayment.updateMany).toHaveBeenCalledWith(expect.objectContaining({ data: { status: 'PENDING_SETTLEMENT' } }));
   });
+
+  it('rejects a decision if the official role was revoked before the locked transaction', async () => {
+    prisma.stokvelOfficial.findFirst.mockResolvedValue({ id: 'official-2', userId: 'official-user-2' });
+    prisma.stokvelPoolFunding.findFirst.mockResolvedValue(funding);
+    prisma.stokvelPoolFundingApproval.findFirst.mockResolvedValue(null);
+    const tx = {
+      $executeRaw: vi.fn().mockResolvedValue(1),
+      stokvelOfficial: { findFirst: vi.fn().mockResolvedValue(null) },
+      stokvelPoolFunding: { findFirst: vi.fn().mockResolvedValue(funding) },
+      stokvelPoolFundingApproval: { findFirst: vi.fn(), create: vi.fn() },
+    };
+    prisma.$transaction.mockImplementation((callback) => callback(tx));
+
+    const res = response();
+    await decidePoolFundingRequest({
+      params: { stokvelId: 'stokvel-1', fundingId: 'funding-1' },
+      body: { decision: 'APPROVE' },
+      userId: 'official-user-2',
+    }, res);
+
+    expect(res.statusCode).toBe(403);
+    expect(tx.stokvelOfficial.findFirst).toHaveBeenCalledWith({
+      where: { stokvelId: 'stokvel-1', userId: 'official-user-2' },
+      select: { id: true, userId: true },
+    });
+    expect(tx.stokvelPoolFundingApproval.create).not.toHaveBeenCalled();
+  });
+
 });
