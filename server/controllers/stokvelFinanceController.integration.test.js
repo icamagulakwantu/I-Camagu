@@ -51,6 +51,7 @@ integrationDescribe('PostgreSQL loan controller integration (real database)', ()
       prisma.stokvelOfficial.create({ data: { stokvelId, userId: officialBUserId, role: 'TREASURER' }, select: { id: true } }),
     ]);
     [officialAId, officialBId] = officials.map((o) => o.id);
+    await prisma.$executeRaw`UPDATE "Stokvel" SET "requiredApprovals" = 2 WHERE "id" = ${stokvelId}`;
     await prisma.stokvelGroupLedger.create({ data: { stokvelId, totalBalance: 0 } });
 
     await prisma.$transaction((tx) => postEntryWithBalanceTx(tx, {
@@ -90,6 +91,19 @@ integrationDescribe('PostgreSQL loan controller integration (real database)', ()
         ("id", "stokvelId", "borrowerId", "amount", "interestPercent", "repayMonths", "status", "termsSnapshot")
       VALUES (${id}, ${stokvelId}, ${borrowerId}, ${amount}::numeric, 10, 1, ${status}, ${terms}::jsonb)
     `;
+    if (status === 'APPROVED') {
+      await prisma.$transaction((tx) => postEntryWithBalanceTx(tx, {
+        stokvelId,
+        kind: 'LOAN_DISBURSEMENT',
+        memo: 'Seed approved loan for controller integration test',
+        idempotencyKey: `loan-seed:${id}`,
+        createdById: borrowerId,
+        lines: [
+          { account: 'LOANS_RECEIVABLE', amountCents: Math.round(Number(amount) * 100) },
+          { account: 'BANK', amountCents: -Math.round(Number(amount) * 100) },
+        ],
+      }, { requireFunds: true }));
+    }
     return id;
   }
 
