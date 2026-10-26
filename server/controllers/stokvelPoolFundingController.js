@@ -67,6 +67,18 @@ export async function decidePoolFundingRequest(req, res) {
       // concurrently.
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${stokvelId}))`;
 
+      // Revalidate the official role inside the same transaction. A role
+      // could have been revoked after the preflight query but before this
+      // transaction acquired the lock; a stale preflight must not authorize a
+      // financial decision.
+      const activeOfficial = await tx.stokvelOfficial.findFirst({
+        where: { stokvelId, userId: req.userId },
+        select: { id: true, userId: true },
+      });
+      if (!activeOfficial) {
+        throw Object.assign(new Error('Only a current stokvel official can decide this request'), { httpStatus: 403 });
+      }
+
       // Re-read mutable state after taking the lock: the preflight reads
       // above may have become stale while another official was deciding.
       const currentFunding = await tx.stokvelPoolFunding.findFirst({
@@ -93,7 +105,7 @@ export async function decidePoolFundingRequest(req, res) {
       await tx.stokvelPoolFundingApproval.create({
         data: {
           fundingId,
-          officialId: official.id,
+          officialId: activeOfficial.id,
           approverId: req.userId,
           decision,
           note: typeof note === 'string' ? note.trim().slice(0, 500) || null : null,
