@@ -2,6 +2,7 @@
 import prisma from '../config/db.js';
 import { syncUserClanGroups } from '../services/izidukoService.js';
 import { setPin, hasPinSet } from '../services/pinService.js';
+import { matchClan } from '../services/clanMatchService.js';
 
 // Live availability check as someone types a username, so "already taken"
 // shows before they submit rather than after. Same rule the real submit
@@ -51,19 +52,21 @@ export async function setUsername(req, res) {
 }
 
 export async function updateIziduko(req, res) {
-  const { paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko } = req.body;
+  const { paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko, nationLabel } = req.body;
   if (!paternalIziduko || !maternalIziduko) {
     return res.status(400).json({ error: 'Both paternal and maternal Iziduko are required' });
   }
 
   try {
+    const paternalMatch = await matchClan(paternalIziduko);
+    const clanGroupId = paternalMatch.autoSelect ? paternalMatch.results[0]?.id || null : null;
     const user = await prisma.user.update({
       where: { id: req.userId },
-      data: { paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko },
+      data: { paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko, nationLabel, clanGroupId },
     });
 
     await syncUserClanGroups(user);
-    res.json({ paternalIziduko: user.paternalIziduko, maternalIziduko: user.maternalIziduko, paternalGrandmotherIziduko: user.paternalGrandmotherIziduko, maternalGrandmotherIziduko: user.maternalGrandmotherIziduko });
+    res.json({ paternalIziduko: user.paternalIziduko, maternalIziduko: user.maternalIziduko, paternalGrandmotherIziduko: user.paternalGrandmotherIziduko, maternalGrandmotherIziduko: user.maternalGrandmotherIziduko, nationLabel: user.nationLabel, clanGroupId: user.clanGroupId });
   } catch (error) {
     console.error('Update Iziduko error:', error.message);
     res.status(500).json({ error: 'Could not update Iziduko' });

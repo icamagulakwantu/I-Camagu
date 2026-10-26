@@ -32,6 +32,7 @@ function serializeUser(user) {
     paternalIziduko: user.paternalIziduko, maternalIziduko: user.maternalIziduko,
     paternalGrandmotherIziduko: user.paternalGrandmotherIziduko,
     maternalGrandmotherIziduko: user.maternalGrandmotherIziduko,
+    nationLabel: user.nationLabel, clanGroupId: user.clanGroupId,
     username: user.username, profileImage: user.profileImage,
     address: user.address, age: user.age, phoneNumber: user.phoneNumber,
     location: user.location, latitude: user.latitude, longitude: user.longitude,

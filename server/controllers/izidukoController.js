@@ -10,6 +10,35 @@ import {
 } from '../services/izidukoService.js';
 import { createNotification } from '../services/notificationDbService.js';
 import prisma from '../config/db.js';
+import { matchClan, submitIsidukoForReview } from '../services/clanMatchService.js';
+
+export async function matchIsidukoName(req, res) {
+  try {
+    const result = await matchClan(req.query.q);
+    res.json(result);
+  } catch (error) {
+    console.error('Isiduko matching error:', error.message);
+    res.status(500).json({ error: 'Could not search registered clan names' });
+  }
+}
+
+export async function submitIsidukoReview(req, res) {
+  try {
+    const submission = await submitIsidukoForReview({
+      userId: req.userId,
+      typedText: req.body?.typedText,
+      nationLabel: req.body?.nationLabel,
+    });
+    res.status(201).json({
+      submission,
+      message: submission.duplicate
+        ? 'This name is already waiting for community review.'
+        : 'Thank you. Your clan name has been sent for community review; no clan group was created automatically.',
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not submit this clan name' });
+  }
+}
 
 export async function getMyClanMatches(req, res) {
   try {

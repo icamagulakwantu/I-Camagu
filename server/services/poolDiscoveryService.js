@@ -1,6 +1,6 @@
 import prisma from '../config/db.js';
-import { checkAndMatchPool } from './matchmakerService.js';
-import { getNextTierForMetric, palletsForCases, resolveTierLadder, amountToReachTier } from '../utils/smartMatchTiers.js';
+import { checkAndMatchPool, parkItemsIntoPool } from './matchmakerService.js';
+import { getNextTierForMetric, getTierForMetric, palletsForCases, resolveTierLadder, amountToReachTier } from '../utils/smartMatchTiers.js';
 
 const TAVERN_CATEGORIES = new Set([
   'BEER', 'CIDER_RTD', 'BRANDY', 'WHISKY', 'VODKA', 'VODKA_PREMIUM',
@@ -98,6 +98,63 @@ function poolMetrics(pool) {
   };
 }
 
+/**
+ * Identifies indicative cross-pool volume opportunities without merging pools.
+ * The target SKU's case price is only a reference denominator; pallet equivalence
+ * is explicitly unconfirmed until a supplier approves a mixed-SKU conversion.
+ * No discount is calculated as achieved or guaranteed.
+ */
+export function buildCrossPoolAggregationSuggestions(pools, referenceCasePriceZAR) {
+  const referenceCasePrice = Number(referenceCasePriceZAR);
+  if (!Number.isFinite(referenceCasePrice) || referenceCasePrice <= 0) return [];
+  const referencePalletValueZAR = referenceCasePrice * 56;
+  const groups = new Map();
+
+  for (const pool of pools || []) {
+    if (!pool || pool.status !== 'OPEN' || !pool.area) continue;
+    const supplierKey = pool.partnerName ? String(pool.partnerName).trim().toLocaleLowerCase() : 'supplier-unconfirmed';
+    const key = `${String(pool.area).trim().toLocaleLowerCase()}::${supplierKey}`;
+    if (!groups.has(key)) groups.set(key, {
+      area: pool.area,
+      supplierName: pool.partnerName || null,
+      supplierCompatibility: pool.partnerName ? 'SAME_NAMED_SUPPLIER' : 'UNCONFIRMED',
+      pools: [],
+      combinedOrderValueZAR: 0,
+    });
+    const group = groups.get(key);
+    group.pools.push(pool);
+    group.combinedOrderValueZAR += Math.max(0, Number(pool.currentAmountZAR) || 0);
+  }
+
+  return [...groups.values()]
+    .filter((group) => group.pools.length >= 2)
+    .map((group) => {
+      const equivalentPallets = group.combinedOrderValueZAR / referencePalletValueZAR;
+      return {
+        area: group.area,
+        supplierName: group.supplierName,
+        supplierCompatibility: group.supplierCompatibility,
+        poolCount: group.pools.length,
+        poolIds: group.pools.map((pool) => pool.id),
+        distinctCategories: [...new Set(group.pools.map((pool) => pool.category).filter(Boolean))],
+        combinedOrderValueZAR: Math.round(group.combinedOrderValueZAR * 100) / 100,
+        referencePalletValueZAR: Math.round(referencePalletValueZAR * 100) / 100,
+        indicativePalletEquivalent: Math.round(equivalentPallets * 100) / 100,
+        reachesThreePalletEquivalent: equivalentPallets >= 3,
+        volumeTierStatus: 'INDICATIVE_ONLY_SUPPLIER_CONFIRMATION_REQUIRED',
+        potentialDiscountLabel: 'Research-backed 8–10% bulk-discount target at qualifying volume; outlet terms apply',
+        message: equivalentPallets >= 3
+          ? 'Join forces: these groups may reach a three-pallet-equivalent order value. Ask the supplier whether mixed products count and request a written quote.'
+          : 'Join forces: combined demand may move the supplier quote toward a higher volume tier. Ask the supplier to confirm eligible products and thresholds.',
+        requiresOptIn: true,
+        orderPlaced: false,
+        supplierConfirmationRequired: true,
+      };
+    })
+    .sort((a, b) => Number(b.reachesThreePalletEquivalent) - Number(a.reachesThreePalletEquivalent)
+      || b.combinedOrderValueZAR - a.combinedOrderValueZAR);
+}
+
 export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, limit = 10 }) {
   if (!skuId) throw new Error('skuId is required');
   const [user, sku] = await Promise.all([
@@ -117,7 +174,7 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
   }
 
   const pools = await prisma.bulkPool.findMany({
-    where: { category: categoryForSku(sku), status: 'OPEN' },
+    where: { status: 'OPEN' },
     include: {
       partner: true,
       baskets: {
@@ -132,12 +189,20 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
     take: 100,
   });
 
-  const ranked = pools.map((pool) => {
+  const allRanked = pools.map((pool) => {
     const distanceKm = locationDistance(user, pool);
     const clan = clanScore(user, pool);
     const metrics = poolMetrics(pool);
-    const closesInTime = !ceremony?.eventDate || !pool.deadline || pool.deadline <= ceremony.eventDate;
-    const distanceAllowed = distanceKm === null || distanceKm <= (pool.radiusKm || 20);
+    const currentTier = getTierForMetric(metrics.metric, resolveTierLadder(pool));
+    const basePrice = Number(sku.casePriceZAR);
+    let poolPriceZAR = null;
+    if (currentTier?.value != null && Number.isFinite(basePrice)) {
+      if ((pool.tierBasis || 'PALLETS') === 'PALLETS') poolPriceZAR = Number(currentTier.value);
+      else poolPriceZAR = Math.max(0, basePrice * (1 - Number(currentTier.value) / 100));
+    }
+    const closesInTime = !ceremony?.eventDate || (Boolean(pool.deadline) && pool.deadline <= ceremony.eventDate);
+    const userHasLocation = (Number.isFinite(user.latitude) && Number.isFinite(user.longitude)) || Boolean(normalise(user.location));
+    const distanceAllowed = distanceKm !== null ? distanceKm <= (pool.radiusKm || 20) : !userHasLocation;
     return {
       id: pool.id,
       category: pool.category,
@@ -154,10 +219,18 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
       clanScore: clan.score,
       sharedClanLines: clan.sharedLines,
       participantCount: new Set(pool.baskets.map((basket) => basket.userId)).size,
+      clanMemberCount: new Set(pool.baskets.filter((basket) => basket.user
+        && clanScore(user, { baskets: [{ user: basket.user }] }).score > 0)
+        .map((basket) => basket.userId)).size,
       closesInTime,
+      currentTier: currentTier ? { id: currentTier.id, name: currentTier.name, value: currentTier.value } : null,
+      poolPriceZAR,
       ...metrics,
     };
-  }).filter((pool) => pool.closesInTime && pool.distanceAllowed)
+  });
+
+  const eligiblePools = allRanked.filter((pool) => pool.closesInTime && pool.distanceAllowed);
+  const ranked = eligiblePools.filter((pool) => pool.category === categoryForSku(sku))
     .sort((a, b) => b.clanScore - a.clanScore
       || (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER)
       || (a.deadline ? new Date(a.deadline).getTime() : Number.MAX_SAFE_INTEGER)
@@ -169,11 +242,12 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
     sku: { id: sku.id, name: sku.name, category: sku.category, casePriceZAR: sku.casePriceZAR },
     ceremony: ceremony ? { id: ceremony.id, title: ceremony.title, eventDate: ceremony.eventDate } : null,
     pools: ranked,
+    combinedOrderSuggestions: buildCrossPoolAggregationSuggestions(eligiblePools, sku.casePriceZAR),
   };
 }
 
 export async function joinPoolWithItem(userId, input) {
-  const { poolId, skuId, quantity = 1, ceremonyId = null, checklistItemId = null, fundingSource = 'PERSONAL', stokvelId = null } = input || {};
+  const { poolId, skuId, quantity = 1, ceremonyId = null, checklistItemId = null, ceremonyCostItemId = null, fundingSource = 'PERSONAL', stokvelId = null } = input || {};
   const amount = Number.parseInt(quantity, 10);
   if (!poolId || !skuId || !Number.isInteger(amount) || amount < 1) {
     throw new Error('poolId, skuId and a quantity of at least 1 are required');
@@ -192,8 +266,17 @@ export async function joinPoolWithItem(userId, input) {
     if (!stokvelId) throw new Error('Choose a stokvel to fund this order');
     const member = await prisma.stokvelMember.findFirst({ where: { userId, stokvelId } });
     if (!member) throw new Error('You must be a member of this stokvel');
-    const ledger = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
-    if (!ledger || Number(ledger.totalBalance) - Number(ledger.groupExpenses) < Number(sku.casePriceZAR) * amount) {
+    const [ledger, commitments] = await Promise.all([
+      prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } }),
+      prisma.stokvelPoolFunding.aggregate({
+        where: { stokvelId, status: { in: ['PENDING_APPROVAL', 'APPROVED'] } },
+        _sum: { amountZAR: true },
+      }),
+    ]);
+    const available = ledger
+      ? Number(ledger.totalBalance) - Number(ledger.groupExpenses) - Number(commitments._sum.amountZAR || 0)
+      : 0;
+    if (available < Number(sku.casePriceZAR) * amount) {
       throw new Error('This stokvel does not have enough available funds for this item');
     }
   } else if (stokvelId) {
@@ -209,20 +292,17 @@ export async function joinPoolWithItem(userId, input) {
   } else if (checklistItemId) {
     throw new Error('ceremonyId is required when linking a checklist item');
   }
+  if (ceremonyCostItemId && ceremonyId) {
+    const costItem = await prisma.ceremonyCostItem.findFirst({ where: { id: ceremonyCostItemId, ceremonyId }, select: { id: true } });
+    if (!costItem) throw new Error('Shopping-list item does not belong to this ceremony');
+  } else if (ceremonyCostItemId) {
+    throw new Error('ceremonyId is required when linking a shopping-list item');
+  }
 
-  const basket = await prisma.basket.create({
-    data: {
-      userId,
-      status: 'PARKED',
-      poolId,
-      ceremonyId,
-      checklistItemId,
-      fundingSource,
-      fundingStokvelId: fundingSource === 'STOKVEL' ? stokvelId : null,
-      stokvelId: fundingSource === 'STOKVEL' ? stokvelId : null,
-      items: { create: { skuId, quantity: amount } },
-    },
-    include: { items: { include: { sku: true } } },
+  const basket = await parkItemsIntoPool({
+    userId, poolId, ceremonyId, checklistItemId, ceremonyCostItemId,
+    fundingSource, fundingStokvelId: stokvelId,
+    itemSpecs: [{ skuId, quantity: amount }],
   });
   try {
     const match = await checkAndMatchPool(poolId);
@@ -234,30 +314,110 @@ export async function joinPoolWithItem(userId, input) {
   }
 }
 
+export async function getCommunityFeed(userId) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new Error('User not found');
+  const [rawPools, rawCeremonies, legends] = await Promise.all([
+    prisma.bulkPool.findMany({
+      where: { status: 'OPEN' },
+      include: {
+        partner: { select: { name: true } },
+        baskets: {
+          where: { status: { not: 'CANCELLED' } },
+          include: {
+            user: { select: { id: true, firstName: true, lastName: true, location: true, latitude: true, longitude: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true } },
+            items: { include: { sku: { select: { casePriceZAR: true } } } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    }),
+    prisma.ceremony.findMany({
+      where: { eventDate: { gte: new Date() }, visibility: { in: ['PUBLIC', 'CLAN_ONLY'] } },
+      include: { host: { select: { id: true, firstName: true, lastName: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true, clanGroupId: true } } },
+      orderBy: { eventDate: 'asc' },
+      take: 100,
+    }),
+    prisma.legendEntry.findMany({
+      where: { isFeatured: true },
+      select: { id: true, title: true, bodyText: true, category: true, updatedAt: true },
+      orderBy: { updatedAt: 'desc' },
+      take: 5,
+    }),
+  ]);
+
+  const pools = rawPools.map((pool) => {
+    const distanceKm = locationDistance(user, pool);
+    const clan = clanScore(user, pool);
+    const metrics = poolMetrics(pool);
+    return {
+      id: pool.id, category: pool.category, area: pool.area,
+      deadline: pool.deadline, status: pool.status, moqTarget: pool.moqTarget,
+      partnerName: pool.partner?.name || null,
+      distanceKm: distanceKm == null ? null : Math.round(distanceKm * 10) / 10,
+      participantCount: new Set(pool.baskets.map((basket) => basket.userId)).size,
+      clanMemberCount: new Set(pool.baskets.filter((basket) => basket.user
+        && clanScore(user, { baskets: [{ user: basket.user }] }).score > 0)
+        .map((basket) => basket.userId)).size,
+      clanScore: clan.score, sharedClanLines: clan.sharedLines,
+      ...metrics,
+    };
+  }).filter((pool) => pool.distanceKm != null && pool.distanceKm <= 20)
+    .sort((a, b) => b.clanScore - a.clanScore
+      || (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER)
+      || (a.deadline ? new Date(a.deadline).getTime() : Number.MAX_SAFE_INTEGER)
+        - (b.deadline ? new Date(b.deadline).getTime() : Number.MAX_SAFE_INTEGER))
+    .slice(0, 20);
+
+  const ceremonies = rawCeremonies.filter((ceremony) => {
+    if (ceremony.hostId === userId || ceremony.visibility === 'PUBLIC') return true;
+    return ceremony.visibility === 'CLAN_ONLY'
+      && ((user.clanGroupId && ceremony.host.clanGroupId === user.clanGroupId)
+        || clanScore(user, { baskets: [{ user: ceremony.host }] }).score > 0);
+  }).map((ceremony) => ({
+    id: ceremony.id,
+    title: ceremony.title,
+    type: ceremony.type,
+    eventDate: ceremony.eventDate,
+    visibility: ceremony.visibility,
+    host: { id: ceremony.host.id, firstName: ceremony.host.firstName },
+  })).slice(0, 20);
+
+  return { pools, upcomingClanCeremonies: ceremonies, featuredLegends: legends };
+}
+
 export async function getNearbyDemandSignal(userId, skuId, radiusKm = 20) {
   if (!skuId) throw new Error('skuId is required');
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { latitude: true, longitude: true, location: true } });
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { latitude: true, longitude: true, location: true, clanGroupId: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true } });
   if (!user) throw new Error('User not found');
   const now = new Date();
   const ceremonies = await prisma.ceremony.findMany({
     where: {
       eventDate: { gte: now },
+      visibility: { in: ['PUBLIC', 'CLAN_ONLY'] },
       costItems: { some: { skuId } },
     },
     select: {
       id: true,
       eventDate: true,
-      host: { select: { latitude: true, longitude: true, location: true } },
+      visibility: true,
+      host: { select: { latitude: true, longitude: true, location: true, clanGroupId: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true } },
     },
     take: 250,
   });
   const nearby = ceremonies.filter((ceremony) => {
     const host = ceremony.host;
+    const visibleToUser = ceremony.visibility === 'PUBLIC'
+      || (ceremony.visibility === 'CLAN_ONLY'
+        && ((user.clanGroupId && host.clanGroupId === user.clanGroupId)
+          || clanScore(user, { baskets: [{ user: host }] }).score > 0));
+    if (!visibleToUser) return false;
     if (Number.isFinite(user.latitude) && Number.isFinite(user.longitude)
       && Number.isFinite(host.latitude) && Number.isFinite(host.longitude)) {
       return haversineKm(user.latitude, user.longitude, host.latitude, host.longitude) <= radiusKm;
     }
-    return normalise(user.location) && normalise(user.location) === normalise(host.location);
+    return Boolean(normalise(user.location)) && normalise(user.location) === normalise(host.location);
   });
   return { skuId, nearbyUpcomingCeremonies: nearby.length, radiusKm };
 }

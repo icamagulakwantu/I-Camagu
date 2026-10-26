@@ -2,6 +2,7 @@ import prisma from '../config/db.js';
 import crypto from 'crypto';
 import { CeremonyType } from '@prisma/client';
 import { CEREMONY_COST_PROFILES, getDefaultItemsForType } from './ceremonyCostProfiles.js';
+import { DRAFT_CEREMONY_TYPE_NAMES } from '../data/ceremonyDrafts.js';
 
 // UMSEBENZI_WENKOMO and IMIGIDI predate UMGIDI as the real user-facing type
 // (UMGIDI is the correct standalone ceremony; IMIGIDI was a duplicate alias
@@ -14,7 +15,7 @@ const LEGACY_CEREMONY_TYPES = new Set(['UMSEBENZI_WENKOMO', 'IMIGIDI']);
 
 export const getCeremonyTypes = async (req, res) => {
       try {
-              res.json(Object.values(CeremonyType).filter((type) => !LEGACY_CEREMONY_TYPES.has(type)));
+              res.json(Object.values(CeremonyType).filter((type) => !LEGACY_CEREMONY_TYPES.has(type) && !DRAFT_CEREMONY_TYPE_NAMES.includes(type)));
       } catch (error) {
               console.error('Error fetching ceremony types:', error);
                   res.status(500).json({ error: 'Internal server error' });
@@ -89,8 +90,12 @@ export const getMyCeremonies = async (req, res) => {
 // POST / - create a ceremony
 export const createCeremony = async (req, res) => {
       try {
-              const { title, type, eventDate, notes, budgetZAR } = req.body;
+              const { title, type, eventDate, notes, budgetZAR, visibility } = req.body;
                   const hostId = req.user.id;
+
+                      if (DRAFT_CEREMONY_TYPE_NAMES.includes(type)) {
+                        return res.status(409).json({ error: 'This ceremony is still a founder-review draft and is not available for family planning yet.' });
+                      }
 
                       if (!title || !type || !hostId) {
                                 return res.status(400).json({ error: 'Missing required fields' });
@@ -116,6 +121,7 @@ export const createCeremony = async (req, res) => {
                                                                         notes: notes || '',
                                                                                 hostId,
                                                                                         status: 'PLANNING',
+                                                visibility: ['PRIVATE', 'CLAN_ONLY', 'PUBLIC'].includes(visibility) ? visibility : 'PRIVATE',
                                                                                                 budgetZAR: parsedBudget,
                                     },
                           });
@@ -479,8 +485,12 @@ export const getPublicPlan = async (req, res) => {
 // POST /auto - create ceremony with auto‑generated checklist & cost items
 export const createAutoCeremony = async (req, res) => {
       try {
-              const { title, type, eventDate, notes, budgetZAR, guestCount, createPlan = false } = req.body;
+              const { title, type, eventDate, notes, budgetZAR, guestCount, visibility, createPlan = false } = req.body;
                   const hostId = req.user.id;
+
+                      if (DRAFT_CEREMONY_TYPE_NAMES.includes(type)) {
+                        return res.status(409).json({ error: 'This ceremony is still a founder-review draft and is not available for family planning yet.' });
+                      }
 
                       if (!title || !type || !hostId) {
                                 return res.status(400).json({ error: 'Missing required fields' });
@@ -515,6 +525,7 @@ export const createAutoCeremony = async (req, res) => {
                                                                                                     notes: notes || '',
                                                                                                               hostId,
                                                                                                                         status: 'PLANNING',
+                                                                                                                                  visibility: ['PRIVATE', 'CLAN_ONLY', 'PUBLIC'].includes(visibility) ? visibility : 'PRIVATE',
                                                                                                                                   budgetZAR: parsedBudget,
                                                                                                                                   guestCount: parsedGuestCount,
                                                         },
@@ -617,7 +628,7 @@ export const getCeremonyById = async (req, res) => {
 export const updateCeremony = async (req, res) => {
       try {
               const { id } = req.params;
-                  const { title, eventDate, status, notes, budgetZAR, guestCount } = req.body;
+                  const { title, eventDate, status, notes, budgetZAR, guestCount, visibility } = req.body;
 
                       let parsedBudget;
                       if (budgetZAR === undefined) {
@@ -643,6 +654,7 @@ export const updateCeremony = async (req, res) => {
                                                                       eventDate: eventDate ? new Date(eventDate) : undefined,
                                                                               status: status || undefined,
                                                                                       notes: notes !== undefined ? notes : undefined,
+                                                                              visibility: visibility !== undefined && ['PRIVATE', 'CLAN_ONLY', 'PUBLIC'].includes(visibility) ? visibility : undefined,
                                                                                               budgetZAR: parsedBudget,
                                                                                               guestCount: guestCount !== undefined ? (guestCount === '' || guestCount === null ? null : parseInt(guestCount, 10)) : undefined,
                                                   },

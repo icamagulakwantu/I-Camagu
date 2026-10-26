@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useCommunity } from '../context/CommunityContext.jsx'
+import PoolOfferCard from '../components/PoolOfferCard.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
@@ -19,6 +20,7 @@ function Store({ onGoToBasket, basketCount }) {
   const [addingId, setAddingId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
+  const [offerSku, setOfferSku] = useState(null)
 
   useEffect(() => {
     fetch('/api/basket/catalogue')
@@ -218,13 +220,18 @@ function Store({ onGoToBasket, basketCount }) {
                     </div>
                   </div>
                   {casePrice != null ? (
-                    <button
-                      onClick={() => addToBasket(sku)}
-                      disabled={addingId === sku.id}
-                      className="bg-terracotta text-white text-xs font-bold px-4 py-2 rounded-pill active:scale-90 transition-transform disabled:opacity-50 mr-3 flex-shrink-0"
-                    >
-                      {addingId === sku.id ? <Icon name="check" size={13} color="#fff" strokeWidth={2.5} /> : `Add ${unitOf(sku)}`}
-                    </button>
+                    <div className="flex flex-col gap-2 mr-3 flex-shrink-0">
+                      <button
+                        onClick={() => addToBasket(sku)}
+                        disabled={addingId === sku.id}
+                        className="bg-terracotta text-white text-xs font-bold px-4 py-2 rounded-pill active:scale-90 transition-transform disabled:opacity-50"
+                      >
+                        {addingId === sku.id ? <Icon name="check" size={13} color="#fff" strokeWidth={2.5} /> : `Add ${unitOf(sku)}`}
+                      </button>
+                      <button type="button" onClick={() => setOfferSku(sku)} className="border border-terracotta text-terracotta text-xs font-bold px-3 py-2 rounded-pill">
+                        Pool offers
+                      </button>
+                    </div>
                   ) : (
                     <span className="text-[10px] text-ink-muted/60 font-bold px-3 mr-3 flex-shrink-0 text-right">
                       Not yet<br />orderable
@@ -236,6 +243,7 @@ function Store({ onGoToBasket, basketCount }) {
           </div>
         )}
       </div>
+      {offerSku && <PoolOfferCard cost={{ id: null, skuId: offerSku.id, label: offerSku.name, quantity: 1, unitCost: offerSku.casePriceZAR }} onClose={() => setOfferSku(null)} />}
     </div>
   )
 }

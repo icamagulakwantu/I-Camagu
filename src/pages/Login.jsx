@@ -179,12 +179,12 @@ function Login() {
           </h1>
           {/* English subtext for Xhosa headings */}
           {step === 'register' && (
-            <p className="text-white/60 text-xs mt-0.5">Join iCamagu</p>
+            <p className="text-white/90 text-sm mt-0.5">Join iCamagu</p>
           )}
           {step === 'password-login' && (
-            <p className="text-white/60 text-xs mt-0.5">Welcome</p>
+            <p className="text-white/90 text-sm mt-0.5">Welcome</p>
           )}
-          <p className="text-white/80 text-sm mt-1.5 leading-snug break-words">
+          <p className="text-white text-sm mt-1.5 leading-snug break-words">
             {step === 'email' && 'Save up to 20% on Mgidi drinks and groceries. Matchmaker joins your order with others nearby so you pay the bulk price. No stokvel needed.'}
             {step === 'register' && `Create your account for ${email}.`}
             {step === 'password-login' && email}
@@ -202,10 +202,10 @@ function Login() {
                 ))}
               </div>
               {/* Tagline: Xhosa with English subtext */}
-              <p className="text-white/70 text-[11px] font-semibold uppercase tracking-[0.14em] mt-4">
+              <p className="text-white/90 text-xs font-semibold uppercase tracking-[0.14em] mt-4">
                 Lungiselela isiko/umcimbi · Incubeko ngaphambi kwemali
               </p>
-              <p className="text-white/45 text-[10px] tracking-wide mt-0.5">
+              <p className="text-white/90 text-xs tracking-wide mt-0.5">
                 Plan your ceremony · Culture before capital
               </p>
             </>

@@ -1,16 +1,15 @@
 import prisma from '../config/db.js';
 import { generateReferenceCode } from '../utils/memberReference.js';
 import { countOpenRequests } from './stokvelApprovalsController.js';
-import { toCents } from '../utils/money.js';
 
 // Joining a stokvel now lives in stokvelApprovalsController.joinOrRequest,
 // because an official has to accept new people.
 
 export async function createStokvel(req, res) {
   const userId = req.userId;
-  const { name, type, contributionAmount, contributionFrequency, targetAmount, targetDate, ceremonyType } = req.body || {};
+  const { name, type, contributionAmount, contributionFrequency, targetAmount, targetDate, ceremonyType } = req.body;
 
-  if (!name || !String(name).trim() || !type) {
+  if (!name || !type) {
     return res.status(400).json({ error: 'Name and type are required' });
   }
 
@@ -21,50 +20,41 @@ export async function createStokvel(req, res) {
 
   for (const [field, value] of [['contributionAmount', contributionAmount], ['targetAmount', targetAmount]]) {
     if (value !== undefined && value !== null && value !== '') {
-      try {
-        if (toCents(String(value)) < 0) {
-          return res.status(400).json({ error: `${field} must be zero or greater, with at most 2 decimal places` });
-        }
-      } catch {
-        return res.status(400).json({ error: `${field} must be a valid amount with at most 2 decimal places` });
+      const parsed = parseFloat(value);
+      if (isNaN(parsed) || parsed < 0) {
+        return res.status(400).json({ error: `${field} must be a positive number` });
       }
     }
   }
 
-  if (targetDate && Number.isNaN(new Date(targetDate).getTime())) {
-    return res.status(400).json({ error: 'targetDate must be a valid date' });
-  }
-
   try {
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, firstName: true } });
-    if (!user) return res.status(401).json({ error: 'Your account could not be verified. Please sign in again.' });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    const stokvel = await prisma.stokvel.create({
+      data: {
+        name,
+        type,
+        organiserId: userId,
+        bankingTrack: 'AFRICAN_BANK',
+        contributionAmount: contributionAmount ? parseFloat(contributionAmount) : null,
+        contributionFrequency: contributionFrequency || null,
+        targetAmount: targetAmount ? parseFloat(targetAmount) : null,
+        targetDate: targetDate ? new Date(targetDate) : null,
+        ceremonyType: ceremonyType || null,
+      },
+    });
+
+    await prisma.stokvelGroupLedger.create({
+      data: { stokvelId: stokvel.id, totalBalance: 0 },
+    });
 
     const referenceCode = await generateReferenceCode(user.firstName, 1);
-    const stokvel = await prisma.$transaction(async (tx) => {
-      const created = await tx.stokvel.create({
-        data: {
-          name: String(name).trim(),
-          type,
-          organiserId: userId,
-          bankingTrack: 'AFRICAN_BANK',
-          contributionAmount: contributionAmount !== undefined && contributionAmount !== null && contributionAmount !== '' ? toCents(String(contributionAmount)) / 100 : null,
-          contributionFrequency: contributionFrequency || null,
-          targetAmount: targetAmount !== undefined && targetAmount !== null && targetAmount !== '' ? toCents(String(targetAmount)) / 100 : null,
-          targetDate: targetDate ? new Date(targetDate) : null,
-          ceremonyType: ceremonyType || null,
-        },
-      });
+    await prisma.stokvelMember.create({
+      data: { stokvelId: stokvel.id, userId, referenceCode },
+    });
 
-      await tx.stokvelGroupLedger.create({
-        data: { stokvelId: created.id, totalBalance: 0 },
-      });
-      await tx.stokvelMember.create({
-        data: { stokvelId: created.id, userId, referenceCode },
-      });
-      await tx.stokvelOfficial.create({
-        data: { stokvelId: created.id, userId, role: 'CHAIRPERSON' },
-      });
-      return created;
+    await prisma.stokvelOfficial.create({
+      data: { stokvelId: stokvel.id, userId, role: 'CHAIRPERSON' },
     });
 
     res.status(201).json({ stokvel, referenceCode, message: `Stokvel created. You are the Chairperson. Your reference code is ${referenceCode}.` });
@@ -112,19 +102,13 @@ export async function leaveStokvel(req, res) {
     const membership = await prisma.stokvelMember.findFirst({ where: { stokvelId, userId } });
     if (!membership) return res.status(400).json({ error: 'You are not a member of this stokvel' });
 
-    // Block if the member has an open loan in this stokvel. The loan table is
-    // created lazily, so check its existence first. If a query fails for any
-    // other reason, the outer handler fails closed rather than letting the
-    // member leave without checking their outstanding obligations.
-    const [loanTable] = await prisma.$queryRaw`SELECT to_regclass('"StokvelLoan"') IS NOT NULL AS "tableExists"`;
-    if (loanTable?.tableExists) {
-      const openLoans = await prisma.$queryRaw`
-        SELECT 1 FROM "StokvelLoan"
-        WHERE "stokvelId" = ${stokvelId} AND "borrowerId" = ${userId}
-          AND "status" IN ('PENDING','APPROVED') LIMIT 1`;
-      if (openLoans.length) {
-        return res.status(400).json({ error: 'You have an open loan in this stokvel. Repay it before leaving.' });
-      }
+    // Block if the member has an open loan in this stokvel.
+    const openLoans = await prisma.$queryRaw`
+      SELECT 1 FROM "StokvelLoan"
+      WHERE "stokvelId" = ${stokvelId} AND "borrowerId" = ${userId}
+        AND "status" IN ('PENDING','APPROVED') LIMIT 1`.catch(() => []);
+    if (openLoans.length) {
+      return res.status(400).json({ error: 'You have an open loan in this stokvel. Repay it before leaving.' });
     }
 
     // Block if there is a pending payout for this member.
@@ -135,13 +119,8 @@ export async function leaveStokvel(req, res) {
       return res.status(400).json({ error: 'You have a pending payout in this stokvel. Wait for it to clear before leaving.' });
     }
 
-    // Membership and official status must be removed atomically. If membership
-    // deletion succeeds but official cleanup fails, role checks that treat an
-    // official as a member could leave the departed user with finance access.
-    await prisma.$transaction(async (tx) => {
-      await tx.stokvelMember.delete({ where: { id: membership.id } });
-      await tx.stokvelOfficial.deleteMany({ where: { stokvelId, userId } });
-    });
+    await prisma.stokvelMember.delete({ where: { id: membership.id } });
+    await prisma.stokvelOfficial.deleteMany({ where: { stokvelId, userId } });
 
     res.json({ message: `You have left ${stokvel.name}` });
   } catch (error) {
@@ -163,111 +142,50 @@ export async function deleteStokvel(req, res) {
       return res.status(400).json({ error: 'Cannot delete a stokvel with real funds in its ledger — this protects real money. Contact support if this stokvel genuinely needs to close.' });
     }
 
-    // Financial history is an audit record, not disposable group metadata.
-    // A zero balance can coexist with historical contributions, cleared payouts,
-    // bank imports, repaid loans, fines, trade credit, or lending entries.
-    // Refuse deletion when a ledger exists or any known history remains. Some
-    // legacy finance tables are created lazily, so check table existence before
-    // querying them; otherwise a brand-new empty group could fail with 500.
-    const [memberCount, contributionCount, payoutCount, bankLogCount] = await Promise.all([
-      prisma.stokvelMember.count({ where: { stokvelId } }),
-      prisma.contribution.count({ where: { stokvelId } }),
-      prisma.payout.count({ where: { stokvelId } }),
-      prisma.rawBankLog.count({ where: { stokvelId } }),
-    ]);
-
-    const legacyHistoryTables = [
-      'StokvelLoan',
-      'StokvelFine',
-      'StokvelTradeCredit',
-      'StokvelLendingEntry',
-      'StokvelLendingTarget',
-    ];
-
-    let legacyHistoryExists = false;
-    for (const table of legacyHistoryTables) {
-      const [tableInfo] = await prisma.$queryRaw`SELECT to_regclass(${`"${table}"`}) IS NOT NULL AS "tableExists"`;
-      if (!tableInfo?.tableExists) continue;
-      const [row] = await prisma.$queryRawUnsafe(
-        `SELECT EXISTS (SELECT 1 FROM "${table}" WHERE "stokvelId" = $1) AS "hasRows"`,
+    // ── Raw-SQL tables (no Prisma cascade) ─────────────────────────────────
+    // Delete child tables before parent tables to avoid FK violations.
+    // Use $executeRawUnsafe so the table name is literal (not a param),
+    // but the stokvelId value is still a bound parameter via interpolation.
+    const wipeRaw = async (table) => {
+      await prisma.$executeRawUnsafe(
+        `DELETE FROM "${table}" WHERE "stokvelId" = $1`,
         stokvelId
       );
-      if (row?.hasRows) {
-        legacyHistoryExists = true;
-        break;
-      }
-    }
+    };
 
-    const hasFinancialHistory =
-      Boolean(ledger) ||
-      memberCount > 0 ||
-      contributionCount > 0 ||
-      payoutCount > 0 ||
-      bankLogCount > 0 ||
-      legacyHistoryExists;
+    // Loan repayments reference loans — delete them first.
+    await prisma.$executeRawUnsafe(
+      `DELETE FROM "StokvelLoanRepayment" WHERE "loanId" IN (
+         SELECT "id" FROM "StokvelLoan" WHERE "stokvelId" = $1
+       )`,
+      stokvelId
+    );
+    await prisma.$executeRawUnsafe(
+      `DELETE FROM "StokvelLoanVote" WHERE "loanId" IN (
+         SELECT "id" FROM "StokvelLoan" WHERE "stokvelId" = $1
+       )`,
+      stokvelId
+    );
+    await wipeRaw('StokvelLoan');
+    await wipeRaw('StokvelTradeCredit');
+    await wipeRaw('StokvelMinutes');
+    await wipeRaw('StokvelFine');
+    await wipeRaw('StokvelConstitution');
+    await wipeRaw('StokvelAuditLog');
+    await wipeRaw('StokvelLendingEntry');
+    await wipeRaw('StokvelLendingTarget');
 
-    if (hasFinancialHistory) {
-      return res.status(409).json({
-        error: 'This stokvel has a ledger, membership, or financial history. Deletion is disabled to protect records. Use a supported closure/archive process or contact support.',
-        code: 'STOKVEL_FINANCIAL_HISTORY_REQUIRES_ARCHIVE',
-      });
-    }
-
-    // Keep the remaining cleanup atomic. Legacy tables are created lazily,
-    // so skip tables that do not exist in this database yet.
-    await prisma.$transaction(async (tx) => {
-      const tableExists = async (table) => {
-        const [row] = await tx.$queryRaw`SELECT to_regclass(${`"${table}"`}) IS NOT NULL AS "tableExists"`;
-        return Boolean(row?.tableExists);
-      };
-
-      const wipeRaw = async (table) => {
-        if (!await tableExists(table)) return;
-        await tx.$executeRawUnsafe(
-          `DELETE FROM "${table}" WHERE "stokvelId" = $1`,
-          stokvelId
-        );
-      };
-
-      // These child tables reference loans, so remove them before the loan rows.
-      if (await tableExists('StokvelLoanRepayment')) {
-        await tx.$executeRawUnsafe(
-          `DELETE FROM "StokvelLoanRepayment" WHERE "loanId" IN (
-             SELECT "id" FROM "StokvelLoan" WHERE "stokvelId" = $1
-           )`,
-          stokvelId
-        );
-      }
-      if (await tableExists('StokvelLoanVote')) {
-        await tx.$executeRawUnsafe(
-          `DELETE FROM "StokvelLoanVote" WHERE "loanId" IN (
-             SELECT "id" FROM "StokvelLoan" WHERE "stokvelId" = $1
-           )`,
-          stokvelId
-        );
-      }
-      for (const table of [
-        'StokvelLoan',
-        'StokvelTradeCredit',
-        'StokvelMinutes',
-        'StokvelFine',
-        'StokvelConstitution',
-        'StokvelAuditLog',
-        'StokvelLendingEntry',
-        'StokvelLendingTarget',
-      ]) {
-        await wipeRaw(table);
-      }
-
-      await tx.stokvelAnnouncement.deleteMany({ where: { stokvelId } });
-      await tx.payout.deleteMany({ where: { stokvelId } });
-      await tx.contribution.deleteMany({ where: { stokvelId } });
-      await tx.rawBankLog.deleteMany({ where: { stokvelId } });
-      await tx.stokvelMember.deleteMany({ where: { stokvelId } });
-      await tx.stokvelOfficial.deleteMany({ where: { stokvelId } });
-      await tx.stokvelGroupLedger.deleteMany({ where: { stokvelId } });
-      await tx.stokvel.delete({ where: { id: stokvelId } });
-    });
+    // ── Prisma-managed tables ───────────────────────────────────────────────
+    // Payout -> PayoutApproval/ShrineContribution cascade in schema; delete
+    // Payout/Contribution before RawBankLog since they hold an optional FK to it.
+    await prisma.stokvelAnnouncement.deleteMany({ where: { stokvelId } });
+    await prisma.payout.deleteMany({ where: { stokvelId } });
+    await prisma.contribution.deleteMany({ where: { stokvelId } });
+    await prisma.rawBankLog.deleteMany({ where: { stokvelId } });
+    await prisma.stokvelMember.deleteMany({ where: { stokvelId } });
+    await prisma.stokvelOfficial.deleteMany({ where: { stokvelId } });
+    await prisma.stokvelGroupLedger.deleteMany({ where: { stokvelId } });
+    await prisma.stokvel.delete({ where: { id: stokvelId } });
 
     res.json({ message: 'Stokvel deleted' });
   } catch (error) {
@@ -310,6 +228,18 @@ export async function getMyStokvels(req, res) {
       orderBy: { joinedAt: 'desc' },
     });
 
+    const stokvelIds = memberships.map((m) => m.stokvelId);
+    const commitments = stokvelIds.length
+      ? await prisma.stokvelPoolFunding.groupBy({
+          by: ['stokvelId'],
+          where: { stokvelId: { in: stokvelIds }, status: { in: ['PENDING_APPROVAL', 'APPROVED'] } },
+          _sum: { amountZAR: true },
+        })
+      : [];
+    const committedByStokvel = Object.fromEntries(
+      commitments.map((item) => [item.stokvelId, Number(item._sum.amountZAR || 0)])
+    );
+
     const memberIds = memberships.map((m) => m.id);
     const sums = memberIds.length
       ? await prisma.contribution.groupBy({
@@ -323,7 +253,16 @@ export async function getMyStokvels(req, res) {
     );
 
     res.json(
-      memberships.map((m) => ({ ...m, myBalance: byMember[m.id] || 0 }))
+      memberships.map((m) => {
+        const ledger = m.stokvel.groupLedger;
+        const availablePoolFundingBalance = Math.max(
+          0,
+          Number(ledger?.totalBalance || 0)
+            - Number(ledger?.groupExpenses || 0)
+            - Number(committedByStokvel[m.stokvelId] || 0)
+        );
+        return { ...m, myBalance: byMember[m.id] || 0, availablePoolFundingBalance };
+      })
     );
   } catch (error) {
     console.error('Get my stokvels error:', error.message);
@@ -460,20 +399,14 @@ export async function updateStokvel(req, res) {
       if (req.body[field] === null || req.body[field] === '') {
         updateData[field] = null;
       } else {
-        try {
-          const cents = toCents(String(req.body[field]));
-          if (cents < 0) {
-            return res.status(400).json({ error: `${field} must be zero or greater, with at most 2 decimal places` });
-          }
-          updateData[field] = cents / 100;
-        } catch {
-          return res.status(400).json({ error: `${field} must be a valid amount with at most 2 decimal places, or null to clear it` });
+        const parsed = parseFloat(req.body[field]);
+        if (isNaN(parsed) || parsed < 0) {
+          return res.status(400).json({ error: `${field} must be a positive number, or null to clear it` });
         }
+        updateData[field] = parsed;
       }
     } else if (field === 'targetDate') {
-      const date = req.body[field] ? new Date(req.body[field]) : null;
-      if (date && Number.isNaN(date.getTime())) return res.status(400).json({ error: 'targetDate must be a valid date' });
-      updateData[field] = date;
+      updateData[field] = req.body[field] ? new Date(req.body[field]) : null;
     } else {
       updateData[field] = req.body[field] || null;
     }

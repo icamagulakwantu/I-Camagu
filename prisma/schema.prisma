@@ -69,6 +69,15 @@ enum CeremonyType {
   UKUBUYISA
   INKOBE_ZIKA_MAMA
   UMSEBENZI_WEGQIRHA
+  IMBELEKO
+  INTONJANE
+  UMGQUPHUZO
+  UKUZILA
+  UMEMBESO_UMENDISO
+  UMSINDLEKO
+  UMHLONYANE
+  UKUPHAHLA
+  INTLOMBE
 }
 
 enum PortalVisibility {
@@ -113,6 +122,7 @@ model User {
   maternalIziduko        String?
   paternalGrandmotherIziduko String?
   maternalGrandmotherIziduko String?
+  nationLabel            String?
   pinHash                String?
 
   // Identity verification — the ID number is encrypted at rest (AES-256-GCM,
@@ -164,6 +174,7 @@ model User {
   createdBulkPools         BulkPool[]            @relation("BulkPoolCreator")
   stokvelPoolFundingRequests StokvelPoolFunding[] @relation("StokvelPoolFundingRequester")
   stokvelPoolFundingApprovals StokvelPoolFundingApproval[] @relation("StokvelPoolFundingApprover")
+  isidukoSubmissions IsidukoSubmission[]
 
   @@index([clanGroupId])
 }
@@ -298,13 +309,15 @@ model RefreshToken {
 // ---------- CLAN / IZIDUKO ----------
 
 model ClanGroup {
-  id        String   @id @default(cuid())
-  clanName  String   @unique
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  clanName    String   @unique
+  nationLabel String?
+  createdAt   DateTime @default(now())
 
   surnameGroups SurnameSubgroup[]
   aliases       ClanAlias[]
   members       User[]
+  submissions   IsidukoSubmission[]
 }
 
 model ClanAlias {
@@ -321,6 +334,27 @@ model SurnameSubgroup {
   surname     String
 
   @@unique([clanGroupId, surname])
+}
+
+
+// Raw text is queued for review, never turned directly into a ClanGroup.
+model IsidukoSubmission {
+  id                  String    @id @default(cuid())
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  typedText           String
+  normalisedText      String
+  nationLabel         String?
+  status              String    @default("PENDING_REVIEW")
+  resolvedClanGroupId String?
+  resolvedClanGroup   ClanGroup? @relation(fields: [resolvedClanGroupId], references: [id], onDelete: SetNull)
+  reviewNote          String?
+  reviewedById        String?
+  reviewedAt          DateTime?
+  createdAt           DateTime  @default(now())
+
+  @@index([status, createdAt])
+  @@index([normalisedText])
 }
 
 // ---------- STOKVEL ----------
@@ -520,6 +554,8 @@ model Basket {
   ceremony     Ceremony?     @relation(fields: [ceremonyId], references: [id], onDelete: SetNull)
   checklistItemId String?
   checklistItem CeremonyChecklistItem? @relation(fields: [checklistItemId], references: [id], onDelete: SetNull)
+  ceremonyCostItemId String?
+  ceremonyCostItem CeremonyCostItem? @relation(fields: [ceremonyCostItemId], references: [id], onDelete: SetNull)
   fundingSource String @default("PERSONAL")
   fundingStokvelId String?
   fundingStokvel Stokvel? @relation("BasketFundingStokvel", fields: [fundingStokvelId], references: [id], onDelete: SetNull)
@@ -679,6 +715,7 @@ model StokvelPoolFunding {
   requiredApprovals Int  @default(2)
   approvedAt    DateTime?
   declinedAt    DateTime?
+  reviewNote    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -702,6 +739,7 @@ model StokvelPoolFundingApproval {
   decidedAt   DateTime @default(now())
 
   @@unique([fundingId, officialId])
+  @@unique([fundingId, approverId])
   @@index([approverId, decidedAt])
 }
 
@@ -1109,6 +1147,7 @@ model Ceremony {
   title     String
   eventDate DateTime?
   status    String       @default("PLANNING")
+  visibility String      @default("PRIVATE")
   notes     String?
   budgetZAR Decimal?     @db.Decimal(10, 2)
   guestCount Int?
@@ -1168,6 +1207,7 @@ model CeremonyCostItem {
   sku             Sku?     @relation(fields: [skuId], references: [id])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  baskets         Basket[]
 
   @@index([ceremonyId])
 }
