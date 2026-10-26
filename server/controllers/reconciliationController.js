@@ -4,6 +4,7 @@
 // Culture before capital.
 
 import prisma from '../config/db.js';
+import { toCents } from '../utils/money.js';
 import {
   runReconciliation,
   manualAssign,
@@ -28,10 +29,16 @@ export async function createRawLog(req, res) {
   // same as reading a real bank statement. Downstream (see
   // reconciliationService) relies on this being positive to apply the
   // correct sign to the ledger.
-  const numericAmount = parseFloat(amount);
-  if (isNaN(numericAmount) || numericAmount <= 0) {
-    return res.status(400).json({ error: 'Amount must be a positive number' });
+  let amountCents;
+  try {
+    amountCents = toCents(String(amount));
+  } catch {
+    return res.status(400).json({ error: 'Amount must be a positive number with no more than 2 decimal places' });
   }
+  if (!Number.isSafeInteger(amountCents) || amountCents <= 0) {
+    return res.status(400).json({ error: 'Amount must be a positive number with no more than 2 decimal places' });
+  }
+  const numericAmount = amountCents / 100;
 
   try {
     // Verify user is an official of this stokvel
