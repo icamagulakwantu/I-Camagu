@@ -112,13 +112,19 @@ export async function leaveStokvel(req, res) {
     const membership = await prisma.stokvelMember.findFirst({ where: { stokvelId, userId } });
     if (!membership) return res.status(400).json({ error: 'You are not a member of this stokvel' });
 
-    // Block if the member has an open loan in this stokvel.
-    const openLoans = await prisma.$queryRaw`
-      SELECT 1 FROM "StokvelLoan"
-      WHERE "stokvelId" = ${stokvelId} AND "borrowerId" = ${userId}
-        AND "status" IN ('PENDING','APPROVED') LIMIT 1`.catch(() => []);
-    if (openLoans.length) {
-      return res.status(400).json({ error: 'You have an open loan in this stokvel. Repay it before leaving.' });
+    // Block if the member has an open loan in this stokvel. The loan table is
+    // created lazily, so check its existence first. If a query fails for any
+    // other reason, the outer handler fails closed rather than letting the
+    // member leave without checking their outstanding obligations.
+    const [loanTable] = await prisma.$queryRaw`SELECT to_regclass('"StokvelLoan"') IS NOT NULL AS "tableExists"`;
+    if (loanTable?.tableExists) {
+      const openLoans = await prisma.$queryRaw`
+        SELECT 1 FROM "StokvelLoan"
+        WHERE "stokvelId" = ${stokvelId} AND "borrowerId" = ${userId}
+          AND "status" IN ('PENDING','APPROVED') LIMIT 1`;
+      if (openLoans.length) {
+        return res.status(400).json({ error: 'You have an open loan in this stokvel. Repay it before leaving.' });
+      }
     }
 
     // Block if there is a pending payout for this member.
