@@ -15,11 +15,11 @@ export default function FundingSourcePicker({ value, onChange, stokvelId, onStok
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || 'Could not load your stokvels');
         const rows = Array.isArray(data) ? data : (data.stokvels || data.items || []);
+        const groups = rows.map((row) => ({ ...(row.stokvel || row), availablePoolFundingBalance: row.availablePoolFundingBalance })).filter((item) => item?.id);
         if (!cancelled) {
-          setStokvels(rows.filter((item) => {
-            const balance = Number(item.groupLedger?.totalBalance ?? item.availableBalance ?? 0);
-            const expenses = Number(item.groupLedger?.groupExpenses ?? 0);
-            return balance - expenses > 0;
+          setStokvels(groups.filter((item) => {
+            const available = item.availablePoolFundingBalance ?? (Number(item.groupLedger?.totalBalance ?? item.availableBalance ?? 0) - Number(item.groupLedger?.groupExpenses ?? 0));
+            return Number(available) > 0;
           }));
         }
       })
@@ -50,7 +50,7 @@ export default function FundingSourcePicker({ value, onChange, stokvelId, onStok
               <option value="">Choose a stokvel</option>
               {stokvels.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.name} · available R{Math.max(0, Number(item.groupLedger?.totalBalance ?? item.availableBalance ?? 0) - Number(item.groupLedger?.groupExpenses ?? 0)).toFixed(2)}
+                  {item.name} · available R{Math.max(0, Number(item.availablePoolFundingBalance ?? (Number(item.groupLedger?.totalBalance ?? item.availableBalance ?? 0) - Number(item.groupLedger?.groupExpenses ?? 0)))).toFixed(2)}
                 </option>
               ))}
             </select>
