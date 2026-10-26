@@ -4,6 +4,7 @@ import {
   GENESIS_HASH, LedgerError, validateLines, assertDistinctDuties, negateLines, computeEntryHash, verifyEntries,
 } from '../utils/ledgerRules.js';
 import { fromCents } from '../utils/money.js';
+import { bankDeltaCents, summariseBalanceCheck } from '../utils/balanceRules.js';
 
 // The stokvel ledger. I-Camagu RECORDS money movements here; it never holds,
 // lends or transfers the money. Rows are append-only: the database itself
@@ -118,6 +119,55 @@ export async function postEntryTx(tx, {
   return { id, seq, hash, duplicate: false };
 }
 
+// FIN-03: the books are the official record; StokvelGroupLedger.totalBalance
+// is a quick-read copy of the books' BANK account. This posts the entry AND
+// moves the stored balance by the entry's BANK amount, in the caller's
+// transaction, so the two can never drift apart.
+//
+// With requireFunds, money only leaves if the stored balance still covers it
+// (checked in the same statement). If not, nothing is changed here and
+// { fundsShort: true } is returned: the caller MUST throw to roll back the
+// books entry already written in this transaction.
+// A repeated idempotencyKey changes nothing (the money was already counted).
+export async function postEntryWithBalanceTx(tx, entry, { requireFunds = false } = {}) {
+  const posted = await postEntryTx(tx, entry);
+  if (posted.duplicate) return posted;
+
+  const deltaCents = bankDeltaCents(entry.lines);
+  if (deltaCents === 0) return posted;
+  const amount = fromCents(Math.abs(deltaCents));
+  const { stokvelId } = entry;
+
+  if (deltaCents > 0) {
+    const updated = await tx.stokvelGroupLedger.updateMany({
+      where: { stokvelId },
+      data: { totalBalance: { increment: amount } },
+    });
+    if (updated.count === 0) await tx.stokvelGroupLedger.create({ data: { stokvelId, totalBalance: amount } });
+    return posted;
+  }
+
+  const where = requireFunds ? { stokvelId, totalBalance: { gte: amount } } : { stokvelId };
+  const updated = await tx.stokvelGroupLedger.updateMany({ where, data: { totalBalance: { decrement: amount } } });
+  if (updated.count === 0) {
+    if (requireFunds) return { ...posted, fundsShort: true };
+    throw new LedgerError('This stokvel has no stored group balance yet');
+  }
+  return posted;
+}
+
+// FIN-03: compares the stored balance with the books' BANK total. Both are
+// read in ONE statement, so they come from the same moment in time.
+export async function checkStokvelBalance(stokvelId) {
+  await ensureLedgerTables();
+  const rows = await prisma.$queryRaw`
+    SELECT
+      (SELECT "totalBalance"::text FROM "StokvelGroupLedger" WHERE "stokvelId" = ${stokvelId}) AS stored,
+      (SELECT COALESCE(SUM("amountCents"), 0)::bigint FROM "LedgerLine"
+        WHERE "stokvelId" = ${stokvelId} AND "account" = 'BANK') AS bank`;
+  return summariseBalanceCheck({ storedText: rows[0]?.stored ?? null, bookBankCents: Number(rows[0]?.bank ?? 0) });
+}
+
 // Records one balanced entry in its own transaction. Use postEntryTx instead
 // whenever the entry describes a balance change made in the same request.
 export async function postEntry(entry) {
@@ -137,10 +187,11 @@ export async function reverseEntry({ stokvelId, entryId, reason, createdById, ap
   const lines = await prisma.$queryRaw`
     SELECT "account", "amountCents" FROM "LedgerLine" WHERE "entryId" = ${entryId}`;
   const original = lines.map((l) => ({ account: l.account, amountCents: Number(l.amountCents) }));
-  return postEntry({
+  // FIN-03: the reversal and the matching stored-balance change are one transaction.
+  return prisma.$transaction((tx) => postEntryWithBalanceTx(tx, {
     stokvelId, kind: 'REVERSAL', memo: `Reversal: ${why}`, lines: negateLines(original),
     idempotencyKey: `reversal:${entryId}`, createdById, approvedById, reversesEntryId: entryId,
-  });
+  }));
 }
 
 // Balances are always worked out from posted lines, never from a stored running total.

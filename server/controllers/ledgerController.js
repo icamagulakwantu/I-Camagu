@@ -1,4 +1,4 @@
-import { listEntries, getBalances, verifyLedger } from '../services/ledgerService.js';
+import { listEntries, getBalances, verifyLedger, checkStokvelBalance } from '../services/ledgerService.js';
 import { getStokvelRole } from '../utils/stokvelAccess.js';
 import { fromCents } from '../utils/money.js';
 
@@ -43,5 +43,18 @@ export async function verifyLedgerChain(req, res) {
   } catch (error) {
     console.error('Verify ledger error:', error.message);
     res.status(500).json({ error: 'Could not check the books' });
+  }
+}
+
+// FIN-03: the books are the official record. This compares the stored group
+// balance (what screens show) with the books' bank total. Read-only: a
+// mismatch is reported, never "fixed" automatically.
+export async function checkBalance(req, res) {
+  try {
+    if (!(await memberGuard(req, res))) return;
+    res.json(await checkStokvelBalance(req.params.stokvelId));
+  } catch (error) {
+    console.error('Check balance error:', error.message);
+    res.status(500).json({ error: 'Could not compare the balance with the books' });
   }
 }

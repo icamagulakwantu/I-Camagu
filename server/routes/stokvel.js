@@ -38,7 +38,7 @@ import {
   listTradeCredit, createTradeCredit, updateTradeCredit, getStatement,
 } from '../controllers/stokvelFinanceController.js';
 import { listLendingTargets, setLendingTarget, recordLendingRound } from '../controllers/stokvelLendingController.js';
-import { getLedger, verifyLedgerChain } from '../controllers/ledgerController.js';
+import { getLedger, verifyLedgerChain, checkBalance } from '../controllers/ledgerController.js';
 import {
   requestPayout,
   approvePayout,
@@ -103,6 +103,7 @@ router.put('/:stokvelId/constitution', requireAuth, saveConstitution);
 router.get('/:stokvelId/audit', requireAuth, getAuditLog);
 router.get('/:stokvelId/ledger', requireAuth, getLedger);
 router.get('/:stokvelId/ledger/verify', requireAuth, verifyLedgerChain);
+router.get('/:stokvelId/ledger/balance-check', requireAuth, checkBalance);
 router.get('/:stokvelId/loans', requireAuth, listLoans);
 router.post('/:stokvelId/loans', requireAuth, requestLoan);
 router.post('/:stokvelId/loans/:loanId/vote', requireAuth, voteLoan);

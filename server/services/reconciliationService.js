@@ -4,7 +4,7 @@
 // Culture before capital.
 
 import prisma from '../config/db.js';
-import { postEntry } from './ledgerService.js';
+import { ensureLedgerTables, lockStokvelLedger, postEntryWithBalanceTx } from './ledgerService.js';
 import { toCents } from '../utils/money.js';
 
 const STK_REF_REGEX = /STK-([A-Z]{3})-(\d{3})/;
@@ -24,16 +24,42 @@ function isSelfEnteredDeposit(rawLog, member) {
   return Boolean(payload.manuallyEntered && payload.enteredBy && payload.enteredBy === member.userId);
 }
 
-// Puts a bank-matched contribution on the tamper-evident books. The bank
-// entry itself is the second check (money really arrived), so automatic
-// matches have no human approver; manual matches record the official.
-// A failure here never undoes the match: it is logged and returned as a
-// warning, and repeating is safe because the key is the bank entry id.
-async function postBankContribution({ rawLog, member, approvedById = null }) {
-  try {
-    const cents = toCents(String(rawLog.amount));
-    if (cents <= 0) throw new Error('Bank entry has no positive amount');
-    await postEntry({
+// Claims a bank entry for a member and records it, all in ONE transaction
+// (FIN-01/FIN-03): the claim, the Contribution row, the books entry and the
+// stored group balance are saved together or not at all. The bank entry
+// itself is the second check (money really arrived), so automatic matches
+// have no human approver; manual matches record the official.
+// Returns false if someone else already claimed this bank entry.
+async function claimAndRecordDeposit({ rawLog, member, approvedById = null }) {
+  // Exact cents: a bank amount with a fraction of a cent is refused, never rounded.
+  const cents = toCents(String(rawLog.amount));
+  if (cents <= 0) throw new Error('Bank entry has no positive amount');
+  await ensureLedgerTables();
+
+  return prisma.$transaction(async (tx) => {
+    // Ledger lock first, the same lock order as every other money flow.
+    await lockStokvelLedger(tx, rawLog.stokvelId);
+
+    // A manual "run reconciliation" trigger and the auto-run that follows
+    // every createRawLog call can both reach this same rawLogId. Gate the
+    // claim atomically so only one caller wins it.
+    const claim = await tx.rawBankLog.updateMany({
+      where: { id: rawLog.id, matchedMemberId: null },
+      data: { matchedMemberId: member.id },
+    });
+    if (claim.count === 0) return false;
+
+    await tx.contribution.create({
+      data: {
+        stokvelId: rawLog.stokvelId,
+        memberId: member.id,
+        amount: rawLog.amount,
+        status: 'CONFIRMED',
+        rawBankLogId: rawLog.id,
+      },
+    });
+
+    await postEntryWithBalanceTx(tx, {
       stokvelId: rawLog.stokvelId,
       kind: 'CONTRIBUTION',
       memo: approvedById ? 'Bank deposit assigned to member by an official' : 'Bank deposit matched by reference code',
@@ -42,11 +68,8 @@ async function postBankContribution({ rawLog, member, approvedById = null }) {
       createdById: member.userId,
       approvedById,
     });
-    return null;
-  } catch (error) {
-    console.error('LEDGER POST FAILED bank', rawLog.id, error.message);
-    return 'The deposit was matched but the books entry could not be saved. Tell your treasurer so it can be corrected.';
-  }
+    return true;
+  });
 }
 
 // Process a single RawBankLog entry
@@ -71,35 +94,10 @@ export async function processRawLog(rawLogId) {
     }
 
     if (member) {
-      // A manual "run reconciliation" trigger and the auto-run that follows
-      // every createRawLog call can both reach this same rawLogId. Gate the
-      // claim atomically so only one caller wins it and only one Contribution
-      // and one ledger credit exist for the bank entry.
-      const claimed = await prisma.$transaction(async (tx) => {
-        const claim = await tx.rawBankLog.updateMany({
-          where: { id: rawLog.id, matchedMemberId: null },
-          data: { matchedMemberId: member.id },
-        });
-        if (claim.count === 0) return false;
-
-        await tx.contribution.create({
-          data: {
-            stokvelId: rawLog.stokvelId,
-            memberId: member.id,
-            amount: rawLog.amount,
-            status: 'CONFIRMED',
-            rawBankLogId: rawLog.id,
-          },
-        });
-
-        await upsertGroupLedgerTx(tx, rawLog.stokvelId, rawLog.amount);
-        return true;
-      });
-
+      const claimed = await claimAndRecordDeposit({ rawLog, member });
       if (!claimed) return null; // Someone else's concurrent call already matched it
-
-      const ledgerWarning = await postBankContribution({ rawLog, member });
-      return { status: 'MATCHED', memberId: member.id, amount: rawLog.amount, ledgerWarning };
+      // ledgerWarning stays in the response for older screens; it is always null now.
+      return { status: 'MATCHED', memberId: member.id, amount: rawLog.amount, ledgerWarning: null };
     }
   }
 
@@ -164,32 +162,11 @@ export async function manualAssign(rawLogId, memberId, officialId) {
   }
 
   // Two officials assigning the same raw log at once could both pass the plain
-  // check above. Claim atomically so only one creates the contribution.
-  const claimed = await prisma.$transaction(async (tx) => {
-    const claim = await tx.rawBankLog.updateMany({
-      where: { id: rawLog.id, matchedMemberId: null },
-      data: { matchedMemberId: member.id },
-    });
-    if (claim.count === 0) return false;
-
-    await tx.contribution.create({
-      data: {
-        stokvelId: rawLog.stokvelId,
-        memberId: member.id,
-        amount: rawLog.amount,
-        status: 'CONFIRMED',
-        rawBankLogId: rawLog.id,
-      },
-    });
-
-    await upsertGroupLedgerTx(tx, rawLog.stokvelId, rawLog.amount);
-    return true;
-  });
-
+  // check above. The claim inside the transaction lets only one record it.
+  const claimed = await claimAndRecordDeposit({ rawLog, member, approvedById: officialId });
   if (!claimed) throw new Error('Already matched');
 
-  const ledgerWarning = await postBankContribution({ rawLog, member, approvedById: officialId });
-  return { status: 'MANUALLY_ASSIGNED', memberId: member.id, amount: rawLog.amount, ledgerWarning };
+  return { status: 'MANUALLY_ASSIGNED', memberId: member.id, amount: rawLog.amount, ledgerWarning: null };
 }
 
 // Get unmatched queue for officials
@@ -214,27 +191,4 @@ export async function getGroupLedger(stokvelId) {
       },
     },
   });
-}
-
-// Helper: create or update group ledger. Takes the Prisma client (or an
-// active $transaction's tx) explicitly so callers running inside a
-// transaction don't accidentally issue this write outside it.
-async function upsertGroupLedgerTx(client, stokvelId, delta) {
-  const existing = await client.stokvelGroupLedger.findUnique({
-    where: { stokvelId },
-  });
-
-  if (existing) {
-    await client.stokvelGroupLedger.update({
-      where: { stokvelId },
-      data: {
-        totalBalance: { increment: delta },
-        updatedAt: new Date(),
-      },
-    });
-  } else {
-    await client.stokvelGroupLedger.create({
-      data: { stokvelId, totalBalance: delta },
-    });
-  }
 }
