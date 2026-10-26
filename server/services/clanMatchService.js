@@ -27,12 +27,17 @@ function editDistance(a, b) {
   return row[b.length];
 }
 
-export async function buildClanIndex() {
+let clanIndexCache = null;
+let clanIndexCachedAt = 0;
+const CLAN_INDEX_TTL_MS = 30_000;
+
+export async function buildClanIndex({ forceRefresh = false } = {}) {
+  if (!forceRefresh && clanIndexCache && Date.now() - clanIndexCachedAt < CLAN_INDEX_TTL_MS) return clanIndexCache;
   const groups = await prisma.clanGroup.findMany({
     include: { aliases: true },
     orderBy: { clanName: 'asc' },
   });
-  return groups.map((group) => ({
+  clanIndexCache = groups.map((group) => ({
     id: group.id,
     head: group.clanName,
     display: group.clanName,
@@ -42,6 +47,13 @@ export async function buildClanIndex() {
       ...group.aliases.map((alias) => ({ label: alias.aliasForm, kind: 'alias' })),
     ],
   }));
+  clanIndexCachedAt = Date.now();
+  return clanIndexCache;
+}
+
+export function clearClanIndexCache() {
+  clanIndexCache = null;
+  clanIndexCachedAt = 0;
 }
 
 export async function matchClan(query) {
