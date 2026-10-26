@@ -8,9 +8,9 @@ import { toCents } from '../utils/money.js';
 
 export async function createStokvel(req, res) {
   const userId = req.userId;
-  const { name, type, contributionAmount, contributionFrequency, targetAmount, targetDate, ceremonyType } = req.body;
+  const { name, type, contributionAmount, contributionFrequency, targetAmount, targetDate, ceremonyType } = req.body || {};
 
-  if (!name || !type) {
+  if (!name || !String(name).trim() || !type) {
     return res.status(400).json({ error: 'Name and type are required' });
   }
 
@@ -36,33 +36,35 @@ export async function createStokvel(req, res) {
   }
 
   try {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-
-    const stokvel = await prisma.stokvel.create({
-      data: {
-        name,
-        type,
-        organiserId: userId,
-        bankingTrack: 'AFRICAN_BANK',
-        contributionAmount: contributionAmount !== undefined && contributionAmount !== null && contributionAmount !== '' ? toCents(String(contributionAmount)) / 100 : null,
-        contributionFrequency: contributionFrequency || null,
-        targetAmount: targetAmount !== undefined && targetAmount !== null && targetAmount !== '' ? toCents(String(targetAmount)) / 100 : null,
-        targetDate: targetDate ? new Date(targetDate) : null,
-        ceremonyType: ceremonyType || null,
-      },
-    });
-
-    await prisma.stokvelGroupLedger.create({
-      data: { stokvelId: stokvel.id, totalBalance: 0 },
-    });
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, firstName: true } });
+    if (!user) return res.status(401).json({ error: 'Your account could not be verified. Please sign in again.' });
 
     const referenceCode = await generateReferenceCode(user.firstName, 1);
-    await prisma.stokvelMember.create({
-      data: { stokvelId: stokvel.id, userId, referenceCode },
-    });
+    const stokvel = await prisma.$transaction(async (tx) => {
+      const created = await tx.stokvel.create({
+        data: {
+          name: String(name).trim(),
+          type,
+          organiserId: userId,
+          bankingTrack: 'AFRICAN_BANK',
+          contributionAmount: contributionAmount !== undefined && contributionAmount !== null && contributionAmount !== '' ? toCents(String(contributionAmount)) / 100 : null,
+          contributionFrequency: contributionFrequency || null,
+          targetAmount: targetAmount !== undefined && targetAmount !== null && targetAmount !== '' ? toCents(String(targetAmount)) / 100 : null,
+          targetDate: targetDate ? new Date(targetDate) : null,
+          ceremonyType: ceremonyType || null,
+        },
+      });
 
-    await prisma.stokvelOfficial.create({
-      data: { stokvelId: stokvel.id, userId, role: 'CHAIRPERSON' },
+      await tx.stokvelGroupLedger.create({
+        data: { stokvelId: created.id, totalBalance: 0 },
+      });
+      await tx.stokvelMember.create({
+        data: { stokvelId: created.id, userId, referenceCode },
+      });
+      await tx.stokvelOfficial.create({
+        data: { stokvelId: created.id, userId, role: 'CHAIRPERSON' },
+      });
+      return created;
     });
 
     res.status(201).json({ stokvel, referenceCode, message: `Stokvel created. You are the Chairperson. Your reference code is ${referenceCode}.` });
