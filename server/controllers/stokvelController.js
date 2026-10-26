@@ -165,7 +165,7 @@ export async function deleteStokvel(req, res) {
       bankLogCount > 0 ||
       [loanRows, fineRows, tradeCreditRows, lendingRows].some((rows) => Number(rows[0]?.count || 0) > 0);
 
-    if (ledger || hasFinancialHistory) {
+    if (hasFinancialHistory) {
       return res.status(409).json({
         error: 'This stokvel has membership, a ledger, or financial history. Deletion is disabled to protect records. Use a supported closure/archive process or contact support.',
         code: 'STOKVEL_FINANCIAL_HISTORY_REQUIRES_ARCHIVE',
