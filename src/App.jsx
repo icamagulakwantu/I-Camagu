@@ -310,6 +310,11 @@ const SCREEN_PATHS = {
 function screenForPath(pathname) {
   if (pathname === '/' || pathname === '') return 'home';
   if (/^\\/ceremonies\\/[^/]+$/.test(pathname) && !['/ceremonies/plan', '/ceremonies/timeline'].includes(pathname)) return 'ceremony';
+  if (/^\\/me\\/iziduko\\/[^/]+$/.test(pathname)) return 'izidukoprofile';
+  if (/^\\/me\\/messages\\/[^/]+$/.test(pathname)) return 'izidukochat';
+  if (/^\\/me\\/clan-groups\\/[^/]+$/.test(pathname)) return 'clangroups';
+  if (/^\\/ceremonies\\/budget\\/[^/]+$/.test(pathname)) return 'budget';
+  if (/^\\/services\\/ekoyini\\/booking\\/[^/]+$/.test(pathname)) return 'ekoyinibooking';
   return Object.entries(SCREEN_PATHS).find(([, path]) => path === pathname)?.[0] || 'home';
 }
 
@@ -344,13 +349,24 @@ function MainApp() {
   }
 
   useEffect(() => {
-    const ceremonyMatch = location.pathname.match(/^\\/ceremonies\\/([^/]+)$/)
+    const path = location.pathname;
+    const ceremonyMatch = path.match(/^\\/ceremonies\\/([^/]+)$/);
     if (ceremonyMatch && !['plan', 'timeline'].includes(ceremonyMatch[1])) {
-      setSelectedCeremonyId(ceremonyMatch[1])
-      setScreenState('ceremony')
-      return
+      setSelectedCeremonyId(ceremonyMatch[1]);
+      setScreenState('ceremony');
+      return;
     }
-    setScreenState(screenForPath(location.pathname))
+    const izidukoProfileMatch = path.match(/^\\/me\\/iziduko\\/([^/]+)$/);
+    if (izidukoProfileMatch) setIzidukoTargetUserId(izidukoProfileMatch[1]);
+    const izidukoChatMatch = path.match(/^\\/me\\/messages\\/([^/]+)$/);
+    if (izidukoChatMatch) setIzidukoTargetUserId(izidukoChatMatch[1]);
+    const clanGroupMatch = path.match(/^\\/me\\/clan-groups\\/([^/]+)$/);
+    if (clanGroupMatch) setClanGroupId(clanGroupMatch[1]);
+    const budgetMatch = path.match(/^\\/ceremonies\\/budget\\/([^/]+)$/);
+    if (budgetMatch) setBudgetPlanId(budgetMatch[1]);
+    const bookingMatch = path.match(/^\\/services\\/ekoyini\\/booking\\/([^/]+)$/);
+    if (bookingMatch) setEkoyiniBookingCeremonyId(bookingMatch[1]);
+    setScreenState(screenForPath(path));
   }, [location.pathname])
 
   // Basket count
@@ -379,13 +395,15 @@ function MainApp() {
   const openBudget = (planId, planTitle) => {
     setBudgetPlanId(planId)
     setBudgetPlanTitle(planTitle)
-    setScreen('budget')
+    setScreenState('budget')
+    navigate('/ceremonies/budget/' + encodeURIComponent(planId))
   }
 
   const openEkoyiniBooking = (ceremonyId, ceremonyTitle) => {
     setEkoyiniBookingCeremonyId(ceremonyId)
     setEkoyiniBookingCeremonyTitle(ceremonyTitle)
-    setScreen('ekoyinibooking')
+    setScreenState('ekoyinibooking')
+    navigate('/services/ekoyini/booking/' + encodeURIComponent(ceremonyId))
   }
 
   const openExistingCeremony = (ceremonyId) => {
@@ -396,17 +414,20 @@ function MainApp() {
 
   const openIzidukoProfile = (userId) => {
     setIzidukoTargetUserId(userId)
-    setScreen('izidukoprofile')
+    setScreenState('izidukoprofile')
+    navigate('/me/iziduko/' + encodeURIComponent(userId))
   }
 
   const openIzidukoChat = (userId) => {
     setIzidukoTargetUserId(userId)
-    setScreen('izidukochat')
+    setScreenState('izidukochat')
+    navigate('/me/messages/' + encodeURIComponent(userId))
   }
 
   const openClanGroup = (groupId) => {
     setClanGroupId(groupId || null)
-    setScreen('clangroups')
+    setScreenState('clangroups')
+    navigate(groupId ? '/me/clan-groups/' + encodeURIComponent(groupId) : '/me/clan-groups')
   }
 
   // Open Hierarchy, optionally with a pre-selected ceremony
