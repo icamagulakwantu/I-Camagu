@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import { CommunityProvider } from './context/CommunityContext.jsx'
 import { ToastProvider, useToast } from './components/ui/Toast.jsx'
@@ -247,10 +247,59 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
   )
 }
 
+const SCREEN_PATHS = {
+  home: '/',
+  ceremonyhub: '/ceremonies',
+  ceremony: '/ceremonies/plan',
+  timeline: '/ceremonies/timeline',
+  store: '/smartmatch',
+  basket: '/basket',
+  stokvels: '/stokvels',
+  more: '/me',
+  profile: '/me/profile',
+  iziduko: '/me/iziduko',
+  clangroups: '/me/clan-groups',
+  legends: '/me/legends',
+  directory: '/me/directory',
+  myorders: '/smartmatch/orders',
+  notifications: '/me/notifications',
+  account: '/me/account',
+  help: '/me/help',
+  privacy: '/me/privacy',
+  activity: '/me/activity',
+  budget: '/ceremonies/budget',
+  templates: '/ceremonies/templates',
+  hierarchy: '/ceremonies/hierarchy',
+  family: '/ceremonies/family',
+  ukugida: '/ceremonies/ukugida',
+  ukusoka: '/ceremonies/ukusoka',
+  expenditure: '/me/expenditure',
+  shrinefund: '/me/ubuhlanti',
+  pin: '/me/pin',
+  ekoyini: '/services/ekoyini',
+  ekoyinibooking: '/services/ekoyini/booking',
+  supplier: '/supplier',
+  portal: '/me/portal',
+  identityadmin: '/admin/identity',
+  marginadmin: '/admin/margins',
+  demandadmin: '/admin/demand',
+  ekoyiniadmin: '/admin/ekoyini',
+  izidukoprofile: '/me/iziduko/profile',
+  izidukochat: '/me/messages',
+};
+
+function screenForPath(pathname) {
+  if (pathname === '/' || pathname === '') return 'home';
+  if (/^\\/ceremonies\\/[^/]+$/.test(pathname) && !['/ceremonies/plan', '/ceremonies/timeline'].includes(pathname)) return 'ceremony';
+  return Object.entries(SCREEN_PATHS).find(([, path]) => path === pathname)?.[0] || 'home';
+}
+
 // ---------- MainApp ----------
 function MainApp() {
   const { accessToken } = useAuth()
-  const [screen, setScreen] = useState('home')
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [screen, setScreenState] = useState(() => screenForPath(location.pathname))
   const [basketCount, setBasketCount] = useState(0)
 
   // Ceremony planning state
@@ -267,6 +316,23 @@ function MainApp() {
   const [clanGroupId, setClanGroupId] = useState(null)
   // Hierarchy: optionally pre-select a ceremony from CeremonyHub
   const [hierarchyCeremonyId, setHierarchyCeremonyId] = useState(null)
+
+  // Keep the browser address in sync with screen navigation so refresh, share
+  // and the browser back button return to a meaningful place in the app.
+  const setScreen = (nextScreen) => {
+    setScreenState(nextScreen)
+    navigate(SCREEN_PATHS[nextScreen] || '/')
+  }
+
+  useEffect(() => {
+    const ceremonyMatch = location.pathname.match(/^\\/ceremonies\\/([^/]+)$/)
+    if (ceremonyMatch && !['plan', 'timeline'].includes(ceremonyMatch[1])) {
+      setSelectedCeremonyId(ceremonyMatch[1])
+      setScreenState('ceremony')
+      return
+    }
+    setScreenState(screenForPath(location.pathname))
+  }, [location.pathname])
 
   // Basket count
   useEffect(() => {
@@ -305,7 +371,8 @@ function MainApp() {
 
   const openExistingCeremony = (ceremonyId) => {
     setSelectedCeremonyId(ceremonyId)
-    setScreen('ceremony')
+    setScreenState('ceremony')
+    navigate('/ceremonies/' + encodeURIComponent(ceremonyId))
   }
 
   const openIzidukoProfile = (userId) => {
