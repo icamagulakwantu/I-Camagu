@@ -74,3 +74,47 @@ jobs:
 
       - name: Run real PostgreSQL financial integrity tests
         run: yarn vitest run server/services/ledgerService.integration.test.js server/controllers/stokvelFinanceController.integration.test.js server/controllers/stokvelPoolFundingController.integration.test.js
+
+  migration-baseline-validation:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: icamagu_migration_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d icamagu_migration_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/icamagu_migration_test?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Generate Prisma client
+        run: yarn prisma:generate
+      - name: Generate candidate baseline SQL from current Prisma schema
+        run: |
+          mkdir -p migration-artifacts
+          yarn prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > migration-artifacts/20261026_candidate_baseline.sql
+          test -s migration-artifacts/20261026_candidate_baseline.sql
+      - name: Apply candidate baseline to disposable PostgreSQL
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f migration-artifacts/20261026_candidate_baseline.sql
+      - name: Verify candidate schema has no Prisma drift
+        run: yarn prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code
+      - name: Upload candidate baseline for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: icamagu-prisma-candidate-baseline
+          path: migration-artifacts/20261026_candidate_baseline.sql
+          if-no-files-found: error
+          retention-days: 14
