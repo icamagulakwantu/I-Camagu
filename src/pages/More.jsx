@@ -157,19 +157,19 @@ export default function More({ onNavigate }) {
         <div className="px-5 py-4">
           <div className="flex items-center gap-2.5 mb-2">
             <Icon name="flame" size={20} color="#ffffff" strokeWidth={1.5} />
-            <p className="eyebrow text-white/70">Ubuhlanti bakwa Xhosa</p>
+            <p className="eyebrow text-white/90">Ubuhlanti bakwa Xhosa</p>
           </div>
           <p className="font-display font-bold text-xl text-white leading-tight mb-1">
             A sacred sanctuary for the Xhosa nation
           </p>
-          <p className="text-white/75 text-xs leading-relaxed">
+          <p className="text-white/90 text-xs leading-relaxed">
             A blessed kraal where families without a homestead can perform rites for their ancestors, supported by community tithes, and a fund building township prosperity.
           </p>
           <div className="mt-3 flex items-center gap-1.5">
             <span className="text-xs font-bold text-white">Jonga Ubuhlanti</span>
             <Icon name="arrowRight" size={13} color="#ffffff" />
           </div>
-          <p className="text-white/50 text-[10px] mt-0.5">View Ubuhlanti</p>
+          <p className="text-white/90 text-[10px] mt-0.5">View Ubuhlanti</p>
         </div>
       </button>
 
