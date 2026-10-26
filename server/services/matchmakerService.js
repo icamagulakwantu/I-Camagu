@@ -67,48 +67,72 @@ function tierBasisForCategory(category) {
 // fixed universal timer. Joining an already-open pool inherits whatever
 // deadline (or lack of one) that pool already has; one later member can't
 // silently shorten or remove the date everyone already in it is relying on.
-async function findOrCreateOpenPool(category, area, targetDate) {
-  let pool = await prisma.bulkPool.findFirst({
-    where: { category, area, status: 'OPEN' },
-    include: { baskets: { include: { items: true } } },
+function normaliseArea(value) {
+  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .trim().toLocaleLowerCase().replace(/\s+/g, ' ');
+}
+
+function distanceKm(aLat, aLon, bLat, bLon) {
+  const radians = (value) => value * Math.PI / 180;
+  const dLat = radians(bLat - aLat);
+  const dLon = radians(bLon - aLon);
+  const h = Math.sin(dLat / 2) ** 2
+    + Math.cos(radians(aLat)) * Math.cos(radians(bLat)) * Math.sin(dLon / 2) ** 2;
+  return 6371 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+}
+
+async function findOrCreateOpenPool(category, area, targetDate, user) {
+  const partner = await pickBestPartnerForCategory(area, category);
+  const candidates = await prisma.bulkPool.findMany({
+    where: { category, status: 'OPEN' },
+    include: { partner: true, baskets: { include: { items: true } } },
     orderBy: { createdAt: 'desc' },
+    take: 100,
+  });
+  let pool = candidates.find((candidate) => {
+    const hasUserCoordinates = Number.isFinite(user?.latitude) && Number.isFinite(user?.longitude);
+    const hasPoolCoordinates = Number.isFinite(candidate.latitude) && Number.isFinite(candidate.longitude);
+    if (hasUserCoordinates && hasPoolCoordinates) {
+      return distanceKm(user.latitude, user.longitude, candidate.latitude, candidate.longitude) <= (candidate.radiusKm || 20);
+    }
+    // Legacy pools without coordinates remain discoverable by normalized
+    // town names; case and surrounding whitespace no longer split a pool.
+    return normaliseArea(area) && normaliseArea(area) === normaliseArea(candidate.area);
   });
   if (pool) {
     const currentCases = pool.baskets
-      .filter((b) => b.status !== 'CANCELLED')
-      .reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
+      .filter((basket) => basket.status !== 'CANCELLED')
+      .reduce((sum, basket) => sum + basket.items.reduce((n, item) => n + item.quantity, 0), 0);
     if (isPoolWindowClosed(pool, currentCases)) pool = null;
   }
   if (!pool) {
-    // Same baseline default a pool has always used when no partner-specific
-    // MOQ is on file yet (see the old partner.moq || 50 fallback) — refined
-    // once a real supplier quote exists for this category/area.
-    const moqTarget = 50;
+    // Use a supplier's recorded minimum when one exists. The 50-case value
+    // remains a clearly documented fallback, not a substitute for real MOQ.
+    const moqTarget = Number.isInteger(partner?.moq) && partner.moq > 0 ? partner.moq : 50;
     pool = await prisma.bulkPool.create({
       data: {
         category,
-        area,
+        area: area || 'Unspecified',
+        latitude: Number.isFinite(user?.latitude) ? user.latitude : null,
+        longitude: Number.isFinite(user?.longitude) ? user.longitude : null,
+        createdById: user?.id || null,
+        radiusKm: 20,
         moqTarget,
         status: 'OPEN',
         tierBasis: tierBasisForCategory(category),
+        partnerId: partner?.id || null,
         ...newPoolWindow(moqTarget, targetDate),
       },
+      include: { partner: true, baskets: { include: { items: true } } },
+    });
+  } else if (!pool.partnerId && partner) {
+    pool = await prisma.bulkPool.update({
+      where: { id: pool.id },
+      data: { partnerId: partner.id },
+      include: { partner: true },
     });
   }
-
-  // Best-effort: if a real, confirmed supplier for this category already
-  // exists, attach it automatically — this is what shows the pool's
-  // "partner store" badge and lets that supplier manage it from their own
-  // dashboard. If none exists (or none yet), the pool still works fully;
-  // nothing here blocks it.
-  if (!pool.partnerId) {
-    const partner = await pickBestPartnerForCategory(pool.area, category);
-    if (partner) {
-      pool = await prisma.bulkPool.update({ where: { id: pool.id }, data: { partnerId: partner.id }, include: { partner: true } });
-    }
-  }
   if (!pool.partner) pool.partner = pool.partnerId ? await prisma.partner.findUnique({ where: { id: pool.partnerId } }) : null;
-
   return pool;
 }
 
@@ -146,7 +170,7 @@ export async function pickBestPartnerForCategory(area, category) {
       ? openPool.baskets.filter((b) => b.status !== 'CANCELLED').reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0)
       : 0;
     const progress = openPool ? Math.min(1, currentCases / openPool.moqTarget) : 0;
-    const sameArea = area && partner.area === area ? 1 : 0;
+    const sameArea = area && normaliseArea(partner.area) === normaliseArea(area) ? 1 : 0;
 
     return { partner, progress, sameArea };
   });
@@ -197,7 +221,7 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
       where: { id: basketId, userId, status: 'DRAFT' },
       include: { items: { include: { sku: true } } },
     }),
-    prisma.user.findUnique({ where: { id: userId }, select: { location: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { id: true, location: true, latitude: true, longitude: true } }),
   ]);
   if (!basket) throw new Error('Basket not found or already submitted');
   if (basket.items.length === 0) throw new Error('Basket is empty');
@@ -245,7 +269,7 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
   for (const [category, items] of groups) {
     const isInvitedCategory = Boolean(joinPoolId) && category === joinPoolCategory;
     const invitedPoolStillJoinable = isInvitedCategory && invitedPool.status === 'OPEN';
-    const pool = invitedPoolStillJoinable ? invitedPool : (await findOrCreateOpenPool(category, area, parsedTargetDate));
+    const pool = invitedPoolStillJoinable ? invitedPool : (await findOrCreateOpenPool(category, area, parsedTargetDate, user));
 
     // Each group gets its own basket row so it can be parked against its own
     // pool independently of the others. It is created already PARKED, never

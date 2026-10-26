@@ -1,8 +1,48 @@
 import prisma from '../config/db.js';
 import { submitBasketToPool } from '../services/matchmakerService.js';
+import { findSuggestedPoolsForItem, joinPoolWithItem, getNearbyDemandSignal } from '../services/poolDiscoveryService.js';
 import { PALLET_CASES, palletsForCases, resolveTierLadder, getTierForMetric, getNextTierForMetric, amountToReachTier } from '../utils/smartMatchTiers.js';
 
 export const CATEGORY_LABEL = { TAVERN: 'Drinks', BUTCHERY: 'Meat & livestock', GROCERY: 'Groceries & other items', PRODUCE: 'Fresh produce' };
+
+export async function suggestPoolsForItem(req, res) {
+  try {
+    const result = await findSuggestedPoolsForItem(req.userId, {
+      skuId: req.query.skuId,
+      ceremonyId: req.query.ceremonyId || undefined,
+      limit: req.query.limit,
+    });
+    const demand = await getNearbyDemandSignal(req.userId, req.query.skuId, Number(req.query.radiusKm) || 20);
+    res.json({ ...result, demand });
+  } catch (error) {
+    const status = /not found|not yet priced|required|must be in the future/i.test(error.message) ? 400 : 500;
+    res.status(status).json({ error: error.message });
+  }
+}
+
+export async function joinPoolWithChecklistItem(req, res) {
+  try {
+    const result = await joinPoolWithItem(req.userId, req.body);
+    res.status(201).json({
+      ...result,
+      message: result.match?.matched
+        ? 'Your item joined the pool and the pool has matched.'
+        : 'Your item has been added to the pool.',
+    });
+  } catch (error) {
+    const status = /not found|not open|different item category|not yet priced|must be a member|does not have enough|choose a stokvel|invalid funding source|required|does not belong/i.test(error.message) ? 400 : 500;
+    res.status(status).json({ error: error.message });
+  }
+}
+
+export async function getPoolDemandSignal(req, res) {
+  try {
+    const result = await getNearbyDemandSignal(req.userId, req.query.skuId, Number(req.query.radiusKm) || 20);
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
 
 export async function submitToPool(req, res) {
   const { basketId, targetDate, joinPoolId } = req.body;
