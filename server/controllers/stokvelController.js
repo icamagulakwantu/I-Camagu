@@ -202,50 +202,61 @@ export async function deleteStokvel(req, res) {
       });
     }
 
-    // ── Raw-SQL tables (no Prisma cascade) ─────────────────────────────────
-    // Delete child tables before parent tables to avoid FK violations.
-    // Use $executeRawUnsafe so the table name is literal (not a param),
-    // but the stokvelId value is still a bound parameter via interpolation.
-    const wipeRaw = async (table) => {
-      await prisma.$executeRawUnsafe(
-        `DELETE FROM "${table}" WHERE "stokvelId" = $1`,
-        stokvelId
-      );
-    };
+    // Keep the remaining cleanup atomic. Legacy tables are created lazily,
+    // so skip tables that do not exist in this database yet.
+    await prisma.$transaction(async (tx) => {
+      const tableExists = async (table) => {
+        const [row] = await tx.$queryRaw`SELECT to_regclass(${`"${table}"`}) IS NOT NULL AS "tableExists"`;
+        return Boolean(row?.tableExists);
+      };
 
-    // Loan repayments reference loans — delete them first.
-    await prisma.$executeRawUnsafe(
-      `DELETE FROM "StokvelLoanRepayment" WHERE "loanId" IN (
-         SELECT "id" FROM "StokvelLoan" WHERE "stokvelId" = $1
-       )`,
-      stokvelId
-    );
-    await prisma.$executeRawUnsafe(
-      `DELETE FROM "StokvelLoanVote" WHERE "loanId" IN (
-         SELECT "id" FROM "StokvelLoan" WHERE "stokvelId" = $1
-       )`,
-      stokvelId
-    );
-    await wipeRaw('StokvelLoan');
-    await wipeRaw('StokvelTradeCredit');
-    await wipeRaw('StokvelMinutes');
-    await wipeRaw('StokvelFine');
-    await wipeRaw('StokvelConstitution');
-    await wipeRaw('StokvelAuditLog');
-    await wipeRaw('StokvelLendingEntry');
-    await wipeRaw('StokvelLendingTarget');
+      const wipeRaw = async (table) => {
+        if (!await tableExists(table)) return;
+        await tx.$executeRawUnsafe(
+          `DELETE FROM "${table}" WHERE "stokvelId" = $1`,
+          stokvelId
+        );
+      };
 
-    // ── Prisma-managed tables ───────────────────────────────────────────────
-    // Payout -> PayoutApproval/ShrineContribution cascade in schema; delete
-    // Payout/Contribution before RawBankLog since they hold an optional FK to it.
-    await prisma.stokvelAnnouncement.deleteMany({ where: { stokvelId } });
-    await prisma.payout.deleteMany({ where: { stokvelId } });
-    await prisma.contribution.deleteMany({ where: { stokvelId } });
-    await prisma.rawBankLog.deleteMany({ where: { stokvelId } });
-    await prisma.stokvelMember.deleteMany({ where: { stokvelId } });
-    await prisma.stokvelOfficial.deleteMany({ where: { stokvelId } });
-    await prisma.stokvelGroupLedger.deleteMany({ where: { stokvelId } });
-    await prisma.stokvel.delete({ where: { id: stokvelId } });
+      // These child tables reference loans, so remove them before the loan rows.
+      if (await tableExists('StokvelLoanRepayment')) {
+        await tx.$executeRawUnsafe(
+          `DELETE FROM "StokvelLoanRepayment" WHERE "loanId" IN (
+             SELECT "id" FROM "StokvelLoan" WHERE "stokvelId" = $1
+           )`,
+          stokvelId
+        );
+      }
+      if (await tableExists('StokvelLoanVote')) {
+        await tx.$executeRawUnsafe(
+          `DELETE FROM "StokvelLoanVote" WHERE "loanId" IN (
+             SELECT "id" FROM "StokvelLoan" WHERE "stokvelId" = $1
+           )`,
+          stokvelId
+        );
+      }
+      for (const table of [
+        'StokvelLoan',
+        'StokvelTradeCredit',
+        'StokvelMinutes',
+        'StokvelFine',
+        'StokvelConstitution',
+        'StokvelAuditLog',
+        'StokvelLendingEntry',
+        'StokvelLendingTarget',
+      ]) {
+        await wipeRaw(table);
+      }
+
+      await tx.stokvelAnnouncement.deleteMany({ where: { stokvelId } });
+      await tx.payout.deleteMany({ where: { stokvelId } });
+      await tx.contribution.deleteMany({ where: { stokvelId } });
+      await tx.rawBankLog.deleteMany({ where: { stokvelId } });
+      await tx.stokvelMember.deleteMany({ where: { stokvelId } });
+      await tx.stokvelOfficial.deleteMany({ where: { stokvelId } });
+      await tx.stokvelGroupLedger.deleteMany({ where: { stokvelId } });
+      await tx.stokvel.delete({ where: { id: stokvelId } });
+    });
 
     res.json({ message: 'Stokvel deleted' });
   } catch (error) {
