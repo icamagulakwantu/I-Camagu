@@ -174,10 +174,12 @@ integrationDescribe('PostgreSQL ledger integration (real database)', () => {
       spend(`final-spend-a:${stokvelId}`),
       spend(`final-spend-b:${stokvelId}`),
     ]);
-    expect(results.filter(x => x.status === 'fulfilled')).toHaveLength(2);
+    expect(results.filter(x => x.status === 'fulfilled')).toHaveLength(1);
+    expect(results.filter(x => x.status === 'rejected')).toHaveLength(1);
     const balance = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
-    // Current balance after earlier test cases is R35; both R20 spends fit.
-    expect(Number(balance.totalBalance)).toBe( -5 );
+    // Current balance after earlier test cases is R35; only one R20 spend fits.
+    expect(Number(balance.totalBalance)).toBe(15);
+    expect((await verifyLedger(stokvelId)).ok).toBe(true);
   });
 
   it('rejects database-level edits to immutable ledger history', async () => {
