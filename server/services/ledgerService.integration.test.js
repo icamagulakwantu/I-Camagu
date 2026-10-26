@@ -121,6 +121,36 @@ integrationDescribe('PostgreSQL ledger integration (real database)', () => {
     expect((await verifyLedger(stokvelId)).ok).toBe(true);
   });
 
+  it('rolls back both ledger entry and balance when a transaction fails', async () => {
+    const before = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
+    const entriesBefore = await prisma.$queryRaw`
+      SELECT COUNT(*)::int AS count FROM "LedgerEntry" WHERE "stokvelId" = ${stokvelId}
+    `;
+
+    await expect(prisma.$transaction(async (tx) => {
+      await postEntryWithBalanceTx(tx, {
+        stokvelId,
+        kind: 'CONTRIBUTION',
+        memo: 'Must roll back with transaction',
+        idempotencyKey: `rollback:${stokvelId}`,
+        createdById: userId,
+        lines: [
+          { account: 'BANK', amountCents: 1_000 },
+          { account: 'CONTRIBUTIONS', amountCents: -1_000 },
+        ],
+      });
+      throw new Error('FORCE_ROLLBACK');
+    })).rejects.toThrow('FORCE_ROLLBACK');
+
+    const after = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
+    const entriesAfter = await prisma.$queryRaw`
+      SELECT COUNT(*)::int AS count FROM "LedgerEntry" WHERE "stokvelId" = ${stokvelId}
+    `;
+    expect(Number(after.totalBalance)).toBe(Number(before.totalBalance));
+    expect(entriesAfter[0].count).toBe(entriesBefore[0].count);
+    expect((await verifyLedger(stokvelId)).ok).toBe(true);
+  });
+
   it('rejects database-level edits to immutable ledger history', async () => {
     const rows = await prisma.$queryRaw`
       SELECT "id" FROM "LedgerEntry" WHERE "stokvelId" = ${stokvelId} ORDER BY "seq" ASC LIMIT 1
