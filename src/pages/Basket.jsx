@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useCommunity } from '../context/CommunityContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
@@ -38,6 +39,7 @@ function tierValueLabel(tier, basis) {
 
 export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
   const { accessToken } = useAuth()
+  const { refreshPools } = useCommunity()
   const { showToast } = useToast()
 
   const [basketData, setBasketData] = useState({ basket: null, items: [], totalCases: 0, totalZAR: 0 })
@@ -179,6 +181,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       if (joiningPool) dismissJoiningPool()
       fetchBasket()
       fetchPoolStatus()
+      refreshPools()
     } catch (err) {
       showToast(err.message, 'error')
     } finally {
