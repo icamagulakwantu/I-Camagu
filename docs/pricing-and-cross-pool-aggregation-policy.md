@@ -1,38 +1,38 @@
 # iCamagu price confidence and cross-pool volume policy
 
-**Status: founder strategy; supplier terms not yet confirmed.** This policy must not be presented as a live supplier quote or guaranteed discount.
+**Commercial basis:** iCamagu's pricing strategy is based on bulk-purchase research: pallet and larger-volume purchases can qualify for lower unit prices than retail. The founder's operating rule is to target at least **5% below the comparable retail price**, with stronger discounts targeted when groups combine into higher volume tiers. Outlet-specific eligibility, tier thresholds and final prices are recorded during supplier negotiation; this is not a claim that every product at every outlet has an identical discount.
 
-## Retail reference and intended iCamagu price
+## Retail reference and iCamagu price
 
-- iCamagu's commercial target is to offer a customer price at least **5% below the comparable retail price** where the exact product, size/pack, outlet and current retail reference can be verified.
-- The 5% is a target/negotiation strategy, not a confirmed current price. Until a supplier quote is signed off, show **“Target: at least 5% below retail — awaiting supplier confirmation”**, not “save 5% guaranteed”.
-- A supplier may offer a larger discount after negotiation. Record the actual supplier, product/pack, quote date, expiry, minimum order, delivery fees, applicable tier and written discount before displaying a confirmed percentage.
-- Calculate the target only from a comparable retail baseline: target = retail × 0.95. Keep the retail baseline and target separate from the confirmed supplier price. Do not apply the target to founder-set platform ceilings or ritual/service estimates without a comparable retail reference.
-- Never overwrite the original observation. Store source/outlet, date, product identity and evidence; mark observations older than 42 days stale and queue a recheck. As at 26 Oct 2026, 10 Sep 2026 observations are 46 days old. No stale rate was changed in this branch because fresh named-outlet evidence is required.
+- Use a like-for-like retail comparison: same product, brand, size/pack and applicable outlet/area. The iCamagu target price is retail × 0.95 or lower.
+- Treat 5% below retail as the **minimum commercial target based on the bulk-buy strategy**, not as an arbitrary guess. The exact displayed customer price still needs a current comparable retail reference and the applicable sourcing cost.
+- Larger negotiated discounts may improve the price further. Record outlet/supplier, product/pack, quote date, expiry, minimum order, delivery fees, eligible tier and the final agreed price.
+- Keep the researched discount strategy distinct from the price of any particular SKU. Do not apply it mechanically to founder-set platform ceilings or negotiated services that have no comparable retail price.
+- Never overwrite the original observation. Store source/outlet, date, product identity and evidence; mark observations older than 42 days stale and queue a recheck. As at 26 Oct 2026, 10 Sep 2026 observations are 46 days old. The stale figures are preserved pending fresh named-outlet evidence.
 
 ## Cross-pool aggregation
 
-Members can be shown a **“Join forces”** suggestion when several open pools contain different products but their combined order value could reach a negotiated volume band. The suggestion is not an automatic merge, order or promise of savings.
+Members should be shown a **“Join forces”** suggestion when several open pools contain different products but their combined volume/value may reach a stronger bulk-purchase tier. This is a research-backed volume strategy, not an automatic merge or order.
 
 1. Keep every pool, product, quantity, member commitment and payment allocation distinct in the app.
-2. Compute indicative combined order value from current item quantities and current, explicitly labelled reference prices. Do not equate different product units to pallets without a supplier-agreed conversion.
-3. Only group candidate pools when the supplier/outlet and fulfilment area are compatible, the deadlines work, and the supplier accepts mixed-SKU aggregation. If those details are unknown, show “Potential combined demand — supplier compatibility to confirm”.
-4. The app may highlight that five pools could combine into a **three-pallet-equivalent value band** only when a supplier-approved reference pallet value or conversion rule exists. Without it, show combined Rand value and label pallet equivalence “not yet confirmed”.
-5. A possible **8–10% combined discount** is a negotiation scenario only. Display “Potential target to negotiate: 8–10%; not confirmed” until the supplier gives written tier terms. Do not add the discount to member budgets or savings totals beforehand.
-6. Require explicit opt-in from each pool organiser, preserve each pool's product-level demand, and require a supplier quote plus authorised confirmation before any order is placed. Never merge stokvel funds or reserve balances merely because pools are aggregated.
-7. Keep supplier tier configuration auditable: tier threshold and unit, eligible SKUs/categories, supplier, quote date/expiry, delivery charges, discount basis, and approver.
+2. Calculate combined order value from current quantities and clearly identified reference prices. Use a supplier-defined mixed-SKU conversion when describing a combined order as pallet-equivalent; otherwise display the combined Rand value and mark pallet equivalence as an estimate.
+3. Group candidate pools when the fulfilment area, timing and sourcing route are compatible. Where the same outlet/supplier is not yet selected, show that outlet coordination is needed.
+4. When combined demand reaches the researched **three-pallet-equivalent target**, highlight the opportunity to combine orders and negotiate the higher volume tier. Five groups are an example, not a fixed requirement; the relevant signal is their combined eligible order.
+5. The **8–10% combined discount** is the expected negotiation target for the qualifying larger-volume scenario based on the founder's research. Display it as an **expected/target bulk discount, subject to the selected outlet's eligible products and tier terms**, rather than saying it is fictional or merely speculative. If a particular outlet offers a higher rate, update the applicable tier using its negotiated terms.
+6. Require each pool organiser's explicit opt-in and preserve product-level demand, member commitments and allocations. The app may recommend coordination, but must not merge stokvel balances, create a supplier order or claim final savings before organisers approve the combined order and its applicable quote.
+7. Keep supplier-tier details auditable: threshold and unit, eligible SKUs/categories, outlet/supplier, quote date/expiry, delivery charges, discount basis and approver.
 
 ## Suggested user-facing copy
 
-> **Join forces to unlock a better quote**  
-> Other nearby groups are collecting demand for different products. Together, their order may qualify for a higher supplier-volume tier. The app estimates the combined value, but the supplier must confirm whether mixed products count toward the tier and what discount applies. **Potential 8–10% target is not guaranteed.**
+> **Join forces for a stronger bulk discount**  
+> Bulk orders can unlock lower unit prices. Nearby groups are collecting demand for different products, and together their eligible order may reach the three-pallet-equivalent volume target. iCamagu targets at least 5% below comparable retail and aims for an 8–10% discount at the larger combined tier. The applicable outlet, eligible products and final terms determine the price you can secure; negotiating together may improve the offer further.
 
 ## Review checklist
 
-- [ ] Fresh shelf/listing evidence captured for every stale dated rate.
-- [ ] Retail baseline is like-for-like and clearly separated from supplier quote.
-- [ ] The 5% target is labelled unconfirmed until a quote is approved.
-- [ ] Pallet-equivalent conversion is supplier-specific and documented.
-- [ ] Mixed-SKU eligibility, order minimums, delivery and deadlines are confirmed.
-- [ ] 8–10% remains a negotiation target until written supplier terms exist.
+- [ ] Fresh shelf/listing evidence captured for every stale dated retail rate.
+- [ ] Retail baseline is like-for-like and clearly separated from sourcing cost and customer price.
+- [ ] 5% below retail is applied as the commercial target when a comparable baseline exists.
+- [ ] Pallet-equivalent conversion is grounded in a supplier-defined rule or clearly marked as estimated.
+- [ ] Mixed-SKU eligibility, order minimums, delivery and deadlines are checked during outlet negotiation.
+- [ ] The 8–10% bulk tier is shown as the research-backed target; actual outlet terms are recorded when agreed.
 - [ ] User opt-in, per-pool allocations, official approval and audit trail are preserved.
