@@ -4,9 +4,9 @@ const { prisma } = vi.hoisted(() => ({
   prisma: {
     stokvel: { findUnique: vi.fn(), delete: vi.fn() },
     stokvelGroupLedger: { findUnique: vi.fn(), deleteMany: vi.fn() },
-    stokvelMember: { count: vi.fn(), deleteMany: vi.fn() },
+    stokvelMember: { count: vi.fn(), deleteMany: vi.fn(), findFirst: vi.fn(), delete: vi.fn() },
     contribution: { count: vi.fn(), deleteMany: vi.fn() },
-    payout: { count: vi.fn(), deleteMany: vi.fn() },
+    payout: { count: vi.fn(), deleteMany: vi.fn(), findFirst: vi.fn() },
     rawBankLog: { count: vi.fn(), deleteMany: vi.fn() },
     stokvelAnnouncement: { deleteMany: vi.fn() },
     stokvelOfficial: { deleteMany: vi.fn() },
@@ -21,7 +21,7 @@ vi.mock('../config/db.js', () => ({ default: prisma }));
 vi.mock('../utils/memberReference.js', () => ({ generateReferenceCode: vi.fn() }));
 vi.mock('./stokvelApprovalsController.js', () => ({ countOpenRequests: vi.fn() }));
 
-const { deleteStokvel, createStokvel, updateStokvel } = await import('./stokvelController.js');
+const { deleteStokvel, createStokvel, updateStokvel, leaveStokvel } = await import('./stokvelController.js');
 
 function response() {
   const res = { statusCode: 200, body: undefined };
@@ -123,5 +123,34 @@ describe('stokvel budget amount validation', () => {
 
     expect(res.statusCode).toBe(400);
     expect(prisma.stokvel.delete).not.toHaveBeenCalled();
+  });
+});
+
+describe('leaveStokvel obligation checks', () => {
+  it('blocks leaving when an open loan exists', async () => {
+    prisma.stokvel.findUnique.mockResolvedValue({ organiserId: 'organiser-1', name: 'Family group' });
+    prisma.stokvelMember.findFirst.mockResolvedValue({ id: 'member-row-1' });
+    prisma.$queryRaw
+      .mockResolvedValueOnce([{ tableExists: true }])
+      .mockResolvedValueOnce([{ id: 'loan-1' }]);
+
+    const res = response();
+    await leaveStokvel({ params: { stokvelId: 'group-1' }, userId: 'member-1' }, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toContain('open loan');
+    expect(prisma.stokvelMember.delete).not.toHaveBeenCalled();
+  });
+
+  it('fails closed if the loan check fails', async () => {
+    prisma.stokvel.findUnique.mockResolvedValue({ organiserId: 'organiser-1', name: 'Family group' });
+    prisma.stokvelMember.findFirst.mockResolvedValue({ id: 'member-row-1' });
+    prisma.$queryRaw.mockRejectedValueOnce(new Error('database unavailable'));
+
+    const res = response();
+    await leaveStokvel({ params: { stokvelId: 'group-1' }, userId: 'member-1' }, res);
+
+    expect(res.statusCode).toBe(500);
+    expect(prisma.stokvelMember.delete).not.toHaveBeenCalled();
   });
 });
