@@ -166,7 +166,7 @@ integrationDescribe('PostgreSQL ledger integration (real database)', () => {
         createdById: userId,
         lines: [
           { account: 'BANK', amountCents: -2_000 },
-          { account: 'POOL_PAYMENTS', amountCents: 2_000 },
+          { account: 'PAYOUTS', amountCents: 2_000 },
         ],
       }, { requireFunds: true });
       if (posted.fundsShort) throw new Error('INSUFFICIENT_TEST_FUNDS');
