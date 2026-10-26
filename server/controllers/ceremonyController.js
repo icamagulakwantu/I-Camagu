@@ -2,6 +2,7 @@ import prisma from '../config/db.js';
 import crypto from 'crypto';
 import { CeremonyType } from '@prisma/client';
 import { CEREMONY_COST_PROFILES, getDefaultItemsForType } from './ceremonyCostProfiles.js';
+import { DRAFT_CEREMONY_TYPE_NAMES } from '../data/ceremonyDrafts.js';
 
 // UMSEBENZI_WENKOMO and IMIGIDI predate UMGIDI as the real user-facing type
 // (UMGIDI is the correct standalone ceremony; IMIGIDI was a duplicate alias
@@ -14,7 +15,7 @@ const LEGACY_CEREMONY_TYPES = new Set(['UMSEBENZI_WENKOMO', 'IMIGIDI']);
 
 export const getCeremonyTypes = async (req, res) => {
       try {
-              res.json(Object.values(CeremonyType).filter((type) => !LEGACY_CEREMONY_TYPES.has(type)));
+              res.json(Object.values(CeremonyType).filter((type) => !LEGACY_CEREMONY_TYPES.has(type) && !DRAFT_CEREMONY_TYPE_NAMES.includes(type)));
       } catch (error) {
               console.error('Error fetching ceremony types:', error);
                   res.status(500).json({ error: 'Internal server error' });
@@ -91,6 +92,10 @@ export const createCeremony = async (req, res) => {
       try {
               const { title, type, eventDate, notes, budgetZAR } = req.body;
                   const hostId = req.user.id;
+
+                      if (DRAFT_CEREMONY_TYPE_NAMES.includes(type)) {
+                        return res.status(409).json({ error: 'This ceremony is still a founder-review draft and is not available for family planning yet.' });
+                      }
 
                       if (!title || !type || !hostId) {
                                 return res.status(400).json({ error: 'Missing required fields' });
