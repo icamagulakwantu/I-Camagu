@@ -174,7 +174,7 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
   }
 
   const pools = await prisma.bulkPool.findMany({
-    where: { category: categoryForSku(sku), status: 'OPEN' },
+    where: { status: 'OPEN' },
     include: {
       partner: true,
       baskets: {
@@ -189,7 +189,7 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
     take: 100,
   });
 
-  const ranked = pools.map((pool) => {
+  const allRanked = pools.map((pool) => {
     const distanceKm = locationDistance(user, pool);
     const clan = clanScore(user, pool);
     const metrics = poolMetrics(pool);
@@ -227,7 +227,10 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
       poolPriceZAR,
       ...metrics,
     };
-  }).filter((pool) => pool.closesInTime && pool.distanceAllowed)
+  });
+
+  const eligiblePools = allRanked.filter((pool) => pool.closesInTime && pool.distanceAllowed);
+  const ranked = eligiblePools.filter((pool) => pool.category === categoryForSku(sku))
     .sort((a, b) => b.clanScore - a.clanScore
       || (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER)
       || (a.deadline ? new Date(a.deadline).getTime() : Number.MAX_SAFE_INTEGER)
@@ -239,7 +242,7 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
     sku: { id: sku.id, name: sku.name, category: sku.category, casePriceZAR: sku.casePriceZAR },
     ceremony: ceremony ? { id: ceremony.id, title: ceremony.title, eventDate: ceremony.eventDate } : null,
     pools: ranked,
-    combinedOrderSuggestions: buildCrossPoolAggregationSuggestions(ranked, sku.casePriceZAR),
+    combinedOrderSuggestions: buildCrossPoolAggregationSuggestions(eligiblePools, sku.casePriceZAR),
   };
 }
 
