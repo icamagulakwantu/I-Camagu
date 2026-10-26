@@ -297,6 +297,13 @@ function Onboarding({ onDone }) {
                 {NATION_OPTIONS.map((nation) => <option key={nation} value={nation}>{nation}</option>)}
               </select>
             </label>
+            <div className="rounded-2xl border border-cream-dark bg-white p-4 mt-3">
+              <p className="font-bold text-ink">Add your location pin</p>
+              <p className="text-xs text-ink-muted mt-1">SmartMatch uses your location to find nearby pools. Your exact coordinates are used for matching, not shown as a public address.</p>
+              <button type="button" onClick={useMyLocation} disabled={locating} className="mt-3 w-full min-h-11 rounded-full border-2 border-terracotta text-terracotta font-bold disabled:opacity-50">
+                {locating ? 'Finding location…' : coords ? 'Location pin captured ✓' : 'Use my current location'}
+              </button>
+            </div>
           </div>
 
           {error && <p className="text-terracotta text-sm mt-3">{error}</p>}
