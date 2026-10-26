@@ -492,7 +492,7 @@ export async function updateTradeCredit(req, res) {
 // the YYYY-MM-DD value before accepting it.
 export function parseStatementDateRange(query = {}, now = new Date()) {
   const parseDay = (value, endOfDay = false) => {
-    if (typeof value !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return null;
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
     const date = new Date(`${value}T${endOfDay ? '23:59:59.999' : '00:00:00.000'}Z`);
     if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) return null;
     return date;
