@@ -1,6 +1,6 @@
 import prisma from '../config/db.js';
 import { checkAndMatchPool } from './matchmakerService.js';
-import { getNextTierForMetric, palletsForCases, resolveTierLadder, amountToReachTier } from '../utils/smartMatchTiers.js';
+import { getNextTierForMetric, getTierForMetric, palletsForCases, resolveTierLadder, amountToReachTier } from '../utils/smartMatchTiers.js';
 
 const TAVERN_CATEGORIES = new Set([
   'BEER', 'CIDER_RTD', 'BRANDY', 'WHISKY', 'VODKA', 'VODKA_PREMIUM',
@@ -136,6 +136,13 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
     const distanceKm = locationDistance(user, pool);
     const clan = clanScore(user, pool);
     const metrics = poolMetrics(pool);
+    const currentTier = getTierForMetric(metrics.metric, resolveTierLadder(pool));
+    const basePrice = Number(sku.casePriceZAR);
+    let poolPriceZAR = null;
+    if (currentTier?.value != null && Number.isFinite(basePrice)) {
+      if ((pool.tierBasis || 'PALLETS') === 'PALLETS') poolPriceZAR = Number(currentTier.value);
+      else poolPriceZAR = Math.max(0, basePrice * (1 - Number(currentTier.value) / 100));
+    }
     const closesInTime = !ceremony?.eventDate || !pool.deadline || pool.deadline <= ceremony.eventDate;
     const distanceAllowed = distanceKm === null || distanceKm <= (pool.radiusKm || 20);
     return {
@@ -155,6 +162,8 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
       sharedClanLines: clan.sharedLines,
       participantCount: new Set(pool.baskets.map((basket) => basket.userId)).size,
       closesInTime,
+      currentTier: currentTier ? { id: currentTier.id, name: currentTier.name, value: currentTier.value } : null,
+      poolPriceZAR,
       ...metrics,
     };
   }).filter((pool) => pool.closesInTime && pool.distanceAllowed)
