@@ -8,6 +8,20 @@ The platform is designed to keep the core cultural layer free and accessible whi
 
 *This document is the internal product spec and architecture reference. For the investor/partner-facing pitch, see [`docs/PITCH.md`](./docs/PITCH.md).*
 
+## 2026 Money-Handling Policy
+
+**For the remainder of 2026, iCamagu will not receive, hold, pool, custody, or transfer users' money.** This applies to Stokvels, SmartMatch bulk purchases, ceremony-related purchases, and marketplace transactions. Actual payments must be made manually and directly by users to the relevant merchant or intended recipient, outside iCamagu.
+
+During this phase, iCamagu may record budgets, contribution declarations, expenses, payment references, receipts, supplier quotes, and confirmation/dispute status. These are records only: entering a payment reference or marking a record as submitted must never be treated as proof that funds were received. Confirmations must be attributable to an authorised person, and changes must remain auditable. The app must not initiate charges, collections, payouts, transfers, or automated refunds.
+
+The intended commercial model is to earn transparent platform/service fees and contractually agreed merchant-funded rebates, commissions, or negotiated benefits. Where feasible, negotiated savings should benefit users under clearly disclosed terms. iCamagu must not disguise user funds as platform revenue or treat a merchant rebate as received until it is contractually due and verified.
+
+**Future payment-provider integration is deferred until 2027 at the earliest**, and is conditional on the business bank account, merchant and provider contracts, legal/compliance review, and technical verification being complete. Any future provider-mediated payment/split-settlement flow must be approved in writing by the provider and advisers, must not make iCamagu the custodian of stokvel or purchase funds, and must clearly define the legal recipient/controller of funds, merchant settlement, platform fees, rebates/commissions, refunds, disputes, chargebacks, and reconciliation. Do not describe a provider arrangement as “escrow” unless the provider contract and legal review confirm that it is genuinely an escrow arrangement.
+
+This is a product and operational constraint, not merely a payment-integration milestone. Payment features must remain disabled for real-money use until the future launch gate is explicitly approved.
+
+---
+
 ---
 
 ## 1. What is iCamagu?
@@ -353,56 +367,33 @@ The platform is not intended to charge ordinary users simply for participating.
 
 ## 13. Pool Payment Architecture
 
-Pooled customer funds should **not simply be deposited into a partner tavern's ordinary operating bank account**.
+### 2026 policy: no custody or in-app money movement
 
-That creates unnecessary counterparty risk and could expose the community to:
+For the remainder of 2026, iCamagu must not receive, hold, pool, custody, or transfer customer or Stokvel money. Members pay the confirmed merchant directly using an agreed method outside the app. The app may coordinate demand and orders and maintain manual records, but a recorded reference is not proof of payment. A payment can be marked confirmed only by an authorised person using evidence appropriate to the workflow; disputes and corrections must remain auditable.
 
-- Misuse of funds
-- Cash-flow problems
-- Failure to fulfil the order
-- Disputes over balances
-- Poor reconciliation
+Do not route members' money through iCamagu's own operating bank account, and do not rely on an ordinary merchant account as a substitute for a protected payment arrangement. No live payment gateway, automated collection, payout, split settlement, or refund processing is authorised for the 2026 launch.
 
-### Current state
+### Intended future commercial/payment model
 
-No live payment gateway exists yet. A pool reaching its bulk-pricing minimum creates a payment record per member, but until a real PSP is integrated, payment is manual EFT direct to the confirmed supplier, reconciled by the member entering their own EFT reference and the supplier confirming receipt from their own dashboard. If a pool matches before a confirmed supplier is attached, members are told plainly that a supplier is being finalised rather than being asked to pay a reference that doesn't yet resolve to anyone real.
+iCamagu's revenue model is platform/service fees plus contractually agreed merchant-funded rebates, commissions, or negotiated commercial percentages. Where negotiated discounts or rebates are intended to benefit members, the terms and calculation must be transparent. Merchant funds, platform fees, and any rebate/commission must be accounted for separately and must not be represented as received before settlement is verified.
 
-The intended flow, once a PSP is integrated, is:
+A future provider-mediated flow may be considered in 2027 or later only after the business bank account, provider and merchant contracts, legal/compliance review, and technical validation are complete. A proposed provider must confirm in writing that its product supports the exact merchant settlement and fee/rebate allocation model. Do not assume PayFast, Ozow, PayPal, or another provider offers escrow or the required split-settlement arrangement simply because it processes payments. Do not call a flow “escrow” unless the contractual product and legal review substantiate that description.
 
-```text
-Buyer
-  ↓
-PSP
-  ↓
-Protected transaction / payment flow
-  ↓
-iCamagu pool ledger
-  ↓
-Order confirmation
-  ↓
-Partner settlement
-  ↓
-Fulfilment
-```
+Before enabling any future payment integration, document:
+- Who legally receives and controls funds at every step, and how iCamagu avoids custody of user/Stokvel money.
+- Merchant settlement, platform fees, rebate/commission terms, refunds, cancellations, chargebacks, disputes, and reconciliation.
+- Provider approval, business banking requirements, applicable South African legal/regulatory obligations, and a tested rollback/incident plan.
+- A staging-only end-to-end test and explicit founder approval.
 
-The intended PSP options are:
-
-- Yoco
-- Peach Payments
-
-PSP contracts and production credentials must be established before real-money functionality is activated.
+Until those gates are passed, SmartMatch pools and Stokvels are coordination and recordkeeping tools only. Users pay merchants or intended recipients directly outside iCamagu.
 
 ---
 
 ## 14. Refunds
 
-Refund rules must be clearly disclosed before a user deposits money into a pool.
+For the 2026 manual-payment phase, iCamagu does not process refunds or move funds. Any refund or repayment is arranged directly between the merchant and the customer (or the relevant parties) outside iCamagu, in line with their disclosed terms and applicable law. The app may record a refund request, evidence, status, and the parties' confirmations, but it must not imply that money has been returned merely because a request is logged or marked approved.
 
-Where a user requests a refund, the requester should bear the applicable refund/transaction cost where permitted by the final terms and PSP rules.
-
-The exact fee structure must be clearly communicated before payment.
-
-A member can already request a refund on a pool payment from within the app; the request is flagged to the supplier, who processes it manually from their own dashboard (there is no automated payout yet, matching the manual-EFT state described in section 13).
+Any future provider-mediated refund/split-settlement workflow is deferred until the payment launch gate is approved. Applicable provider rules, contract terms, refund costs, consumer disclosures, and responsibility for execution must be verified before activation.
 
 ---
 
