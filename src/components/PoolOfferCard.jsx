@@ -6,7 +6,7 @@ import FundingSourcePicker from './FundingSourcePicker.jsx';
 
 const money = (n) => n == null || !Number.isFinite(Number(n)) ? 'Price to confirm' : 'R' + Number(n).toFixed(2);
 
-export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClose }) {
+export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClose, variant = 'sheet', pool: feedPool = null, onOpen }) {
   const { accessToken } = useAuth();
   const { activeCeremony, refreshPools } = useCommunity();
   const { showToast } = useToast();
@@ -18,6 +18,19 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
   const skuId = cost?.skuId;
   const quantity = Math.max(1, Math.ceil(Number(cost?.quantity) || 1));
   const linkedCeremonyId = ceremonyId || activeCeremony?.ceremonyId || activeCeremony?.id;
+
+  if (variant === 'feed' && feedPool) {
+    return <article className="w-full rounded-2xl border border-cream-dark bg-white p-4 text-left shadow-soft space-y-3">
+      <div className="flex items-start justify-between gap-3">
+        <div><h3 className="font-bold text-ink">{feedPool.partnerName || feedPool.category} pool</h3><p className="text-xs text-ink-muted mt-1">{feedPool.distanceKm == null ? feedPool.area : feedPool.distanceKm + ' km away'} · {feedPool.participantCount} members{feedPool.deadline ? ' · Closes ' + new Date(feedPool.deadline).toLocaleDateString() : ''}</p>
+        {feedPool.clanMemberCount > 0 && <p className="text-xs font-semibold text-terracotta mt-1">{feedPool.clanMemberCount} clan member{feedPool.clanMemberCount === 1 ? '' : 's'} already joined</p>}</div>
+        <span className="text-xs font-bold text-ink">{feedPool.currentCases}/{feedPool.moqTarget} cases</span>
+      </div>
+      <div className="h-2 rounded-full bg-cream-dark overflow-hidden"><div className="h-full bg-terracotta" style={{ width: Math.min(100, feedPool.moqTarget > 0 ? feedPool.currentCases / feedPool.moqTarget * 100 : 0) + '%' }} /></div>
+      <p className="text-xs text-ink-muted">{feedPool.nextTier ? 'Next tier: ' + feedPool.nextTier.name : 'Pool price awaits a real quote'}</p>
+      <button type="button" onClick={onOpen} className="w-full min-h-10 rounded-full border border-terracotta text-terracotta font-bold">Browse items</button>
+    </article>;
+  }
 
   useEffect(() => {
     let cancelled = false;
