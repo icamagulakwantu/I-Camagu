@@ -10,6 +10,7 @@ This is a living engineering plan based on source review of the repository. It i
 - Added a server-side deletion guard that blocks hard deletion when a ledger, members, contributions, payouts, bank imports, or legacy financial records exist. It checks for lazily created legacy tables before querying them.
 - Made cleanup for a truly empty stokvel atomic and skip legacy tables that do not exist, preventing partial deletion and failures caused by lazy DDL.
 - Made stokvel creation transactional across the group, initial ledger, organiser membership and official record, so a failure cannot leave a partially-created group.
+- Changed member departure to fail closed if the outstanding-loan check errors; a database failure can no longer be swallowed and followed by deleting the membership. Added tests for open-loan blocking and query failure.
 - Enforced exact-cent validation for stokvel contribution/target amounts and rejected invalid target dates.
 - Added focused tests for organiser-only deletion and financial-history protection.
 - Changed manual bank-log amount validation to exact cents; values with fractional cents (for example R10.005) are rejected instead of being accepted by `parseFloat`.
