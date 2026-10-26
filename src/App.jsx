@@ -304,12 +304,12 @@ const SCREEN_PATHS = {
 
 function screenForPath(pathname) {
   if (pathname === '/' || pathname === '') return 'home';
-  if (/^\\/ceremonies\\/[^/]+$/.test(pathname) && !['/ceremonies/plan', '/ceremonies/timeline'].includes(pathname)) return 'ceremony';
-  if (/^\\/me\\/iziduko\\/[^/]+$/.test(pathname)) return 'izidukoprofile';
-  if (/^\\/me\\/messages\\/[^/]+$/.test(pathname)) return 'izidukochat';
-  if (/^\\/me\\/clan-groups\\/[^/]+$/.test(pathname)) return 'clangroups';
-  if (/^\\/ceremonies\\/budget\\/[^/]+$/.test(pathname)) return 'budget';
-  if (/^\\/services\\/ekoyini\\/booking\\/[^/]+$/.test(pathname)) return 'ekoyinibooking';
+  if (/^\/ceremonies\/[^/]+$/.test(pathname) && !['/ceremonies/plan', '/ceremonies/timeline'].includes(pathname)) return 'ceremony';
+  if (/^\/me\/iziduko\/[^/]+$/.test(pathname)) return 'izidukoprofile';
+  if (/^\/me\/messages\/[^/]+$/.test(pathname)) return 'izidukochat';
+  if (/^\/me\/clan-groups\/[^/]+$/.test(pathname)) return 'clangroups';
+  if (/^\/ceremonies\/budget\/[^/]+$/.test(pathname)) return 'budget';
+  if (/^\/services\/ekoyini\/booking\/[^/]+$/.test(pathname)) return 'ekoyinibooking';
   return Object.entries(SCREEN_PATHS).find(([, path]) => path === pathname)?.[0] || 'home';
 }
 
@@ -345,21 +345,21 @@ function MainApp() {
 
   useEffect(() => {
     const path = location.pathname;
-    const ceremonyMatch = path.match(/^\\/ceremonies\\/([^/]+)$/);
+    const ceremonyMatch = path.match(/^\/ceremonies\/([^/]+)$/);
     if (ceremonyMatch && !['plan', 'timeline'].includes(ceremonyMatch[1])) {
       setSelectedCeremonyId(ceremonyMatch[1]);
       setScreenState('ceremony');
       return;
     }
-    const izidukoProfileMatch = path.match(/^\\/me\\/iziduko\\/([^/]+)$/);
+    const izidukoProfileMatch = path.match(/^\/me\/iziduko\/([^/]+)$/);
     if (izidukoProfileMatch) setIzidukoTargetUserId(izidukoProfileMatch[1]);
-    const izidukoChatMatch = path.match(/^\\/me\\/messages\\/([^/]+)$/);
+    const izidukoChatMatch = path.match(/^\/me\/messages\/([^/]+)$/);
     if (izidukoChatMatch) setIzidukoTargetUserId(izidukoChatMatch[1]);
-    const clanGroupMatch = path.match(/^\\/me\\/clan-groups\\/([^/]+)$/);
+    const clanGroupMatch = path.match(/^\/me\/clan-groups\/([^/]+)$/);
     if (clanGroupMatch) setClanGroupId(clanGroupMatch[1]);
-    const budgetMatch = path.match(/^\\/ceremonies\\/budget\\/([^/]+)$/);
+    const budgetMatch = path.match(/^\/ceremonies\/budget\/([^/]+)$/);
     if (budgetMatch) setBudgetPlanId(budgetMatch[1]);
-    const bookingMatch = path.match(/^\\/services\\/ekoyini\\/booking\\/([^/]+)$/);
+    const bookingMatch = path.match(/^\/services\/ekoyini\/booking\/([^/]+)$/);
     if (bookingMatch) setEkoyiniBookingCeremonyId(bookingMatch[1]);
     setScreenState(screenForPath(path));
   }, [location.pathname])
