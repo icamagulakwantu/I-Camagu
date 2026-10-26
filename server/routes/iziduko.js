@@ -10,10 +10,13 @@ import {
   viewConnectionProfile,
 } from '../controllers/izidukoController.js';
 import { listRites, addRite, updateRite, deleteRite } from '../controllers/ancestralRitesController.js';
+import { matchIsidukoName, submitIsidukoReview } from '../controllers/izidukoController.js';
 import clanGroupRoutes from './clanGroups.js';
 
 const router = express.Router();
 
+router.get('/match', requireAuth, matchIsidukoName);
+router.post('/submissions', requireAuth, submitIsidukoReview);
 router.get('/matches', requireAuth, getMyClanMatches);
 router.post('/connect', requireAuth, connectWithMatch);
 router.get('/requests', requireAuth, listConnectionRequests);
