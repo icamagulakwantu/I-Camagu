@@ -250,6 +250,75 @@ export async function joinPoolWithItem(userId, input) {
   }
 }
 
+export async function getCommunityFeed(userId) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new Error('User not found');
+  const [rawPools, rawCeremonies, legends] = await Promise.all([
+    prisma.bulkPool.findMany({
+      where: { status: 'OPEN' },
+      include: {
+        partner: { select: { name: true } },
+        baskets: {
+          where: { status: { not: 'CANCELLED' } },
+          include: {
+            user: { select: { id: true, firstName: true, lastName: true, location: true, latitude: true, longitude: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true } },
+            items: { include: { sku: { select: { casePriceZAR: true } } } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    }),
+    prisma.ceremony.findMany({
+      where: { eventDate: { gte: new Date() }, visibility: { in: ['PUBLIC', 'CLAN_ONLY'] } },
+      include: { host: { select: { id: true, firstName: true, lastName: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true, clanGroupId: true } } },
+      orderBy: { eventDate: 'asc' },
+      take: 100,
+    }),
+    prisma.legendEntry.findMany({
+      where: { isFeatured: true },
+      select: { id: true, title: true, bodyText: true, category: true, updatedAt: true },
+      orderBy: { updatedAt: 'desc' },
+      take: 5,
+    }),
+  ]);
+
+  const pools = rawPools.map((pool) => {
+    const distanceKm = locationDistance(user, pool);
+    const clan = clanScore(user, pool);
+    const metrics = poolMetrics(pool);
+    return {
+      id: pool.id, category: pool.category, area: pool.area,
+      deadline: pool.deadline, status: pool.status, moqTarget: pool.moqTarget,
+      partnerName: pool.partner?.name || null,
+      distanceKm: distanceKm == null ? null : Math.round(distanceKm * 10) / 10,
+      participantCount: new Set(pool.baskets.map((basket) => basket.userId)).size,
+      clanScore: clan.score, sharedClanLines: clan.sharedLines,
+      ...metrics,
+    };
+  }).filter((pool) => pool.distanceKm == null || pool.distanceKm <= 20)
+    .sort((a, b) => b.clanScore - a.clanScore
+      || (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER)
+      || (a.deadline ? new Date(a.deadline).getTime() : Number.MAX_SAFE_INTEGER)
+        - (b.deadline ? new Date(b.deadline).getTime() : Number.MAX_SAFE_INTEGER))
+    .slice(0, 20);
+
+  const ceremonies = rawCeremonies.filter((ceremony) => {
+    if (ceremony.hostId === userId || ceremony.visibility === 'PUBLIC') return true;
+    return ceremony.visibility === 'CLAN_ONLY'
+      && clanScore(user, { baskets: [{ user: ceremony.host }] }).score > 0;
+  }).map((ceremony) => ({
+    id: ceremony.id,
+    title: ceremony.title,
+    type: ceremony.type,
+    eventDate: ceremony.eventDate,
+    visibility: ceremony.visibility,
+    host: { id: ceremony.host.id, firstName: ceremony.host.firstName },
+  })).slice(0, 20);
+
+  return { pools, upcomingClanCeremonies: ceremonies, featuredLegends: legends };
+}
+
 export async function getNearbyDemandSignal(userId, skuId, radiusKm = 20) {
   if (!skuId) throw new Error('skuId is required');
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { latitude: true, longitude: true, location: true } });
