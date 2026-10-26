@@ -57,7 +57,18 @@ export function clearClanIndexCache() {
 }
 
 export async function matchClan(query) {
-  const q = String(query || '').trim();
+  const rawQuery = String(query || '').trim();
+  if (rawQuery.length > 120) {
+    return {
+      query: rawQuery.slice(0, 120),
+      normalised: '',
+      results: [],
+      ambiguous: false,
+      autoSelect: false,
+      advice: 'Keep the clan or praise name under 120 characters.',
+    };
+  }
+  const q = rawQuery;
   const normalised = normaliseIsiduko(q);
   if (normalised.length < 2) {
     return { query: q, normalised, results: [], ambiguous: false, autoSelect: false, advice: 'Type at least two letters to search.' };
