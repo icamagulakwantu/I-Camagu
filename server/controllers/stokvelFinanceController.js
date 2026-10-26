@@ -239,10 +239,15 @@ export async function requestLoan(req, res) {
 // on the books exactly once.
 export async function voteLoan(req, res) {
   try {
+    // Do not coerce strings such as "false" to true. A malformed request
+    // must never silently become an approval vote.
+    if (typeof req.body?.approve !== 'boolean') {
+      return res.status(400).json({ error: 'approve must be a boolean value' });
+    }
     const role = await guard(req, res, { officialOnly: true });
     if (!role) return;
     const { stokvelId, loanId } = req.params;
-    const approve = Boolean(req.body?.approve);
+    const approve = req.body.approve;
     await ensureLedgerTables();
 
     const result = await prisma.$transaction(async (tx) => {

@@ -15,7 +15,11 @@ sweep.unref?.();
 
 export function rateLimit({ windowMs = 15 * 60 * 1000, max = 10 } = {}) {
   return (req, res, next) => {
-    const key = `${req.ip}:${req.path}`;
+    // Use Express's route template rather than the concrete URL. Otherwise
+    // callers can evade a per-route limit by changing path parameters (for
+    // example, trying a different inviteId on every request).
+    const routeKey = req.route?.path || req.path;
+    const key = `${req.ip}:${req.baseUrl || ''}:${req.method || 'GET'}:${routeKey}`;
     const now = Date.now();
     const record = attempts.get(key) || { count: 0, resetAt: now + windowMs };
 
