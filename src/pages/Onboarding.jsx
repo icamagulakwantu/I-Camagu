@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { captureLocation } from '../lib/geolocation.js'
 import Icon from '../components/Icon.jsx'
+import IsidukoTypeahead from '../components/IsidukoTypeahead.jsx'
 
 const STEPS = ['welcome', 'ancestry', 'details']
 
@@ -281,24 +282,12 @@ function Onboarding({ onDone }) {
           <div className="space-y-2">
             {!user?.paternalIziduko && (
               <>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Isiduko sikaTata (Paternal)</label>
-                  <input type="text" placeholder="e.g. Mbeki, Zulu, Cele" value={paternalIziduko} onChange={(e) => setPaternalIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Isiduko sikaMama (Maternal)</label>
-                  <input type="text" placeholder="Optional" value={maternalIziduko} onChange={(e) => setMaternalIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
-                </div>
+                <IsidukoTypeahead label="Isiduko sikaTata (Paternal)" value={paternalIziduko} required onChange={setPaternalIziduko} placeholder="Type your father’s clan or praise name" />
+                <IsidukoTypeahead label="Isiduko sikaMama (Maternal)" value={maternalIziduko} required onChange={setMaternalIziduko} placeholder="Type your mother’s clan or praise name" />
               </>
             )}
-            <div>
-              <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Paternal grandmother's Iziduko</label>
-              <input type="text" placeholder="Optional" value={paternalGrandmotherIziduko} onChange={(e) => setPaternalGrandmotherIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Maternal grandmother's Iziduko</label>
-              <input type="text" placeholder="Optional" value={maternalGrandmotherIziduko} onChange={(e) => setMaternalGrandmotherIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
-            </div>
+            <IsidukoTypeahead label="Paternal grandmother’s Isiduko" value={paternalGrandmotherIziduko} onChange={setPaternalGrandmotherIziduko} />
+            <IsidukoTypeahead label="Maternal grandmother’s Isiduko" value={maternalGrandmotherIziduko} onChange={setMaternalGrandmotherIziduko} />
           </div>
 
           {error && <p className="text-terracotta text-sm mt-3">{error}</p>}
