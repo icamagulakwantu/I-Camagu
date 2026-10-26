@@ -51,7 +51,7 @@ export async function setUsername(req, res) {
 }
 
 export async function updateIziduko(req, res) {
-  const { paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko } = req.body;
+  const { paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko, nationLabel } = req.body;
   if (!paternalIziduko || !maternalIziduko) {
     return res.status(400).json({ error: 'Both paternal and maternal Iziduko are required' });
   }
@@ -59,11 +59,11 @@ export async function updateIziduko(req, res) {
   try {
     const user = await prisma.user.update({
       where: { id: req.userId },
-      data: { paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko },
+      data: { paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko, nationLabel },
     });
 
     await syncUserClanGroups(user);
-    res.json({ paternalIziduko: user.paternalIziduko, maternalIziduko: user.maternalIziduko, paternalGrandmotherIziduko: user.paternalGrandmotherIziduko, maternalGrandmotherIziduko: user.maternalGrandmotherIziduko });
+    res.json({ paternalIziduko: user.paternalIziduko, maternalIziduko: user.maternalIziduko, paternalGrandmotherIziduko: user.paternalGrandmotherIziduko, maternalGrandmotherIziduko: user.maternalGrandmotherIziduko, nationLabel: user.nationLabel });
   } catch (error) {
     console.error('Update Iziduko error:', error.message);
     res.status(500).json({ error: 'Could not update Iziduko' });
