@@ -4,6 +4,7 @@ import prisma from '../config/db.js';
 import {
   ensureLedgerTables,
   postEntryWithBalanceTx,
+  lockStokvelLedger,
   verifyLedger,
   checkStokvelBalance,
 } from './ledgerService.js';
@@ -60,6 +61,7 @@ integrationDescribe('PostgreSQL ledger integration (real database)', () => {
 
   it('serializes concurrent spending so the balance cannot go below zero', async () => {
     const spend = (idempotencyKey) => prisma.$transaction(async (tx) => {
+      await lockStokvelLedger(tx, stokvelId);
       const result = await postEntryWithBalanceTx(tx, {
         stokvelId,
         kind: 'POOL_PAYMENT',
@@ -155,6 +157,7 @@ integrationDescribe('PostgreSQL ledger integration (real database)', () => {
     // Both attempts use distinct idempotency keys; the ledger's advisory lock
     // must serialize them, and the failed transaction must leave no entry.
     const spend = (key) => prisma.$transaction(async (tx) => {
+      await lockStokvelLedger(tx, stokvelId);
       const posted = await postEntryWithBalanceTx(tx, {
         stokvelId,
         kind: 'POOL_PAYMENT',
