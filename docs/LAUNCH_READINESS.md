@@ -10,7 +10,9 @@
 
 ## Database and financial integrity — release blockers
 
-- [ ] Establish versioned Prisma migrations from the current production schema. The repository currently has no `prisma/migrations` history and uses runtime/lazy schema DDL in several paths. Baseline and test against a staging database before changing startup to migration-only.
+**Deployment context:** Render backend + Supabase PostgreSQL. Supabase Storage usage is not yet confirmed; repository environment examples indicate it may be configured, but live usage and bucket policies still need owner verification. No production database has been accessed or changed in this work session.
+
+- [ ] Establish versioned Prisma migrations from the current production schema. The repository currently has no reviewed baseline migration and uses runtime/lazy schema DDL in several paths. Render hosts the backend and Supabase hosts PostgreSQL (owner-confirmed 26 October 2026). Follow [the safe Supabase verification runbook](./SAFE_DATABASE_VERIFICATION_SUPABASE.md): identify the exact target, obtain a schema-only snapshot, compare schema objects, restore to a separate staging project, and verify balances there before considering baseline adoption. Do not run migration or schema-write commands against production during discovery.
 - [ ] Run the balance-check script on a copy of live data; reconcile any historic divergence through auditable correcting entries approved by the relevant stokvel officials. Never rewrite historical ledger rows to force a match.
 - [ ] Run PostgreSQL integration tests for transaction rollback and concurrent requests, including payout, contribution, fund allocation, final loan votes/repayments, and stokvel-funded pool approvals. Unit tests alone are not enough for row-lock/transaction guarantees.
 - [ ] Verify that every ledger writer and stokvel pool-funding approval path uses the same per-stokvel database lock/transaction boundary. Add PostgreSQL integration tests for two concurrent funding requests, duplicate votes, insufficient-funds rechecks and rollback; mocked Prisma tests do not prove database-level serialization.
