@@ -739,6 +739,7 @@ model StokvelPoolFundingApproval {
   decidedAt   DateTime @default(now())
 
   @@unique([fundingId, officialId])
+  @@unique([fundingId, approverId])
   @@index([approverId, decidedAt])
 }
 
