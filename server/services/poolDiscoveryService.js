@@ -143,7 +143,7 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
       if ((pool.tierBasis || 'PALLETS') === 'PALLETS') poolPriceZAR = Number(currentTier.value);
       else poolPriceZAR = Math.max(0, basePrice * (1 - Number(currentTier.value) / 100));
     }
-    const closesInTime = !ceremony?.eventDate || !pool.deadline || pool.deadline <= ceremony.eventDate;
+    const closesInTime = !ceremony?.eventDate || (Boolean(pool.deadline) && pool.deadline <= ceremony.eventDate);
     const userHasLocation = (Number.isFinite(user.latitude) && Number.isFinite(user.longitude)) || Boolean(normalise(user.location));
     const distanceAllowed = distanceKm !== null ? distanceKm <= (pool.radiusKm || 20) : !userHasLocation;
     return {
