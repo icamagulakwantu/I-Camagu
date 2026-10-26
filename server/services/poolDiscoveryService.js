@@ -328,22 +328,29 @@ export async function getNearbyDemandSignal(userId, skuId, radiusKm = 20) {
   const ceremonies = await prisma.ceremony.findMany({
     where: {
       eventDate: { gte: now },
+      visibility: { in: ['PUBLIC', 'CLAN_ONLY'] },
       costItems: { some: { skuId } },
     },
     select: {
       id: true,
       eventDate: true,
-      host: { select: { latitude: true, longitude: true, location: true } },
+      visibility: true,
+      host: { select: { latitude: true, longitude: true, location: true, clanGroupId: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true } },
     },
     take: 250,
   });
   const nearby = ceremonies.filter((ceremony) => {
     const host = ceremony.host;
+    const visibleToUser = ceremony.visibility === 'PUBLIC'
+      || (ceremony.visibility === 'CLAN_ONLY'
+        && ((user.clanGroupId && host.clanGroupId === user.clanGroupId)
+          || clanScore(user, { baskets: [{ user: host }] }).score > 0));
+    if (!visibleToUser) return false;
     if (Number.isFinite(user.latitude) && Number.isFinite(user.longitude)
       && Number.isFinite(host.latitude) && Number.isFinite(host.longitude)) {
       return haversineKm(user.latitude, user.longitude, host.latitude, host.longitude) <= radiusKm;
     }
-    return normalise(user.location) && normalise(user.location) === normalise(host.location);
+    return Boolean(normalise(user.location)) && normalise(user.location) === normalise(host.location);
   });
   return { skuId, nearbyUpcomingCeremonies: nearby.length, radiusKm };
 }
