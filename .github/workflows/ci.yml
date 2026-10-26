@@ -108,7 +108,7 @@ jobs:
           yarn prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > migration-artifacts/20261026_candidate_baseline.sql
           test -s migration-artifacts/20261026_candidate_baseline.sql
       - name: Apply candidate baseline to disposable PostgreSQL
-        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f migration-artifacts/20261026_candidate_baseline.sql
+        run: psql "postgresql://postgres:postgres@localhost:5432/icamagu_migration_test" -v ON_ERROR_STOP=1 -f migration-artifacts/20261026_candidate_baseline.sql
       - name: Verify candidate schema has no Prisma drift
         run: yarn prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code
       - name: Upload candidate baseline for review
