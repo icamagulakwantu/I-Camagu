@@ -1145,6 +1145,7 @@ model Ceremony {
   title     String
   eventDate DateTime?
   status    String       @default("PLANNING")
+  visibility String      @default("PRIVATE")
   notes     String?
   budgetZAR Decimal?     @db.Decimal(10, 2)
   guestCount Int?
