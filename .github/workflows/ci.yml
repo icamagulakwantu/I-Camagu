@@ -72,5 +72,5 @@ jobs:
       - name: Create disposable PostgreSQL schema
         run: yarn prisma db push --schema=prisma/schema.prisma
 
-      - name: Run real PostgreSQL ledger integrity tests
-        run: yarn vitest run server/services/ledgerService.integration.test.js
+      - name: Run real PostgreSQL financial integrity tests
+        run: yarn vitest run server/services/ledgerService.integration.test.js server/controllers/stokvelFinanceController.integration.test.js
