@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 
-export default function IsidukoTypeahead({ label, value, onChange, nationLabel = '', placeholder = 'Type a clan or praise name' }) {
+export default function IsidukoTypeahead({ label, value, onChange, nationLabel = '', required = false, placeholder = 'Type a clan or praise name' }) {
   const { accessToken } = useAuth();
   const [result, setResult] = useState({ results: [], advice: '' });
   const [loading, setLoading] = useState(false);
@@ -63,6 +63,7 @@ export default function IsidukoTypeahead({ label, value, onChange, nationLabel =
       autoComplete="off"
       className="w-full min-h-12 rounded-xl border border-cream-dark bg-white px-4 py-3 text-ink"
       aria-label={label}
+      required={required}
     />
     {loading && <p className="text-xs text-ink-muted">Checking registered names…</p>}
     {result.advice && <p className="text-xs text-ink-muted">{result.advice}</p>}
