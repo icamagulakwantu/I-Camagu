@@ -90,7 +90,7 @@ export const getMyCeremonies = async (req, res) => {
 // POST / - create a ceremony
 export const createCeremony = async (req, res) => {
       try {
-              const { title, type, eventDate, notes, budgetZAR } = req.body;
+              const { title, type, eventDate, notes, budgetZAR, visibility } = req.body;
                   const hostId = req.user.id;
 
                       if (DRAFT_CEREMONY_TYPE_NAMES.includes(type)) {
@@ -121,6 +121,7 @@ export const createCeremony = async (req, res) => {
                                                                         notes: notes || '',
                                                                                 hostId,
                                                                                         status: 'PLANNING',
+                                                visibility: ['PRIVATE', 'CLAN_ONLY', 'PUBLIC'].includes(visibility) ? visibility : 'PRIVATE',
                                                                                                 budgetZAR: parsedBudget,
                                     },
                           });
@@ -622,7 +623,7 @@ export const getCeremonyById = async (req, res) => {
 export const updateCeremony = async (req, res) => {
       try {
               const { id } = req.params;
-                  const { title, eventDate, status, notes, budgetZAR, guestCount } = req.body;
+                  const { title, eventDate, status, notes, budgetZAR, guestCount, visibility } = req.body;
 
                       let parsedBudget;
                       if (budgetZAR === undefined) {
@@ -648,6 +649,7 @@ export const updateCeremony = async (req, res) => {
                                                                       eventDate: eventDate ? new Date(eventDate) : undefined,
                                                                               status: status || undefined,
                                                                                       notes: notes !== undefined ? notes : undefined,
+                                                                              visibility: visibility !== undefined && ['PRIVATE', 'CLAN_ONLY', 'PUBLIC'].includes(visibility) ? visibility : undefined,
                                                                                               budgetZAR: parsedBudget,
                                                                                               guestCount: guestCount !== undefined ? (guestCount === '' || guestCount === null ? null : parseInt(guestCount, 10)) : undefined,
                                                   },
