@@ -39,6 +39,7 @@ import {
 } from '../controllers/stokvelFinanceController.js';
 import { listLendingTargets, setLendingTarget, recordLendingRound } from '../controllers/stokvelLendingController.js';
 import { getLedger, verifyLedgerChain, checkBalance } from '../controllers/ledgerController.js';
+import { listPoolFundingRequests, decidePoolFundingRequest } from '../controllers/stokvelPoolFundingController.js';
 import {
   requestPayout,
   approvePayout,
@@ -115,6 +116,8 @@ router.get('/:stokvelId/trade-credit', requireAuth, listTradeCredit);
 router.post('/:stokvelId/trade-credit', requireAuth, createTradeCredit);
 router.patch('/:stokvelId/trade-credit/:creditId', requireAuth, updateTradeCredit);
 router.get('/:stokvelId/statement', requireAuth, getStatement);
+router.get('/:stokvelId/pool-funding', requireAuth, listPoolFundingRequests);
+router.post('/:stokvelId/pool-funding/:fundingId/decision', requireAuth, decidePoolFundingRequest);
 
 router.post('/contributions/submit', requireAuth, submitContribution);
 router.post('/contributions/confirm', requireAuth, pinLimiter, confirmContribution);

@@ -419,22 +419,61 @@ export async function checkAndMatchPool(poolId) {
       }
       await tx.basket.update({ where: { id: basket.id }, data: { status: 'MATCHED', orderReference } });
 
-      // One PENDING PoolPayment per member for their share — manual EFT to the
-      // supplier for now (no PSP yet); the supplier confirms receipt from their
-      // own dashboard, mirroring how stokvel contributions get confirmed. Its
-      // paymentReference is this same orderReference — the order and the
-      // payment for it are the same cart, so they share one code rather than
-      // forcing a supplier to cross-reference two.
-      await tx.poolPayment.create({
-        data: {
-          poolId: pool.id,
-          userId: basket.userId,
-          provider: 'MANUAL_EFT',
-          amountZAR: memberAmountZAR,
-          status: 'PENDING',
-          paymentReference: orderReference,
-        },
-      });
+      // A stokvel-funded basket becomes an approval request, not a manual
+      // bank-transfer instruction to the member. The existing two-official
+      // rule is applied by stokvelPoolFundingController; approval authorizes
+      // the spend but settlement remains a separate real-money step.
+      if (basket.fundingSource === 'STOKVEL') {
+        if (!basket.fundingStokvelId) throw new Error('Stokvel-funded basket has no selected stokvel');
+        const stokvel = await tx.stokvel.findUnique({
+          where: { id: basket.fundingStokvelId },
+          include: { officials: { select: { userId: true } } },
+        });
+        if (!stokvel) throw new Error('Stokvel funding source no longer exists');
+        const fundingRequest = await tx.stokvelPoolFunding.create({
+          data: {
+            stokvelId: stokvel.id,
+            poolId: pool.id,
+            basketId: basket.id,
+            requestedById: basket.userId,
+            amountZAR: memberAmountZAR,
+            purpose: `SmartMatch order for pool ${pool.id}`,
+            requiredApprovals: Math.max(2, stokvel.requiredApprovals || 2),
+            status: 'PENDING_APPROVAL',
+          },
+        });
+        await tx.poolPayment.create({
+          data: {
+            poolId: pool.id,
+            userId: basket.userId,
+            provider: 'STOKVEL_FUNDS',
+            stokvelId: stokvel.id,
+            fundingRequestId: fundingRequest.id,
+            amountZAR: memberAmountZAR,
+            status: 'PENDING_APPROVAL',
+            paymentReference: orderReference,
+          },
+        });
+        const officialsToNotify = stokvel.officials.map((official) => ({
+          userId: official.userId,
+          type: 'STOKVEL_POOL_FUNDING_APPROVAL_NEEDED',
+          message: `A SmartMatch pool order needs your approval from stokvel ${stokvel.name}.`,
+          linkScreen: 'stokvels',
+        }));
+        if (officialsToNotify.length) await tx.notification.createMany({ data: officialsToNotify });
+      } else {
+        // Personal funding retains the established manual-EFT workflow.
+        await tx.poolPayment.create({
+          data: {
+            poolId: pool.id,
+            userId: basket.userId,
+            provider: 'MANUAL_EFT',
+            amountZAR: memberAmountZAR,
+            status: 'PENDING',
+            paymentReference: orderReference,
+          },
+        });
+      }
     }
 
     return { matched: true, currentCases, documentId: document.id, groupCode: document.groupCode };
