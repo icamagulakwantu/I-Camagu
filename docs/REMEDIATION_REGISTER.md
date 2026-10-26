@@ -44,8 +44,8 @@ used the older books-only path.
 
 | ID | Status | Evidence / change | Remaining work |
 |---|---|---|---|
-| SEC-03 Stokvel deletion and authorization | Partially reviewed; targeted mitigation in PR | Hard deletion is now blocked when a ledger, members, contributions, payouts, bank imports or existing legacy finance rows are found. Added deletion guard tests. Manual bank-log entry now rejects fractional-cent amounts, with tests. | Full route-by-route IDOR/role audit and PostgreSQL integration/concurrency tests remain open. Hard deletion still exists for a strictly empty group; verify every legacy table and race before considering this closed. |
-| FIN-04b Manual bank-entry precision | Targeted fix in PR | `createRawLog` now uses exact-cent parsing and refuses fractions of a cent rather than accepting them via `parseFloat`. | Run unit tests and PostgreSQL integration tests on the PR head. |
+| SEC-03 Stokvel deletion and authorization | Partially reviewed; targeted mitigation in PR | Hard deletion is now blocked when a ledger, members, contributions, payouts, bank imports or existing legacy finance rows are found. Empty-group cleanup is transactional and skips missing lazy tables. Added deletion guard tests. Manual bank-log entry and stokvel contribution/target configuration now reject fractional-cent amounts; invalid target dates are refused. Initial stokvel + ledger + organiser membership + official creation now happens in one transaction. | Full route-by-route IDOR/role audit and PostgreSQL integration/concurrency tests remain open. Hard deletion still exists for a strictly empty group; verify every legacy table and race before considering this closed. |
+| FIN-04b Manual bank-entry precision | Targeted fix in PR | `createRawLog` now uses exact-cent parsing and refuses fractions of a cent rather than accepting them via `parseFloat`; stokvel budget/target configuration uses the same exact-cent rule. | Run unit tests and PostgreSQL integration tests on the PR head. |
 
 The broader prioritised security, reliability, migration and product roadmap is in `docs/SECURITY_AND_DELIVERY_PLAN.md`.
 
