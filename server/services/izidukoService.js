@@ -5,11 +5,17 @@ import prisma from '../config/db.js';
 async function resolveCanonicalClanName(inputName) {
   if (!inputName) return null;
   const trimmed = inputName.trim();
-  const alias = await prisma.clanAlias.findUnique({
-    where: { aliasForm: trimmed },
+  const alias = await prisma.clanAlias.findFirst({
+    where: { aliasForm: { equals: trimmed, mode: 'insensitive' } },
     include: { clanGroup: true },
   });
-  return alias ? alias.clanGroup.clanName : trimmed;
+  if (alias) return alias.clanGroup.clanName;
+  const canonical = await prisma.clanGroup.findFirst({
+    where: { clanName: { equals: trimmed, mode: 'insensitive' } },
+    select: { clanName: true },
+  });
+  // Unknown free text is not a canonical clan and must not create a group.
+  return canonical?.clanName || null;
 }
 
 async function findOrCreateClanGroup(clanName) {
@@ -53,7 +59,9 @@ export async function syncUserClanGroups(user) {
   for (const clanName of clanNames) {
     const canonical = await resolveCanonicalClanName(clanName);
     if (canonical) {
-      const clanGroup = await findOrCreateClanGroup(canonical);
+      const clanGroup = await prisma.clanGroup.findFirst({
+        where: { clanName: { equals: canonical, mode: 'insensitive' } },
+      });
       if (clanGroup) await findOrCreateSurnameSubgroup(clanGroup.id, user.lastName);
     }
   }
