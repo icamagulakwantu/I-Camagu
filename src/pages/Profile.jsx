@@ -4,6 +4,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { cn } from '../lib/utils'
 import { captureLocation } from '../lib/geolocation.js'
 import Icon from '../components/Icon.jsx'
+import IsidukoTypeahead from '../components/IsidukoTypeahead.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96]'
 
@@ -316,18 +317,10 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
 
           {editingClan ? (
             <form onSubmit={saveClan} className="space-y-2">
-              <input placeholder="Paternal Iziduko" value={clanForm.paternalIziduko}
-                onChange={(e) => setClanForm({ ...clanForm, paternalIziduko: e.target.value })}
-                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
-              <input placeholder="Maternal Iziduko" value={clanForm.maternalIziduko}
-                onChange={(e) => setClanForm({ ...clanForm, maternalIziduko: e.target.value })}
-                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
-              <input placeholder="Paternal grandmother's Isiduko" value={clanForm.paternalGrandmotherIziduko}
-                onChange={(e) => setClanForm({ ...clanForm, paternalGrandmotherIziduko: e.target.value })}
-                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
-              <input placeholder="Maternal grandmother's Isiduko" value={clanForm.maternalGrandmotherIziduko}
-                onChange={(e) => setClanForm({ ...clanForm, maternalGrandmotherIziduko: e.target.value })}
-                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" />
+              <IsidukoTypeahead label="Paternal Isiduko" value={clanForm.paternalIziduko} required onChange={(value) => setClanForm({ ...clanForm, paternalIziduko: value })} />
+              <IsidukoTypeahead label="Maternal Isiduko" value={clanForm.maternalIziduko} required onChange={(value) => setClanForm({ ...clanForm, maternalIziduko: value })} />
+              <IsidukoTypeahead label="Paternal grandmother’s Isiduko" value={clanForm.paternalGrandmotherIziduko} onChange={(value) => setClanForm({ ...clanForm, paternalGrandmotherIziduko: value })} />
+              <IsidukoTypeahead label="Maternal grandmother’s Isiduko" value={clanForm.maternalGrandmotherIziduko} onChange={(value) => setClanForm({ ...clanForm, maternalGrandmotherIziduko: value })} />
               <div className="flex gap-2 pt-2">
                 <button type="submit" className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm">Save</button>
                 <button type="button" onClick={() => setEditingClan(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">Cancel</button>
