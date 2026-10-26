@@ -144,7 +144,8 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
       else poolPriceZAR = Math.max(0, basePrice * (1 - Number(currentTier.value) / 100));
     }
     const closesInTime = !ceremony?.eventDate || !pool.deadline || pool.deadline <= ceremony.eventDate;
-    const distanceAllowed = distanceKm === null || distanceKm <= (pool.radiusKm || 20);
+    const userHasLocation = (Number.isFinite(user.latitude) && Number.isFinite(user.longitude)) || Boolean(normalise(user.location));
+    const distanceAllowed = distanceKm !== null ? distanceKm <= (pool.radiusKm || 20) : !userHasLocation;
     return {
       id: pool.id,
       category: pool.category,
@@ -296,7 +297,7 @@ export async function getCommunityFeed(userId) {
       clanScore: clan.score, sharedClanLines: clan.sharedLines,
       ...metrics,
     };
-  }).filter((pool) => pool.distanceKm == null || pool.distanceKm <= 20)
+  }).filter((pool) => pool.distanceKm != null && pool.distanceKm <= 20)
     .sort((a, b) => b.clanScore - a.clanScore
       || (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER)
       || (a.deadline ? new Date(a.deadline).getTime() : Number.MAX_SAFE_INTEGER)
@@ -306,7 +307,8 @@ export async function getCommunityFeed(userId) {
   const ceremonies = rawCeremonies.filter((ceremony) => {
     if (ceremony.hostId === userId || ceremony.visibility === 'PUBLIC') return true;
     return ceremony.visibility === 'CLAN_ONLY'
-      && clanScore(user, { baskets: [{ user: ceremony.host }] }).score > 0;
+      && ((user.clanGroupId && ceremony.host.clanGroupId === user.clanGroupId)
+        || clanScore(user, { baskets: [{ user: ceremony.host }] }).score > 0);
   }).map((ceremony) => ({
     id: ceremony.id,
     title: ceremony.title,
