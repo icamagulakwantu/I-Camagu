@@ -159,6 +159,13 @@ model User {
   partner                 Partner?
   createdVendors          Vendor[]
   directoryVotes          DirectoryVote[]
+  clanGroupId              String?
+  clanGroup                ClanGroup?           @relation(fields: [clanGroupId], references: [id], onDelete: SetNull)
+  createdBulkPools         BulkPool[]            @relation("BulkPoolCreator")
+  stokvelPoolFundingRequests StokvelPoolFunding[] @relation("StokvelPoolFundingRequester")
+  stokvelPoolFundingApprovals StokvelPoolFundingApproval[] @relation("StokvelPoolFundingApprover")
+
+  @@index([clanGroupId])
 }
 
 model ClanConnection {
@@ -297,6 +304,7 @@ model ClanGroup {
 
   surnameGroups SurnameSubgroup[]
   aliases       ClanAlias[]
+  members       User[]
 }
 
 model ClanAlias {
@@ -341,9 +349,12 @@ model Stokvel {
   contributions Contribution[]
   payouts       Payout[]
   baskets       Basket[]
+  fundedBaskets Basket[] @relation("BasketFundingStokvel")
   rawBankLogs   RawBankLog[]
   groupLedger   StokvelGroupLedger?
   announcements StokvelAnnouncement[]
+  poolFundings  StokvelPoolFunding[]
+  poolPayments  PoolPayment[]
 }
 
 model StokvelMember {
@@ -370,6 +381,7 @@ model StokvelOfficial {
   createdAt DateTime     @default(now())
 
   approvals PayoutApproval[]
+  poolFundingApprovals StokvelPoolFundingApproval[]
 
   @@unique([stokvelId, userId])
 }
@@ -504,6 +516,13 @@ model Basket {
   stokvel      Stokvel?      @relation(fields: [stokvelId], references: [id], onDelete: SetNull)
   status       BasketStatus  @default(DRAFT)
   ceremonyType CeremonyType?
+  ceremonyId   String?
+  ceremony     Ceremony?     @relation(fields: [ceremonyId], references: [id], onDelete: SetNull)
+  checklistItemId String?
+  checklistItem CeremonyChecklistItem? @relation(fields: [checklistItemId], references: [id], onDelete: SetNull)
+  fundingSource String @default("PERSONAL")
+  fundingStokvelId String?
+  fundingStokvel Stokvel? @relation("BasketFundingStokvel", fields: [fundingStokvelId], references: [id], onDelete: SetNull)
   poolId       String?
   pool         BulkPool?     @relation(fields: [poolId], references: [id])
   // System-generated, globally unique — set once this basket's pool matches
@@ -518,6 +537,9 @@ model Basket {
   updatedAt    DateTime      @updatedAt
 
   items BasketItem[]
+  fundingRequests StokvelPoolFunding[]
+
+  @@index([ceremonyId])
 }
 
 model BasketItem {
@@ -590,6 +612,11 @@ model BulkPool {
   partnerId String?
   partner   Partner?  @relation(fields: [partnerId], references: [id])
   area      String
+  latitude  Float?
+  longitude Float?
+  radiusKm  Float     @default(20)
+  createdById String?
+  createdBy User?     @relation("BulkPoolCreator", fields: [createdById], references: [id], onDelete: SetNull)
   deadline  DateTime?
   moqTarget Int
   status    String    @default("OPEN")
@@ -628,7 +655,54 @@ model BulkPool {
 
   baskets       Basket[]
   payments      PoolPayment[]
+  fundingRequests StokvelPoolFunding[]
   orderDocument OrderConfirmationDocument?
+
+  @@index([category, status])
+}
+
+// Requests to spend a stokvel's funds on a SmartMatch pool order.
+// Money must not move until the configured number of distinct officials approve.
+model StokvelPoolFunding {
+  id            String   @id @default(cuid())
+  stokvelId     String
+  stokvel       Stokvel  @relation(fields: [stokvelId], references: [id])
+  poolId        String
+  pool          BulkPool @relation(fields: [poolId], references: [id])
+  basketId      String?
+  basket        Basket?  @relation(fields: [basketId], references: [id], onDelete: SetNull)
+  requestedById String
+  requestedBy   User     @relation("StokvelPoolFundingRequester", fields: [requestedById], references: [id])
+  amountZAR     Decimal  @db.Decimal(10, 2)
+  purpose       String?
+  status        String   @default("PENDING_APPROVAL")
+  requiredApprovals Int  @default(2)
+  approvedAt    DateTime?
+  declinedAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  approvals StokvelPoolFundingApproval[]
+  payments  PoolPayment[]
+
+  @@index([stokvelId, status, createdAt])
+  @@index([poolId, status])
+}
+
+model StokvelPoolFundingApproval {
+  id          String   @id @default(cuid())
+  fundingId   String
+  funding     StokvelPoolFunding @relation(fields: [fundingId], references: [id], onDelete: Cascade)
+  officialId  String
+  official    StokvelOfficial @relation(fields: [officialId], references: [id])
+  approverId  String
+  approver    User @relation("StokvelPoolFundingApprover", fields: [approverId], references: [id])
+  decision    String
+  note        String?
+  decidedAt   DateTime @default(now())
+
+  @@unique([fundingId, officialId])
+  @@index([approverId, decidedAt])
 }
 
 // ---------- ORDER CONFIRMATION & SAFE DELIVERY ----------
@@ -639,6 +713,10 @@ model PoolPayment {
   pool              BulkPool @relation(fields: [poolId], references: [id], onDelete: Cascade)
   userId            String
   user              User     @relation(fields: [userId], references: [id])
+  stokvelId         String?
+  stokvel           Stokvel? @relation(fields: [stokvelId], references: [id], onDelete: SetNull)
+  fundingRequestId  String?
+  fundingRequest    StokvelPoolFunding? @relation(fields: [fundingRequestId], references: [id], onDelete: SetNull)
   provider          String
   providerReference String?
   // System-generated, globally unique — see server/utils/referenceGenerator.js.
@@ -686,6 +764,7 @@ model PoolPayment {
 
   @@index([poolId, status])
   @@index([userId, createdAt])
+  @@index([stokvelId, createdAt])
 }
 
 model OrderConfirmationDocument {
@@ -1037,6 +1116,7 @@ model Ceremony {
   updatedAt DateTime     @updatedAt
 
   checklistItems   CeremonyChecklistItem[]
+  baskets          Basket[]
   costItems        CeremonyCostItem[]
   preparationPlans PreparationPlan[]
   ceremonyGroups   CeremonyGroup[]
@@ -1065,6 +1145,7 @@ model CeremonyChecklistItem {
   actualCostZAR Decimal? @db.Decimal(10, 2)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  baskets     Basket[]
 
   @@index([ceremonyId])
 }
