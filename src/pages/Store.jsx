@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useCommunity } from '../context/CommunityContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
@@ -9,6 +10,7 @@ import { unitOf, collectiveNoun } from '../data/bulkUnits.js'
 
 function Store({ onGoToBasket, basketCount }) {
   const { accessToken } = useAuth()
+  const { location, pools, loadingPools } = useCommunity()
   const { showToast } = useToast()
   const [allSkus, setAllSkus] = useState([])
   const [activeDept, setActiveDept] = useState(DEPARTMENTS[0].id)
@@ -80,7 +82,7 @@ function Store({ onGoToBasket, basketCount }) {
         <div className="flex items-center justify-between gap-2">
           <div>
             <h1 className="font-display font-bold text-2xl text-ink leading-tight">SmartMatch</h1>
-            <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wide -mt-0.5">Bulk buying</p>
+            <p className="text-xs font-semibold text-ink-muted mt-0.5">{location.label ? 'Near ' + location.label : 'Bulk buying'}{!loadingPools && pools.length > 0 ? ' · ' + pools.length + ' active pool' + (pools.length === 1 ? '' : 's') : ''}</p>
           </div>
           <div className="flex items-center gap-2">
             <button

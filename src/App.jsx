@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
+import { CommunityProvider } from './context/CommunityContext.jsx'
 import { ToastProvider, useToast } from './components/ui/Toast.jsx'
 import { Skeleton } from './components/ui/Skeleton.jsx'
 import OfflineBanner from './components/OfflineBanner.jsx'
@@ -579,7 +580,9 @@ export default function App() {
           element={
             <ToastProvider>
               <AuthProvider>
-                <AuthenticatedApp />
+                <CommunityProvider>
+                  <AuthenticatedApp />
+                </CommunityProvider>
               </AuthProvider>
             </ToastProvider>
           }
