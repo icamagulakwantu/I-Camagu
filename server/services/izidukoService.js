@@ -1,21 +1,14 @@
 import prisma from '../config/db.js';
+import { matchClan } from './clanMatchService.js';
 
 // Resolves any registered alias to its canonical clan name. If no alias is
 // registered, treats the input as already canonical — we never fuzzy-match.
 async function resolveCanonicalClanName(inputName) {
   if (!inputName) return null;
-  const trimmed = inputName.trim();
-  const alias = await prisma.clanAlias.findFirst({
-    where: { aliasForm: { equals: trimmed, mode: 'insensitive' } },
-    include: { clanGroup: true },
-  });
-  if (alias) return alias.clanGroup.clanName;
-  const canonical = await prisma.clanGroup.findFirst({
-    where: { clanName: { equals: trimmed, mode: 'insensitive' } },
-    select: { clanName: true },
-  });
-  // Unknown free text is not a canonical clan and must not create a group.
-  return canonical?.clanName || null;
+  const match = await matchClan(inputName);
+  // Only a unique exact head/alias match resolves. Fuzzy suggestions and
+  // ambiguous spellings are not used for clan connections or group sync.
+  return match.autoSelect ? match.results[0]?.head || null : null;
 }
 
 async function findOrCreateClanGroup(clanName) {
