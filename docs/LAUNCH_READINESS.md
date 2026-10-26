@@ -53,7 +53,8 @@
 
 ## Current evidence snapshot — 26 October 2026
 
-- Full-stack GitHub Actions run #40318201616 passed on head `0562635e1b93974a3a605cdabe06f9e74e3aebe3` (install, Prisma generation, tests and build).
-- A later pricing recheck-log commit was added; its follow-up CI run must pass before that newer head is described as validated.
+- Full-stack GitHub Actions run [#40318741650](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40318741650) passed on head `25d59925e349ac360dbf26f372c09a7354c2765a`: frozen dependency install, Prisma generation, `yarn test`, and `yarn build`.
+- That run validates the code at that exact SHA only. Any subsequent commit, including a documentation-only commit, needs its own CI result before the new head is called validated.
+- The focused funding-controller tests mock Prisma. They do not establish PostgreSQL concurrency/rollback behaviour; staging integration tests remain required.
 - No live PostgreSQL integration, production/staging deployment, PSP sandbox, physical Android review or cultural community sign-off has been performed in this work session.
 - The listed release blockers must be checked off with evidence before the app is represented as launch-ready.
