@@ -143,31 +143,53 @@ export async function deleteStokvel(req, res) {
     }
 
     // Financial history is an audit record, not disposable group metadata.
-    // Even a zero balance can coexist with repaid loans, cleared payouts,
-    // historical contributions, fines, or bank imports. Keep those records
-    // intact and require a supported closure/archive workflow instead.
-    const [memberCount, contributionCount, payoutCount, bankLogCount, loanRows, fineRows, tradeCreditRows, lendingRows] =
-      await Promise.all([
-        prisma.stokvelMember.count({ where: { stokvelId } }),
-        prisma.contribution.count({ where: { stokvelId } }),
-        prisma.payout.count({ where: { stokvelId } }),
-        prisma.rawBankLog.count({ where: { stokvelId } }),
-        prisma.$queryRaw`SELECT COUNT(*)::int AS count FROM "StokvelLoan" WHERE "stokvelId" = ${stokvelId}`,
-        prisma.$queryRaw`SELECT COUNT(*)::int AS count FROM "StokvelFine" WHERE "stokvelId" = ${stokvelId}`,
-        prisma.$queryRaw`SELECT COUNT(*)::int AS count FROM "StokvelTradeCredit" WHERE "stokvelId" = ${stokvelId}`,
-        prisma.$queryRaw`SELECT COUNT(*)::int AS count FROM "StokvelLendingEntry" WHERE "stokvelId" = ${stokvelId}`,
-      ]);
+    // A zero balance can coexist with historical contributions, cleared payouts,
+    // bank imports, repaid loans, fines, trade credit, or lending entries.
+    // Refuse deletion when a ledger exists or any known history remains. Some
+    // legacy finance tables are created lazily, so check table existence before
+    // querying them; otherwise a brand-new empty group could fail with 500.
+    const [memberCount, contributionCount, payoutCount, bankLogCount] = await Promise.all([
+      prisma.stokvelMember.count({ where: { stokvelId } }),
+      prisma.contribution.count({ where: { stokvelId } }),
+      prisma.payout.count({ where: { stokvelId } }),
+      prisma.rawBankLog.count({ where: { stokvelId } }),
+    ]);
+
+    const legacyHistoryTables = [
+      'StokvelLoan',
+      'StokvelFine',
+      'StokvelTradeCredit',
+      'StokvelLendingEntry',
+      'StokvelLendingTarget',
+      'StokvelLoanRepayment',
+      'StokvelLoanVote',
+    ];
+
+    let legacyHistoryExists = false;
+    for (const table of legacyHistoryTables) {
+      const [tableInfo] = await prisma.$queryRaw`SELECT to_regclass(${`"${table}"`}) IS NOT NULL AS "tableExists"`;
+      if (!tableInfo?.tableExists) continue;
+      const [row] = await prisma.$queryRawUnsafe(
+        `SELECT EXISTS (SELECT 1 FROM "${table}" WHERE "stokvelId" = $1) AS "hasRows"`,
+        stokvelId
+      );
+      if (row?.hasRows) {
+        legacyHistoryExists = true;
+        break;
+      }
+    }
 
     const hasFinancialHistory =
+      Boolean(ledger) ||
       memberCount > 0 ||
       contributionCount > 0 ||
       payoutCount > 0 ||
       bankLogCount > 0 ||
-      [loanRows, fineRows, tradeCreditRows, lendingRows].some((rows) => Number(rows[0]?.count || 0) > 0);
+      legacyHistoryExists;
 
     if (hasFinancialHistory) {
       return res.status(409).json({
-        error: 'This stokvel has membership, a ledger, or financial history. Deletion is disabled to protect records. Use a supported closure/archive process or contact support.',
+        error: 'This stokvel has a ledger, membership, or financial history. Deletion is disabled to protect records. Use a supported closure/archive process or contact support.',
         code: 'STOKVEL_FINANCIAL_HISTORY_REQUIRES_ARCHIVE',
       });
     }
