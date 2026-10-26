@@ -6,6 +6,8 @@ import { captureLocation } from '../lib/geolocation.js'
 import Icon from '../components/Icon.jsx'
 import IsidukoTypeahead from '../components/IsidukoTypeahead.jsx'
 
+const NATION_OPTIONS = ['AmaXhosa', 'AbaThembu', 'AmaBomvana', 'AmaGqunukhwebe', 'AbeSuthu / AmaVundle', 'AmaMpondo', 'AmaMpondomise', 'AmaMfengu', 'AmaHlubi', 'AmaBhaca', 'AmaXesibe', 'AmaQwathi', 'Not sure / another nation']
+
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96]'
 
 // "Pending" matches the wording Directory.jsx already uses for a
@@ -317,10 +319,16 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
 
           {editingClan ? (
             <form onSubmit={saveClan} className="space-y-2">
-              <IsidukoTypeahead label="Paternal Isiduko" value={clanForm.paternalIziduko} required onChange={(value) => setClanForm({ ...clanForm, paternalIziduko: value })} />
-              <IsidukoTypeahead label="Maternal Isiduko" value={clanForm.maternalIziduko} required onChange={(value) => setClanForm({ ...clanForm, maternalIziduko: value })} />
-              <IsidukoTypeahead label="Paternal grandmother’s Isiduko" value={clanForm.paternalGrandmotherIziduko} onChange={(value) => setClanForm({ ...clanForm, paternalGrandmotherIziduko: value })} />
-              <IsidukoTypeahead label="Maternal grandmother’s Isiduko" value={clanForm.maternalGrandmotherIziduko} onChange={(value) => setClanForm({ ...clanForm, maternalGrandmotherIziduko: value })} />
+              <IsidukoTypeahead label="Paternal Isiduko" value={clanForm.paternalIziduko} nationLabel={clanForm.nationLabel} required onChange={(value) => setClanForm({ ...clanForm, paternalIziduko: value })} />
+              <IsidukoTypeahead label="Maternal Isiduko" value={clanForm.maternalIziduko} nationLabel={clanForm.nationLabel} required onChange={(value) => setClanForm({ ...clanForm, maternalIziduko: value })} />
+              <IsidukoTypeahead label="Paternal grandmother’s Isiduko" value={clanForm.paternalGrandmotherIziduko} nationLabel={clanForm.nationLabel} onChange={(value) => setClanForm({ ...clanForm, paternalGrandmotherIziduko: value })} />
+              <IsidukoTypeahead label="Maternal grandmother’s Isiduko" value={clanForm.maternalGrandmotherIziduko} nationLabel={clanForm.nationLabel} onChange={(value) => setClanForm({ ...clanForm, maternalGrandmotherIziduko: value })} />
+              <label className="block text-sm font-bold text-ink">Your nation / community label
+                <select value={clanForm.nationLabel} onChange={(event) => setClanForm({ ...clanForm, nationLabel: event.target.value })} className="mt-2 w-full min-h-12 rounded-xl border border-cream-dark bg-white px-3 text-ink">
+                  <option value="">Choose your own label</option>
+                  {NATION_OPTIONS.map((nation) => <option key={nation} value={nation}>{nation}</option>)}
+                </select>
+              </label>
               <div className="flex gap-2 pt-2">
                 <button type="submit" className="flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm">Save</button>
                 <button type="button" onClick={() => setEditingClan(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">Cancel</button>
