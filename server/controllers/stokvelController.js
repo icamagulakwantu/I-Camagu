@@ -142,6 +142,36 @@ export async function deleteStokvel(req, res) {
       return res.status(400).json({ error: 'Cannot delete a stokvel with real funds in its ledger — this protects real money. Contact support if this stokvel genuinely needs to close.' });
     }
 
+    // Financial history is an audit record, not disposable group metadata.
+    // Even a zero balance can coexist with repaid loans, cleared payouts,
+    // historical contributions, fines, or bank imports. Keep those records
+    // intact and require a supported closure/archive workflow instead.
+    const [memberCount, contributionCount, payoutCount, bankLogCount, loanRows, fineRows, tradeCreditRows, lendingRows] =
+      await Promise.all([
+        prisma.stokvelMember.count({ where: { stokvelId } }),
+        prisma.contribution.count({ where: { stokvelId } }),
+        prisma.payout.count({ where: { stokvelId } }),
+        prisma.rawBankLog.count({ where: { stokvelId } }),
+        prisma.$queryRaw`SELECT COUNT(*)::int AS count FROM "StokvelLoan" WHERE "stokvelId" = ${stokvelId}`,
+        prisma.$queryRaw`SELECT COUNT(*)::int AS count FROM "StokvelFine" WHERE "stokvelId" = ${stokvelId}`,
+        prisma.$queryRaw`SELECT COUNT(*)::int AS count FROM "StokvelTradeCredit" WHERE "stokvelId" = ${stokvelId}`,
+        prisma.$queryRaw`SELECT COUNT(*)::int AS count FROM "StokvelLendingEntry" WHERE "stokvelId" = ${stokvelId}`,
+      ]);
+
+    const hasFinancialHistory =
+      memberCount > 0 ||
+      contributionCount > 0 ||
+      payoutCount > 0 ||
+      bankLogCount > 0 ||
+      [loanRows, fineRows, tradeCreditRows, lendingRows].some((rows) => Number(rows[0]?.count || 0) > 0);
+
+    if (ledger || hasFinancialHistory) {
+      return res.status(409).json({
+        error: 'This stokvel has membership, a ledger, or financial history. Deletion is disabled to protect records. Use a supported closure/archive process or contact support.',
+        code: 'STOKVEL_FINANCIAL_HISTORY_REQUIRES_ARCHIVE',
+      });
+    }
+
     // ── Raw-SQL tables (no Prisma cascade) ─────────────────────────────────
     // Delete child tables before parent tables to avoid FK violations.
     // Use $executeRawUnsafe so the table name is literal (not a param),
