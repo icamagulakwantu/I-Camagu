@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Icon from '../components/Icon.jsx'
 import { PENDING_PLEDGE_KEY } from '../lib/inviteLinks.js'
+import { PENDING_PLEDGE_KEY } from '../lib/inviteLinks.js'
 
 // Public, view-only copy of a ceremony checklist. Anyone with the link can read
 // it. The buttons at the top send people into the app: new people register,
