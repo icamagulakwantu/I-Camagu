@@ -322,7 +322,7 @@ export async function getCommunityFeed(userId) {
 
 export async function getNearbyDemandSignal(userId, skuId, radiusKm = 20) {
   if (!skuId) throw new Error('skuId is required');
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { latitude: true, longitude: true, location: true } });
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { latitude: true, longitude: true, location: true, clanGroupId: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true } });
   if (!user) throw new Error('User not found');
   const now = new Date();
   const ceremonies = await prisma.ceremony.findMany({
