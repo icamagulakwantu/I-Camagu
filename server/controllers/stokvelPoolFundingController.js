@@ -61,6 +61,35 @@ export async function decidePoolFundingRequest(req, res) {
     if (priorVote) return res.status(409).json({ error: 'Each official account can vote only once on a funding request' });
 
     const result = await prisma.$transaction(async (tx) => {
+      // Serialize every spend decision for this stokvel against the same
+      // advisory lock used by the ledger. A preflight balance read alone is
+      // not safe when two different requests receive their final approval
+      // concurrently.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${stokvelId}))`;
+
+      // Re-read mutable state after taking the lock: the preflight reads
+      // above may have become stale while another official was deciding.
+      const currentFunding = await tx.stokvelPoolFunding.findFirst({
+        where: { id: fundingId, stokvelId },
+        select: { id: true, status: true, requestedById: true, amountZAR: true, requiredApprovals: true },
+      });
+      if (!currentFunding) {
+        throw Object.assign(new Error('Funding request not found'), { httpStatus: 404 });
+      }
+      if (currentFunding.status !== 'PENDING_APPROVAL') {
+        throw Object.assign(new Error('This funding request has already been decided'), { httpStatus: 409 });
+      }
+      if (currentFunding.requestedById === req.userId) {
+        throw Object.assign(new Error('The person who requested funding cannot approve their own request'), { httpStatus: 403 });
+      }
+      const existingVote = await tx.stokvelPoolFundingApproval.findFirst({
+        where: { fundingId, approverId: req.userId },
+        select: { id: true },
+      });
+      if (existingVote) {
+        throw Object.assign(new Error('Each official account can vote only once on a funding request'), { httpStatus: 409 });
+      }
+
       await tx.stokvelPoolFundingApproval.create({
         data: {
           fundingId,
@@ -94,7 +123,7 @@ export async function decidePoolFundingRequest(req, res) {
       const approvedCount = await tx.stokvelPoolFundingApproval.count({
         where: { fundingId, decision: 'APPROVE' },
       });
-      const needed = Math.max(2, funding.requiredApprovals || 2);
+      const needed = Math.max(2, currentFunding.requiredApprovals || 2);
       if (approvedCount >= needed) {
         const [ledger, otherCommitments] = await Promise.all([
           tx.stokvelGroupLedger.findUnique({ where: { stokvelId } }),
@@ -106,7 +135,7 @@ export async function decidePoolFundingRequest(req, res) {
         const available = ledger
           ? Number(ledger.totalBalance) - Number(ledger.groupExpenses) - Number(otherCommitments._sum.amountZAR || 0)
           : 0;
-        if (available < Number(funding.amountZAR)) {
+        if (available < Number(currentFunding.amountZAR)) {
           const declined = await tx.stokvelPoolFunding.update({
             where: { id: fundingId },
             data: { status: 'DECLINED', declinedAt: new Date(), reviewNote: 'Insufficient available funds after other pool commitments.' },
@@ -166,6 +195,7 @@ export async function decidePoolFundingRequest(req, res) {
             : 'Funding request approved. Settlement is still pending.',
     });
   } catch (error) {
+    if (error.httpStatus) return res.status(error.httpStatus).json({ error: error.message });
     if (error.code === 'P2002') return res.status(409).json({ error: 'You have already decided this funding request' });
     console.error('Decide stokvel pool funding request:', error.message);
     res.status(500).json({ error: 'Could not record your decision' });
