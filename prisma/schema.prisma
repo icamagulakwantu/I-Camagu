@@ -308,9 +308,10 @@ model RefreshToken {
 // ---------- CLAN / IZIDUKO ----------
 
 model ClanGroup {
-  id        String   @id @default(cuid())
-  clanName  String   @unique
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  clanName    String   @unique
+  nationLabel String?
+  createdAt   DateTime @default(now())
 
   surnameGroups SurnameSubgroup[]
   aliases       ClanAlias[]
