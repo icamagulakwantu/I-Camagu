@@ -19,20 +19,8 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
   const quantity = Math.max(1, Math.ceil(Number(cost?.quantity) || 1));
   const linkedCeremonyId = ceremonyId || activeCeremony?.ceremonyId || activeCeremony?.id;
 
-  if (variant === 'feed' && feedPool) {
-    return <article className="w-full rounded-2xl border border-cream-dark bg-white p-4 text-left shadow-soft space-y-3">
-      <div className="flex items-start justify-between gap-3">
-        <div><h3 className="font-bold text-ink">{feedPool.partnerName || feedPool.category} pool</h3><p className="text-xs text-ink-muted mt-1">{feedPool.distanceKm == null ? feedPool.area : feedPool.distanceKm + ' km away'} · {feedPool.participantCount} members{feedPool.deadline ? ' · Closes ' + new Date(feedPool.deadline).toLocaleDateString() : ''}</p>
-        {feedPool.clanMemberCount > 0 && <p className="text-xs font-semibold text-terracotta mt-1">{feedPool.clanMemberCount} clan member{feedPool.clanMemberCount === 1 ? '' : 's'} already joined</p>}</div>
-        <span className="text-xs font-bold text-ink">{feedPool.currentCases}/{feedPool.moqTarget} cases</span>
-      </div>
-      <div className="h-2 rounded-full bg-cream-dark overflow-hidden"><div className="h-full bg-terracotta" style={{ width: Math.min(100, feedPool.moqTarget > 0 ? feedPool.currentCases / feedPool.moqTarget * 100 : 0) + '%' }} /></div>
-      <p className="text-xs text-ink-muted">{feedPool.nextTier ? 'Next tier: ' + feedPool.nextTier.name : 'Pool price awaits a real quote'}</p>
-      <button type="button" onClick={onOpen} className="w-full min-h-10 rounded-full border border-terracotta text-terracotta font-bold">Browse items</button>
-    </article>;
-  }
-
   useEffect(() => {
+    if (variant === 'feed' && feedPool) { setLoading(false); return undefined; }
     let cancelled = false;
     const params = new URLSearchParams({ skuId: skuId || '', limit: '8' });
     if (linkedCeremonyId) params.set('ceremonyId', linkedCeremonyId);
@@ -42,7 +30,7 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
       .catch((err) => { if (!cancelled) showToast(err.message, 'error'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [skuId, linkedCeremonyId, accessToken, showToast]);
+  }, [skuId, linkedCeremonyId, accessToken, showToast, variant, feedPool]);
 
   const buy = async () => {
     setBusy(true);
@@ -62,6 +50,19 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
       showToast(data.message || 'Added to pool', 'success'); await refreshPools(); onClose?.();
     } catch (err) { showToast(err.message, 'error'); } finally { setBusy(false); }
   };
+
+  if (variant === 'feed' && feedPool) {
+    return <article className="w-full rounded-2xl border border-cream-dark bg-white p-4 text-left shadow-soft space-y-3">
+      <div className="flex items-start justify-between gap-3">
+        <div><h3 className="font-bold text-ink">{feedPool.partnerName || feedPool.category} pool</h3><p className="text-xs text-ink-muted mt-1">{feedPool.distanceKm == null ? feedPool.area : feedPool.distanceKm + ' km away'} · {feedPool.participantCount} members{feedPool.deadline ? ' · Closes ' + new Date(feedPool.deadline).toLocaleDateString() : ''}</p>
+        {feedPool.clanMemberCount > 0 && <p className="text-xs font-semibold text-terracotta mt-1">{feedPool.clanMemberCount} clan member{feedPool.clanMemberCount === 1 ? '' : 's'} already joined</p>}</div>
+        <span className="text-xs font-bold text-ink">{feedPool.currentCases}/{feedPool.moqTarget} cases</span>
+      </div>
+      <div className="h-2 rounded-full bg-cream-dark overflow-hidden"><div className="h-full bg-terracotta" style={{ width: Math.min(100, feedPool.moqTarget > 0 ? feedPool.currentCases / feedPool.moqTarget * 100 : 0) + '%' }} /></div>
+      <p className="text-xs text-ink-muted">{feedPool.nextTier ? 'Next tier: ' + feedPool.nextTier.name : 'Pool price awaits a real quote'}</p>
+      <button type="button" onClick={onOpen} className="w-full min-h-10 rounded-full border border-terracotta text-terracotta font-bold">Browse items</button>
+    </article>;
+  }
 
   return <div className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center bg-ink/55 p-0 sm:p-4" role="dialog" aria-modal="true" aria-label="Pool offers">
     <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-cream p-5 space-y-4">
