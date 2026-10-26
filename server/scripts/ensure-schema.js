@@ -277,4 +277,54 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'CREATE INDEX IF NOT EXISTS "Message_recipientId_senderId_createdAt_idx" ON "Message" ("recipientId", "senderId", "createdAt");'
   );
+
+  // SmartMatch location and funding relationships. These columns are added
+  // idempotently because this repository has no complete migration baseline.
+  await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "clanGroupId" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "latitude" DOUBLE PRECISION;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "longitude" DOUBLE PRECISION;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "radiusKm" DOUBLE PRECISION NOT NULL DEFAULT 20;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "createdById" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Basket" ADD COLUMN IF NOT EXISTS "ceremonyId" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Basket" ADD COLUMN IF NOT EXISTS "checklistItemId" TEXT;');
+  await prisma.$executeRawUnsafe("ALTER TABLE \"Basket\" ADD COLUMN IF NOT EXISTS \"fundingSource\" TEXT NOT NULL DEFAULT 'PERSONAL';");
+  await prisma.$executeRawUnsafe('ALTER TABLE "Basket" ADD COLUMN IF NOT EXISTS "fundingStokvelId" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "stokvelId" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "fundingRequestId" TEXT;');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "BulkPool_category_status_idx" ON "BulkPool" ("category", "status");');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "Basket_ceremonyId_idx" ON "Basket" ("ceremonyId");');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "User_clanGroupId_idx" ON "User" ("clanGroupId");');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "PoolPayment_stokvelId_createdAt_idx" ON "PoolPayment" ("stokvelId", "createdAt");');
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "StokvelPoolFunding" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "stokvelId" TEXT NOT NULL,
+      "poolId" TEXT NOT NULL,
+      "basketId" TEXT,
+      "requestedById" TEXT NOT NULL,
+      "amountZAR" DECIMAL(10,2) NOT NULL,
+      "purpose" TEXT,
+      "status" TEXT NOT NULL DEFAULT 'PENDING_APPROVAL',
+      "requiredApprovals" INTEGER NOT NULL DEFAULT 2,
+      "approvedAt" TIMESTAMP(3),
+      "declinedAt" TIMESTAMP(3),
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL
+    );
+  `);
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "StokvelPoolFundingApproval" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "fundingId" TEXT NOT NULL,
+      "officialId" TEXT NOT NULL,
+      "approverId" TEXT NOT NULL,
+      "decision" TEXT NOT NULL,
+      "note" TEXT,
+      "decidedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "StokvelPoolFundingApproval_fundingId_officialId_key" UNIQUE ("fundingId", "officialId")
+    );
+  `);
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "StokvelPoolFunding_stokvelId_status_createdAt_idx" ON "StokvelPoolFunding" ("stokvelId", "status", "createdAt");');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "StokvelPoolFunding_poolId_status_idx" ON "StokvelPoolFunding" ("poolId", "status");');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "StokvelPoolFundingApproval_approverId_decidedAt_idx" ON "StokvelPoolFundingApproval" ("approverId", "decidedAt");');
 }
