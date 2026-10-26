@@ -287,6 +287,8 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe('ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "createdById" TEXT;');
   await prisma.$executeRawUnsafe('ALTER TABLE "Basket" ADD COLUMN IF NOT EXISTS "ceremonyId" TEXT;');
   await prisma.$executeRawUnsafe('ALTER TABLE "Basket" ADD COLUMN IF NOT EXISTS "checklistItemId" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Basket" ADD COLUMN IF NOT EXISTS "ceremonyCostItemId" TEXT;');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "Basket_ceremonyCostItemId_idx" ON "Basket" ("ceremonyCostItemId");');
   await prisma.$executeRawUnsafe("ALTER TABLE \"Basket\" ADD COLUMN IF NOT EXISTS \"fundingSource\" TEXT NOT NULL DEFAULT 'PERSONAL';");
   await prisma.$executeRawUnsafe('ALTER TABLE "Basket" ADD COLUMN IF NOT EXISTS "fundingStokvelId" TEXT;');
   await prisma.$executeRawUnsafe('ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "stokvelId" TEXT;');
