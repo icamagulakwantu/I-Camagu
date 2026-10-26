@@ -294,6 +294,8 @@ export async function ensureCeremonyBudgetColumns() {
   // SmartMatch location and funding relationships. These columns are added
   // idempotently because this repository has no complete migration baseline.
   await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "clanGroupId" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Ceremony" ADD COLUMN IF NOT EXISTS "visibility" TEXT NOT NULL DEFAULT \'PRIVATE\';');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "Ceremony_visibility_eventDate_idx" ON "Ceremony" ("visibility", "eventDate");');
   await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "nationLabel" TEXT;');
   await prisma.$executeRawUnsafe('ALTER TABLE "ClanGroup" ADD COLUMN IF NOT EXISTS "nationLabel" TEXT;');
   await prisma.$executeRawUnsafe('ALTER TABLE "BulkPool" ADD COLUMN IF NOT EXISTS "latitude" DOUBLE PRECISION;');
