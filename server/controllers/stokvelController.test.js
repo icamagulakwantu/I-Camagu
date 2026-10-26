@@ -13,6 +13,7 @@ const { prisma } = vi.hoisted(() => ({
     $queryRaw: vi.fn(),
     $queryRawUnsafe: vi.fn(),
     $executeRawUnsafe: vi.fn(),
+    $transaction: vi.fn(async (fn) => fn(prisma)),
   },
 }));
 
