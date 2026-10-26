@@ -98,6 +98,63 @@ function poolMetrics(pool) {
   };
 }
 
+/**
+ * Identifies indicative cross-pool volume opportunities without merging pools.
+ * The target SKU's case price is only a reference denominator; pallet equivalence
+ * is explicitly unconfirmed until a supplier approves a mixed-SKU conversion.
+ * No discount is calculated as achieved or guaranteed.
+ */
+export function buildCrossPoolAggregationSuggestions(pools, referenceCasePriceZAR) {
+  const referenceCasePrice = Number(referenceCasePriceZAR);
+  if (!Number.isFinite(referenceCasePrice) || referenceCasePrice <= 0) return [];
+  const referencePalletValueZAR = referenceCasePrice * 56;
+  const groups = new Map();
+
+  for (const pool of pools || []) {
+    if (!pool || pool.status !== 'OPEN' || !pool.area) continue;
+    const supplierKey = pool.partnerName ? String(pool.partnerName).trim().toLocaleLowerCase() : 'supplier-unconfirmed';
+    const key = `${String(pool.area).trim().toLocaleLowerCase()}::${supplierKey}`;
+    if (!groups.has(key)) groups.set(key, {
+      area: pool.area,
+      supplierName: pool.partnerName || null,
+      supplierCompatibility: pool.partnerName ? 'SAME_NAMED_SUPPLIER' : 'UNCONFIRMED',
+      pools: [],
+      combinedOrderValueZAR: 0,
+    });
+    const group = groups.get(key);
+    group.pools.push(pool);
+    group.combinedOrderValueZAR += Math.max(0, Number(pool.currentAmountZAR) || 0);
+  }
+
+  return [...groups.values()]
+    .filter((group) => group.pools.length >= 2)
+    .map((group) => {
+      const equivalentPallets = group.combinedOrderValueZAR / referencePalletValueZAR;
+      return {
+        area: group.area,
+        supplierName: group.supplierName,
+        supplierCompatibility: group.supplierCompatibility,
+        poolCount: group.pools.length,
+        poolIds: group.pools.map((pool) => pool.id),
+        distinctCategories: [...new Set(group.pools.map((pool) => pool.category).filter(Boolean))],
+        combinedOrderValueZAR: Math.round(group.combinedOrderValueZAR * 100) / 100,
+        referencePalletValueZAR: Math.round(referencePalletValueZAR * 100) / 100,
+        indicativePalletEquivalent: Math.round(equivalentPallets * 100) / 100,
+        reachesThreePalletEquivalent: equivalentPallets >= 3,
+        volumeTierStatus: 'INDICATIVE_ONLY_SUPPLIER_CONFIRMATION_REQUIRED',
+        potentialDiscountLabel: 'Research-backed 8–10% bulk-discount target at qualifying volume; outlet terms apply',
+        message: equivalentPallets >= 3
+          ? 'Join forces: these groups may reach a three-pallet-equivalent order value. Ask the supplier whether mixed products count and request a written quote.'
+          : 'Join forces: combined demand may move the supplier quote toward a higher volume tier. Ask the supplier to confirm eligible products and thresholds.',
+        requiresOptIn: true,
+        orderPlaced: false,
+        supplierConfirmationRequired: true,
+      };
+    })
+    .sort((a, b) => Number(b.reachesThreePalletEquivalent) - Number(a.reachesThreePalletEquivalent)
+      || b.combinedOrderValueZAR - a.combinedOrderValueZAR);
+}
+
 export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, limit = 10 }) {
   if (!skuId) throw new Error('skuId is required');
   const [user, sku] = await Promise.all([
@@ -117,7 +174,7 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
   }
 
   const pools = await prisma.bulkPool.findMany({
-    where: { category: categoryForSku(sku), status: 'OPEN' },
+    where: { status: 'OPEN' },
     include: {
       partner: true,
       baskets: {
@@ -132,7 +189,7 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
     take: 100,
   });
 
-  const ranked = pools.map((pool) => {
+  const allRanked = pools.map((pool) => {
     const distanceKm = locationDistance(user, pool);
     const clan = clanScore(user, pool);
     const metrics = poolMetrics(pool);
@@ -170,7 +227,10 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
       poolPriceZAR,
       ...metrics,
     };
-  }).filter((pool) => pool.closesInTime && pool.distanceAllowed)
+  });
+
+  const eligiblePools = allRanked.filter((pool) => pool.closesInTime && pool.distanceAllowed);
+  const ranked = eligiblePools.filter((pool) => pool.category === categoryForSku(sku))
     .sort((a, b) => b.clanScore - a.clanScore
       || (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER)
       || (a.deadline ? new Date(a.deadline).getTime() : Number.MAX_SAFE_INTEGER)
@@ -182,6 +242,7 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
     sku: { id: sku.id, name: sku.name, category: sku.category, casePriceZAR: sku.casePriceZAR },
     ceremony: ceremony ? { id: ceremony.id, title: ceremony.title, eventDate: ceremony.eventDate } : null,
     pools: ranked,
+    combinedOrderSuggestions: buildCrossPoolAggregationSuggestions(eligiblePools, sku.casePriceZAR),
   };
 }
 

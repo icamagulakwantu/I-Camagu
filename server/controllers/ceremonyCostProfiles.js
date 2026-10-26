@@ -8,21 +8,24 @@
 //
 // Rule: a rate only changes when the change can name a shop and a date. Lines
 // carrying a trailing comment were checked against a real listing on that
-// date. Lines without one are still the original estimates — treat them as
-// unverified and do not adjust them by "inflation" or a general benchmark.
+// date. As of 26 Oct 2026, 10 Sep 2026 observations are 46 days old (past the
+// six-week recheck window): keep the historical numbers for auditability, but
+// treat them as STALE pending a fresh shelf/listing check. Do not silently
+// update these values from web averages. Lines without dated evidence remain
+// estimates and must be treated as unverified.
 // ============================================================================
 
 const COST_RATES = {
   alcohol: {
-    brandy_750ml: 195.00,  // Ultra Liquors 10 Sep 2026: Commando R196.99, KWV 3yr R179.99, Klipdrift Export R174.91/btl in case
-    gin_750ml: 160.00,  // Ultra Liquors 10 Sep 2026: Old Buck R154.99, Gordon's R169.99, Strettons R145.75
-    whisky_750ml: 200.00,  // Ultra Liquors 10 Sep 2026: Three Ships R179.99, Bell's/J&B R199.99, Harrier R159.99
-    beer_case_24: 330.00,  // Ultra + Prestons 10 Sep 2026: Castle Lager 24x500ml R299.99, Black Label R329.99, Castle Lite R364.99
+    brandy_750ml: 195.00,  // Ultra Liquors 10 Sep 2026 (STALE — recheck required): Commando R196.99, KWV 3yr R179.99, Klipdrift Export R174.91/btl in case
+    gin_750ml: 160.00,  // Ultra Liquors 10 Sep 2026 (STALE — recheck required): Old Buck R154.99, Gordon's R169.99, Strettons R145.75
+    whisky_750ml: 200.00,  // Ultra Liquors 10 Sep 2026 (STALE — recheck required): Three Ships R179.99, Bell's/J&B R199.99, Harrier R159.99
+    beer_case_24: 330.00,  // Ultra + Prestons 10 Sep 2026 (STALE — recheck required): Castle Lager 24x500ml R299.99, Black Label R329.99, Castle Lite R364.99
     beer_bottle: 20.00,
     umqombothi_bhekile: 35.00,
     umqombothi_50l_drum: 850.00,
-    wine_750ml: 80.00,  // Ultra Liquors 10 Sep 2026: Graca R59.99, Van Loveren R69.99, Alto Rouge R114.99
-    cognac_750ml: 500.00,  // Ultra Liquors 10 Sep 2026: Hennessy VS R499.99, Honor VS R499.99
+    wine_750ml: 80.00,  // Ultra Liquors 10 Sep 2026 (STALE — recheck required): Graca R59.99, Van Loveren R69.99, Alto Rouge R114.99
+    cognac_750ml: 500.00,  // Ultra Liquors 10 Sep 2026 (STALE — recheck required): Hennessy VS R499.99, Honor VS R499.99
     vodka_750ml: 200.00,
   },
   livestock: {
@@ -62,10 +65,10 @@ const COST_RATES = {
     maize_meal_50kg: 520.00,
     maize_meal_12_5kg: 145.00,
     rice_10kg: 195.00,
-    cooking_oil_5l: 158.95,  // Makro 10 Sep 2026: Great Value 5L R158.95 (SunStar R152.95, Econo R147.99 at Game)
+    cooking_oil_5l: 158.95,  // Makro 10 Sep 2026 (STALE — recheck required): Great Value 5L R158.95 (SunStar R152.95, Econo R147.99 at Game)
     spinach_bundle: 25.00,
     cabbage_head: 22.00,
-    potatoes_10kg: 113.99,  // Pick n Pay 10 Sep 2026: PnP Potatoes 10kg R113.99
+    potatoes_10kg: 113.99,  // Pick n Pay 10 Sep 2026 (STALE — recheck required): PnP Potatoes 10kg R113.99
     onions_10kg: 95.00,
     carrots_10kg: 95.00,
     green_pepper_kg: 32.00,
@@ -74,13 +77,13 @@ const COST_RATES = {
     green_apples_kg: 38.00,
     butter_500g: 85.00,
     salt_1kg: 18.00,
-    sugar_10kg: 232.25,  // Makro 10 Sep 2026: Selati Pure White 10kg R232.25 (Huletts R239.95)
+    sugar_10kg: 232.25,  // Makro 10 Sep 2026 (STALE — recheck required): Selati Pure White 10kg R232.25 (Huletts R239.95)
     inkobe_white_maize_kg: 22.00,
     brown_bread_loaf: 20.00,
     milk_2l: 35.00,
     instant_coffee_750g: 165.00,
     peanut_butter_400g: 50.00,
-    flour_2_5kg: 34.99,  // Food Lover's Market William Moffett 10 Sep 2026: Snowflake cake flour 2.5kg R34.99
+    flour_2_5kg: 34.99,  // Food Lover's Market William Moffett 10 Sep 2026 (STALE — recheck required): Snowflake cake flour 2.5kg R34.99
     tea_100bags: 60.00,
   },
   supplies: {
@@ -89,13 +92,13 @@ const COST_RATES = {
     bhekile_can: 35.00,
     plastic_plate_pack_50: 95.00,
     plastic_spoon_pack_50: 45.00,
-    blanket_white_striped: 425.00,  // Aranda 10 Sep 2026: Ingcawe Xhosa white/black R425 (Blankets of Africa poly R349)
-    blanket_plain: 189.00,  // Makro 10 Sep 2026: Aranda 150x200 rewool grey R189 (Aranda Boxer grey/white R229)
+    blanket_white_striped: 425.00,  // Aranda 10 Sep 2026 (STALE — recheck required): Ingcawe Xhosa white/black R425 (Blankets of Africa poly R349)
+    blanket_plain: 189.00,  // Makro 10 Sep 2026 (STALE — recheck required): Aranda 150x200 rewool grey R189 (Aranda Boxer grey/white R229)
     grass_mat_ikhukho: 150.00,
-    tarpaulin_sail: 375.00,  // Leroy Merlin 10 Sep 2026: 70gr 5x8m with eyelets R375 (140gr R679)
+    tarpaulin_sail: 375.00,  // Leroy Merlin 10 Sep 2026 (STALE — recheck required): 70gr 5x8m with eyelets R375 (140gr R679)
     poles_bundle: 450.00,  // Corrected from founder's own knowledge of what a pole bundle for ibhoma actually costs (not a shop listing)
     firewood_bundle: 95.00,
-    water_container_25l: 129.99,  // Mambo's 10 Sep 2026: 25L canister with tap R129.99 (25L polycan drum R55 at Foamy)
+    water_container_25l: 129.99,  // Mambo's 10 Sep 2026 (STALE — recheck required): 25L canister with tap R129.99 (25L polycan drum R55 at Foamy)
     matches_box: 15.00,
     candles_pack: 35.00,
     lamp_paraffin: 120.00,
