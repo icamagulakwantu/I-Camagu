@@ -5,7 +5,7 @@
 ## Automated checks
 
 - [ ] Latest full-stack head passes CI after the final commit: frozen install, Prisma generation, `yarn test`, `yarn build`.
-- [ ] The reviewable feature stack is reviewed and merged in dependency order by the repository owner. Temporary validation PRs #36 and #38 must never be merged.
+- [x] The SmartMatch, ceremony, stokvel-funding, clan-matching, community-feed and pricing/concurrency feature stack was consolidated and merged through PR #42 (`9d571b104a0e4daa879157809f963bcd2a5fea2f`). Temporary validation PRs #36 and #38 were closed without merging.
 - [ ] A clean checkout can install from the committed lockfile; no lockfile regeneration is performed as part of a release without review.
 
 ## Database and financial integrity — release blockers
@@ -13,7 +13,7 @@
 - [ ] Establish versioned Prisma migrations from the current production schema. The repository currently has no `prisma/migrations` history and uses runtime/lazy schema DDL in several paths. Baseline and test against a staging database before changing startup to migration-only.
 - [ ] Run the balance-check script on a copy of live data; reconcile any historic divergence through auditable correcting entries approved by the relevant stokvel officials. Never rewrite historical ledger rows to force a match.
 - [ ] Run PostgreSQL integration tests for transaction rollback and concurrent requests, including payout, contribution, fund allocation, final loan votes/repayments, and stokvel-funded pool approvals. Unit tests alone are not enough for row-lock/transaction guarantees.
-- [ ] Resolve the remaining race risk in stokvel pool funding availability checks with a database lock/serializable transaction and concurrency test; do not rely only on a preflight balance read.
+- [ ] Verify that every ledger writer and stokvel pool-funding approval path uses the same per-stokvel database lock/transaction boundary. Add PostgreSQL integration tests for two concurrent funding requests, duplicate votes, insufficient-funds rechecks and rollback; mocked Prisma tests do not prove database-level serialization.
 - [ ] Verify provider webhooks, payment idempotency, refunds, reconciliation and partner settlement in a PSP sandbox. An approval or pending settlement must never be displayed as money already paid.
 - [ ] Reconcile supplier/order statuses and per-member allocations end to end in staging. Keep separate pools and stokvel balances separate unless each organiser explicitly approves a combined order.
 
@@ -53,7 +53,7 @@
 
 ## Current evidence snapshot — 26 October 2026
 
-- Full-stack GitHub Actions run [#40318741650](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40318741650) passed on head `25d59925e349ac360dbf26f372c09a7354c2765a`: frozen dependency install, Prisma generation, `yarn test`, and `yarn build`.
+- Consolidated feature integration PR [#42](https://github.com/icamagulakwantu/I-Camagu/pull/42) was merged to `main` as `9d571b104a0e4daa879157809f963bcd2a5fea2f`. The exact main-head CI run [#40350594066](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40350594066) passed dependency installation, Prisma client generation, `yarn test`, and `yarn build`.
 - That run validates the code at that exact SHA only. Any subsequent commit, including a documentation-only commit, needs its own CI result before the new head is called validated.
 - The focused funding-controller tests mock Prisma. They do not establish PostgreSQL concurrency/rollback behaviour; staging integration tests remain required.
 - No live PostgreSQL integration, production/staging deployment, PSP sandbox, physical Android review or cultural community sign-off has been performed in this work session.
