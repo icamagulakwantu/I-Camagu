@@ -487,13 +487,35 @@ export async function updateTradeCredit(req, res) {
 // ---------- Statement ----------
 
 // Every money movement in a date range, oldest first, with a running total.
+// Parse statement dates strictly as calendar days in UTC. JavaScript's Date
+// parser normalises impossible dates (for example, February 31), so round-trip
+// the YYYY-MM-DD value before accepting it.
+export function parseStatementDateRange(query = {}, now = new Date()) {
+  const parseDay = (value, endOfDay = false) => {
+    if (typeof value !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return null;
+    const date = new Date(`${value}T${endOfDay ? '23:59:59.999' : '00:00:00.000'}Z`);
+    if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) return null;
+    return date;
+  };
+
+  const from = query.from === undefined || query.from === ''
+    ? new Date(Date.UTC(now.getUTCFullYear(), 0, 1))
+    : parseDay(query.from);
+  const to = query.to === undefined || query.to === ''
+    ? new Date(now)
+    : parseDay(query.to, true);
+
+  if (!from || !to || from > to) return { ok: false };
+  return { ok: true, from, to };
+}
+
 export async function getStatement(req, res) {
   try {
     if (!(await guard(req, res))) return;
     const { stokvelId } = req.params;
-    const from = req.query.from ? new Date(`${req.query.from}T00:00:00.000Z`) : new Date(Date.UTC(new Date().getUTCFullYear(), 0, 1));
-    const to = req.query.to ? new Date(`${req.query.to}T23:59:59.999Z`) : new Date();
-    if (isNaN(from) || isNaN(to)) return res.status(400).json({ error: 'Invalid date range' });
+    const range = parseStatementDateRange(req.query);
+    if (!range.ok) return res.status(400).json({ error: 'Invalid date range' });
+    const { from, to } = range;
 
     const [contributions, payouts, fines, loans, repayments] = await Promise.all([
       prisma.contribution.findMany({ where: { stokvelId, status: 'CONFIRMED', createdAt: { gte: from, lte: to } }, take: 2000 }),
