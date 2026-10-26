@@ -342,4 +342,22 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "StokvelPoolFunding_stokvelId_status_createdAt_idx" ON "StokvelPoolFunding" ("stokvelId", "status", "createdAt");');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "StokvelPoolFunding_poolId_status_idx" ON "StokvelPoolFunding" ("poolId", "status");');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "StokvelPoolFundingApproval_approverId_decidedAt_idx" ON "StokvelPoolFundingApproval" ("approverId", "decidedAt");');
+
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "IsidukoSubmission" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "typedText" TEXT NOT NULL,
+      "normalisedText" TEXT NOT NULL,
+      "nationLabel" TEXT,
+      "status" TEXT NOT NULL DEFAULT 'PENDING_REVIEW',
+      "resolvedClanGroupId" TEXT,
+      "reviewNote" TEXT,
+      "reviewedById" TEXT,
+      "reviewedAt" TIMESTAMP(3),
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "IsidukoSubmission_status_createdAt_idx" ON "IsidukoSubmission" ("status", "createdAt");');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "IsidukoSubmission_normalisedText_idx" ON "IsidukoSubmission" ("normalisedText");');
 }
