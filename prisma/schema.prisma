@@ -520,6 +520,8 @@ model Basket {
   ceremony     Ceremony?     @relation(fields: [ceremonyId], references: [id], onDelete: SetNull)
   checklistItemId String?
   checklistItem CeremonyChecklistItem? @relation(fields: [checklistItemId], references: [id], onDelete: SetNull)
+  ceremonyCostItemId String?
+  ceremonyCostItem CeremonyCostItem? @relation(fields: [ceremonyCostItemId], references: [id], onDelete: SetNull)
   fundingSource String @default("PERSONAL")
   fundingStokvelId String?
   fundingStokvel Stokvel? @relation("BasketFundingStokvel", fields: [fundingStokvelId], references: [id], onDelete: SetNull)
@@ -1168,6 +1170,7 @@ model CeremonyCostItem {
   sku             Sku?     @relation(fields: [skuId], references: [id])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  baskets         Basket[]
 
   @@index([ceremonyId])
 }
