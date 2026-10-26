@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react'
 import Icon from '../components/Icon.jsx'
 import { PENDING_PLEDGE_KEY } from '../lib/inviteLinks.js'
-import { PENDING_PLEDGE_KEY } from '../lib/inviteLinks.js'
 
-// Public, view-only copy of a ceremony checklist. Anyone with the link can read
-// it. The buttons at the top send people into the app: new people register,
-// then are asked what they would like to pledge to this ceremony.
+const money = (n) => `R${Number(n).toLocaleString('en-ZA', { maximumFractionDigits: 0 })}`
+
+// Public, view-only copy of a ceremony checklist and its family pledges. Anyone
+// with the link can read it; the call to action at the top sends people into
+// the app, where new people register and can plan their own ceremony.
 function PublicPlanView({ token }) {
   const [plan, setPlan] = useState(null)
+  const [pledges, setPledges] = useState([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
 
@@ -20,10 +22,16 @@ function PublicPlanView({ token }) {
         setLoading(false)
       })
       .catch(() => { setError('Could not load this checklist'); setLoading(false) })
+
+    // Pledges are a nice extra: if they fail to load the checklist still shows.
+    fetch(`/api/public/plan/${token}/pledges`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setPledges(Array.isArray(data) ? data : []))
+      .catch(() => setPledges([]))
   }, [token])
 
-  // Remember the ceremony, then go to the app. Signed-in people get the pledge
-  // form straight away; new people register first.
+  // Remember the ceremony and return to the app so a signed-in family member
+  // can pledge, or a new member can register first.
   const startPledge = () => {
     localStorage.setItem(PENDING_PLEDGE_KEY, token)
     window.location.assign('/')
@@ -62,6 +70,34 @@ function PublicPlanView({ token }) {
           <a href="/" className="inline-block mt-3 text-xs text-sage-600 underline">Or plan your own ceremony: register or sign in</a>
           <p className="text-[11px] text-ink-muted mt-2">This page is view-only.</p>
         </div>
+
+        {pledges.length > 0 && (
+          <div className="mb-4">
+            <p className="text-xs font-black uppercase text-ink-muted mb-2">Family pledges</p>
+            <div className="space-y-1.5">
+              {pledges.map((p) => {
+                const pledged = p.pledgedAmountZAR != null ? parseFloat(p.pledgedAmountZAR) : null
+                const paid = p.paidAmountZAR != null ? parseFloat(p.paidAmountZAR) : 0
+                const received = pledged != null && pledged > 0 && paid >= pledged
+                return (
+                  <div key={p.id} className="flex items-center justify-between gap-3 bg-white border border-terracotta/15 rounded-soft p-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-ink truncate">
+                        {p.pledgerName}{p.relationship ? ` · ${p.relationship}` : ''}
+                      </p>
+                      <p className="text-xs text-ink-muted truncate">
+                        {p.pledgedItem}{pledged != null ? ` · ${money(pledged)}` : ''}
+                      </p>
+                    </div>
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-pill bg-sage-50 text-sage-700 flex-shrink-0">
+                      {received ? 'Received' : 'Pledged'}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {phases.map((phase) => (
           <div key={phase} className="mb-4">
