@@ -112,8 +112,8 @@ export default function More({ onNavigate }) {
       <div className="mb-6 px-1">
         {/* Xhosa eyebrow with English subtext */}
         <p className="eyebrow text-terracotta">Konke okukhoyo</p>
-        <p className="text-[10px] text-ink-muted mb-1">All features &amp; settings</p>
-        <h1 className="font-display font-bold text-3xl text-ink">More</h1>
+        <p className="text-[10px] text-ink-muted mb-1">My profile, community &amp; settings</p>
+        <h1 className="font-display font-bold text-3xl text-ink">Me</h1>
       </div>
 
       {user && (
