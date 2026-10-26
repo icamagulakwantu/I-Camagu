@@ -47,6 +47,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   const [creating, setCreating] = useState(false)
   const [stepId, setStepId] = useState('what')
   const [form, setForm] = useState(EMPTY_FORM)
+  const [visibility, setVisibility] = useState('PRIVATE')
   const [returnToSummary, setReturnToSummary] = useState(false)
   const [saving, setSaving] = useState(false)
   const [showPledges, setShowPledges] = useState(false)
@@ -56,6 +57,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     setActiveCeremony(plan.ceremony || plan)
     setActivePlan(plan)
     setForm(formFromPlan(plan))
+    setVisibility(plan.ceremony?.visibility || 'PRIVATE')
     setStepId('summary')
     setCreating(false)
     setReturnToSummary(false)
@@ -129,7 +131,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     try {
       const response = await request('/api/ceremonies/auto', accessToken, {
         method: 'POST',
-        body: JSON.stringify({ type: form.type, ...formToPayload(form), createPlan: true }),
+        body: JSON.stringify({ type: form.type, ...formToPayload(form), visibility, createPlan: true }),
       })
       const ceremony = response.ceremony || response
       const plan = response.preparationPlan
@@ -274,6 +276,19 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         {isFormStep && (
           <div className="px-4 mt-5">
             <FormStep form={form} setForm={setForm} ceremonyTypes={ceremonyTypes} locked={Boolean(activePlan)} />
+          </div>
+        )}
+        {creating && stepId === 'money' && (
+          <div className="px-4 mt-4">
+            <label className="block rounded-2xl border border-cream-dark bg-white p-4">
+              <span className="block font-bold text-ink">Who can see this ceremony?</span>
+              <span className="block mt-1 text-xs text-ink-muted">Private is the default. Clan-only shares it only with people who match your registered clan lines. Public can appear in the community feed.</span>
+              <select value={visibility} onChange={(event) => setVisibility(event.target.value)} className="mt-3 w-full min-h-12 rounded-xl border border-cream-dark bg-white px-3 text-ink">
+                <option value="PRIVATE">Private — only me</option>
+                <option value="CLAN_ONLY">Clan-only — matching clan members</option>
+                <option value="PUBLIC">Public — community feed</option>
+              </select>
+            </label>
           </div>
         )}
 
