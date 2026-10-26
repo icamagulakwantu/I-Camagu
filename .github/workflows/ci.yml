@@ -105,7 +105,7 @@ jobs:
       - name: Generate candidate baseline SQL from current Prisma schema
         run: |
           mkdir -p migration-artifacts
-          yarn prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > migration-artifacts/20261026_candidate_baseline.sql
+          ./node_modules/.bin/prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > migration-artifacts/20261026_candidate_baseline.sql
           test -s migration-artifacts/20261026_candidate_baseline.sql
       - name: Apply candidate baseline to disposable PostgreSQL
         run: psql "postgresql://postgres:postgres@localhost:5432/icamagu_migration_test" -v ON_ERROR_STOP=1 -f migration-artifacts/20261026_candidate_baseline.sql
