@@ -36,7 +36,7 @@ integrationDescribe('PostgreSQL ledger integration (real database)', () => {
     });
     stokvelId = stokvel.id;
     await prisma.stokvelGroupLedger.create({
-      data: { stokvelId, totalBalance: 100 },
+      data: { stokvelId, totalBalance: 0 },
     });
 
     // Establish the opening balance in the books and stored balance together.
