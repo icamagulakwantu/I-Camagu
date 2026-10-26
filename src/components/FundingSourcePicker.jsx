@@ -15,8 +15,9 @@ export default function FundingSourcePicker({ value, onChange, stokvelId, onStok
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || 'Could not load your stokvels');
         const rows = Array.isArray(data) ? data : (data.stokvels || data.items || []);
+        const groups = rows.map((row) => row.stokvel || row).filter((item) => item?.id);
         if (!cancelled) {
-          setStokvels(rows.filter((item) => {
+          setStokvels(groups.filter((item) => {
             const balance = Number(item.groupLedger?.totalBalance ?? item.availableBalance ?? 0);
             const expenses = Number(item.groupLedger?.groupExpenses ?? 0);
             return balance - expenses > 0;
