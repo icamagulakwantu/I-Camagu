@@ -5,6 +5,19 @@
 import prisma from '../config/db.js';
 
 export async function ensureCeremonyBudgetColumns() {
+  // New ceremony types remain draft-only in the API until their checklists are reviewed.
+  // Postgres enum additions are idempotent and do not rewrite existing rows.
+  await prisma.$executeRawUnsafe('ALTER TYPE "CeremonyType" ADD VALUE IF NOT EXISTS \'IMBELEKO\';');
+  await prisma.$executeRawUnsafe('ALTER TYPE "CeremonyType" ADD VALUE IF NOT EXISTS \'INTONJANE\';');
+  await prisma.$executeRawUnsafe('ALTER TYPE "CeremonyType" ADD VALUE IF NOT EXISTS \'UMGQUPHUZO\';');
+  await prisma.$executeRawUnsafe('ALTER TYPE "CeremonyType" ADD VALUE IF NOT EXISTS \'UKUZILA\';');
+  await prisma.$executeRawUnsafe('ALTER TYPE "CeremonyType" ADD VALUE IF NOT EXISTS \'UMEMBESO_UMENDISO\';');
+  await prisma.$executeRawUnsafe('ALTER TYPE "CeremonyType" ADD VALUE IF NOT EXISTS \'UMSINDLEKO\';');
+  await prisma.$executeRawUnsafe('ALTER TYPE "CeremonyType" ADD VALUE IF NOT EXISTS \'UMHLONYANE\';');
+  await prisma.$executeRawUnsafe('ALTER TYPE "CeremonyType" ADD VALUE IF NOT EXISTS \'UKUPHAHLA\';');
+  await prisma.$executeRawUnsafe('ALTER TYPE "CeremonyType" ADD VALUE IF NOT EXISTS \'INTLOMBE\';');
+
+
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "Ceremony" ADD COLUMN IF NOT EXISTS "budgetZAR" DECIMAL(10,2);'
   );
