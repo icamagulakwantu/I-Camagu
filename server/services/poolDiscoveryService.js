@@ -162,6 +162,9 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
       clanScore: clan.score,
       sharedClanLines: clan.sharedLines,
       participantCount: new Set(pool.baskets.map((basket) => basket.userId)).size,
+      clanMemberCount: new Set(pool.baskets.filter((basket) => basket.user
+        && clanScore(user, { baskets: [{ user: basket.user }] }).score > 0)
+        .map((basket) => basket.userId)).size,
       closesInTime,
       currentTier: currentTier ? { id: currentTier.id, name: currentTier.name, value: currentTier.value } : null,
       poolPriceZAR,
@@ -293,6 +296,9 @@ export async function getCommunityFeed(userId) {
       partnerName: pool.partner?.name || null,
       distanceKm: distanceKm == null ? null : Math.round(distanceKm * 10) / 10,
       participantCount: new Set(pool.baskets.map((basket) => basket.userId)).size,
+      clanMemberCount: new Set(pool.baskets.filter((basket) => basket.user
+        && clanScore(user, { baskets: [{ user: basket.user }] }).score > 0)
+        .map((basket) => basket.userId)).size,
       clanScore: clan.score, sharedClanLines: clan.sharedLines,
       ...metrics,
     };
