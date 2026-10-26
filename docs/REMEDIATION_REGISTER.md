@@ -3,10 +3,15 @@
 Verified against `main` by reading the source. First pass at commit `894ece0`
 (22 Oct 2026); second pass (fines, loans, crash handling, start-up) on top of
 `838e7ba`; third pass (sign-in) on top of `4784360`; fourth pass (donations
-and fund allocations) on top of `f4469f4` (25 Oct 2026). No live database,
-staging environment or full `node_modules` were available, so nothing below
-was verified by running the app against PostgreSQL. Statuses:
+and fund allocations) on top of `f4469f4` (25 Oct 2026); fifth pass (trade
+credit and lending rounds) on top of `d0994dd` (26 Oct 2026). No live
+database, staging environment or full `node_modules` were available, so
+nothing below was verified by running the app against PostgreSQL. Statuses:
 Confirmed / Partially confirmed / Not reproduced / Blocked / Not yet reviewed.
+
+Note: commit `77b2e18` briefly replaced `stokvelLendingController.js` with a
+placeholder by mistake; `cce0254` restored the intended version. Do not
+deploy `77b2e18` on its own.
 
 ## Fixed
 
@@ -20,7 +25,7 @@ Confirmed / Partially confirmed / Not reproduced / Blocked / Not yet reviewed.
 | SEC-02 Account enumeration | Confirmed, mostly fixed | `check-email` returned `exists`/`hasPassword` and leaked `error.message`; OTP `login` returned 404 "No account found" plus the internal `userId`; `verify-otp` took that `userId`. | `check-email` retired (410, reads nothing). `/login` returns the same reply for every email; code created and emailed (without waiting) only for real accounts; no `userId` returned. `/verify-otp` takes `{ email, code }`; wrong guesses for unknown emails counted under a stand-in key so replies and locks match. Password sign-in does a dummy bcrypt check when there is no account. `Login.jsx` shows the same choices to everyone after the email step. 8 unit tests. **Residual:** `register-password` still says "account already exists"; closing that needs an email-confirmation step on sign-up. |
 | DB-03 Crash handling | Confirmed, fixed | `uncaughtException` handler logged and kept running. | Log, report to Sentry, flush up to 2 s, `process.exit(1)`. Unhandled rejections logged/reported only (no exit) to avoid restart loops from fire-and-forget sends. Unit tested. |
 | DB-02 Startup | Confirmed, fixed | Server served traffic even if the schema check failed, then ran ~25 catalogue backfills every boot. | `/api/health` returns 503 until the schema check passes. Backfills moved to `server/scripts/maintenance.js`; run with `node server/scripts/run-maintenance.js` or `RUN_BOOT_MAINTENANCE=true` for one deploy. |
-| FIN-04 Money precision | Confirmed, mostly fixed | `parseFloat`/`Number` used for money amounts and `amount * 0.03`; shrine fund reserve worked out by subtracting floats; allocation reserve check ran separately from the insert, so two admins at once could over-allocate. | Contribution, interest, payout, loan, repayment, fine, shrine donation and fund allocation amounts now exact cents (more than 2 decimals refused, never rounded). Fund totals, reserve and per-sector sums summed in cents. Allocation reserve check + insert now ONE transaction under a fund-wide advisory lock. A failed donation notification no longer turns a saved pledge into HTTP 500. Response shapes unchanged. 11 unit tests in `payoutController.test.js`. **Still open:** trade credit (`createTradeCredit` in `stokvelFinanceController`) and lending rounds (`stokvelLendingController`). |
+| FIN-04 Money precision | Confirmed, fixed | `parseFloat`/`Number` used for money amounts and `amount * 0.03`; shrine fund reserve worked out by subtracting floats; allocation reserve check ran separately from the insert. Trade credit and lending rounds also used `Number()` (R10.005 silently rounded), summed floats, and trade credit months silently fell back to 12. | Contribution, interest, payout, loan, repayment, fine, shrine donation, fund allocation, **trade credit and lending round/target** amounts are now exact cents (more than 2 decimals refused, never rounded) and read back from the database as exact text. Allocation reserve check + insert ONE transaction under a fund-wide lock. Lending progress worked out in cents and rounded down, so 99.99% never shows "target reached". A group-wide lending target is set in ONE transaction (all members or none). Trade credit status can only go ACTIVE -> USED/CANCELLED, enforced in the update itself, so two officials at once cannot both change it and a used deal cannot be revived. Bad trade credit months are refused. Failed audit lines after a saved deal/round no longer return HTTP 500. Response shapes unchanged. Tests: `payoutController.test.js` (11), `stokvelFinanceController.test.js` (13), `stokvelLendingController.test.js` (9). **Note:** trade credit is a record of a retailer deal and is not posted to the ledger; whether it should be is part of FIN-03. |
 
 ## Confirmed, NOT yet fixed
 
@@ -30,7 +35,7 @@ Confirmed / Partially confirmed / Not reproduced / Blocked / Not yet reviewed.
 | SEC-01b Distributed throttling | `middleware/rateLimiter.js` is in-memory per process. | Shared store or edge throttling. |
 
 ## Not yet reviewed
-FIN-03 (balance source of truth), SEC-03 (full authorisation audit), SEC-04, COM-01, COM-02, UX-01..03, Q-01..04.
+FIN-03 (balance source of truth, incl. whether trade credit belongs on the ledger), SEC-03 (full authorisation audit), SEC-04, COM-01, COM-02, UX-01..03, Q-01..04.
 
 ## Not verified here (needs owner/staging)
 - Clean `yarn install`, `yarn test`, `yarn build` on this commit (CI runs these on push).
@@ -51,3 +56,8 @@ FIN-03 (balance source of truth), SEC-03 (full authorisation audit), SEC-04, COM
 10. Donate R10.50: stored as exactly 10.50. Donate R10.005 or R0.99: refused.
 11. Two admins allocate the last of the fund at the same moment: only one succeeds; the other is told the reserve is too low.
 12. Ledger verify for a stokvel: chain still valid.
+13. Record a lending round of R10.005: refused. Record R100.10 lent and R110.30 back: progress shows exactly R10.20 raised.
+14. Set a lending target for every member: all members show the new target (none left on the old one).
+15. Add trade credit of R1000.005 or for 0 / 61 months: refused. R1000.50 for 12 months at 12.5%: saved exactly.
+16. Mark a trade credit deal USED, then try to set it back to ACTIVE: refused.
+17. Two officials mark the same ACTIVE deal at once (one USED, one CANCELLED): only one succeeds; the other is told it was already changed.
