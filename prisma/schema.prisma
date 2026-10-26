@@ -173,6 +173,7 @@ model User {
   createdBulkPools         BulkPool[]            @relation("BulkPoolCreator")
   stokvelPoolFundingRequests StokvelPoolFunding[] @relation("StokvelPoolFundingRequester")
   stokvelPoolFundingApprovals StokvelPoolFundingApproval[] @relation("StokvelPoolFundingApprover")
+  isidukoSubmissions IsidukoSubmission[]
 
   @@index([clanGroupId])
 }
@@ -314,6 +315,7 @@ model ClanGroup {
   surnameGroups SurnameSubgroup[]
   aliases       ClanAlias[]
   members       User[]
+  submissions   IsidukoSubmission[]
 }
 
 model ClanAlias {
@@ -330,6 +332,27 @@ model SurnameSubgroup {
   surname     String
 
   @@unique([clanGroupId, surname])
+}
+
+
+// Raw text is queued for review, never turned directly into a ClanGroup.
+model IsidukoSubmission {
+  id                  String    @id @default(cuid())
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  typedText           String
+  normalisedText      String
+  nationLabel         String?
+  status              String    @default("PENDING_REVIEW")
+  resolvedClanGroupId String?
+  resolvedClanGroup   ClanGroup? @relation(fields: [resolvedClanGroupId], references: [id], onDelete: SetNull)
+  reviewNote          String?
+  reviewedById        String?
+  reviewedAt          DateTime?
+  createdAt           DateTime  @default(now())
+
+  @@index([status, createdAt])
+  @@index([normalisedText])
 }
 
 // ---------- STOKVEL ----------
