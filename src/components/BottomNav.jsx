@@ -6,7 +6,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
     { id: 'ceremonyhub', label: 'Ceremonies', icon: 'calendar' },
     { id: 'store', label: 'SmartMatch', icon: 'cart', badge: basketCount },
     { id: 'stokvels', label: 'Stokvels', icon: 'users', badge: pendingApprovals },
-    { id: 'more', label: 'More', icon: 'menu' },
+    { id: 'more', label: 'Me', icon: 'user-round' },
   ]
 
   return (
