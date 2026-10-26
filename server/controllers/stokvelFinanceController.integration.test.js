@@ -51,7 +51,7 @@ integrationDescribe('PostgreSQL loan controller integration (real database)', ()
       prisma.stokvelOfficial.create({ data: { stokvelId, userId: officialBUserId, role: 'TREASURER' }, select: { id: true } }),
     ]);
     [officialAId, officialBId] = officials.map((o) => o.id);
-    await prisma.stokvelGroupLedger.create({ data: { stokvelId, totalBalance: 500 } });
+    await prisma.stokvelGroupLedger.create({ data: { stokvelId, totalBalance: 0 } });
 
     await prisma.$transaction((tx) => postEntryWithBalanceTx(tx, {
       stokvelId,
