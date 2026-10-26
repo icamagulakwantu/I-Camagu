@@ -343,6 +343,7 @@ export async function ensureCeremonyBudgetColumns() {
       CONSTRAINT "StokvelPoolFundingApproval_fundingId_officialId_key" UNIQUE ("fundingId", "officialId")
     );
   `);
+  await prisma.$executeRawUnsafe('ALTER TABLE "StokvelPoolFunding" ADD COLUMN IF NOT EXISTS "reviewNote" TEXT;');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "StokvelPoolFunding_stokvelId_status_createdAt_idx" ON "StokvelPoolFunding" ("stokvelId", "status", "createdAt");');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "StokvelPoolFunding_poolId_status_idx" ON "StokvelPoolFunding" ("poolId", "status");');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "StokvelPoolFundingApproval_approverId_decidedAt_idx" ON "StokvelPoolFundingApproval" ("approverId", "decidedAt");');
