@@ -14,7 +14,7 @@ This is a living engineering plan based on source review of the repository. It i
 - Added focused tests for organiser-only deletion and financial-history protection.
 - Changed manual bank-log amount validation to exact cents; values with fractional cents (for example R10.005) are rejected instead of being accepted by `parseFloat`.
 - Added tests for invalid fractional-cent bank amounts, non-positive amounts, and valid amounts.
-- Existing route review confirms reconciliation queue and raw-log creation check official membership in the target stokvel; manual assignment is scoped to the raw log's stokvel, requires an official, requires the target member to belong to that stokvel, and blocks self-assignment. This is source review, not an integration test.
+- Existing route review confirms reconciliation queue and raw-log creation check official membership in the target stokvel; manual assignment is scoped to the raw log's stokvel, requires an official, requires the target member to belong to that stokvel, and blocks self-assignment. Added unit tests for cross-stokvel member-ID substitution, self-assignment, and DEBIT-vs-CREDIT assignment boundaries. These are unit tests, not PostgreSQL integration tests.
 
 ## Security and correctness backlog
 
