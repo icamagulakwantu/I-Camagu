@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
-import { CommunityProvider } from './context/CommunityContext.jsx'
+import { CommunityProvider, useCommunity } from './context/CommunityContext.jsx'
 import { ToastProvider, useToast } from './components/ui/Toast.jsx'
 import { Skeleton } from './components/ui/Skeleton.jsx'
 import OfflineBanner from './components/OfflineBanner.jsx'
@@ -78,6 +78,7 @@ const MORE_SCREENS = [
 // ---------- Dashboard ----------
 function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
   const { user, accessToken } = useAuth()
+  const { feed, location } = useCommunity()
   const { showToast } = useToast()
   const [stokvels, setStokvels] = useState([])
   const [ceremonies, setCeremonies] = useState([])
@@ -148,6 +149,24 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
           </div>
         </div>
       </button>
+
+      {(feed.pools?.length > 0 || feed.upcomingClanCeremonies?.length > 0 || feed.featuredLegends?.length > 0) && (
+        <section className="mb-6 space-y-3" aria-label="Community feed">
+          <div className="flex items-end justify-between gap-3">
+            <div><p className="eyebrow text-terracotta">Community</p><h2 className="font-display text-xl font-bold text-ink">Around you</h2></div>
+            {location.label && <span className="text-xs text-ink-muted">{location.label}</span>}
+          </div>
+          {feed.pools?.slice(0, 3).map((pool) => (
+            <button key={pool.id} type="button" onClick={() => onNavigate('store')} className="w-full rounded-2xl border border-cream-dark bg-white p-4 text-left shadow-soft">
+              <div className="flex items-start justify-between gap-3"><div><p className="font-bold text-ink">{pool.partnerName || pool.category} pool</p><p className="text-xs text-ink-muted mt-1">{pool.distanceKm == null ? pool.area : pool.distanceKm + ' km away'} · {pool.participantCount} member{pool.participantCount === 1 ? '' : 's'}</p></div><Icon name="arrow-up-right" size={18} color="#c45c26" /></div>
+              <div className="mt-3 h-2 rounded-full bg-cream-dark overflow-hidden"><div className="h-full rounded-full bg-terracotta" style={{ width: Math.min(100, pool.moqTarget > 0 ? pool.currentCases / pool.moqTarget * 100 : 0) + '%' }} /></div>
+              <p className="mt-1 text-xs text-ink-muted">{pool.currentCases}/{pool.moqTarget} units · {pool.nextTier ? pool.nextTier.name + ' next' : 'Pool price awaits a real quote'}</p>
+            </button>
+          ))}
+          {feed.upcomingClanCeremonies?.length > 0 && <div className="rounded-2xl border border-cream-dark bg-white p-4"><p className="text-xs font-bold uppercase tracking-wide text-ink-muted mb-2">Upcoming family ceremonies</p>{feed.upcomingClanCeremonies.slice(0, 3).map((ceremony) => <div key={ceremony.id} className="py-2 border-t border-cream-dark/70 first:border-t-0"><p className="font-bold text-ink text-sm">{ceremony.title}</p><p className="text-xs text-ink-muted">{ceremony.eventDate ? new Date(ceremony.eventDate).toLocaleDateString() : 'Date to be confirmed'} · {ceremony.host?.firstName || 'Community member'}</p></div>)}</div>}
+          {feed.featuredLegends?.length > 0 && <div className="rounded-2xl bg-terracotta/10 p-4"><p className="text-xs font-bold uppercase tracking-wide text-terracotta mb-2">Featured legends</p>{feed.featuredLegends.slice(0, 2).map((legend) => <button key={legend.id} type="button" onClick={() => onNavigate('legends')} className="block w-full py-1 text-left"><span className="font-bold text-ink text-sm">{legend.title}</span><span className="block text-xs text-ink-muted line-clamp-2">{legend.bodyText}</span></button>)}</div>}
+        </section>
+      )}
 
       {/* Ukugida */}
       <p className="eyebrow text-ink-muted mb-2">Quick actions</p>
