@@ -135,8 +135,13 @@ export async function leaveStokvel(req, res) {
       return res.status(400).json({ error: 'You have a pending payout in this stokvel. Wait for it to clear before leaving.' });
     }
 
-    await prisma.stokvelMember.delete({ where: { id: membership.id } });
-    await prisma.stokvelOfficial.deleteMany({ where: { stokvelId, userId } });
+    // Membership and official status must be removed atomically. If membership
+    // deletion succeeds but official cleanup fails, role checks that treat an
+    // official as a member could leave the departed user with finance access.
+    await prisma.$transaction(async (tx) => {
+      await tx.stokvelMember.delete({ where: { id: membership.id } });
+      await tx.stokvelOfficial.deleteMany({ where: { stokvelId, userId } });
+    });
 
     res.json({ message: `You have left ${stokvel.name}` });
   } catch (error) {
