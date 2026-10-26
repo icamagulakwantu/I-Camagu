@@ -423,7 +423,8 @@ export async function checkAndMatchPool(poolId) {
       // bank-transfer instruction to the member. The existing two-official
       // rule is applied by stokvelPoolFundingController; approval authorizes
       // the spend but settlement remains a separate real-money step.
-      if (basket.fundingSource === 'STOKVEL' && basket.fundingStokvelId) {
+      if (basket.fundingSource === 'STOKVEL') {
+        if (!basket.fundingStokvelId) throw new Error('Stokvel-funded basket has no selected stokvel');
         const stokvel = await tx.stokvel.findUnique({
           where: { id: basket.fundingStokvelId },
           include: { officials: { select: { userId: true } } },
