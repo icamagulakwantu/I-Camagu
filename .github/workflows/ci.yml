@@ -33,3 +33,44 @@ jobs:
 
       - name: Build frontend
         run: yarn build
+
+  postgres-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: icamagu_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d icamagu_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/icamagu_test?schema=public
+      RUN_POSTGRES_INTEGRATION: 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: yarn prisma:generate
+
+      # Disposable CI database only. This validates the current schema against
+      # real PostgreSQL; it does not replace the required reviewed migration
+      # baseline for staging or production.
+      - name: Create disposable PostgreSQL schema
+        run: yarn prisma db push --schema=prisma/schema.prisma
+
+      - name: Run real PostgreSQL ledger integrity tests
+        run: yarn vitest run server/services/ledgerService.integration.test.js
