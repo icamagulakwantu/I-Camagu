@@ -4,10 +4,8 @@ import { useToast } from './ui/Toast.jsx'
 import PendingPledge from './PendingPledge.jsx'
 import { PENDING_STOKVEL_KEY } from '../lib/inviteLinks.js'
 
-// Runs once the person is signed in, registered and past onboarding. Acts on
-// any invite link they arrived with:
-//  - a stokvel link: joins them to that stokvel and shows them the stokvels
-//  - a ceremony pledge link: opens the pledge form (PendingPledge)
+// Handles stokvel invites after sign-in and also renders the pending ceremony
+// pledge flow. A stokvel invite may require an official's approval.
 export default function PendingStokvelJoin({ onJoined }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
@@ -18,7 +16,7 @@ export default function PendingStokvelJoin({ onJoined }) {
     const pendingId = localStorage.getItem(PENDING_STOKVEL_KEY)
     if (!pendingId) return
     started.current = true
-    // Cleared first so a failure can never loop on every page load.
+    // Clear first so a failure cannot loop on every page load.
     localStorage.removeItem(PENDING_STOKVEL_KEY)
 
     fetch('/api/stokvels/join', {
@@ -28,11 +26,14 @@ export default function PendingStokvelJoin({ onJoined }) {
     })
       .then(async (res) => {
         const data = await res.json().catch(() => ({}))
+        if (data.requested) {
+          showToast(data.error || 'Request sent. An official must accept you first.', 'info')
+          return
+        }
         if (!res.ok) throw new Error(data.error || 'Could not join that stokvel')
         showToast('You have joined the stokvel', 'success')
       })
       .catch((err) => showToast(err.message, 'error'))
-      // Either way, show them the stokvels so they can see the result.
       .finally(() => onJoined?.())
   }, [accessToken, showToast, onJoined])
 
