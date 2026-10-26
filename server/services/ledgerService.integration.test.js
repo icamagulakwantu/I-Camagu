@@ -177,7 +177,7 @@ integrationDescribe('PostgreSQL ledger integration (real database)', () => {
       spend(`final-spend-a:${stokvelId}`),
       spend(`final-spend-b:${stokvelId}`),
     ]);
-    expect(results.filter(x => x.status === 'fulfilled')).toHaveLength(1);
+    expect(results.filter(x => x.status === 'fulfilled'), JSON.stringify(results.map(x => x.status === 'rejected' ? String(x.reason?.message ?? x.reason) : x.status))).toHaveLength(1);
     expect(results.filter(x => x.status === 'rejected')).toHaveLength(1);
     const balance = await prisma.stokvelGroupLedger.findUnique({ where: { stokvelId } });
     // Current balance after earlier test cases is R35; only one R20 spend fits.
