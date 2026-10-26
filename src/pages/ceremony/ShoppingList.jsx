@@ -9,6 +9,7 @@ import {
 import { request } from './api.js'
 import Bi from './Bi.jsx'
 import MoneyCard from './MoneyCard.jsx'
+import PoolOfferCard from '../../components/PoolOfferCard.jsx'
 import ListRow from './ListRow.jsx'
 import { BUTTONS } from './wizardText.js'
 import { inputClass, pressable } from './styles.js'
@@ -51,6 +52,7 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
   const [form, setForm] = useState(EMPTY_ADD)
   const [adding, setAdding] = useState(false)
   const [busyKey, setBusyKey] = useState(null)
+  const [offerCost, setOfferCost] = useState(null)
 
   const load = useCallback(async () => {
     try {
@@ -148,17 +150,7 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
     }
   }
 
-  const buyItem = async (cost) => {
-    try {
-      const data = await request('/api/basket/items', accessToken, {
-        method: 'POST',
-        body: JSON.stringify({ skuId: cost.skuId, quantity: Math.max(1, Math.ceil(cost.quantity || 1)) }),
-      })
-      showToast(data.message || 'Added to basket', 'success')
-    } catch (err) {
-      showToast(err.message, 'error')
-    }
-  }
+  const buyItem = (cost) => setOfferCost(cost)
 
   const addItem = async (e) => {
     e.preventDefault()
@@ -250,6 +242,7 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
           </div>
         </div>
       )}
+      {offerCost && <PoolOfferCard cost={offerCost} ceremonyId={ceremonyId} onClose={() => setOfferCost(null)} />}
     </div>
   )
 }
