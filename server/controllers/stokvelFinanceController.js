@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import prisma from '../config/db.js';
 import { logAudit, logAuditQuietly } from './stokvelRecordsController.js';
-import { ensureLedgerTables, lockStokvelLedger, postEntryTx } from '../services/ledgerService.js';
+import { ensureLedgerTables, lockStokvelLedger, postEntryWithBalanceTx } from '../services/ledgerService.js';
 import { toCents } from '../utils/money.js';
 import { parseTerms, buildSchedule, totalDueFor } from '../utils/loanTerms.js';
 
@@ -269,12 +269,17 @@ export async function voteLoan(req, res) {
       }
       if (status === 'APPROVED') {
         // Money leaves the group pot and becomes an amount owed back by the borrower.
+        // FIN-03: the stored group balance drops by the same amount, and only
+        // if it still covers the loan, so it can never go below zero.
         const principalCents = toCents(String(rows[0].amount));
-        await postEntryTx(tx, {
+        const posted = await postEntryWithBalanceTx(tx, {
           stokvelId, kind: 'LOAN_DISBURSEMENT', memo: 'Loan approved and paid out',
           lines: [{ account: 'LOANS_RECEIVABLE', amountCents: principalCents }, { account: 'BANK', amountCents: -principalCents }],
           idempotencyKey: `loan:${loanId}`, createdById: rows[0].borrowerId, approvedById: req.userId,
-        });
+        }, { requireFunds: true });
+        if (posted.fundsShort) {
+          throw new RequestRefused(409, 'The group balance is too low to pay out this loan. Your vote was not saved.');
+        }
       }
       return { status, yes, no, amount: rows[0].amount };
     });
@@ -338,7 +343,8 @@ export async function repayLoan(req, res) {
         const lines = [{ account: 'BANK', amountCents }];
         if (principalPart > 0) lines.push({ account: 'LOANS_RECEIVABLE', amountCents: -principalPart });
         if (interestPart > 0) lines.push({ account: 'INTEREST_INCOME', amountCents: -interestPart });
-        await postEntryTx(tx, {
+        // FIN-03: the repaid money goes back into the stored group balance too.
+        await postEntryWithBalanceTx(tx, {
           stokvelId, kind: 'LOAN_REPAYMENT', memo: 'Loan repayment',
           lines, idempotencyKey: `repayment:${repaymentId}`, createdById: req.userId,
         });
@@ -359,10 +365,10 @@ export async function repayLoan(req, res) {
 // ---------- Trade credit ----------
 //
 // FIN-04: amounts are exact cents (more than 2 decimals refused, never
-// rounded) and are read back from the database as exact text. Note: trade
-// credit is a record of a deal with a retailer; it is not posted to the
-// ledger (books). Whether it should be is part of FIN-03 (balance source of
-// truth), not changed here.
+// rounded) and are read back from the database as exact text.
+// FIN-03 decision: trade credit is a record of a deal with a retailer, not
+// money leaving the group's bank, so it is deliberately NOT posted to the
+// books and does not change the group balance.
 
 const MAX_CREDIT_CENTS = 1_000_000_000; // R10 million, well inside DECIMAL(12,2)
 const PERCENT_PATTERN = /^\d{1,2}(\.\d{1,2})?$/;

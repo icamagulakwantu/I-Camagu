@@ -4,7 +4,8 @@ Verified against `main` by reading the source. First pass at commit `894ece0`
 (22 Oct 2026); second pass (fines, loans, crash handling, start-up) on top of
 `838e7ba`; third pass (sign-in) on top of `4784360`; fourth pass (donations
 and fund allocations) on top of `f4469f4` (25 Oct 2026); fifth pass (trade
-credit and lending rounds) on top of `d0994dd` (26 Oct 2026). No live
+credit and lending rounds) on top of `d0994dd` (26 Oct 2026); sixth pass
+(balance source of truth, FIN-03) on top of `6c923bc` (26 Oct 2026). No live
 database, staging environment or full `node_modules` were available, so
 nothing below was verified by running the app against PostgreSQL. Statuses:
 Confirmed / Partially confirmed / Not reproduced / Blocked / Not yet reviewed.
@@ -12,6 +13,10 @@ Confirmed / Partially confirmed / Not reproduced / Blocked / Not yet reviewed.
 Note: commit `77b2e18` briefly replaced `stokvelLendingController.js` with a
 placeholder by mistake; `cce0254` restored the intended version. Do not
 deploy `77b2e18` on its own.
+
+Note: FIN-03 was pushed in two commits. Deploy only the second one (or
+later), never `11e2033` on its own: in that commit fines and loans still
+used the older books-only path.
 
 ## Fixed
 
@@ -26,6 +31,7 @@ deploy `77b2e18` on its own.
 | DB-03 Crash handling | Confirmed, fixed | `uncaughtException` handler logged and kept running. | Log, report to Sentry, flush up to 2 s, `process.exit(1)`. Unhandled rejections logged/reported only (no exit) to avoid restart loops from fire-and-forget sends. Unit tested. |
 | DB-02 Startup | Confirmed, fixed | Server served traffic even if the schema check failed, then ran ~25 catalogue backfills every boot. | `/api/health` returns 503 until the schema check passes. Backfills moved to `server/scripts/maintenance.js`; run with `node server/scripts/run-maintenance.js` or `RUN_BOOT_MAINTENANCE=true` for one deploy. |
 | FIN-04 Money precision | Confirmed, fixed | `parseFloat`/`Number` used for money amounts and `amount * 0.03`; shrine fund reserve worked out by subtracting floats; allocation reserve check ran separately from the insert. Trade credit and lending rounds also used `Number()` (R10.005 silently rounded), summed floats, and trade credit months silently fell back to 12. | Contribution, interest, payout, loan, repayment, fine, shrine donation, fund allocation, **trade credit and lending round/target** amounts are now exact cents (more than 2 decimals refused, never rounded) and read back from the database as exact text. Allocation reserve check + insert ONE transaction under a fund-wide lock. Lending progress worked out in cents and rounded down, so 99.99% never shows "target reached". A group-wide lending target is set in ONE transaction (all members or none). Trade credit status can only go ACTIVE -> USED/CANCELLED, enforced in the update itself, so two officials at once cannot both change it and a used deal cannot be revived. Bad trade credit months are refused. Failed audit lines after a saved deal/round no longer return HTTP 500. Response shapes unchanged. Tests: `payoutController.test.js` (11), `stokvelFinanceController.test.js` (13), `stokvelLendingController.test.js` (9). **Note:** trade credit is a record of a retailer deal and is not posted to the ledger; whether it should be is part of FIN-03. |
+| FIN-03 Balance source of truth | Confirmed, fixed in code (history needs review) | Two records of each group's money: the stored running total `StokvelGroupLedger.totalBalance` (shown on screens, used for "enough money?" checks) and the tamper-evident books (`LedgerEntry`/`LedgerLine`). Approved loans and loan repayments, paid fines and ledger reversals changed the books' BANK account but never the stored total, so the two drifted apart: a paid-out loan still showed as money in the pot and could be paid out again as a payout. Bank-matched deposits changed the stored total and then posted the books entry in a SEPARATE transaction (a failure left them apart). | **Decision: the books are the official record.** The stored total is a quick-read copy of the books' BANK account. New `postEntryWithBalanceTx` saves the books entry and moves the stored total by the same amount in ONE transaction; a repeated entry changes nothing. Used by fines, loan payout, loan repayment, reversals and bank-matched deposits (contributions, interest, payouts and expenses already moved both together). A loan can only be paid out if the stored total still covers it (409 otherwise; the vote is not saved). Bank amounts with a fraction of a cent are refused, not rounded. New read-only check `GET /api/stokvels/:id/ledger/balance-check` and script `node server/scripts/check-balances.js` compare the two and report any difference; nothing is ever "fixed" automatically. Screens still show the stored total (as the assessment requires until history is reconciled). 17 new unit tests. **Still open:** (1) stokvels whose loans/fines happened before this fix will show a difference: run the script on a copy of the live database and have an official post a correcting entry for each, never edit rows; (2) trade credit stays off the books: it records a deal with a retailer, not money leaving the group's bank, so it does not belong on BANK; (3) switching screens to read the books directly waits until (1) is done. |
 
 ## Confirmed, NOT yet fixed
 
@@ -35,7 +41,7 @@ deploy `77b2e18` on its own.
 | SEC-01b Distributed throttling | `middleware/rateLimiter.js` is in-memory per process. | Shared store or edge throttling. |
 
 ## Not yet reviewed
-FIN-03 (balance source of truth, incl. whether trade credit belongs on the ledger), SEC-03 (full authorisation audit), SEC-04, COM-01, COM-02, UX-01..03, Q-01..04.
+SEC-03 (full authorisation audit), SEC-04, COM-01, COM-02, UX-01..03, Q-01..04.
 
 ## Not verified here (needs owner/staging)
 - Clean `yarn install`, `yarn test`, `yarn build` on this commit (CI runs these on push).
@@ -61,3 +67,8 @@ FIN-03 (balance source of truth, incl. whether trade credit belongs on the ledge
 15. Add trade credit of R1000.005 or for 0 / 61 months: refused. R1000.50 for 12 months at 12.5%: saved exactly.
 16. Mark a trade credit deal USED, then try to set it back to ACTIVE: refused.
 17. Two officials mark the same ACTIVE deal at once (one USED, one CANCELLED): only one succeeds; the other is told it was already changed.
+18. Before deploying, run `node server/scripts/check-balances.js` against a copy of the live database and keep the list of mismatches (these are from before the FIN-03 fix).
+19. New stokvel: contribute R1000, approve a R400 loan, repay R100, pay a R50 fine. Stored balance shows R750.00 and `/ledger/balance-check` says it matches the books.
+20. Stokvel with R300: approve a R500 loan with the final vote. Refused ("balance is too low"); loan still PENDING; balance unchanged.
+21. Match a bank deposit by reference code: balance rises once, one CONTRIBUTION entry, balance-check still matches.
+22. Reverse a books entry: stored balance moves back by the same amount; balance-check still matches.

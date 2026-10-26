@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import prisma from '../config/db.js';
-import { ensureLedgerTables, lockStokvelLedger, postEntryTx } from '../services/ledgerService.js';
+import { ensureLedgerTables, lockStokvelLedger, postEntryWithBalanceTx } from '../services/ledgerService.js';
 import { toCents } from '../utils/money.js';
 
 // Meeting minutes, fines, constitution and the audit trail for a stokvel.
@@ -251,7 +251,8 @@ export async function payFine(req, res) {
 
       const cents = toCents(String(rows[0].amount));
       const name = await actorName(rows[0].memberId, tx);
-      await postEntryTx(tx, {
+      // FIN-03: the books entry and the stored group balance move together.
+      await postEntryWithBalanceTx(tx, {
         stokvelId, kind: 'FINE_PAID', memo: `Fine paid by ${name}`,
         lines: [{ account: 'BANK', amountCents: cents }, { account: 'FINES_INCOME', amountCents: -cents }],
         idempotencyKey: `fine:${fineId}`, createdById: rows[0].memberId, approvedById: req.userId,
