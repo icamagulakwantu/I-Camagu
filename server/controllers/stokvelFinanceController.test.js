@@ -5,7 +5,7 @@ vi.mock('../services/ledgerService.js', () => ({}));
 vi.mock('./stokvelRecordsController.js', () => ({}));
 
 const {
-  decideLoanStatus, splitRepayment, parseTradeCredit, tradeCreditSavingCents, canChangeCreditStatus,
+  decideLoanStatus, splitRepayment, parseTradeCredit, tradeCreditSavingCents, canChangeCreditStatus, voteLoan,
 } = await import('./stokvelFinanceController.js');
 
 describe('decideLoanStatus', () => {
@@ -94,5 +94,25 @@ describe('canChangeCreditStatus', () => {
     expect(canChangeCreditStatus('ACTIVE', 'ACTIVE')).toBe(false);
     expect(canChangeCreditStatus('USED', 'ACTIVE')).toBe(false);
     expect(canChangeCreditStatus('CANCELLED', 'USED')).toBe(false);
+  });
+});
+
+describe('voteLoan input validation', () => {
+  it('rejects string booleans instead of treating "false" as an approval', async () => {
+    const res = {
+      statusCode: 200,
+      body: undefined,
+      status(code) { this.statusCode = code; return this; },
+      json(body) { this.body = body; return this; },
+    };
+
+    await voteLoan({
+      body: { approve: 'false' },
+      params: { stokvelId: 'group-1', loanId: 'loan-1' },
+      userId: 'official-1',
+    }, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toContain('boolean');
   });
 });
