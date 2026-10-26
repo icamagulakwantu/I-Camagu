@@ -310,6 +310,21 @@ export async function getMyStokvels(req, res) {
       orderBy: { joinedAt: 'desc' },
     });
 
+    const stokvelIds = memberships.map((m) => m.stokvelId);
+    const commitments = stokvelIds.length
+      ? await prisma.stokvelPoolFunding.groupBy({
+          by: ['stokvelId'],
+          where: {
+            stokvelId: { in: stokvelIds },
+            status: { in: ['PENDING_APPROVAL', 'APPROVED', 'PENDING_SETTLEMENT'] },
+          },
+          _sum: { amountZAR: true },
+        })
+      : [];
+    const committedByStokvel = Object.fromEntries(
+      commitments.map((item) => [item.stokvelId, Number(item._sum.amountZAR || 0)])
+    );
+
     const memberIds = memberships.map((m) => m.id);
     const sums = memberIds.length
       ? await prisma.contribution.groupBy({
@@ -323,7 +338,16 @@ export async function getMyStokvels(req, res) {
     );
 
     res.json(
-      memberships.map((m) => ({ ...m, myBalance: byMember[m.id] || 0 }))
+      memberships.map((m) => {
+        const ledger = m.stokvel.groupLedger;
+        const availablePoolFundingBalance = Math.max(
+          0,
+          Number(ledger?.totalBalance || 0)
+            - Number(ledger?.groupExpenses || 0)
+            - Number(committedByStokvel[m.stokvelId] || 0)
+        );
+        return { ...m, myBalance: byMember[m.id] || 0, availablePoolFundingBalance };
+      })
     );
   } catch (error) {
     console.error('Get my stokvels error:', error.message);

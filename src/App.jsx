@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
-import { CommunityProvider } from './context/CommunityContext.jsx'
+import { CommunityProvider, useCommunity } from './context/CommunityContext.jsx'
+import PoolOfferCard from './components/PoolOfferCard.jsx'
 import { ToastProvider, useToast } from './components/ui/Toast.jsx'
 import { Skeleton } from './components/ui/Skeleton.jsx'
 import OfflineBanner from './components/OfflineBanner.jsx'
@@ -78,6 +79,7 @@ const MORE_SCREENS = [
 // ---------- Dashboard ----------
 function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
   const { user, accessToken } = useAuth()
+  const { feed, location } = useCommunity()
   const { showToast } = useToast()
   const [stokvels, setStokvels] = useState([])
   const [ceremonies, setCeremonies] = useState([])
@@ -148,6 +150,18 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
           </div>
         </div>
       </button>
+
+      {(feed.pools?.length > 0 || feed.upcomingClanCeremonies?.length > 0 || feed.featuredLegends?.length > 0) && (
+        <section className="mb-6 space-y-3" aria-label="Community feed">
+          <div className="flex items-end justify-between gap-3">
+            <div><p className="eyebrow text-terracotta">Community</p><h2 className="font-display text-xl font-bold text-ink">Around you</h2></div>
+            {location.label && <span className="text-xs text-ink-muted">{location.label}</span>}
+          </div>
+          {feed.pools?.slice(0, 3).map((pool) => <PoolOfferCard key={pool.id} variant="feed" pool={pool} onOpen={() => onNavigate('store')} />)}
+          {feed.upcomingClanCeremonies?.length > 0 && <div className="rounded-2xl border border-cream-dark bg-white p-4"><p className="text-xs font-bold uppercase tracking-wide text-ink-muted mb-2">Upcoming family ceremonies</p>{feed.upcomingClanCeremonies.slice(0, 3).map((ceremony) => <div key={ceremony.id} className="py-2 border-t border-cream-dark/70 first:border-t-0"><p className="font-bold text-ink text-sm">{ceremony.title}</p><p className="text-xs text-ink-muted">{ceremony.eventDate ? new Date(ceremony.eventDate).toLocaleDateString() : 'Date to be confirmed'} · {ceremony.host?.firstName || 'Community member'}</p></div>)}</div>}
+          {feed.featuredLegends?.length > 0 && <div className="rounded-2xl bg-terracotta/10 p-4"><p className="text-xs font-bold uppercase tracking-wide text-terracotta mb-2">Featured legends</p>{feed.featuredLegends.slice(0, 2).map((legend) => <button key={legend.id} type="button" onClick={() => onNavigate('legends')} className="block w-full py-1 text-left"><span className="font-bold text-ink text-sm">{legend.title}</span><span className="block text-xs text-ink-muted line-clamp-2">{legend.bodyText}</span></button>)}</div>}
+        </section>
+      )}
 
       {/* Ukugida */}
       <p className="eyebrow text-ink-muted mb-2">Quick actions</p>
@@ -247,10 +261,64 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
   )
 }
 
+const SCREEN_PATHS = {
+  home: '/',
+  ceremonyhub: '/ceremonies',
+  ceremony: '/ceremonies/plan',
+  timeline: '/ceremonies/timeline',
+  store: '/smartmatch',
+  basket: '/basket',
+  stokvels: '/stokvels',
+  more: '/me',
+  profile: '/me/profile',
+  iziduko: '/me/iziduko',
+  clangroups: '/me/clan-groups',
+  legends: '/me/legends',
+  directory: '/me/directory',
+  myorders: '/smartmatch/orders',
+  notifications: '/me/notifications',
+  account: '/me/account',
+  help: '/me/help',
+  privacy: '/me/privacy',
+  activity: '/me/activity',
+  budget: '/ceremonies/budget',
+  templates: '/ceremonies/templates',
+  hierarchy: '/ceremonies/hierarchy',
+  family: '/ceremonies/family',
+  ukugida: '/ceremonies/ukugida',
+  ukusoka: '/ceremonies/ukusoka',
+  expenditure: '/me/expenditure',
+  shrinefund: '/me/ubuhlanti',
+  pin: '/me/pin',
+  ekoyini: '/services/ekoyini',
+  ekoyinibooking: '/services/ekoyini/booking',
+  supplier: '/supplier',
+  portal: '/me/portal',
+  identityadmin: '/admin/identity',
+  marginadmin: '/admin/margins',
+  demandadmin: '/admin/demand',
+  ekoyiniadmin: '/admin/ekoyini',
+  izidukoprofile: '/me/iziduko-profile',
+  izidukochat: '/me/messages',
+};
+
+function screenForPath(pathname) {
+  if (pathname === '/' || pathname === '') return 'home';
+  if (/^\/ceremonies\/[^/]+$/.test(pathname) && !['/ceremonies/plan', '/ceremonies/timeline'].includes(pathname)) return 'ceremony';
+  if (/^\/me\/iziduko\/[^/]+$/.test(pathname)) return 'izidukoprofile';
+  if (/^\/me\/messages\/[^/]+$/.test(pathname)) return 'izidukochat';
+  if (/^\/me\/clan-groups\/[^/]+$/.test(pathname)) return 'clangroups';
+  if (/^\/ceremonies\/budget\/[^/]+$/.test(pathname)) return 'budget';
+  if (/^\/services\/ekoyini\/booking\/[^/]+$/.test(pathname)) return 'ekoyinibooking';
+  return Object.entries(SCREEN_PATHS).find(([, path]) => path === pathname)?.[0] || 'home';
+}
+
 // ---------- MainApp ----------
 function MainApp() {
   const { accessToken } = useAuth()
-  const [screen, setScreen] = useState('home')
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [screen, setScreenState] = useState(() => screenForPath(location.pathname))
   const [basketCount, setBasketCount] = useState(0)
 
   // Ceremony planning state
@@ -267,6 +335,34 @@ function MainApp() {
   const [clanGroupId, setClanGroupId] = useState(null)
   // Hierarchy: optionally pre-select a ceremony from CeremonyHub
   const [hierarchyCeremonyId, setHierarchyCeremonyId] = useState(null)
+
+  // Keep the browser address in sync with screen navigation so refresh, share
+  // and the browser back button return to a meaningful place in the app.
+  const setScreen = (nextScreen) => {
+    setScreenState(nextScreen)
+    navigate(SCREEN_PATHS[nextScreen] || '/')
+  }
+
+  useEffect(() => {
+    const path = location.pathname;
+    const ceremonyMatch = path.match(/^\/ceremonies\/([^/]+)$/);
+    if (ceremonyMatch && !['plan', 'timeline'].includes(ceremonyMatch[1])) {
+      setSelectedCeremonyId(ceremonyMatch[1]);
+      setScreenState('ceremony');
+      return;
+    }
+    const izidukoProfileMatch = path.match(/^\/me\/iziduko\/([^/]+)$/);
+    if (izidukoProfileMatch) setIzidukoTargetUserId(izidukoProfileMatch[1]);
+    const izidukoChatMatch = path.match(/^\/me\/messages\/([^/]+)$/);
+    if (izidukoChatMatch) setIzidukoTargetUserId(izidukoChatMatch[1]);
+    const clanGroupMatch = path.match(/^\/me\/clan-groups\/([^/]+)$/);
+    if (clanGroupMatch) setClanGroupId(clanGroupMatch[1]);
+    const budgetMatch = path.match(/^\/ceremonies\/budget\/([^/]+)$/);
+    if (budgetMatch) setBudgetPlanId(budgetMatch[1]);
+    const bookingMatch = path.match(/^\/services\/ekoyini\/booking\/([^/]+)$/);
+    if (bookingMatch) setEkoyiniBookingCeremonyId(bookingMatch[1]);
+    setScreenState(screenForPath(path));
+  }, [location.pathname])
 
   // Basket count
   useEffect(() => {
@@ -294,33 +390,39 @@ function MainApp() {
   const openBudget = (planId, planTitle) => {
     setBudgetPlanId(planId)
     setBudgetPlanTitle(planTitle)
-    setScreen('budget')
+    setScreenState('budget')
+    navigate('/ceremonies/budget/' + encodeURIComponent(planId))
   }
 
   const openEkoyiniBooking = (ceremonyId, ceremonyTitle) => {
     setEkoyiniBookingCeremonyId(ceremonyId)
     setEkoyiniBookingCeremonyTitle(ceremonyTitle)
-    setScreen('ekoyinibooking')
+    setScreenState('ekoyinibooking')
+    navigate('/services/ekoyini/booking/' + encodeURIComponent(ceremonyId))
   }
 
   const openExistingCeremony = (ceremonyId) => {
     setSelectedCeremonyId(ceremonyId)
-    setScreen('ceremony')
+    setScreenState('ceremony')
+    navigate('/ceremonies/' + encodeURIComponent(ceremonyId))
   }
 
   const openIzidukoProfile = (userId) => {
     setIzidukoTargetUserId(userId)
-    setScreen('izidukoprofile')
+    setScreenState('izidukoprofile')
+    navigate('/me/iziduko/' + encodeURIComponent(userId))
   }
 
   const openIzidukoChat = (userId) => {
     setIzidukoTargetUserId(userId)
-    setScreen('izidukochat')
+    setScreenState('izidukochat')
+    navigate('/me/messages/' + encodeURIComponent(userId))
   }
 
   const openClanGroup = (groupId) => {
     setClanGroupId(groupId || null)
-    setScreen('clangroups')
+    setScreenState('clangroups')
+    navigate(groupId ? '/me/clan-groups/' + encodeURIComponent(groupId) : '/me/clan-groups')
   }
 
   // Open Hierarchy, optionally with a pre-selected ceremony

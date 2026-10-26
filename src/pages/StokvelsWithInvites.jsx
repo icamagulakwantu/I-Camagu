@@ -4,7 +4,9 @@ import MyStokvelInvites from '../components/MyStokvelInvites.jsx'
 import NearbyStokvels from '../components/NearbyStokvels.jsx'
 import ProfileCompletionCard from '../components/ProfileCompletionCard.jsx'
 import StokvelWelcomeTour from '../components/StokvelWelcomeTour.jsx'
+import StokvelPoolFundingRequests from '../components/StokvelPoolFundingRequests.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useCommunity } from '../context/CommunityContext.jsx'
 
 const seenKey = (userId, stokvelId) => `icamagu_tour_seen:${userId}:${stokvelId}`
 const baselineKey = (userId) => `icamagu_tour_baseline:${userId}`
@@ -14,6 +16,7 @@ const baselineKey = (userId) => `icamagu_tour_baseline:${userId}`
 // one-time welcome tour for any stokvel they have just joined.
 export default function StokvelsWithInvites(props) {
   const { accessToken, user } = useAuth()
+  const { location, pools } = useCommunity()
   const [refreshKey, setRefreshKey] = useState(0)
   const [tourStokvelId, setTourStokvelId] = useState(null)
 
@@ -58,7 +61,14 @@ export default function StokvelsWithInvites(props) {
       </div>
       <ProfileCompletionCard />
       <NearbyStokvels />
+      {(location.label || pools.length > 0) && (
+        <div className="mx-4 mt-4 rounded-2xl border border-cream-dark bg-white p-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-ink-muted">SmartMatch community</p>
+          <p className="mt-1 text-sm text-ink">{location.label ? 'Matching near ' + location.label : 'Your current pool pledges'}{pools.length > 0 ? ' · ' + pools.length + ' active pool pledge' + (pools.length === 1 ? '' : 's') : ''}</p>
+        </div>
+      )}
       <Stokvels key={refreshKey} {...props} />
+      <StokvelPoolFundingRequests />
       {tourStokvelId && <StokvelWelcomeTour stokvelId={tourStokvelId} onClose={closeTour} />}
     </>
   )

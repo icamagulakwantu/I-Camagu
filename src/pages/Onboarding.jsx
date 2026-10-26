@@ -3,6 +3,9 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { captureLocation } from '../lib/geolocation.js'
 import Icon from '../components/Icon.jsx'
+import IsidukoTypeahead from '../components/IsidukoTypeahead.jsx'
+
+const NATION_OPTIONS = ['AmaXhosa', 'AbaThembu', 'AmaBomvana', 'AmaGqunukhwebe', 'AbeSuthu / AmaVundle', 'AmaMpondo', 'AmaMpondomise', 'AmaMfengu', 'AmaHlubi', 'AmaBhaca', 'AmaXesibe', 'AmaQwathi', 'Not sure / another nation']
 
 const STEPS = ['welcome', 'ancestry', 'details']
 
@@ -75,6 +78,7 @@ function Onboarding({ onDone }) {
   const [error, setError] = useState('')
   const [activeCard, setActiveCard] = useState(0)
 
+  const [nationLabel, setNationLabel] = useState(user?.nationLabel || '')
   const [paternalIziduko, setPaternalIziduko] = useState(user?.paternalIziduko || '')
   const [maternalIziduko, setMaternalIziduko] = useState(user?.maternalIziduko || '')
   const [paternalGrandmotherIziduko, setPaternalGrandmotherIziduko] = useState(user?.paternalGrandmotherIziduko || '')
@@ -155,7 +159,7 @@ function Onboarding({ onDone }) {
       const res = await fetch('/api/user/iziduko', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko }),
+        body: JSON.stringify({ paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko, nationLabel }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Could not save your clan lines')
@@ -281,23 +285,24 @@ function Onboarding({ onDone }) {
           <div className="space-y-2">
             {!user?.paternalIziduko && (
               <>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Isiduko sikaTata (Paternal)</label>
-                  <input type="text" placeholder="e.g. Mbeki, Zulu, Cele" value={paternalIziduko} onChange={(e) => setPaternalIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Isiduko sikaMama (Maternal)</label>
-                  <input type="text" placeholder="Optional" value={maternalIziduko} onChange={(e) => setMaternalIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
-                </div>
+                <IsidukoTypeahead label="Isiduko sikaTata (Paternal)" value={paternalIziduko} nationLabel={nationLabel} required onChange={setPaternalIziduko} placeholder="Type your father’s clan or praise name" />
+                <IsidukoTypeahead label="Isiduko sikaMama (Maternal)" value={maternalIziduko} nationLabel={nationLabel} required onChange={setMaternalIziduko} placeholder="Type your mother’s clan or praise name" />
               </>
             )}
-            <div>
-              <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Paternal grandmother's Iziduko</label>
-              <input type="text" placeholder="Optional" value={paternalGrandmotherIziduko} onChange={(e) => setPaternalGrandmotherIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold uppercase text-ink-muted tracking-wide">Maternal grandmother's Iziduko</label>
-              <input type="text" placeholder="Optional" value={maternalGrandmotherIziduko} onChange={(e) => setMaternalGrandmotherIziduko(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm mt-1" />
+            <IsidukoTypeahead label="Paternal grandmother’s Isiduko" value={paternalGrandmotherIziduko} nationLabel={nationLabel} onChange={setPaternalGrandmotherIziduko} />
+            <IsidukoTypeahead label="Maternal grandmother’s Isiduko" value={maternalGrandmotherIziduko} nationLabel={nationLabel} onChange={setMaternalGrandmotherIziduko} />
+            <label className="block text-sm font-bold text-ink">Your nation / community label
+              <select value={nationLabel} onChange={(event) => setNationLabel(event.target.value)} className="mt-2 w-full min-h-12 rounded-xl border border-cream-dark bg-white px-3 text-ink">
+                <option value="">Choose your own label</option>
+                {NATION_OPTIONS.map((nation) => <option key={nation} value={nation}>{nation}</option>)}
+              </select>
+            </label>
+            <div className="rounded-2xl border border-cream-dark bg-white p-4 mt-3">
+              <p className="font-bold text-ink">Add your location pin</p>
+              <p className="text-xs text-ink-muted mt-1">SmartMatch uses your location to find nearby pools. Your exact coordinates are used for matching, not shown as a public address.</p>
+              <button type="button" onClick={useMyLocation} disabled={locating} className="mt-3 w-full min-h-11 rounded-full border-2 border-terracotta text-terracotta font-bold disabled:opacity-50">
+                {locating ? 'Finding location…' : coords ? 'Location pin captured ✓' : 'Use my current location'}
+              </button>
             </div>
           </div>
 
