@@ -9,7 +9,7 @@ vi.mock('../services/pinService.js', () => ({
 }));
 
 import { confirmContribution } from './contributionController.js';
-import { approveExpense } from './stokvelApprovalsController.js';
+import { approveExpense, requestExpense } from './stokvelApprovalsController.js';
 
 const integrationDescribe = process.env.RUN_POSTGRES_INTEGRATION === 'true' ? describe : describe.skip;
 
@@ -101,13 +101,13 @@ integrationDescribe('PostgreSQL contribution and group-expense controller integr
   });
 
   it('allows only one concurrent group-expense approval to spend the remaining funds', async () => {
-    const requestIds = [randomUUID(), randomUUID()];
-    await prisma.$executeRaw`
-      INSERT INTO "StokvelExpenseRequest" ("id", "stokvelId", "requestedById", "amountCents", "note")
-      VALUES
-        (${requestIds[0]}, ${stokvelId}, ${officialAId}, 7000, 'Concurrent expense A'),
-        (${requestIds[1]}, ${stokvelId}, ${officialBId}, 7000, 'Concurrent expense B')
-    `;
+    const requestA = responseRecorder();
+    const requestB = responseRecorder();
+    await requestExpense({ userId: officialAId, body: { stokvelId, amount: '70.00', note: 'Concurrent expense A' } }, requestA);
+    await requestExpense({ userId: officialBId, body: { stokvelId, amount: '70.00', note: 'Concurrent expense B' } }, requestB);
+    expect(requestA.statusCode).toBe(201);
+    expect(requestB.statusCode).toBe(201);
+    const requestIds = [requestA.body.requestId, requestB.body.requestId];
     const approve = async (requestId, userId) => {
       const response = responseRecorder();
       await approveExpense({ params: { stokvelId, requestId }, body: { pin: '1234' }, userId }, response);
