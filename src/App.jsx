@@ -303,7 +303,7 @@ const SCREEN_PATHS = {
   marginadmin: '/admin/margins',
   demandadmin: '/admin/demand',
   ekoyiniadmin: '/admin/ekoyini',
-  izidukoprofile: '/me/iziduko/profile',
+  izidukoprofile: '/me/iziduko-profile',
   izidukochat: '/me/messages',
 };
 
