@@ -66,9 +66,15 @@ describe('stokvel pool funding approval rules', () => {
     prisma.stokvelPoolFunding.findFirst.mockResolvedValue(funding);
     prisma.stokvelPoolFundingApproval.findFirst.mockResolvedValue(null);
     const tx = {
-      stokvelPoolFundingApproval: { create: vi.fn().mockResolvedValue({}), count: vi.fn().mockResolvedValue(2) },
+      $executeRaw: vi.fn().mockResolvedValue(1),
+      stokvelPoolFundingApproval: {
+        findFirst: vi.fn().mockResolvedValue(null),
+        create: vi.fn().mockResolvedValue({}),
+        count: vi.fn().mockResolvedValue(2),
+      },
       stokvelGroupLedger: { findUnique: vi.fn().mockResolvedValue({ totalBalance: 500, groupExpenses: 0 }) },
       stokvelPoolFunding: {
+        findFirst: vi.fn().mockResolvedValue(funding),
         aggregate: vi.fn().mockResolvedValue({ _sum: { amountZAR: 0 } }),
         update: vi.fn().mockResolvedValue({ ...funding, status: 'APPROVED' }),
       },
@@ -79,6 +85,8 @@ describe('stokvel pool funding approval rules', () => {
     const res = response();
     await decidePoolFundingRequest({ params: { stokvelId: 'stokvel-1', fundingId: 'funding-1' }, body: { decision: 'APPROVE' }, userId: 'official-user-2' }, res);
     expect(res.statusCode).toBe(200);
+    expect(tx.$executeRaw).toHaveBeenCalledTimes(1);
+    expect(tx.stokvelPoolFunding.findFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'funding-1', stokvelId: 'stokvel-1' } }));
     expect(tx.stokvelPoolFunding.update).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ status: 'APPROVED' }) }));
     expect(tx.poolPayment.updateMany).toHaveBeenCalledWith(expect.objectContaining({ data: { status: 'PENDING_SETTLEMENT' } }));
   });
