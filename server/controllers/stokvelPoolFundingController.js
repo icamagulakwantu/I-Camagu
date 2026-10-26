@@ -90,6 +90,29 @@ export async function decidePoolFundingRequest(req, res) {
         where: { fundingId, decision: 'APPROVE' },
       });
       const needed = Math.max(2, funding.requiredApprovals || 2);
+      if (approvedCount >= needed) {
+        const [ledger, otherCommitments] = await Promise.all([
+          tx.stokvelGroupLedger.findUnique({ where: { stokvelId } }),
+          tx.stokvelPoolFunding.aggregate({
+            where: { stokvelId, id: { not: fundingId }, status: { in: ['PENDING_APPROVAL', 'APPROVED'] } },
+            _sum: { amountZAR: true },
+          }),
+        ]);
+        const available = ledger
+          ? Number(ledger.totalBalance) - Number(ledger.groupExpenses) - Number(otherCommitments._sum.amountZAR || 0)
+          : 0;
+        if (available < Number(funding.amountZAR)) {
+          const declined = await tx.stokvelPoolFunding.update({
+            where: { id: fundingId },
+            data: { status: 'DECLINED', declinedAt: new Date(), reviewNote: 'Insufficient available funds after other pool commitments.' },
+          });
+          await tx.poolPayment.updateMany({ where: { fundingRequestId: fundingId }, data: { status: 'DECLINED' } });
+          await tx.notification.create({
+            data: { userId: funding.requestedById, type: 'STOKVEL_POOL_FUNDING_DECLINED', message: 'The request could not be approved because available funds changed.', linkScreen: 'stokvels' },
+          });
+          return { funding: declined, approvalsNeeded: 0, insufficientFunds: true };
+        }
+      }
       if (approvedCount < needed) {
         await tx.notification.create({
           data: {
@@ -131,9 +154,11 @@ export async function decidePoolFundingRequest(req, res) {
       ...result,
       message: decision === 'DECLINE'
         ? 'Funding request declined.'
-        : result.approvalsNeeded > 0
-          ? 'Approval recorded. Another official must approve before settlement.'
-          : 'Funding request approved. Settlement is still pending.',
+        : result.insufficientFunds
+          ? 'The request could not be approved because available funds changed.'
+          : result.approvalsNeeded > 0
+            ? 'Approval recorded. Another official must approve before settlement.'
+            : 'Funding request approved. Settlement is still pending.',
     });
   } catch (error) {
     if (error.code === 'P2002') return res.status(409).json({ error: 'You have already decided this funding request' });
