@@ -61,6 +61,31 @@ describe('stokvel pool funding approval rules', () => {
     expect(prisma.$transaction).not.toHaveBeenCalled();
   });
 
+  it('rechecks status under the stokvel lock when a request was decided after the preflight read', async () => {
+    prisma.stokvelOfficial.findFirst.mockResolvedValue({ id: 'official-2', userId: 'official-user-2' });
+    prisma.stokvelPoolFunding.findFirst.mockResolvedValue(funding);
+    prisma.stokvelPoolFundingApproval.findFirst.mockResolvedValue(null);
+    const tx = {
+      $executeRaw: vi.fn().mockResolvedValue(1),
+      stokvelPoolFunding: {
+        findFirst: vi.fn().mockResolvedValue({ ...funding, status: 'APPROVED' }),
+      },
+      stokvelPoolFundingApproval: { findFirst: vi.fn(), create: vi.fn() },
+    };
+    prisma.$transaction.mockImplementation((callback) => callback(tx));
+
+    const res = response();
+    await decidePoolFundingRequest({
+      params: { stokvelId: 'stokvel-1', fundingId: 'funding-1' },
+      body: { decision: 'APPROVE' },
+      userId: 'official-user-2',
+    }, res);
+
+    expect(res.statusCode).toBe(409);
+    expect(tx.$executeRaw).toHaveBeenCalledTimes(1);
+    expect(tx.stokvelPoolFundingApproval.create).not.toHaveBeenCalled();
+  });
+
   it('requires two approvals and only then marks settlement pending', async () => {
     prisma.stokvelOfficial.findFirst.mockResolvedValue({ id: 'official-2', userId: 'official-user-2' });
     prisma.stokvelPoolFunding.findFirst.mockResolvedValue(funding);
