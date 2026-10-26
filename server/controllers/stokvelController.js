@@ -1,6 +1,7 @@
 import prisma from '../config/db.js';
 import { generateReferenceCode } from '../utils/memberReference.js';
 import { countOpenRequests } from './stokvelApprovalsController.js';
+import { toCents } from '../utils/money.js';
 
 // Joining a stokvel now lives in stokvelApprovalsController.joinOrRequest,
 // because an official has to accept new people.
@@ -20,11 +21,18 @@ export async function createStokvel(req, res) {
 
   for (const [field, value] of [['contributionAmount', contributionAmount], ['targetAmount', targetAmount]]) {
     if (value !== undefined && value !== null && value !== '') {
-      const parsed = parseFloat(value);
-      if (isNaN(parsed) || parsed < 0) {
-        return res.status(400).json({ error: `${field} must be a positive number` });
+      try {
+        if (toCents(String(value)) < 0) {
+          return res.status(400).json({ error: `${field} must be zero or greater, with at most 2 decimal places` });
+        }
+      } catch {
+        return res.status(400).json({ error: `${field} must be a valid amount with at most 2 decimal places` });
       }
     }
+  }
+
+  if (targetDate && Number.isNaN(new Date(targetDate).getTime())) {
+    return res.status(400).json({ error: 'targetDate must be a valid date' });
   }
 
   try {
@@ -36,9 +44,9 @@ export async function createStokvel(req, res) {
         type,
         organiserId: userId,
         bankingTrack: 'AFRICAN_BANK',
-        contributionAmount: contributionAmount ? parseFloat(contributionAmount) : null,
+        contributionAmount: contributionAmount !== undefined && contributionAmount !== null && contributionAmount !== '' ? toCents(String(contributionAmount)) / 100 : null,
         contributionFrequency: contributionFrequency || null,
-        targetAmount: targetAmount ? parseFloat(targetAmount) : null,
+        targetAmount: targetAmount !== undefined && targetAmount !== null && targetAmount !== '' ? toCents(String(targetAmount)) / 100 : null,
         targetDate: targetDate ? new Date(targetDate) : null,
         ceremonyType: ceremonyType || null,
       },
@@ -428,14 +436,20 @@ export async function updateStokvel(req, res) {
       if (req.body[field] === null || req.body[field] === '') {
         updateData[field] = null;
       } else {
-        const parsed = parseFloat(req.body[field]);
-        if (isNaN(parsed) || parsed < 0) {
-          return res.status(400).json({ error: `${field} must be a positive number, or null to clear it` });
+        try {
+          const cents = toCents(String(req.body[field]));
+          if (cents < 0) {
+            return res.status(400).json({ error: `${field} must be zero or greater, with at most 2 decimal places` });
+          }
+          updateData[field] = cents / 100;
+        } catch {
+          return res.status(400).json({ error: `${field} must be a valid amount with at most 2 decimal places, or null to clear it` });
         }
-        updateData[field] = parsed;
       }
     } else if (field === 'targetDate') {
-      updateData[field] = req.body[field] ? new Date(req.body[field]) : null;
+      const date = req.body[field] ? new Date(req.body[field]) : null;
+      if (date && Number.isNaN(date.getTime())) return res.status(400).json({ error: 'targetDate must be a valid date' });
+      updateData[field] = date;
     } else {
       updateData[field] = req.body[field] || null;
     }
