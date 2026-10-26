@@ -44,7 +44,7 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
     if (fundingSource === 'STOKVEL' && !stokvelId) return showToast('Choose a stokvel first', 'error');
     setBusy(true);
     try {
-      const res = await fetch('/api/basket/pool/join-item', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ poolId: pool.id, skuId, quantity, ceremonyId: linkedCeremonyId || undefined, checklistItemId: checklistItemId || undefined, fundingSource, stokvelId: fundingSource === 'STOKVEL' ? stokvelId : undefined }) });
+      const res = await fetch('/api/basket/pool/join-item', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ poolId: pool.id, skuId, quantity, ceremonyId: linkedCeremonyId || undefined, checklistItemId: checklistItemId || undefined, ceremonyCostItemId: cost?.id || undefined, fundingSource, stokvelId: fundingSource === 'STOKVEL' ? stokvelId : undefined }) });
       const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Could not join pool');
       showToast(data.message || 'Added to pool', 'success'); await refreshPools(); onClose?.();
     } catch (err) { showToast(err.message, 'error'); } finally { setBusy(false); }
