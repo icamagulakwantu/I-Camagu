@@ -215,6 +215,54 @@ async function getInvitedPool(joinPoolId) {
   return prisma.bulkPool.findUnique({ where: { id: joinPoolId }, include: { partner: true } });
 }
 
+// One parking primitive for both full-basket checkout and the ceremony
+// planner's item-level pool join. Existing draft items are moved atomically;
+// planner items are created directly in the parked basket, never as a second
+// draft cart (the user has at most one DRAFT basket).
+export async function parkItemsIntoPool({
+  userId,
+  poolId,
+  sourceBasketId = null,
+  itemIds = [],
+  itemSpecs = [],
+  ceremonyId = null,
+  checklistItemId = null,
+  ceremonyCostItemId = null,
+  fundingSource = 'PERSONAL',
+  fundingStokvelId = null,
+}) {
+  if (!userId || !poolId) throw new Error('userId and poolId are required');
+  if (!itemIds.length && !itemSpecs.length) throw new Error('At least one item is required');
+  return prisma.$transaction(async (tx) => {
+    const basket = await tx.basket.create({
+      data: {
+        userId,
+        status: 'PARKED',
+        poolId,
+        ceremonyId,
+        checklistItemId,
+        ceremonyCostItemId,
+        fundingSource,
+        fundingStokvelId: fundingSource === 'STOKVEL' ? fundingStokvelId : null,
+        stokvelId: fundingSource === 'STOKVEL' ? fundingStokvelId : null,
+        ...(itemSpecs.length ? { items: { create: itemSpecs.map((item) => ({ skuId: item.skuId, quantity: item.quantity })) } } : {}),
+      },
+      include: { items: { include: { sku: true } } },
+    });
+    if (itemIds.length) {
+      const moved = await tx.basketItem.updateMany({
+        where: {
+          id: { in: itemIds },
+          ...(sourceBasketId ? { basketId: sourceBasketId } : {}),
+        },
+        data: { basketId: basket.id },
+      });
+      if (moved.count !== itemIds.length) throw new Error('One or more basket items changed before they could be parked');
+    }
+    return basket;
+  });
+}
+
 export async function submitBasketToPool(userId, basketId, targetDate, joinPoolId) {
   const [basket, user] = await Promise.all([
     prisma.basket.findFirst({
@@ -277,10 +325,11 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
     // member (the member's open cart, which is still `basket` here), so
     // creating another DRAFT is what failed with "Unique constraint failed
     // on the fields: (userId)".
-    const groupBasket = await prisma.basket.create({ data: { userId, status: 'PARKED', poolId: pool.id } });
-    await prisma.basketItem.updateMany({
-      where: { id: { in: items.map((it) => it.id) } },
-      data: { basketId: groupBasket.id },
+    const groupBasket = await parkItemsIntoPool({
+      userId,
+      poolId: pool.id,
+      sourceBasketId: basket.id,
+      itemIds: items.map((item) => item.id),
     });
 
     const result = await checkAndMatchPool(pool.id);
