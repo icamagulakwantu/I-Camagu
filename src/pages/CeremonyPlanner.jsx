@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useCommunity } from '../context/CommunityContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
@@ -36,6 +37,7 @@ const planProgress = (plan) => countProgress(buildListRows({
 // the old planner so App.jsx needs no edit.
 export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, onBookEkoyini, selectedCeremonyId }) {
   const { accessToken } = useAuth()
+  const { setActiveCeremony } = useCommunity()
   const { showToast } = useToast()
 
   const [plans, setPlans] = useState([])
@@ -51,6 +53,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   const [pledges, setPledges] = useState([])
 
   const openPlan = (plan) => {
+    setActiveCeremony(plan.ceremony || plan)
     setActivePlan(plan)
     setForm(formFromPlan(plan))
     setStepId('summary')
@@ -99,6 +102,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   }
 
   const leaveWizard = () => {
+    setActiveCeremony(null)
     setActivePlan(null)
     setCreating(false)
     setReturnToSummary(false)
