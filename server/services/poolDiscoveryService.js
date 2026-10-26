@@ -142,7 +142,7 @@ export function buildCrossPoolAggregationSuggestions(pools, referenceCasePriceZA
         indicativePalletEquivalent: Math.round(equivalentPallets * 100) / 100,
         reachesThreePalletEquivalent: equivalentPallets >= 3,
         volumeTierStatus: 'INDICATIVE_ONLY_SUPPLIER_CONFIRMATION_REQUIRED',
-        potentialDiscountLabel: 'Potential 8–10% target to negotiate; not confirmed',
+        potentialDiscountLabel: 'Research-backed 8–10% bulk-discount target at qualifying volume; outlet terms apply',
         message: equivalentPallets >= 3
           ? 'Join forces: these groups may reach a three-pallet-equivalent order value. Ask the supplier whether mixed products count and request a written quote.'
           : 'Join forces: combined demand may move the supplier quote toward a higher volume tier. Ask the supplier to confirm eligible products and thresholds.',
