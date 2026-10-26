@@ -198,12 +198,12 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
 
       <p className="text-sm font-bold text-ink">{done} / {total} <span className="font-normal text-ink-muted">done</span></p>
 
-      <button type="button" onClick={() => setShowAdd((v) => !v)} className={cn('w-full h-14 rounded-pill bg-white border-2 border-sage-500 text-sage-700', pressable)}>
+      <button type="button" onClick={() => setShowAdd((v) => !v)} className={cn('w-full h-14 rounded-pill bg-white border-2 border-terracotta text-terracotta', pressable)}>
         <Bi {...(showAdd ? BUTTONS.cancel : { xh: 'Ongeza into', en: 'Add something to the list' })} />
       </button>
 
       {showAdd && (
-        <form onSubmit={addItem} className="bg-white border-2 border-sage-200 rounded-soft p-4 space-y-3">
+        <form onSubmit={addItem} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
           <select value={form.phase} onChange={(e) => setForm({ ...form, phase: e.target.value })} className={inputClass}>
             {PHASE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -215,7 +215,7 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
             value={form.actual}
             onChange={(e) => setForm({ ...form, actual: e.target.value })}
           />
-          <button type="submit" disabled={adding} className={cn('w-full h-14 rounded-pill bg-sage-600 text-white', pressable)}>
+          <button type="submit" disabled={adding} className={cn('w-full h-14 rounded-pill bg-terracotta text-white', pressable)}>
             <Bi {...BUTTONS.add} />
           </button>
         </form>
