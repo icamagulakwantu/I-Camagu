@@ -67,6 +67,7 @@ describe('stokvel pool funding approval rules', () => {
     prisma.stokvelPoolFundingApproval.findFirst.mockResolvedValue(null);
     const tx = {
       $executeRaw: vi.fn().mockResolvedValue(1),
+      stokvelOfficial: { findFirst: vi.fn().mockResolvedValue({ id: 'official-2', userId: 'official-user-2' }) },
       stokvelPoolFunding: {
         findFirst: vi.fn().mockResolvedValue({ ...funding, status: 'APPROVED' }),
       },
@@ -92,6 +93,7 @@ describe('stokvel pool funding approval rules', () => {
     prisma.stokvelPoolFundingApproval.findFirst.mockResolvedValue(null);
     const tx = {
       $executeRaw: vi.fn().mockResolvedValue(1),
+      stokvelOfficial: { findFirst: vi.fn().mockResolvedValue({ id: 'official-2', userId: 'official-user-2' }) },
       stokvelPoolFundingApproval: {
         findFirst: vi.fn().mockResolvedValue(null),
         create: vi.fn().mockResolvedValue({}),
