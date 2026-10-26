@@ -485,8 +485,12 @@ export const getPublicPlan = async (req, res) => {
 // POST /auto - create ceremony with auto‑generated checklist & cost items
 export const createAutoCeremony = async (req, res) => {
       try {
-              const { title, type, eventDate, notes, budgetZAR, guestCount, createPlan = false } = req.body;
+              const { title, type, eventDate, notes, budgetZAR, guestCount, visibility, createPlan = false } = req.body;
                   const hostId = req.user.id;
+
+                      if (DRAFT_CEREMONY_TYPE_NAMES.includes(type)) {
+                        return res.status(409).json({ error: 'This ceremony is still a founder-review draft and is not available for family planning yet.' });
+                      }
 
                       if (!title || !type || !hostId) {
                                 return res.status(400).json({ error: 'Missing required fields' });
@@ -521,6 +525,7 @@ export const createAutoCeremony = async (req, res) => {
                                                                                                     notes: notes || '',
                                                                                                               hostId,
                                                                                                                         status: 'PLANNING',
+                                                                                                                                  visibility: ['PRIVATE', 'CLAN_ONLY', 'PUBLIC'].includes(visibility) ? visibility : 'PRIVATE',
                                                                                                                                   budgetZAR: parsedBudget,
                                                                                                                                   guestCount: parsedGuestCount,
                                                         },
