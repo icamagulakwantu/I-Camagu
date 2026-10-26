@@ -4,9 +4,9 @@
 
 ## Automated checks
 
-- [ ] Latest full-stack head passes CI after the final commit: frozen install, Prisma generation, `yarn test`, `yarn build`.
+- [x] Latest verified `main` head `edd2a298416c4efdbde19a89583c5a2f8cf0b2ec` passes CI: `yarn install --frozen-lockfile`, Prisma generation, `yarn test`, and `yarn build` (run [40383440869](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40383440869)). This evidence applies to that exact SHA only.
 - [x] The SmartMatch, ceremony, stokvel-funding, clan-matching, community-feed and pricing/concurrency feature stack was consolidated and merged through PR #42 (`9d571b104a0e4daa879157809f963bcd2a5fea2f`). Temporary validation PRs #36 and #38 were closed without merging.
-- [ ] A clean checkout can install from the committed lockfile; no lockfile regeneration is performed as part of a release without review.
+- [x] CI installs from a clean checkout with `yarn install --frozen-lockfile` and does not regenerate the lockfile. Release builds must continue using the frozen lockfile.
 
 ## Database and financial integrity — release blockers
 
@@ -52,6 +52,8 @@
 - [ ] Complete a founder sign-off on pricing, ceremony types, cultural language, privacy text, terms, customer support route and launch scope.
 
 ## Current evidence snapshot — 26 October 2026
+
+- Latest verified `main` head at the time of this update is `edd2a298416c4efdbde19a89583c5a2f8cf0b2ec`; CI run [#40383440869](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40383440869) passed frozen dependency installation, Prisma client generation, the Vitest suite (including strict financial-statement date validation tests), and the frontend production build. Re-run this check after every subsequent code or documentation commit.
 
 - Consolidated feature integration PR [#42](https://github.com/icamagulakwantu/I-Camagu/pull/42) was merged to `main` as `9d571b104a0e4daa879157809f963bcd2a5fea2f`. The exact main-head CI run [#40350594066](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40350594066) passed dependency installation, Prisma client generation, `yarn test`, and `yarn build`.
 - That run validates the code at that exact SHA only. Any subsequent commit, including a documentation-only commit, needs its own CI result before the new head is called validated.
