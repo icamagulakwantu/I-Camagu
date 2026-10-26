@@ -182,7 +182,7 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
 }
 
 export async function joinPoolWithItem(userId, input) {
-  const { poolId, skuId, quantity = 1, ceremonyId = null, checklistItemId = null, fundingSource = 'PERSONAL', stokvelId = null } = input || {};
+  const { poolId, skuId, quantity = 1, ceremonyId = null, checklistItemId = null, ceremonyCostItemId = null, fundingSource = 'PERSONAL', stokvelId = null } = input || {};
   const amount = Number.parseInt(quantity, 10);
   if (!poolId || !skuId || !Number.isInteger(amount) || amount < 1) {
     throw new Error('poolId, skuId and a quantity of at least 1 are required');
@@ -218,6 +218,12 @@ export async function joinPoolWithItem(userId, input) {
   } else if (checklistItemId) {
     throw new Error('ceremonyId is required when linking a checklist item');
   }
+  if (ceremonyCostItemId && ceremonyId) {
+    const costItem = await prisma.ceremonyCostItem.findFirst({ where: { id: ceremonyCostItemId, ceremonyId }, select: { id: true } });
+    if (!costItem) throw new Error('Shopping-list item does not belong to this ceremony');
+  } else if (ceremonyCostItemId) {
+    throw new Error('ceremonyId is required when linking a shopping-list item');
+  }
 
   const basket = await prisma.basket.create({
     data: {
@@ -226,6 +232,7 @@ export async function joinPoolWithItem(userId, input) {
       poolId,
       ceremonyId,
       checklistItemId,
+      ceremonyCostItemId,
       fundingSource,
       fundingStokvelId: fundingSource === 'STOKVEL' ? stokvelId : null,
       stokvelId: fundingSource === 'STOKVEL' ? stokvelId : null,
