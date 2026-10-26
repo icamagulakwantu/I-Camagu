@@ -4,7 +4,9 @@ vi.mock('../config/db.js', () => ({ default: {} }));
 vi.mock('../services/ledgerService.js', () => ({}));
 vi.mock('./stokvelRecordsController.js', () => ({}));
 
-const { decideLoanStatus, splitRepayment } = await import('./stokvelFinanceController.js');
+const {
+  decideLoanStatus, splitRepayment, parseTradeCredit, tradeCreditSavingCents, canChangeCreditStatus,
+} = await import('./stokvelFinanceController.js');
 
 describe('decideLoanStatus', () => {
   it('stays pending until enough officials agree', () => {
@@ -34,5 +36,63 @@ describe('splitRepayment', () => {
   it('counts everything as interest once principal is paid', () => {
     expect(splitRepayment({ amountCents: 5000, principalCents: 100000, paidBeforeCents: 100000 }))
       .toEqual({ principalPart: 0, interestPart: 5000 });
+  });
+});
+
+// FIN-04: trade credit amounts are exact cents and never silently rounded.
+describe('parseTradeCredit', () => {
+  const base = { retailer: 'Mthatha Cash and Carry', amount: '1000.50', discountPercent: '10', months: '12' };
+
+  it('accepts a normal deal and keeps the amount exact', () => {
+    const out = parseTradeCredit(base);
+    expect(out.ok).toBe(true);
+    expect(out.value).toMatchObject({ retailer: 'Mthatha Cash and Carry', amountCents: 100050, discountPercent: '10', months: 12 });
+  });
+
+  it('refuses amounts with more than 2 decimals instead of rounding', () => {
+    expect(parseTradeCredit({ ...base, amount: '10.005' }).ok).toBe(false);
+  });
+
+  it('refuses zero, negative, empty and huge amounts', () => {
+    for (const amount of ['0', '-5', '', 'abc', '20000000']) {
+      expect(parseTradeCredit({ ...base, amount }).ok).toBe(false);
+    }
+  });
+
+  it('checks the discount range and decimals', () => {
+    expect(parseTradeCredit({ ...base, discountPercent: '12.5' }).ok).toBe(true);
+    expect(parseTradeCredit({ ...base, discountPercent: '' }).value.discountPercent).toBe('0');
+    expect(parseTradeCredit({ ...base, discountPercent: '91' }).ok).toBe(false);
+    expect(parseTradeCredit({ ...base, discountPercent: '-1' }).ok).toBe(false);
+    expect(parseTradeCredit({ ...base, discountPercent: '1.234' }).ok).toBe(false);
+  });
+
+  it('refuses months outside 1 to 60 instead of quietly using 12', () => {
+    expect(parseTradeCredit({ ...base, months: undefined }).value.months).toBe(12);
+    expect(parseTradeCredit({ ...base, months: '0' }).ok).toBe(false);
+    expect(parseTradeCredit({ ...base, months: '61' }).ok).toBe(false);
+    expect(parseTradeCredit({ ...base, months: '2.5' }).ok).toBe(false);
+  });
+
+  it('requires a retailer name', () => {
+    expect(parseTradeCredit({ ...base, retailer: '   ' }).ok).toBe(false);
+  });
+});
+
+describe('tradeCreditSavingCents', () => {
+  it('works out the saving in whole cents', () => {
+    expect(tradeCreditSavingCents(100000, '10')).toBe(10000);
+    expect(tradeCreditSavingCents(33333, '12.5')).toBe(4167); // 4166.625 rounds half up
+    expect(tradeCreditSavingCents(100000, '0')).toBe(0);
+  });
+});
+
+describe('canChangeCreditStatus', () => {
+  it('only lets an active deal be marked used or cancelled', () => {
+    expect(canChangeCreditStatus('ACTIVE', 'USED')).toBe(true);
+    expect(canChangeCreditStatus('ACTIVE', 'CANCELLED')).toBe(true);
+    expect(canChangeCreditStatus('ACTIVE', 'ACTIVE')).toBe(false);
+    expect(canChangeCreditStatus('USED', 'ACTIVE')).toBe(false);
+    expect(canChangeCreditStatus('CANCELLED', 'USED')).toBe(false);
   });
 });

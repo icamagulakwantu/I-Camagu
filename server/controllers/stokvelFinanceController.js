@@ -357,14 +357,63 @@ export async function repayLoan(req, res) {
 }
 
 // ---------- Trade credit ----------
+//
+// FIN-04: amounts are exact cents (more than 2 decimals refused, never
+// rounded) and are read back from the database as exact text. Note: trade
+// credit is a record of a deal with a retailer; it is not posted to the
+// ledger (books). Whether it should be is part of FIN-03 (balance source of
+// truth), not changed here.
+
+const MAX_CREDIT_CENTS = 1_000_000_000; // R10 million, well inside DECIMAL(12,2)
+const PERCENT_PATTERN = /^\d{1,2}(\.\d{1,2})?$/;
+
+// Validates a new trade credit deal. Returns { ok: true, value } or
+// { ok: false, error }. Exported for unit tests.
+export function parseTradeCredit(body) {
+  const retailer = String(body?.retailer || '').trim().slice(0, 200);
+  if (!retailer) return { ok: false, error: 'Retailer name is required' };
+
+  let amountCents;
+  try { amountCents = toCents(String(body?.amount ?? '')); } catch { amountCents = 0; }
+  if (!(amountCents > 0)) return { ok: false, error: 'Enter an amount above zero (at most 2 decimals)' };
+  if (amountCents > MAX_CREDIT_CENTS) return { ok: false, error: 'Amount is too large' };
+
+  const rawDiscount = body?.discountPercent === undefined || body?.discountPercent === null || body?.discountPercent === ''
+    ? '0' : String(body.discountPercent).trim();
+  if (!PERCENT_PATTERN.test(rawDiscount) || Number(rawDiscount) > 90) {
+    return { ok: false, error: 'Discount must be between 0 and 90% (at most 2 decimals)' };
+  }
+
+  const rawMonths = body?.months === undefined || body?.months === null || body?.months === '' ? '12' : String(body.months).trim();
+  const months = /^\d+$/.test(rawMonths) ? Number(rawMonths) : NaN;
+  if (!(months >= 1 && months <= 60)) return { ok: false, error: 'Months must be a whole number from 1 to 60' };
+
+  const purpose = String(body?.purpose || '').trim().slice(0, 1000) || null;
+  return { ok: true, value: { retailer, amountCents, discountPercent: rawDiscount, months, purpose } };
+}
+
+// Expected saving on a deal, in whole cents (rounded half up). Exported for unit tests.
+export function tradeCreditSavingCents(amountCents, discountPercent) {
+  const basisPoints = Math.round(Number(discountPercent) * 100); // 12.5% -> 1250
+  return Math.round((amountCents * basisPoints) / 10_000);
+}
+
+// Deals can only move forward: an ACTIVE deal can be marked USED or CANCELLED.
+// A used or cancelled deal cannot be revived. Exported for unit tests.
+export function canChangeCreditStatus(from, to) {
+  return from === 'ACTIVE' && (to === 'USED' || to === 'CANCELLED');
+}
 
 export async function listTradeCredit(req, res) {
   try {
     if (!(await guard(req, res))) return;
     const rows = await prisma.$queryRaw`
-      SELECT * FROM "StokvelTradeCredit" WHERE "stokvelId" = ${req.params.stokvelId} ORDER BY "createdAt" DESC LIMIT 100`;
+      SELECT "id", "retailer", "amount"::text AS amount, "discountPercent"::text AS "discountPercent",
+        "months", "purpose", "status", "createdAt"
+      FROM "StokvelTradeCredit" WHERE "stokvelId" = ${req.params.stokvelId} ORDER BY "createdAt" DESC LIMIT 100`;
+    // Response shape unchanged: amount in rand and discount as numbers.
     res.json(rows.map((r) => ({
-      id: r.id, retailer: r.retailer, amount: Number(r.amount), discountPercent: Number(r.discountPercent),
+      id: r.id, retailer: r.retailer, amount: toCents(r.amount) / 100, discountPercent: Number(r.discountPercent),
       months: r.months, purpose: r.purpose, status: r.status, createdAt: r.createdAt,
     })));
   } catch (error) {
@@ -377,19 +426,17 @@ export async function createTradeCredit(req, res) {
   try {
     if (!(await guard(req, res, { officialOnly: true }))) return;
     const { stokvelId } = req.params;
-    const retailer = String(req.body?.retailer || '').trim().slice(0, 200);
-    const amount = Number(req.body?.amount);
-    const discountPercent = Number(req.body?.discountPercent || 0);
-    const months = parseInt(req.body?.months, 10) || 12;
-    if (!retailer) return res.status(400).json({ error: 'Retailer name is required' });
-    if (!(amount > 0)) return res.status(400).json({ error: 'Enter an amount above zero' });
-    if (!(discountPercent >= 0 && discountPercent <= 90)) return res.status(400).json({ error: 'Discount must be between 0 and 90%' });
-    const purpose = String(req.body?.purpose || '').slice(0, 1000) || null;
+    const parsed = parseTradeCredit(req.body);
+    if (!parsed.ok) return res.status(400).json({ error: parsed.error });
+    const { retailer, amountCents, discountPercent, months, purpose } = parsed.value;
+    const amount = (amountCents / 100).toFixed(2);
     const id = randomUUID();
     await prisma.$executeRaw`
       INSERT INTO "StokvelTradeCredit" ("id", "stokvelId", "retailer", "amount", "discountPercent", "months", "purpose", "createdById")
-      VALUES (${id}, ${stokvelId}, ${retailer}, ${amount}, ${discountPercent}, ${months}, ${purpose}, ${req.userId})`;
-    await logAudit(stokvelId, req.userId, 'Committed trade credit', `${money(amount)} with ${retailer} at ${discountPercent}% off`);
+      VALUES (${id}, ${stokvelId}, ${retailer}, ${amount}::numeric, ${discountPercent}::numeric, ${months}, ${purpose}, ${req.userId})`;
+    // The deal is saved; a failed audit line is logged, not returned as an
+    // error (that would invite a duplicate deal).
+    await logAuditQuietly(stokvelId, req.userId, 'Committed trade credit', `R${amount} with ${retailer} at ${discountPercent}% off`);
     res.status(201).json({ id });
   } catch (error) {
     console.error('Create trade credit error:', error.message);
@@ -405,11 +452,20 @@ export async function updateTradeCredit(req, res) {
     const { stokvelId, creditId } = req.params;
     const status = req.body?.status;
     if (!CREDIT_STATUSES.includes(status)) return res.status(400).json({ error: 'Unknown status' });
+    if (!canChangeCreditStatus('ACTIVE', status)) return res.status(400).json({ error: 'A deal can only be marked used or cancelled' });
+    // Only an ACTIVE deal changes, checked in the same statement as the update,
+    // so two officials acting at once cannot both change it.
     const rows = await prisma.$queryRaw`
-      UPDATE "StokvelTradeCredit" SET "status" = ${status} WHERE "id" = ${creditId} AND "stokvelId" = ${stokvelId}
+      UPDATE "StokvelTradeCredit" SET "status" = ${status}
+      WHERE "id" = ${creditId} AND "stokvelId" = ${stokvelId} AND "status" = 'ACTIVE'
       RETURNING "retailer"`;
-    if (!rows.length) return res.status(404).json({ error: 'Trade credit not found' });
-    await logAudit(stokvelId, req.userId, 'Updated trade credit', `${rows[0].retailer}: ${status.toLowerCase()}`);
+    if (!rows.length) {
+      const exists = await prisma.$queryRaw`
+        SELECT "status" FROM "StokvelTradeCredit" WHERE "id" = ${creditId} AND "stokvelId" = ${stokvelId}`;
+      if (!exists.length) return res.status(404).json({ error: 'Trade credit not found' });
+      return res.status(409).json({ error: `This deal is already ${String(exists[0].status).toLowerCase()} and cannot be changed` });
+    }
+    await logAuditQuietly(stokvelId, req.userId, 'Updated trade credit', `${rows[0].retailer}: ${status.toLowerCase()}`);
     res.json({ message: 'Updated' });
   } catch (error) {
     console.error('Update trade credit error:', error.message);
