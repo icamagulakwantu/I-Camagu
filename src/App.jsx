@@ -76,6 +76,10 @@ const MORE_SCREENS = [
   'notifications', 'account', 'help', 'activity',
 ]
 
+const CEREMONY_SCREENS = [
+  'ceremony', 'timeline', 'budget', 'templates', 'family', 'ukugida', 'ukusoka', 'hierarchy',
+]
+
 // ---------- Dashboard ----------
 function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
   const { user, accessToken } = useAuth()
@@ -571,8 +575,8 @@ function MainApp() {
 
   const activeTab =
     screen === 'home' ? 'home'
-    : screen === 'ceremonyhub' ? 'ceremonyhub'
-    : screen === 'store' || screen === 'basket' ? 'store'
+    : screen === 'ceremonyhub' || CEREMONY_SCREENS.includes(screen) ? 'ceremonyhub'
+    : screen === 'store' || screen === 'basket' || screen === 'myorders' ? 'store'
     : screen === 'stokvels' ? 'stokvels'
     : MORE_SCREENS.includes(screen) ? 'more'
     : 'home'
