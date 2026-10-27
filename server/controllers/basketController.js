@@ -64,18 +64,22 @@ export async function addItem(req, res) {
 
                           const basket = await getOrCreateDraftBasket(req.userId);
 
-                              const existing = await prisma.basketItem.findFirst({ where: { basketId: basket.id, skuId } });
-
-                                  const item = existing
-                                        ? await prisma.basketItem.update({
-                                                      where: { id: existing.id },
-                                                                data: { quantity: existing.quantity + numericQuantity },
-                                                                          include: { sku: { select: PUBLIC_SKU_SELECT } },
-                                        })
-                                              : await prisma.basketItem.create({
-                                                            data: { basketId: basket.id, skuId, quantity: numericQuantity },
-                                                                      include: { sku: { select: PUBLIC_SKU_SELECT } },
-                                              });
+                              const item = await prisma.$transaction(async (tx) => {
+                            // Serialize adds for this basket so simultaneous taps/tabs
+                            // cannot read the same old quantity and overwrite each other.
+                            await tx.$queryRaw`SELECT "id" FROM "Basket" WHERE "id" = ${basket.id} FOR UPDATE`;
+                            const existing = await tx.basketItem.findFirst({ where: { basketId: basket.id, skuId } });
+                            return existing
+                              ? tx.basketItem.update({
+                                  where: { id: existing.id },
+                                  data: { quantity: { increment: numericQuantity } },
+                                  include: { sku: { select: PUBLIC_SKU_SELECT } },
+                                })
+                              : tx.basketItem.create({
+                                  data: { basketId: basket.id, skuId, quantity: numericQuantity },
+                                  include: { sku: { select: PUBLIC_SKU_SELECT } },
+                                });
+                          });
 
                                                   res.status(201).json({ item, message: `${item.quantity} case(s) of ${sku.name} in your basket.` });
           } catch (error) {
