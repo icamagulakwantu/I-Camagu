@@ -93,6 +93,14 @@ export async function registerWithPassword(req, res) {
   }
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
 
+  // Admin identities must be established through the verified Google sign-in
+  // path, not by claiming a hard-coded administrator email during password
+  // registration. This closes the new-account takeover path while the full
+  // email-verification flow is implemented.
+  if (isAdminEmail(cleanEmail(email).toLowerCase())) {
+    return res.status(403).json({ error: 'Administrator accounts must use verified Google sign-in. Contact support if you need access restored.' });
+  }
+
   try {
     // Still reveals that an account exists (SEC-02 residual): fixing that needs
     // an email-confirmation step on sign-up. Rate limited by authLimiter.
