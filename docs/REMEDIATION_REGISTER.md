@@ -116,3 +116,8 @@ Verified in Render service metadata and recent startup logs: two auto-deploying 
 ## PAY-02 — Stokvel-funded payments in PSP payout queue (27 Oct 2026)
 
 **Status: fix prepared on PR branch; merge gated on CI.** The payout queue now excludes both `MANUAL_EFT` and `STOKVEL_FUNDS`, and the server-side processor rejects Stokvel-funded rows before writing payout-forwarded metadata. Regression tests verify the queue filter and that no update is written for a blocked payment. Do not process Stokvel-funded rows through the PSP payout workflow. After CI passes, verify the guard is present on the deployed commit; do not inspect or alter production financial rows as part of this change.
+
+
+## UX-04 — Avoid presenting unquoted SmartMatch savings as a research-backed promise (27 Oct 2026)
+
+**Fix prepared on a review branch.** The combined-order card no longer advertises a generic 8–10% target as “research-backed.” It now says savings remain unconfirmed until a supplier provides a written quote for the specific combined order. This aligns the UI with the rule that price/tier values remain TBC until supported by real supplier quotes.
