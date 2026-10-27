@@ -1,6 +1,7 @@
 import prisma from '../config/db.js';
 import { loadCostRows } from './ceremonyCostController.js';
-import { summariseCosts, hasActual } from '../../shared/ceremonyCosts.js';
+import { hasActual, UNFORESEEN_PHASE } from '../../shared/ceremonyCosts.js';
+import { buildListRows, summariseRows } from '../../shared/ceremonyList.js';
 
 // The read-only budget screen now uses the same sums as the Checklist & Budget
 // tab: only amounts actually paid are deducted from the budget, whether they
@@ -18,20 +19,31 @@ export async function getPlanBudget(req, res) {
     const costRows = plan.ceremony ? await loadCostRows(plan.ceremony.id) : [];
     const checklist = plan.ceremony?.checklistItems || [];
     const budgetZAR = plan.ceremony?.budgetZAR == null ? null : Number(plan.ceremony.budgetZAR);
-    const summary = summariseCosts({ budgetZAR, costItems: costRows, checklistItems: checklist });
+    const rows = buildListRows({ costItems: costRows, checklistItems: checklist });
+    const unforeseenItems = checklist.filter((item) => item.phase === UNFORESEEN_PHASE);
+    // Reuse the same merged-row calculation as the main Checklist & Budget tab.
+    // If a task and priced provision represent the same thing, an actual cost
+    // recorded in both storage locations must still count only once.
+    const summary = summariseRows({ budgetZAR, rows, unforeseenItems });
     const totalPledged = plan.pledges.reduce((sum, pledge) => sum + Number(pledge.pledgedAmountZAR || 0), 0);
 
-    const provisions = costRows.map((item) => ({
-      id: item.id, label: item.label, phase: item.phase,
-      quantity: item.quantity, unit: item.unit, unitCost: item.suggestedUnitCost,
-      total: hasActual(item) ? item.actualCostZAR : item.suggestedTotal,
-      isPurchased: hasActual(item),
-    }));
-    const paidTasks = checklist.filter(hasActual).map((item) => ({
-      id: item.id, label: item.label, phase: item.phase,
-      quantity: 1, unit: 'paid', unitCost: Number(item.actualCostZAR),
-      total: Number(item.actualCostZAR), isPurchased: true,
-    }));
+    const itemBreakdown = [
+      ...rows.filter((row) => row.kind !== 'note').map((row) => ({
+        id: row.key,
+        label: row.label,
+        phase: row.phase,
+        quantity: row.quantity || 1,
+        unit: row.cost?.unit || 'item',
+        unitCost: row.unitPrice ?? (row.actual != null ? row.actual : 0),
+        total: row.actual != null ? row.actual : (row.suggested ?? 0),
+        isPurchased: Boolean(row.done),
+      })),
+      ...unforeseenItems.map((item) => ({
+        id: item.id, label: item.label, phase: item.phase,
+        quantity: 1, unit: 'paid', unitCost: hasActual(item) ? Number(item.actualCostZAR) : 0,
+        total: hasActual(item) ? Number(item.actualCostZAR) : 0, isPurchased: hasActual(item),
+      })),
+    ];
 
     res.json({
       budgetZAR,
@@ -42,7 +54,7 @@ export async function getPlanBudget(req, res) {
       pledgeShortfall: budgetZAR == null ? null : Math.max(0, budgetZAR - totalPledged),
       shortfall: summary.projected - totalPledged,
       unforeseen: summary.unforeseen,
-      itemBreakdown: [...provisions, ...paidTasks],
+      itemBreakdown,
     });
   } catch (error) {
     console.error('Get plan budget error:', error.message);
