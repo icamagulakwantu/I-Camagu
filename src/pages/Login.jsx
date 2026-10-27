@@ -29,6 +29,8 @@ function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [code, setCode] = useState('')
@@ -103,7 +105,9 @@ function Login() {
   }
 
   const handleRegister = async (e) => {
-    e.preventDefault(); setError(''); setLoading(true)
+    e.preventDefault(); setError('')
+    if (password !== confirmPassword) { setError('Passwords do not match. Please check both fields.'); return }
+    setLoading(true)
     try {
       const res = await fetch('/api/auth/register-password', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -245,6 +249,7 @@ function Login() {
                   }
                   setEmail(email.trim())
                   setPassword('')
+                  setConfirmPassword('')
                   goTo('register')
                 }}
                 className="w-full border-2 border-terracotta/30 text-terracotta font-bold py-3 rounded-pill text-sm pressable"
@@ -291,9 +296,27 @@ function Login() {
                   <Icon name={showPassword ? 'eye-off' : 'eye'} size={18} />
                 </button>
               </div>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Confirm password" aria-label="Confirm password" value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                  className="w-full border-2 border-terracotta/20 rounded-2xl pl-4 pr-12 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
+                  required minLength={8}
+                />
+                <button type="button" onClick={() => setShowConfirmPassword((shown) => !shown)} aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted">
+                  <Icon name={showConfirmPassword ? 'eye-off' : 'eye'} size={18} />
+                </button>
+              </div>
+              {confirmPassword.length > 0 && (
+                <p className={`text-[11px] font-bold ${confirmPassword === password ? 'text-sage-600' : 'text-terracotta'}`} role="status">
+                  {confirmPassword === password ? 'Passwords match' : 'Passwords do not match yet'}
+                </p>
+              )}
               <ErrorBanner message={error} />
               <button
-                type="submit" disabled={loading}
+                type="submit" disabled={loading || !password || password !== confirmPassword}
                 className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 pressable shadow-terracotta"
               >
                 {loading ? 'Creating account...' : 'Create Account →'}
@@ -345,7 +368,7 @@ function Login() {
                 <div className="flex-1 h-px bg-cream-dark" />
               </div>
               <button
-                type="button" onClick={() => { setPassword(''); goTo('register') }}
+                type="button" onClick={() => { setPassword(''); setConfirmPassword(''); goTo('register') }}
                 className="w-full text-sm text-terracotta font-bold underline"
               >
                 Create an account
