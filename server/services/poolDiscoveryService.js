@@ -1,6 +1,7 @@
 import prisma from '../config/db.js';
 import { checkAndMatchPool, parkItemsIntoPool } from './matchmakerService.js';
 import { getNextTierForMetric, getTierForMetric, palletsForCases, resolveTierLadder, amountToReachTier } from '../utils/smartMatchTiers.js';
+import { parsePositiveIntegerQuantity } from '../utils/quantity.js';
 
 const TAVERN_CATEGORIES = new Set([
   'BEER', 'CIDER_RTD', 'BRANDY', 'WHISKY', 'VODKA', 'VODKA_PREMIUM',
@@ -246,15 +247,7 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
   };
 }
 
-export function parsePoolQuantity(quantity) {
-  const raw = typeof quantity === 'number' ? String(quantity) : String(quantity ?? '').trim();
-  if (!/^\\d+$/.test(raw)) throw new Error('Quantity must be a whole number of at least 1');
-  const amount = Number(raw);
-  if (!Number.isSafeInteger(amount) || amount < 1) {
-    throw new Error('Quantity must be a whole number of at least 1');
-  }
-  return amount;
-}
+export const parsePoolQuantity = parsePositiveIntegerQuantity;
 
 export async function joinPoolWithItem(userId, input) {
   const { poolId, skuId, quantity = 1, ceremonyId = null, checklistItemId = null, ceremonyCostItemId = null, fundingSource = 'PERSONAL', stokvelId = null } = input || {};
