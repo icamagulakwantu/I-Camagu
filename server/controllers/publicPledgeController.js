@@ -29,7 +29,21 @@ export const getPublicPlanPledges = async (req, res) => {
       },
     });
 
-    res.json(pledges);
+    // The public view only needs to show whether a pledge was received, not
+    // the exact amount paid. Keep the paid amount private while preserving the
+    // display of the originally pledged amount.
+    res.json(pledges.map((pledge) => {
+      const pledged = pledge.pledgedAmountZAR == null ? null : Number(pledge.pledgedAmountZAR);
+      const paid = pledge.paidAmountZAR == null ? 0 : Number(pledge.paidAmountZAR);
+      return {
+        id: pledge.id,
+        pledgerName: pledge.pledgerName,
+        relationship: pledge.relationship,
+        pledgedItem: pledge.pledgedItem,
+        pledgedAmountZAR: pledge.pledgedAmountZAR,
+        isReceived: pledged !== null && pledged > 0 && paid >= pledged,
+      };
+    }));
   } catch (error) {
     console.error('Error loading public pledges:', error.message);
     res.status(500).json({ error: 'Could not load pledges' });
