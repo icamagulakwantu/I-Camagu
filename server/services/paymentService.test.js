@@ -3,13 +3,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const mockPrisma = {
   poolPayment: {
     findUnique: vi.fn(),
+    findMany: vi.fn(),
     update: vi.fn(),
   },
 };
 vi.mock('../config/db.js', () => ({ default: mockPrisma }));
 vi.mock('./notificationDbService.js', () => ({ createNotification: vi.fn() }));
 
-const { isOnlinePaymentConfigured, isOnlinePaymentEligible, initiatePoolPayment, markRefundProcessed } = await import('./paymentService.js');
+const { isOnlinePaymentConfigured, isOnlinePaymentEligible, initiatePoolPayment, markRefundProcessed, listPendingSupplierRefunds } = await import('./paymentService.js');
 
 const ORIGINAL_ENV = { ...process.env };
 
@@ -59,6 +60,22 @@ describe('markRefundProcessed', () => {
     });
     await expect(markRefundProcessed('pay_1', {})).rejects.toThrow(/supplier's to process/);
     expect(mockPrisma.poolPayment.update).not.toHaveBeenCalled();
+  });
+
+  it('refuses Stokvel-funded payments instead of treating them as PSP refunds', async () => {
+    mockPrisma.poolPayment.findUnique.mockResolvedValue({
+      id: 'pay_stokvel', provider: 'STOKVEL_FUNDS', status: 'PENDING_SETTLEMENT', refundRequestedAt: new Date(),
+    });
+    await expect(markRefundProcessed('pay_stokvel', {})).rejects.toThrow(/Stokvel-funded pool shares/);
+    expect(mockPrisma.poolPayment.update).not.toHaveBeenCalled();
+  });
+
+  it('excludes Stokvel-funded requests from the PSP refund queue', async () => {
+    mockPrisma.poolPayment.findMany.mockResolvedValue([]);
+    await listPendingSupplierRefunds();
+    expect(mockPrisma.poolPayment.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ provider: { notIn: ['MANUAL_EFT', 'STOKVEL_FUNDS'] } }),
+    }));
   });
 
   it('refuses when no refund was ever requested', async () => {

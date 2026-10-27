@@ -224,7 +224,7 @@ export async function markPayoutForwarded(paymentId, { reference, note }) {
 // a PSP refund request had no valid path to actually being resolved.
 export async function listPendingSupplierRefunds() {
   return prisma.poolPayment.findMany({
-    where: { provider: { not: 'MANUAL_EFT' }, refundRequestedAt: { not: null }, status: { not: 'REFUNDED' } },
+    where: { provider: { notIn: ['MANUAL_EFT', 'STOKVEL_FUNDS'] }, refundRequestedAt: { not: null }, status: { not: 'REFUNDED' } },
     include: {
       pool: { include: { partner: true } },
       user: { select: { firstName: true, lastName: true, email: true } },
@@ -238,6 +238,11 @@ export async function markRefundProcessed(paymentId, { feeZAR, note }) {
   if (!payment) {
     const err = new Error('Payment not found');
     err.status = 404;
+    throw err;
+  }
+  if (payment.provider === 'STOKVEL_FUNDS') {
+    const err = new Error('Stokvel-funded pool shares must be handled by the Stokvel officials, not the PSP refund workflow');
+    err.status = 400;
     throw err;
   }
   if (payment.provider === 'MANUAL_EFT') {
