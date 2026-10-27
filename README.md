@@ -915,6 +915,14 @@ The platform should therefore:
 
 ---
 
+## 37. Development and Deployment Workflow
+
+GitHub is the source of truth for code, branches, pull requests and CI. Render is the only production deployment platform. Do not use StackBlitz, Bolt, or another hosted code workspace as an editing or deployment target for iCamagu. See [the development workflow policy](./docs/DEVELOPMENT_WORKFLOW.md) and [launch-readiness gates](./docs/LAUNCH_READINESS.md).
+
+Merging to `main` triggers Render auto-deploys. Verify the deployed commit and runtime logs after every production merge. Do not disable either existing Render service until the canonical domain, database target, environment settings and callbacks have been confirmed.
+
+---
+
 ## 36. Long-Term Vision
 
 iCamagu is intended to become more than a ceremony planner.
