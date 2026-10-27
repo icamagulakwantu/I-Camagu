@@ -132,7 +132,8 @@ export async function registerWithPassword(req, res) {
 
 // NEW: real password login
 export async function loginWithPassword(req, res) {
-  const { email, password } = req.body;
+  const { password } = req.body;
+  const email = cleanEmail(req.body?.email).toLowerCase();
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
   try {
@@ -235,7 +236,7 @@ export async function register(req, res) {
 
 // "Email me a login code". Same reply whether or not the email has an account.
 export async function login(req, res) {
-  const email = cleanEmail(req.body?.email);
+  const email = cleanEmail(req.body?.email).toLowerCase();
   if (!email) return res.status(400).json({ error: 'Email is required' });
   try {
     const user = await prisma.user.findUnique({ where: { email } });
@@ -339,7 +340,7 @@ export async function logout(req, res) {
 }
 
 export async function requestPasswordReset(req, res) {
-  const { email } = req.body;
+  const email = cleanEmail(req.body?.email).toLowerCase();
   if (!email) return res.status(400).json({ error: 'Email is required' });
   const genericReply = { message: 'If an account exists with this email, a reset link has been sent.' };
 
