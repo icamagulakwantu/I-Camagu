@@ -72,6 +72,11 @@
 The release blockers above remain open until evidence is recorded. Do not represent iCamagu as launch-ready based only on the automated checks.
 
 
+## SmartMatch concurrency check — 27 Oct 2026
+
+- [ ] Review and merge the targeted pool row-lock/snapshot-refresh fix only after CI passes. Test concurrent joins against a disposable PostgreSQL database before launch; do not test concurrency against production.
+
+
 ## Render runtime verification — 27 Oct 2026
 
 Live Render API inspection found two public web services attached to the same GitHub repository and `main` branch. Both are currently live on commit `514e5d1cf38cdc442448dea458596da6ea1eb44d` and auto-deploy on commits:
