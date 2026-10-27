@@ -721,7 +721,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                 <p className="text-xs font-black uppercase text-ink-muted mb-2">At a glance · tap to open</p>
                 <button type="button" onClick={() => setDetailTab('members')} className="flex w-full items-center justify-between gap-3 rounded-lg px-2 py-2 text-left text-sm transition-colors hover:bg-sage-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500">
                   <span className="text-ink-muted">Members</span>
-                  <span className="flex items-center gap-2 font-bold text-ink">{stokvel.members.length}<Icon name="chevron-right" size={16} /></span>
+                  <span className="flex items-center gap-2 font-bold text-ink">{stokvel.members.length}<Icon name="arrowRight" size={16} /></span>
                 </button>
                 {nextRotationMember && (
                   <div className="flex justify-between text-sm py-1 border-t border-terracotta/10">
@@ -732,7 +732,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                 {myPending.length > 0 && (
                   <button type="button" onClick={() => setDetailTab('contributions')} className="flex w-full items-center justify-between gap-3 border-t border-terracotta/10 px-2 py-2 text-left text-sm rounded-lg transition-colors hover:bg-terracotta/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500">
                     <span className="text-ink-muted">Awaiting your confirmation</span>
-                    <span className="flex items-center gap-2 font-bold text-terracotta">{myPending.length}<Icon name="chevron-right" size={16} /></span>
+                    <span className="flex items-center gap-2 font-bold text-terracotta">{myPending.length}<Icon name="arrowRight" size={16} /></span>
                   </button>
                 )}
                 {payouts.filter((p) => p.status === 'PENDING_APPROVAL').length > 0 && (
