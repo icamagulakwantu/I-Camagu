@@ -16,6 +16,7 @@ function Store({ onGoToBasket, basketCount }) {
   const [allSkus, setAllSkus] = useState([])
   const [activeDept, setActiveDept] = useState(DEPARTMENTS[0].id)
   const [activeAisle, setActiveAisle] = useState('all')
+  const [departmentsOpen, setDepartmentsOpen] = useState(true)
   const [loading, setLoading] = useState(true)
   const [addingId, setAddingId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -39,6 +40,7 @@ function Store({ onGoToBasket, basketCount }) {
   const pickDept = (id) => {
     setActiveDept(id)
     setActiveAisle('all')
+    setDepartmentsOpen(false)
   }
 
   const activeDepartment = DEPARTMENTS.find((d) => d.id === activeDept)
@@ -134,13 +136,33 @@ function Store({ onGoToBasket, basketCount }) {
 
       {!isSearching && (
         <>
-          <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-1">
-            {DEPARTMENTS.map((d) => (
-              <DeptTile key={d.id} label={d.short} xhosa={d.xhosa} active={activeDept === d.id} onClick={() => pickDept(d.id)} />
-            ))}
+          <div className="px-4 mt-4">
+            <button
+              type="button"
+              aria-expanded={departmentsOpen}
+              onClick={() => setDepartmentsOpen((open) => !open)}
+              className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white border border-cream-dark px-4 py-3 text-left shadow-soft"
+            >
+              <span>
+                <span className="block text-[10px] uppercase tracking-[0.14em] font-bold text-ink-muted">Browse departments</span>
+                <span className="block text-sm font-bold text-ink mt-0.5">{activeDepartment?.name || 'Choose a department'}</span>
+              </span>
+              <span className="flex items-center gap-2 text-xs font-bold text-terracotta">
+                {departmentsOpen ? 'Hide' : 'Change'}
+                <Icon name={departmentsOpen ? 'chevron-up' : 'chevron-down'} size={16} color="#c45c26" />
+              </span>
+            </button>
           </div>
 
-          {activeDepartment && (
+          {departmentsOpen && (
+            <div className="grid grid-cols-2 gap-2 px-4 mt-3">
+              {DEPARTMENTS.map((d) => (
+                <DeptTile key={d.id} label={d.short} xhosa={d.xhosa} active={activeDept === d.id} onClick={() => pickDept(d.id)} />
+              ))}
+            </div>
+          )}
+
+          {!departmentsOpen && activeDepartment && (
             <div className="flex gap-2 px-4 mt-3 overflow-x-auto pb-1">
               <button
                 onClick={() => setActiveAisle('all')}
@@ -267,12 +289,12 @@ function DeptTile({ label, xhosa, active, onClick }) {
     <button
       onClick={onClick}
       aria-pressed={active}
-      className={`flex-shrink-0 w-24 min-h-16 flex flex-col items-start justify-center rounded-2xl px-3 py-2 text-left transition-colors active:scale-[0.97] ${
+      className={`w-full min-h-16 flex flex-col items-start justify-center rounded-2xl px-3 py-3 text-left transition-colors active:scale-[0.97] ${
         active ? 'bg-terracotta' : 'bg-white border border-cream-dark'
       }`}
     >
       <span className={`text-[13px] font-bold leading-tight ${active ? 'text-white' : 'text-ink'}`}>{label}</span>
-      <span className={`text-[10px] ${active ? 'text-white/70' : 'text-ink-muted'}`}>{xhosa}</span>
+      <span className={`text-[10px] mt-1 ${active ? 'text-white/70' : 'text-ink-muted'}`}>{xhosa}</span>
     </button>
   )
 }
