@@ -116,3 +116,16 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [x] Removed wording that could imply a guaranteed or research-backed 8–10% SmartMatch saving. The card now states that savings remain unconfirmed until the supplier provides a written quote for the specific combined order.
 - [x] Added a basket-change event so the navigation badge refreshes after the SmartMatch “Buy on my own” action, with listener cleanup and a focused unit test.
 - [ ] Run the relevant CI tests/build and verify the deployed Render commit before treating these changes as production-verified.
+
+
+## Live Render verification — 27 October 2026
+
+- [x] Confirmed both Render web services in workspace "My Workspace" point to `icamagulakwantu/I-Camagu`, branch `main`, and are not suspended.
+- [x] Both services successfully deployed commit `fb95d2b3dae9af98475ef9edba19d283407cff16` after the `APP_URL` update.
+- [x] Set `APP_URL=https://i-camagu.co.za` on both services using a merge-only environment update; the deployment logs no longer report `APP_URL` as missing.
+- [x] Both latest deployments log "Start-up database check passed."
+- [ ] Direct HTTP response from `/api/health` and `/api/health/env` remains unverified because the available external fetch tool cannot access these endpoints. Render service-live state and startup log are not substitutes for an HTTP response.
+- [ ] Configure Render health-check path `/api/health` after direct readiness behaviour is verified. Current Render service configuration exposes an empty health-check path; available Render connector actions do not support editing this field.
+- [ ] Verify latest main-head CI. The GitHub combined-status endpoint returned an empty status list, and the available workflow-run wrapper only returns pull-request-triggered runs; neither establishes a passing or failing push workflow.
+- [ ] Resolve remaining production configuration: `EMAIL_FROM` is unset on both services, so Resend's onboarding sender only delivers to the Resend account owner; `ID_ENCRYPTION_KEY` and `SENTRY_DSN` are also reported missing. Do not invent provider credentials or rotate encryption keys without verifying whether existing encrypted data depends on them.
+- [ ] Resolve canonical-service duplication only after mapping the custom domains, traffic, env parity and integrations. Both services remain enabled intentionally.
