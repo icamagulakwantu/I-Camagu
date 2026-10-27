@@ -111,3 +111,9 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 
 - [ ] Merge and deploy the targeted provider exclusion/processor guard only after CI passes. Regression tests assert Stokvel-funded payments cannot enter the PSP payout queue and cannot be marked forwarded.
 - [ ] Before any future PSP settlement feature, perform a separate review of payment-provider routing, custody, supplier beneficiary, reconciliation, refund and payout semantics. Current 2026 no-custody policy remains in force.
+
+
+## SmartMatch savings copy — 27 Oct 2026
+
+- [ ] Review the copy change that removes the generic 8–10% “research-backed target” and requires a written quote before savings are presented as confirmed.
+- [ ] Before launch, verify that all discount amounts and tier thresholds shown to users are quote-backed, or clearly marked indicative and unconfirmed.
