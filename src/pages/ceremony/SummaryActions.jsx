@@ -9,7 +9,7 @@ import Bi from './Bi.jsx'
 import { BUTTONS } from './wizardText.js'
 import { inputClass, pressable } from './styles.js'
 
-const ACTION_BUTTON = 'flex flex-col items-center justify-center gap-1 bg-white border-2 border-terracotta/15 rounded-soft py-3 px-1 min-h-[76px]'
+const ACTION_BUTTON = 'group flex min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border border-terracotta/15 bg-white px-2 py-4 text-center shadow-sm transition-all hover:border-sage-300 hover:bg-sage-50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 min-h-[88px] active:scale-[0.98]'
 
 // Everything a host can do with a finished plan: save it as a template, open
 // the timeline, book the bar, share it, or delete it.
@@ -69,16 +69,16 @@ export default function SummaryActions({ plan, accessToken, onViewTimeline, onBo
       <div className={cn('grid gap-2', plan.ceremonyId ? 'grid-cols-3' : 'grid-cols-2')}>
         <button type="button" onClick={openTemplate} className={cn(ACTION_BUTTON, pressable)}>
           <Icon name="template" color="#c45c26" />
-          <span className="text-[11px] text-ink-muted text-center"><Bi {...BUTTONS.template} /></span>
+          <span className="text-xs font-semibold leading-tight text-ink"><Bi {...BUTTONS.template} /></span>
         </button>
         <button type="button" onClick={() => onViewTimeline?.(plan.ceremonyType)} className={cn(ACTION_BUTTON, pressable)}>
           <Icon name="clock" color="#4a7a4a" />
-          <span className="text-[11px] text-ink-muted text-center"><Bi {...BUTTONS.timeline} /></span>
+          <span className="text-xs font-semibold leading-tight text-ink"><Bi {...BUTTONS.timeline} /></span>
         </button>
         {plan.ceremonyId && (
           <button type="button" onClick={() => onBookEkoyini?.(plan.ceremonyId, title)} className={cn(ACTION_BUTTON, pressable)}>
             <Icon name="cocktail" color="#2b2620" />
-            <span className="text-[11px] text-ink-muted text-center"><Bi {...BUTTONS.bar} /></span>
+            <span className="text-xs font-semibold leading-tight text-ink"><Bi {...BUTTONS.bar} /></span>
           </button>
         )}
       </div>
