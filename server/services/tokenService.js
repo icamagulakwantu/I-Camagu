@@ -25,10 +25,15 @@ export async function generateTokenPair(userId, oldRefreshToken = null) {
   await prisma.$transaction(async (tx) => {
     if (oldRefreshToken) {
       const oldHash = crypto.createHash('sha256').update(oldRefreshToken).digest('hex');
-      await tx.refreshToken.updateMany({
-        where: { tokenHash: oldHash },
+      const revoked = await tx.refreshToken.updateMany({
+        where: { tokenHash: oldHash, revokedAt: null },
         data: { revokedAt: new Date() },
       });
+      if (revoked.count !== 1) {
+        // A concurrent refresh already rotated this token. Do not create a
+        // second child token and do not treat a tab race as token theft.
+        throw new Error('REFRESH_TOKEN_ALREADY_ROTATED');
+      }
     }
 
     await tx.refreshToken.create({
@@ -45,13 +50,20 @@ export async function rotateToken(presentedRefreshToken) {
 
   const stored = await prisma.refreshToken.findUnique({ where: { tokenHash } });
 
-  if (!stored || stored.revokedAt) {
-    if (stored) {
-      await prisma.refreshToken.updateMany({
-        where: { userId: stored.userId },
-        data: { revokedAt: new Date() },
-      });
-    }
+  if (!stored) throw new Error('COMPROMISE_DETECTED');
+
+  if (stored.revokedAt) {
+    // Two tabs can submit the same cookie at almost the same time. The first
+    // request rotates it; the second then sees the revoked row. Treat only a
+    // very recent rotation as a benign race, returning a retryable response
+    // rather than revoking every session. Older revoked-token reuse remains
+    // a compromise signal.
+    const recentlyRotated = Date.now() - new Date(stored.revokedAt).getTime() <= 15_000;
+    if (recentlyRotated) throw new Error('REFRESH_TOKEN_ALREADY_ROTATED');
+    await prisma.refreshToken.updateMany({
+      where: { userId: stored.userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
     throw new Error('COMPROMISE_DETECTED');
   }
 
