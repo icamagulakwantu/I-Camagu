@@ -75,3 +75,26 @@ The release blockers above remain open until evidence is recorded. Do not repres
 ## SmartMatch concurrency check — 27 Oct 2026
 
 - [ ] Review and merge the targeted pool row-lock/snapshot-refresh fix only after CI passes. Test concurrent joins against a disposable PostgreSQL database before launch; do not test concurrency against production.
+
+
+## Render runtime verification — 27 Oct 2026
+
+Live Render API inspection found two public web services attached to the same GitHub repository and `main` branch. Both are currently live on commit `514e5d1cf38cdc442448dea458596da6ea1eb44d` and auto-deploy on commits:
+
+- `I-Camagu-1` — primary domain reported in Render logs as `https://i-camagu.co.za`; build command `yarn install --production=false && yarn build`; start command `yarn start`.
+- `I-Camagu` — `https://i-camagu.onrender.com`; build command `yarn install; yarn build`; start command `yarn start`.
+
+Both currently have no Render health-check path configured, despite the app exposing `/api/health`. Do not disable either service until DNS/custom-domain attachment, environment-variable parity, database target, webhook callbacks, email delivery and real traffic are verified. The service API did not expose the environment-variable values for comparison.
+
+Recent startup logs show both services can connect to PostgreSQL, but also show missing runtime configuration:
+- Both services: `EMAIL_FROM` missing (email falls back to Resend's onboarding sender, which only reaches the account owner).
+- Both services: `SENTRY_DSN` missing (central error monitoring unavailable; use Render logs only).
+- `I-Camagu` additionally reports `ID_ENCRYPTION_KEY` missing (identity verification / ID-number submission unavailable).
+- `I-Camagu` additionally reports `PAYFAST_MERCHANT_ID` and `PAYFAST_MERCHANT_KEY` missing. Online checkout is intentionally disabled under the current no-custody policy, so do not add these credentials merely to silence the warning.
+
+- [ ] Confirm the intended sender address with a verified domain and configure `EMAIL_FROM` on the canonical service.
+- [ ] Configure `SENTRY_DSN` if Sentry monitoring is part of the launch plan.
+- [ ] Decide whether ID-number verification is a launch requirement; if so, generate/store `ID_ENCRYPTION_KEY` securely in Render and test on staging without exposing the key.
+- [ ] Set the Render health-check path to `/api/health` on the canonical service after confirming the endpoint returns healthy status.
+- [ ] Compare the two services' environment keys/values securely in the Render dashboard and verify their database/callback parity. Never paste secret values into GitHub or chat.
+- [ ] After traffic, DNS, integrations and configuration are confirmed, consolidate to one canonical service; do not delete/disable a service as part of automated discovery.
