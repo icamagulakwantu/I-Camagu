@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { CeremonyType } from '@prisma/client';
 import { CEREMONY_COST_PROFILES, getDefaultItemsForType } from './ceremonyCostProfiles.js';
 import { DRAFT_CEREMONY_TYPE_NAMES } from '../data/ceremonyDrafts.js';
+import { createShareToken, isShareTokenValid } from '../utils/shareToken.js';
 
 // UMSEBENZI_WENKOMO and IMIGIDI predate UMGIDI as the real user-facing type
 // (UMGIDI is the correct standalone ceremony; IMIGIDI was a duplicate alias
@@ -443,26 +444,27 @@ export const deletePledge = async (req, res) => {
 
 
 export const generateShareLink = async (req, res) => {
-      const { planId } = req.params;
-        try {
-                const plan = await prisma.preparationPlan.findUnique({ where: { id: planId } });
-                    if (!plan || plan.hostId !== req.user.id) return res.status(403).json({ error: 'Not your plan' });
+  const { planId } = req.params;
+  try {
+    const plan = await prisma.preparationPlan.findUnique({ where: { id: planId } });
+    if (!plan || plan.hostId !== req.user.id) return res.status(403).json({ error: 'Not your plan' });
 
-                        const token = plan.shareToken || crypto.randomBytes(12).toString('hex');
-                            if (!plan.shareToken) {
-                                      await prisma.preparationPlan.update({ where: { id: planId }, data: { shareToken: token } });
-                            }
-                                res.json({ shareUrl: `${req.protocol}://${req.get('host')}/share/${token}` });
-        } catch (error) {
-                console.error('Generate share link error:', error.message);
-                    res.status(500).json({ error: 'Could not generate share link' });
-        }
+    // Always rotate the bearer token when the owner creates a new share link,
+    // revoking any previously copied link. Links expire after 30 days.
+    const token = createShareToken(Date.now(), crypto.randomBytes(16).toString('hex'));
+    await prisma.preparationPlan.update({ where: { id: planId }, data: { shareToken: token } });
+    res.json({ shareUrl: `${req.protocol}://${req.get('host')}/share/${token}` });
+  } catch (error) {
+    console.error('Generate share link error:', error.message);
+    res.status(500).json({ error: 'Could not generate share link' });
+  }
 };
 
 export const getPublicPlan = async (req, res) => {
   const { token } = req.params;
   try {
     if (!token) return res.status(400).json({ error: 'Missing link' });
+    if (!isShareTokenValid(token)) return res.status(404).json({ error: 'This link is invalid or has expired' });
 
     // A share token intentionally exposes a read-only checklist, not the full
     // PreparationPlan, linked pledge records, or unrelated database fields.
