@@ -22,17 +22,31 @@ export function AuthProvider({ children }) {
 
     const promise = fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' })
       .then(async (res) => {
-        if (!res.ok) throw new Error('Session expired')
+        if (!res.ok) {
+          const err = new Error(res.status === 401 ? 'Session expired' : 'Session refresh temporarily unavailable')
+          err.status = res.status
+          throw err
+        }
         const data = await res.json()
-        if (!data.accessToken) throw new Error('Invalid session data')
+        if (!data.accessToken) {
+          const err = new Error('Invalid session data')
+          err.status = 401
+          throw err
+        }
         setAccessToken(data.accessToken)
         setUser(data.user)
+        setDebugInfo('')
         return true
       })
       .catch((err) => {
         setDebugInfo(err.message)
-        setAccessToken(null)
-        setUser(null)
+        // Only a definitive authentication failure should clear an existing
+        // session. Network errors and 5xx responses are transient; keep the
+        // current access token/user so a short outage doesn't log the member out.
+        if (err.status === 401) {
+          setAccessToken(null)
+          setUser(null)
+        }
         return false
       })
       .finally(() => {
