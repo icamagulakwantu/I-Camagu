@@ -22,8 +22,8 @@ const BRAND_IMAGES = {
   // and Count Pushkin were a plain text/wordmark logo card with no bottle
   // in it at all — pulled from here and the files deleted, rather than left
   // showing a photo that isn't an actual product shot.
-  'Hennessy VS': 'hennessy-vs',
-  'Hennessy VSOP': 'hennessy-vsop',
+  // Hennessy VS / VSOP / XO are managed by backfill-hennessy-product-images.js
+  // with verified official packshots; do not let old cropped local files overwrite them.
   // These nine had a real bottle photo too, just buried inside the same
   // oversized black canvas frame, off-angle, against a colored lifestyle
   // background rather than plain white (and a couple originally caught a
@@ -33,8 +33,8 @@ const BRAND_IMAGES = {
   'Glenfiddich 12 Year': 'glenfiddich-12',
   'Jose Cuervo Especial Silver': 'jose-cuervo-especial-silver',
   'Jose Cuervo Especial Reposado': 'jose-cuervo-especial-reposado',
-  'Remy Martin VSOP': 'remy-martin-vsop',
-  'Remy Martin 1738 Accord Royal': 'remy-martin-1738',
+  // Rémy Martin VSOP / 1738 are managed by backfill-hennessy-product-images.js
+  // with variant-matched packshots; do not restore the old framed/cropped files.
   'Russian Bear Standard': 'russian-bear-standard',
   'Russian Bear Flavours': 'russian-bear-flavours',
   'Strettons London Dry': 'strettons-london-dry',
