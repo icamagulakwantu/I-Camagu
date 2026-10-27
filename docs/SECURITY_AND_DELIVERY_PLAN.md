@@ -116,3 +116,8 @@ Do not describe iCamagu as production-ready until:
 
 - [x] Improve persistent bottom-navigation readability: raise labels from 10px to 12px, increase inactive-label contrast, and use the agreed “More” label for the final tab. This is a targeted UI improvement, not a full WCAG audit.
 - [ ] Continue route-by-route contrast, focus-state, text-size and screen-reader checks across core ceremony, SmartMatch and Stokvel flows.
+
+
+## Navigation active-state follow-up — 27 Oct 2026
+
+- [x] Keep ceremony detail, timeline, budget, templates, family contributions, Ukugida, Ukusoka and hierarchy screens under the Ceremonies active tab; keep order history under SmartMatch. This fixes misleading active-tab highlighting without changing route destinations.
