@@ -194,7 +194,7 @@ function Store({ onGoToBasket, basketCount }) {
                       <img src={sku.imageUrl} alt={sku.name} className="w-16 h-16 object-contain bg-white flex-shrink-0" loading="lazy" decoding="async" />
                     ) : (
                       <span className="w-16 h-16 bg-terracotta/10 flex items-center justify-center flex-shrink-0">
-                        <Icon name={dept.id === 'alcohol' ? 'cocktail' : dept.id === 'softdrinks' ? 'cupSoda' : 'package'} size={22} color="#c45c26" />
+                        <Icon name={dept.id === 'alcohol' ? 'cocktail' : 'package'} size={22} color="#c45c26" />
                       </span>
                     )}
                     <div className="min-w-0 py-1">
