@@ -9,6 +9,7 @@
 // Order matters and is kept exactly as it was in server/index.js.
 import { runTasks } from './maintenanceRunner.js';
 import { backfillBrandImages } from './backfill-brand-images.js';
+import { backfillHennessyProductImages } from './backfill-hennessy-product-images.js';
 import { backfillSpiritPricing } from './backfill-spirit-pricing.js';
 import { backfillCeremonySkus } from './backfill-ceremony-skus.js';
 import { backfillCatalogueExpansion } from './backfill-catalogue-expansion.js';
@@ -59,6 +60,7 @@ export const MAINTENANCE_TASKS = [
   ["Sedgwick's backfill", backfillSedgwicks],
   ['Extracted brand photo backfill', backfillExtractedBrandPhotos],
   ['Format-specific photo backfill', backfillFormatSpecificPhotos],
+  ['Official Hennessy product images', backfillHennessyProductImages],
   ['Broken brand photo clear', clearBrokenBrandPhotos],
   ['Launch pricing backfill', backfillLaunchPricing],
   // Last, deliberately: the verified retail price backfill above rewrites
