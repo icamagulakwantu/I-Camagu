@@ -144,3 +144,32 @@ jobs:
           done
           echo "Production health check did not return JSON status=ok."
           exit 1
+
+      - name: Compare runtime configuration presence on both Render services
+        env:
+          CANONICAL_ENV_URL: https://i-camagu.co.za/api/health/env
+          SECONDARY_ENV_URL: https://i-camagu.onrender.com/api/health/env
+        run: |
+          canonical="$(curl --fail --silent --show-error --max-time 15 "$CANONICAL_ENV_URL")"
+          secondary="$(curl --fail --silent --show-error --max-time 15 "$SECONDARY_ENV_URL")"
+          node - "$canonical" "$secondary" <<'NODE'
+          const [canonical, secondary] = process.argv.slice(2).map((value) => JSON.parse(value));
+          const keys = [
+            'DATABASE_URL', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET', 'APP_URL',
+            'RESEND_API_KEY', 'EMAIL_FROM', 'SENTRY_DSN', 'ID_ENCRYPTION_KEY',
+            'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_STORAGE_BUCKET',
+            'PAYFAST_MERCHANT_ID', 'PAYFAST_MERCHANT_KEY',
+          ];
+          console.log('Render runtime configuration presence (booleans only; no secret values):');
+          for (const key of keys) {
+            const a = canonical[key] === true;
+            const b = secondary[key] === true;
+            console.log(`${key}: canonical=${a} secondary=${b}${a !== b ? ' [DIFF]' : ''}`);
+          }
+          const required = ['DATABASE_URL', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET'];
+          const missing = required.filter((key) => canonical[key] !== true || secondary[key] !== true);
+          if (missing.length) {
+            console.error(`Required runtime configuration missing on one or both services: ${missing.join(', ')}`);
+            process.exit(1);
+          }
+          NODE
