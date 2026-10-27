@@ -16,7 +16,7 @@ describe('lockOpenPoolForJoin', () => {
     expect(tx.$queryRaw).toHaveBeenCalledTimes(1);
     expect(tx.bulkPool.findUnique).toHaveBeenCalledWith({
       where: { id: 'pool-1' },
-      select: { status: true },
+      select: { status: true, deadline: true, capCases: true, moqTarget: true },
     });
   });
 
@@ -27,6 +27,27 @@ describe('lockOpenPoolForJoin', () => {
     };
 
     await expect(lockOpenPoolForJoin(tx, 'pool-1')).rejects.toThrow('This pool is no longer open');
+  });
+
+  it('rejects joins after the pool deadline', async () => {
+    const tx = {
+      $queryRaw: vi.fn().mockResolvedValue([{ id: 'pool-1' }]),
+      bulkPool: { findUnique: vi.fn().mockResolvedValue({ status: 'OPEN', deadline: new Date(Date.now() - 1000), capCases: 100, moqTarget: 25 }) },
+      basket: { findMany: vi.fn() },
+    };
+
+    await expect(lockOpenPoolForJoin(tx, 'pool-1', 1)).rejects.toThrow('joining deadline');
+    expect(tx.basket.findMany).not.toHaveBeenCalled();
+  });
+
+  it('rejects joins that would exceed the case cap', async () => {
+    const tx = {
+      $queryRaw: vi.fn().mockResolvedValue([{ id: 'pool-1' }]),
+      bulkPool: { findUnique: vi.fn().mockResolvedValue({ status: 'OPEN', deadline: null, capCases: 10, moqTarget: 3 }) },
+      basket: { findMany: vi.fn().mockResolvedValue([{ items: [{ quantity: 9 }] }]) },
+    };
+
+    await expect(lockOpenPoolForJoin(tx, 'pool-1', 2)).rejects.toThrow('case cap of 10');
   });
 
   it('rejects a missing pool row', async () => {
