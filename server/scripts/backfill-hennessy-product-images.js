@@ -61,6 +61,7 @@ async function ensureAmstelFormats() {
     where: { name: 'Amstel Lager', bottleFormat: 'Can (500ml)' },
     data: { imageUrl: '/images/brands/amstel-lager-can.png' },
   });
+  console.log('Amstel 750ml quart and 500ml can formats checked; separate packshots assigned.');
 }
 
 async function removeBlackLabelDumpies() {
@@ -78,7 +79,7 @@ async function removeBlackLabelDumpies() {
     const result = await prisma.sku.deleteMany({ where: { id: row.id } });
     removed += result.count;
   }
-  if (removed) console.log(`Removed ${removed} nonexistent Black Label dumpy SKU(s).`);
+  console.log(`Black Label dumpy cleanup checked: ${rows.length} invalid format row(s) found; ${removed} unlinked row(s) removed.`);
 }
 
 export async function backfillHennessyProductImages() {
