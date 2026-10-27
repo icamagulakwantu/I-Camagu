@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } fro
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import { CommunityProvider, useCommunity } from './context/CommunityContext.jsx'
 import PoolOfferCard from './components/PoolOfferCard.jsx'
+import { BASKET_CHANGED_EVENT } from './lib/basketEvents.js'
 import { ToastProvider, useToast } from './components/ui/Toast.jsx'
 import { Skeleton } from './components/ui/Skeleton.jsx'
 import OfflineBanner from './components/OfflineBanner.jsx'
@@ -368,13 +369,25 @@ function MainApp() {
     setScreenState(screenForPath(path));
   }, [location.pathname])
 
-  // Basket count
+  // Basket count stays in sync when a component outside the Basket screen adds an item.
   useEffect(() => {
-    if (!accessToken) return
-    fetch('/api/basket', { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => { if (data?.items) setBasketCount(data.items.length) })
-      .catch(() => {})
+    if (!accessToken) {
+      setBasketCount(0)
+      return undefined
+    }
+    let cancelled = false
+    const refreshBasketCount = () => {
+      fetch('/api/basket', { headers: { Authorization: `Bearer ${accessToken}` } })
+        .then((r) => r.ok ? r.json() : null)
+        .then((data) => { if (!cancelled && data?.items) setBasketCount(data.items.length) })
+        .catch(() => {})
+    }
+    refreshBasketCount()
+    window.addEventListener(BASKET_CHANGED_EVENT, refreshBasketCount)
+    return () => {
+      cancelled = true
+      window.removeEventListener(BASKET_CHANGED_EVENT, refreshBasketCount)
+    }
   }, [accessToken])
 
   const goHome = () => setScreen('home')
