@@ -62,10 +62,18 @@ export default function StokvelsWithInvites(props) {
       <ProfileCompletionCard />
       <NearbyStokvels />
       {(location.label || pools.length > 0) && (
-        <div className="mx-4 mt-4 rounded-2xl border border-cream-dark bg-white p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-ink-muted">SmartMatch community</p>
-          <p className="mt-1 text-sm text-ink">{location.label ? 'Matching near ' + location.label : 'Your current pool pledges'}{pools.length > 0 ? ' · ' + pools.length + ' active pool pledge' + (pools.length === 1 ? '' : 's') : ''}</p>
-        </div>
+        <button
+          type="button"
+          onClick={() => props.onNavigate?.('store')}
+          className="mx-4 mt-4 block w-[calc(100%-2rem)] rounded-2xl border border-cream-dark bg-white p-4 text-left shadow-sm transition hover:border-sage-400 hover:bg-sage-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500"
+          aria-label="Open Store and SmartMatch pools"
+        >
+          <span className="flex items-center justify-between gap-3">
+            <span className="text-xs font-bold uppercase tracking-wide text-ink-muted">SmartMatch community</span>
+            <span className="text-sm font-bold text-sage-700">Open Store →</span>
+          </span>
+          <span className="mt-1 block text-sm text-ink">{location.label ? 'Matching near ' + location.label : 'Your current pool pledges'}{pools.length > 0 ? ' · ' + pools.length + ' active pool pledge' + (pools.length === 1 ? '' : 's') : ''}</span>
+        </button>
       )}
       <Stokvels key={refreshKey} {...props} />
       <StokvelPoolFundingRequests />
