@@ -46,7 +46,7 @@ function Store({ onGoToBasket, basketCount }) {
   const skus = useMemo(() => {
     if (isSearching) {
       const q = searchQuery.trim().toLowerCase()
-      return allSkus.filter((s) => s.name.toLowerCase().includes(q))
+      return allSkus.filter((s) => [s.name, s.category, s.bottleFormat, s.bulkUnit, s.bulkUnitPlural].some((value) => String(value || '').toLowerCase().includes(q)))
     }
     return allSkus.filter((s) => {
       if (departmentOf(s).id !== activeDept) return false
@@ -179,7 +179,7 @@ function Store({ onGoToBasket, basketCount }) {
             <Skeleton className="h-20 w-full" />
           </div>
         ) : skus.length === 0 ? (
-          <EmptyState emoji="📦" title="No items found" description="Try selecting a different department." />
+          <EmptyState emoji="📦" title="No items found" description={isSearching ? "Try another product name, size or category, or clear your search." : "Try another department or aisle."} />
         ) : (
           <div className="space-y-3">
             {skus.map((sku) => {
