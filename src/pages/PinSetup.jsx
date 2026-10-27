@@ -93,20 +93,20 @@ export default function PinSetup({ onBack }) {
           {hasPinSet && (
             <input
               type="password" inputMode="numeric" autoComplete="current-password"
-              placeholder="Current PIN" value={oldPin}
+              placeholder="Current PIN" aria-label="Current security PIN" value={oldPin}
               onChange={(e) => setOldPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
               className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest"
               maxLength={6} required
             />
           )}
           <input
-            type="password" inputMode="numeric" autoComplete="new-password" placeholder="New PIN (4-6 digits)" value={pin}
+            type="password" inputMode="numeric" autoComplete="new-password" placeholder="New PIN (4-6 digits)" aria-label="New security PIN" value={pin}
             onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
             className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest"
             maxLength={6}
           />
           <input
-            type="password" inputMode="numeric" placeholder="Confirm PIN" value={confirmPin}
+            type="password" inputMode="numeric" placeholder="Confirm PIN" aria-label="Confirm new security PIN" value={confirmPin}
             onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
             className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest"
             maxLength={6}
@@ -116,7 +116,7 @@ export default function PinSetup({ onBack }) {
               {confirmPin === pin ? <><Icon name="check" size={11} color="#4a7a4a" /> PINs match</> : 'PINs do not match yet'}
             </p>
           )}
-          {error && <p className="text-terracotta text-sm">{error}</p>}
+          {error && <p role="alert" aria-live="assertive" className="text-terracotta text-sm">{error}</p>}
           <button
             type="submit" disabled={saving}
             className={`w-full bg-sage-500 text-white font-bold py-3 rounded-pill ${pressable}`}
