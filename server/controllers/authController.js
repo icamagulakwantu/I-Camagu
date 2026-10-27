@@ -93,6 +93,13 @@ export async function registerWithPassword(req, res) {
   }
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
 
+  // Resend's shared onboarding sender can only deliver to the Resend account
+  // owner. Fail closed instead of creating an account whose verification code
+  // the real member cannot receive. Google sign-in remains available.
+  if (String(FROM_ADDRESS).toLowerCase().includes('onboarding@resend.dev')) {
+    return res.status(503).json({ error: 'Password registration is temporarily unavailable until iCamagu email delivery is configured. Please use verified Google sign-in for now.' });
+  }
+
   // Admin identities must be established through the verified Google sign-in
   // path, not by claiming a hard-coded administrator email during password
   // registration. This closes the new-account takeover path while the full
