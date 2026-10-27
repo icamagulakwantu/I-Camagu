@@ -51,7 +51,7 @@ function PublicPlanView({ token }) {
       <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
         <p className="text-xs uppercase tracking-widest text-white/70">Shared from iCamagu</p>
         <h1 className="font-display font-bold text-2xl mt-1">{plan.title}</h1>
-        <p className="text-white/70 text-sm mt-1">Hosted by {plan.host.firstName} {plan.host.lastName} — {doneCount}/{plan.checklistItems.length} done</p>
+        <p className="text-white/70 text-sm mt-1">{doneCount}/{plan.checklistItems.length} checklist items done</p>
       </div>
 
       <div className="px-4 mt-4 pb-10">
@@ -63,7 +63,7 @@ function PublicPlanView({ token }) {
 
         {pledges.length > 0 && (
           <div className="mb-4">
-            <p className="text-xs font-black uppercase text-ink-muted mb-2">Family pledges</p>
+            <p className="text-xs font-black uppercase text-ink-muted mb-2">Pledge progress (names and amounts are private)</p>
             <div className="space-y-1.5">
               {pledges.map((p) => {
                 const pledged = p.pledgedAmountZAR != null ? parseFloat(p.pledgedAmountZAR) : null
