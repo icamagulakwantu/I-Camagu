@@ -1,5 +1,6 @@
 import prisma from '../config/db.js';
 import { PUBLIC_SKU_SELECT, toPublicItem, isOrderable } from '../utils/skuVisibility.js';
+import { parsePositiveIntegerQuantity } from '../utils/quantity.js';
 
 // One open (DRAFT) basket per member. Two tabs/requests racing here could
 // otherwise each create one; the partial unique index added in
@@ -46,12 +47,14 @@ export async function getMyBasket(req, res) {
 export async function addItem(req, res) {
       const { skuId, quantity } = req.body; // quantity = number of CASES, never single bottles
 
-        // A non-numeric quantity (e.g. "abc") coerces to NaN, and NaN < 1 is
-        // false — that let a bad quantity slip past a plain `quantity < 1`
-        // check. parseInt first, then check isNaN explicitly.
-        const numericQuantity = parseInt(quantity, 10);
-        if (!skuId || isNaN(numericQuantity) || numericQuantity < 1) {
-                return res.status(400).json({ error: 'skuId and a quantity of at least 1 case are required' });
+        if (!skuId) {
+                return res.status(400).json({ error: 'skuId and a whole-number quantity of at least 1 case are required' });
+        }
+        let numericQuantity;
+        try {
+                numericQuantity = parsePositiveIntegerQuantity(quantity);
+        } catch {
+                return res.status(400).json({ error: 'skuId and a whole-number quantity of at least 1 case are required' });
         }
 
           try {
@@ -85,10 +88,11 @@ export async function addItem(req, res) {
 export async function updateItem(req, res) {
   const { itemId } = req.params;
   const { quantity } = req.body;
-  const numericQuantity = parseInt(quantity, 10);
-
-  if (isNaN(numericQuantity) || numericQuantity < 1) {
-    return res.status(400).json({ error: 'Quantity must be at least 1 case' });
+  let numericQuantity;
+  try {
+    numericQuantity = parsePositiveIntegerQuantity(quantity);
+  } catch {
+    return res.status(400).json({ error: 'Quantity must be a whole number of at least 1 case' });
   }
 
   try {
