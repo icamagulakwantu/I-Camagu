@@ -204,7 +204,23 @@ function MyOrders({ onBack }) {
                     ) : (
                       <>
                         {payment.status === 'CLEARED' ? (
-                          <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Payment confirmed by supplier</p>
+                          payment.provider === 'MANUAL_EFT' ? (
+                            <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Payment confirmed by supplier</p>
+                          ) : payment.provider === 'STOKVEL_FUNDS' ? (
+                            <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Stokvel-funded settlement confirmed; no separate member payment is needed.</p>
+                          ) : (
+                            <p className="text-xs font-bold text-sage-600">
+                              Payment provider confirmed this payment to iCamagu. This does not by itself confirm supplier settlement; do not pay again while iCamagu reconciles it.
+                            </p>
+                          )
+                        ) : payment.provider === 'STOKVEL_FUNDS' ? (
+                          <p className="text-[11px] text-brand-black/60">
+                            {payment.status === 'PENDING_SETTLEMENT'
+                              ? 'Your Stokvel funding request has the required approvals and is awaiting settlement. You do not need to pay separately.'
+                              : payment.status === 'DECLINED'
+                                ? 'Your Stokvel funding request was declined. Contact your officials before making any payment.'
+                                : 'This share is being funded through your Stokvel and is awaiting the required officials’ approval. Do not make a separate EFT payment.'}
+                          </p>
                         ) : !payment.pool?.partner ? (
                           <p className="text-[11px] text-brand-black/50">
                             MOQ reached — we're finalizing a supplier for this pool now. Payment details will show here as soon as one is confirmed.
@@ -273,7 +289,11 @@ function MyOrders({ onBack }) {
                             )}
                           </div>
                         )}
-                        {payment.refundRequestedAt ? (
+                        {payment.provider === 'STOKVEL_FUNDS' ? (
+                          <p className="text-[11px] text-brand-black/60 mt-2">
+                            For a Stokvel-funded order, contact your Chair/Treasurer to discuss cancellation or a refund. This screen does not submit a refund request for Stokvel funds; if you previously submitted one, officials must resolve it through the Stokvel process.
+                          </p>
+                        ) : payment.refundRequestedAt ? (
                           <p className="text-[11px] text-terracotta font-bold mt-2">Refund requested — awaiting supplier</p>
                         ) : (
                           <button
