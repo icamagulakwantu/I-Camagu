@@ -100,3 +100,8 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [ ] Set the Render health-check path to `/api/health` on the canonical service after confirming the endpoint returns healthy status.
 - [ ] Compare the two services' environment keys/values securely in the Render dashboard and verify their database/callback parity. Never paste secret values into GitHub or chat.
 - [ ] After traffic, DNS, integrations and configuration are confirmed, consolidate to one canonical service; do not delete/disable a service as part of automated discovery.
+
+
+## Additional Stokvel money-routing blocker — 27 Oct 2026
+
+- [ ] **Do not launch Stokvel-funded SmartMatch settlement until the PSP payout queue is provider-safe.** Current `listPendingSupplierPayouts()` filters out only `MANUAL_EFT`, so `STOKVEL_FUNDS` can be included if its payment status is `CLEARED`; `markPayoutForwarded()` also rejects only `MANUAL_EFT`. Stokvel ledger-funded payments must not be treated as money held by iCamagu or forwarded through the PSP payout workflow. Add an explicit `STOKVEL_FUNDS` exclusion to the queue and a server-side guard to the processor, with regression tests, before launch.
