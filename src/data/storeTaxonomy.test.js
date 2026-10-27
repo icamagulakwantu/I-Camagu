@@ -6,6 +6,9 @@ describe('SmartMatch store taxonomy', () => {
     expect(departmentOf({ category: 'BEER' }).id).toBe('alcohol');
     expect(departmentOf({ category: 'SOFT_DRINKS' }).id).toBe('softdrinks');
     expect(departmentOf({ category: 'WATER' }).id).toBe('softdrinks');
+    // Known source-data error: energy drink SKUs were tagged CIDER_RTD.
+    expect(departmentOf({ category: 'CIDER_RTD', name: 'Extreme Energy' }).id).toBe('softdrinks');
+    expect(departmentOf({ category: 'CIDER_RTD', name: 'Extreme Energy' }).id).not.toBe('alcohol');
   });
 
   it('keeps meat separate from live livestock', () => {
