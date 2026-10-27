@@ -14,7 +14,7 @@ const targets = [
   'env.example',
 ];
 const extensions = new Set(['.js', '.jsx', '.ts', '.tsx', '.json', '.html', '.yml', '.yaml', '.sh', '.env']);
-const forbidden = /stackblitz(?:\\.(?:io|com|dev))?|bolt\\.new|webcontainer\\.io/i;
+const forbidden = /stackblitz(?:\.(?:io|com|dev))?|bolt\.new|webcontainer\.io/i;
 const violations = [];
 
 function scan(target) {
@@ -35,7 +35,7 @@ function scan(target) {
 function inspectFile(file) {
   if (!extensions.has(path.extname(file)) && !['env.example'].includes(path.basename(file))) return;
   const content = fs.readFileSync(file, 'utf8');
-  content.split(/\\r?\\n/).forEach((line, index) => {
+  content.split(/\r?\n/).forEach((line, index) => {
     if (forbidden.test(line)) {
       violations.push(`${path.relative(root, file)}:${index + 1}: ${line.trim()}`);
     }
@@ -47,7 +47,7 @@ for (const target of targets) scan(target);
 
 if (violations.length) {
   console.error('Forbidden hosted-editor/runtime target found. Use relative /api requests and deploy only through Render:');
-  console.error(violations.join('\\n'));
+  console.error(violations.join('\n'));
   process.exit(1);
 }
 
