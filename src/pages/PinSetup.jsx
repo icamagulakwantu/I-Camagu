@@ -12,6 +12,7 @@ export default function PinSetup({ onBack }) {
   const [loading, setLoading] = useState(true)
   const [hasPinSet, setHasPinSet] = useState(false)
   const [changing, setChanging] = useState(false)
+  const [oldPin, setOldPin] = useState('')
   const [pin, setPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
   const [saving, setSaving] = useState(false)
@@ -43,13 +44,14 @@ export default function PinSetup({ onBack }) {
       const res = await fetch('/api/user/pin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ pin }),
+        body: JSON.stringify({ pin, ...(hasPinSet ? { oldPin } : {}) }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Could not set PIN')
       showToast(hasPinSet ? 'PIN updated' : 'PIN set — you can now confirm contributions and approve payouts', 'success')
       setHasPinSet(true)
       setChanging(false)
+      setOldPin('')
       setPin('')
       setConfirmPin('')
     } catch (err) {
@@ -88,8 +90,17 @@ export default function PinSetup({ onBack }) {
         </div>
       ) : (
         <form onSubmit={submit} className="bg-white border-2 border-terracotta/25 rounded-soft p-5 space-y-3">
+          {hasPinSet && (
+            <input
+              type="password" inputMode="numeric" autoComplete="current-password"
+              placeholder="Current PIN" value={oldPin}
+              onChange={(e) => setOldPin(e.target.value.replace(/\\D/g, '').slice(0, 6))}
+              className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest"
+              maxLength={6} required
+            />
+          )}
           <input
-            type="password" inputMode="numeric" placeholder="New PIN (4-6 digits)" value={pin}
+            type="password" inputMode="numeric" autoComplete="new-password" placeholder="New PIN (4-6 digits)" value={pin}
             onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
             className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest"
             maxLength={6}
