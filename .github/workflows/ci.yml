@@ -73,7 +73,7 @@ jobs:
         run: yarn prisma db push --schema=prisma/schema.prisma
 
       - name: Run real PostgreSQL financial integrity tests
-        run: yarn vitest run --no-file-parallelism server/services/ledgerService.integration.test.js server/controllers/stokvelFinanceController.integration.test.js server/controllers/stokvelPoolFundingController.integration.test.js server/controllers/contributionExpense.integration.test.js
+        run: yarn vitest run --no-file-parallelism server/services/ledgerService.integration.test.js server/controllers/stokvelFinanceController.integration.test.js server/controllers/stokvelPoolFundingController.integration.test.js server/controllers/contributionExpense.integration.test.js server/services/matchmakerService.pool-lock.integration.test.js
 
   migration-baseline-validation:
     runs-on: ubuntu-latest
