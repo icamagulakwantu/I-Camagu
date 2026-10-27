@@ -172,6 +172,19 @@ function Store({ onGoToBasket, basketCount }) {
         </p>
       )}
 
+      {!isSearching && activeDepartment && (
+        <div className="px-5 mt-5">
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <p className="eyebrow text-terracotta/80">Shop by department</p>
+              <h2 className="font-display text-xl font-bold text-ink">{activeDepartment.name}</h2>
+              <p className="text-xs text-ink-muted mt-1">Choose a product, check its pack size, then add it to your basket.</p>
+            </div>
+            <span className="text-xs font-semibold text-ink-muted">{skus.length} item{skus.length === 1 ? '' : 's'}</span>
+          </div>
+        </div>
+      )}
+
       <div className="px-4 mt-4">
         {loading ? (
           <div className="space-y-3">
@@ -182,26 +195,26 @@ function Store({ onGoToBasket, basketCount }) {
         ) : skus.length === 0 ? (
           <EmptyState emoji="📦" title="No items found" description={isSearching ? "Try another product name, size or category, or clear your search." : "Try another department or aisle."} />
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
             {skus.map((sku) => {
               const retail = sku.retailPriceZAR ? parseFloat(sku.retailPriceZAR) : null
               const casePrice = sku.casePriceZAR != null ? parseFloat(sku.casePriceZAR) : null
               const savings = retail && casePrice != null && retail > casePrice ? retail - casePrice : null
               const dept = departmentOf(sku)
               return (
-                <div key={sku.id} className="card-paper flex justify-between items-center overflow-hidden">
-                  <div className="flex items-center gap-3 min-w-0">
+                <div key={sku.id} className="card-paper flex flex-col min-w-0 overflow-hidden p-3">
+                  <div className="flex flex-col min-w-0">
                     {sku.imageUrl && !failedImageIds.has(sku.id) ? (
-                      <img src={sku.imageUrl} alt={`${sku.name}${sku.bottleFormat ? `, ${sku.bottleFormat}` : ''}`} className="w-16 h-16 object-contain bg-white flex-shrink-0" loading="lazy" decoding="async" onError={() => setFailedImageIds((current) => new Set(current).add(sku.id))} />
+                      <img src={sku.imageUrl} alt={`${sku.name}${sku.bottleFormat ? `, ${sku.bottleFormat}` : ''}`} className="w-full h-32 object-contain bg-white rounded-xl mb-3" loading="lazy" decoding="async" onError={() => setFailedImageIds((current) => new Set(current).add(sku.id))} />
                     ) : (
-                      <span className="w-16 h-16 bg-terracotta/10 flex items-center justify-center flex-shrink-0">
-                        <Icon name={dept.id === 'alcohol' ? 'cocktail' : 'package'} size={22} color="#c45c26" />
+                      <span className="w-full h-32 bg-terracotta/10 rounded-xl mb-3 flex items-center justify-center">
+                        <Icon name={dept.id === 'alcohol' ? 'cocktail' : 'package'} size={28} color="#c45c26" />
                       </span>
                     )}
                     <div className="min-w-0 py-1">
                       <p className="eyebrow text-terracotta/70">{dept.short}</p>
-                      <h3 className="font-display font-bold text-sm text-ink truncate">{sku.name}</h3>
-                      <p className="text-xs text-ink-muted">
+                      <h3 className="font-display font-bold text-sm text-ink leading-snug min-h-[2.5rem]">{sku.name}</h3>
+                      <p className="text-[11px] text-ink-muted min-h-8 mt-1">
                         {sku.bottleFormat ? `${sku.bottleFormat} • ` : ''}
                         {sku.unitsPerCase > 1 ? `${sku.unitsPerCase} per ${unitOf(sku)}` : `per ${unitOf(sku)}`}
                       </p>
@@ -221,20 +234,20 @@ function Store({ onGoToBasket, basketCount }) {
                     </div>
                   </div>
                   {casePrice != null ? (
-                    <div className="flex flex-col gap-2 mr-3 flex-shrink-0">
+                    <div className="flex flex-col gap-2 mt-3">
                       <button
                         onClick={() => addToBasket(sku)}
                         disabled={addingId === sku.id}
-                        className="bg-terracotta text-white text-xs font-bold px-4 py-2 rounded-pill active:scale-90 transition-transform disabled:opacity-50"
+                        className="w-full bg-terracotta text-white text-xs font-bold px-3 py-2.5 rounded-pill active:scale-90 transition-transform disabled:opacity-50"
                       >
                         {addingId === sku.id ? <Icon name="check" size={13} color="#fff" strokeWidth={2.5} /> : `Add ${unitOf(sku)}`}
                       </button>
-                      <button type="button" onClick={() => setOfferSku(sku)} className="border border-terracotta text-terracotta text-xs font-bold px-3 py-2 rounded-pill">
+                      <button type="button" onClick={() => setOfferSku(sku)} className="w-full border border-terracotta text-terracotta text-xs font-bold px-3 py-2 rounded-pill">
                         Pool offers
                       </button>
                     </div>
                   ) : (
-                    <span className="text-[10px] text-ink-muted/60 font-bold px-3 mr-3 flex-shrink-0 text-right">
+                    <span className="text-[10px] text-ink-muted/60 font-bold px-3 mt-3 text-center">
                       Not yet<br />orderable
                     </span>
                   )}
