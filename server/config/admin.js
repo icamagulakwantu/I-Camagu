@@ -4,5 +4,5 @@
 export const ADMIN_EMAILS = ['admin@i-camagu.co.za', 'icamagulakwantu@gmail.com'];
 
 export function isAdminEmail(email) {
-  return ADMIN_EMAILS.includes(email);
+  return ADMIN_EMAILS.includes(String(email || '').trim().toLowerCase());
 }
