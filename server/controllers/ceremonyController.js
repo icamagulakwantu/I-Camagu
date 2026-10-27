@@ -481,11 +481,29 @@ export const getPublicPlan = async (req, res) => {
             label: true,
           },
         },
-
+        ceremony: {
+          select: {
+            checklistItems: {
+              select: { id: true, phase: true, isCompleted: true, label: true },
+            },
+          },
+        },
       },
     });
     if (!plan) return res.status(404).json({ error: 'This link is invalid or has expired' });
-    res.json(plan);
+
+    // Older/newly-created plans can store the checklist on the linked Ceremony
+    // instead of PreparationPlan. Shared links should still show the actual
+    // checklist without exposing budget, cost, pledge or host details.
+    const checklistItems = plan.checklistItems?.length
+      ? plan.checklistItems
+      : (plan.ceremony?.checklistItems || []).map((item) => ({
+          id: item.id,
+          phase: item.phase,
+          isChecked: item.isCompleted,
+          label: item.label,
+        }));
+    res.json({ title: plan.title, checklistItems });
   } catch (error) {
     console.error('Get public plan error:', error.message);
     res.status(500).json({ error: 'Could not load shared plan' });
