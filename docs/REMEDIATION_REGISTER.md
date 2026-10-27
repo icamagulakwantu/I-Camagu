@@ -39,6 +39,12 @@ used the older books-only path.
 |---|---|---|---|---|
 | PAY-01 No-custody checkout gate | Fixed in code; deployment not yet verified | Previously, valid PayFast environment credentials made online checkout available for non-TAVERN categories, sending collections to iCamagu's own merchant account despite the 2026 no-custody policy. | `isOnlinePaymentConfigured()` now returns false as a policy gate, and `initiatePoolPayment()` rejects direct API calls before reading/updating payment rows. Regression test covers configured credentials and direct-call rejection. | Deploy only through reviewed CI; verify Render uses the intended commit; inspect any historical/in-flight PSP payments. This does not process or reverse past payments. Never re-enable without a separate reviewed change after legal, banking, provider, settlement and compliance gates. |
 
+## Authentication resilience update (27 Oct 2026)
+
+| ID | Status | Evidence / change | Remaining work |
+|---|---|---|---|
+| AUTH-01 Transient refresh failures | Targeted fix in PR #48 and follow-up PR #50 | Refresh endpoint previously cleared the refresh cookie for every error and returned 401, including database outages. The client also cleared an existing session on any failed refresh. A further failure window existed because the token was rotated before the user lookup completed. | PR #48 keeps the existing client session on network/5xx failures and returns 503 without clearing the cookie for unexpected server errors. PR #50 moves the user lookup before token rotation and adds regression tests. Cross-tab / multi-device simultaneous token rotation remains a separate risk to test; this fix does not eliminate the token-reuse policy's multi-tab edge case. |
+
 ## Confirmed, NOT yet fixed
 
 | ID | Evidence | Proposed fix |
