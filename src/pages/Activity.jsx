@@ -8,20 +8,27 @@ const TYPE_ICON = { CONTRIBUTION: 'coins', PAYOUT: 'send', CEREMONY: 'clipboard'
 const STATUS_COLOR = { PENDING: 'text-ink-muted', CONFIRMED: 'text-sage-600', PENDING_APPROVAL: 'text-terracotta', CLEARED: 'text-sage-600' }
 
 function Activity({ onBack }) {
-      const { accessToken } = useAuth()
-        const [feed, setFeed] = useState([])
-          const [loading, setLoading] = useState(true)
+  const { accessToken } = useAuth()
+  const [feed, setFeed] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-            useEffect(() => {
-                    fetch('/api/activity/my', { headers: { Authorization: `Bearer ${accessToken}` } })
-                          .then(async (res) => {
-                                const data = await res.json()
-                                if (!res.ok) throw new Error()
-                                setFeed(Array.isArray(data) ? data : [])
-                          })
-                          .catch(() => setFeed([]))
-                          .finally(() => setLoading(false))
-            }, [])
+  const loadActivity = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/activity/my', { headers: { Authorization: `Bearer ${accessToken}` } })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || 'Could not load activity')
+      setFeed(Array.isArray(data) ? data : [])
+    } catch (err) {
+      setError(err.message || 'Could not load activity')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { loadActivity() }, [accessToken])
 
               return (
                       <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
@@ -31,6 +38,12 @@ function Activity({ onBack }) {
 
                                               {loading ? (
                                                           <div className="space-y-2"><Skeleton className="h-14 w-full" /><Skeleton className="h-14 w-full" /></div>
+                                              ) : error ? (
+                                                <div role="alert" className="rounded-2xl border border-terracotta/30 bg-white p-4">
+                                                  <p className="text-sm font-bold text-ink">Activity could not be loaded.</p>
+                                                  <p className="text-xs text-ink-muted mt-1">{error}</p>
+                                                  <button type="button" onClick={loadActivity} className="mt-3 min-h-11 rounded-full bg-terracotta px-4 text-sm font-bold text-white">Try again</button>
+                                                </div>
                                               ) : feed.length === 0 ? (
                                                           <EmptyState emoji="📜" title="No activity yet" description="Your contributions, payouts, and plans will show up here." />
                                               ) : (
