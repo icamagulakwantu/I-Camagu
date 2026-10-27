@@ -21,6 +21,8 @@
 import prisma from '../config/db.js';
 
 const NONEXISTENT_FORMATS = [
+  // Founder-confirmed catalogue correction: Carling Black Label is not sold as a South African dumpy. Keep quart and can formats; remove the invented dumpy variant.
+  { name: 'Black Label', bottleFormat: 'Dumpy (330ml)' },
   { name: 'Flying Fish Lemon', bottleFormat: 'Can (500ml)' },
   { name: 'Flying Fish Apple', bottleFormat: 'Can (500ml)' },
   { name: 'Savanna Angry Lemon', bottleFormat: 'Can (500ml)' },
@@ -29,8 +31,18 @@ const NONEXISTENT_FORMATS = [
 export async function removeNonexistentFormats() {
   let removed = 0;
   for (const { name, bottleFormat } of NONEXISTENT_FORMATS) {
-    const { count } = await prisma.sku.deleteMany({ where: { name, bottleFormat } });
-    removed += count;
+    const rows = await prisma.sku.findMany({
+      where: { name, bottleFormat },
+      select: { id: true, _count: { select: { basketItems: true, costItems: true } } },
+    });
+    for (const row of rows) {
+      if (row._count.basketItems > 0 || row._count.costItems > 0) {
+        console.warn(`Nonexistent format kept for history: "${name}" / "${bottleFormat}" has linked records.`);
+        continue;
+      }
+      const result = await prisma.sku.deleteMany({ where: { id: row.id } });
+      removed += result.count;
+    }
   }
   if (removed > 0) console.log(`Nonexistent format removal: ${removed} row(s) deleted.`);
   return removed;
