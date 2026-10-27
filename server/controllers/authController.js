@@ -105,7 +105,14 @@ export async function registerWithPassword(req, res) {
     // Still reveals that an account exists (SEC-02 residual): fixing that needs
     // an email-confirmation step on sign-up. Rate limited by authLimiter.
     const existing = await prisma.user.findUnique({ where: { email: cleanEmail(email).toLowerCase() } });
-    if (existing) return res.status(409).json({ error: 'An account with this email already exists. Go back and sign in instead.' });
+    if (existing) {
+      // Keep registration from revealing whether an email is registered. A
+      // code is sent to the owner of that address; entering it follows the
+      // normal OTP login path and never changes the existing password.
+      const code = await createOtp(existing.id);
+      sendQuietly({ from: FROM_ADDRESS, to: existing.email, subject: 'Your iCamagu login code', html: otpEmail(code) }, 'Registration existing-account code');
+      return res.status(201).json({ needsEmailVerification: true, message: 'If you can use this email, check your inbox for a code to continue.' });
+    }
 
     const passwordHash = await hashPassword(password);
     const user = await prisma.user.create({
