@@ -173,7 +173,7 @@ export async function handlePayFastWebhook(rawBody) {
 // forwarded from what's still sitting there.
 export async function listPendingSupplierPayouts() {
   const payments = await prisma.poolPayment.findMany({
-    where: { provider: { not: 'MANUAL_EFT' }, status: 'CLEARED', payoutForwardedAt: null },
+    where: { provider: { notIn: ['MANUAL_EFT', 'STOKVEL_FUNDS'] }, status: 'CLEARED', payoutForwardedAt: null },
     include: {
       pool: { include: { partner: true } },
       user: { select: { firstName: true, lastName: true, email: true } },
@@ -192,6 +192,11 @@ export async function markPayoutForwarded(paymentId, { reference, note }) {
   }
   if (payment.provider === 'MANUAL_EFT') {
     const err = new Error('Manual EFT payments go straight to the supplier — there is nothing to forward');
+    err.status = 400;
+    throw err;
+  }
+  if (payment.provider === 'STOKVEL_FUNDS') {
+    const err = new Error('Stokvel-funded payments are tracked in the Stokvel ledger and must never enter the PSP payout workflow');
     err.status = 400;
     throw err;
   }
