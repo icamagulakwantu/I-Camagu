@@ -259,7 +259,6 @@ const EXTRACTED_BRAND_IMAGES = {
   "Blue Curacao (Peddler's)": 'peddlers-blue-curacao',
   'Ponchos Blanco Tequila': 'ponchos-blanco-tequila',
   'Ponchos Caramel Tequila': 'ponchos-caramel-tequila',
-  'Peach Schnapps Generic': 'relic-peach-schnapps',
 };
 
 export async function backfillExtractedBrandPhotos() {
