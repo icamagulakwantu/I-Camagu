@@ -127,7 +127,7 @@ function Store({ onGoToBasket, basketCount }) {
       <div className="wash-ember grain card-paper mx-4 mt-4 p-4">
         <p className="eyebrow text-cream/75 mb-1">How SmartMatch works</p>
         <p className="text-sm font-bold leading-snug text-cream">
-          Add items to your cart and iCamagu pools your order with other members — alcohol, groceries, meat, or livestock from the same supplier. Once the group hits the minimum, everyone unlocks bulk pricing.
+          Add items to your cart and explore pools that bring community demand together by area and category. Alcohol, soft drinks, groceries, meat, livestock and household supplies are kept separate so you can find what you need. Supplier availability, final prices and any savings must be confirmed before an order is placed.
         </p>
       </div>
 
@@ -191,10 +191,10 @@ function Store({ onGoToBasket, basketCount }) {
                 <div key={sku.id} className="card-paper flex justify-between items-center overflow-hidden">
                   <div className="flex items-center gap-3 min-w-0">
                     {sku.imageUrl ? (
-                      <img src={sku.imageUrl} alt={sku.name} className="w-16 h-16 object-cover flex-shrink-0" />
+                      <img src={sku.imageUrl} alt={sku.name} className="w-16 h-16 object-contain bg-white flex-shrink-0" loading="lazy" decoding="async" />
                     ) : (
                       <span className="w-16 h-16 bg-terracotta/10 flex items-center justify-center flex-shrink-0">
-                        <Icon name={dept.id === 'beverages' ? 'cocktail' : 'package'} size={22} color="#c45c26" />
+                        <Icon name={dept.id === 'alcohol' ? 'cocktail' : dept.id === 'softdrinks' ? 'cupSoda' : 'package'} size={22} color="#c45c26" />
                       </span>
                     )}
                     <div className="min-w-0 py-1">
