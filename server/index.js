@@ -14,6 +14,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import prisma from './config/db.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
+import { backfillHennessyProductImages } from './scripts/backfill-hennessy-product-images.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -171,6 +172,16 @@ try {
   startup.schemaError = err;
   console.error(`Start-up database check FAILED — name=${err?.name} code=${err?.code} message=${err?.message}`);
   captureException(err);
+}
+
+if (startup.schemaReady) {
+  // A tightly scoped, idempotent correction for three known bad product images.
+  // This is deliberately separate from the broad catalogue maintenance suite.
+  try {
+    await backfillHennessyProductImages();
+  } catch (err) {
+    console.error('Hennessy product image correction failed:', err?.message);
+  }
 }
 
 // DB-02: the ~25 catalogue data repairs no longer run on every start. Run
