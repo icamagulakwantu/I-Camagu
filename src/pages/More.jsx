@@ -82,6 +82,11 @@ export default function More({ onNavigate }) {
   const { user, logout } = useAuth()
   const { showToast } = useToast()
   const [showRites, setShowRites] = useState(false)
+  const [expandedSections, setExpandedSections] = useState(['Inkcubeko yam'])
+
+  const toggleSection = (title) => setExpandedSections((current) =>
+    current.includes(title) ? current.filter((item) => item !== title) : [...current, title]
+  )
 
   const handleNav = (screen) => {
     if (screen === 'rites') { setShowRites(true); window.scrollTo(0, 0); return }
@@ -178,18 +183,22 @@ export default function More({ onNavigate }) {
         const items = section.items.filter((item) => !item.adminOnly || user?.isAdmin)
         if (items.length === 0) return null
         return (
-          <div key={section.title} className="mb-6">
-            <div className="flex items-start gap-3 mb-2 px-1">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-black uppercase text-terracotta">{section.title}</p>
-                {/* English subtext for translated section titles */}
-                {section.english && (
-                  <p className="text-[10px] text-ink-muted">{section.english}</p>
-                )}
-              </div>
-              <span className="h-px flex-1 bg-terracotta/10 mt-2" />
-            </div>
-            <div className={cn('card-paper divide-y divide-terracotta/10 overflow-hidden', alt && 'wash-clay')}>
+          <section key={section.title} className="mb-3">
+            <button
+              type="button"
+              onClick={() => toggleSection(section.title)}
+              aria-expanded={expandedSections.includes(section.title)}
+              className="w-full flex items-center gap-3 rounded-2xl border border-terracotta/10 bg-white/80 px-4 py-3.5 text-left shadow-sm"
+            >
+              <span className="flex-1 min-w-0">
+                <span className="block text-xs font-black uppercase text-terracotta">{section.title}</span>
+                {section.english && <span className="block text-[11px] text-ink-muted mt-0.5">{section.english}</span>}
+                <span className="block text-[11px] text-ink-muted mt-1">{items.length} options</span>
+              </span>
+              <Icon name={expandedSections.includes(section.title) ? 'chevronUp' : 'chevronDown'} size={18} color="#8a8278" />
+            </button>
+            {expandedSections.includes(section.title) && (
+              <div className={cn('card-paper divide-y divide-terracotta/10 overflow-hidden mt-2', alt && 'wash-clay')}> 
               {items.map((item) => (
                 <button
                   key={item.id}
@@ -210,8 +219,9 @@ export default function More({ onNavigate }) {
                   <Icon name="arrowRight" size={16} color="#8a8278" />
                 </button>
               ))}
-            </div>
-          </div>
+              </div>
+            )}
+          </section>
         )
       })}
 
