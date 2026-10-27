@@ -479,7 +479,7 @@ export const getPublicPlan = async (req, res) => {
             label: true,
           },
         },
-        host: { select: { firstName: true, lastName: true } },
+
       },
     });
     if (!plan) return res.status(404).json({ error: 'This link is invalid or has expired' });
