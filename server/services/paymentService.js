@@ -5,14 +5,13 @@
 // (paymentController, the webhook route) deal in PoolPayment rows and never
 // touch PayFast's field names directly.
 //
-// This does NOT replace manual EFT — a member can still pay a supplier
-// directly and enter a reference (see poolController.submitPoolPaymentReference).
-// This adds a second, faster path: pay online, PayFast confirms instantly via
-// webhook. Money still lands in iCamagu's own PayFast merchant account, not
-// the supplier's — getting it from there to the supplier is a manual step
-// this does not yet automate (same "no live bank API yet" posture as
-// ManualEFTAdapter). That's a real business decision to revisit before this
-// ever runs with PAYFAST_SANDBOX=false.
+// 2026 NO-CUSTODY RELEASE GATE: online checkout is deliberately disabled.
+// A configured PayFast merchant account would collect money into iCamagu's
+// account rather than directly into the supplier's account. Environment vars
+// must never be enough to activate a real-money path. Re-enable only in a
+// reviewed future change after the founder's 2027+ legal, banking, provider,
+// settlement and compliance gates have all been met. Manual/direct payment
+// recording remains available and does not move money through iCamagu.
 // Culture before capital. 🌾
 
 import prisma from '../config/db.js';
@@ -31,8 +30,10 @@ function getAdapter() {
   });
 }
 
+// This is a policy gate, not a credential check. Keep false until a separately
+// reviewed future release explicitly changes the no-custody policy.
 export function isOnlinePaymentConfigured() {
-  return getAdapter() !== null;
+  return false;
 }
 
 // Alcohol sales carry real liquor-licensing exposure that manual EFT never
@@ -53,6 +54,14 @@ export function isOnlinePaymentEligible(category) {
 }
 
 export async function initiatePoolPayment(userId, paymentId, baseUrl) {
+  // Enforce the no-custody policy server-side before reading or changing any
+  // payment row. Hiding the frontend button is not a security boundary.
+  if (!isOnlinePaymentConfigured()) {
+    const err = new Error('Online checkout is disabled under iCamagu’s current no-custody policy. Pay the supplier or intended recipient directly and record the reference here.');
+    err.status = 503;
+    throw err;
+  }
+
   const adapter = getAdapter();
   if (!adapter) {
     const err = new Error('Online payment is not set up yet — pay by manual EFT instead.');
