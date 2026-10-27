@@ -9,7 +9,7 @@ import Bi from './Bi.jsx'
 import { BUTTONS } from './wizardText.js'
 import { inputClass, pressable } from './styles.js'
 
-const ACTION_BUTTON = 'group flex min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border border-terracotta/15 bg-white px-2 py-4 text-center shadow-sm transition-all hover:border-sage-300 hover:bg-sage-50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 min-h-[88px] active:scale-[0.98]'
+const ACTION_BUTTON = 'group flex min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border border-terracotta/15 bg-white px-2 py-3 text-center shadow-[0_8px_22px_-12px_rgba(43,38,32,0.28)] transition-all hover:border-sage-300 hover:bg-sage-50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 min-h-[76px] active:scale-[0.98]'
 
 // Everything a host can do with a finished plan: save it as a template, open
 // the timeline, book the bar, share it, or delete it.
