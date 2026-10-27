@@ -87,7 +87,7 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
               <p className="text-[11px] text-ink-muted">combined value</p>
             </div>
           </div>
-          <p className="text-sm font-semibold text-terracotta">Research-backed target: 8–10% at the qualifying larger-volume tier</p>
+          <p className="text-sm font-semibold text-terracotta">Possible savings are unconfirmed until a supplier provides a written quote for this combined order.</p>
           {suggestion.reachesThreePalletEquivalent && <p className="text-xs text-ink-muted">Indicative value is around {Number(suggestion.indicativePalletEquivalent).toFixed(2)} pallet-equivalents using a reference case price; the supplier must confirm mixed-product eligibility and the conversion.</p>}
           <p className="text-xs text-ink-muted">{suggestion.message}</p>
           <p className="text-xs text-ink-muted">This is an opportunity, not a confirmed quote or guaranteed saving. Pools and payments stay separate; each organiser must opt in before any combined order.</p>
