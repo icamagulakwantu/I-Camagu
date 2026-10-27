@@ -20,18 +20,20 @@ vi.mock('../services/googleAuthService.js', () => ({ verifyGoogleToken: vi.fn() 
 vi.mock('../config/admin.js', () => ({ isAdminEmail: () => false }));
 
 const auth = await import('./authController.js');
+const tokenService = await import('../services/tokenService.js');
 
 function fakeRes() {
   const res = { statusCode: 200, body: undefined };
   res.status = (code) => { res.statusCode = code; return res; };
   res.json = (body) => { res.body = body; return res; };
-  res.cookie = () => res;
+  res.cookie = vi.fn(() => res);
+  res.clearCookie = vi.fn(() => res);
   return res;
 }
 
-async function call(handler, body) {
+async function call(handler, body, extra = {}) {
   const res = fakeRes();
-  await handler({ body }, res);
+  await handler({ body, ...extra }, res);
   return { status: res.statusCode, body: res.body };
 }
 
@@ -114,6 +116,33 @@ describe('password sign-in', () => {
 
     expect(unknown).toEqual(known);
     expect(verifyPassword).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('refresh session', () => {
+  it('returns the user from the pre-rotation lookup and rotates the cookie', async () => {
+    tokenService.rotateToken.mockResolvedValueOnce({
+      accessToken: 'fresh-access',
+      refreshToken: 'fresh-refresh',
+      userId: 'user-1',
+      user: MEMBER,
+    });
+    const res = fakeRes();
+    await auth.refresh({ cookies: { jid: 'old-refresh' } }, res);
+    expect(res.statusCode).toBe(200);
+    expect(res.cookie).toHaveBeenCalledWith('jid', 'fresh-refresh', expect.any(Object));
+    expect(res.body.accessToken).toBe('fresh-access');
+    expect(res.body.user.email).toBe('member@example.com');
+    expect(prisma.user.findUnique).not.toHaveBeenCalled();
+    expect(res.clearCookie).not.toHaveBeenCalled();
+  });
+
+  it('does not clear the refresh cookie on a transient database error', async () => {
+    tokenService.rotateToken.mockRejectedValueOnce(new Error('database unavailable'));
+    const res = fakeRes();
+    await auth.refresh({ cookies: { jid: 'still-valid-refresh' } }, res);
+    expect(res.statusCode).toBe(503);
+    expect(res.clearCookie).not.toHaveBeenCalled();
   });
 });
 

@@ -68,9 +68,13 @@ export async function rotateToken(presentedRefreshToken) {
     throw new Error('INACTIVITY_WINDOW_EXPIRED');
   }
 
-  // This is the one line that changed from the original version:
-  // it now also returns userId, which authController.js needs
-  // to look up and return your user details on refresh.
+  // Load the user BEFORE rotating/revoking the current token. If this query
+  // fails transiently after rotation, the server would have created a new
+  // token but could not send its cookie, stranding the client with a revoked
+  // token. A lookup failure here leaves the current token untouched.
+  const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+  if (!user) throw new Error('ACCOUNT_NOT_FOUND');
+
   const tokens = await generateTokenPair(decoded.userId, presentedRefreshToken);
-  return { ...tokens, userId: decoded.userId };
+  return { ...tokens, userId: decoded.userId, user };
 }
