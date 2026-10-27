@@ -25,3 +25,8 @@
 ## Current operational note
 
 Two Render web services currently point to the same GitHub repository and `main`, and both auto-deploy. The primary-domain service appears to be `I-Camagu-1`, but service consolidation remains a release task until environment/database parity, callbacks, health checks and DNS are confirmed. See [launch readiness](./LAUNCH_READINESS.md).
+
+
+## Runtime target guard
+
+CI runs `yarn check:runtime-targets` against application code, public assets, shared modules, deployment workflows and runtime configuration. It fails if a StackBlitz, Bolt.new or WebContainer reference is introduced there. Historical mentions in documentation are allowed; they do not change the GitHub + Render-only workflow.
