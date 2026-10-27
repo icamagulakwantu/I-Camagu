@@ -72,6 +72,38 @@ async function ensureAmstelFormats() {
   console.log('Amstel 750ml quart and 500ml can formats checked; separate packshots assigned.');
 }
 
+async function repairGuinnessForeignExtraFormats() {
+  // South African retailer listings show Guinness Foreign Extra as a 325ml
+  // non-returnable bottle, not a 500ml can or a generic 340ml dumpy.
+  await upsertSkuByNameAndBottleFormat(prisma, {
+    name: 'Guinness Foreign Extra',
+    category: 'BEER',
+    productType: 'ALCOHOL',
+    bottleFormat: '325ml Bottle',
+    unitsPerCase: 24,
+    casePriceZAR: null,
+  }, {});
+  const invalidFormats = ['Can (500ml)', 'Can (440ml)', 'Can (330ml)', 'Dumpy (340ml)', 'Dumpy (330ml)'];
+  let removed = 0;
+  let quarantined = 0;
+  for (const bottleFormat of invalidFormats) {
+    const rows = await prisma.sku.findMany({
+      where: { name: 'Guinness Foreign Extra', bottleFormat },
+      select: { id: true, _count: { select: { basketItems: true, costItems: true } } },
+    });
+    for (const row of rows) {
+      if (row._count.basketItems > 0 || row._count.costItems > 0) {
+        await prisma.sku.update({ where: { id: row.id }, data: { casePriceZAR: null, imageUrl: null } });
+        quarantined += 1;
+        continue;
+      }
+      const result = await prisma.sku.deleteMany({ where: { id: row.id } });
+      removed += result.count;
+    }
+  }
+  console.log(`Guinness Foreign Extra format check: ${removed} invalid unlinked row(s) removed; ${quarantined} linked row(s) made unavailable; 325ml bottle ensured.`);
+}
+
 async function removeBlackLabelDumpies() {
   const rows = await prisma.sku.findMany({
     where: { name: 'Black Label', bottleFormat: { startsWith: 'Dumpy (' } },
@@ -101,6 +133,7 @@ export async function backfillHennessyProductImages() {
     await runRepairStep('founder-confirmed SKU formats', backfillFounderSourcedSkus);
     await runRepairStep('Amstel quart and can', ensureAmstelFormats);
     await runRepairStep('Black Label nonexistent dumpy', removeBlackLabelDumpies);
+    await runRepairStep('Guinness Foreign Extra bottle size', repairGuinnessForeignExtraFormats);
     await runRepairStep('brand image defaults', backfillBrandImages);
     await runRepairStep('product photo mappings', backfillExtractedBrandPhotos);
     await runRepairStep('format-specific photos', backfillFormatSpecificPhotos);
