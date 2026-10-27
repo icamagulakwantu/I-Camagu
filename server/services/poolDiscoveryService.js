@@ -323,7 +323,7 @@ export async function joinPoolWithItem(userId, input) {
 export async function getCommunityFeed(userId) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error('User not found');
-  const [rawPools, rawCeremonies, legends] = await Promise.all([
+  const results = await Promise.allSettled([
     prisma.bulkPool.findMany({
       where: { status: 'OPEN' },
       include: {
@@ -352,6 +352,16 @@ export async function getCommunityFeed(userId) {
       take: 5,
     }),
   ]);
+  const [poolResult, ceremonyResult, legendResult] = results;
+  const rawPools = poolResult.status === 'fulfilled' ? poolResult.value : [];
+  const rawCeremonies = ceremonyResult.status === 'fulfilled' ? ceremonyResult.value : [];
+  const legends = legendResult.status === 'fulfilled' ? legendResult.value : [];
+  // Each feed source is optional. A missing/temporarily failing table must not
+  // make the entire community feed fail; keep the working sections available
+  // and preserve stack traces so the failed section can be repaired.
+  for (const [name, result] of [['pools', poolResult], ['ceremonies', ceremonyResult], ['legends', legendResult]]) {
+    if (result.status === 'rejected') console.error(`Community feed ${name} query failed:`, result.reason?.stack || result.reason);
+  }
 
   const pools = rawPools.map((pool) => {
     const distanceKm = locationDistance(user, pool);
