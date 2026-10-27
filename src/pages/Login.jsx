@@ -30,6 +30,7 @@ function Login() {
   const [step, setStep] = useState('email')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [code, setCode] = useState('')
@@ -166,11 +167,11 @@ function Login() {
               src="/icons/source/gateway-mark-1024.png"
               alt="iCamagu"
               className="w-9 h-9"
-              style={{ filter: 'brightness(0) invert(1)' }}
+              style={{ filter: 'brightness(0) saturate(100%) invert(18%) sepia(28%) saturate(1715%) hue-rotate(335deg) brightness(92%) contrast(91%)' }}
             />
-            <span className="font-display font-bold text-2xl text-white">iCamagu</span>
+            <span className="font-display font-bold text-2xl text-[#4b281b]">iCamagu</span>
           </div>
-          <h1 className="font-display font-bold text-[1.55rem] leading-tight text-white text-balance">
+          <h1 className="font-display font-bold text-[1.55rem] leading-tight text-[#4b281b] text-balance">
             {step === 'email' && 'Buy together. Save more.'}
             {step === 'register' && 'Joyina iCamagu'}
             {step === 'password-login' && 'Wamkelekile'}
@@ -179,12 +180,12 @@ function Login() {
           </h1>
           {/* English subtext for Xhosa headings */}
           {step === 'register' && (
-            <p className="text-white/90 text-sm mt-0.5">Join iCamagu</p>
+            <p className="text-[#4b281b]/90 text-sm mt-0.5">Join iCamagu</p>
           )}
           {step === 'password-login' && (
-            <p className="text-white/90 text-sm mt-0.5">Welcome</p>
+            <p className="text-[#4b281b]/90 text-sm mt-0.5">Welcome</p>
           )}
-          <p className="text-white text-sm mt-1.5 leading-snug break-words">
+          <p className="text-[#4b281b] text-sm mt-1.5 leading-snug break-words">
             {step === 'email' && 'Save up to 20% on Mgidi drinks and groceries. Matchmaker joins your order with others nearby so you pay the bulk price. No stokvel needed.'}
             {step === 'register' && `Create your account for ${email}.`}
             {step === 'password-login' && email}
@@ -195,17 +196,17 @@ function Login() {
             <>
               <div className="flex flex-wrap gap-1.5 mt-4">
                 {WHO_CAN_JOIN.map((label) => (
-                  <span key={label} className="flex items-center gap-1 bg-white/15 border border-white/25 text-white text-[11px] font-bold px-2.5 py-1 rounded-pill">
-                    <Icon name="check" size={11} color="#ffffff" />
+                  <span key={label} className="flex items-center gap-1 bg-white/45 border border-[#4b281b]/20 text-[#4b281b] text-[11px] font-bold px-2.5 py-1 rounded-pill">
+                    <Icon name="check" size={11} color="#4b281b" />
                     {label}
                   </span>
                 ))}
               </div>
               {/* Tagline: Xhosa with English subtext */}
-              <p className="text-white/90 text-xs font-semibold uppercase tracking-[0.14em] mt-4">
+              <p className="text-[#4b281b]/90 text-xs font-semibold uppercase tracking-[0.14em] mt-4">
                 Lungiselela isiko/umcimbi · Incubeko ngaphambi kwemali
               </p>
-              <p className="text-white/90 text-xs tracking-wide mt-0.5">
+              <p className="text-[#4b281b]/90 text-xs tracking-wide mt-0.5">
                 Plan your ceremony · Culture before capital
               </p>
             </>
@@ -277,12 +278,18 @@ function Login() {
                   required
                 />
               </div>
-              <input
-                type="password" placeholder="Create a password (min 8 characters)" value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
-                required minLength={8}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'} placeholder="Create a password (min 8 characters)" value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                  className="w-full border-2 border-terracotta/20 rounded-2xl pl-4 pr-12 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
+                  required minLength={8}
+                />
+                <button type="button" onClick={() => setShowPassword((shown) => !shown)} aria-label={showPassword ? 'Hide password' : 'Show password'} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted">
+                  <Icon name={showPassword ? 'eye-off' : 'eye'} size={18} />
+                </button>
+              </div>
               <ErrorBanner message={error} />
               <button
                 type="submit" disabled={loading}
@@ -299,12 +306,18 @@ function Login() {
           {step === 'password-login' && (
             <div className="space-y-3">
               <form onSubmit={handlePasswordLogin} className="space-y-3">
-                <input
-                  type="password" placeholder="Your password" value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
-                  required autoFocus
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'} placeholder="Your password" value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                    className="w-full border-2 border-terracotta/20 rounded-2xl pl-4 pr-12 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
+                    required autoFocus
+                  />
+                  <button type="button" onClick={() => setShowPassword((shown) => !shown)} aria-label={showPassword ? 'Hide password' : 'Show password'} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted">
+                    <Icon name={showPassword ? 'eye-off' : 'eye'} size={18} />
+                  </button>
+                </div>
                 <ErrorBanner message={error} />
                 <button
                   type="submit" disabled={loading}
