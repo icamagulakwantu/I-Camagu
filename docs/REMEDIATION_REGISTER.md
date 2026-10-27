@@ -132,3 +132,12 @@ Verified in Render service metadata and recent startup logs: two auto-deploying 
 - **Source verified on current `main`:** `server/services/paymentService.js` excludes `STOKVEL_FUNDS` alongside `MANUAL_EFT` from `listPendingSupplierPayouts()` and rejects attempts to mark a Stokvel-funded payment forwarded before updating the row.
 - **Regression coverage verified in source:** `server/services/paymentService.test.js` asserts both the queue filter and the processor rejection/no-update behaviour.
 - **Not yet verified:** current-head CI result and Render deployment. The GitHub commit-status lookup returned an empty status list, which is inconclusive. No production payment operation was performed.
+
+
+## Render deployment follow-up — 27 Oct 2026
+
+- Verified in Render that both `I-Camagu` and `I-Camagu-1` deployed commit `fb95d2b3dae9af98475ef9edba19d283407cff16` successfully after setting `APP_URL=https://i-camagu.co.za` on both services.
+- Both latest startup logs report the database schema check passed and no longer list `APP_URL` as missing.
+- Remaining confirmed warnings: `EMAIL_FROM` unset on both services; `ID_ENCRYPTION_KEY` and `SENTRY_DSN` missing on I-Camagu; `SENTRY_DSN` missing on I-Camagu-1. PayFast merchant credentials are missing on I-Camagu, which is consistent with the no-custody policy and is not a reason to enable checkout.
+- The latest commit combined-status query returned no statuses. The workflow-run wrapper available to this session filters to pull-request-triggered runs, so push-CI status remains unverified, not failed.
+- Direct HTTP health response and Render health-check-path configuration remain unverified/blocked by available tools. Both services remain enabled while domain, environment and dependency mapping is incomplete.
