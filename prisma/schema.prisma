@@ -104,6 +104,7 @@ enum IdentityVerificationStatus {
 model User {
   id                     String               @id @default(uuid())
   email                  String               @unique
+  emailVerifiedAt        DateTime?
   firstName              String
   lastName               String
   username               String?              @unique
