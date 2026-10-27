@@ -19,7 +19,7 @@ const WHO_CAN_JOIN = ['On your own', 'With your stokvel', 'Tavern owners']
 function ErrorBanner({ message }) {
   if (!message) return null
   return (
-    <div className="flex items-start gap-2 bg-terracotta/10 border border-terracotta/30 rounded-2xl px-3 py-2.5">
+    <div role="alert" aria-live="assertive" className="flex items-start gap-2 bg-terracotta/10 border border-terracotta/30 rounded-2xl px-3 py-2.5">
       <Icon name="close" size={13} color="#c45c26" className="mt-0.5 flex-shrink-0" />
       <p className="text-terracotta text-xs font-bold leading-snug">{message}</p>
     </div>
@@ -240,7 +240,7 @@ function Login() {
               <div className="relative">
                 <input
                   type="email"
-                  placeholder="Your email address"
+                  placeholder="Your email address" aria-label="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
@@ -287,13 +287,13 @@ function Login() {
             <form onSubmit={handleRegister} className="space-y-3">
               <div className="grid grid-cols-2 gap-2">
                 <input
-                  type="text" placeholder="First name" value={firstName}
+                  type="text" placeholder="First name" aria-label="First name" value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
                   required
                 />
                 <input
-                  type="text" placeholder="Surname" value={lastName}
+                  type="text" placeholder="Surname" aria-label="Surname" value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
                   required
@@ -301,7 +301,7 @@ function Login() {
               </div>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'} placeholder="Create a password (min 8 characters)" value={password}
+                  type={showPassword ? 'text' : 'password'} placeholder="Create a password (min 8 characters)" aria-label="Create password" value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
                   className="w-full border-2 border-terracotta/20 rounded-2xl pl-4 pr-12 py-2.5 text-sm focus:outline-none focus:border-terracotta/60 transition-all"
@@ -329,7 +329,7 @@ function Login() {
               <form onSubmit={handlePasswordLogin} className="space-y-3">
                 <div className="relative">
                   <input
-                    type={showPassword ? 'text' : 'password'} placeholder="Your password" value={password}
+                    type={showPassword ? 'text' : 'password'} placeholder="Your password" aria-label="Password" value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     autoComplete="current-password"
                     className="w-full border-2 border-terracotta/20 rounded-2xl pl-4 pr-12 py-3 text-sm focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
@@ -413,7 +413,7 @@ function Login() {
             <form onSubmit={handleVerifyOtp} className="space-y-3">
               <input
                 type="text" inputMode="numeric" autoComplete="one-time-code"
-                placeholder="123456" value={code}
+                placeholder="123456" aria-label="Six-digit email verification code" value={code}
                 onChange={(e) => setCode(e.target.value)} maxLength={6}
                 className="w-full border-2 border-terracotta/20 rounded-2xl px-4 py-4 text-center text-2xl tracking-[0.4em] font-bold focus:outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all"
                 required autoFocus
