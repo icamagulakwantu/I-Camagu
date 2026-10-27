@@ -153,6 +153,7 @@ export async function loginWithPassword(req, res) {
 
     const valid = await verifyPassword(password, user.passwordHash);
     if (!valid) return res.status(401).json({ error: 'Invalid email or password' });
+    if (isAdminEmail(email)) return res.status(403).json({ error: 'Administrator accounts must use verified Google sign-in.' });
     if (user.emailVerificationRequired) return res.status(403).json({ error: 'Verify your email first using the 6-digit code we sent when you registered.' });
 
     const { accessToken, refreshToken } = await generateTokenPair(user.id);
@@ -190,14 +191,30 @@ export async function googleAuth(req, res) {
     if (!user) {
       const existing = await prisma.user.findUnique({ where: { email: googleData.email } });
       if (existing) {
-        if (existing.passwordHash || (existing.googleId && existing.googleId !== googleData.googleId)) {
-          return res.status(409).json({
-            error: 'An iCamagu account already uses this email. Sign in with your email and password first.',
-            code: 'ACCOUNT_EXISTS',
+        if (isAdminEmail(existing.email) && (!existing.googleId || existing.googleId === googleData.googleId)) {
+          // A verified Google assertion is the required proof for administrator
+          // identities. It can safely recover a legacy password-only admin
+          // account without trusting the password that originally claimed it.
+          user = await prisma.user.update({
+            where: { id: existing.id },
+            data: {
+              googleId: googleData.googleId,
+              passwordHash: null,
+              emailVerificationRequired: false,
+              passwordResetTokenHash: null,
+              passwordResetExpiresAt: null,
+            },
           });
+        } else {
+          if (existing.passwordHash || (existing.googleId && existing.googleId !== googleData.googleId)) {
+            return res.status(409).json({
+              error: 'An iCamagu account already uses this email. Sign in with its existing sign-in method.',
+              code: 'ACCOUNT_EXISTS',
+            });
+          }
+          // Account made with email codes only: Google has proved the person owns this email.
+          user = await prisma.user.update({ where: { id: existing.id }, data: { googleId: googleData.googleId, emailVerificationRequired: false } });
         }
-        // Account made with email codes only: Google has proved the person owns this email.
-        user = await prisma.user.update({ where: { id: existing.id }, data: { googleId: googleData.googleId } });
       } else {
         user = await prisma.user.create({
           data: {
