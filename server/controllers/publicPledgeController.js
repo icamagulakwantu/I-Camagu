@@ -35,12 +35,12 @@ export const getPublicPlanPledges = async (req, res) => {
     res.json(pledges.map((pledge) => {
       const pledged = pledge.pledgedAmountZAR == null ? null : Number(pledge.pledgedAmountZAR);
       const paid = pledge.paidAmountZAR == null ? 0 : Number(pledge.paidAmountZAR);
+      // A bearer link may be forwarded beyond the intended family group.
+      // Public links therefore show only the item and whether it was received;
+      // names, relationships and pledged amounts stay behind authenticated access.
       return {
         id: pledge.id,
-        pledgerName: pledge.pledgerName,
-        relationship: pledge.relationship,
         pledgedItem: pledge.pledgedItem,
-        pledgedAmountZAR: pledge.pledgedAmountZAR,
         isReceived: pledged !== null && pledged > 0 && paid >= pledged,
       };
     }));
