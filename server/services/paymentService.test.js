@@ -98,7 +98,7 @@ describe('markRefundProcessed', () => {
       id: 'pay_4', provider: 'PAYFAST', status: 'CLEARED', refundRequestedAt: new Date(),
     });
     await expect(markRefundProcessed('pay_4', { feeZAR: '-5' })).rejects.toThrow(/non-negative amount/);
-    await expect(markRefundProcessed('pay_4', { feeZAR: 'not-a-number' })).rejects.toThrow(/positive number/);
+    await expect(markRefundProcessed('pay_4', { feeZAR: 'not-a-number' })).rejects.toThrow(/non-negative amount/);
   });
 
   it('refuses a refund fee greater than the amount received', async () => {
