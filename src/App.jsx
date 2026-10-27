@@ -84,7 +84,7 @@ const CEREMONY_SCREENS = [
 // ---------- Dashboard ----------
 function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
   const { user, accessToken } = useAuth()
-  const { feed, location } = useCommunity()
+  const { feed, feedError, refreshPools, location } = useCommunity()
   const { showToast } = useToast()
   const [stokvels, setStokvels] = useState([])
   const [ceremonies, setCeremonies] = useState([])
@@ -155,6 +155,14 @@ function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
           </div>
         </div>
       </button>
+
+      {feedError && (
+        <div role="status" className="mb-4 rounded-2xl border border-terracotta/30 bg-white p-4">
+          <p className="text-sm font-bold text-ink">The community feed could not load.</p>
+          <p className="text-xs text-ink-muted mt-1">Your other iCamagu features remain available. Try again in a moment.</p>
+          <button type="button" onClick={() => refreshPools()} className="mt-3 min-h-11 rounded-full bg-terracotta px-4 text-sm font-bold text-white">Retry community feed</button>
+        </div>
+      )}
 
       {(feed.pools?.length > 0 || feed.upcomingClanCeremonies?.length > 0 || feed.featuredLegends?.length > 0) && (
         <section className="mb-6 space-y-3" aria-label="Community feed">
