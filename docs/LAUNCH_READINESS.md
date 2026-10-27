@@ -102,14 +102,12 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [ ] After traffic, DNS, integrations and configuration are confirmed, consolidate to one canonical service; do not delete/disable a service as part of automated discovery.
 
 
-## Additional Stokvel money-routing blocker — 27 Oct 2026
+## PAY-02 — Stokvel-funded PSP payout routing — source/test verification 27 Oct 2026
 
-- [ ] **Do not launch Stokvel-funded SmartMatch settlement until the PSP payout queue is provider-safe.** Current `listPendingSupplierPayouts()` filters out only `MANUAL_EFT`, so `STOKVEL_FUNDS` can be included if its payment status is `CLEARED`; `markPayoutForwarded()` also rejects only `MANUAL_EFT`. Stokvel ledger-funded payments must not be treated as money held by iCamagu or forwarded through the PSP payout workflow. Add an explicit `STOKVEL_FUNDS` exclusion to the queue and a server-side guard to the processor, with regression tests, before launch.
-
-
-## PAY-02 — Stokvel-funded PSP payout routing — 27 Oct 2026
-
-- [ ] Merge and deploy the targeted provider exclusion/processor guard only after CI passes. Regression tests assert Stokvel-funded payments cannot enter the PSP payout queue and cannot be marked forwarded.
+- [x] Source-level guard present on `main`: `listPendingSupplierPayouts()` excludes both `MANUAL_EFT` and `STOKVEL_FUNDS`; `markPayoutForwarded()` rejects `STOKVEL_FUNDS` before any update. Evidence: `server/services/paymentService.js`.
+- [x] Regression tests are present in `server/services/paymentService.test.js`: queue exclusion and attempted-forwarding rejection are asserted, including no database update on rejection.
+- [ ] Latest main-head GitHub Actions result still needs explicit verification. The commit-status endpoint returned no status entries; that is not proof that CI passed.
+- [ ] Render deployment of the commit containing these guards still needs verification.
 - [ ] Before any future PSP settlement feature, perform a separate review of payment-provider routing, custody, supplier beneficiary, reconciliation, refund and payout semantics. Current 2026 no-custody policy remains in force.
 
 
