@@ -74,7 +74,8 @@ The release blockers above remain open until evidence is recorded. Do not repres
 
 ## SmartMatch concurrency check — 27 Oct 2026
 
-- [ ] Review and merge the targeted pool row-lock/snapshot-refresh fix only after CI passes. Test concurrent joins against a disposable PostgreSQL database before launch; do not test concurrency against production.
+- [x] Targeted pool row-lock/snapshot-refresh fix merged in PR #53; unit, PostgreSQL integration and migration-baseline checks passed in CI run [#40441295886](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40441295886). PR #55 added the row-lock concurrency test to the disposable PostgreSQL CI job.
+- [ ] Add a full end-to-end concurrent matching test that proves no basket is omitted from the order document; run only against disposable PostgreSQL, never production.
 
 
 ## Render runtime verification — 27 Oct 2026
