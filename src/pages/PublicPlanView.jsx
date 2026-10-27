@@ -67,8 +67,7 @@ function PublicPlanView({ token }) {
             <div className="space-y-1.5">
               {pledges.map((p) => {
                 const pledged = p.pledgedAmountZAR != null ? parseFloat(p.pledgedAmountZAR) : null
-                const paid = p.paidAmountZAR != null ? parseFloat(p.paidAmountZAR) : 0
-                const received = pledged != null && pledged > 0 && paid >= pledged
+                const received = p.isReceived === true
                 return (
                   <div key={p.id} className="flex items-center justify-between gap-3 bg-white border border-terracotta/15 rounded-soft p-3">
                     <div className="min-w-0">
