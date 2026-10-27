@@ -16,7 +16,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "seed": "node prisma/seed.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "check:runtime-targets": "node scripts/check-runtime-targets.js"
   },
   "dependencies": {
     "@prisma/client": "^5.20.0",

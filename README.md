@@ -954,3 +954,8 @@ The platform's social and community layer can expand gradually as the underlying
 ## Plan — together.
 
 **iCamagu**
+
+
+### Hosted workspace guard
+
+CI rejects StackBlitz, Bolt.new and WebContainer references in runtime code and deployment configuration. Application API requests should remain relative to the deployed app (for example, `/api/...`), with Render as the production host.
