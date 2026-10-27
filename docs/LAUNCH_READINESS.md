@@ -96,6 +96,7 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [ ] Confirm the intended sender address with a verified domain and configure `EMAIL_FROM` on the canonical service.
 - [ ] Configure `SENTRY_DSN` if Sentry monitoring is part of the launch plan.
 - [ ] Decide whether ID-number verification is a launch requirement; if so, generate/store `ID_ENCRYPTION_KEY` securely in Render and test on staging without exposing the key.
+- [ ] Standardize both Render build commands in the dashboard to `yarn install --frozen-lockfile --production=false && yarn build`. The `I-Camagu` service currently uses `yarn install; yarn build`, so a failed install can be masked by a later successful build command.
 - [ ] Set the Render health-check path to `/api/health` on the canonical service after confirming the endpoint returns healthy status.
 - [ ] Compare the two services' environment keys/values securely in the Render dashboard and verify their database/callback parity. Never paste secret values into GitHub or chat.
 - [ ] After traffic, DNS, integrations and configuration are confirmed, consolidate to one canonical service; do not delete/disable a service as part of automated discovery.
