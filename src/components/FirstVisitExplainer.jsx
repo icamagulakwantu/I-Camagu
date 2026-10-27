@@ -147,7 +147,7 @@ export default function FirstVisitExplainer({ onNavigate }) {
             <Icon name="cocktail" size={22} color="#c45c26" />
           </span>
           <div className="min-w-0">
-            <p className="font-bold text-sm text-ink">Castle Lager — case of 24</p>
+            <p className="font-bold text-sm text-ink">Example drinks case — pack details vary</p>
             <p className="text-xs text-ink-muted">
               Illustrative product only · No live supplier quote
             </p>
@@ -164,7 +164,7 @@ export default function FirstVisitExplainer({ onNavigate }) {
           </div>
           <p className="text-[11px] text-ink-muted mt-1.5">
             {joinedPool
-              ? `You're in! ${POOL_TARGET - poolCount} more members unlock the group price for everyone.`
+              ? `You're in this sample pool. Real pricing and minimums depend on the supplier quote.`
               : `${POOL_TARGET - poolCount} more members to reach this sample target. Any discount must be confirmed by the supplier.`}
           </p>
         </div>
