@@ -315,6 +315,41 @@ const SCREEN_PATHS = {
   izidukochat: '/me/messages',
 };
 
+function isKnownAppPath(pathname) {
+  if (pathname === '/' || Object.values(SCREEN_PATHS).includes(pathname)) return true;
+  return [
+    /^\\/ceremonies\\/[^/]+$/,
+    /^\\/me\\/iziduko\\/[^/]+$/,
+    /^\\/me\\/messages\\/[^/]+$/,
+    /^\\/me\\/clan-groups\\/[^/]+$/,
+    /^\\/ceremonies\\/budget\\/[^/]+$/,
+    /^\\/services\\/ekoyini\\/booking\\/[^/]+$/,
+  ].some((pattern) => pattern.test(pathname));
+}
+
+function LostPage({ onNavigate }) {
+  return (
+    <main className="min-h-[70vh] px-5 py-12 flex items-center justify-center">
+      <section className="w-full max-w-md rounded-3xl border border-cream-dark bg-white p-6 text-center shadow-soft">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-terracotta/10">
+          <Icon name="compass" size={28} color="#c45c26" />
+        </div>
+        <p className="eyebrow text-terracotta">You’re still in iCamagu</p>
+        <h1 className="mt-2 font-display text-2xl font-bold text-ink">Let’s get you back on track</h1>
+        <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+          This page may have moved or the link may be incomplete. Choose where you’d like to go next.
+        </p>
+        <div className="mt-5 grid gap-2">
+          <button type="button" onClick={() => onNavigate('home')} className="min-h-11 rounded-full bg-terracotta px-4 py-3 text-sm font-bold text-white">Go to Home</button>
+          <button type="button" onClick={() => onNavigate('store')} className="min-h-11 rounded-full border border-terracotta px-4 py-3 text-sm font-bold text-terracotta">Browse SmartMatch Store</button>
+          <button type="button" onClick={() => onNavigate('ceremonyhub')} className="min-h-11 rounded-full border border-cream-dark px-4 py-3 text-sm font-bold text-ink">Open Ceremonies</button>
+          <button type="button" onClick={() => onNavigate('more')} className="min-h-11 rounded-full border border-cream-dark px-4 py-3 text-sm font-bold text-ink">More help and features</button>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function screenForPath(pathname) {
   if (pathname === '/' || pathname === '') return 'home';
   if (/^\/ceremonies\/[^/]+$/.test(pathname) && !['/ceremonies/plan', '/ceremonies/timeline'].includes(pathname)) return 'ceremony';
@@ -482,6 +517,7 @@ function MainApp() {
   useEffect(() => { refreshUnreadNotifications() }, [screen])
 
   const renderScreen = () => {
+    if (!isKnownAppPath(location.pathname)) return <LostPage onNavigate={setScreen} />;
     switch (screen) {
       case 'ceremonyhub':
         return (
