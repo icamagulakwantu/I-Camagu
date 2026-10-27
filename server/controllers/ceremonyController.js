@@ -59,7 +59,7 @@ export const getCeremonyTimeline = async (req, res) => {
             res.json({ success: true, ceremonyType: normalized, phases });
       } catch (error) {
             console.error('Timeline error:', error.message);
-            res.status(500).json({ success: false, message: 'Failed to fetch ceremony timeline', error: error.message });
+            res.status(500).json({ success: false, message: 'Failed to fetch ceremony timeline' });
       }
 };
 
