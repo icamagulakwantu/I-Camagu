@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from './ui/Toast.jsx';
 import { useCommunity } from '../context/CommunityContext.jsx';
 import FundingSourcePicker from './FundingSourcePicker.jsx';
+import { notifyBasketChanged } from '../lib/basketEvents.js';
 
 const money = (n) => n == null || !Number.isFinite(Number(n)) ? 'Price to confirm' : 'R' + Number(n).toFixed(2);
 
@@ -37,7 +38,7 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
     try {
       const res = await fetch('/api/basket/items', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ skuId, quantity }) });
       const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Could not add item');
-      showToast(data.message || 'Added to basket', 'success'); onClose?.();
+      notifyBasketChanged(); showToast(data.message || 'Added to basket', 'success'); onClose?.();
     } catch (err) { showToast(err.message, 'error'); } finally { setBusy(false); }
   };
 
