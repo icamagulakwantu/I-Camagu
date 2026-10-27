@@ -143,7 +143,7 @@ export function buildCrossPoolAggregationSuggestions(pools, referenceCasePriceZA
         indicativePalletEquivalent: Math.round(equivalentPallets * 100) / 100,
         reachesThreePalletEquivalent: equivalentPallets >= 3,
         volumeTierStatus: 'INDICATIVE_ONLY_SUPPLIER_CONFIRMATION_REQUIRED',
-        potentialDiscountLabel: 'Research-backed 8–10% bulk-discount target at qualifying volume; outlet terms apply',
+        potentialDiscountLabel: 'Savings are unconfirmed until the supplier provides a written quote for this combined order',
         message: equivalentPallets >= 3
           ? 'Join forces: these groups may reach a three-pallet-equivalent order value. Ask the supplier whether mixed products count and request a written quote.'
           : 'Join forces: combined demand may move the supplier quote toward a higher volume tier. Ask the supplier to confirm eligible products and thresholds.',
@@ -347,8 +347,8 @@ export async function getCommunityFeed(userId) {
     }),
     prisma.legendEntry.findMany({
       where: { isFeatured: true },
-      select: { id: true, title: true, bodyText: true, category: true, updatedAt: true },
-      orderBy: { updatedAt: 'desc' },
+      select: { id: true, title: true, bodyText: true, category: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
       take: 5,
     }),
   ]);
