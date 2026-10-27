@@ -9,6 +9,11 @@ import { backfillBrandImages } from './backfill-brand-images.js';
 import { backfillExtractedBrandPhotos } from './backfill-extracted-brand-photos.js';
 import { backfillFormatSpecificPhotos } from './backfill-format-specific-photos.js';
 import { clearBrokenBrandPhotos } from './clear-broken-brand-photos.js';
+import { fixBeerQuartFormats } from './fix-beer-quart-formats.js';
+import { fixSavannaDryFormat } from './fix-savanna-dry-format.js';
+import { fixPackSizes } from './fix-pack-sizes-oct-2026.js';
+import { backfillQuartGaps } from './backfill-quart-gaps.js';
+import { backfillFounderSourcedSkus } from './backfill-founder-sourced-skus.js';
 
 const PACKSHOTS_750ML = {
   'Hennessy VS': 'https://fr.hennessy.com/sites/hennessy_fr/files/2024-08/hny_vs_packshot_2000x2000.jpg',
@@ -79,6 +84,12 @@ async function removeBlackLabelDumpies() {
 export async function backfillHennessyProductImages() {
   if (process.env.RUN_BOOT_STORE_CATALOGUE_REPAIR === 'true') {
     console.warn('RUN_BOOT_STORE_CATALOGUE_REPAIR=true: applying targeted Store image and pack-format corrections.');
+    // Correct existing beer/cider pack-size labels before assigning their images.
+    await fixBeerQuartFormats();
+    await fixSavannaDryFormat();
+    await fixPackSizes();
+    await backfillQuartGaps();
+    await backfillFounderSourcedSkus();
     await ensureAmstelFormats();
     await removeBlackLabelDumpies();
     await backfillBrandImages();
