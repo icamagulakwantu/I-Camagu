@@ -10,6 +10,7 @@ const REQUIRED = [
 ];
 
 const OPTIONAL = [
+  { name: 'APP_URL', breaks: 'password reset links (must be the public HTTPS origin)' },
   { name: 'RESEND_API_KEY', breaks: 'OTP login codes and password reset emails' },
   { name: 'GOOGLE_CLIENT_ID', breaks: 'Google sign-in (server-side token verification)' },
   { name: 'ID_ENCRYPTION_KEY', breaks: 'identity verification (ID number submission)' },
