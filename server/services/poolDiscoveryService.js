@@ -333,7 +333,7 @@ export async function getCommunityFeed(userId) {
         baskets: {
           where: { status: { not: 'CANCELLED' } },
           include: {
-            user: { select: { id: true, firstName: true, lastName: true, location: true, latitude: true, longitude: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true } },
+            user: { select: { id: true, location: true, latitude: true, longitude: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true } },
             items: { include: { sku: { select: { casePriceZAR: true } } } },
           },
         },
