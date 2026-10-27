@@ -251,6 +251,15 @@ const EXTRACTED_BRAND_IMAGES = {
   // rather than wait on a jug-specific photo for this differently-sized,
   // differently-supplied product.
   'Grenadine Syrup Cordial': 'monin-grenadine',
+  'Gordons Premium Pink': 'gordons-pink-berry',
+  "Hendrick's Original": 'hendricks-original',
+  "Bain's Cape Mountain": 'bains-cape-mountain',
+  'Glenfiddich 12 Year': 'glenfiddich-12',
+  "Jack Daniel's Old No.7": 'jack-daniels-old-no7',
+  "Blue Curacao (Peddler's)": 'peddlers-blue-curacao',
+  'Ponchos Blanco Tequila': 'ponchos-blanco-tequila',
+  'Ponchos Caramel Tequila': 'ponchos-caramel-tequila',
+  'Peach Schnapps Generic': 'relic-peach-schnapps',
 };
 
 export async function backfillExtractedBrandPhotos() {
