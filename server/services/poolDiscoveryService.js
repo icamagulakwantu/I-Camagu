@@ -1,6 +1,7 @@
 import prisma from '../config/db.js';
 import { checkAndMatchPool, parkItemsIntoPool } from './matchmakerService.js';
 import { getNextTierForMetric, getTierForMetric, palletsForCases, resolveTierLadder, amountToReachTier } from '../utils/smartMatchTiers.js';
+import { parsePositiveIntegerQuantity } from '../utils/quantity.js';
 
 const TAVERN_CATEGORIES = new Set([
   'BEER', 'CIDER_RTD', 'BRANDY', 'WHISKY', 'VODKA', 'VODKA_PREMIUM',
@@ -246,11 +247,18 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
   };
 }
 
+export const parsePoolQuantity = parsePositiveIntegerQuantity;
+
 export async function joinPoolWithItem(userId, input) {
   const { poolId, skuId, quantity = 1, ceremonyId = null, checklistItemId = null, ceremonyCostItemId = null, fundingSource = 'PERSONAL', stokvelId = null } = input || {};
-  const amount = Number.parseInt(quantity, 10);
-  if (!poolId || !skuId || !Number.isInteger(amount) || amount < 1) {
-    throw new Error('poolId, skuId and a quantity of at least 1 are required');
+  let amount;
+  try {
+    amount = parsePoolQuantity(quantity);
+  } catch {
+    throw new Error('poolId, skuId and a whole-number quantity of at least 1 are required');
+  }
+  if (!poolId || !skuId) {
+    throw new Error('poolId, skuId and a whole-number quantity of at least 1 are required');
   }
   if (!['PERSONAL', 'STOKVEL'].includes(fundingSource)) throw new Error('Invalid funding source');
   const [user, pool, sku] = await Promise.all([

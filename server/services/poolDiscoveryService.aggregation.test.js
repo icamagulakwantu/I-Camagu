@@ -6,7 +6,7 @@ vi.mock('./matchmakerService.js', () => ({
   parkItemsIntoPool: vi.fn(),
 }));
 
-import { buildCrossPoolAggregationSuggestions } from './poolDiscoveryService.js';
+import { buildCrossPoolAggregationSuggestions, parsePoolQuantity } from './poolDiscoveryService.js';
 
 describe('buildCrossPoolAggregationSuggestions', () => {
   it('combines different products in compatible-area pools and flags a three-pallet-equivalent target as indicative', () => {
@@ -40,4 +40,20 @@ describe('buildCrossPoolAggregationSuggestions', () => {
     expect(buildCrossPoolAggregationSuggestions([], null)).toEqual([]);
     expect(buildCrossPoolAggregationSuggestions([], 0)).toEqual([]);
   });
+});
+
+
+describe('parsePoolQuantity', () => {
+  it('accepts only positive whole-number quantities', () => {
+    expect(parsePoolQuantity(1)).toBe(1);
+    expect(parsePoolQuantity('56')).toBe(56);
+    expect(parsePoolQuantity(' 003 ')).toBe(3);
+  });
+
+  it.each(['2.5', '2abc', '', '0', '-1', 'Infinity', '1e3', Number.NaN, Number.POSITIVE_INFINITY, Number.MAX_SAFE_INTEGER + 1])(
+    'rejects invalid quantity %s',
+    (quantity) => {
+      expect(() => parsePoolQuantity(quantity)).toThrow('Quantity must be a whole number of at least 1');
+    }
+  );
 });
