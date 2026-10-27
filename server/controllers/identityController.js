@@ -12,11 +12,21 @@ export async function submitIdentityVerification(req, res) {
   if (!idNumber || !idDocumentUrl) {
     return res.status(400).json({ error: 'idNumber and idDocumentUrl (a photo of your ID) are both required' });
   }
+  if (typeof idDocumentUrl !== 'string') {
+    return res.status(400).json({ error: 'ID document must be a JPEG, PNG or WebP image' });
+  }
+  const imageData = idDocumentUrl.match(/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/i);
+  if (!imageData) {
+    return res.status(400).json({ error: 'ID document must be a valid JPEG, PNG or WebP image' });
+  }
+  const base64 = imageData[2];
+  const padding = base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0;
+  const decodedBytes = Math.floor(base64.length * 3 / 4) - padding;
+  if (decodedBytes > MAX_DOC_SIZE_BYTES) {
+    return res.status(400).json({ error: 'ID document photo is too large — please use a smaller image (max 2MB)' });
+  }
   const check = validateSaIdNumber(idNumber);
   if (!check.valid) return res.status(400).json({ error: check.reason });
-  if (idDocumentUrl.length > MAX_DOC_SIZE_BYTES) {
-    return res.status(400).json({ error: 'ID document photo is too large — please use a smaller image (max ~2MB)' });
-  }
 
   try {
     const digits = String(idNumber).trim();
