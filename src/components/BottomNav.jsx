@@ -4,14 +4,14 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
   const tabs = [
     { id: 'home', label: 'Home', icon: 'home', badge: unreadNotifications },
     { id: 'ceremonyhub', label: 'Ceremonies', icon: 'calendar' },
-    { id: 'store', label: 'SmartMatch', icon: 'cart', badge: basketCount },
+    { id: 'store', label: 'Store', icon: 'cart', badge: basketCount },
     { id: 'stokvels', label: 'Stokvels', icon: 'users', badge: pendingApprovals },
     { id: 'more', label: 'More', icon: 'user-round' },
   ]
 
   return (
     <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center print:hidden">
-      <div className="pointer-events-auto safe-bottom mb-3 w-[min(100%-1.5rem,406px)]">
+      <div className="pointer-events-auto safe-bottom mb-3 w-[min(100%-1rem,560px)]">
         <div className="grain relative overflow-hidden rounded-[26px] bg-brand-black px-1.5 py-1.5 shadow-[0_22px_44px_-22px_rgba(43,38,32,0.55)]">
           <div className="motif-thresholds absolute inset-x-0 top-0 h-px opacity-60" />
           <ul className="relative flex items-stretch">
@@ -24,7 +24,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
                     onClick={() => onNavigate(tab.id)}
                     aria-label={tab.label}
                     aria-current={active ? 'page' : undefined}
-                    className="pressable flex h-[58px] w-full flex-col items-center justify-center gap-1 rounded-[20px]"
+                    className="pressable flex min-h-[60px] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-[18px] px-0.5" 
                   >
                     <span className={`relative flex h-8 w-8 items-center justify-center rounded-full transition-colors ${active ? 'bg-terracotta' : ''}`}>
                       {active && <span className="absolute inset-[-4px] rounded-full border border-brand-ochre/45" />}
@@ -33,7 +33,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
                         <span className="absolute -top-1.5 -right-1.5 bg-terracotta text-white text-[9px] font-black w-4 h-4 rounded-pill flex items-center justify-center">{tab.badge}</span>
                       )}
                     </span>
-                    <span className={`text-xs leading-tight tracking-wide ${active ? 'font-bold text-cream' : 'text-cream/80'}`}>
+                    <span className={`max-w-full truncate text-[10px] sm:text-[11px] leading-tight tracking-normal text-center ${active ? 'font-bold text-cream' : 'text-cream/80'}`}>
                       {tab.label}
                     </span>
                   </button>
