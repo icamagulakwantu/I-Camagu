@@ -47,7 +47,7 @@ export function AuthProvider({ children }) {
           setAccessToken(null)
           setUser(null)
         }
-        return false
+        return err.status === 401 ? false : 'retry'
       })
       .finally(() => {
         refreshInFlight.current = null
@@ -58,7 +58,30 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    silentRefresh().finally(() => setCheckingSession(false))
+    let cancelled = false
+    let retryTimer
+    let attempts = 0
+
+    const checkSession = async () => {
+      const result = await silentRefresh()
+      if (cancelled) return
+      if (result === 'retry' && attempts < 5) {
+        // Render free instances can need several seconds to wake up. Retry
+        // transient network/5xx failures instead of rendering a signed-out
+        // screen and never trying again until the user reloads.
+        const delay = Math.min(1000 * (2 ** attempts), 15000)
+        attempts += 1
+        retryTimer = setTimeout(checkSession, delay)
+        return
+      }
+      setCheckingSession(false)
+    }
+
+    checkSession()
+    return () => {
+      cancelled = true
+      if (retryTimer) clearTimeout(retryTimer)
+    }
   }, [])
 
   // The access token expires after 15 minutes server-side; refresh it well
