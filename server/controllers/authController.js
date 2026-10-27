@@ -272,9 +272,27 @@ export async function refresh(req, res) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     res.json({ accessToken, user: serializeUser(user) });
   } catch (error) {
-    res.clearCookie('jid', { path: '/api/auth' });
-    if (error.message === 'COMPROMISE_DETECTED') return res.status(401).json({ error: 'Session invalidated. Please log in again.' });
-    return res.status(401).json({ error: 'Session expired. Please log in again.' });
+    // Only invalidate the cookie when the token is known to be invalid or
+    // expired. A temporary database/outage error must not destroy a valid
+    // refresh session or force a signed-in member to log in again.
+    const invalidToken =
+      error.message === 'COMPROMISE_DETECTED' ||
+      error.message === 'REFRESH_TOKEN_EXPIRED' ||
+      error.message === 'INACTIVITY_WINDOW_EXPIRED' ||
+      error.name === 'JsonWebTokenError' ||
+      error.name === 'TokenExpiredError' ||
+      error.name === 'NotBeforeError';
+
+    if (invalidToken) {
+      res.clearCookie('jid', { path: '/api/auth' });
+      if (error.message === 'COMPROMISE_DETECTED') {
+        return res.status(401).json({ error: 'Session invalidated. Please log in again.' });
+      }
+      return res.status(401).json({ error: 'Session expired. Please log in again.' });
+    }
+
+    console.error('Refresh session temporarily failed:', error.message);
+    return res.status(503).json({ error: 'Session refresh is temporarily unavailable. Please try again.' });
   }
 }
 
