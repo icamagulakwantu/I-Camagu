@@ -246,11 +246,26 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
   };
 }
 
+export function parsePoolQuantity(quantity) {
+  const raw = typeof quantity === 'number' ? String(quantity) : String(quantity ?? '').trim();
+  if (!/^\\d+$/.test(raw)) throw new Error('Quantity must be a whole number of at least 1');
+  const amount = Number(raw);
+  if (!Number.isSafeInteger(amount) || amount < 1) {
+    throw new Error('Quantity must be a whole number of at least 1');
+  }
+  return amount;
+}
+
 export async function joinPoolWithItem(userId, input) {
   const { poolId, skuId, quantity = 1, ceremonyId = null, checklistItemId = null, ceremonyCostItemId = null, fundingSource = 'PERSONAL', stokvelId = null } = input || {};
-  const amount = Number.parseInt(quantity, 10);
-  if (!poolId || !skuId || !Number.isInteger(amount) || amount < 1) {
-    throw new Error('poolId, skuId and a quantity of at least 1 are required');
+  let amount;
+  try {
+    amount = parsePoolQuantity(quantity);
+  } catch {
+    throw new Error('poolId, skuId and a whole-number quantity of at least 1 are required');
+  }
+  if (!poolId || !skuId) {
+    throw new Error('poolId, skuId and a whole-number quantity of at least 1 are required');
   }
   if (!['PERSONAL', 'STOKVEL'].includes(fundingSource)) throw new Error('Invalid funding source');
   const [user, pool, sku] = await Promise.all([
