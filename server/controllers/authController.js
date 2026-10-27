@@ -267,9 +267,8 @@ export async function refresh(req, res) {
   const oldRefreshToken = req.cookies.jid;
   if (!oldRefreshToken) return res.status(401).json({ error: 'No refresh token provided' });
   try {
-    const { accessToken, refreshToken, userId } = await rotateToken(oldRefreshToken);
+    const { accessToken, refreshToken, user } = await rotateToken(oldRefreshToken);
     res.cookie('jid', refreshToken, REFRESH_COOKIE_OPTIONS);
-    const user = await prisma.user.findUnique({ where: { id: userId } });
     res.json({ accessToken, user: serializeUser(user) });
   } catch (error) {
     // Only invalidate the cookie when the token is known to be invalid or
@@ -279,6 +278,7 @@ export async function refresh(req, res) {
       error.message === 'COMPROMISE_DETECTED' ||
       error.message === 'REFRESH_TOKEN_EXPIRED' ||
       error.message === 'INACTIVITY_WINDOW_EXPIRED' ||
+      error.message === 'ACCOUNT_NOT_FOUND' ||
       error.name === 'JsonWebTokenError' ||
       error.name === 'TokenExpiredError' ||
       error.name === 'NotBeforeError';
