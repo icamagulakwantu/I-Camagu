@@ -99,3 +99,8 @@ SEC-03 (remaining authorization routes), SEC-04, COM-01, COM-02, UX-01..03, Q-01
 20. Stokvel with R300: approve a R500 loan with the final vote. Refused ("balance is too low"); loan still PENDING; balance unchanged.
 21. Match a bank deposit by reference code: balance rises once, one CONTRIBUTION entry, balance-check still matches.
 22. Reverse a books entry: stored balance moves back by the same amount; balance-check still matches.
+
+
+## SmartMatch concurrent-join release blocker (review branch)
+
+The review branch `fix/smartmatch-pool-join-race` adds a PostgreSQL row lock around pool joins and refreshes the basket snapshot inside the matching transaction. This addresses a race where a late join could attach to a matched pool or be omitted from its order document. Treat this as **proposed until CI passes and the PR is reviewed**; no production database was touched.
