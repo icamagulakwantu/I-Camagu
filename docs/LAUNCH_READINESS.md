@@ -105,3 +105,9 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 ## Additional Stokvel money-routing blocker — 27 Oct 2026
 
 - [ ] **Do not launch Stokvel-funded SmartMatch settlement until the PSP payout queue is provider-safe.** Current `listPendingSupplierPayouts()` filters out only `MANUAL_EFT`, so `STOKVEL_FUNDS` can be included if its payment status is `CLEARED`; `markPayoutForwarded()` also rejects only `MANUAL_EFT`. Stokvel ledger-funded payments must not be treated as money held by iCamagu or forwarded through the PSP payout workflow. Add an explicit `STOKVEL_FUNDS` exclusion to the queue and a server-side guard to the processor, with regression tests, before launch.
+
+
+## PAY-02 — Stokvel-funded PSP payout routing — 27 Oct 2026
+
+- [ ] Merge and deploy the targeted provider exclusion/processor guard only after CI passes. Regression tests assert Stokvel-funded payments cannot enter the PSP payout queue and cannot be marked forwarded.
+- [ ] Before any future PSP settlement feature, perform a separate review of payment-provider routing, custody, supplier beneficiary, reconciliation, refund and payout semantics. Current 2026 no-custody policy remains in force.

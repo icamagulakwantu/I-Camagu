@@ -10,7 +10,7 @@ const mockPrisma = {
 vi.mock('../config/db.js', () => ({ default: mockPrisma }));
 vi.mock('./notificationDbService.js', () => ({ createNotification: vi.fn() }));
 
-const { isOnlinePaymentConfigured, isOnlinePaymentEligible, initiatePoolPayment, markRefundProcessed, listPendingSupplierRefunds } = await import('./paymentService.js');
+const { isOnlinePaymentConfigured, isOnlinePaymentEligible, initiatePoolPayment, markRefundProcessed, listPendingSupplierRefunds, listPendingSupplierPayouts, markPayoutForwarded } = await import('./paymentService.js');
 
 const ORIGINAL_ENV = { ...process.env };
 
@@ -115,3 +115,35 @@ describe('markRefundProcessed', () => {
     });
   });
 });
+
+describe('PSP supplier payout routing', () => {
+  it('excludes both manual EFT and Stokvel-funded payments from the PSP payout queue', async () => {
+    mockPrisma.poolPayment.findMany.mockResolvedValue([]);
+    await listPendingSupplierPayouts();
+    expect(mockPrisma.poolPayment.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({
+        provider: { notIn: ['MANUAL_EFT', 'STOKVEL_FUNDS'] },
+        status: 'CLEARED',
+        payoutForwardedAt: null,
+      }),
+    }));
+  });
+
+  it('refuses to mark a Stokvel-funded payment as forwarded and does not write a payout update', async () => {
+    mockPrisma.poolPayment.findUnique.mockResolvedValue({
+      id: 'pay_stokvel', provider: 'STOKVEL_FUNDS', status: 'CLEARED', payoutForwardedAt: null,
+    });
+    await expect(markPayoutForwarded('pay_stokvel', { reference: 'abc', note: 'test' }))
+      .rejects.toMatchObject({ status: 400 });
+    expect(mockPrisma.poolPayment.update).not.toHaveBeenCalled();
+  });
+
+  it('still rejects manual EFT payments from the PSP payout workflow', async () => {
+    mockPrisma.poolPayment.findUnique.mockResolvedValue({
+      id: 'pay_eft', provider: 'MANUAL_EFT', status: 'CLEARED', payoutForwardedAt: null,
+    });
+    await expect(markPayoutForwarded('pay_eft', {})).rejects.toThrow(/go straight to the supplier/);
+    expect(mockPrisma.poolPayment.update).not.toHaveBeenCalled();
+  });
+});
+
