@@ -140,12 +140,22 @@ export async function requestPoolPaymentRefund(req, res) {
         error: 'Stokvel-funded pool shares must be handled by the Stokvel officials. No refund request was recorded by this supplier/online refund route.',
       });
     }
+    if (payment.status !== 'CLEARED') {
+      return res.status(409).json({ error: 'A refund can only be requested for a payment confirmed as received. This payment is not marked as received.' });
+    }
     if (payment.refundRequestedAt) return res.status(409).json({ error: 'A refund has already been requested for this payment' });
 
-    const updated = await prisma.poolPayment.update({
-      where: { id: paymentId },
+    // Compare-and-set prevents two simultaneous requests from both being
+    // accepted and ensures a payment cannot become refund-eligible between a
+    // stale read and the write.
+    const request = await prisma.poolPayment.updateMany({
+      where: { id: paymentId, userId: req.userId, status: 'CLEARED', refundRequestedAt: null, provider: { not: 'STOKVEL_FUNDS' } },
       data: { refundRequestedAt: new Date() },
     });
+    if (request.count !== 1) {
+      return res.status(409).json({ error: 'This payment changed while the refund was being requested. Refresh and check its current status.' });
+    }
+    const updated = await prisma.poolPayment.findUnique({ where: { id: paymentId } });
 
     // Manual EFT: the supplier holds the money, so they're the one who can
     // actually process this — notify them in-app, same as before. PayFast:
