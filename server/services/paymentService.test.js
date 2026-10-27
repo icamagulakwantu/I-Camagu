@@ -5,6 +5,7 @@ const mockPrisma = {
     findUnique: vi.fn(),
     findMany: vi.fn(),
     update: vi.fn(),
+    updateMany: vi.fn(),
   },
 };
 vi.mock('../config/db.js', () => ({ default: mockPrisma }));
@@ -96,23 +97,34 @@ describe('markRefundProcessed', () => {
     mockPrisma.poolPayment.findUnique.mockResolvedValue({
       id: 'pay_4', provider: 'PAYFAST', status: 'CLEARED', refundRequestedAt: new Date(),
     });
-    await expect(markRefundProcessed('pay_4', { feeZAR: '-5' })).rejects.toThrow(/positive number/);
+    await expect(markRefundProcessed('pay_4', { feeZAR: '-5' })).rejects.toThrow(/non-negative amount/);
     await expect(markRefundProcessed('pay_4', { feeZAR: 'not-a-number' })).rejects.toThrow(/positive number/);
   });
 
-  it('processes a valid PSP refund and records the fee and note', async () => {
+  it('refuses a refund fee greater than the amount received', async () => {
     mockPrisma.poolPayment.findUnique.mockResolvedValue({
-      id: 'pay_5', provider: 'PAYFAST', status: 'CLEARED', refundRequestedAt: new Date(),
-      userId: 'user_1', amountZAR: '100.00',
+      id: 'pay_fee', provider: 'PAYFAST', status: 'CLEARED', refundRequestedAt: new Date(), amountZAR: '20.00',
     });
-    mockPrisma.poolPayment.update.mockResolvedValue({ id: 'pay_5', status: 'REFUNDED' });
+    await expect(markRefundProcessed('pay_fee', { feeZAR: '20.01' })).rejects.toThrow(/cannot exceed/);
+    expect(mockPrisma.poolPayment.updateMany).not.toHaveBeenCalled();
+  });
+
+  it('processes a valid PSP refund and records the fee and note', async () => {
+    mockPrisma.poolPayment.findUnique
+      .mockResolvedValueOnce({
+        id: 'pay_5', provider: 'PAYFAST', status: 'CLEARED', refundRequestedAt: new Date(),
+        userId: 'user_1', amountZAR: '100.00',
+      })
+      .mockResolvedValueOnce({ id: 'pay_5', status: 'REFUNDED' });
+    mockPrisma.poolPayment.updateMany.mockResolvedValue({ count: 1 });
 
     await markRefundProcessed('pay_5', { feeZAR: '10', note: 'Refunded via EFT' });
 
-    expect(mockPrisma.poolPayment.update).toHaveBeenCalledWith({
-      where: { id: 'pay_5' },
+    expect(mockPrisma.poolPayment.updateMany).toHaveBeenCalledWith({
+      where: { id: 'pay_5', status: 'CLEARED', refundRequestedAt: { not: null }, provider: { notIn: ['MANUAL_EFT', 'STOKVEL_FUNDS'] } },
       data: { status: 'REFUNDED', refundFeeZAR: 10, refundNote: 'Refunded via EFT' },
     });
+    expect(mockPrisma.poolPayment.findUnique).toHaveBeenCalledTimes(2);
   });
 });
 
