@@ -114,6 +114,12 @@ function Login() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Registration failed')
+      if (data.needsEmailVerification) {
+        setCode('')
+        setStep('otp-verify')
+        showToast('Check your inbox for the verification code.', 'info')
+        return
+      }
       login(data.accessToken, data.user)
     } catch (err) {
       setError(err.message)
