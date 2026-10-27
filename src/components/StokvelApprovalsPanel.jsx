@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from './ui/Toast.jsx'
+import Icon from './Icon.jsx'
 
 const rand = (n) => `R${Number(n).toFixed(2)}`
 
@@ -13,6 +14,7 @@ export default function StokvelApprovalsPanel({ stokvelId }) {
   const [data, setData] = useState(null)
   const [busyId, setBusyId] = useState(null)
   const [pins, setPins] = useState({})
+  const [visiblePins, setVisiblePins] = useState({})
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/stokvels/${stokvelId}/approvals`, { headers: { Authorization: `Bearer ${accessToken}` } })
@@ -99,13 +101,18 @@ export default function StokvelApprovalsPanel({ stokvelId }) {
                   </div>
                 ) : (
                   <div className="flex flex-wrap items-center gap-2">
-                    <input
-                      type="password" inputMode="numeric" maxLength={6} autoComplete="off"
-                      aria-label="Your security PIN" placeholder="Your PIN"
-                      value={pins[e.id] || ''}
-                      onChange={(ev) => setPins({ ...pins, [e.id]: ev.target.value.replace(/\D/g, '') })}
-                      className="w-28 text-base border border-ink/20 rounded-soft px-3 py-2.5"
-                    />
+                    <div className="relative">
+                      <input
+                        type={visiblePins[e.id] ? 'text' : 'password'} inputMode="numeric" maxLength={6} autoComplete="off"
+                        aria-label="Your security PIN" placeholder="Your PIN"
+                        value={pins[e.id] || ''}
+                        onChange={(ev) => setPins({ ...pins, [e.id]: ev.target.value.replace(/\D/g, '').slice(0, 6) })}
+                        className="w-28 text-base border border-ink/20 rounded-soft pl-3 pr-10 py-2.5"
+                      />
+                      <button type="button" onClick={() => setVisiblePins((v) => ({ ...v, [e.id]: !v[e.id] }))} aria-label={visiblePins[e.id] ? 'Hide PIN' : 'Show PIN'} className="absolute inset-y-0 right-0 px-2 flex items-center text-ink-muted">
+                        <Icon name={visiblePins[e.id] ? 'eye-off' : 'eye'} size={17} />
+                      </button>
+                    </div>
                     <button type="button" disabled={busyId === e.id || (pins[e.id] || '').length < 4}
                       onClick={() => send(e.id, `expenses/${e.id}/approve`, { pin: pins[e.id] })}
                       className={`${btn} text-white bg-sage`}>
