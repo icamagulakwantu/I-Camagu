@@ -94,7 +94,7 @@ export default function PinSetup({ onBack }) {
             <input
               type="password" inputMode="numeric" autoComplete="current-password"
               placeholder="Current PIN" value={oldPin}
-              onChange={(e) => setOldPin(e.target.value.replace(/\\D/g, '').slice(0, 6))}
+              onChange={(e) => setOldPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
               className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest"
               maxLength={6} required
             />
