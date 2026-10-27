@@ -204,7 +204,15 @@ function MyOrders({ onBack }) {
                     ) : (
                       <>
                         {payment.status === 'CLEARED' ? (
-                          <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Payment confirmed by supplier</p>
+                          payment.provider === 'MANUAL_EFT' ? (
+                            <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Payment confirmed by supplier</p>
+                          ) : payment.provider === 'STOKVEL_FUNDS' ? (
+                            <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Stokvel-funded settlement confirmed; no separate member payment is needed.</p>
+                          ) : (
+                            <p className="text-xs font-bold text-sage-600">
+                              Payment provider confirmed this payment to iCamagu. This does not by itself confirm supplier settlement; do not pay again while iCamagu reconciles it.
+                            </p>
+                          )
                         ) : payment.provider === 'STOKVEL_FUNDS' ? (
                           <p className="text-[11px] text-brand-black/60">
                             {payment.status === 'PENDING_SETTLEMENT'
