@@ -1,15 +1,16 @@
 /**
  * Store taxonomy — one hierarchy, two levels, no competing chip rows.
  *
- *   department (Drinks | Meat | Groceries | Supplies | Clothing)
- *     └── aisle (Live animals, Meat & poultry, Spirits, Wine, …)
+ *   department (Alcohol | Soft drinks & water | Meat | Livestock | Groceries | Non-consumables)
+ *     └── aisle (Beer & cider, Spirits, Meat & poultry, Live animals, …)
  *
  * Maps the real backend `Sku.category` codes (MEAT, LIVESTOCK_ANIMAL,
  * SOFT_DRINKS, WHISKY, …) into a human aisle instead of rendering the raw
  * codes as a flat wall of pills. Display-layer only — no schema change
  * (Sku.category is a plain string, not a DB enum).
  *
- * Five departments, in this order, per the founder's call: alcohol and
+ * Departments are split by the way people shop: alcohol never shares a default list with soft drinks or water, and live animals are separate from meat. Non-consumables are separated from groceries.
+ * Six departments, in this order, per the founder's call: alcohol and
  * food used to sit under one merged "Staples & Dry Goods" department
  * alongside a separate "Vegetables" one — now Groceries and Supplies
  * (ceremony/ritual items) are their own top-level departments, fresh
@@ -21,25 +22,41 @@
 
 export const DEPARTMENTS = [
   {
-    id: 'beverages',
-    name: 'Drinks',
-    short: 'Drinks',
-    xhosa: 'Iziselo',
+    id: 'alcohol',
+    name: 'Alcohol',
+    short: 'Alcohol',
+    xhosa: 'Utywala',
     aisles: [
       { id: 'beer', name: 'Beer & cider', categories: ['BEER', 'CIDER_RTD'] },
       { id: 'spirits', name: 'Spirits', categories: ['BRANDY', 'WHISKY', 'VODKA', 'VODKA_PREMIUM', 'GIN', 'TEQUILA', 'TEQUILA_PREMIUM', 'COGNAC', 'LIQUEUR', 'MIXER'] },
       { id: 'wine', name: 'Wine & sparkling', categories: ['WINE', 'WINE_BOX', 'SPARKLING', 'CHAMPAGNE'] },
-      { id: 'soft', name: 'Soft drinks & water', categories: ['SOFT_DRINKS', 'WATER'] },
+    ],
+  },
+  {
+    id: 'softdrinks',
+    name: 'Soft drinks & water',
+    short: 'Soft drinks',
+    xhosa: 'Iziselo ezinganxilisiyo',
+    aisles: [
+      { id: 'soft', name: 'Soft drinks & water', categories: ['SOFT_DRINKS', 'WATER', 'JUICE', 'ENERGY_DRINK'] },
     ],
   },
   {
     id: 'meat',
-    name: 'Meat & Livestock',
+    name: 'Meat & poultry',
     short: 'Meat',
     xhosa: 'Inyama',
     aisles: [
-      { id: 'livestock', name: 'Live animals', categories: ['LIVESTOCK_ANIMAL'] },
       { id: 'meat', name: 'Meat & poultry', categories: ['MEAT'] },
+    ],
+  },
+  {
+    id: 'livestock',
+    name: 'Livestock',
+    short: 'Livestock',
+    xhosa: 'Imfuyo',
+    aisles: [
+      { id: 'livestock', name: 'Live animals', categories: ['LIVESTOCK_ANIMAL'] },
     ],
   },
   {
@@ -54,21 +71,12 @@ export const DEPARTMENTS = [
     ],
   },
   {
-    id: 'supplies',
-    name: 'Supplies',
-    short: 'Supplies',
-    xhosa: 'Izixhobo',
+    id: 'nonconsumables',
+    name: 'Non-consumables',
+    short: 'Non-consumables',
+    xhosa: 'Izinto ezingatyiwayo',
     aisles: [
-      { id: 'ritual', name: 'Ceremony supplies', categories: ['RITUAL_SUPPLIES', 'ULWALUKO_SUPPLIES'] },
-    ],
-  },
-  {
-    id: 'clothing',
-    name: 'Clothing',
-    short: 'Clothing',
-    xhosa: 'Impahla',
-    aisles: [
-      { id: 'general', name: 'General clothing', categories: ['CLOTHING'] },
+      { id: 'ritual', name: 'Ceremony & household supplies', categories: ['RITUAL_SUPPLIES', 'ULWALUKO_SUPPLIES', 'NON_CONSUMABLE', 'NON_CONSUMABLES', 'HOUSEHOLD', 'CLEANING', 'HYGIENE', 'CLOTHING', 'TOOLS'] },
     ],
   },
 ]
