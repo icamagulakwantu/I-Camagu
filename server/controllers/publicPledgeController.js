@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import { isShareTokenValid } from '../utils/shareToken.js';
 
 // GET /api/public/plan/:token/pledges
 // View-only list of the pledges on a shared ceremony plan. The token is the
@@ -9,6 +10,7 @@ export const getPublicPlanPledges = async (req, res) => {
   try {
     const { token } = req.params;
     if (!token) return res.status(400).json({ error: 'Missing link' });
+    if (!isShareTokenValid(token)) return res.status(404).json({ error: 'This link is invalid or has expired' });
 
     const plan = await prisma.preparationPlan.findUnique({
       where: { shareToken: token },
