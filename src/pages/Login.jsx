@@ -197,8 +197,8 @@ function Login() {
           </p>
           {step === 'email' && (
             <div className="mt-4 rounded-2xl border border-[#4b281b]/15 bg-white/45 px-3.5 py-3">
-              <p className="text-[#4b281b] text-sm font-bold">Community group-buy offer</p>
-              <p className="text-[#4b281b]/90 text-xs leading-snug mt-0.5">Save up to 20% on eligible alcohol, grocery and livestock orders when your community buys together. Final savings depend on the supplier and group order.</p>
+              <p className="text-[#4b281b] text-sm font-bold">SmartMatch Pool</p>
+              <p className="text-[#4b281b]/90 text-xs leading-snug mt-0.5">Join with other people nearby to pool demand and buy alcohol, groceries or livestock together. SmartMatch helps groups work toward better bulk pricing, with savings of up to 20% on eligible orders depending on supplier quotes and group size.</p>
             </div>
           )}
         </div>
