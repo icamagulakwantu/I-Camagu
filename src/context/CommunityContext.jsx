@@ -10,15 +10,18 @@ export function CommunityProvider({ children }) {
   const [activeCeremony, setActiveCeremony] = useState(null);
   const [loadingPools, setLoadingPools] = useState(false);
   const [poolError, setPoolError] = useState('');
+  const [feedError, setFeedError] = useState('');
 
   const refreshPools = useCallback(async () => {
     if (!accessToken || !isAuthenticated) {
       setPools([]);
       setFeed({ pools: [], upcomingClanCeremonies: [], featuredLegends: [] });
+      setFeedError('');
       return [];
     }
     setLoadingPools(true);
     setPoolError('');
+    setFeedError('');
     try {
       const response = await fetch('/api/basket/pool-status/my', {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -32,12 +35,16 @@ export function CommunityProvider({ children }) {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const feedPayload = await feedResponse.json().catch(() => ({}));
-        if (feedResponse.ok) setFeed({
+        if (!feedResponse.ok) throw new Error(feedPayload.error || 'Could not load the community feed');
+        setFeed({
           pools: feedPayload.pools || [],
           upcomingClanCeremonies: feedPayload.upcomingClanCeremonies || [],
           featuredLegends: feedPayload.featuredLegends || [],
         });
-      } catch { /* Pool status remains useful when the community feed is unavailable. */ }
+      } catch (error) {
+        setFeedError(error.message || 'Could not load the community feed');
+        // Keep pool status useful when the community feed is unavailable.
+      }
       return rows;
     } catch (error) {
       setPoolError(error.message || 'Could not refresh SmartMatch pools');
@@ -68,10 +75,11 @@ export function CommunityProvider({ children }) {
     setActiveCeremony,
     pools,
     feed,
+    feedError,
     loadingPools,
     poolError,
     refreshPools,
-  }), [user, activeCeremony, pools, loadingPools, poolError, refreshPools]);
+  }), [user, activeCeremony, pools, feedError, loadingPools, poolError, refreshPools]);
 
   return <CommunityContext.Provider value={value}>{children}</CommunityContext.Provider>;
 }
