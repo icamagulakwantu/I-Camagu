@@ -54,7 +54,7 @@ export const PUBLIC_SKU_SELECT = {
   id: true, name: true, category: true, productType: true,
   bottleFormat: true, unitsPerCase: true, casePriceZAR: true,
   palletPackQty: true, palletPriceZAR: true, supplierPortfolio: true,
-  imageUrl: true, retailPriceZAR: true, retailPriceSource: true,
+  imageUrl: true, retailPriceZAR: true, retailPriceSource: true, retailPriceCheckedAt: true,
   bulkUnit: true, bulkUnitPlural: true, createdAt: true,
 };
 
