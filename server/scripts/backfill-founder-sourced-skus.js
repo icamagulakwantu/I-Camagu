@@ -13,6 +13,10 @@ import prisma from '../config/db.js';
 import { upsertSkuByNameAndBottleFormat } from '../utils/upsertSku.js';
 
 const NEW_SKUS = [
+  // Amstel's actual SA pack range: 750ml returnable quart and 500ml can.
+  // Prices stay null until iCamagu has a verified supplier quote.
+  { name: 'Amstel Lager', category: 'BEER', bottleFormat: 'Quart (750ml)', unitsPerCase: 12 },
+  { name: 'Amstel Lager', category: 'BEER', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
   { name: 'Southern Comfort', category: 'LIQUEUR', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
   { name: 'Captain Morgan Spiced Gold', category: 'RUM', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
   { name: 'Klipdrift Premium', category: 'BRANDY', bottleFormat: '750ml Bottle', unitsPerCase: 12 },
