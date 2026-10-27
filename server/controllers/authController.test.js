@@ -121,6 +121,15 @@ describe('enter the login code', () => {
     expect(result.status).toBe(401);
   });
 
+  it('marks a newly registered email verified after the correct code', async () => {
+    checkOtp.mockResolvedValue({ ok: true });
+    prisma.user.findUnique.mockResolvedValueOnce({ ...MEMBER, emailVerificationRequired: true });
+    prisma.user.update.mockResolvedValueOnce({ ...MEMBER, emailVerificationRequired: false });
+    const result = await call(auth.verifyOtp, { email: 'member@example.com', code: '123456' });
+    expect(result.status).toBe(200);
+    expect(prisma.user.update).toHaveBeenCalledWith({ where: { id: 'user-1' }, data: { emailVerificationRequired: false } });
+  });
+
   it('signs in a real account with the right code', async () => {
     checkOtp.mockResolvedValue({ ok: true });
     prisma.user.findUnique.mockResolvedValueOnce(MEMBER);
@@ -132,6 +141,15 @@ describe('enter the login code', () => {
 });
 
 describe('password sign-in', () => {
+  it('does not create a session for an unverified password registration', async () => {
+    verifyPassword.mockResolvedValue(true);
+    prisma.user.findUnique.mockResolvedValueOnce({ ...MEMBER, emailVerificationRequired: true });
+    const result = await call(auth.loginWithPassword, { email: 'member@example.com', password: 'password123' });
+    expect(result.status).toBe(403);
+    expect(result.body.error).toMatch(/Verify your email/);
+    expect(tokenService.generateTokenPair).not.toHaveBeenCalled();
+  });
+
   it('does the same slow password check when there is no account', async () => {
     verifyPassword.mockResolvedValue(false);
     prisma.user.findUnique.mockResolvedValueOnce(null);
