@@ -297,8 +297,27 @@ export async function refresh(req, res) {
 }
 
 export async function logout(req, res) {
-  res.clearCookie('jid', { path: '/api/auth' });
-  res.json({ message: 'Logged out' });
+  const refreshToken = req.cookies?.jid;
+
+  // Revoke the server-side refresh token as well as clearing the browser
+  // cookie. Clearing only the cookie leaves a copied token usable until it
+  // expires or rotates.
+  try {
+    if (refreshToken) {
+      const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+      await prisma.refreshToken.updateMany({
+        where: { tokenHash, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+    }
+    res.clearCookie('jid', { path: '/api/auth' });
+    return res.json({ message: 'Logged out' });
+  } catch (error) {
+    console.error('Logout token revocation failed:', error.message);
+    // Clear the local cookie even if the database is temporarily unavailable.
+    res.clearCookie('jid', { path: '/api/auth' });
+    return res.status(503).json({ error: 'Signed out on this device, but server-side session revocation could not be confirmed. Please retry.' });
+  }
 }
 
 export async function requestPasswordReset(req, res) {
