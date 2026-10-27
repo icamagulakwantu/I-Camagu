@@ -103,4 +103,11 @@ SEC-03 (remaining authorization routes), SEC-04, COM-01, COM-02, UX-01..03, Q-01
 
 ## SmartMatch concurrent-join release blocker (review branch)
 
-The review branch `fix/smartmatch-pool-join-race` adds a PostgreSQL row lock around pool joins and refreshes the basket snapshot inside the matching transaction. This addresses a race where a late join could attach to a matched pool or be omitted from its order document. Treat this as **proposed until CI passes and the PR is reviewed**; no production database was touched.
+PR #53 merged the PostgreSQL row lock around pool joins and refreshes the basket snapshot inside the matching transaction. CI passed, and PR #55 added a PostgreSQL integration test proving a concurrent join waits for matching and is rejected after the pool closes. This reduces the risk of late joins attaching to matched pools. A full end-to-end concurrent test proving no basket is omitted from the generated order document remains open; no production database was touched.
+
+
+## Render runtime findings (27 Oct 2026)
+
+Verified in Render service metadata and recent startup logs: two auto-deploying web services point to the same repository/main branch and same current commit, but differ in build command and observed optional environment warnings. Both report successful startup database checks. Neither has a configured health-check path. The primary domain is reported by Render as `i-camagu.co.za` on `I-Camagu-1`. Environment values were not available from the service metadata response, so parity remains unverified.
+
+**Action:** configure the verified sender, Sentry and identity-encryption settings only if required, add a health check, compare environment/database targets safely, then choose one canonical service after validating DNS, payment/webhook callbacks and real traffic. Online PayFast credentials are intentionally not a launch requirement while the 2026 no-custody policy is in force.
