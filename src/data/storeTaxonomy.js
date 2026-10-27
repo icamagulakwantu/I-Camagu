@@ -1,7 +1,7 @@
 /**
  * Store taxonomy — one hierarchy, two levels, no competing chip rows.
  *
- *   department (Alcohol | Soft drinks & water | Meat | Livestock | Groceries | Non-consumables)
+ *   department (Alcohol | Soft drinks & water | Meat | Livestock | Groceries | Non-consumables | Other items)
  *     └── aisle (Beer & cider, Spirits, Meat & poultry, Live animals, …)
  *
  * Maps the real backend `Sku.category` codes (MEAT, LIVESTOCK_ANIMAL,
@@ -10,14 +10,9 @@
  * (Sku.category is a plain string, not a DB enum).
  *
  * Departments are split by the way people shop: alcohol never shares a default list with soft drinks or water, and live animals are separate from meat. Non-consumables are separated from groceries.
- * Six departments, in this order, per the founder's call: alcohol and
- * food used to sit under one merged "Staples & Dry Goods" department
- * alongside a separate "Vegetables" one — now Groceries and Supplies
- * (ceremony/ritual items) are their own top-level departments, fresh
- * produce folds into Groceries, and Clothing is a new department shell
- * (no real SKUs yet — same "the tab exists ahead of the catalogue"
- * pattern already used for supplier categories with zero partners on
- * file) ready for when clothing items are added.
+ * Unmapped category codes are deliberately routed to Other items instead of
+ * being silently presented as groceries. Review these SKUs and map them to a
+ * proper department as part of catalogue maintenance.
  */
 
 export const DEPARTMENTS = [
@@ -79,11 +74,20 @@ export const DEPARTMENTS = [
       { id: 'ritual', name: 'Ceremony & household supplies', categories: ['RITUAL_SUPPLIES', 'ULWALUKO_SUPPLIES', 'NON_CONSUMABLE', 'NON_CONSUMABLES', 'HOUSEHOLD', 'CLEANING', 'HYGIENE', 'CLOTHING', 'TOOLS'] },
     ],
   },
+  {
+    id: 'other',
+    name: 'Other items',
+    short: 'Other',
+    xhosa: 'Ezinye izinto',
+    aisles: [
+      { id: 'review', name: 'Other items', categories: ['OTHER', 'UNCATEGORIZED', 'MISC', 'MISCELLANEOUS', 'GENERAL'] },
+    ],
+  },
 ]
 
 export function departmentOf(sku) {
   return DEPARTMENTS.find((d) => d.aisles.some((a) => a.categories.includes(sku?.category)))
-    || DEPARTMENTS.find((d) => d.id === 'groceries')
+    || DEPARTMENTS.find((d) => d.id === 'other')
 }
 
 export function aisleOf(sku) {
