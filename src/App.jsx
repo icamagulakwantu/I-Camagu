@@ -318,12 +318,12 @@ const SCREEN_PATHS = {
 function isKnownAppPath(pathname) {
   if (pathname === '/' || Object.values(SCREEN_PATHS).includes(pathname)) return true;
   return [
-    /^\\/ceremonies\\/[^/]+$/,
-    /^\\/me\\/iziduko\\/[^/]+$/,
-    /^\\/me\\/messages\\/[^/]+$/,
-    /^\\/me\\/clan-groups\\/[^/]+$/,
-    /^\\/ceremonies\\/budget\\/[^/]+$/,
-    /^\\/services\\/ekoyini\\/booking\\/[^/]+$/,
+    /^\/ceremonies\/[^/]+$/,
+    /^\/me\/iziduko\/[^/]+$/,
+    /^\/me\/messages\/[^/]+$/,
+    /^\/me\/clan-groups\/[^/]+$/,
+    /^\/ceremonies\/budget\/[^/]+$/,
+    /^\/services\/ekoyini\/booking\/[^/]+$/,
   ].some((pattern) => pattern.test(pathname));
 }
 
