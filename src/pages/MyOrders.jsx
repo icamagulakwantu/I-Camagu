@@ -207,7 +207,11 @@ function MyOrders({ onBack }) {
                           <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Payment confirmed by supplier</p>
                         ) : payment.provider === 'STOKVEL_FUNDS' ? (
                           <p className="text-[11px] text-brand-black/60">
-                            This share is being funded through your Stokvel. The required officials must approve the funding request. Do not make a separate EFT payment; supplier details will appear after the supplier is confirmed.
+                            {payment.status === 'PENDING_SETTLEMENT'
+                              ? 'Your Stokvel funding request has the required approvals and is awaiting settlement. You do not need to pay separately.'
+                              : payment.status === 'DECLINED'
+                                ? 'Your Stokvel funding request was declined. Contact your officials before making any payment.'
+                                : 'This share is being funded through your Stokvel and is awaiting the required officials’ approval. Do not make a separate EFT payment.'}
                           </p>
                         ) : !payment.pool?.partner ? (
                           <p className="text-[11px] text-brand-black/50">
