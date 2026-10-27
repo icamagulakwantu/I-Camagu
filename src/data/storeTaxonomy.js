@@ -86,6 +86,11 @@ export const DEPARTMENTS = [
 ]
 
 export function departmentOf(sku) {
+  // The current catalogue incorrectly labels Extreme Energy as CIDER_RTD.
+  // Keep this known non-alcoholic product in soft drinks until its source data is corrected.
+  if (sku?.category === 'CIDER_RTD' && /^extreme energy(?:\b|$)/i.test(String(sku?.name || '').trim())) {
+    return DEPARTMENTS.find((d) => d.id === 'softdrinks')
+  }
   return DEPARTMENTS.find((d) => d.aisles.some((a) => a.categories.includes(sku?.category)))
     || DEPARTMENTS.find((d) => d.id === 'other')
 }
