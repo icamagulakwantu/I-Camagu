@@ -7,6 +7,7 @@ const send = vi.fn();
 const createOtp = vi.fn();
 const checkOtp = vi.fn();
 const verifyPassword = vi.fn();
+const isAdminEmail = vi.fn((email) => email === 'admin@i-camagu.co.za' || email === 'icamagulakwantu@gmail.com');
 
 vi.mock('../config/db.js', () => ({ default: prisma }));
 vi.mock('../config/email.js', () => ({ default: { emails: { send } }, FROM_ADDRESS: 'test@example.com' }));
@@ -18,7 +19,7 @@ vi.mock('../services/tokenService.js', () => ({
 vi.mock('../services/passwordService.js', () => ({ hashPassword: vi.fn(async () => 'dummy-hash'), verifyPassword }));
 vi.mock('../services/googleAuthService.js', () => ({ verifyGoogleToken: vi.fn() }));
 vi.mock('../services/izidukoService.js', () => ({ syncUserClanGroups: vi.fn(async () => {}) }));
-vi.mock('../config/admin.js', () => ({ isAdminEmail: () => false }));
+vi.mock('../config/admin.js', () => ({ isAdminEmail }));
 
 const auth = await import('./authController.js');
 const tokenService = await import('../services/tokenService.js');
@@ -147,6 +148,17 @@ describe('password sign-in', () => {
     const result = await call(auth.loginWithPassword, { email: 'member@example.com', password: 'password123' });
     expect(result.status).toBe(403);
     expect(result.body.error).toMatch(/Verify your email/);
+    expect(tokenService.generateTokenPair).not.toHaveBeenCalled();
+  });
+
+  it('requires verified Google sign-in for administrator identities', async () => {
+    verifyPassword.mockResolvedValue(true);
+    prisma.user.findUnique.mockResolvedValueOnce({
+      ...MEMBER, id: 'admin-1', email: 'admin@i-camagu.co.za', emailVerificationRequired: false,
+    });
+    const result = await call(auth.loginWithPassword, { email: 'admin@i-camagu.co.za', password: 'password123' });
+    expect(result.status).toBe(403);
+    expect(result.body.error).toMatch(/verified Google sign-in/);
     expect(tokenService.generateTokenPair).not.toHaveBeenCalled();
   });
 
