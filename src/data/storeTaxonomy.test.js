@@ -6,6 +6,8 @@ describe('SmartMatch store taxonomy', () => {
     expect(departmentOf({ category: 'BEER' }).id).toBe('alcohol');
     expect(departmentOf({ category: 'SOFT_DRINKS' }).id).toBe('softdrinks');
     expect(departmentOf({ category: 'WATER' }).id).toBe('softdrinks');
+    expect(departmentOf({ category: 'MIXER' }).id).toBe('softdrinks');
+    expect(aisleOf({ category: 'MIXER' }).id).toBe('mixers');
     // Known source-data error: energy drink SKUs were tagged CIDER_RTD.
     expect(departmentOf({ category: 'CIDER_RTD', name: 'Extreme Energy' }).id).toBe('softdrinks');
     expect(departmentOf({ category: 'CIDER_RTD', name: 'Extreme Energy' }).id).not.toBe('alcohol');
