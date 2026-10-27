@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // SEC-02: these tests fail if sign-in ever again tells a stranger whether an
 // email has an iCamagu account.
-const prisma = { user: { findUnique: vi.fn() } };
+const prisma = { user: { findUnique: vi.fn(), update: vi.fn() } };
 const send = vi.fn();
 const createOtp = vi.fn();
 const checkOtp = vi.fn();
@@ -116,6 +116,37 @@ describe('password sign-in', () => {
 
     expect(unknown).toEqual(known);
     expect(verifyPassword).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('password reset links', () => {
+  it('uses the configured HTTPS origin instead of the request Host header', async () => {
+    vi.stubEnv('APP_URL', 'https://i-camagu.co.za/path-is-ignored');
+    prisma.user.findUnique.mockResolvedValueOnce(MEMBER);
+    prisma.user.update.mockResolvedValueOnce(MEMBER);
+
+    const req = {
+      body: { email: MEMBER.email },
+      protocol: 'http',
+      get: vi.fn(() => 'attacker.example'),
+    };
+    const res = fakeRes();
+    await auth.requestPasswordReset(req, res);
+    await vi.waitFor(() => expect(send).toHaveBeenCalled());
+
+    const message = send.mock.calls[0][0];
+    expect(message.html).toContain('https://i-camagu.co.za/reset-password/');
+    expect(message.html).not.toContain('attacker.example');
+    vi.unstubAllEnvs();
+  });
+
+  it('does not send reset links when APP_URL is missing or invalid', async () => {
+    vi.stubEnv('APP_URL', 'http://attacker.example');
+    const res = await call(auth.requestPasswordReset, { email: MEMBER.email });
+    expect(res.status).toBe(200);
+    expect(prisma.user.findUnique).not.toHaveBeenCalled();
+    expect(send).not.toHaveBeenCalled();
+    vi.unstubAllEnvs();
   });
 });
 
