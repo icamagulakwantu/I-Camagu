@@ -265,21 +265,41 @@ export async function markRefundProcessed(paymentId, { feeZAR, note }) {
     err.status = 409;
     throw err;
   }
+  if (payment.status !== 'CLEARED') {
+    const err = new Error('Only a payment confirmed as received can be marked refunded');
+    err.status = 409;
+    throw err;
+  }
 
   let parsedFee = 0;
   if (feeZAR !== undefined && feeZAR !== null && feeZAR !== '') {
-    parsedFee = parseFloat(feeZAR);
-    if (isNaN(parsedFee) || parsedFee < 0) {
-      const err = new Error('Refund fee must be a positive number');
+    parsedFee = Number(feeZAR);
+    if (!Number.isFinite(parsedFee) || parsedFee < 0) {
+      const err = new Error('Refund fee must be a non-negative amount');
       err.status = 400;
       throw err;
     }
   }
+  const paidAmount = Number(payment.amountZAR);
+  if (!Number.isFinite(paidAmount) || paidAmount <= 0 || parsedFee > paidAmount) {
+    const err = new Error('Refund fee cannot exceed the amount received');
+    err.status = 400;
+    throw err;
+  }
 
-  const updated = await prisma.poolPayment.update({
-    where: { id: paymentId },
+  // Compare-and-set prevents concurrent administrators from recording the
+  // same refund twice. This records a refund only after the external refund
+  // has actually been executed and the operator has its evidence/reference.
+  const transition = await prisma.poolPayment.updateMany({
+    where: { id: paymentId, status: 'CLEARED', refundRequestedAt: { not: null }, provider: { notIn: ['MANUAL_EFT', 'STOKVEL_FUNDS'] } },
     data: { status: 'REFUNDED', refundFeeZAR: parsedFee, refundNote: note || null },
   });
+  if (transition.count !== 1) {
+    const err = new Error('Payment changed while the refund was being recorded. Refresh and verify its current state.');
+    err.status = 409;
+    throw err;
+  }
+  const updated = await prisma.poolPayment.findUnique({ where: { id: paymentId } });
 
   const { createNotification } = await import('./notificationDbService.js');
   await createNotification(
