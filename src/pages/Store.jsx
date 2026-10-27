@@ -79,7 +79,7 @@ function Store({ onGoToBasket, basketCount }) {
   }
 
   return (
-    <div className="min-h-screen pb-24 bg-cream">
+    <div className="min-h-screen pb-36 bg-cream">
       {/* Sticky Header */}
       <div className="sticky top-0 z-30 bg-cream/95 backdrop-blur-xl border-b border-cream-dark px-5 py-4">
         <div className="flex items-center justify-between gap-2">
