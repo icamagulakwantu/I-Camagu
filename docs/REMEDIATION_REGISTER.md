@@ -125,3 +125,10 @@ Verified in Render service metadata and recent startup logs: two auto-deploying 
 ## UX-05 — SmartMatch basket badge refresh (27 Oct 2026)
 
 **Code change committed to main; CI/deployment verification pending.** The app shell now listens for a shared basket-change event, and the SmartMatch “Buy on my own” action dispatches it after a successful basket addition. The listener is cleaned up on effect teardown; a focused unit test covers event dispatch and the no-window case.
+
+
+## PAY-02 — Stokvel-funded PSP payout routing — 27 Oct 2026 source review
+
+- **Source verified on current `main`:** `server/services/paymentService.js` excludes `STOKVEL_FUNDS` alongside `MANUAL_EFT` from `listPendingSupplierPayouts()` and rejects attempts to mark a Stokvel-funded payment forwarded before updating the row.
+- **Regression coverage verified in source:** `server/services/paymentService.test.js` asserts both the queue filter and the processor rejection/no-update behaviour.
+- **Not yet verified:** current-head CI result and Render deployment. The GitHub commit-status lookup returned an empty status list, which is inconclusive. No production payment operation was performed.
