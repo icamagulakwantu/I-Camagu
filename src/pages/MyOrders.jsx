@@ -205,6 +205,10 @@ function MyOrders({ onBack }) {
                       <>
                         {payment.status === 'CLEARED' ? (
                           <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Payment confirmed by supplier</p>
+                        ) : payment.provider === 'STOKVEL_FUNDS' ? (
+                          <p className="text-[11px] text-brand-black/60">
+                            This share is being funded through your Stokvel. The required officials must approve the funding request. Do not make a separate EFT payment; supplier details will appear after the supplier is confirmed.
+                          </p>
                         ) : !payment.pool?.partner ? (
                           <p className="text-[11px] text-brand-black/50">
                             MOQ reached — we're finalizing a supplier for this pool now. Payment details will show here as soon as one is confirmed.
