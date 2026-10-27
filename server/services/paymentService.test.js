@@ -101,6 +101,14 @@ describe('markRefundProcessed', () => {
     await expect(markRefundProcessed('pay_4', { feeZAR: 'not-a-number' })).rejects.toThrow(/non-negative amount/);
   });
 
+  it('requires external refund evidence before marking a payment refunded', async () => {
+    mockPrisma.poolPayment.findUnique.mockResolvedValue({
+      id: 'pay-evidence', provider: 'PAYFAST', status: 'CLEARED', refundRequestedAt: new Date(), amountZAR: '100.00',
+    });
+    await expect(markRefundProcessed('pay-evidence', { feeZAR: '0' })).rejects.toThrow(/external refund confirmation or bank reference/);
+    expect(mockPrisma.poolPayment.updateMany).not.toHaveBeenCalled();
+  });
+
   it('refuses a refund fee greater than the amount received', async () => {
     mockPrisma.poolPayment.findUnique.mockResolvedValue({
       id: 'pay_fee', provider: 'PAYFAST', status: 'CLEARED', refundRequestedAt: new Date(), amountZAR: '20.00',
