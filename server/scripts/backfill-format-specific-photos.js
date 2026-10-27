@@ -109,12 +109,30 @@ const FORMAT_SPECIFIC_IMAGES = [
   { name: "Sedgwick's Old Brown", bottleFormat: '2 Litre Box', slug: 'sedgwicks-old-brown-box' },
 ];
 
+// This verified South African retailer packshot is specifically the 500ml can,
+// not the 330ml NRB bottle. It is hosted as a direct image so we do not
+// accidentally reuse the generic Hansa product photo for the can row.
+const EXTERNAL_FORMAT_SPECIFIC_IMAGES = [
+  {
+    name: 'Hansa Pilsener',
+    bottleFormat: 'Can (500ml)',
+    imageUrl: 'https://res.cloudinary.com/agrimark/image/upload/v1645439722/uploads/assets/597-HP-500ml-can-render-225d1a.png',
+  },
+];
+
 export async function backfillFormatSpecificPhotos() {
   let totalUpdated = 0;
   for (const { name, bottleFormat, slug } of FORMAT_SPECIFIC_IMAGES) {
     const { count } = await prisma.sku.updateMany({
       where: { name, bottleFormat },
       data: { imageUrl: `/images/brands/${slug}.png` },
+    });
+    totalUpdated += count;
+  }
+  for (const { name, bottleFormat, imageUrl } of EXTERNAL_FORMAT_SPECIFIC_IMAGES) {
+    const { count } = await prisma.sku.updateMany({
+      where: { name, bottleFormat },
+      data: { imageUrl },
     });
     totalUpdated += count;
   }
