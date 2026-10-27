@@ -99,10 +99,17 @@ export async function cancelParkedBasket(req, res) {
       return res.status(409).json({ error: `Only a parked basket can be withdrawn this way (this one is ${basket.status})` });
     }
 
-    const updated = await prisma.basket.update({
-      where: { id: basketId },
+    // Make the status transition conditional in the database. A separate
+    // read followed by update() lets a matcher mark the basket MATCHED between
+    // those operations, leaving an order that contains a cancelled basket.
+    const transition = await prisma.basket.updateMany({
+      where: { id: basketId, userId: req.userId, status: 'PARKED' },
       data: { status: 'CANCELLED' },
     });
+    if (transition.count !== 1) {
+      return res.status(409).json({ error: 'This basket changed state while you were withdrawing it. Refresh your pool and order status.' });
+    }
+    const updated = await prisma.basket.findUnique({ where: { id: basketId } });
 
     res.json({ basket: updated, message: 'Basket withdrawn from the pool.' });
   } catch (error) {
