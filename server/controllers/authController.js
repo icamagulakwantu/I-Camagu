@@ -306,6 +306,21 @@ export async function requestPasswordReset(req, res) {
   if (!email) return res.status(400).json({ error: 'Email is required' });
   const genericReply = { message: 'If an account exists with this email, a reset link has been sent.' };
 
+  // Never build password-reset links from Host / X-Forwarded-Host: those
+  // headers are request-controlled and can poison a legitimate reset email.
+  // APP_URL must be configured to the public HTTPS origin on the deployment.
+  let publicAppUrl;
+  try {
+    const configuredUrl = new URL(process.env.APP_URL || '');
+    if (configuredUrl.protocol !== 'https:' || configuredUrl.username || configuredUrl.password) {
+      return res.json(genericReply);
+    }
+    publicAppUrl = configuredUrl.origin;
+  } catch {
+    console.error('Password reset email skipped: APP_URL must be a valid public HTTPS URL.');
+    return res.json(genericReply);
+  }
+
   try {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || !user.passwordHash) return res.json(genericReply);
@@ -319,7 +334,7 @@ export async function requestPasswordReset(req, res) {
       data: { passwordResetTokenHash: tokenHash, passwordResetExpiresAt: expiresAt },
     });
 
-    const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${rawToken}`;
+    const resetUrl = `${publicAppUrl}/reset-password/${rawToken}`;
     sendQuietly({
       from: FROM_ADDRESS,
       to: email,
