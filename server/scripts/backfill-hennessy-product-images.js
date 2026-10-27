@@ -47,6 +47,14 @@ async function applyVerifiedCognacPackshots() {
   return updated;
 }
 
+async function runRepairStep(label, task) {
+  try {
+    await task();
+  } catch (err) {
+    console.error(`Store catalogue repair step "${label}" failed: ${err?.message}`);
+  }
+}
+
 async function ensureAmstelFormats() {
   const formats = [
     { name: 'Amstel Lager', category: 'BEER', productType: 'ALCOHOL', bottleFormat: 'Quart (750ml)', unitsPerCase: 12, casePriceZAR: null, supplierPortfolio: 'SAB' },
@@ -86,18 +94,18 @@ export async function backfillHennessyProductImages() {
   if (process.env.RUN_BOOT_STORE_CATALOGUE_REPAIR === 'true') {
     console.warn('RUN_BOOT_STORE_CATALOGUE_REPAIR=true: applying targeted Store image and pack-format corrections.');
     // Correct existing beer/cider pack-size labels before assigning their images.
-    await fixBeerQuartFormats();
-    await fixSavannaDryFormat();
-    await fixPackSizes();
-    await backfillQuartGaps();
-    await backfillFounderSourcedSkus();
-    await ensureAmstelFormats();
-    await removeBlackLabelDumpies();
-    await backfillBrandImages();
-    await backfillExtractedBrandPhotos();
-    await backfillFormatSpecificPhotos();
-    await applyVerifiedCognacPackshots();
-    await clearBrokenBrandPhotos();
+    await runRepairStep('beer quart sizes', fixBeerQuartFormats);
+    await runRepairStep('Savanna Dry size', fixSavannaDryFormat);
+    await runRepairStep('beer/cider can and dumpy sizes', fixPackSizes);
+    await runRepairStep('verified quart gaps', backfillQuartGaps);
+    await runRepairStep('founder-confirmed SKU formats', backfillFounderSourcedSkus);
+    await runRepairStep('Amstel quart and can', ensureAmstelFormats);
+    await runRepairStep('Black Label nonexistent dumpy', removeBlackLabelDumpies);
+    await runRepairStep('brand image defaults', backfillBrandImages);
+    await runRepairStep('product photo mappings', backfillExtractedBrandPhotos);
+    await runRepairStep('format-specific photos', backfillFormatSpecificPhotos);
+    await runRepairStep('verified cognac packshots', applyVerifiedCognacPackshots);
+    await runRepairStep('broken local image cleanup', clearBrokenBrandPhotos);
     console.log('Targeted Store catalogue repair completed. Unset RUN_BOOT_STORE_CATALOGUE_REPAIR now.');
     return;
   }
