@@ -128,12 +128,12 @@ export async function requestPoolPaymentRefund(req, res) {
     });
     if (!payment || payment.userId !== req.userId) return res.status(404).json({ error: 'Payment not found' });
     if (payment.status === 'REFUNDED') return res.status(409).json({ error: 'This payment has already been refunded' });
-    if (payment.refundRequestedAt) return res.status(409).json({ error: 'A refund has already been requested for this payment' });
     if (payment.provider === 'STOKVEL_FUNDS') {
       return res.status(409).json({
         error: 'Stokvel-funded pool shares must be handled by the Stokvel officials. No refund request was recorded by this supplier/online refund route.',
       });
     }
+    if (payment.refundRequestedAt) return res.status(409).json({ error: 'A refund has already been requested for this payment' });
 
     const updated = await prisma.poolPayment.update({
       where: { id: paymentId },
