@@ -14,8 +14,6 @@ const STEP_META = {
   'otp-verify': { title: 'Enter code', depth: 3 },
 }
 
-const WHO_CAN_JOIN = ['On your own', 'With your stokvel', 'Tavern owners']
-
 function ErrorBanner({ message }) {
   if (!message) return null
   return (
@@ -167,8 +165,8 @@ function Login() {
     <div className="min-h-screen icamagu-bg flex flex-col items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm animate-slide-up">
 
-        <div className="wash-ember rings rounded-t-soft px-6 pt-7 pb-6">
-          <div className="flex items-center gap-2.5 mb-4">
+        <div className="wash-ember rounded-t-soft px-6 pt-6 pb-5">
+          <div className="flex items-center gap-2.5 mb-5">
             <img
               src="/icons/source/gateway-mark-1024.png"
               alt="iCamagu"
@@ -177,45 +175,27 @@ function Login() {
             />
             <span className="font-display font-bold text-2xl text-[#4b281b]">iCamagu</span>
           </div>
-          <h1 className="font-display font-bold text-[1.55rem] leading-tight text-[#4b281b] text-balance">
-            {step === 'email' && 'Buy together. Save more.'}
+          <h1 className="font-display font-bold text-[1.65rem] leading-tight text-[#4b281b] text-balance">
+            {step === 'email' && 'Your people. Your plans. Together.'}
             {step === 'register' && 'Joyina iCamagu'}
             {step === 'password-login' && 'Wamkelekile'}
             {step === 'forgot-password' && 'Reset your password'}
             {step === 'otp-verify' && 'Check your inbox'}
           </h1>
-          {/* English subtext for Xhosa headings */}
-          {step === 'register' && (
-            <p className="text-[#4b281b]/90 text-sm mt-0.5">Join iCamagu</p>
-          )}
-          {step === 'password-login' && (
-            <p className="text-[#4b281b]/90 text-sm mt-0.5">Welcome</p>
-          )}
-          <p className="text-[#4b281b] text-sm mt-1.5 leading-snug break-words">
-            {step === 'email' && 'Save up to 20% on Mgidi drinks and groceries. Matchmaker joins your order with others nearby so you pay the bulk price. No stokvel needed.'}
+          {step === 'register' && <p className="text-[#4b281b]/85 text-sm mt-1">Join iCamagu</p>}
+          {step === 'password-login' && <p className="text-[#4b281b]/85 text-sm mt-1">Welcome back</p>}
+          <p className="text-[#4b281b]/90 text-sm mt-2 leading-snug break-words">
+            {step === 'email' && 'Plan ceremonies, organise your stokvel and buy together in one place.'}
             {step === 'register' && `Create your account for ${email}.`}
             {step === 'password-login' && email}
             {step === 'forgot-password' && `We'll send a reset link to ${email}`}
             {step === 'otp-verify' && `If an iCamagu account uses ${email}, we've sent it a 6-digit code.`}
           </p>
           {step === 'email' && (
-            <>
-              <div className="flex flex-wrap gap-1.5 mt-4">
-                {WHO_CAN_JOIN.map((label) => (
-                  <span key={label} className="flex items-center gap-1 bg-white/45 border border-[#4b281b]/20 text-[#4b281b] text-[11px] font-bold px-2.5 py-1 rounded-pill">
-                    <Icon name="check" size={11} color="#4b281b" />
-                    {label}
-                  </span>
-                ))}
-              </div>
-              {/* Tagline: Xhosa with English subtext */}
-              <p className="text-[#4b281b]/90 text-xs font-semibold uppercase tracking-[0.14em] mt-4">
-                Lungiselela isiko/umcimbi · Incubeko ngaphambi kwemali
-              </p>
-              <p className="text-[#4b281b]/90 text-xs tracking-wide mt-0.5">
-                Plan your ceremony · Culture before capital
-              </p>
-            </>
+            <div className="mt-4 rounded-2xl border border-[#4b281b]/15 bg-white/45 px-3.5 py-3">
+              <p className="text-[#4b281b] text-sm font-bold">Livestock group-buy offer</p>
+              <p className="text-[#4b281b]/90 text-xs leading-snug mt-0.5">Save up to 20% on eligible livestock orders when your community buys together. Final savings depend on the supplier and group order.</p>
+            </div>
           )}
         </div>
 
@@ -254,7 +234,7 @@ function Login() {
                 disabled={loading}
                 className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 text-[15px] pressable shadow-terracotta"
               >
-                Sign in with email →
+                Continue with email →
               </button>
               <button
                 type="button"
@@ -269,7 +249,7 @@ function Login() {
                 }}
                 className="w-full border-2 border-terracotta/30 text-terracotta font-bold py-3 rounded-pill text-sm pressable"
               >
-                Create a new account / profile
+                Create an account
               </button>
               <div className="flex items-center gap-3 my-1">
                 <div className="flex-1 h-px bg-cream-dark" />
@@ -278,7 +258,7 @@ function Login() {
               </div>
               <div ref={googleBtnRef} className="flex justify-center" />
               <p className="text-center text-[11px] text-ink-muted pt-1">
-                Free to join. No card required.
+                Free to join · No card required
               </p>
             </form>
           )}
