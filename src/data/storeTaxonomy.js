@@ -23,7 +23,7 @@ export const DEPARTMENTS = [
     xhosa: 'Utywala',
     aisles: [
       { id: 'beer', name: 'Beer & cider', categories: ['BEER', 'CIDER_RTD'] },
-      { id: 'spirits', name: 'Spirits', categories: ['BRANDY', 'WHISKY', 'VODKA', 'VODKA_PREMIUM', 'GIN', 'TEQUILA', 'TEQUILA_PREMIUM', 'COGNAC', 'LIQUEUR', 'MIXER'] },
+      { id: 'spirits', name: 'Spirits', categories: ['BRANDY', 'WHISKY', 'VODKA', 'VODKA_PREMIUM', 'GIN', 'TEQUILA', 'TEQUILA_PREMIUM', 'COGNAC', 'LIQUEUR'] },
       { id: 'wine', name: 'Wine & sparkling', categories: ['WINE', 'WINE_BOX', 'SPARKLING', 'CHAMPAGNE'] },
     ],
   },
@@ -34,6 +34,7 @@ export const DEPARTMENTS = [
     xhosa: 'Iziselo ezinganxilisiyo',
     aisles: [
       { id: 'soft', name: 'Soft drinks & water', categories: ['SOFT_DRINKS', 'WATER', 'JUICE', 'ENERGY_DRINK'] },
+      { id: 'mixers', name: 'Mixers & tonic', categories: ['MIXER'] },
     ],
   },
   {
