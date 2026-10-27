@@ -81,6 +81,7 @@ const FORMAT_SPECIFIC_IMAGES = [
   // sent after the Black Label check — each of these had its bottle shot
   // (or, for Budweiser, its can shot) standing in for every format.
   { name: 'Castle Lite', bottleFormat: 'Can (500ml)', slug: 'castle-lite-can' },
+  { name: 'Amstel Lager', bottleFormat: 'Quart (750ml)', slug: 'amstel-lager' },
   { name: 'Amstel Lager', bottleFormat: 'Can (500ml)', slug: 'amstel-lager-can' },
   { name: 'Castle Milk Stout', bottleFormat: 'Can (500ml)', slug: 'castle-milk-stout-can' },
   // Budweiser's default (backfill-extracted-brand-photos.js) used to be its
