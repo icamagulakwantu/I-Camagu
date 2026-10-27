@@ -460,22 +460,34 @@ export const generateShareLink = async (req, res) => {
 };
 
 export const getPublicPlan = async (req, res) => {
-      const { token } = req.params;
-        try {
-                const plan = await prisma.preparationPlan.findUnique({
-                          where: { shareToken: token },
-                                include: {
-                                            checklistItems: true,
-                                                    pledges: true,
-                                                            host: { select: { firstName: true, lastName: true } },
-                                },
-                });
-                    if (!plan) return res.status(404).json({ error: 'This link is invalid or has expired' });
-                        res.json(plan);
-        } catch (error) {
-                console.error('Get public plan error:', error.message);
-                    res.status(500).json({ error: 'Could not load shared plan' });
-        }
+  const { token } = req.params;
+  try {
+    if (!token) return res.status(400).json({ error: 'Missing link' });
+
+    // A share token intentionally exposes a read-only checklist, not the full
+    // PreparationPlan, linked pledge records, or unrelated database fields.
+    // Keep this allowlist aligned with PublicPlanView's actual requirements.
+    const plan = await prisma.preparationPlan.findUnique({
+      where: { shareToken: token },
+      select: {
+        title: true,
+        checklistItems: {
+          select: {
+            id: true,
+            phase: true,
+            isChecked: true,
+            label: true,
+          },
+        },
+        host: { select: { firstName: true, lastName: true } },
+      },
+    });
+    if (!plan) return res.status(404).json({ error: 'This link is invalid or has expired' });
+    res.json(plan);
+  } catch (error) {
+    console.error('Get public plan error:', error.message);
+    res.status(500).json({ error: 'Could not load shared plan' });
+  }
 };
 
 // ============================================================================
