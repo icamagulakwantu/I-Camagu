@@ -113,8 +113,6 @@ Verified in Render service metadata and recent startup logs: two auto-deploying 
 **Action:** configure the verified sender, Sentry and identity-encryption settings only if required, add a health check, compare environment/database targets safely, then choose one canonical service after validating DNS, payment/webhook callbacks and real traffic. Online PayFast credentials are intentionally not a launch requirement while the 2026 no-custody policy is in force.
 
 
-## PAY-02 — Stokvel-funded payments can enter the PSP payout queue (27 Oct 2026)
+## PAY-02 — Stokvel-funded payments in PSP payout queue (27 Oct 2026)
 
-**Status: open release blocker.** In current `main`, `listPendingSupplierPayouts()` excludes `MANUAL_EFT` but not `STOKVEL_FUNDS`; `markPayoutForwarded()` similarly rejects `MANUAL_EFT` only. A Stokvel-funded payment that reaches `CLEARED` could therefore be surfaced as if it were a PSP-held supplier payout. This is inconsistent with the no-custody policy and the Stokvel ledger model.
-
-Required fix: explicitly exclude `STOKVEL_FUNDS` from the PSP payout queue and reject it in the payout processor; add tests proving no payout update is written. Do not process any Stokvel-funded rows through the PSP payout workflow. No production records were changed during this review.
+**Status: fix prepared on PR branch; merge gated on CI.** The payout queue now excludes both `MANUAL_EFT` and `STOKVEL_FUNDS`, and the server-side processor rejects Stokvel-funded rows before writing payout-forwarded metadata. Regression tests verify the queue filter and that no update is written for a blocked payment. Do not process Stokvel-funded rows through the PSP payout workflow. After CI passes, verify the guard is present on the deployed commit; do not inspect or alter production financial rows as part of this change.
