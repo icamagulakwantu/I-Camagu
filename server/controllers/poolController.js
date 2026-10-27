@@ -99,20 +99,33 @@ export async function cancelParkedBasket(req, res) {
       return res.status(409).json({ error: `Only a parked basket can be withdrawn this way (this one is ${basket.status})` });
     }
 
-    // Make the status transition conditional in the database. A separate
-    // read followed by update() lets a matcher mark the basket MATCHED between
-    // those operations, leaving an order that contains a cancelled basket.
-    const transition = await prisma.basket.updateMany({
-      where: { id: basketId, userId: req.userId, status: 'PARKED' },
-      data: { status: 'CANCELLED' },
+    // Use the same pool-row lock as matching. A conditional update alone is
+    // insufficient if the matcher already read PARKED and later overwrites
+    // CANCELLED with MATCHED inside its transaction.
+    const updated = await prisma.$transaction(async (tx) => {
+      if (basket.poolId) {
+        await tx.$queryRaw`SELECT "id" FROM "BulkPool" WHERE "id" = ${basket.poolId} FOR UPDATE`;
+      }
+      const current = await tx.basket.findUnique({ where: { id: basketId } });
+      if (!current || current.userId !== req.userId) {
+        throw Object.assign(new Error('Basket not found'), { httpStatus: 404 });
+      }
+      if (current.status !== 'PARKED') {
+        throw Object.assign(new Error('This basket has already started matching or ordering and can no longer be withdrawn.'), { httpStatus: 409 });
+      }
+      const transition = await tx.basket.updateMany({
+        where: { id: basketId, userId: req.userId, status: 'PARKED' },
+        data: { status: 'CANCELLED' },
+      });
+      if (transition.count !== 1) {
+        throw Object.assign(new Error('This basket changed state while you were withdrawing it. Refresh your pool and order status.'), { httpStatus: 409 });
+      }
+      return tx.basket.findUnique({ where: { id: basketId } });
     });
-    if (transition.count !== 1) {
-      return res.status(409).json({ error: 'This basket changed state while you were withdrawing it. Refresh your pool and order status.' });
-    }
-    const updated = await prisma.basket.findUnique({ where: { id: basketId } });
 
     res.json({ basket: updated, message: 'Basket withdrawn from the pool.' });
   } catch (error) {
+    if (error.httpStatus) return res.status(error.httpStatus).json({ error: error.message });
     console.error('Cancel parked basket error:', error.message);
     res.status(500).json({ error: 'Could not withdraw basket' });
   }
