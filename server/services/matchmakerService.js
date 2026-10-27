@@ -7,11 +7,30 @@ import { generateUniqueReference } from '../utils/referenceGenerator.js';
 // Serialize a pool join against matching. The lock is held until the
 // caller's transaction commits, so a match cannot close the pool between the
 // status check and the new basket being created.
-export async function lockOpenPoolForJoin(tx, poolId) {
+export async function lockOpenPoolForJoin(tx, poolId, incomingCases = 0) {
   const lockedRows = await tx.$queryRaw`SELECT "id" FROM "BulkPool" WHERE "id" = ${poolId} FOR UPDATE`;
   if (!lockedRows.length) throw new Error('Pool not found');
-  const pool = await tx.bulkPool.findUnique({ where: { id: poolId }, select: { status: true } });
+  const pool = await tx.bulkPool.findUnique({
+    where: { id: poolId },
+    select: { status: true, deadline: true, capCases: true, moqTarget: true },
+  });
   if (!pool || pool.status !== 'OPEN') throw new Error('This pool is no longer open');
+  if (pool.deadline && new Date(pool.deadline).getTime() <= Date.now()) {
+    throw new Error('This pool has passed its joining deadline');
+  }
+  if (pool.capCases != null) {
+    const activeBaskets = await tx.basket.findMany({
+      where: { poolId, status: { not: 'CANCELLED' } },
+      select: { items: { select: { quantity: true } } },
+    });
+    const currentCases = activeBaskets.reduce(
+      (sum, basket) => sum + basket.items.reduce((itemSum, item) => itemSum + item.quantity, 0),
+      0,
+    );
+    if (currentCases + incomingCases > pool.capCases) {
+      throw new Error(`This pool has reached its case cap of ${pool.capCases}`);
+    }
+  }
   return pool;
 }
 
@@ -245,7 +264,14 @@ export async function parkItemsIntoPool({
   if (!userId || !poolId) throw new Error('userId and poolId are required');
   if (!itemIds.length && !itemSpecs.length) throw new Error('At least one item is required');
   return prisma.$transaction(async (tx) => {
-    await lockOpenPoolForJoin(tx, poolId);
+    // Calculate the exact incoming case count while holding the pool lock.
+    // Both invited joins and checklist-item joins pass through this path.
+    const movedItems = itemIds.length
+      ? await tx.basketItem.findMany({ where: { id: { in: itemIds } }, select: { quantity: true } })
+      : [];
+    const incomingCases = itemSpecs.reduce((sum, item) => sum + item.quantity, 0)
+      + movedItems.reduce((sum, item) => sum + item.quantity, 0);
+    await lockOpenPoolForJoin(tx, poolId, incomingCases);
     const basket = await tx.basket.create({
       data: {
         userId,
