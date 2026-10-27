@@ -55,6 +55,16 @@ async function runRepairStep(label, task) {
   }
 }
 
+async function fixNonAlcoholicCategories() {
+  const energy = await prisma.sku.updateMany({
+    where: { name: 'Extreme Energy', category: 'CIDER_RTD' },
+    data: { category: 'ENERGY_DRINK' },
+  });
+  if (energy.count > 0) {
+    console.log(`Non-alcoholic category repair: ${energy.count} Extreme Energy SKU row(s) moved from CIDER_RTD to ENERGY_DRINK.`);
+  }
+}
+
 async function ensureAmstelFormats() {
   const formats = [
     { name: 'Amstel Lager', category: 'BEER', productType: 'ALCOHOL', bottleFormat: 'Quart (750ml)', unitsPerCase: 12, casePriceZAR: null, supplierPortfolio: 'SAB' },
@@ -131,6 +141,7 @@ export async function backfillHennessyProductImages() {
     await runRepairStep('beer/cider can and dumpy sizes', fixPackSizes);
     await runRepairStep('verified quart gaps', backfillQuartGaps);
     await runRepairStep('founder-confirmed SKU formats', backfillFounderSourcedSkus);
+    await runRepairStep('non-alcoholic category contamination', fixNonAlcoholicCategories);
     await runRepairStep('Amstel quart and can', ensureAmstelFormats);
     await runRepairStep('Black Label nonexistent dumpy', removeBlackLabelDumpies);
     await runRepairStep('Guinness Foreign Extra bottle size', repairGuinnessForeignExtraFormats);
