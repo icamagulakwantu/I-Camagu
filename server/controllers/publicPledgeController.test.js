@@ -9,6 +9,7 @@ vi.mock('../config/db.js', () => ({
 
 import prisma from '../config/db.js';
 import { getPublicPlanPledges } from './publicPledgeController.js';
+import { createShareToken } from '../utils/shareToken.js';
 
 function responseRecorder() {
   return {
@@ -28,7 +29,8 @@ describe('getPublicPlanPledges privacy', () => {
       { id: 'pledge-1', pledgerName: 'Family Member', relationship: 'Aunt', pledgedItem: 'Meat', pledgedAmountZAR: '1000.00', paidAmountZAR: '1000.00' },
       { id: 'pledge-2', pledgerName: 'Family Member 2', relationship: null, pledgedItem: 'Groceries', pledgedAmountZAR: '500.00', paidAmountZAR: '100.00' },
     ]);
-    const req = { params: { token: 'share-token' } };
+    const token = createShareToken(Date.now(), 'e'.repeat(32));
+    const req = { params: { token } };
     const res = responseRecorder();
 
     await getPublicPlanPledges(req, res);
