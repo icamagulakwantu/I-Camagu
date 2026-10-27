@@ -111,3 +111,10 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 
 - [ ] Merge and deploy the targeted provider exclusion/processor guard only after CI passes. Regression tests assert Stokvel-funded payments cannot enter the PSP payout queue and cannot be marked forwarded.
 - [ ] Before any future PSP settlement feature, perform a separate review of payment-provider routing, custody, supplier beneficiary, reconciliation, refund and payout semantics. Current 2026 no-custody policy remains in force.
+
+
+## SmartMatch UI corrections — 27 October 2026
+
+- [x] Removed wording that could imply a guaranteed or research-backed 8–10% SmartMatch saving. The card now states that savings remain unconfirmed until the supplier provides a written quote for the specific combined order.
+- [x] Added a basket-change event so the navigation badge refreshes after the SmartMatch “Buy on my own” action, with listener cleanup and a focused unit test.
+- [ ] Run the relevant CI tests/build and verify the deployed Render commit before treating these changes as production-verified.
