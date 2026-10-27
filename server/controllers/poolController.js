@@ -10,7 +10,7 @@ export async function getSmartMatchCommunityFeed(req, res) {
     const feed = await getCommunityFeed(req.userId);
     res.json(feed);
   } catch (error) {
-    console.error('Community feed error:', error.message);
+    console.error('Community feed error:', error?.stack || error);
     res.status(500).json({ error: 'Could not load the community feed' });
   }
 }
