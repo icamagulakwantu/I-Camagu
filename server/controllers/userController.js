@@ -1,7 +1,7 @@
 // backend/controllers/userController.js
 import prisma from '../config/db.js';
 import { syncUserClanGroups } from '../services/izidukoService.js';
-import { setPin, hasPinSet } from '../services/pinService.js';
+import { setPin, hasPinSet, verifyPin, pinFailureResponse } from '../services/pinService.js';
 import { matchClan } from '../services/clanMatchService.js';
 
 // Live availability check as someone types a username, so "already taken"
@@ -109,8 +109,28 @@ export async function updateProfile(req, res) {
 }
 
 export async function setUserPin(req, res) {
-  const { pin } = req.body;
+  const { pin, oldPin } = req.body;
   try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { pinHash: true },
+    });
+    if (!user) return res.status(404).json({ error: 'Account not found' });
+
+    // Setting a first PIN only requires an authenticated account. Replacing an
+    // existing PIN requires proof of the current PIN to limit damage from a
+    // stolen access token.
+    if (user.pinHash) {
+      if (typeof oldPin !== 'string' || !/^\\d{4,6}$/.test(oldPin)) {
+        return res.status(400).json({ error: 'Enter your current PIN to change it' });
+      }
+      const check = await verifyPin(req.userId, oldPin);
+      if (!check.valid) {
+        const failure = pinFailureResponse(check);
+        return res.status(failure.status).json({ error: failure.error });
+      }
+    }
+
     await setPin(req.userId, pin);
     res.json({ message: 'PIN set successfully' });
   } catch (error) {
