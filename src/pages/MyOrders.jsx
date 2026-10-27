@@ -283,6 +283,10 @@ function MyOrders({ onBack }) {
                         )}
                         {payment.refundRequestedAt ? (
                           <p className="text-[11px] text-terracotta font-bold mt-2">Refund requested — awaiting supplier</p>
+                        ) : payment.provider === 'STOKVEL_FUNDS' ? (
+                          <p className="text-[11px] text-brand-black/60 mt-2">
+                            For a Stokvel-funded order, contact your Chair/Treasurer to discuss cancellation or a refund. This screen does not submit a refund request for Stokvel funds.
+                          </p>
                         ) : (
                           <button
                             onClick={() => requestRefund(payment.id)}
