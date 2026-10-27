@@ -195,7 +195,7 @@ export default function More({ onNavigate }) {
                 {section.english && <span className="block text-[11px] text-ink-muted mt-0.5">{section.english}</span>}
                 <span className="block text-[11px] text-ink-muted mt-1">{items.length} options</span>
               </span>
-              <Icon name={expandedSections.includes(section.title) ? 'chevronUp' : 'chevronDown'} size={18} color="#8a8278" />
+              <Icon name={expandedSections.includes(section.title) ? 'arrowUp' : 'arrowDown'} size={18} color="#8a8278" />
             </button>
             {expandedSections.includes(section.title) && (
               <div className={cn('card-paper divide-y divide-terracotta/10 overflow-hidden mt-2', alt && 'wash-clay')}> 
