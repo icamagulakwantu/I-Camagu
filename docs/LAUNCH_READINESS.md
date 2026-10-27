@@ -111,3 +111,8 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 
 - [ ] Merge and deploy the targeted provider exclusion/processor guard only after CI passes. Regression tests assert Stokvel-funded payments cannot enter the PSP payout queue and cannot be marked forwarded.
 - [ ] Before any future PSP settlement feature, perform a separate review of payment-provider routing, custody, supplier beneficiary, reconciliation, refund and payout semantics. Current 2026 no-custody policy remains in force.
+
+
+## SmartMatch basket badge — 27 Oct 2026
+
+- [ ] Review and merge the basket-change notification fix after CI passes. Verify the SmartMatch “Buy on my own” action updates the basket badge without a page reload and does not leave event listeners after unmount.
