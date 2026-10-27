@@ -104,7 +104,7 @@ export async function registerWithPassword(req, res) {
   try {
     // Still reveals that an account exists (SEC-02 residual): fixing that needs
     // an email-confirmation step on sign-up. Rate limited by authLimiter.
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await prisma.user.findUnique({ where: { email: cleanEmail(email).toLowerCase() } });
     if (existing) return res.status(409).json({ error: 'An account with this email already exists. Go back and sign in instead.' });
 
     const passwordHash = await hashPassword(password);
