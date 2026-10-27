@@ -53,6 +53,7 @@
 
 - [ ] Test Android Chrome and installed PWA on a physical Android device: login/password/OTP, keyboard resize, focus, autofill, form contrast, bottom navigation, long forms, offline/reconnect and small-screen layouts.
 - [ ] Test current Safari/Chrome desktop and one lower-powered Android device for rendering and performance.
+- [ ] Render configuration review (27 Oct 2026): two web services (`I-Camagu` and `I-Camagu-1`) currently point to this repository's `main` branch and both auto-deploy, but use different public URLs and slightly different build commands. Neither has an HTTP health-check path configured. Confirm the canonical public URL, environment/database parity and callback URLs; configure `/api/health` on the intended service after verifying its readiness behavior. Do not delete or disable either service until usage and environment equivalence are established.
 - [ ] Confirm error monitoring, health checks, logs without sensitive data, backups, restore procedure, database connection limits, rollback plan and a named incident owner.
 - [ ] Perform a staging smoke test with test accounts and non-production payment credentials. Do not use real family/stokvel funds during launch rehearsal.
 - [ ] Complete a founder sign-off on pricing, ceremony types, cultural language, privacy text, terms, customer support route and launch scope.
