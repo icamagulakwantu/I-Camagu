@@ -74,6 +74,7 @@ function Stokvels({ onBack, onOpenShrineFund }) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [pinModal, setPinModal] = useState(null)
   const [pinInput, setPinInput] = useState('')
+  const [showPinInput, setShowPinInput] = useState(false)
   const [pinError, setPinError] = useState('')
   const [submittingPin, setSubmittingPin] = useState(false)
 
@@ -1199,17 +1200,22 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                 <h2 className="text-sm font-bold text-ink mb-1">{pinModal.label}</h2>
                 <p className="text-xs text-ink-muted mb-3">Enter your security PIN to authorise this action.</p>
                 <label htmlFor="stokvel-pin" className="block text-xs font-bold text-ink-muted mb-1">Security PIN</label>
-                <input
-                  id="stokvel-pin"
-                  type="password"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  autoComplete="off"
-                  value={pinInput}
-                  onChange={(e) => { setPinInput(e.target.value); setPinError('') }}
-                  className="w-full border-2 border-cream-dark rounded-soft px-3 py-2 text-ink tracking-widest"
-                  autoFocus
-                />
+                <div className="relative">
+                  <input
+                    id="stokvel-pin"
+                    type={showPinInput ? 'text' : 'password'}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoComplete="off"
+                    value={pinInput}
+                    onChange={(e) => { setPinInput(e.target.value.replace(/\D/g, '').slice(0, 6)); setPinError('') }}
+                    className="w-full border-2 border-cream-dark rounded-soft pl-3 pr-12 py-2 text-ink tracking-widest"
+                    autoFocus
+                  />
+                  <button type="button" onClick={() => setShowPinInput((shown) => !shown)} aria-label={showPinInput ? 'Hide PIN' : 'Show PIN'} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted">
+                    <Icon name={showPinInput ? 'eye-off' : 'eye'} size={18} />
+                  </button>
+                </div>
                 {pinError && <p className="text-xs text-terracotta font-bold mt-1.5">{pinError}</p>}
                 <div className="flex gap-2 mt-3">
                   <button type="submit" disabled={submittingPin} className={`flex-1 bg-sage-600 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
