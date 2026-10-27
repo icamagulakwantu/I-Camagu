@@ -58,6 +58,12 @@ The broader prioritised security, reliability, migration and product roadmap is 
 ## Not yet reviewed
 SEC-03 (remaining authorization routes), SEC-04, COM-01, COM-02, UX-01..03, Q-01..04. The P0/P1 items in `docs/SECURITY_AND_DELIVERY_PLAN.md` are not signed off merely because targeted changes have been made.
 
+## Deployment configuration review (27 Oct 2026)
+
+| ID | Status | Evidence | Required follow-up |
+|---|---|---|---|
+| DEP-01 Canonical Render service and readiness | Open — owner/staging verification needed | Render workspace currently contains two web services named `I-Camagu` and `I-Camagu-1`. Both point to `https://github.com/icamagulakwantu/I-Camagu`, track `main`, and auto-deploy. Their public URLs and build commands differ; neither has an HTTP health-check path configured. Both were observed live on commit `cae7373` after the latest release. | Confirm which URL is canonical, compare environment variable *names/presence* and database targets without copying secrets, verify external callback references, align build commands to frozen-lockfile installation, and configure `/api/health` on the canonical service. Do not delete the duplicate until environment parity and traffic use are known. Render log retrieval was unavailable during this check, so application-level HTTP health was not independently verified. |
+
 ## Not verified here (needs owner/staging)
 - Clean `yarn install`, `yarn test`, `yarn build` on this commit (CI runs these on push).
 - Concurrency and rollback behaviour against real PostgreSQL (Q-01).
