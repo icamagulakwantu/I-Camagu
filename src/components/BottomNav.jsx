@@ -6,7 +6,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
     { id: 'ceremonyhub', label: 'Ceremonies', icon: 'calendar' },
     { id: 'store', label: 'Store', icon: 'cart', badge: basketCount },
     { id: 'stokvels', label: 'Stokvels', icon: 'users', badge: pendingApprovals },
-    { id: 'more', label: 'More', icon: 'user-round' },
+    { id: 'more', label: 'More', icon: 'user' },
   ]
 
   return (
@@ -24,16 +24,16 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
                     onClick={() => onNavigate(tab.id)}
                     aria-label={tab.label}
                     aria-current={active ? 'page' : undefined}
-                    className="pressable flex min-h-[60px] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-[18px] px-0.5" 
+                    className="pressable flex min-h-[64px] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-[18px] px-0.5" 
                   >
-                    <span className={`relative flex h-8 w-8 items-center justify-center rounded-full transition-colors ${active ? 'bg-terracotta' : ''}`}>
+                    <span className={`relative flex h-9 w-9 items-center justify-center rounded-full transition-colors ${active ? 'bg-terracotta' : ''}`}>
                       {active && <span className="absolute inset-[-4px] rounded-full border border-brand-ochre/45" />}
-                      <Icon name={tab.icon} size={18} color={active ? '#fff' : 'rgba(245,243,238,0.6)'} strokeWidth={active ? 2 : 1.6} />
+                      <Icon name={tab.icon} size={22} color={active ? '#fff' : 'rgba(245,243,238,0.6)'} strokeWidth={active ? 2 : 1.6} />
                       {tab.badge > 0 && (
                         <span className="absolute -top-1.5 -right-1.5 bg-terracotta text-white text-[9px] font-black w-4 h-4 rounded-pill flex items-center justify-center">{tab.badge}</span>
                       )}
                     </span>
-                    <span className={`max-w-full truncate text-[10px] sm:text-[11px] leading-tight tracking-normal text-center ${active ? 'font-bold text-cream' : 'text-cream/80'}`}>
+                    <span className={`max-w-full truncate text-[11px] sm:text-xs leading-tight tracking-normal text-center ${active ? 'font-bold text-cream' : 'text-cream/80'}`}>
                       {tab.label}
                     </span>
                   </button>
