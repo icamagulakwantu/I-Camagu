@@ -312,7 +312,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
                 {storeMatchCount} item{storeMatchCount > 1 ? 's' : ''} matched to live iCamagu store prices
               </p>
               <p className="text-[10px] text-sage-600 leading-relaxed">
-                These prices and bulk discounts are only available when you order through iCamagu SmartMatch. Ordering outside the app will cost more.
+                These are the prices currently listed in iCamagu. Supplier availability, current quotes and any bulk discount can change; compare like-for-like offers before ordering.
               </p>
             </div>
           )}
@@ -452,7 +452,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
                   </button>
                   <div className="bg-sage-50 border border-sage-200 rounded-2xl px-3 py-2.5">
                     <p className="text-[10px] font-bold text-sage-700 leading-relaxed">
-                      These prices and discounts are only available by ordering through iCamagu SmartMatch. Pool your order with other community members to unlock bulk supplier pricing.
+                      Use SmartMatch to coordinate demand with other community members. A bulk discount applies only when the supplier confirms the eligible products, minimum quantity and final price.
                     </p>
                   </div>
                 </div>

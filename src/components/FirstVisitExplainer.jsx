@@ -43,8 +43,6 @@ const SAMPLE_SPENT = 18400
 // touching the real catalogue or basket.
 const POOL_TARGET = 20
 const POOL_STARTING = 14
-const POOL_RETAIL = 220
-const POOL_CASE_PRICE = 165
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.97]'
 
@@ -58,7 +56,6 @@ export default function FirstVisitExplainer({ onNavigate }) {
 
   const poolCount = joinedPool ? POOL_STARTING + 1 : POOL_STARTING
   const poolPercent = Math.min(100, Math.round((poolCount / POOL_TARGET) * 100))
-  const poolSavings = POOL_RETAIL - POOL_CASE_PRICE
 
   return (
     <div className="mb-6">
@@ -140,19 +137,19 @@ export default function FirstVisitExplainer({ onNavigate }) {
       {/* Tappable sample SmartMatch pool — fake data only, nothing saved */}
       <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 shadow-soft mt-4">
         <div className="flex items-center justify-between mb-1">
-          <p className="font-display font-bold text-sm text-ink">Sample: Castle Lager case pool</p>
+          <p className="font-display font-bold text-sm text-ink">Sample: drinks case pool</p>
           <span className="text-[9px] font-bold uppercase tracking-wide text-ink-muted bg-cream-dark px-2 py-0.5 rounded-pill">Try it — not real</span>
         </div>
-        <p className="text-[11px] text-ink-muted mb-3">Tap "Join pool" to see how SmartMatch unlocks bulk pricing. Nothing here is added to a real cart.</p>
+        <p className="text-[11px] text-ink-muted mb-3">Tap "Join pool" to explore how SmartMatch tracks demand. Prices and discounts depend on a real supplier quote. Nothing here is added to a real cart.</p>
 
         <div className="flex items-center gap-3 mb-3">
           <span className="w-14 h-14 bg-terracotta/10 rounded-xl flex items-center justify-center flex-shrink-0">
             <Icon name="cocktail" size={22} color="#c45c26" />
           </span>
           <div className="min-w-0">
-            <p className="font-bold text-sm text-ink">Castle Lager — case of 24</p>
+            <p className="font-bold text-sm text-ink">Example drinks case — pack details vary</p>
             <p className="text-xs text-ink-muted">
-              Retail R{POOL_RETAIL} · Group price <span className="font-bold text-sage-700">R{POOL_CASE_PRICE}</span>
+              Illustrative product only · No live supplier quote
             </p>
           </div>
         </div>
@@ -167,8 +164,8 @@ export default function FirstVisitExplainer({ onNavigate }) {
           </div>
           <p className="text-[11px] text-ink-muted mt-1.5">
             {joinedPool
-              ? `You're in! ${POOL_TARGET - poolCount} more members unlock the group price for everyone.`
-              : `${POOL_TARGET - poolCount} more members needed to unlock R${poolSavings} savings per case.`}
+              ? `You're in this sample pool. Real pricing and minimums depend on the supplier quote.`
+              : `${POOL_TARGET - poolCount} more members to reach this sample target. Any discount must be confirmed by the supplier.`}
           </p>
         </div>
 
