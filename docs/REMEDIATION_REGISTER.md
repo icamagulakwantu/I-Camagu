@@ -116,3 +116,8 @@ Verified in Render service metadata and recent startup logs: two auto-deploying 
 ## PAY-02 — Stokvel-funded payments in PSP payout queue (27 Oct 2026)
 
 **Status: fix prepared on PR branch; merge gated on CI.** The payout queue now excludes both `MANUAL_EFT` and `STOKVEL_FUNDS`, and the server-side processor rejects Stokvel-funded rows before writing payout-forwarded metadata. Regression tests verify the queue filter and that no update is written for a blocked payment. Do not process Stokvel-funded rows through the PSP payout workflow. After CI passes, verify the guard is present on the deployed commit; do not inspect or alter production financial rows as part of this change.
+
+
+## UX-05 — Refresh the SmartMatch basket badge after individual purchase (27 Oct 2026)
+
+**Fix prepared on a review branch.** The app shell previously fetched basket count only when the access token changed. Adding an item through SmartMatch’s “Buy on my own” path did not notify the shell, so the bottom-navigation basket badge could remain stale until a reload or re-login. A small browser event now triggers a fresh count, with listener cleanup and a regression test for the event helper.
