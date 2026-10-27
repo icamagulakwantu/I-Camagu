@@ -10,9 +10,15 @@ export async function saveAsTemplate(req, res) {
           try {
                   const source = await prisma.preparationPlan.findUnique({
                             where: { id: planId },
-                                  include: { checklistItems: true },
+                                  include: {
+                                    checklistItems: true,
+                                    ceremony: { include: { checklistItems: true } },
+                                  },
                   });
                       if (!source || source.hostId !== req.userId) return res.status(403).json({ error: 'Not your plan' });
+                      const sourceItems = source.checklistItems?.length
+                        ? source.checklistItems
+                        : (source.ceremony?.checklistItems || []);
 
                           const template = await prisma.preparationPlan.create({
                                     data: {
@@ -25,7 +31,7 @@ export async function saveAsTemplate(req, res) {
                           });
 
                               await prisma.checklistItem.createMany({
-                                        data: source.checklistItems.map((item) => ({
+                                        data: sourceItems.map((item) => ({
                                                     planId: template.id,
                                                             phase: item.phase,
                                                                     label: item.label,
