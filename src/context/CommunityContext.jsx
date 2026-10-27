@@ -79,7 +79,7 @@ export function CommunityProvider({ children }) {
     loadingPools,
     poolError,
     refreshPools,
-  }), [user, activeCeremony, pools, feedError, loadingPools, poolError, refreshPools]);
+  }), [user, activeCeremony, pools, feed, feedError, loadingPools, poolError, refreshPools]);
 
   return <CommunityContext.Provider value={value}>{children}</CommunityContext.Provider>;
 }
