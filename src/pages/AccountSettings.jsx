@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
+import Icon from '../components/Icon.jsx'
 
 function AccountSettings({ onBack, onOpenPrivacy }) {
   const { accessToken, logout } = useAuth()
   const { showToast } = useToast()
   const [showDeleteForm, setShowDeleteForm] = useState(false)
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [confirmText, setConfirmText] = useState('')
   const [error, setError] = useState('')
 
@@ -84,8 +86,13 @@ function AccountSettings({ onBack, onOpenPrivacy }) {
             </button>
           ) : (
             <form onSubmit={deleteAccount} className="space-y-2">
-              <input type="password" placeholder="Confirm your password" value={password} onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm bg-white" />
+              <div className="relative">
+                <input type={showPassword ? 'text' : 'password'} placeholder="Confirm your password" aria-label="Confirm your password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)}
+                  className="w-full border border-ink/30 rounded-soft pl-3 pr-12 py-2 text-sm bg-white" required />
+                <button type="button" onClick={() => setShowPassword((shown) => !shown)} aria-label={showPassword ? 'Hide password' : 'Show password'} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted">
+                  <Icon name={showPassword ? 'eye-off' : 'eye'} size={18} />
+                </button>
+              </div>
               <input type="text" placeholder='Type "DELETE MY ACCOUNT"' value={confirmText} onChange={(e) => setConfirmText(e.target.value)}
                 className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm bg-white" required />
               {error && <p className="text-terracotta text-xs">{error}</p>}
