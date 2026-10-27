@@ -21,6 +21,7 @@ function Store({ onGoToBasket, basketCount }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
   const [offerSku, setOfferSku] = useState(null)
+  const [failedImageIds, setFailedImageIds] = useState(() => new Set())
 
   useEffect(() => {
     fetch('/api/basket/catalogue')
@@ -190,8 +191,8 @@ function Store({ onGoToBasket, basketCount }) {
               return (
                 <div key={sku.id} className="card-paper flex justify-between items-center overflow-hidden">
                   <div className="flex items-center gap-3 min-w-0">
-                    {sku.imageUrl ? (
-                      <img src={sku.imageUrl} alt={sku.name} className="w-16 h-16 object-contain bg-white flex-shrink-0" loading="lazy" decoding="async" />
+                    {sku.imageUrl && !failedImageIds.has(sku.id) ? (
+                      <img src={sku.imageUrl} alt={`${sku.name}${sku.bottleFormat ? `, ${sku.bottleFormat}` : ''}`} className="w-16 h-16 object-contain bg-white flex-shrink-0" loading="lazy" decoding="async" onError={() => setFailedImageIds((current) => new Set(current).add(sku.id))} />
                     ) : (
                       <span className="w-16 h-16 bg-terracotta/10 flex items-center justify-center flex-shrink-0">
                         <Icon name={dept.id === 'alcohol' ? 'cocktail' : 'package'} size={22} color="#c45c26" />
