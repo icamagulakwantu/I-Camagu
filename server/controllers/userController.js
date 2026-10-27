@@ -121,7 +121,7 @@ export async function setUserPin(req, res) {
     // existing PIN requires proof of the current PIN to limit damage from a
     // stolen access token.
     if (user.pinHash) {
-      if (typeof oldPin !== 'string' || !/^\\d{4,6}$/.test(oldPin)) {
+      if (typeof oldPin !== 'string' || !/^\d{4,6}$/.test(oldPin)) {
         return res.status(400).json({ error: 'Enter your current PIN to change it' });
       }
       const check = await verifyPin(req.userId, oldPin);
