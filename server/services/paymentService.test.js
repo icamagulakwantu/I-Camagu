@@ -9,7 +9,7 @@ const mockPrisma = {
 vi.mock('../config/db.js', () => ({ default: mockPrisma }));
 vi.mock('./notificationDbService.js', () => ({ createNotification: vi.fn() }));
 
-const { isOnlinePaymentConfigured, isOnlinePaymentEligible, markRefundProcessed } = await import('./paymentService.js');
+const { isOnlinePaymentConfigured, isOnlinePaymentEligible, initiatePoolPayment, markRefundProcessed } = await import('./paymentService.js');
 
 const ORIGINAL_ENV = { ...process.env };
 
@@ -32,17 +32,21 @@ describe('isOnlinePaymentConfigured / isOnlinePaymentEligible', () => {
     expect(isOnlinePaymentEligible('GROCERY')).toBe(false);
   });
 
-  it('is configured once both merchant credentials are set', () => {
+  it('keeps online checkout disabled even when merchant credentials are configured', () => {
     setPayfastEnv({ PAYFAST_MERCHANT_ID: '10000100', PAYFAST_MERCHANT_KEY: '46f0cd694581a' });
-    expect(isOnlinePaymentConfigured()).toBe(true);
+    expect(isOnlinePaymentConfigured()).toBe(false);
+    expect(isOnlinePaymentEligible('GROCERY')).toBe(false);
+    expect(isOnlinePaymentEligible('BUTCHERY')).toBe(false);
+    expect(isOnlinePaymentEligible('PRODUCE')).toBe(false);
+    expect(isOnlinePaymentEligible('TAVERN')).toBe(false);
   });
 
-  it('never offers online payment for alcohol (TAVERN) pools, even when configured — liquor-licensing exposure', () => {
-    setPayfastEnv({ PAYFAST_MERCHANT_ID: '10000100', PAYFAST_MERCHANT_KEY: '46f0cd694581a' });
-    expect(isOnlinePaymentEligible('TAVERN')).toBe(false);
-    expect(isOnlinePaymentEligible('GROCERY')).toBe(true);
-    expect(isOnlinePaymentEligible('BUTCHERY')).toBe(true);
-    expect(isOnlinePaymentEligible('PRODUCE')).toBe(true);
+  it('blocks direct checkout API calls before accessing payment records', async () => {
+    setPayfastEnv({ PAYFAST_MERCHANT_ID: '10000100', PAYFAST_MERCHANT_KEY: '46f0cd694581a', PAYFAST_SANDBOX: 'false' });
+    await expect(initiatePoolPayment('user_1', 'pay_1', 'https://example.test'))
+      .rejects.toMatchObject({ status: 503 });
+    expect(mockPrisma.poolPayment.findUnique).not.toHaveBeenCalled();
+    expect(mockPrisma.poolPayment.update).not.toHaveBeenCalled();
   });
 });
 
