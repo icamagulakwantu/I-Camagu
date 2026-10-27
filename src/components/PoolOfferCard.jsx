@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from './ui/Toast.jsx';
 import { useCommunity } from '../context/CommunityContext.jsx';
 import FundingSourcePicker from './FundingSourcePicker.jsx';
+import { notifyBasketChanged } from '../lib/basketEvents.js';
 
 const money = (n) => n == null || !Number.isFinite(Number(n)) ? 'Price to confirm' : 'R' + Number(n).toFixed(2);
 
@@ -37,7 +38,7 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
     try {
       const res = await fetch('/api/basket/items', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ skuId, quantity }) });
       const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Could not add item');
-      showToast(data.message || 'Added to basket', 'success'); onClose?.();
+      notifyBasketChanged(); showToast(data.message || 'Added to basket', 'success'); onClose?.();
     } catch (err) { showToast(err.message, 'error'); } finally { setBusy(false); }
   };
 
@@ -87,7 +88,7 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
               <p className="text-[11px] text-ink-muted">combined value</p>
             </div>
           </div>
-          <p className="text-sm font-semibold text-terracotta">Research-backed target: 8–10% at the qualifying larger-volume tier</p>
+          <p className="text-sm font-semibold text-terracotta">Possible savings are unconfirmed until a supplier provides a written quote for this combined order.</p>
           {suggestion.reachesThreePalletEquivalent && <p className="text-xs text-ink-muted">Indicative value is around {Number(suggestion.indicativePalletEquivalent).toFixed(2)} pallet-equivalents using a reference case price; the supplier must confirm mixed-product eligibility and the conversion.</p>}
           <p className="text-xs text-ink-muted">{suggestion.message}</p>
           <p className="text-xs text-ink-muted">This is an opportunity, not a confirmed quote or guaranteed saving. Pools and payments stay separate; each organiser must opt in before any combined order.</p>
