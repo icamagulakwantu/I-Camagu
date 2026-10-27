@@ -915,7 +915,7 @@ The platform should therefore:
 
 ---
 
-## 37. Development and Deployment Workflow
+## Development and Deployment Workflow
 
 GitHub is the source of truth for code, branches, pull requests and CI. Render is the only production deployment platform. Do not use StackBlitz, Bolt, or another hosted code workspace as an editing or deployment target for iCamagu. See [the development workflow policy](./docs/DEVELOPMENT_WORKFLOW.md) and [launch-readiness gates](./docs/LAUNCH_READINESS.md).
 
