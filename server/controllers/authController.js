@@ -255,7 +255,7 @@ export async function login(req, res) {
 // an email with no account are counted exactly like real ones, under a
 // stand-in key, so the replies ("N tries left", then the lock) are the same.
 export async function verifyOtp(req, res) {
-  const email = cleanEmail(req.body?.email);
+  const email = cleanEmail(req.body?.email).toLowerCase();
   const code = req.body?.code;
   if (!email || !code) return res.status(400).json({ error: 'Email and code are required' });
   try {
