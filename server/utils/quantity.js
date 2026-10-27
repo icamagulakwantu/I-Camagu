@@ -7,7 +7,7 @@ export function parsePositiveIntegerQuantity(value) {
     throw new Error('Quantity must be a whole number of at least 1');
   }
   const amount = Number(raw);
-  if (!Number.isSafeInteger(amount) || amount < 1) {
+  if (!Number.isSafeInteger(amount) || amount < 1 || amount > 2_147_483_647) {
     throw new Error('Quantity must be a whole number of at least 1');
   }
   return amount;
