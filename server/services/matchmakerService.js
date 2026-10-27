@@ -4,6 +4,17 @@ import { notifyAdminOfSmartMatchTier } from './notificationService.js';
 import { newPoolWindow, isPoolWindowClosed } from '../utils/poolWindow.js';
 import { generateUniqueReference } from '../utils/referenceGenerator.js';
 
+// Serialize a pool join against matching. The lock is held until the
+// caller's transaction commits, so a match cannot close the pool between the
+// status check and the new basket being created.
+export async function lockOpenPoolForJoin(tx, poolId) {
+  const lockedRows = await tx.$queryRaw`SELECT "id" FROM "BulkPool" WHERE "id" = ${poolId} FOR UPDATE`;
+  if (!lockedRows.length) throw new Error('Pool not found');
+  const pool = await tx.bulkPool.findUnique({ where: { id: poolId }, select: { status: true } });
+  if (!pool || pool.status !== 'OPEN') throw new Error('This pool is no longer open');
+  return pool;
+}
+
 // Honest simplification, noted here for future reference: MOQ matching here
 // is by TOTAL CASE COUNT in the pool, not per-SKU. A true per-SKU MOQ engine
 // (matching Section 4.2 fully) needs Partner-level per-SKU MOQ data, which
@@ -234,6 +245,7 @@ export async function parkItemsIntoPool({
   if (!userId || !poolId) throw new Error('userId and poolId are required');
   if (!itemIds.length && !itemSpecs.length) throw new Error('At least one item is required');
   return prisma.$transaction(async (tx) => {
+    await lockOpenPoolForJoin(tx, poolId);
     const basket = await tx.basket.create({
       data: {
         userId,
@@ -365,6 +377,7 @@ export async function checkAndMatchPool(poolId) {
     where: { id: poolId },
     include: { baskets: { include: { items: { include: { sku: true } } } }, partner: true },
   });
+  if (!pool) throw new Error('Pool not found');
 
   const activeBaskets = pool.baskets.filter((b) => b.status !== 'CANCELLED');
   const currentCases = activeBaskets.reduce(
@@ -401,23 +414,44 @@ export async function checkAndMatchPool(poolId) {
       data: { status: 'MATCHED' },
     });
     if (claim.count === 0) {
-      // Someone else's call already matched this pool — don't create a
-      // second document, just report the real, already-created one.
-      const alreadyMatched = await tx.bulkPool.findUnique({
+      // Another request won the state transition. Return the actual final
+      // state rather than incorrectly reporting CLOSED/expired pools as matched.
+      const existing = await tx.bulkPool.findUnique({
         where: { id: pool.id },
         include: { orderDocument: true },
       });
+      if (!existing) throw new Error('Pool not found');
       return {
-        matched: true,
+        matched: existing.status === 'MATCHED',
         currentCases,
-        documentId: alreadyMatched?.orderDocument?.id,
-        groupCode: alreadyMatched?.orderDocument?.groupCode,
+        documentId: existing.orderDocument?.id,
+        groupCode: existing.orderDocument?.groupCode,
       };
     }
 
-    // Generate the Order Confirmation Document
+    // The row lock above waits for any in-flight join to commit. Read baskets
+    // again inside this transaction so a just-committed member is not omitted
+    // from the order document built from the earlier optimistic snapshot.
+    const currentPool = await tx.bulkPool.findUnique({
+      where: { id: pool.id },
+      include: { baskets: { include: { items: { include: { sku: true } } } }, partner: true },
+    });
+    if (!currentPool) throw new Error('Pool not found while matching');
+    const currentActiveBaskets = currentPool.baskets.filter((b) => b.status !== 'CANCELLED');
+    const lockedCurrentCases = currentActiveBaskets.reduce(
+      (sum, basket) => sum + basket.items.reduce((itemSum, item) => itemSum + item.quantity, 0),
+      0
+    );
+    if (lockedCurrentCases < currentPool.moqTarget) {
+      // A cancellation may have reduced the total after the optimistic read.
+      // Re-open atomically rather than create an order below the MOQ.
+      await tx.bulkPool.update({ where: { id: pool.id }, data: { status: 'OPEN' } });
+      return { matched: false, currentCases: lockedCurrentCases };
+    }
+
+    // Generate the Order Confirmation Document from the fresh, locked snapshot.
     const lineItemsBySku = {};
-    for (const basket of activeBaskets) {
+    for (const basket of currentActiveBaskets) {
       for (const item of basket.items) {
         const key = item.skuId;
         if (!lineItemsBySku[key]) lineItemsBySku[key] = { quantity: 0, memberContributions: [] };
@@ -441,12 +475,12 @@ export async function checkAndMatchPool(poolId) {
         totalAmountZAR,
         // Default safety measure per Section 4.2: collection points default to
         // a location near a police station, mirroring real-world SAB delivery practice.
-        deliveryLocation: `Near the police station closest to ${pool.area} — exact location to be confirmed`,
+        deliveryLocation: `Near the police station closest to ${currentPool.area} — exact location to be confirmed`,
         status: 'PENDING_MEMBER_CONFIRMATION',
       },
     });
 
-    for (const basket of activeBaskets) {
+    for (const basket of currentActiveBaskets) {
       // One reference for this whole cart — same code on every line item,
       // the basket itself, and the payment created for it below. See
       // generateOrderReference above for why one code does both jobs.
@@ -525,7 +559,7 @@ export async function checkAndMatchPool(poolId) {
       }
     }
 
-    return { matched: true, currentCases, documentId: document.id, groupCode: document.groupCode };
+    return { matched: true, currentCases: lockedCurrentCases, documentId: document.id, groupCode: document.groupCode };
   });
 
   return matchResult;

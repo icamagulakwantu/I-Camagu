@@ -70,3 +70,8 @@
 - CI runs on each push to `main`; the evidence above applies only to the exact linked commits and runs. Recheck the latest main-head run before calling any later commit validated.
 
 The release blockers above remain open until evidence is recorded. Do not represent iCamagu as launch-ready based only on the automated checks.
+
+
+## SmartMatch concurrency check — 27 Oct 2026
+
+- [ ] Review and merge the targeted pool row-lock/snapshot-refresh fix only after CI passes. Test concurrent joins against a disposable PostgreSQL database before launch; do not test concurrency against production.
