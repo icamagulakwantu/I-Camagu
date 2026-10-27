@@ -161,5 +161,5 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 
 ## Expanded production smoke coverage — 27 October 2026
 
-- [x] Added checks for both public health endpoints (`i-camagu.co.za` and `i-camagu.onrender.com`) so the secondary Render service cannot silently drift into a broken state while only the canonical domain is tested.
-- [x] Added a canonical frontend/PWA smoke check for the SPA root, generated web manifest, and all four configured install icons. The current main-head CI run must pass before these checks are considered verified.
+- [x] Both public health endpoints passed in main-head CI run [#40487751157](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40487751157): `https://i-camagu.co.za/api/health` and `https://i-camagu.onrender.com/api/health` each returned JSON `status: ok`.
+- [x] The same run confirmed the canonical frontend root, generated `manifest.webmanifest`, and all four configured PWA install icons return successfully.
