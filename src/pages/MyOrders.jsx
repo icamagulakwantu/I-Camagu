@@ -229,7 +229,11 @@ function MyOrders({ onBack }) {
                                 <p className="text-[10px] text-brand-black/40 text-center mb-3">— or pay by manual EFT instead —</p>
                               </>
                             )}
-                            {payment.provider !== 'MANUAL_EFT' ? (
+                            {payment.provider === 'STOKVEL_FUNDS' ? (
+                              <p className="text-[11px] text-brand-black/60 mb-2">
+                                This share is being funded through your Stokvel. The required officials must approve the funding request; do not make a separate EFT payment.
+                              </p>
+                            ) : payment.provider !== 'MANUAL_EFT' ? (
                               <p className="text-[11px] text-terracotta font-bold mb-2">
                                 This payment is recorded with {payment.provider}. Do not make a second EFT transfer while it is being reconciled. If the status remains pending, contact the iCamagu admin through the app.
                               </p>
