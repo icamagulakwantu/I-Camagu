@@ -121,3 +121,26 @@ jobs:
           path: migration-artifacts/20261026_candidate_baseline.sql
           if-no-files-found: error
           retention-days: 14
+
+  production-smoke:
+    # The source tests cannot prove the public Render deployment is responding.
+    # Run this only after the build, PostgreSQL suites and migration validation
+    # pass; retry briefly to allow Render's auto-deploy to finish after a push.
+    needs: [test, postgres-integration, migration-baseline-validation]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify canonical production health endpoint
+        env:
+          HEALTH_URL: https://i-camagu.co.za/api/health
+        run: |
+          for attempt in $(seq 1 18); do
+            body="$(curl --silent --show-error --max-time 15 "$HEALTH_URL" || true)"
+            if printf '%s' "$body" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const r=JSON.parse(s);process.exit(r.status === 'ok' ? 0 : 1)}catch{process.exit(1)}})"; then
+              echo "Production health endpoint returned status=ok."
+              exit 0
+            fi
+            echo "Production health check attempt $attempt/18 not ready yet."
+            sleep 10
+          done
+          echo "Production health check did not return JSON status=ok."
+          exit 1
