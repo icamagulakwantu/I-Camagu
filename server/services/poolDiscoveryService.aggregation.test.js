@@ -24,7 +24,7 @@ describe('buildCrossPoolAggregationSuggestions', () => {
     expect(suggestions[0].reachesThreePalletEquivalent).toBe(true);
     expect(suggestions[0].supplierConfirmationRequired).toBe(true);
     expect(suggestions[0].orderPlaced).toBe(false);
-    expect(suggestions[0].potentialDiscountLabel).toContain('Research-backed 8–10% bulk-discount target');
+    expect(suggestions[0].potentialDiscountLabel).toContain('Savings are unconfirmed until the supplier provides a written quote');
   });
 
   it('does not combine different named suppliers or different areas', () => {
