@@ -248,7 +248,22 @@ function Login() {
                 disabled={loading}
                 className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 text-[15px] pressable shadow-terracotta"
               >
-                Join or sign in →
+                Sign in with email →
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+                    setError('Enter a valid email address first.')
+                    return
+                  }
+                  setEmail(email.trim())
+                  setPassword('')
+                  goTo('register')
+                }}
+                className="w-full border-2 border-terracotta/30 text-terracotta font-bold py-3 rounded-pill text-sm pressable"
+              >
+                Create a new account / profile
               </button>
               <div className="flex items-center gap-3 my-1">
                 <div className="flex-1 h-px bg-cream-dark" />
