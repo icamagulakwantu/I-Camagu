@@ -13,9 +13,13 @@
 export const RETAIL_VERIFIED = 'VERIFIED';
 export const RETAIL_ESTIMATE = 'ESTIMATE';
 export const RETAIL_SOURCES = [RETAIL_VERIFIED, RETAIL_ESTIMATE];
+export const RETAIL_VERIFICATION_MAX_AGE_MS = 42 * 24 * 60 * 60 * 1000;
 
-export function isVerifiedRetail(sku) {
-  return sku?.retailPriceSource === RETAIL_VERIFIED && sku?.retailPriceZAR != null;
+export function isVerifiedRetail(sku, now = Date.now()) {
+  if (sku?.retailPriceSource !== RETAIL_VERIFIED || sku?.retailPriceZAR == null || !sku?.retailPriceCheckedAt) return false;
+  const checkedAt = new Date(sku.retailPriceCheckedAt).getTime();
+  const age = now - checkedAt;
+  return Number.isFinite(checkedAt) && age >= 0 && age <= RETAIL_VERIFICATION_MAX_AGE_MS;
 }
 
 // A SKU can be catalogued — name, pack format, category all real — before
