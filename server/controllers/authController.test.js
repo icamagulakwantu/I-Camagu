@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // SEC-02: these tests fail if sign-in ever again tells a stranger whether an
 // email has an iCamagu account.
-const prisma = { user: { findUnique: vi.fn(), update: vi.fn() } };
+const prisma = { user: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn() } };
 const send = vi.fn();
 const createOtp = vi.fn();
 const checkOtp = vi.fn();
@@ -17,6 +17,7 @@ vi.mock('../services/tokenService.js', () => ({
 }));
 vi.mock('../services/passwordService.js', () => ({ hashPassword: vi.fn(async () => 'dummy-hash'), verifyPassword }));
 vi.mock('../services/googleAuthService.js', () => ({ verifyGoogleToken: vi.fn() }));
+vi.mock('../services/izidukoService.js', () => ({ syncUserClanGroups: vi.fn(async () => {}) }));
 vi.mock('../config/admin.js', () => ({ isAdminEmail: () => false }));
 
 const auth = await import('./authController.js');
@@ -43,6 +44,30 @@ beforeEach(() => {
   vi.clearAllMocks();
   send.mockResolvedValue({ error: null });
   createOtp.mockResolvedValue('123456');
+  prisma.user.create.mockResolvedValue({ ...MEMBER, emailVerificationRequired: true });
+});
+
+describe('password registration verification', () => {
+  it('creates an unverified account, sends a code and does not issue a session', async () => {
+    prisma.user.findUnique.mockResolvedValueOnce(null);
+    prisma.user.create.mockResolvedValueOnce({
+      id: 'user-2', email: 'new@example.com', firstName: 'New', lastName: 'Member',
+      passwordHash: 'dummy-hash', emailVerificationRequired: true,
+    });
+
+    const result = await call(auth.registerWithPassword, {
+      email: 'new@example.com', password: 'password123', firstName: 'New', lastName: 'Member',
+    });
+
+    expect(result.status).toBe(201);
+    expect(result.body.needsEmailVerification).toBe(true);
+    expect(result.body.accessToken).toBeUndefined();
+    expect(createOtp).toHaveBeenCalledWith('user-2');
+    expect(tokenService.generateTokenPair).not.toHaveBeenCalled();
+    await vi.waitFor(() => expect(send).toHaveBeenCalledWith(expect.objectContaining({
+      to: 'new@example.com', subject: 'Verify your iCamagu email',
+    })));
+  });
 });
 
 describe('email me a login code', () => {
