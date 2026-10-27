@@ -200,7 +200,10 @@ function MyOrders({ onBack }) {
                   <div className="mt-3 pt-3 border-t border-terracotta/15">
                     <p className="text-xs font-black uppercase text-brand-black/50 mb-1">Your share: {money(payment.amountZAR)}</p>
                     {payment.status === 'REFUNDED' ? (
-                      <p className="text-xs font-bold text-terracotta">Refunded{payment.refundFeeZAR > 0 ? ` (${money(payment.refundFeeZAR)} processing fee deducted)` : ''}</p>
+                      <p className="text-xs font-bold text-terracotta">
+                        Refund recorded: {money(Math.max(0, Number(payment.amountZAR) - Number(payment.refundFeeZAR || 0)))}
+                        {payment.refundFeeZAR > 0 ? ` net after ${money(payment.refundFeeZAR)} processing fee` : ''}
+                      </p>
                     ) : (
                       <>
                         {payment.status === 'CLEARED' ? (
