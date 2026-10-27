@@ -103,7 +103,7 @@ SEC-03 (remaining authorization routes), SEC-04, COM-01, COM-02, UX-01..03, Q-01
 
 ## SmartMatch concurrent-join release blocker (review branch)
 
-The review branch `fix/smartmatch-pool-join-race` adds a PostgreSQL row lock around pool joins and refreshes the basket snapshot inside the matching transaction. This addresses a race where a late join could attach to a matched pool or be omitted from its order document. Treat this as **proposed until CI passes and the PR is reviewed**; no production database was touched.
+PR #53 merged the PostgreSQL row lock around pool joins and refreshes the basket snapshot inside the matching transaction. CI passed, and PR #55 added a PostgreSQL integration test proving a concurrent join waits for matching and is rejected after the pool closes. This reduces the risk of late joins attaching to matched pools. A full end-to-end concurrent test proving no basket is omitted from the generated order document remains open; no production database was touched.
 
 
 ## Render runtime findings (27 Oct 2026)
