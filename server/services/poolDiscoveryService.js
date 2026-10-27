@@ -194,13 +194,11 @@ export async function findSuggestedPoolsForItem(userId, { skuId, ceremonyId, lim
     const distanceKm = locationDistance(user, pool);
     const clan = clanScore(user, pool);
     const metrics = poolMetrics(pool);
+    // Tier values are not yet a consistently defined, supplier-approved
+    // quote (pallet tiers and amount tiers have different units). Never expose
+    // them as a checkout price; current order totals use the catalogue price.
     const currentTier = getTierForMetric(metrics.metric, resolveTierLadder(pool));
-    const basePrice = Number(sku.casePriceZAR);
-    let poolPriceZAR = null;
-    if (currentTier?.value != null && Number.isFinite(basePrice)) {
-      if ((pool.tierBasis || 'PALLETS') === 'PALLETS') poolPriceZAR = Number(currentTier.value);
-      else poolPriceZAR = Math.max(0, basePrice * (1 - Number(currentTier.value) / 100));
-    }
+    const poolPriceZAR = null;
     const closesInTime = !ceremony?.eventDate || (Boolean(pool.deadline) && pool.deadline <= ceremony.eventDate);
     const userHasLocation = (Number.isFinite(user.latitude) && Number.isFinite(user.longitude)) || Boolean(normalise(user.location));
     const distanceAllowed = distanceKm !== null ? distanceKm <= (pool.radiusKm || 20) : !userHasLocation;
