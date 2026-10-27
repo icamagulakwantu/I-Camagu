@@ -17,6 +17,9 @@ export default function PinSetup({ onBack }) {
   const [confirmPin, setConfirmPin] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [showOldPin, setShowOldPin] = useState(false)
+  const [showPin, setShowPin] = useState(false)
+  const [showConfirmPin, setShowConfirmPin] = useState(false)
 
   useEffect(() => {
     fetch('/api/user/pin/status', { headers: { Authorization: `Bearer ${accessToken}` } })
@@ -91,26 +94,27 @@ export default function PinSetup({ onBack }) {
       ) : (
         <form onSubmit={submit} className="bg-white border-2 border-terracotta/25 rounded-soft p-5 space-y-3">
           {hasPinSet && (
-            <input
-              type="password" inputMode="numeric" autoComplete="current-password"
-              placeholder="Current PIN" aria-label="Current security PIN" value={oldPin}
-              onChange={(e) => setOldPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest"
-              maxLength={6} required
-            />
+            <div className="relative">
+              <input type={showOldPin ? 'text' : 'password'} inputMode="numeric" autoComplete="current-password"
+                placeholder="Current PIN" aria-label="Current security PIN" value={oldPin}
+                onChange={(e) => setOldPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                className="w-full border border-ink/30 rounded-soft pl-4 pr-12 py-3 text-center text-2xl tracking-widest"
+                maxLength={6} required />
+              <button type="button" onClick={() => setShowOldPin((v) => !v)} aria-label={showOldPin ? 'Hide current PIN' : 'Show current PIN'} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted"><Icon name={showOldPin ? 'eye-off' : 'eye'} size={18} /></button>
+            </div>
           )}
-          <input
-            type="password" inputMode="numeric" autoComplete="new-password" placeholder="New PIN (4-6 digits)" aria-label="New security PIN" value={pin}
-            onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest"
-            maxLength={6}
-          />
-          <input
-            type="password" inputMode="numeric" placeholder="Confirm PIN" aria-label="Confirm new security PIN" value={confirmPin}
-            onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="w-full border border-ink/30 rounded-soft px-4 py-3 text-center text-2xl tracking-widest"
-            maxLength={6}
-          />
+          <div className="relative">
+            <input type={showPin ? 'text' : 'password'} inputMode="numeric" autoComplete="new-password" placeholder="New PIN (4-6 digits)" aria-label="New security PIN" value={pin}
+              onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              className="w-full border border-ink/30 rounded-soft pl-4 pr-12 py-3 text-center text-2xl tracking-widest" maxLength={6} required />
+            <button type="button" onClick={() => setShowPin((v) => !v)} aria-label={showPin ? 'Hide new PIN' : 'Show new PIN'} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted"><Icon name={showPin ? 'eye-off' : 'eye'} size={18} /></button>
+          </div>
+          <div className="relative">
+            <input type={showConfirmPin ? 'text' : 'password'} inputMode="numeric" placeholder="Confirm PIN" aria-label="Confirm new security PIN" value={confirmPin}
+              onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              className="w-full border border-ink/30 rounded-soft pl-4 pr-12 py-3 text-center text-2xl tracking-widest" maxLength={6} required />
+            <button type="button" onClick={() => setShowConfirmPin((v) => !v)} aria-label={showConfirmPin ? 'Hide confirm PIN' : 'Show confirm PIN'} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted"><Icon name={showConfirmPin ? 'eye-off' : 'eye'} size={18} /></button>
+          </div>
           {confirmPin.length > 0 && (
             <p className={`text-[11px] font-bold text-center flex items-center justify-center gap-1 ${confirmPin === pin ? 'text-sage-600' : 'text-terracotta'}`}>
               {confirmPin === pin ? <><Icon name="check" size={11} color="#4a7a4a" /> PINs match</> : 'PINs do not match yet'}
