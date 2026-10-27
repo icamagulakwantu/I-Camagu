@@ -229,40 +229,48 @@ function MyOrders({ onBack }) {
                                 <p className="text-[10px] text-brand-black/40 text-center mb-3">— or pay by manual EFT instead —</p>
                               </>
                             )}
-                            {payment.pool?.partner?.bankName && payment.pool?.partner?.bankAccountHolder && payment.pool?.partner?.bankAccountNumber ? (
-                              <div className="rounded-soft border border-sage-200 bg-sage-50 p-3 mb-3">
-                                <p className="text-[10px] font-black uppercase tracking-wide text-ink-muted mb-1">Supplier bank details on file</p>
-                                <p className="text-xs font-bold text-ink">{payment.pool.partner.bankName} · {payment.pool.partner.bankAccountHolder}</p>
-                                <p className="text-xs text-ink">Account: {payment.pool.partner.bankAccountNumber}</p>
-                                {payment.pool.partner.bankBranchCode && <p className="text-xs text-ink">Branch code: {payment.pool.partner.bankBranchCode}</p>}
-                                <p className="text-[10px] text-ink-muted mt-1">Confirm these details with the supplier before transferring.</p>
-                              </div>
-                            ) : (
+                            {payment.provider !== 'MANUAL_EFT' ? (
                               <p className="text-[11px] text-terracotta font-bold mb-2">
-                                Supplier bank details are not on file. Do not transfer money yet; ask the supplier or iCamagu admin for verified details. If you have already paid the supplier directly, you can still enter your reference below.
+                                This payment is recorded with {payment.provider}. Do not make a second EFT transfer while it is being reconciled. If the status remains pending, contact the iCamagu admin through the app.
                               </p>
+                            ) : (
+                              <>
+                                {payment.pool?.partner?.bankName && payment.pool?.partner?.bankAccountHolder && payment.pool?.partner?.bankAccountNumber ? (
+                                  <div className="rounded-soft border border-sage-200 bg-sage-50 p-3 mb-3">
+                                    <p className="text-[10px] font-black uppercase tracking-wide text-ink-muted mb-1">Supplier bank details on file</p>
+                                    <p className="text-xs font-bold text-ink">{payment.pool.partner.bankName} · {payment.pool.partner.bankAccountHolder}</p>
+                                    <p className="text-xs text-ink">Account: {payment.pool.partner.bankAccountNumber}</p>
+                                    {payment.pool.partner.bankBranchCode && <p className="text-xs text-ink">Branch code: {payment.pool.partner.bankBranchCode}</p>}
+                                    <p className="text-[10px] text-ink-muted mt-1">Confirm these details with the supplier before transferring.</p>
+                                  </div>
+                                ) : (
+                                  <p className="text-[11px] text-terracotta font-bold mb-2">
+                                    Supplier bank details are not on file. Do not transfer money yet; ask the supplier or iCamagu admin for verified details. If you have already paid the supplier directly, you can still enter your reference below.
+                                  </p>
+                                )}
+                                <p className="text-[11px] text-brand-black/50 mb-2">
+                                  {payment.pool?.partner?.bankName && payment.pool?.partner?.bankAccountHolder && payment.pool?.partner?.bankAccountNumber
+                                    ? `Pay ${money(payment.amountZAR)} via EFT using ${payment.paymentReference ? `reference "${payment.paymentReference}"` : 'your own reference'} — this code is yours alone, not shared with the rest of the pool, so the supplier can tell your payment apart from everyone else's. Then enter your reference below so they can confirm receipt.`
+                                    : 'Only record a reference if you have already paid directly to the supplier using independently verified details.'}
+                                </p>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text" placeholder={payment.providerReference || 'EFT reference'}
+                                    value={referenceDrafts[payment.id] ?? payment.providerReference ?? ''}
+                                    onChange={(e) => setReferenceDrafts((prev) => ({ ...prev, [payment.id]: e.target.value }))}
+                                    className="flex-1 border border-brand-black/30 rounded-soft px-3 py-2 text-sm"
+                                  />
+                                  <button
+                                    onClick={() => submitReference(payment.id)}
+                                    disabled={submittingId === payment.id}
+                                    className={`bg-sage-500 text-white font-bold px-4 rounded-pill text-sm ${pressable}`}
+                                  >
+                                    {submittingId === payment.id ? '...' : 'Save'}
+                                  </button>
+                                </div>
+                                <p className="text-[10px] text-brand-black/40 mt-1">Awaiting supplier confirmation.</p>
+                              </>
                             )}
-                            <p className="text-[11px] text-brand-black/50 mb-2">
-                              {payment.pool?.partner?.bankName && payment.pool?.partner?.bankAccountHolder && payment.pool?.partner?.bankAccountNumber
-                                ? `Pay ${money(payment.amountZAR)} via EFT using ${payment.paymentReference ? `reference "${payment.paymentReference}"` : 'your own reference'} — this code is yours alone, not shared with the rest of the pool, so the supplier can tell your payment apart from everyone else's. Then enter your reference below so they can confirm receipt.`
-                                : 'Only record a reference if you have already paid directly to the supplier using independently verified details.'}
-                            </p>
-                            <div className="flex gap-2">
-                              <input
-                                type="text" placeholder={payment.providerReference || 'EFT reference'}
-                                value={referenceDrafts[payment.id] ?? payment.providerReference ?? ''}
-                                onChange={(e) => setReferenceDrafts((prev) => ({ ...prev, [payment.id]: e.target.value }))}
-                                className="flex-1 border border-brand-black/30 rounded-soft px-3 py-2 text-sm"
-                              />
-                              <button
-                                onClick={() => submitReference(payment.id)}
-                                disabled={submittingId === payment.id}
-                                className={`bg-sage-500 text-white font-bold px-4 rounded-pill text-sm ${pressable}`}
-                              >
-                                {submittingId === payment.id ? '...' : 'Save'}
-                              </button>
-                            </div>
-                            <p className="text-[10px] text-brand-black/40 mt-1">Awaiting supplier confirmation.</p>
                           </div>
                         )}
                         {payment.refundRequestedAt ? (
