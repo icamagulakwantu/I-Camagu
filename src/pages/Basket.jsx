@@ -351,7 +351,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           )}
           <p className="text-sm font-bold mb-2">
             {poolStatus.poolStatus === 'OPEN'
-              ? `Pooling with other members near ${poolStatus.area}${poolStatus.partnerName ? ` via ${poolStatus.partnerName}` : ''} — the more members join, the bigger the discount.`
+              ? `Pooling with other members near ${poolStatus.area}${poolStatus.partnerName ? ` via ${poolStatus.partnerName}` : ''}. More joined demand may help us request a better quote; any discount depends on confirmed supplier terms.`
               : poolStatus.poolStatus === 'FULFILLED'
                 ? `Delivered/collected — your order${poolStatus.partnerName ? ` from ${poolStatus.partnerName}` : ''} is complete.`
                 : `Matched! Your order pooled with other members${poolStatus.partnerName ? ` via ${poolStatus.partnerName}` : ''}.`}

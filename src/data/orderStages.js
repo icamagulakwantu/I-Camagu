@@ -13,7 +13,7 @@ export const ORDER_STAGES = [
   'MOQ reached',
   'Payment submitted',
   'Payment confirmed',
-  'Ready for delivery',
+  'Delivered/collected',
 ]
 
 // poolStatus: 'OPEN' | 'MATCHED' | 'FULFILLED'
