@@ -231,11 +231,23 @@ export async function getMyPoolStatus(req, res) {
       // not just on My Orders, so the Basket screen can show real end-to-end
       // progress (Collecting → MOQ reached → Payment submitted → Payment
       // confirmed → Ready for delivery) instead of stopping at "Matched!".
-      const payment = await prisma.poolPayment.findFirst({
-        where: { poolId: basket.pool.id, userId: req.userId },
-        orderBy: { createdAt: 'desc' },
-        select: { status: true, providerReference: true, amountZAR: true },
-      });
+      // Match the payment to this exact basket/order reference. A member can
+      // have multiple baskets in one pool; selecting the latest pool payment
+      // for every basket incorrectly duplicates one payment across all of them.
+      const sameMemberBaskets = activeBaskets.filter((candidate) => candidate.userId === req.userId);
+      const payment = basket.orderReference
+        ? await prisma.poolPayment.findFirst({
+            where: { poolId: basket.pool.id, userId: req.userId, paymentReference: basket.orderReference },
+            orderBy: { createdAt: 'desc' },
+            select: { status: true, providerReference: true, amountZAR: true, paymentReference: true },
+          })
+        : sameMemberBaskets.length === 1
+          ? await prisma.poolPayment.findFirst({
+              where: { poolId: basket.pool.id, userId: req.userId },
+              orderBy: { createdAt: 'desc' },
+              select: { status: true, providerReference: true, amountZAR: true, paymentReference: true },
+            })
+          : null;
 
       statuses.push({
         basketId: basket.id,
