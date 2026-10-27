@@ -270,6 +270,11 @@ export async function markRefundProcessed(paymentId, { feeZAR, note }) {
     err.status = 409;
     throw err;
   }
+  if (typeof note !== 'string' || !note.trim()) {
+    const err = new Error('Add the external refund confirmation or bank reference before recording the refund');
+    err.status = 400;
+    throw err;
+  }
 
   let parsedFee = 0;
   if (feeZAR !== undefined && feeZAR !== null && feeZAR !== '') {
@@ -292,7 +297,7 @@ export async function markRefundProcessed(paymentId, { feeZAR, note }) {
   // has actually been executed and the operator has its evidence/reference.
   const transition = await prisma.poolPayment.updateMany({
     where: { id: paymentId, status: 'CLEARED', refundRequestedAt: { not: null }, provider: { notIn: ['MANUAL_EFT', 'STOKVEL_FUNDS'] } },
-    data: { status: 'REFUNDED', refundFeeZAR: parsedFee, refundNote: note || null },
+    data: { status: 'REFUNDED', refundFeeZAR: parsedFee, refundNote: note.trim().slice(0, 500) },
   });
   if (transition.count !== 1) {
     const err = new Error('Payment changed while the refund was being recorded. Refresh and verify its current state.');
