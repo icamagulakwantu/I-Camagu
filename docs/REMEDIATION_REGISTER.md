@@ -116,3 +116,12 @@ Verified in Render service metadata and recent startup logs: two auto-deploying 
 ## PAY-02 — Stokvel-funded payments in PSP payout queue (27 Oct 2026)
 
 **Status: fix prepared on PR branch; merge gated on CI.** The payout queue now excludes both `MANUAL_EFT` and `STOKVEL_FUNDS`, and the server-side processor rejects Stokvel-funded rows before writing payout-forwarded metadata. Regression tests verify the queue filter and that no update is written for a blocked payment. Do not process Stokvel-funded rows through the PSP payout workflow. After CI passes, verify the guard is present on the deployed commit; do not inspect or alter production financial rows as part of this change.
+
+
+## UX-04 — SmartMatch savings language (27 Oct 2026)
+
+**Code change committed to main; CI/deployment verification pending.** Removed the generic “research-backed target: 8–10%” claim from the combined-order card. The card now states that savings are unconfirmed until a supplier provides a written quote for the specific combined order. Do not present indicative tier values as guaranteed savings.
+
+## UX-05 — SmartMatch basket badge refresh (27 Oct 2026)
+
+**Code change committed to main; CI/deployment verification pending.** The app shell now listens for a shared basket-change event, and the SmartMatch “Buy on my own” action dispatches it after a successful basket addition. The listener is cleaned up on effect teardown; a focused unit test covers event dispatch and the no-window case.
