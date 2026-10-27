@@ -109,15 +109,21 @@ export async function registerWithPassword(req, res) {
 
     const passwordHash = await hashPassword(password);
     const user = await prisma.user.create({
-      data: { email, passwordHash, firstName, lastName, paternalIziduko: paternalIziduko || null, maternalIziduko: maternalIziduko || null },
+      data: { email: cleanEmail(email).toLowerCase(), passwordHash, firstName, lastName, paternalIziduko: paternalIziduko || null, maternalIziduko: maternalIziduko || null, emailVerificationRequired: true },
     });
 
     const { syncUserClanGroups } = await import('../services/izidukoService.js');
     await syncUserClanGroups(user);
 
-    const { accessToken, refreshToken } = await generateTokenPair(user.id);
-    res.cookie('jid', refreshToken, REFRESH_COOKIE_OPTIONS);
-    res.status(201).json({ accessToken, user: serializeUser(user), needsIziduko: !user.paternalIziduko });
+    const code = await createOtp(user.id);
+    sendQuietly({
+      from: FROM_ADDRESS,
+      to: user.email,
+      subject: 'Verify your iCamagu email',
+      html: `<p>Welcome to iCamagu.</p><p>Enter this 6-digit code to verify your email and finish creating your account:</p><h2>${code}</h2><p>The code expires in 10 minutes. If you did not create this account, ignore this email.</p>`,
+    }, 'Registration verification');
+    // Do not issue a session until the person proves they control the email.
+    res.status(201).json({ needsEmailVerification: true, message: 'Check your email for a verification code.' });
   } catch (error) {
     console.error('Register with password error:', error.message);
     res.status(500).json({ error: 'Could not register' });
@@ -139,6 +145,7 @@ export async function loginWithPassword(req, res) {
 
     const valid = await verifyPassword(password, user.passwordHash);
     if (!valid) return res.status(401).json({ error: 'Invalid email or password' });
+    if (user.emailVerificationRequired) return res.status(403).json({ error: 'Verify your email first using the 6-digit code we sent when you registered.' });
 
     const { accessToken, refreshToken } = await generateTokenPair(user.id);
     res.cookie('jid', refreshToken, REFRESH_COOKIE_OPTIONS);
@@ -262,9 +269,12 @@ export async function verifyOtp(req, res) {
       return res.status(401).json({ error: `Wrong or expired code.${left}` });
     }
 
-    const { accessToken, refreshToken } = await generateTokenPair(user.id);
+    const verifiedUser = user.emailVerificationRequired
+      ? await prisma.user.update({ where: { id: user.id }, data: { emailVerificationRequired: false } })
+      : user;
+    const { accessToken, refreshToken } = await generateTokenPair(verifiedUser.id);
     res.cookie('jid', refreshToken, REFRESH_COOKIE_OPTIONS);
-    res.json({ accessToken, user: serializeUser(user) });
+    res.json({ accessToken, user: serializeUser(verifiedUser) });
   } catch (error) {
     console.error('Verify OTP error:', error.message);
     res.status(500).json({ error: 'Could not verify code' });
