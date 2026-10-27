@@ -32,13 +32,13 @@ export default function ListRow({ row, showTick = true, busy, onToggle, onSavePr
           {guide && <p className="text-xs text-ink-muted mt-0.5">{LABELS.guide.xh} / {LABELS.guide.en}: {guide}</p>}
         </div>
       </div>
-      <div className={cn('flex items-center gap-2 mt-2', showTick && 'pl-[52px]')}>
+      <div className={cn('flex w-full min-w-0 flex-wrap items-center gap-2 mt-2', showTick && 'pl-[52px]')}>
         {row.cost?.skuId && !row.done && (
           <button type="button" onClick={() => onBuy(row.cost)} className={cn('h-11 px-4 rounded-pill bg-terracotta text-white text-sm', pressable)}>
             <Bi {...BUTTONS.buy} enClassName="hidden" />
           </button>
         )}
-        <label className="flex items-center gap-2 ml-auto">
+        <label className="ml-auto flex min-w-0 max-w-full items-center gap-1.5">
           <span className="text-xs text-ink-muted text-right"><Bi {...LABELS.paid} /></span>
           <span className="text-base font-bold text-ink-muted">R</span>
           <input
@@ -52,7 +52,7 @@ export default function ListRow({ row, showTick = true, busy, onToggle, onSavePr
             disabled={busy}
             onBlur={(e) => onSavePrice(row, e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur() }}
-            className={cn(smallInputClass, 'w-28')}
+            className={cn(smallInputClass, 'w-20 max-w-[28vw] sm:w-24')}
           />
         </label>
       </div>
