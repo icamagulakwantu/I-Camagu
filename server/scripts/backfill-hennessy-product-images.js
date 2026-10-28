@@ -16,8 +16,8 @@ import { backfillQuartGaps } from './backfill-quart-gaps.js';
 import { backfillFounderSourcedSkus } from './backfill-founder-sourced-skus.js';
 
 const PACKSHOTS_750ML = {
-  'Hennessy VS': '/images/brands/hennessy-vs.png',
-  'Hennessy VSOP': '/images/brands/hennessy-vsop.png',
+  'Hennessy VS': 'https://ngf.co.za/cdn/shop/files/hennessy-vs-cognac-750ml.png?v=1790160168&width=1200',
+  'Hennessy VSOP': 'https://shop.captains.co.za/product/image/medium/hennvsop750_1.jpg',
   'Hennessy XO': '/images/brands/hennessy-xo.png',
   'Remy Martin VSOP': 'https://cdn.shopify.com/s/files/1/0987/1588/products/remy-martin-vsop-cognac_1200x1200.jpg?v=1601327577',
   'Remy Martin 1738 Accord Royal': 'https://static-prod.remymartin.com/app/uploads/2026/05/collection-remy-martin-1738-accord-royal-lps-260527-01.jpg',
