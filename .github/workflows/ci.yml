@@ -129,6 +129,7 @@ jobs:
     needs: [test, postgres-integration, migration-baseline-validation]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Verify both public production health endpoints
         env:
           HEALTH_URLS: https://i-camagu.co.za/api/health https://i-camagu.onrender.com/api/health
@@ -164,6 +165,68 @@ jobs:
             curl --fail --silent --show-error --max-time 15 -o /dev/null "$APP_ORIGIN$asset"
           done
           echo "Public frontend root, PWA manifest, and install icons respond successfully."
+
+      - name: Audit live catalogue category and image coverage
+        env:
+          APP_ORIGIN: https://i-camagu.co.za
+        run: |
+          catalogue="$(curl --fail --silent --show-error --max-time 30 "$APP_ORIGIN/api/basket/catalogue")"
+          printf '%s' "$catalogue" > /tmp/icamagu-live-catalogue.json
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import { DEPARTMENTS, departmentOf } from './src/data/storeTaxonomy.js';
+
+          const rows = JSON.parse(fs.readFileSync('/tmp/icamagu-live-catalogue.json', 'utf8'));
+          if (!Array.isArray(rows) || rows.length === 0) {
+            console.error('Live catalogue endpoint did not return a non-empty SKU array.');
+            process.exit(1);
+          }
+
+          const categoryCounts = new Map();
+          const departmentCounts = new Map();
+          const mappedCategories = new Set(DEPARTMENTS.flatMap((department) =>
+            department.aisles.flatMap((aisle) => aisle.categories.map((category) => category.trim().toUpperCase())),
+          ));
+          let missingCategory = 0;
+          let unmappedCategory = 0;
+          let missingImage = 0;
+          const missingImagesByCategory = new Map();
+          const missingImagesByDepartment = new Map();
+          const missingImageSkus = [];
+
+          for (const row of rows) {
+            const category = String(row.category ?? '').trim().toUpperCase();
+            if (!category) missingCategory += 1;
+            else {
+              categoryCounts.set(category, (categoryCounts.get(category) ?? 0) + 1);
+              if (!mappedCategories.has(category)) unmappedCategory += 1;
+            }
+            const department = departmentOf(row).id;
+            departmentCounts.set(department, (departmentCounts.get(department) ?? 0) + 1);
+            if (!String(row.imageUrl ?? '').trim()) {
+              missingImage += 1;
+              const categoryKey = category || '(missing category)';
+              missingImagesByCategory.set(categoryKey, (missingImagesByCategory.get(categoryKey) ?? 0) + 1);
+              missingImagesByDepartment.set(department, (missingImagesByDepartment.get(department) ?? 0) + 1);
+              missingImageSkus.push({
+                name: String(row.name ?? '').trim() || '(unnamed SKU)',
+                category: categoryKey,
+                pack: String(row.bottleFormat ?? row.bulkUnit ?? '').trim() || '(unspecified pack)',
+              });
+            }
+          }
+
+          console.log(`Live catalogue audit: ${rows.length} SKU rows`);
+          console.log('Category counts:', Object.fromEntries([...categoryCounts].sort(([a], [b]) => a.localeCompare(b))));
+          console.log('Department counts:', Object.fromEntries([...departmentCounts].sort(([a], [b]) => a.localeCompare(b))));
+          console.log(`Rows without category: ${missingCategory}; category codes not mapped to a named aisle: ${unmappedCategory}; rows without imageUrl: ${missingImage}`);
+          console.log('Rows without imageUrl by category:', Object.fromEntries([...missingImagesByCategory].sort(([a], [b]) => a.localeCompare(b))));
+          console.log('Rows without imageUrl by department:', Object.fromEntries([...missingImagesByDepartment].sort(([a], [b]) => a.localeCompare(b))));
+          console.log('Missing-image review list (name | category | pack; no IDs, prices or image URLs):');
+          for (const sku of missingImageSkus.sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name))) {
+            console.log(`- ${sku.name} | ${sku.category} | ${sku.pack}`);
+          }
+          NODE
 
       - name: Compare runtime configuration presence on both Render services
         env:
