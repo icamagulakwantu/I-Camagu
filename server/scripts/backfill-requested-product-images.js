@@ -45,15 +45,26 @@ const VERIFIED_SOFT_DRINK_IMAGES = [
 
 async function backfillVerifiedSoftDrinkImages() {
   let updated = 0;
+  let quarantined = 0;
   for (const entry of VERIFIED_SOFT_DRINK_IMAGES) {
     const result = await prisma.sku.updateMany({
       where: { name: { contains: entry.nameContains }, category: entry.category, bottleFormat: { contains: entry.format } },
       data: { imageUrl: entry.imageUrl },
     });
     updated += result.count;
+
+    // The checked-in grocery seed CSV labels these four cans as 250ml, while
+    // the pricing TSV labels them 300ml. Until the live pack size is reconciled,
+    // never display a 300ml image against a 250ml SKU. Hide the image rather
+    // than silently claim a match; the Store renders its safe placeholder.
+    const unverified250ml = await prisma.sku.updateMany({
+      where: { name: { contains: entry.nameContains }, category: entry.category, bottleFormat: { contains: '250ml' }, imageUrl: { not: null } },
+      data: { imageUrl: null },
+    });
+    quarantined += unverified250ml.count;
   }
-  console.log(`Verified soft-drink packshots: ${updated} matching 300ml SKU row(s) updated.`);
-  return updated;
+  console.log(`Soft-drink image audit: ${updated} verified 300ml SKU image(s) set; ${quarantined} unverified 250ml image(s) cleared pending pack-size reconciliation.`);
+  return updated + quarantined;
 }
 
 export async function backfillRequestedProductImages() {
