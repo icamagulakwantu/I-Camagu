@@ -41,7 +41,7 @@ const FORMAT_SPECIFIC_IMAGES = [
   // Every Hunter's can is 440ml (fix-pack-sizes-oct-2026.js).
   { name: "Hunter's Gold", bottleFormat: 'Can (440ml)', slug: 'hunters-gold-can' },
   { name: 'Flying Fish Chill', bottleFormat: 'Can (500ml)', slug: 'flying-fish-chill-can' },
-  { name: 'Extreme Energy', bottleFormat: 'Can (500ml)', slug: 'extreme-energy-can' },
+  { name: 'Extreme Energy', bottleFormat: 'Dumpy (340ml)', slug: 'extreme-energy' },
   // Savanna Dry's big returnable bottle (fix-savanna-dry-format.js corrected
   // it from a wrong 750ml to the real 500ml) gets its own photo, distinct
   // from the Dumpy bottle shot that's the default for the name.
