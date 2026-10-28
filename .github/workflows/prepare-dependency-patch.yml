@@ -33,7 +33,7 @@ jobs:
             'fast-uri': '3.1.9',
             'postcss-selector-parser': '6.1.5',
           };
-          fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2) + '\\n');
+          fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2) + '\n');
           NODE
           yarn install --force
       - name: Verify lockfile remains installable
