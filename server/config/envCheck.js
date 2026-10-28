@@ -12,22 +12,24 @@ const REQUIRED = [
 const OPTIONAL = [
   { name: 'APP_URL', breaks: 'password reset links (must be the public HTTPS origin)' },
   { name: 'RESEND_API_KEY', breaks: 'OTP login codes and password reset emails' },
+  { name: 'EMAIL_FROM', breaks: 'email sender identity (use a verified sender on the configured domain)' },
   { name: 'GOOGLE_CLIENT_ID', breaks: 'Google sign-in (server-side token verification)' },
   { name: 'ID_ENCRYPTION_KEY', breaks: 'identity verification (ID number submission)' },
   { name: 'SUPABASE_URL', breaks: 'Supabase Storage (ceremony photo uploads)' },
   { name: 'SUPABASE_SERVICE_ROLE_KEY', breaks: 'Supabase Storage (ceremony photo uploads)' },
   { name: 'SUPABASE_STORAGE_BUCKET', breaks: 'Supabase Storage (ceremony photo uploads)' },
-  // Missing either means paymentService.isOnlinePaymentConfigured() returns
-  // false — the "Pay online" button just doesn't appear, and every pool
-  // payment falls back to the existing manual-EFT-and-reference flow.
-  // PAYFAST_SANDBOX defaults to true (sandbox) whenever unset; only an
-  // explicit 'false' points this at PayFast's live endpoint.
-  { name: 'PAYFAST_MERCHANT_ID', breaks: 'online pool payments (falls back to manual EFT)' },
-  { name: 'PAYFAST_MERCHANT_KEY', breaks: 'online pool payments (falls back to manual EFT)' },
   // Free at sentry.io — create a project, set this to its DSN. Until then
   // the app runs exactly as before; nothing breaks, there's just no
   // dashboard visibility into server errors beyond Render's own logs.
   { name: 'SENTRY_DSN', breaks: 'error monitoring (falls back to Render logs only)' },
+];
+
+// Retained in the presence-only health report for deployment parity checks,
+// but intentionally excluded from boot warnings: the 2026 no-custody policy
+// disables online checkout in code regardless of whether these credentials exist.
+const STATUS_ONLY = [
+  { name: 'PAYFAST_MERCHANT_ID' },
+  { name: 'PAYFAST_MERCHANT_KEY' },
 ];
 
 export function checkRequiredEnvVars() {
@@ -51,7 +53,7 @@ export function checkRequiredEnvVars() {
 // itself may be the thing broken when this is needed.
 export function envStatus() {
   const status = {};
-  for (const v of [...REQUIRED, ...OPTIONAL]) {
+  for (const v of [...REQUIRED, ...OPTIONAL, ...STATUS_ONLY]) {
     status[v.name] = !!process.env[v.name];
   }
   return status;

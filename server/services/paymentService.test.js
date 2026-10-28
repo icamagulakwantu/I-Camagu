@@ -28,7 +28,7 @@ afterEach(() => {
 });
 
 describe('isOnlinePaymentConfigured / isOnlinePaymentEligible', () => {
-  it('is unconfigured when PayFast credentials are missing — degrades to manual EFT only, never crashes', () => {
+  it('keeps online checkout disabled when PayFast credentials are missing', () => {
     setPayfastEnv({});
     expect(isOnlinePaymentConfigured()).toBe(false);
     expect(isOnlinePaymentEligible('GROCERY')).toBe(false);
