@@ -83,6 +83,18 @@ These records need a pack/size description before catalogue QA can reliably dist
 | cmtjzlm6d0004yt0bk1nc470m | Tarpaulin Sail | ULWALUKO_SUPPLIES | 350.00 |
 | cmtjzllzi0003yt0b4ugvk5ts | White Blanket with Black Stripes | ULWALUKO_SUPPLIES | 450.00 |
 
+## Suspected pack-label inconsistencies (verify before changing live SKUs)
+
+These records use the word “Quart” with a size that does not match the usual South African 750 ml quart convention. This is a **review flag, not an automatic correction**: confirm the exact SKU with the supplier/manufacturer before editing a live format or image.
+
+| TSV row | SKU | Current format | Review action |
+|---:|---|---|---|
+| 28 | Heineken | Quart (500ml) | Verify whether this is a 500 ml bottle/can and correct the pack label only with source evidence |
+| 36 | Windhoek Draught | Quart (440ml) | Verify the physical container and whether the intended SKU is a 440 ml can |
+| 39 | Windhoek Lager/Light | Quart (500ml) | Verify the physical container and whether the intended SKU is a 500 ml can/bottle |
+
+The export has no image URL or source metadata, so image correctness cannot be assessed from this TSV alone. Live image review must use the current production SKU records and their actual image URLs.
+
 ## Required next steps
 
 1. Export live SKU data from the production catalogue using a read-only, access-controlled admin export. Include SKU ID, name, brand, category, format, units per case, bulk unit, image URL, image source, and price source/last-checked date.
