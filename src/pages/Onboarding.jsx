@@ -9,6 +9,13 @@ const NATION_OPTIONS = ['AmaXhosa', 'AbaThembu', 'AmaBomvana', 'AmaGqunukhwebe',
 
 const STEPS = ['welcome', 'ancestry', 'details']
 
+const FEATURE_PATHS = {
+  'Ceremony Planner': '/ceremonies',
+  SmartMatch: '/smartmatch',
+  Stokvels: '/stokvels',
+  'Iziduko Network': '/me/iziduko',
+}
+
 const FEATURES = [
   {
     icon: 'calendarRange',
@@ -134,9 +141,10 @@ function Onboarding({ onDone }) {
     reader.readAsDataURL(file)
   }
 
-  const finishOnboarding = () => {
+  const finishOnboarding = (destination) => {
     if (user?.id) localStorage.setItem(`icamagu_onboarding_done:${user.id}`, '1')
     onDone?.()
+    if (destination) window.location.assign(destination)
   }
 
   const saveAncestryAndContinue = async () => {
@@ -244,6 +252,18 @@ function Onboarding({ onDone }) {
                 </div>
               </button>
             ))}
+            {activeCard >= 0 && FEATURES[activeCard] && (
+              <div className="rounded-2xl bg-cream/80 border border-cream-dark p-3">
+                <p className="text-xs text-ink-muted mb-2">Want to try this now? You can finish profile setup later.</p>
+                <button
+                  type="button"
+                  onClick={() => finishOnboarding(FEATURE_PATHS[FEATURES[activeCard].label])}
+                  className="w-full min-h-11 rounded-full bg-terracotta px-4 py-2.5 text-sm font-bold text-white pressable"
+                >
+                  Open {FEATURES[activeCard].label} →
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="bg-white/95 backdrop-blur-md border-x-2 border-b-2 border-terracotta/20 rounded-b-soft px-4 pb-6 pt-2">
