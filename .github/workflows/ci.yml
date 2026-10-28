@@ -129,6 +129,7 @@ jobs:
     needs: [test, postgres-integration, migration-baseline-validation]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Verify both public production health endpoints
         env:
           HEALTH_URLS: https://i-camagu.co.za/api/health https://i-camagu.onrender.com/api/health
