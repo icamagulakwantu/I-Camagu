@@ -4,6 +4,8 @@ import { DEPARTMENTS, departmentOf, aisleOf } from './storeTaxonomy.js';
 
 describe('SmartMatch store taxonomy', () => {
   it('keeps alcohol separate from soft drinks and water', () => {
+    expect(departmentOf({ category: 'RUM' }).id).toBe('alcohol');
+    expect(aisleOf({ category: ' rum ' }).id).toBe('spirits');
     expect(departmentOf({ category: 'BEER' }).id).toBe('alcohol');
     expect(departmentOf({ category: 'SOFT_DRINKS' }).id).toBe('softdrinks');
     expect(departmentOf({ category: 'WATER' }).id).toBe('softdrinks');
