@@ -55,14 +55,28 @@ async function runRepairStep(label, task) {
   }
 }
 
-async function fixNonAlcoholicCategories() {
-  const energy = await prisma.sku.updateMany({
-    where: { name: 'Extreme Energy', category: 'CIDER_RTD' },
-    data: { category: 'ENERGY_DRINK' },
+async function fixExtremeEnergyDumpyFormat() {
+  const sourceFormat = 'Dumpy (500ml)';
+  const correctedFormat = 'Dumpy (340ml)';
+  const rows = await prisma.sku.findMany({
+    where: { name: 'Extreme Energy', category: 'CIDER_RTD', bottleFormat: sourceFormat },
+    select: { id: true },
   });
-  if (energy.count > 0) {
-    console.log(`Non-alcoholic category repair: ${energy.count} Extreme Energy SKU row(s) moved from CIDER_RTD to ENERGY_DRINK.`);
+  let changed = 0;
+  for (const row of rows) {
+    const duplicate = await prisma.sku.findFirst({
+      where: { name: 'Extreme Energy', category: 'CIDER_RTD', bottleFormat: correctedFormat },
+      select: { id: true },
+    });
+    if (duplicate) {
+      console.warn('Extreme Energy dumpy size: 340ml SKU already exists; leaving 500ml row for manual reconciliation.');
+      continue;
+    }
+    await prisma.sku.update({ where: { id: row.id }, data: { bottleFormat: correctedFormat } });
+    changed += 1;
   }
+  if (changed) console.log(`Extreme Energy dumpy size: corrected ${changed} SKU row(s) to 340ml.`);
+  return changed;
 }
 
 async function ensureAmstelFormats() {
@@ -139,9 +153,9 @@ export async function backfillHennessyProductImages() {
     await runRepairStep('beer quart sizes', fixBeerQuartFormats);
     await runRepairStep('Savanna Dry size', fixSavannaDryFormat);
     await runRepairStep('beer/cider can and dumpy sizes', fixPackSizes);
+    await runRepairStep('Extreme Energy dumpy size', fixExtremeEnergyDumpyFormat);
     await runRepairStep('verified quart gaps', backfillQuartGaps);
     await runRepairStep('founder-confirmed SKU formats', backfillFounderSourcedSkus);
-    await runRepairStep('non-alcoholic category contamination', fixNonAlcoholicCategories);
     await runRepairStep('Amstel quart and can', ensureAmstelFormats);
     await runRepairStep('Black Label nonexistent dumpy', removeBlackLabelDumpies);
     await runRepairStep('Guinness Foreign Extra bottle size', repairGuinnessForeignExtraFormats);
