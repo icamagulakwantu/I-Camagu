@@ -86,12 +86,21 @@ export const DEPARTMENTS = [
   },
 ]
 
+// Backend category strings are not constrained by a database enum. Normalise
+// harmless casing/whitespace differences so a value such as " water " cannot
+// fall through to Other items or evade the intended department filter.
+export function categoryCodeOf(sku) {
+  return String(sku?.category ?? '').trim().toUpperCase()
+}
+
 export function departmentOf(sku) {
-  return DEPARTMENTS.find((d) => d.aisles.some((a) => a.categories.includes(sku?.category)))
+  const category = categoryCodeOf(sku)
+  return DEPARTMENTS.find((d) => d.aisles.some((a) => a.categories.includes(category)))
     || DEPARTMENTS.find((d) => d.id === 'other')
 }
 
 export function aisleOf(sku) {
+  const category = categoryCodeOf(sku)
   const department = departmentOf(sku)
-  return department.aisles.find((a) => a.categories.includes(sku?.category)) || department.aisles[0]
+  return department.aisles.find((a) => a.categories.includes(category)) || department.aisles[0]
 }

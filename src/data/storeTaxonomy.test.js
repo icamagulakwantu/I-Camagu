@@ -12,6 +12,13 @@ describe('SmartMatch store taxonomy', () => {
     expect(departmentOf({ category: 'CIDER_RTD', name: 'Extreme Energy' }).id).toBe('alcohol');
   });
 
+  it('normalises category casing and whitespace before assigning a department', () => {
+    expect(departmentOf({ category: ' water ' }).id).toBe('softdrinks');
+    expect(aisleOf({ category: ' mixer ' }).id).toBe('mixers');
+    expect(departmentOf({ category: ' beer ' }).id).toBe('alcohol');
+    expect(departmentOf({ category: null }).id).toBe('other');
+  });
+
   it('keeps meat separate from live livestock', () => {
     expect(departmentOf({ category: 'MEAT' }).id).toBe('meat');
     expect(departmentOf({ category: 'LIVESTOCK_ANIMAL' }).id).toBe('livestock');
