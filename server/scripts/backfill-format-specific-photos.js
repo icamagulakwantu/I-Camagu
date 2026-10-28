@@ -115,13 +115,19 @@ const FORMAT_SPECIFIC_IMAGES = [
 //
 // Captain's (shop.captains.co.za) photos: one packshot per pack size, each
 // checked visually on 28 Oct 2026 against its exact format (quart vs dumpy
-// vs can). These replace the shared name-level photo that made e.g. a
-// Castle Lager quart show a dumpy. Note: Captain's lists several quarts as
-// 660ml (Castle Lite, Amstel, Hunter's, Strongbow); the bottle shape is
-// right, but the 750ml catalogue label may need a separate size check.
-// Some quart shots show the crate, which is how quarts are sold.
+// vs can). NOTE: Captain's blocks hotlinking, so these do not render on our
+// site — the founder is supplying replacements, which should be hosted on
+// the Hercules CDN like the water photos below.
+// Captain's lists several quarts as 660ml (Castle Lite, Amstel, Hunter's,
+// Strongbow); the bottle shape is right, but the 750ml catalogue label may
+// need a separate size check.
 // Amstel Quart keeps the founder's own photo (amstel-lager.png) above.
 const CAPTAINS = 'https://shop.captains.co.za/product/image/large/';
+// Founder-supplied photos hosted on the Hercules CDN (permanent URLs, no
+// hotlink blocking). Each was checked by eye for brand, still vs sparkling
+// and printed size before being assigned; photos whose size couldn't be
+// read from the label were NOT assigned to any row.
+const CDN = 'https://hercules-cdn.com/';
 const EXTERNAL_FORMAT_SPECIFIC_IMAGES = [
   // This verified South African retailer packshot is specifically the 500ml
   // can, not the 330ml NRB bottle.
@@ -156,10 +162,20 @@ const EXTERNAL_FORMAT_SPECIFIC_IMAGES = [
   { name: 'Brutal Fruit Ruby Apple', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}brutfra275_1.jpg` },
   { name: 'Brutal Fruit Strawberry Rouge', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}brutfsr275_1.jpg` },
   { name: 'Breezer Blueberry', bottleFormat: 'Dumpy (275ml)', imageUrl: `${CAPTAINS}bacbblb275_1.jpg` },
-  { name: 'Valpre Still Water', bottleFormat: 'Bottle (500ml)', imageUrl: `${CAPTAINS}valpst500_1.jpg` },
-  { name: 'Valpre Still Water', bottleFormat: 'Bottle (1.5L)', imageUrl: `${CAPTAINS}valpst1.5lt_1.jpg` },
-  { name: 'Valpre Sparkling Water', bottleFormat: 'Bottle (500ml)', imageUrl: `${CAPTAINS}valpsp500_1.jpg` },
-  { name: 'Valpre Sparkling Water', bottleFormat: 'Bottle (1L)', imageUrl: `${CAPTAINS}valpsplt_1.jpg` },
+  // Water — founder-supplied photos (28 Oct 2026).
+  { name: 'Valpre Still Water', bottleFormat: 'Bottle (500ml)', imageUrl: `${CDN}file_xHCC1xZIP6rImE2peq8q8X8g` },
+  { name: 'Valpre Still Water', bottleFormat: 'Bottle (1.5L)', imageUrl: `${CDN}file_PI0C9ubaYB2NEkIoO6yVWi0B` },
+  { name: 'Valpre Sparkling Water', bottleFormat: 'Bottle (500ml)', imageUrl: `${CDN}file_H1Bfr1jzX6vhZF32ujouaxHi` },
+  { name: 'Valpre Sparkling Water', bottleFormat: 'Bottle (1L)', imageUrl: `${CDN}file_fQ0zaxCT4NfJilGVOGDVtAmx` },
+  { name: 'Bonaqua Still Water', bottleFormat: 'Bottle (500ml)', imageUrl: `${CDN}file_jM0jztZR0cP3rZToV75X9lWF` },
+  { name: 'Tsitsikamma Still Water', bottleFormat: 'Bottle (500ml)', imageUrl: `${CDN}file_VPNKAxGLTob9bEn0wwBj2hjl` },
+  { name: 'Tsitsikamma Sparkling Water', bottleFormat: 'Bottle (500ml)', imageUrl: `${CDN}file_zrCLbbN9zkHKDCcahbf0nbp8` },
+];
+
+// Rows that previously pointed at a hotlink-blocked Captain's URL and have
+// no verified replacement yet. Cleared to null so the store shows its
+// normal "no photo" placeholder instead of a broken image.
+const BROKEN_IMAGES_TO_CLEAR = [
   { name: 'Bonaqua Still Water', bottleFormat: 'Bottle (1.5L)', imageUrl: `${CAPTAINS}bona1.5lt_1.png` },
 ];
 
@@ -202,6 +218,13 @@ export async function backfillFormatSpecificPhotos() {
     const { count } = await prisma.sku.updateMany({
       where: { name, bottleFormat, NOT: { imageUrl } },
       data: { imageUrl },
+    });
+    totalUpdated += count;
+  }
+  for (const { name, bottleFormat, imageUrl } of BROKEN_IMAGES_TO_CLEAR) {
+    const { count } = await prisma.sku.updateMany({
+      where: { name, bottleFormat, imageUrl },
+      data: { imageUrl: null },
     });
     totalUpdated += count;
   }
