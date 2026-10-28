@@ -27,7 +27,7 @@
 
 - [ ] Complete route-by-route authorization audit for every read/write route, including cross-user IDs, clan-only content, ceremony ownership, supplier/admin actions, account export/deletion and uploaded media.
 - [ ] Replace the in-memory per-process rate limiter with a shared/distributed store or enforce equivalent rate limiting at the trusted edge for multi-instance deployments.
-- [ ] Close the account-registration enumeration residual by implementing an email-confirmation flow before revealing whether an address is already registered.
+- [ ] Finish the registration-enumeration review. PR [#80](https://github.com/icamagulakwantu/I-Camagu/pull/80) removed the direct response-body difference between new and existing email addresses and added a regression test; assess timing differences and any other observable behavior before marking this security item complete.
 - [ ] Run dependency audit and triage the previously reported advisories; document accepted residual risks rather than assuming old scan results are current.
 - [ ] Verify production secrets and permissions: JWT/session secrets, Google auth, Resend, Sentry, Supabase service role, PayFast/PSP credentials and webhook secrets must be configured in the deployment secret store, never committed.
 - [ ] Verify private Supabase media bucket policies and signed URL expiry. Test that one user cannot fetch another user's private ceremony media.
@@ -201,3 +201,12 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [ ] Visually review the 77 missing-image rows in [`docs/pricing/live-catalogue-missing-image-queue-2026-10-28.md`](pricing/live-catalogue-missing-image-queue-2026-10-28.md): groceries 37, livestock 8, meat 4, non-consumables 8, and soft drinks/water/mixers 20. The public audit does not inspect image content, licensing, or whether the 307 existing images match their exact pack sizes; obtain a read-only export of existing image URLs for that review. Do not auto-replace live imagery from the pricing TSV alone.
 - [ ] Verify soft-drink and water pack-size imagery before adding URLs: the live missing-image queue contains four 250 ml cans and 15 water products, while the existing boot repair only applies verified 300 ml soft-drink images and matched zero live rows. Do not reuse 300 ml imagery for the 250 ml products.
 - [ ] Run Android Chrome and installed-PWA tests on a physical device, then obtain founder/community sign-off for cultural content, privacy/terms, pricing, support contacts and launch scope.
+
+
+## Verification update — 28 October 2026, 21:06 SAST
+
+- [x] PR [#80](https://github.com/icamagulakwantu/I-Camagu/pull/80) merged as `ab3c7581d498f4663322bf2a0a55cf69f6101c42`. It unifies the password-registration response for existing and new email addresses and adds a regression test comparing the complete HTTP status/body response.
+- [x] Main-head CI run [#40751000266](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40751000266) passed the standard tests/build, hosted-workspace runtime-target guard, PostgreSQL financial integration tests, candidate migration-baseline validation, and production smoke checks.
+- [x] Both Render services, `I-Camagu-1` and `I-Camagu`, are live on commit `ab3c7581d498f4663322bf2a0a55cf69f6101c42`. Production smoke verified the canonical domain's frontend/PWA assets and both public health endpoints.
+- [ ] Do not confuse the registration response fix with a complete timing-side-channel audit; this remains open until registration paths are compared under realistic conditions.
+- [ ] Remaining launch blockers listed above are unchanged: dual-service configuration/domain/secret parity, native Render health-check settings, schema/migration and balance reconciliation, route-level authorization/privacy, distributed rate limiting, dependency review, verified email delivery, image review, Android/PWA manual tests, and founder/community sign-off.
