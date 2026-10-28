@@ -31,7 +31,7 @@ async function applyVerifiedCognacPackshots() {
   let updated = 0;
   for (const [name, imageUrl] of Object.entries(PACKSHOTS_750ML)) {
     const result = await prisma.sku.updateMany({
-      where: { name, bottleFormat: { contains: '750ml' } },
+      where: { name, bottleFormat: { contains: '750ml' }, OR: [{ imageUrl: null }, { imageUrl: { not: imageUrl } }] },
       data: { imageUrl },
     });
     updated += result.count;
