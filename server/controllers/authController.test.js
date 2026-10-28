@@ -49,6 +49,30 @@ beforeEach(() => {
 });
 
 describe('password registration verification', () => {
+  it('returns the same public response for a new address and an existing address', async () => {
+    prisma.user.findUnique.mockResolvedValueOnce(MEMBER);
+    const existing = await call(auth.registerWithPassword, {
+      email: 'member@example.com', password: 'password123', firstName: 'Member', lastName: 'Existing',
+    });
+    prisma.user.findUnique.mockResolvedValueOnce(null);
+    prisma.user.create.mockResolvedValueOnce({
+      id: 'user-2', email: 'new@example.com', firstName: 'New', lastName: 'Member',
+      passwordHash: 'dummy-hash', emailVerificationRequired: true,
+    });
+    const fresh = await call(auth.registerWithPassword, {
+      email: 'new@example.com', password: 'password123', firstName: 'New', lastName: 'Member',
+    });
+
+    expect(existing).toEqual(fresh);
+    expect(existing).toEqual({
+      status: 201,
+      body: {
+        needsEmailVerification: true,
+        message: 'If you can use this email, check your inbox for a code to continue.',
+      },
+    });
+  });
+
   it('creates an unverified account, sends a code and does not issue a session', async () => {
     prisma.user.findUnique.mockResolvedValueOnce(null);
     prisma.user.create.mockResolvedValueOnce({
@@ -62,6 +86,7 @@ describe('password registration verification', () => {
 
     expect(result.status).toBe(201);
     expect(result.body.needsEmailVerification).toBe(true);
+    expect(result.body.message).toBe('If you can use this email, check your inbox for a code to continue.');
     expect(result.body.accessToken).toBeUndefined();
     expect(createOtp).toHaveBeenCalledWith('user-2');
     expect(tokenService.generateTokenPair).not.toHaveBeenCalled();
