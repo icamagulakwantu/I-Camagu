@@ -2,6 +2,11 @@ import prisma from '../config/db.js';
 import { toPublicSku, PUBLIC_SKU_SELECT } from '../utils/skuVisibility.js';
 
 export async function getCatalogue(req, res) {
+  // Catalogue image/format corrections are applied to live SKU rows. Do not let
+  // browser, proxy, or installed-PWA caches keep serving stale product image URLs.
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
   const { category, search } = req.query;
 
   try {
