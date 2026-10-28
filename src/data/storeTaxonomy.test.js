@@ -38,14 +38,14 @@ describe('SmartMatch store taxonomy', () => {
 
   it('maps every category code in the committed catalogue export', () => {
     const tsv = readFileSync(new URL('../../docs/pricing/skus_clean.tsv', import.meta.url), 'utf8');
-    const [header, ...rows] = tsv.trimEnd().split(/\\r?\\n/);
-    const categoryIndex = header.split('\\t').indexOf('category');
+    const [header, ...rows] = tsv.trimEnd().split(/\r?\n/);
+    const categoryIndex = header.split('\t').indexOf('category');
     expect(categoryIndex).toBeGreaterThanOrEqual(0);
 
     const catalogueCategories = [...new Set(
       rows
         .filter((row) => row.trim())
-        .map((row) => row.split('\\t')[categoryIndex]?.trim().toUpperCase())
+        .map((row) => row.split('\t')[categoryIndex]?.trim().toUpperCase())
         .filter(Boolean),
     )];
 
