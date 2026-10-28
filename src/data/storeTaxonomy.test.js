@@ -28,6 +28,20 @@ describe('SmartMatch store taxonomy', () => {
     expect(aisleOf({ category: 'NEW_UNREVIEWED_CODE' }).id).toBe('review');
   });
 
+  it('maps every category code in the current catalogue export', () => {
+    const catalogueCategories = [
+      'BEER', 'BRANDY', 'CANNED_GOODS', 'CHAMPAGNE', 'CIDER_RTD', 'COGNAC',
+      'DRY_GOODS', 'FRESH_PRODUCE', 'GIN', 'GROCERY', 'GROCERY_BULK',
+      'LIQUEUR', 'LIVESTOCK_ANIMAL', 'MEAT', 'MIXER', 'RITUAL_SUPPLIES',
+      'SOFT_DRINKS', 'SPARKLING', 'TEQUILA', 'TEQUILA_PREMIUM',
+      'ULWALUKO_SUPPLIES', 'VODKA', 'VODKA_PREMIUM', 'WATER', 'WHISKY',
+      'WINE', 'WINE_BOX',
+    ];
+    for (const category of catalogueCategories) {
+      expect(departmentOf({ category }).id, category).not.toBe('other');
+    }
+  });
+
   it('exposes all top-level departments with unique IDs', () => {
     const ids = DEPARTMENTS.map(({ id }) => id);
     expect(new Set(ids).size).toBe(ids.length);
