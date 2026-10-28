@@ -38,8 +38,11 @@ export default {
         },
         ink: {
           DEFAULT: '#2b2620',
-          light: '#5c564e',
-          muted: '#8a8278',
+          // Darkened for readability (older users, outdoor phone screens):
+          // the old muted grey #8a8278 was ~3.4:1 on cream, below the WCAG AA
+          // 4.5:1 minimum for body text. #625b52 is ~5.9:1 on cream.
+          light: '#4a443d',
+          muted: '#625b52',
         },
         // Aliases — each points at one of the canonical values above.
         // brand.blue was never actually blue; it was a stray sage. brand.gold
@@ -58,6 +61,12 @@ export default {
       fontFamily: {
         display: ['Playfair Display', 'Georgia', 'serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      // The smallest text size is used for hints, prices-per-unit and labels
+      // all over the app. 12px was hard to read for older users, so it is
+      // bumped to 13px everywhere in one place.
+      fontSize: {
+        xs: ['0.8125rem', { lineHeight: '1.15rem' }],
       },
       borderWidth: {
         '3': '3px',
