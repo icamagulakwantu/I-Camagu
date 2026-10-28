@@ -300,6 +300,7 @@ const SCREEN_PATHS = {
   family: '/ceremonies/family',
   ukugida: '/ceremonies/ukugida',
   ukusoka: '/ceremonies/ukusoka',
+  umqombothi: '/me/umqombothi',
   expenditure: '/me/expenditure',
   shrinefund: '/me/ubuhlanti',
   pin: '/me/pin',
