@@ -6,7 +6,6 @@
 import prisma from '../config/db.js';
 
 const REQUESTED_PRODUCT_IMAGES = [
-  { names: ['Honor VS'], image: 'honor-vs.png' },
   { names: ['Strettons London Dry'], image: 'strettons-london-dry.png' },
   { names: ['Strettons Wild Berry'], image: 'strettons-wild-berry.png' },
   { names: ['Baileys Irish Cream', 'Baileys Original Irish Cream'], image: 'baileys-original-irish-cream.png' },
@@ -48,7 +47,7 @@ async function backfillVerifiedSoftDrinkImages() {
   let quarantined = 0;
   for (const entry of VERIFIED_SOFT_DRINK_IMAGES) {
     const result = await prisma.sku.updateMany({
-      where: { name: { contains: entry.nameContains }, category: entry.category, bottleFormat: { contains: entry.format } },
+      where: { name: { contains: entry.nameContains }, category: entry.category, bottleFormat: { contains: entry.format }, OR: [{ imageUrl: null }, { imageUrl: { not: entry.imageUrl } }] },
       data: { imageUrl: entry.imageUrl },
     });
     updated += result.count;
@@ -72,7 +71,7 @@ export async function backfillRequestedProductImages() {
   for (const entry of REQUESTED_PRODUCT_IMAGES) {
     for (const name of entry.names) {
       const result = await prisma.sku.updateMany({
-        where: { name, bottleFormat: { contains: '750ml' } },
+        where: { name, bottleFormat: { contains: '750ml' }, OR: [{ imageUrl: null }, { imageUrl: { not: `/images/brands/${entry.image}` } }] },
         data: { imageUrl: `/images/brands/${entry.image}` },
       });
       updated += result.count;
@@ -90,7 +89,7 @@ export async function backfillRequestedProductImages() {
   // The old local Honor VS image is cropped and includes unrelated artwork.
   // This retailer packshot is explicitly the standalone 750ml Honor VS bottle.
   const honorVs = await prisma.sku.updateMany({
-    where: { name: 'Honor VS', bottleFormat: { contains: '750ml' } },
+    where: { name: 'Honor VS', bottleFormat: { contains: '750ml' }, OR: [{ imageUrl: null }, { imageUrl: { not: 'https://thedrinkshopsa.com/cdn/shop/files/honorvs.jpg?v=1749290413&width=1080' } }] },
     data: { imageUrl: 'https://thedrinkshopsa.com/cdn/shop/files/honorvs.jpg?v=1749290413&width=1080' },
   });
   updated += honorVs.count;
