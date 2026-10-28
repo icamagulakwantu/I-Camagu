@@ -175,3 +175,25 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [ ] Both Render services still have no native health-check path configured, even though public health endpoints are passing in CI. Configure `/api/health` through the Render service settings after confirming the intended service behavior.
 - [ ] The canonical service and secondary Render service have not been proven to share identical secret values or the same database target. Do not consolidate or disable either until parity, custom-domain attachment, callbacks, email delivery and traffic are verified.
 - [ ] The production Prisma migration baseline, protected-copy balance reconciliation, route-level authorization/privacy review, dependency advisory triage, backup/restore rehearsal, Android/PWA manual testing and cultural/founder sign-off remain open. The CI candidate migration baseline only validates a fresh disposable database and must not be applied to production as a shortcut.
+
+
+## Launch verification update — 28 October 2026, 18:06 UTC
+
+### Completed and deployed
+
+- [x] PR [#71](https://github.com/icamagulakwantu/I-Camagu/pull/71) normalised SmartMatch category codes, clarified cross-department search, and added regression coverage. Its CI run [#40739996353](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40739996353) passed.
+- [x] PR [#72](https://github.com/icamagulakwantu/I-Camagu/pull/72) aligned boot warnings with the no-custody policy. Missing PayFast credentials are no longer described as a broken feature because online checkout is hard-disabled in code regardless of credentials. `EMAIL_FROM` is included in optional runtime diagnostics. Main-head CI [#40741134594](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40741134594) passed all four jobs, including public production smoke.
+- [x] PR [#73](https://github.com/icamagulakwantu/I-Camagu/pull/73) changed the taxonomy regression test to read category codes from the committed `docs/pricing/skus_clean.tsv` file rather than a manually copied list. CI passed all jobs.
+- [x] PR [#74](https://github.com/icamagulakwantu/I-Camagu/pull/74) lazy-loads 44 feature screens. Main-head CI [#40741731163](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40741731163) passed tests, PostgreSQL integration, migration-baseline validation and production smoke. Both Render services are live on main commit `e5197a7cebf4ec17371e1e3ff91afa01fe1271be`; startup logs confirm the server listens and the database check passes.
+- [x] Render build logs show the initial JavaScript bundle reduced from `822.21 kB (213.84 kB gzip)` to `273.11 kB (87.11 kB gzip)`. The new PWA build precaches 62 entries (about 864 KiB); the latest build no longer emits the previous greater-than-500-kB chunk warning. This is a build-size improvement, not a substitute for physical-device performance testing.
+- [x] The committed pricing extract contains 294 SKU rows and 27 distinct category codes; every code is mapped by the taxonomy. This validates the static extract only, not the live database catalogue or image accuracy.
+
+### Still blocking public launch
+
+- [ ] Render has two live services for this repository. Verify custom-domain attachment, actual database target, secret-value parity, callback/webhook configuration, email delivery and traffic before consolidating. Do not disable either service during discovery.
+- [ ] Configure the native Render health-check path to `/api/health` on the intended canonical service after confirming the endpoint's readiness behavior.
+- [ ] Production configuration comparison reports `EMAIL_FROM` and `SENTRY_DSN` absent on both services; `ID_ENCRYPTION_KEY` and PayFast merchant credentials are present only on the canonical service. Set a verified sender only after confirming the sender domain; decide whether Sentry is a launch requirement; do not rotate or remove identity/payment credentials without checking encrypted records and historical/in-flight provider activity. Keep online checkout disabled under the 2026 no-custody policy.
+- [ ] Complete the production-schema comparison, safe migration-baseline decision, protected-copy balance reconciliation and backup/restore rehearsal. The disposable CI baseline is not permission to apply a migration to production.
+- [ ] Complete the route-by-route authorization/privacy audit, distributed rate-limiting plan, registration-enumeration remediation, dependency advisory triage, private-media policy tests and account deletion/export/retention review.
+- [ ] Export the live catalogue through an authenticated, read-only server environment and visually audit exact SKU/pack-size images. The pricing TSV does not contain live `imageUrl` values; do not auto-replace live imagery from that file alone.
+- [ ] Run Android Chrome and installed-PWA tests on a physical device, then obtain founder/community sign-off for cultural content, privacy/terms, pricing, support contacts and launch scope.
