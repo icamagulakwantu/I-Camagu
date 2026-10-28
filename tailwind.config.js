@@ -38,16 +38,12 @@ export default {
         },
         ink: {
           DEFAULT: '#2b2620',
-          // Darkened for readability (older users, outdoor phone screens):
-          // the old muted grey #8a8278 was ~3.4:1 on cream, below the WCAG AA
-          // 4.5:1 minimum for body text. #625b52 is ~5.9:1 on cream.
           light: '#4a443d',
-          muted: '#625b52',
+          // Slightly darker than the original #8a8278 so hint text stays
+          // readable on cream (meets the 4.5:1 contrast guideline).
+          muted: '#6b645a',
         },
         // Aliases — each points at one of the canonical values above.
-        // brand.blue was never actually blue; it was a stray sage. brand.gold
-        // and the old brand.ochre were both near-duplicates of terracotta —
-        // both now alias the same, more golden ochre scale above.
         brand: {
           blue: '#4a7a4a',
           cream: '#f5f3ee',
@@ -61,12 +57,6 @@ export default {
       fontFamily: {
         display: ['Playfair Display', 'Georgia', 'serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
-      },
-      // The smallest text size is used for hints, prices-per-unit and labels
-      // all over the app. 12px was hard to read for older users, so it is
-      // bumped to 13px everywhere in one place.
-      fontSize: {
-        xs: ['0.8125rem', { lineHeight: '1.15rem' }],
       },
       borderWidth: {
         '3': '3px',

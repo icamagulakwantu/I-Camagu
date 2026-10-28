@@ -19,23 +19,20 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
               const active = activeScreen === tab.id
               return (
                 <li key={tab.id} className="flex-1">
-                  {/* Larger tap area and labels, and brighter inactive
-                      icons/text, so older users can read every tab at a
-                      glance instead of relying on icon shapes alone. */}
                   <button
                     type="button"
                     onClick={() => onNavigate(tab.id)}
                     aria-label={tab.badge > 0 ? `${tab.label}, ${tab.badge} new` : tab.label}
                     aria-current={active ? 'page' : undefined}
-                    className={`pressable flex min-h-[68px] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-[18px] px-0.5 ${active ? 'bg-white/10' : ''}`}
+                    className="pressable flex min-h-[60px] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-[18px] px-0.5"
                   >
-                    <span className={`relative flex h-9 w-9 items-center justify-center rounded-full transition-colors ${active ? 'bg-terracotta' : ''}`}>
-                      <Icon name={tab.icon} size={24} color={active ? '#fff' : 'rgba(245,243,238,0.85)'} strokeWidth={active ? 2.2 : 1.8} />
+                    <span className={`relative flex h-8 w-8 items-center justify-center rounded-full transition-colors ${active ? 'bg-terracotta' : ''}`}>
+                      <Icon name={tab.icon} size={20} color={active ? '#fff' : 'rgba(245,243,238,0.8)'} strokeWidth={active ? 2 : 1.7} />
                       {tab.badge > 0 && (
-                        <span className="absolute -top-1.5 -right-2 min-w-[20px] h-5 px-1 rounded-pill bg-brand-ochre text-brand-black text-xs font-black flex items-center justify-center border-2 border-brand-black">{tab.badge > 99 ? '99+' : tab.badge}</span>
+                        <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 rounded-pill bg-brand-ochre text-brand-black text-[10px] font-black flex items-center justify-center">{tab.badge > 99 ? '99+' : tab.badge}</span>
                       )}
                     </span>
-                    <span className={`max-w-full truncate text-xs sm:text-sm leading-tight text-center ${active ? 'font-bold text-white' : 'font-medium text-cream'}`}>
+                    <span className={`max-w-full truncate text-[11px] sm:text-xs leading-tight text-center ${active ? 'font-bold text-white' : 'font-medium text-cream/85'}`}>
                       {tab.label}
                     </span>
                   </button>
