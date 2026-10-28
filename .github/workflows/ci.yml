@@ -25,6 +25,70 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Audit dependency advisories (report-only)
+        id: dependency_audit
+        continue-on-error: true
+        run: |
+          set +e
+          yarn audit --json > dependency-audit.json 2>&1
+          audit_exit_code=$?
+          set -e
+          echo "audit_exit_code=$audit_exit_code" >> "$GITHUB_OUTPUT"
+          test -f dependency-audit.json || touch dependency-audit.json
+
+      - name: Summarize dependency advisory audit
+        if: always()
+        env:
+          AUDIT_EXIT_CODE: ${{ steps.dependency_audit.outputs.audit_exit_code }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const lines = fs.readFileSync('dependency-audit.json', 'utf8').split(/\r?\n/).filter(Boolean);
+          const events = [];
+          const parseErrors = [];
+          for (const line of lines) {
+            try { events.push(JSON.parse(line)); }
+            catch { parseErrors.push(line.slice(0, 300)); }
+          }
+          const advisories = events.filter((event) => event.type === 'auditAdvisory').map((event) => event.data?.advisory).filter(Boolean);
+          const unique = [...new Map(advisories.map((advisory) => [String(advisory.id), advisory])).values()];
+          const summary = events.find((event) => event.type === 'auditSummary')?.data;
+          const total = summary?.vulnerabilities || {};
+          const severities = ['critical', 'high', 'moderate', 'low', 'info'];
+          const completed = Boolean(summary);
+          const report = [
+            '## Dependency advisory audit (report-only)',
+            '',
+            completed
+              ? 'Yarn completed the registry audit. This step reports advisories but does not automatically upgrade dependencies or block the release.'
+              : 'The audit did not produce a final summary. Treat this result as **incomplete**, not as a clean dependency audit.',
+            '',
+            `Audit command exit code: ${process.env.AUDIT_EXIT_CODE || 'unknown'}`,
+            '',
+            '| Severity | Count |',
+            '|---|---:|',
+            ...severities.map((severity) => `| ${severity} | ${Number(total[severity] || 0)} |`),
+            '',
+            `Unique advisories returned: ${unique.length}`,
+            '',
+            ...unique.slice(0, 50).map((advisory) => `- **${String(advisory.severity || 'unknown').toUpperCase()}** ${advisory.module_name || 'unknown package'} — ${advisory.title || 'Untitled advisory'} (patched: ${advisory.patched_versions || 'no patched version listed'}) ${advisory.url || ''}`),
+            ...(unique.length > 50 ? [`- ${unique.length - 50} additional advisories are retained in the downloadable artifact.`] : []),
+            ...(parseErrors.length ? ['', `Unparsed audit output lines: ${parseErrors.length}; inspect the artifact to determine whether the registry or command failed.`] : []),
+          ];
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, report.join('\n') + '\n');
+          console.log(report.join('\n'));
+          NODE
+
+      - name: Upload dependency advisory audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: icamagu-dependency-audit
+          path: dependency-audit.json
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Reject hosted-editor runtime targets
         run: yarn check:runtime-targets
 
