@@ -18,6 +18,8 @@ function Store({ onGoToBasket, basketCount }) {
   const [activeAisle, setActiveAisle] = useState('all')
   const [departmentsOpen, setDepartmentsOpen] = useState(true)
   const [loading, setLoading] = useState(true)
+  const [catalogueError, setCatalogueError] = useState(false)
+  const [catalogueRetry, setCatalogueRetry] = useState(0)
   const [addingId, setAddingId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
@@ -25,17 +27,31 @@ function Store({ onGoToBasket, basketCount }) {
   const [failedImageIds, setFailedImageIds] = useState(() => new Set())
 
   useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    setCatalogueError(false)
+
     fetch('/api/basket/catalogue')
-      .then(res => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Catalogue request failed')
+        return res.json()
+      })
       .then((data) => {
-        setAllSkus(Array.isArray(data) ? data : [])
-        setLoading(false)
+        if (!Array.isArray(data)) throw new Error('Catalogue response was invalid')
+        if (!cancelled) setAllSkus(data)
       })
       .catch(() => {
-        setLoading(false)
+        if (cancelled) return
+        setAllSkus([])
+        setCatalogueError(true)
         showToast('Could not load products', 'error')
       })
-  }, [])
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [catalogueRetry])
 
   const pickDept = (id) => {
     setActiveDept(id)
@@ -220,6 +236,14 @@ function Store({ onGoToBasket, basketCount }) {
             <Skeleton className="h-20 w-full" />
             <Skeleton className="h-20 w-full" />
           </div>
+        ) : catalogueError ? (
+          <EmptyState
+            emoji="📦"
+            title="Products couldn't load"
+            description="Check your connection, then try again. Your basket and other iCamagu features are unchanged."
+            primaryLabel="Try again"
+            onPrimary={() => setCatalogueRetry((attempt) => attempt + 1)}
+          />
         ) : skus.length === 0 ? (
           <EmptyState emoji="📦" title="No items found" description={isSearching ? "Try another product name, size or category, or clear your search." : "Try another department or aisle."} />
         ) : (
