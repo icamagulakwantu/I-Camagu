@@ -57,7 +57,7 @@ async function backfillVerifiedSoftDrinkImages() {
 }
 
 export async function backfillRequestedProductImages() {
-  let updated = 0;
+  let updated = await backfillVerifiedSoftDrinkImages();
   for (const entry of REQUESTED_PRODUCT_IMAGES) {
     for (const name of entry.names) {
       const result = await prisma.sku.updateMany({
