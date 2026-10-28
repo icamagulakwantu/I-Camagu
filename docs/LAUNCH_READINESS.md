@@ -177,14 +177,15 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [ ] The production Prisma migration baseline, protected-copy balance reconciliation, route-level authorization/privacy review, dependency advisory triage, backup/restore rehearsal, Android/PWA manual testing and cultural/founder sign-off remain open. The CI candidate migration baseline only validates a fresh disposable database and must not be applied to production as a shortcut.
 
 
-## Launch verification update — 28 October 2026, 18:06 UTC
+## Launch verification update — 28 October 2026, 18:10 UTC
 
 ### Completed and deployed
 
 - [x] PR [#71](https://github.com/icamagulakwantu/I-Camagu/pull/71) normalised SmartMatch category codes, clarified cross-department search, and added regression coverage. Its CI run [#40739996353](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40739996353) passed.
 - [x] PR [#72](https://github.com/icamagulakwantu/I-Camagu/pull/72) aligned boot warnings with the no-custody policy. Missing PayFast credentials are no longer described as a broken feature because online checkout is hard-disabled in code regardless of credentials. `EMAIL_FROM` is included in optional runtime diagnostics. Main-head CI [#40741134594](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40741134594) passed all four jobs, including public production smoke.
 - [x] PR [#73](https://github.com/icamagulakwantu/I-Camagu/pull/73) changed the taxonomy regression test to read category codes from the committed `docs/pricing/skus_clean.tsv` file rather than a manually copied list. CI passed all jobs.
-- [x] PR [#74](https://github.com/icamagulakwantu/I-Camagu/pull/74) lazy-loads 44 feature screens. Main-head CI [#40741731163](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40741731163) passed tests, PostgreSQL integration, migration-baseline validation and production smoke. Both Render services are live on main commit `e5197a7cebf4ec17371e1e3ff91afa01fe1271be`; startup logs confirm the server listens and the database check passes.
+- [x] PR [#74](https://github.com/icamagulakwantu/I-Camagu/pull/74) lazy-loads 44 feature screens. Main-head CI [#40741731163](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40741731163) passed tests, PostgreSQL integration, migration-baseline validation and production smoke. The bundle-size comparison is recorded below.
+- [x] PR [#75](https://github.com/icamagulakwantu/I-Camagu/pull/75) distinguishes a failed catalogue request from a genuinely empty result and provides a retry action. CI run [#40742042779](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40742042779) passed all jobs, and both Render services are live on main commit `34db46d04d7653be12a0622efc299ef81bb0546e`; startup logs confirm the server listens and the database check passes.
 - [x] Render build logs show the initial JavaScript bundle reduced from `822.21 kB (213.84 kB gzip)` to `273.11 kB (87.11 kB gzip)`. The new PWA build precaches 62 entries (about 864 KiB); the latest build no longer emits the previous greater-than-500-kB chunk warning. This is a build-size improvement, not a substitute for physical-device performance testing.
 - [x] The committed pricing extract contains 294 SKU rows and 27 distinct category codes; every code is mapped by the taxonomy. This validates the static extract only, not the live database catalogue or image accuracy.
 
