@@ -76,6 +76,13 @@ export async function backfillRequestedProductImages() {
       updated += unmatchedVariants.count;
     }
   }
+  // The old local Honor VS image is cropped and includes unrelated artwork.
+  // This retailer packshot is explicitly the standalone 750ml Honor VS bottle.
+  const honorVs = await prisma.sku.updateMany({
+    where: { name: 'Honor VS', bottleFormat: { contains: '750ml' } },
+    data: { imageUrl: 'https://thedrinkshopsa.com/cdn/shop/files/honorvs.jpg?v=1749290413&width=1080' },
+  });
+  updated += honorVs.count;
   if (updated) console.log(`Requested product image audit: corrected ${updated} SKU row(s).`);
   return updated;
 }
