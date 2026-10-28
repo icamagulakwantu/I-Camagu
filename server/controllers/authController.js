@@ -137,7 +137,7 @@ export async function registerWithPassword(req, res) {
       html: `<p>Welcome to iCamagu.</p><p>Enter this 6-digit code to verify your email and finish creating your account:</p><h2>${code}</h2><p>The code expires in 10 minutes. If you did not create this account, ignore this email.</p>`,
     }, 'Registration verification');
     // Do not issue a session until the person proves they control the email.
-    res.status(201).json({ needsEmailVerification: true, message: 'Check your email for a verification code.' });
+    res.status(201).json({ needsEmailVerification: true, message: 'If you can use this email, check your inbox for a code to continue.' });
   } catch (error) {
     console.error('Register with password error:', error.message);
     res.status(500).json({ error: 'Could not register' });
