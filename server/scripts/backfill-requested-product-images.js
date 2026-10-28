@@ -30,6 +30,32 @@ const REQUESTED_PRODUCT_IMAGES = [
   { names: ['Van Der Hum Tangerine (Butlers)'], image: 'butlers-van-der-hum.png' },
 ];
 
+// Exact 300ml can packshots sourced from Norman Goodfellows product pages.
+// These URLs identify the individual can, not a mixed case or a different volume.
+// Source pages: https://ngf.co.za/products/coke-can-300ml,
+// https://ngf.co.za/products/fanta-orange-can-300ml,
+// https://ngf.co.za/products/sprite-can-300ml,
+// https://www.ngf.co.za/product/stoney-ginger-beer-can-300ml/
+const VERIFIED_SOFT_DRINK_IMAGES = [
+  { name: 'Coca-Cola 300ml Can', category: 'SOFT_DRINKS', format: '300ml', imageUrl: 'https://ngf.co.za/cdn/shop/files/coke-can-300ml.jpg?v=1790155408&width=1200' },
+  { name: 'Fanta Orange 300ml Can', category: 'SOFT_DRINKS', format: '300ml', imageUrl: 'https://ngf.co.za/cdn/shop/files/fanta-orange-can-300ml.jpg?v=1790155408&width=1200' },
+  { name: 'Sprite 300ml Can', category: 'SOFT_DRINKS', format: '300ml', imageUrl: 'https://ngf.co.za/cdn/shop/files/sprite-can-300ml.jpg?v=1790158666&width=1200' },
+  { name: 'Stoney Ginger Beer 300ml Can', category: 'SOFT_DRINKS', format: '300ml', imageUrl: 'https://www.ngf.co.za/wp-content/uploads/2023/11/wp-image-32261396005047-scaled-1.jpg' },
+];
+
+async function backfillVerifiedSoftDrinkImages() {
+  let updated = 0;
+  for (const entry of VERIFIED_SOFT_DRINK_IMAGES) {
+    const result = await prisma.sku.updateMany({
+      where: { name: entry.name, category: entry.category, bottleFormat: { contains: entry.format } },
+      data: { imageUrl: entry.imageUrl },
+    });
+    updated += result.count;
+  }
+  if (updated) console.log(`Verified soft-drink packshots: ${updated} exact 300ml SKU row(s) updated.`);
+  return updated;
+}
+
 export async function backfillRequestedProductImages() {
   let updated = 0;
   for (const entry of REQUESTED_PRODUCT_IMAGES) {
