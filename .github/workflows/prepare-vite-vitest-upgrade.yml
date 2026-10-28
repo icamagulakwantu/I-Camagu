@@ -18,8 +18,18 @@ jobs:
           node-version: '22'
       - name: Install current lockfile
         run: yarn install --frozen-lockfile
-      - name: Upgrade Vite, Vitest and compatible plugins
-        run: yarn upgrade vite@^6.4.4 vitest@^4.1.12 vite-plugin-pwa@^0.21.2 @vitejs/plugin-react@^4.3.4
+      - name: Set patched Vite and Vitest version ranges
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          packageJson.dependencies.vite = '^6.4.4';
+          packageJson.dependencies['vite-plugin-pwa'] = '^0.21.2';
+          packageJson.dependencies['@vitejs/plugin-react'] = '^4.3.4';
+          packageJson.devDependencies.vitest = '^4.1.12';
+          fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2) + '\\n');
+          NODE
+          yarn install
       - name: Verify frozen lockfile install
         run: yarn install --frozen-lockfile
       - name: Run test suite
