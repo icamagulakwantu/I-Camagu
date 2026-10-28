@@ -165,6 +165,49 @@ jobs:
           done
           echo "Public frontend root, PWA manifest, and install icons respond successfully."
 
+      - name: Audit live catalogue category and image coverage
+        env:
+          APP_ORIGIN: https://i-camagu.co.za
+        run: |
+          catalogue="$(curl --fail --silent --show-error --max-time 30 "$APP_ORIGIN/api/basket/catalogue")"
+          printf '%s' "$catalogue" > /tmp/icamagu-live-catalogue.json
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import { DEPARTMENTS, departmentOf } from './src/data/storeTaxonomy.js';
+
+          const rows = JSON.parse(fs.readFileSync('/tmp/icamagu-live-catalogue.json', 'utf8'));
+          if (!Array.isArray(rows) || rows.length === 0) {
+            console.error('Live catalogue endpoint did not return a non-empty SKU array.');
+            process.exit(1);
+          }
+
+          const categoryCounts = new Map();
+          const departmentCounts = new Map();
+          const mappedCategories = new Set(DEPARTMENTS.flatMap((department) =>
+            department.aisles.flatMap((aisle) => aisle.categories.map((category) => category.trim().toUpperCase())),
+          ));
+          let missingCategory = 0;
+          let unmappedCategory = 0;
+          let missingImage = 0;
+
+          for (const row of rows) {
+            const category = String(row.category ?? '').trim().toUpperCase();
+            if (!category) missingCategory += 1;
+            else {
+              categoryCounts.set(category, (categoryCounts.get(category) ?? 0) + 1);
+              if (!mappedCategories.has(category)) unmappedCategory += 1;
+            }
+            const department = departmentOf(row).id;
+            departmentCounts.set(department, (departmentCounts.get(department) ?? 0) + 1);
+            if (!String(row.imageUrl ?? '').trim()) missingImage += 1;
+          }
+
+          console.log(`Live catalogue audit: ${rows.length} SKU rows`);
+          console.log('Category counts:', Object.fromEntries([...categoryCounts].sort(([a], [b]) => a.localeCompare(b))));
+          console.log('Department counts:', Object.fromEntries([...departmentCounts].sort(([a], [b]) => a.localeCompare(b))));
+          console.log(`Rows without category: ${missingCategory}; category codes not mapped to a named aisle: ${unmappedCategory}; rows without imageUrl: ${missingImage}`);
+          NODE
+
       - name: Compare runtime configuration presence on both Render services
         env:
           CANONICAL_ENV_URL: https://i-camagu.co.za/api/health/env
