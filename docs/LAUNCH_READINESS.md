@@ -177,7 +177,7 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [ ] The production Prisma migration baseline, protected-copy balance reconciliation, route-level authorization/privacy review, dependency advisory triage, backup/restore rehearsal, Android/PWA manual testing and cultural/founder sign-off remain open. The CI candidate migration baseline only validates a fresh disposable database and must not be applied to production as a shortcut.
 
 
-## Launch verification update — 28 October 2026, 18:16 UTC
+## Launch verification update — 28 October 2026, 18:28 UTC
 
 ### Completed and deployed
 
@@ -189,6 +189,7 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [x] PR [#77](https://github.com/icamagulakwantu/I-Camagu/pull/77) makes startup image repairs truly idempotent: approved image URLs are written only when a row differs, and the obsolete local Honor VS image is no longer assigned before being overwritten by its verified retailer packshot. CI [#40743068692](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40743068692) passed all jobs. Both Render services are live on main commit `e73f152f088a676e4740572d892453c7192afbf1`; startup logs show the database check passes and no longer repeat the 23-row and 7-row image-correction messages.
 - [x] Render build logs show the initial JavaScript bundle reduced from `822.21 kB (213.84 kB gzip)` to `273.11 kB (87.11 kB gzip)`. The new PWA build precaches 62 entries (about 865 KiB); the latest build no longer emits the previous greater-than-500-kB chunk warning. This is a build-size improvement, not a substitute for physical-device performance testing.
 - [x] The committed pricing extract contains 294 SKU rows and 27 distinct category codes; every code is mapped by the taxonomy. This validates the static extract only, not the live database catalogue or image accuracy.
+- [x] PR [#78](https://github.com/icamagulakwantu/I-Camagu/pull/78) added a production live-catalogue audit and mapped the live-only `RUM` category to Alcohol → Spirits. The live snapshot contains 384 SKU rows, 0 rows without a category, and 0 category codes unmapped after the fix. It found 77 rows (20.1%) without `imageUrl`; see [`docs/pricing/live-catalogue-missing-image-queue-2026-10-28.md`](pricing/live-catalogue-missing-image-queue-2026-10-28.md) for the 77-row review queue. Alcohol has 278 rows and 0 missing image URLs.
 
 ### Still blocking public launch
 
@@ -197,5 +198,6 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [ ] Latest runtime-presence comparison in CI [#40743068692](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40743068692) reports `EMAIL_FROM` present on both services and `SENTRY_DSN` absent on both. `ID_ENCRYPTION_KEY` and PayFast merchant credentials are present only on the canonical service. Verify the configured sender's domain and complete an end-to-end email delivery test; decide whether Sentry is required for launch; do not rotate or remove identity/payment credentials without checking encrypted records and historical/in-flight provider activity. Keep online checkout disabled under the 2026 no-custody policy.
 - [ ] Complete the production-schema comparison, safe migration-baseline decision, protected-copy balance reconciliation and backup/restore rehearsal. The disposable CI baseline is not permission to apply a migration to production.
 - [ ] Complete the route-by-route authorization/privacy audit, distributed rate-limiting plan, registration-enumeration remediation, dependency advisory triage, private-media policy tests and account deletion/export/retention review.
-- [ ] Export the live catalogue through an authenticated, read-only server environment and visually audit exact SKU/pack-size images. The pricing TSV does not contain live `imageUrl` values; do not auto-replace live imagery from that file alone.
+- [ ] Visually review the 77 missing-image rows in [`docs/pricing/live-catalogue-missing-image-queue-2026-10-28.md`](pricing/live-catalogue-missing-image-queue-2026-10-28.md): groceries 37, livestock 8, meat 4, non-consumables 8, and soft drinks/water/mixers 20. The public audit does not inspect image content, licensing, or whether the 307 existing images match their exact pack sizes; obtain a read-only export of existing image URLs for that review. Do not auto-replace live imagery from the pricing TSV alone.
+- [ ] Verify soft-drink and water pack-size imagery before adding URLs: the live missing-image queue contains four 250 ml cans and 15 water products, while the existing boot repair only applies verified 300 ml soft-drink images and matched zero live rows. Do not reuse 300 ml imagery for the 250 ml products.
 - [ ] Run Android Chrome and installed-PWA tests on a physical device, then obtain founder/community sign-off for cultural content, privacy/terms, pricing, support contacts and launch scope.
