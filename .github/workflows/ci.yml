@@ -190,6 +190,8 @@ jobs:
           let missingCategory = 0;
           let unmappedCategory = 0;
           let missingImage = 0;
+          const missingImagesByCategory = new Map();
+          const missingImagesByDepartment = new Map();
 
           for (const row of rows) {
             const category = String(row.category ?? '').trim().toUpperCase();
@@ -200,13 +202,20 @@ jobs:
             }
             const department = departmentOf(row).id;
             departmentCounts.set(department, (departmentCounts.get(department) ?? 0) + 1);
-            if (!String(row.imageUrl ?? '').trim()) missingImage += 1;
+            if (!String(row.imageUrl ?? '').trim()) {
+              missingImage += 1;
+              const categoryKey = category || '(missing category)';
+              missingImagesByCategory.set(categoryKey, (missingImagesByCategory.get(categoryKey) ?? 0) + 1);
+              missingImagesByDepartment.set(department, (missingImagesByDepartment.get(department) ?? 0) + 1);
+            }
           }
 
           console.log(`Live catalogue audit: ${rows.length} SKU rows`);
           console.log('Category counts:', Object.fromEntries([...categoryCounts].sort(([a], [b]) => a.localeCompare(b))));
           console.log('Department counts:', Object.fromEntries([...departmentCounts].sort(([a], [b]) => a.localeCompare(b))));
           console.log(`Rows without category: ${missingCategory}; category codes not mapped to a named aisle: ${unmappedCategory}; rows without imageUrl: ${missingImage}`);
+          console.log('Rows without imageUrl by category:', Object.fromEntries([...missingImagesByCategory].sort(([a], [b]) => a.localeCompare(b))));
+          console.log('Rows without imageUrl by department:', Object.fromEntries([...missingImagesByDepartment].sort(([a], [b]) => a.localeCompare(b))));
           NODE
 
       - name: Compare runtime configuration presence on both Render services
