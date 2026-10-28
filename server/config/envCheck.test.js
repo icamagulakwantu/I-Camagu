@@ -21,6 +21,7 @@ describe('environment diagnostics under the 2026 no-custody policy', () => {
 
     expect(warnings.join('\n')).not.toContain('PAYFAST_MERCHANT_ID');
     expect(warnings.join('\n')).not.toContain('PAYFAST_MERCHANT_KEY');
+    expect(warnings.join('\n')).toContain('EMAIL_FROM');
     expect(envStatus()).toMatchObject({
       PAYFAST_MERCHANT_ID: false,
       PAYFAST_MERCHANT_KEY: false,
