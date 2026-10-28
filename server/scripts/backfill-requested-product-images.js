@@ -1,7 +1,8 @@
-// Targeted, idempotent image repair for the products explicitly flagged in the
-// October 2026 SmartMatch visual audit. This changes imageUrl only; it never
-// changes SKU names, pack sizes, prices, quantities, or orders. The referenced
-// files are committed under public/images/brands/ and served by the app.
+// Targeted, idempotent image repair for products explicitly flagged in the
+// October 2026 SmartMatch visual audit. The committed packshots are approved
+// for 750ml bottle variants only. Never assign a 750ml image to a 375ml/other
+// SKU: clear the image for unmatched sizes so the Store shows its safe
+// placeholder until a matching packshot is verified. This changes imageUrl only.
 import prisma from '../config/db.js';
 
 const REQUESTED_PRODUCT_IMAGES = [
@@ -34,10 +35,19 @@ export async function backfillRequestedProductImages() {
   for (const entry of REQUESTED_PRODUCT_IMAGES) {
     for (const name of entry.names) {
       const result = await prisma.sku.updateMany({
-        where: { name },
+        where: { name, bottleFormat: { contains: '750ml' } },
         data: { imageUrl: `/images/brands/${entry.image}` },
       });
       updated += result.count;
+
+      // The approved local asset is a 750ml packshot. Do not reuse it for
+      // smaller/larger bottles or any other pack format without a verified
+      // matching image.
+      const unmatchedVariants = await prisma.sku.updateMany({
+        where: { name, NOT: { bottleFormat: { contains: '750ml' } }, imageUrl: { not: null } },
+        data: { imageUrl: null },
+      });
+      updated += unmatchedVariants.count;
     }
   }
   if (updated) console.log(`Requested product image audit: corrected ${updated} SKU row(s).`);
