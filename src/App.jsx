@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { lazy, Suspense, useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import { CommunityProvider, useCommunity } from './context/CommunityContext.jsx'
@@ -9,50 +9,6 @@ import { Skeleton } from './components/ui/Skeleton.jsx'
 import OfflineBanner from './components/OfflineBanner.jsx'
 
 // Screen Imports
-import Login from './pages/Login.jsx'
-import Username from './pages/Username.jsx'
-import Onboarding from './pages/Onboarding.jsx'
-import Store from './pages/Store.jsx'
-import Basket from './pages/Basket.jsx'
-import CeremonyHub from './pages/CeremonyHub.jsx'
-import CeremonyPlanner from './pages/CeremonyPlanner.jsx'
-import CeremonyTimeline from './pages/CeremonyTimeline.jsx'
-import Templates from './pages/Templates.jsx'
-import FamilyContributions from './pages/FamilyContributions.jsx'
-import Ukugida from './pages/Ukugida.jsx'
-import Ukusoka from './pages/Ukusoka.jsx'
-import IzidukoNetwork from './pages/IzidukoNetwork.jsx'
-import IzidukoProfileView from './pages/IzidukoProfileView.jsx'
-import IzidukoChat from './pages/IzidukoChat.jsx'
-import ClanGroups from './pages/ClanGroups.jsx'
-import Stokvels from './pages/StokvelsWithInvites.jsx'
-import Portal from './pages/Portal.jsx'
-import Ekoyini from './pages/Ekoyini.jsx'
-import EkoyiniAdmin from './pages/EkoyiniAdmin.jsx'
-import IdentityAdmin from './pages/IdentityAdmin.jsx'
-import MarginAdmin from './pages/MarginAdmin.jsx'
-import DemandDashboard from './pages/DemandDashboard.jsx'
-import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
-import Hierarchy from './pages/Hierarchy.jsx'
-import MyOrders from './pages/MyOrders.jsx'
-import Expenditure from './pages/Expenditure.jsx'
-import ShrineFund from './pages/ShrineFund.jsx'
-import LegendsExplore from './pages/LegendsExplore.jsx'
-import Directory from './pages/Directory.jsx'
-import UmqombothiCalculator from './pages/UmqombothiCalculator.jsx'
-import Profile from './pages/Profile.jsx'
-import PinSetup from './pages/PinSetup.jsx'
-import PublicPlanView from './pages/PublicPlanView.jsx'
-import PublicUbuhlanti from './pages/PublicUbuhlanti.jsx'
-import More from './pages/More.jsx'
-import Activity from './pages/Activity.jsx'
-import Notifications from './pages/Notifications.jsx'
-import ResetPassword from './pages/ResetPassword.jsx'
-import AccountSettings from './pages/AccountSettings.jsx'
-import Help from './pages/Help.jsx'
-import BudgetDashboard from './pages/BudgetDashboard.jsx'
-import SupplierDashboard from './pages/SupplierDashboard.jsx'
-import EkoyiniBooking from './pages/EkoyiniBooking.jsx'
 
 // Components
 import BottomNav from './components/BottomNav.jsx'
@@ -64,6 +20,53 @@ import FirstVisitExplainer from './components/FirstVisitExplainer.jsx'
 import PendingStokvelJoin from './components/PendingStokvelJoin.jsx'
 import PendingClanJoin from './components/PendingClanJoin.jsx'
 import { PENDING_STOKVEL_KEY, PENDING_CLAN_KEY } from './lib/inviteLinks.js'
+
+// Load feature screens on demand so first-time and returning mobile visits do not
+// download every ceremony, admin, and community screen before the home screen.
+const Login = lazy(() => import('./pages/Login.jsx'))
+const Username = lazy(() => import('./pages/Username.jsx'))
+const Onboarding = lazy(() => import('./pages/Onboarding.jsx'))
+const Store = lazy(() => import('./pages/Store.jsx'))
+const Basket = lazy(() => import('./pages/Basket.jsx'))
+const CeremonyHub = lazy(() => import('./pages/CeremonyHub.jsx'))
+const CeremonyPlanner = lazy(() => import('./pages/CeremonyPlanner.jsx'))
+const CeremonyTimeline = lazy(() => import('./pages/CeremonyTimeline.jsx'))
+const Templates = lazy(() => import('./pages/Templates.jsx'))
+const FamilyContributions = lazy(() => import('./pages/FamilyContributions.jsx'))
+const Ukugida = lazy(() => import('./pages/Ukugida.jsx'))
+const Ukusoka = lazy(() => import('./pages/Ukusoka.jsx'))
+const IzidukoNetwork = lazy(() => import('./pages/IzidukoNetwork.jsx'))
+const IzidukoProfileView = lazy(() => import('./pages/IzidukoProfileView.jsx'))
+const IzidukoChat = lazy(() => import('./pages/IzidukoChat.jsx'))
+const ClanGroups = lazy(() => import('./pages/ClanGroups.jsx'))
+const Stokvels = lazy(() => import('./pages/StokvelsWithInvites.jsx'))
+const Portal = lazy(() => import('./pages/Portal.jsx'))
+const Ekoyini = lazy(() => import('./pages/Ekoyini.jsx'))
+const EkoyiniAdmin = lazy(() => import('./pages/EkoyiniAdmin.jsx'))
+const IdentityAdmin = lazy(() => import('./pages/IdentityAdmin.jsx'))
+const MarginAdmin = lazy(() => import('./pages/MarginAdmin.jsx'))
+const DemandDashboard = lazy(() => import('./pages/DemandDashboard.jsx'))
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy.jsx'))
+const Hierarchy = lazy(() => import('./pages/Hierarchy.jsx'))
+const MyOrders = lazy(() => import('./pages/MyOrders.jsx'))
+const Expenditure = lazy(() => import('./pages/Expenditure.jsx'))
+const ShrineFund = lazy(() => import('./pages/ShrineFund.jsx'))
+const LegendsExplore = lazy(() => import('./pages/LegendsExplore.jsx'))
+const Directory = lazy(() => import('./pages/Directory.jsx'))
+const UmqombothiCalculator = lazy(() => import('./pages/UmqombothiCalculator.jsx'))
+const Profile = lazy(() => import('./pages/Profile.jsx'))
+const PinSetup = lazy(() => import('./pages/PinSetup.jsx'))
+const PublicPlanView = lazy(() => import('./pages/PublicPlanView.jsx'))
+const PublicUbuhlanti = lazy(() => import('./pages/PublicUbuhlanti.jsx'))
+const More = lazy(() => import('./pages/More.jsx'))
+const Activity = lazy(() => import('./pages/Activity.jsx'))
+const Notifications = lazy(() => import('./pages/Notifications.jsx'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'))
+const AccountSettings = lazy(() => import('./pages/AccountSettings.jsx'))
+const Help = lazy(() => import('./pages/Help.jsx'))
+const BudgetDashboard = lazy(() => import('./pages/BudgetDashboard.jsx'))
+const SupplierDashboard = lazy(() => import('./pages/SupplierDashboard.jsx'))
+const EkoyiniBooking = lazy(() => import('./pages/EkoyiniBooking.jsx'))
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
@@ -731,6 +734,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <OfflineBanner />
+      <Suspense fallback={
+        <div className="icamagu-bg flex min-h-screen items-center justify-center" role="status" aria-live="polite">
+          <p className="text-brand-black/60 font-bold text-sm">Loading iCamagu…</p>
+        </div>
+      }>
       <Routes>
         <Route path="/share/:token" element={<ShareRoute />} />
         <Route path="/reset-password/:token" element={<ResetPasswordRoute />} />
@@ -752,6 +760,7 @@ export default function App() {
           }
         />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }
