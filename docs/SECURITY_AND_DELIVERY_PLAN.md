@@ -62,7 +62,7 @@ This is a living engineering plan based on source review of the repository. It i
 
 8. **Security headers, input limits and dependency checks**
    - Verify CSP/security headers, CORS allow-list, JSON body limits, pagination ceilings, date/enum validation, upload content-type/size checks and dependency scanning.
-   - Add CI checks for test, build, dependency audit and secret scanning. Triage existing dependency advisories instead of blindly applying breaking upgrades.
+   - [x] Add CI checks for test/build and a report-only dependency audit with severity summary and a 14-day raw-report artifact (PR #82). [ ] Add secret scanning and triage the residual dependency advisories instead of blindly applying breaking upgrades.
 
 ### P2 — reliability and maintainability
 
@@ -74,6 +74,13 @@ This is a living engineering plan based on source review of the repository. It i
     - CI must pass on the exact PR head; add PostgreSQL service integration tests and test coverage for rollback and concurrency.
     - Require a staging smoke test for signup/login, ceremonies, contributions, payout approvals, loans, bank reconciliation, statements, and account deletion before release.
     - Keep changes in small reviewable PRs. Do not merge a security PR merely because the code compiles.
+
+## Dependency audit follow-up — 28 Oct 2026
+
+- [x] A live Yarn audit is now included in CI (PR #82); it records advisory counts and retains the raw report as an artifact. This is report-only, so passing CI does not mean the dependencies are vulnerability-free.
+- [x] PR #83 patched compatible runtime/transitive releases for `proxy-addr` 2.0.8, `body-parser` 1.20.9, `qs` 6.16.1, `source-map-js` 1.2.2, `fast-uri` 3.1.9 and `postcss-selector-parser` 6.1.5. CI tests/build and production smoke passed after merge.
+- [ ] Post-patch audit: 3 critical, 7 high, 28 moderate and 6 low findings remain. The critical items are in Vitest/Tinypool; Vite 5 has remaining advisories. A candidate upgrade to Vite 6 / Vitest 4 hit a Yarn Classic package-linking invariant and was not merged. Rework the upgrade using a compatible dependency/package-manager path, then rerun the full suite and PWA build.
+- [ ] Triage the remaining `brace-expansion`, `esbuild`, `uuid`, `deepmerge` and `serialize-javascript` advisories; document any accepted residual risk explicitly.
 
 ## Product completion roadmap (after P0 safety gates)
 
