@@ -16,8 +16,10 @@ import { backfillQuartGaps } from './backfill-quart-gaps.js';
 import { backfillFounderSourcedSkus } from './backfill-founder-sourced-skus.js';
 
 const PACKSHOTS_750ML = {
-  'Hennessy VS': 'https://ngf.co.za/cdn/shop/files/hennessy-vs-cognac-750ml.png?v=1790160168&width=1200',
-  'Hennessy VSOP': 'https://shop.captains.co.za/product/image/medium/hennvsop750_1.jpg',
+  // Replaced the old retailer images after visual review: both old packshots included distracting black framing in the Store cards.
+  // These replacement source listings explicitly identify the matching 750ml variant; verify commercial image-use permission and keep a fallback if hotlinking fails.
+  'Hennessy VS': 'https://d2sz1kgdtrlf1n.cloudfront.net/task_images/RCFc1724247307285-HennessyVSCognac750ml.png',
+  'Hennessy VSOP': 'https://assets.woolworthsstatic.co.za/Hennessy-V-S-O-P-Privilege-Cognac-750-ml-3245990969402.jpg?V=SaGx&o=eyJidWNrZXQiOiJ3dy1vbmxpbmUtaW1hZ2UtcmVzaXplIiwia2V5IjoiaW1hZ2VzL2VsYXN0aWNlcmEvcHJvZHVjdHMvaGVyby8yMDIxLTA4LTAzLzMyNDU5OTA5Njk0MDJfaGVyby5qcGcifQ',
   'Hennessy XO': '/images/brands/hennessy-xo.png',
   'Remy Martin VSOP': 'https://cdn.shopify.com/s/files/1/0987/1588/products/remy-martin-vsop-cognac_1200x1200.jpg?v=1601327577',
   'Remy Martin 1738 Accord Royal': 'https://static-prod.remymartin.com/app/uploads/2026/05/collection-remy-martin-1738-accord-royal-lps-260527-01.jpg',
