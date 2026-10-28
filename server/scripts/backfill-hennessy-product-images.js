@@ -16,9 +16,9 @@ import { backfillQuartGaps } from './backfill-quart-gaps.js';
 import { backfillFounderSourcedSkus } from './backfill-founder-sourced-skus.js';
 
 const PACKSHOTS_750ML = {
-  'Hennessy VS': 'https://fr.hennessy.com/sites/hennessy_fr/files/2024-08/hny_vs_packshot_2000x2000.jpg',
-  'Hennessy VSOP': 'https://www.hennessy.com/sites/hennessy/files/2023-04/HENNESSY-VSOP-BOTTLE.png',
-  'Hennessy XO': 'https://www.hennessy.com/sites/hennessy/files/2025-10/2212_xo_bottle_front_2000x2000.jpg',
+  'Hennessy VS': '/images/brands/hennessy-vs.png',
+  'Hennessy VSOP': '/images/brands/hennessy-vsop.png',
+  'Hennessy XO': '/images/brands/hennessy-xo.png',
   'Remy Martin VSOP': 'https://cdn.shopify.com/s/files/1/0987/1588/products/remy-martin-vsop-cognac_1200x1200.jpg?v=1601327577',
   'Remy Martin 1738 Accord Royal': 'https://static-prod.remymartin.com/app/uploads/2026/05/collection-remy-martin-1738-accord-royal-lps-260527-01.jpg',
   'Martell VS': 'https://thedrinkshopsa.com/cdn/shop/files/martell1.webp?v=1735993297&width=1080',
