@@ -192,6 +192,7 @@ jobs:
           let missingImage = 0;
           const missingImagesByCategory = new Map();
           const missingImagesByDepartment = new Map();
+          const missingImageSkus = [];
 
           for (const row of rows) {
             const category = String(row.category ?? '').trim().toUpperCase();
@@ -207,6 +208,11 @@ jobs:
               const categoryKey = category || '(missing category)';
               missingImagesByCategory.set(categoryKey, (missingImagesByCategory.get(categoryKey) ?? 0) + 1);
               missingImagesByDepartment.set(department, (missingImagesByDepartment.get(department) ?? 0) + 1);
+              missingImageSkus.push({
+                name: String(row.name ?? '').trim() || '(unnamed SKU)',
+                category: categoryKey,
+                pack: String(row.bottleFormat ?? row.bulkUnit ?? '').trim() || '(unspecified pack)',
+              });
             }
           }
 
@@ -216,6 +222,10 @@ jobs:
           console.log(`Rows without category: ${missingCategory}; category codes not mapped to a named aisle: ${unmappedCategory}; rows without imageUrl: ${missingImage}`);
           console.log('Rows without imageUrl by category:', Object.fromEntries([...missingImagesByCategory].sort(([a], [b]) => a.localeCompare(b))));
           console.log('Rows without imageUrl by department:', Object.fromEntries([...missingImagesByDepartment].sort(([a], [b]) => a.localeCompare(b))));
+          console.log('Missing-image review list (name | category | pack; no IDs, prices or image URLs):');
+          for (const sku of missingImageSkus.sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name))) {
+            console.log(`- ${sku.name} | ${sku.category} | ${sku.pack}`);
+          }
           NODE
 
       - name: Compare runtime configuration presence on both Render services
