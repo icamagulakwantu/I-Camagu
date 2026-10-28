@@ -109,15 +109,84 @@ const FORMAT_SPECIFIC_IMAGES = [
   { name: "Sedgwick's Old Brown", bottleFormat: '2 Litre Box', slug: 'sedgwicks-old-brown-box' },
 ];
 
-// This verified South African retailer packshot is specifically the 500ml can,
-// not the 330ml NRB bottle. It is hosted as a direct image so we do not
-// accidentally reuse the generic Hansa product photo for the can row.
+// Retailer packshots hosted externally, matched on (name, bottleFormat) so
+// each pack size shows its own bottle/can. Applied AFTER the local slugs
+// above, so these win for the rows they list.
+//
+// Captain's (shop.captains.co.za) photos: one packshot per pack size, each
+// checked visually on 28 Oct 2026 against its exact format (quart vs dumpy
+// vs can). These replace the shared name-level photo that made e.g. a
+// Castle Lager quart show a dumpy. Note: Captain's lists several quarts as
+// 660ml (Castle Lite, Amstel, Hunter's, Strongbow); the bottle shape is
+// right, but the 750ml catalogue label may need a separate size check.
+// Some quart shots show the crate, which is how quarts are sold.
+// Amstel Quart keeps the founder's own photo (amstel-lager.png) above.
+const CAPTAINS = 'https://shop.captains.co.za/product/image/large/';
 const EXTERNAL_FORMAT_SPECIFIC_IMAGES = [
+  // This verified South African retailer packshot is specifically the 500ml
+  // can, not the 330ml NRB bottle.
   {
     name: 'Hansa Pilsener',
     bottleFormat: 'Can (500ml)',
     imageUrl: 'https://res.cloudinary.com/agrimark/image/upload/v1645439722/uploads/assets/597-HP-500ml-can-render-225d1a.png',
   },
+  { name: 'Castle Lager', bottleFormat: 'Quart (750ml)', imageUrl: `${CAPTAINS}castlq750qz_1.jpg` },
+  { name: 'Castle Lager', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}castln340_1.jpg` },
+  { name: 'Castle Lite', bottleFormat: 'Quart (750ml)', imageUrl: `${CAPTAINS}caslq660qz_1.jpg` },
+  { name: 'Castle Lite', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}casln340_1.png` },
+  { name: 'Castle Milk Stout', bottleFormat: 'Quart (750ml)', imageUrl: `${CAPTAINS}stouq750qz_1.jpg` },
+  { name: 'Castle Milk Stout', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}stoun340_1.jpg` },
+  { name: 'Amstel Lager', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}amstn340_1.jpg` },
+  { name: 'Hansa Pilsener', bottleFormat: 'Quart (750ml)', imageUrl: `${CAPTAINS}hansq750qz_1.jpg` },
+  { name: 'Hansa Pilsener', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}hansn340_1.jpg` },
+  { name: 'Stella Artois', bottleFormat: 'Quart (620ml)', imageUrl: `${CAPTAINS}stela620_1.jpg` },
+  { name: 'Stella Artois', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}stella330_1.jpg` },
+  { name: 'Windhoek Lager', bottleFormat: 'Quart (750ml)', imageUrl: `${CAPTAINS}windhlaq750qz_1.jpg` },
+  { name: 'Windhoek Lager', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}windhlan340_1.png` },
+  { name: 'Flying Fish Lemon', bottleFormat: 'Quart (660ml)', imageUrl: `${CAPTAINS}flyfpl660qz_1.jpg` },
+  { name: 'Flying Fish Lemon', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}flyfpl330_1.jpg` },
+  { name: "Hunter's Dry", bottleFormat: 'Quart (750ml)', imageUrl: `${CAPTAINS}huntdq660qz_1.jpg` },
+  { name: "Hunter's Dry", bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}huntdn340_1.jpg` },
+  { name: "Hunter's Gold", bottleFormat: 'Quart (750ml)', imageUrl: `${CAPTAINS}huntgq660qz_1.jpg` },
+  { name: "Hunter's Gold", bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}huntgn340_1.jpg` },
+  { name: 'Strongbow Gold Apple', bottleFormat: 'Quart (750ml)', imageUrl: `${CAPTAINS}strobgold660qz_1.png` },
+  { name: 'Strongbow Gold Apple', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}strog330_1.png` },
+  { name: 'Strongbow Red Berries', bottleFormat: 'Quart (750ml)', imageUrl: `${CAPTAINS}strobred660qz_1.png` },
+  { name: 'Strongbow Red Berries', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}strober330_1.png` },
+  { name: 'Brutal Fruit Ruby Apple', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}brutfra275_1.jpg` },
+  { name: 'Brutal Fruit Strawberry Rouge', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}brutfsr275_1.jpg` },
+  { name: 'Breezer Blueberry', bottleFormat: 'Dumpy (275ml)', imageUrl: `${CAPTAINS}bacbblb275_1.jpg` },
+  { name: 'Valpre Still Water', bottleFormat: 'Bottle (500ml)', imageUrl: `${CAPTAINS}valpst500_1.jpg` },
+  { name: 'Valpre Still Water', bottleFormat: 'Bottle (1.5L)', imageUrl: `${CAPTAINS}valpst1.5lt_1.jpg` },
+  { name: 'Valpre Sparkling Water', bottleFormat: 'Bottle (500ml)', imageUrl: `${CAPTAINS}valpsp500_1.jpg` },
+  { name: 'Valpre Sparkling Water', bottleFormat: 'Bottle (1L)', imageUrl: `${CAPTAINS}valpsplt_1.jpg` },
+  { name: 'Bonaqua Still Water', bottleFormat: 'Bottle (1.5L)', imageUrl: `${CAPTAINS}bona1.5lt_1.png` },
+];
+
+// Generic (non-branded) products that had NO photo at all. Unsplash photos
+// (free licence, picked 28 Oct 2026) of the item itself — fine for produce,
+// livestock and chicken where the brand/pack doesn't change what it looks
+// like. Matched on (name, category) and ONLY applied where imageUrl is still
+// null, so a real founder photo added later is never overwritten.
+const unsplash = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=600&q=80`;
+const MISSING_GENERIC_IMAGES = [
+  { name: 'Cabbage', category: 'FRESH_PRODUCE', imageUrl: unsplash('1611105637889-3afd7295bdbf') },
+  { name: 'Carrots', category: 'FRESH_PRODUCE', imageUrl: unsplash('1590868309235-ea34bed7bd7f') },
+  { name: 'Green Apples', category: 'FRESH_PRODUCE', imageUrl: unsplash('1786212444902-ea8ef49815f5') },
+  { name: 'Green Peppers', category: 'FRESH_PRODUCE', imageUrl: unsplash('1758221056967-52731a2dc935') },
+  { name: 'Red Peppers', category: 'FRESH_PRODUCE', imageUrl: unsplash('1666213871235-422c5f80ceba') },
+  { name: 'Yellow Peppers', category: 'FRESH_PRODUCE', imageUrl: unsplash('1730433267235-ed682d9346f9') },
+  { name: 'Onions', category: 'FRESH_PRODUCE', imageUrl: unsplash('1518977956812-cd3dbadaaf31') },
+  { name: 'Potatoes', category: 'FRESH_PRODUCE', imageUrl: unsplash('1790070194230-ac8c1d921b54') },
+  { name: 'Spinach', category: 'FRESH_PRODUCE', imageUrl: unsplash('1574316071802-0d684efa7bf5') },
+  { name: 'Sweet Corn', category: 'FRESH_PRODUCE', imageUrl: unsplash('1683543124257-1d214be3a366') },
+  // Nguni-type cattle, matching the animals used for imigidi and other
+  // ceremonies; applies to both Imazi and Inkabi rows.
+  { name: 'Inkomo / Cow', category: 'LIVESTOCK_ANIMAL', imageUrl: unsplash('1694275856344-c3f131896954') },
+  { name: 'Goat', category: 'LIVESTOCK_ANIMAL', imageUrl: unsplash('1611524159648-999101ef2b49') },
+  { name: 'Sheep', category: 'LIVESTOCK_ANIMAL', imageUrl: unsplash('1683548919628-c0ce464f444d') },
+  { name: 'Whole Chicken', category: 'MEAT', imageUrl: unsplash('1642102903909-560c5a7665bf') },
+  { name: 'Chicken Trays', category: 'MEAT', imageUrl: unsplash('1759493321741-883fbf9f433c') },
 ];
 
 export async function backfillFormatSpecificPhotos() {
@@ -131,7 +200,14 @@ export async function backfillFormatSpecificPhotos() {
   }
   for (const { name, bottleFormat, imageUrl } of EXTERNAL_FORMAT_SPECIFIC_IMAGES) {
     const { count } = await prisma.sku.updateMany({
-      where: { name, bottleFormat },
+      where: { name, bottleFormat, NOT: { imageUrl } },
+      data: { imageUrl },
+    });
+    totalUpdated += count;
+  }
+  for (const { name, category, imageUrl } of MISSING_GENERIC_IMAGES) {
+    const { count } = await prisma.sku.updateMany({
+      where: { name, category, imageUrl: null },
       data: { imageUrl },
     });
     totalUpdated += count;
