@@ -177,7 +177,7 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [ ] The production Prisma migration baseline, protected-copy balance reconciliation, route-level authorization/privacy review, dependency advisory triage, backup/restore rehearsal, Android/PWA manual testing and cultural/founder sign-off remain open. The CI candidate migration baseline only validates a fresh disposable database and must not be applied to production as a shortcut.
 
 
-## Launch verification update — 28 October 2026, 18:15 UTC
+## Launch verification update — 28 October 2026, 18:16 UTC
 
 ### Completed and deployed
 
@@ -194,7 +194,7 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 
 - [ ] Render has two live services for this repository. Verify custom-domain attachment, actual database target, secret-value parity, callback/webhook configuration, email delivery and traffic before consolidating. Do not disable either service during discovery.
 - [ ] Configure the native Render health-check path to `/api/health` on the intended canonical service after confirming the endpoint's readiness behavior.
-- [ ] Production configuration comparison reports `EMAIL_FROM` and `SENTRY_DSN` absent on both services; `ID_ENCRYPTION_KEY` and PayFast merchant credentials are present only on the canonical service. Set a verified sender only after confirming the sender domain; decide whether Sentry is a launch requirement; do not rotate or remove identity/payment credentials without checking encrypted records and historical/in-flight provider activity. Keep online checkout disabled under the 2026 no-custody policy.
+- [ ] Latest runtime-presence comparison in CI [#40743068692](https://github.com/icamagulakwantu/I-Camagu/actions/runs/40743068692) reports `EMAIL_FROM` present on both services and `SENTRY_DSN` absent on both. `ID_ENCRYPTION_KEY` and PayFast merchant credentials are present only on the canonical service. Verify the configured sender's domain and complete an end-to-end email delivery test; decide whether Sentry is required for launch; do not rotate or remove identity/payment credentials without checking encrypted records and historical/in-flight provider activity. Keep online checkout disabled under the 2026 no-custody policy.
 - [ ] Complete the production-schema comparison, safe migration-baseline decision, protected-copy balance reconciliation and backup/restore rehearsal. The disposable CI baseline is not permission to apply a migration to production.
 - [ ] Complete the route-by-route authorization/privacy audit, distributed rate-limiting plan, registration-enumeration remediation, dependency advisory triage, private-media policy tests and account deletion/export/retention review.
 - [ ] Export the live catalogue through an authenticated, read-only server environment and visually audit exact SKU/pack-size images. The pricing TSV does not contain live `imageUrl` values; do not auto-replace live imagery from that file alone.
