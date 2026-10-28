@@ -15,6 +15,7 @@ import { fileURLToPath } from 'url';
 import prisma from './config/db.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import { backfillHennessyProductImages } from './scripts/backfill-hennessy-product-images.js';
+import { backfillRequestedProductImages } from './scripts/backfill-requested-product-images.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -181,6 +182,13 @@ if (startup.schemaReady) {
     await backfillHennessyProductImages();
   } catch (err) {
     console.error('Hennessy product image correction failed:', err?.message);
+  }
+  // Apply only the explicitly audited product-image mappings. This does not
+  // alter prices, formats, quantities, orders, or other catalogue fields.
+  try {
+    await backfillRequestedProductImages();
+  } catch (err) {
+    console.error('Requested product image correction failed:', err?.message);
   }
 }
 
