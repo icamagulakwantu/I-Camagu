@@ -9,52 +9,37 @@ const NATION_OPTIONS = ['AmaXhosa', 'AbaThembu', 'AmaBomvana', 'AmaGqunukhwebe',
 
 const STEPS = ['welcome', 'ancestry', 'details']
 
-const FEATURE_PATHS = {
-  'Ceremony Planner': '/ceremonies',
-  SmartMatch: '/smartmatch',
-  Stokvels: '/stokvels',
-  'Iziduko Network': '/me/iziduko',
-}
-
+// Each welcome card is a direct shortcut: tapping it finishes onboarding and
+// opens that part of the app. (They used to expand into a paragraph and
+// needed a second "Open …" tap, which read as static text.)
 const FEATURES = [
   {
     icon: 'calendarRange',
     accent: '#c45c26',
-    bg: 'bg-[#fdf4ee]',
-    border: 'border-terracotta/20',
     label: 'Ceremony Planner',
-    headline: 'Planning an umsebenzi this season?',
-    desc: 'Build a full plan — checklist, budget, timeline, supplier bookings. Everything in one place so nothing gets forgotten.',
+    headline: 'Checklist, budget and family pledges',
+    path: '/ceremonies',
   },
   {
     icon: 'store',
     accent: '#c1922f',
-    bg: 'bg-[#fdf9ee]',
-    border: 'border-ochre/20',
-    label: 'SmartMatch',
-    headline: 'Pool your order. Unlock bulk prices.',
-    desc: 'iCamagu groups your order with other members buying the same things — alcohol, groceries, meat, or livestock — so everyone hits the bulk minimum together. Cases of Commando, Old Buck, maize meal, or a beast: you pay supplier prices, not retail.',
+    label: 'Store',
+    headline: 'Pool orders with others for bulk prices',
+    path: '/smartmatch',
   },
   {
     icon: 'coins',
     accent: '#4a7a4a',
-    bg: 'bg-sage-50',
-    border: 'border-sage-200',
     label: 'Stokvels',
-    // Xhosa headline + English subtext shown in the expanded card body
-    headline: 'Siza ndawonye, sihlawula ngobulungisa.',
-    headlineEn: 'Save together, pay out fairly.',
-    desc: 'Run your pool digitally — track who paid, send reminders, and pay out with a full paper trail.',
+    headline: 'Siza ndawonye · Save and pay out fairly',
+    path: '/stokvels',
   },
   {
     icon: 'link',
     accent: '#3d623d',
-    bg: 'bg-[#f4f7f4]',
-    border: 'border-sage-200',
     label: 'Iziduko Network',
-    headline: 'Fumana isiduko sakho ebuhlanti.',
-    headlineEn: 'Find your clan across South Africa.',
-    desc: 'Enter your clan names and connect with relatives you have never met. The digital umuntu ngumntu ngabantu.',
+    headline: 'Find relatives through your clan names',
+    path: '/me/iziduko',
   },
 ]
 
@@ -83,7 +68,6 @@ function Onboarding({ onDone }) {
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
-  const [activeCard, setActiveCard] = useState(0)
 
   const [nationLabel, setNationLabel] = useState(user?.nationLabel || '')
   const [paternalIziduko, setPaternalIziduko] = useState(user?.paternalIziduko || '')
@@ -144,7 +128,7 @@ function Onboarding({ onDone }) {
   const finishOnboarding = (destination) => {
     if (user?.id) localStorage.setItem(`icamagu_onboarding_done:${user.id}`, '1')
     onDone?.()
-    if (destination) window.location.assign(destination)
+    if (typeof destination === 'string') window.location.assign(destination)
   }
 
   const saveAncestryAndContinue = async () => {
@@ -208,69 +192,46 @@ function Onboarding({ onDone }) {
 
       {step === 'welcome' && (
         <div className="w-full max-w-sm animate-slide-up">
-          <div className="wash-ember rings rounded-t-soft px-6 pt-7 pb-6">
-            <div className="flex items-center gap-2.5 mb-4">
-              <img src="/icons/source/gateway-mark-1024.png" alt="iCamagu" className="w-9 h-9" style={{ filter: 'brightness(0) invert(1)' }} />
-              <span className="font-display font-bold text-2xl text-white">iCamagu</span>
+          <div className="wash-ember rings rounded-t-soft px-6 pt-6 pb-5">
+            <div className="flex items-center gap-2.5 mb-3">
+              <img src="/icons/source/gateway-mark-1024.png" alt="iCamagu" className="w-8 h-8" style={{ filter: 'brightness(0) invert(1)' }} />
+              <span className="font-display font-bold text-xl text-white">iCamagu</span>
             </div>
-            <p className="eyebrow text-white/60 mb-1.5">Molo, {user?.firstName || 'mhlobo'}</p>
-            {/* Xhosa headline with English subtext */}
-            <h1 className="font-display font-bold text-[1.65rem] leading-tight text-white">
+            <p className="eyebrow text-white/70 mb-1">Molo, {user?.firstName || 'mhlobo'}</p>
+            <h1 className="font-display font-bold text-2xl leading-tight text-white">
               Konke okufunwa ngumsebenzi wakho. Ndawonye.
             </h1>
-            <p className="text-white/55 text-xs mt-1">Everything your ceremony needs. All in one place.</p>
-            <p className="text-white/75 text-sm mt-2 leading-relaxed">
-              From the first planning conversation to the last bottle ordered — iCamagu runs alongside you.
-            </p>
+            <p className="text-white/80 text-sm mt-1">Everything your ceremony needs, in one place.</p>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-md border-x-2 border-terracotta/20 px-4 pt-5 pb-4 space-y-3">
-            {FEATURES.map((f, i) => (
-              <button
-                key={f.label}
-                type="button"
-                onClick={() => setActiveCard(i === activeCard ? -1 : i)}
-                className={`w-full text-left rounded-2xl border px-4 py-3.5 transition-all duration-200 ${f.bg} ${f.border} ${activeCard === i ? 'shadow-card' : ''}`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: f.accent + '18' }}>
-                    <Icon name={f.icon} size={18} color={f.accent} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="font-bold text-sm text-ink">{f.label}</p>
-                      <Icon name="chevronDown" size={14} color="#8a8278" className={`flex-shrink-0 transition-transform duration-200 ${activeCard === i ? 'rotate-180' : ''}`} />
-                    </div>
-                    {/* Xhosa headline */}
-                    <p className="text-xs font-semibold mt-0.5" style={{ color: f.accent }}>{f.headline}</p>
-                    {/* English subtext for Xhosa headlines */}
-                    {f.headlineEn && (
-                      <p className="text-[10px] text-ink-muted mt-0.5">{f.headlineEn}</p>
-                    )}
-                    {activeCard === i && <p className="text-xs text-ink-muted leading-relaxed mt-1.5">{f.desc}</p>}
-                  </div>
-                </div>
-              </button>
-            ))}
-            {activeCard >= 0 && FEATURES[activeCard] && (
-              <div className="rounded-2xl bg-cream/80 border border-cream-dark p-3">
-                <p className="text-xs text-ink-muted mb-2">Want to try this now? You can finish profile setup later.</p>
+          <div className="bg-white/95 backdrop-blur-md border-x-2 border-terracotta/20 px-4 pt-4 pb-2">
+            <p className="text-xs text-ink-muted mb-2 px-1">Tap one to open it now, or set up your profile first.</p>
+            <div className="divide-y divide-cream-dark rounded-2xl border border-cream-dark overflow-hidden">
+              {FEATURES.map((f) => (
                 <button
+                  key={f.label}
                   type="button"
-                  onClick={() => finishOnboarding(FEATURE_PATHS[FEATURES[activeCard].label])}
-                  className="w-full min-h-11 rounded-full bg-terracotta px-4 py-2.5 text-sm font-bold text-white pressable"
+                  onClick={() => finishOnboarding(f.path)}
+                  className="w-full flex items-center gap-3 bg-white px-3.5 py-3 text-left pressable hover:bg-cream/60"
                 >
-                  Open {FEATURES[activeCard].label} →
+                  <span className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: f.accent + '18' }}>
+                    <Icon name={f.icon} size={18} color={f.accent} />
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block font-bold text-sm text-ink">{f.label}</span>
+                    <span className="block text-xs text-ink-muted truncate">{f.headline}</span>
+                  </span>
+                  <Icon name="arrowRight" size={16} color={f.accent} />
                 </button>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-md border-x-2 border-b-2 border-terracotta/20 rounded-b-soft px-4 pb-6 pt-2">
+          <div className="bg-white/95 backdrop-blur-md border-x-2 border-b-2 border-terracotta/20 rounded-b-soft px-4 pb-5 pt-3">
             <button onClick={() => setStep('ancestry')} className="w-full wash-ember text-white font-bold py-3.5 rounded-pill shadow-terracotta text-[15px] pressable">
-              Start setting up my profile &rarr;
+              Set up my profile &rarr;
             </button>
-            <p className="text-center text-[10px] text-ink-muted mt-2.5">Amanyathelo amabini · Two quick steps · Under a minute</p>
+            <p className="text-center text-[11px] text-ink-muted mt-2">Amanyathelo amabini · Two quick steps</p>
           </div>
         </div>
       )}
@@ -319,7 +280,7 @@ function Onboarding({ onDone }) {
             </label>
             <div className="rounded-2xl border border-cream-dark bg-white p-4 mt-3">
               <p className="font-bold text-ink">Add your location pin</p>
-              <p className="text-xs text-ink-muted mt-1">SmartMatch uses your location to find nearby pools. Your exact coordinates are used for matching, not shown as a public address.</p>
+              <p className="text-xs text-ink-muted mt-1">The Store uses your location to find nearby group orders. Your exact coordinates are used for matching, not shown as a public address.</p>
               <button type="button" onClick={useMyLocation} disabled={locating} className="mt-3 w-full min-h-11 rounded-full border-2 border-terracotta text-terracotta font-bold disabled:opacity-50">
                 {locating ? 'Finding location…' : coords ? 'Location pin captured ✓' : 'Use my current location'}
               </button>
@@ -361,7 +322,7 @@ function Onboarding({ onDone }) {
           <button onClick={saveDetailsAndFinish} disabled={saving} className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 mt-5 pressable shadow-terracotta">
             {saving ? 'Saving...' : 'Finish & enter iCamagu →'}
           </button>
-          <button type="button" onClick={finishOnboarding} className="w-full text-xs text-ink-muted underline mt-2.5">Skip for now</button>
+          <button type="button" onClick={() => finishOnboarding()} className="w-full text-xs text-ink-muted underline mt-2.5">Skip for now</button>
         </div>
       )}
     </div>
