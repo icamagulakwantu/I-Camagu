@@ -27,7 +27,7 @@ jobs:
           packageJson.dependencies['vite-plugin-pwa'] = '^0.21.2';
           packageJson.dependencies['@vitejs/plugin-react'] = '^4.3.4';
           packageJson.devDependencies.vitest = '^4.1.12';
-          fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2) + '\\n');
+          fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
           NODE
           yarn install
       - name: Verify frozen lockfile install
