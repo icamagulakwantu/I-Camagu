@@ -57,7 +57,7 @@ async function runRepairStep(label, task) {
 
 async function fixExtremeEnergyDumpyFormat() {
   const sourceFormat = 'Dumpy (500ml)';
-  const correctedFormat = 'Dumpy (340ml)';
+  const correctedFormat = 'Dumpy (330ml)';
   const rows = await prisma.sku.findMany({
     where: { name: 'Extreme Energy', category: 'CIDER_RTD', bottleFormat: sourceFormat },
     select: { id: true },
@@ -69,13 +69,13 @@ async function fixExtremeEnergyDumpyFormat() {
       select: { id: true },
     });
     if (duplicate) {
-      console.warn('Extreme Energy dumpy size: 340ml SKU already exists; leaving 500ml row for manual reconciliation.');
+      console.warn('Extreme Energy dumpy size: 330ml SKU already exists; leaving 500ml row for manual reconciliation.');
       continue;
     }
     await prisma.sku.update({ where: { id: row.id }, data: { bottleFormat: correctedFormat } });
     changed += 1;
   }
-  if (changed) console.log(`Extreme Energy dumpy size: corrected ${changed} SKU row(s) to 340ml.`);
+  if (changed) console.log(`Extreme Energy dumpy size: corrected ${changed} SKU row(s) to 330ml.`);
   return changed;
 }
 
