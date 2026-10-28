@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { DEPARTMENTS, departmentOf, aisleOf } from './storeTaxonomy.js';
 
@@ -35,15 +36,20 @@ describe('SmartMatch store taxonomy', () => {
     expect(aisleOf({ category: 'NEW_UNREVIEWED_CODE' }).id).toBe('review');
   });
 
-  it('maps every category code in the current catalogue export', () => {
-    const catalogueCategories = [
-      'BEER', 'BRANDY', 'CANNED_GOODS', 'CHAMPAGNE', 'CIDER_RTD', 'COGNAC',
-      'DRY_GOODS', 'FRESH_PRODUCE', 'GIN', 'GROCERY', 'GROCERY_BULK',
-      'LIQUEUR', 'LIVESTOCK_ANIMAL', 'MEAT', 'MIXER', 'RITUAL_SUPPLIES',
-      'SOFT_DRINKS', 'SPARKLING', 'TEQUILA', 'TEQUILA_PREMIUM',
-      'ULWALUKO_SUPPLIES', 'VODKA', 'VODKA_PREMIUM', 'WATER', 'WHISKY',
-      'WINE', 'WINE_BOX',
-    ];
+  it('maps every category code in the committed catalogue export', () => {
+    const tsv = readFileSync(new URL('../../docs/pricing/skus_clean.tsv', import.meta.url), 'utf8');
+    const [header, ...rows] = tsv.trimEnd().split(/\\r?\\n/);
+    const categoryIndex = header.split('\\t').indexOf('category');
+    expect(categoryIndex).toBeGreaterThanOrEqual(0);
+
+    const catalogueCategories = [...new Set(
+      rows
+        .filter((row) => row.trim())
+        .map((row) => row.split('\\t')[categoryIndex]?.trim().toUpperCase())
+        .filter(Boolean),
+    )];
+
+    expect(catalogueCategories.length).toBeGreaterThan(0);
     for (const category of catalogueCategories) {
       expect(departmentOf({ category }).id, category).not.toBe('other');
     }
