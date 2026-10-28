@@ -19,8 +19,23 @@ jobs:
           node-version: '22'
       - name: Install current lockfile
         run: yarn install --frozen-lockfile
-      - name: Upgrade selected transitive dependencies within existing semver ranges
-        run: yarn upgrade --pattern "proxy-addr|body-parser|qs|source-map-js|brace-expansion|fast-uri|postcss-selector-parser|esbuild|uuid"
+      - name: Pin reviewed patched transitive dependency versions
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          packageJson.resolutions = {
+            ...packageJson.resolutions,
+            'proxy-addr': '2.0.8',
+            'body-parser': '1.20.9',
+            'qs': '6.16.1',
+            'source-map-js': '1.2.2',
+            'fast-uri': '3.1.9',
+            'postcss-selector-parser': '6.1.5',
+          };
+          fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2) + '\\n');
+          NODE
+          yarn install --force
       - name: Verify lockfile remains installable
         run: yarn install --frozen-lockfile
       - name: Run test suite
@@ -37,12 +52,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cp yarn.lock /tmp/icamagu-patched-yarn.lock
+          cp package.json /tmp/icamagu-patched-package.json
           cp dependency-audit-after.json /tmp/icamagu-dependency-audit-after.json
           git fetch origin main
           git switch --force-create security/transitive-dependency-patches origin/main
           cp /tmp/icamagu-patched-yarn.lock yarn.lock
+          cp /tmp/icamagu-patched-package.json package.json
           cp /tmp/icamagu-dependency-audit-after.json dependency-audit-after.json
-          git add yarn.lock
+          git add package.json yarn.lock
           if git diff --cached --quiet; then
             echo "No targeted lockfile changes were produced; no PR needed."
             exit 0
@@ -62,6 +79,7 @@ jobs:
         with:
           name: icamagu-targeted-dependency-patch
           path: |
+            package.json
             yarn.lock
             dependency-audit-after.json
           if-no-files-found: error
