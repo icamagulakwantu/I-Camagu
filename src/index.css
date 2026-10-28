@@ -108,15 +108,6 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-
-  /* Many screens use very small fixed sizes (text-[9px]..text-[11px]) for
-     hints and labels. Rather than edit hundreds of call sites, raise the
-     floor here so nothing in the app renders below 12px — the minimum that
-     stays readable for older users on small phones. */
-  .text-\[9px\], .text-\[10px\], .text-\[11px\] {
-    font-size: 0.75rem !important;
-    line-height: 1.1rem;
-  }
 }
 
 @keyframes shimmer {
@@ -186,14 +177,13 @@
 /* Section eyebrow: small caps label. Wrapped in :where() so its default
    grey has zero specificity — a text-color utility on the same element
    (e.g. "eyebrow text-cream/75") always wins, instead of silently losing
-   to this rule just because it's declared later in the file.
-   Grey darkened from #8a8278 to meet the 4.5:1 contrast minimum on cream. */
+   to this rule just because it's declared later in the file. */
 :where(.eyebrow) {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #625b52;
+  color: #6b645a;
 }
 
 /* Repeating threshold motif — abstracted gateway arcs, never tribal print */
