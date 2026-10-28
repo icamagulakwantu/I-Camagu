@@ -94,6 +94,16 @@ These catalogue names need explicit SKU-to-image review. Do not automatically as
 - Saint Raphael Sweet Red
 - 4th Street Sweet Red/Rose
 
+## Soft-drink pack-size conflict found on 28 October
+
+The same four SKU IDs have conflicting pack descriptions across checked-in sources:
+
+- `server/scripts/grocery-sku-catalog.csv` describes Coca-Cola, Fanta Orange, Sprite and Stoney as **250ml cans x24**.
+- `docs/pricing/skus_clean.tsv` describes those same SKU IDs as **300ml cans**.
+- The live startup image mapper matched **zero** 300ml rows on its first run, confirming the 300ml assumption does not match the current live records.
+
+Do not change the product formats or prices automatically. The image repair now assigns the 300ml product photo only to rows explicitly categorized `SOFT_DRINKS` with a 300ml format. If a matching row is 250ml, it clears the existing image rather than display a misleading 300ml photo; the Store's safe placeholder is shown until the correct 250ml can packshot is verified. Reconcile the live SKU ID, name, category, bottleFormat and unitsPerCase against the source export before restoring those images.
+
 ## Corrective rules
 
 1. **One SKU variant per image assignment.** Product names, exact variant, pack type and volume must agree.
