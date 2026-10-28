@@ -121,8 +121,14 @@ function Store({ onGoToBasket, basketCount }) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search all items — e.g. Commando, Maize Meal..."
+            aria-label="Search all marketplace departments"
             className="w-full mt-3 h-11 border-2 border-cream-dark rounded-pill px-4 text-sm bg-white focus:outline-none focus:border-terracotta"
           />
+        )}
+        {searchOpen && (
+          <p className="mt-2 text-xs leading-relaxed text-ink-muted">
+            Search covers all departments. Each result is labelled with its department so you can check it before adding it.
+          </p>
         )}
       </div>
 
