@@ -71,8 +71,25 @@ async function downloadImage(url) {
   return { buffer, contentType: res.headers.get('content-type') };
 }
 
+function expectedFormatFromSourceUrl(sourceUrl) {
+  // A source URL can supply a size hint, but not proof that the returned
+  // og:image depicts a single bottle rather than a multipack. Never guess
+  // when the retailer URL contains no explicit size.
+  const decoded = decodeURIComponent(sourceUrl);
+  const match = decoded.match(/(?:^|[^0-9])(\d{2,4})\s*[- ]?ml\b/i);
+  return match ? `${match[1]}ml` : null;
+}
+
+function hasAmbiguousVariantName(product) {
+  // A source page for one flavour/variant must not be assigned to every
+  // flavour in a grouped SKU name (e.g. Red/Watermelon or Apple/Lime).
+  return /\/|\b(asstd|assorted|mixed)\b/i.test(product);
+}
+
 async function processEntry(entry) {
   const { product, slug, sourceUrl, needsReview, imageOnly, note } = entry;
+  const expectedFormat = entry.expectedFormat || expectedFormatFromSourceUrl(sourceUrl);
+  const ambiguousVariant = hasAmbiguousVariantName(product);
   const tag = needsReview ? ' [FLAGGED — will not auto-apply]' : imageOnly ? ' [foreign source — image only, not a price reference]' : '';
   console.log(`\n${product}${tag}`);
   if (note) console.log(`  note: ${note}`);
@@ -82,10 +99,20 @@ async function processEntry(entry) {
     return;
   }
 
-  if (!FORCE) {
-    const existing = await prisma.sku.findFirst({ where: { name: product }, select: { imageUrl: true } });
+  // Prevent a name-only match from applying one packshot to every size of a
+  // product. A precise format must be present in the manifest or source URL.
+  // Ambiguous grouped variants and URLs with no explicit size are review-only.
+  if (!expectedFormat) console.log('  no size in source URL — image will be saved for review only');
+  if (ambiguousVariant) console.log('  grouped variants in SKU name — image will be saved for review only');
+
+  const targetWhere = expectedFormat
+    ? { name: product, bottleFormat: { contains: expectedFormat } }
+    : null;
+
+  if (!FORCE && targetWhere) {
+    const existing = await prisma.sku.findFirst({ where: { ...targetWhere, imageUrl: { not: null } }, select: { imageUrl: true } });
     if (existing?.imageUrl) {
-      console.log(`  skipped — already has imageUrl (${existing.imageUrl}). Use --force to overwrite.`);
+      console.log(`  skipped — matching ${expectedFormat} SKU already has imageUrl (${existing.imageUrl}). Use --force to overwrite.`);
       return;
     }
   }
@@ -101,16 +128,16 @@ async function processEntry(entry) {
   fs.writeFileSync(path.join(IMAGES_DIR, filename), buffer);
   console.log(`  saved public/images/brands/${filename} (${(buffer.length / 1024).toFixed(0)}KB)`);
 
-  if (needsReview) {
-    console.log('  NOT applied to the DB — open the file, confirm it is the right product, then update Sku.imageUrl by hand.');
+  if (needsReview || !targetWhere || ambiguousVariant) {
+    console.log('  NOT applied to the DB — confirm exact product variant and pack size before assigning the image.');
     return;
   }
 
   const { count } = await prisma.sku.updateMany({
-    where: { name: product },
+    where: targetWhere,
     data: { imageUrl: `/images/brands/${filename}` },
   });
-  console.log(`  applied to ${count} Sku row(s) matching name "${product}"`);
+  console.log(`  applied to ${count} SKU row(s) matching "${product}" and format "${expectedFormat}"`);
 }
 
 async function main() {
