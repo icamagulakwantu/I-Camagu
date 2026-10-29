@@ -14,6 +14,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import prisma from './config/db.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
+import { ensureOfferSchema } from './services/offerService.js';
 import { backfillHennessyProductImages } from './scripts/backfill-hennessy-product-images.js';
 import { backfillRequestedProductImages } from './scripts/backfill-requested-product-images.js';
 import { backfillUploadedProductImages } from './scripts/backfill-uploaded-product-images.js';
@@ -168,6 +169,8 @@ try {
   // budgetZAR/isPurchased and friends are columns the Prisma client expects
   // on every query — they must exist before the app is reported healthy.
   await ensureCeremonyBudgetColumns();
+  // Merchant offers on group orders (raw-SQL table, idempotent).
+  await ensureOfferSchema();
   startup.schemaReady = true;
   console.log('Start-up database check passed.');
 } catch (err) {

@@ -10,6 +10,11 @@ export const UNSPECIFIED_AREA = 'Unspecified';
 
 export const AREA_REQUIRED_MESSAGE = 'Please add your area (town or suburb) to your profile before joining a pool, so we can match you with people near you.';
 
+// Default minimum (in cases) before a group order is MATCHED and merchants'
+// offers can be accepted. No merchant is chosen up front any more, so there
+// is no merchant-specific minimum to use at the time a pool opens.
+const DEFAULT_MOQ_CASES = 50;
+
 // Serialize a pool join against matching. The lock is held until the
 // caller's transaction commits, so a match cannot close the pool between the
 // status check and the new basket being created.
@@ -64,8 +69,8 @@ function generateOrderReference(tx) {
 
 // Which real-world category a SKU needs — mirrors the departments in
 // src/data/storeTaxonomy.js. Matches BulkPool.category / Partner.type
-// exactly, so a pool's category IS the kind of partner that could
-// eventually be attached to it, with no separate mapping to keep in sync.
+// exactly, so a pool's category IS the kind of merchant that can send an
+// offer on it, with no separate mapping to keep in sync.
 const TAVERN_CATEGORIES = new Set([
   'BEER', 'CIDER_RTD',
   'BRANDY', 'WHISKY', 'VODKA', 'VODKA_PREMIUM', 'GIN', 'TEQUILA', 'TEQUILA_PREMIUM', 'COGNAC', 'LIQUEUR', 'MIXER',
@@ -139,15 +144,14 @@ async function findMyOpenPool(userId, category, incomingCases) {
   return null;
 }
 
-// Finds (or opens) the pool for this category+area — no Partner required.
-// Pool formation must never depend on a confirmed supplier existing yet
-// (the founder's explicit call): members can always form and join a pool;
-// which real distributor eventually fulfils it is a separate, later step.
+// Finds (or opens) the pool for this category+area. No merchant is chosen
+// or attached here: members form and join pools freely, merchants of the
+// matching kind send offers on them (see offerService.js), and the best
+// offer is accepted once the pool reaches its minimum.
 //
 // targetDate only matters when a *new* pool is being opened — joining an
 // already-open pool inherits whatever deadline that pool already has.
 async function findOrCreateOpenPool(category, area, targetDate, user, incomingCases = 0) {
-  const partner = await pickBestPartnerForCategory(area, category);
   const candidates = await prisma.bulkPool.findMany({
     where: { category, status: 'OPEN', area: { not: UNSPECIFIED_AREA } },
     include: { partner: true, baskets: { include: { items: true } } },
@@ -165,9 +169,7 @@ async function findOrCreateOpenPool(category, area, targetDate, user, incomingCa
     return normaliseArea(area) && normaliseArea(area) === normaliseArea(candidate.area);
   }) || null;
   if (!pool) {
-    // Use a supplier's recorded minimum when one exists. The 50-case value
-    // remains a clearly documented fallback, not a substitute for real MOQ.
-    const moqTarget = Number.isInteger(partner?.moq) && partner.moq > 0 ? partner.moq : 50;
+    const moqTarget = DEFAULT_MOQ_CASES;
     pool = await prisma.bulkPool.create({
       data: {
         category,
@@ -179,56 +181,14 @@ async function findOrCreateOpenPool(category, area, targetDate, user, incomingCa
         moqTarget,
         status: 'OPEN',
         tierBasis: tierBasisForCategory(category),
-        partnerId: partner?.id || null,
+        partnerId: null,
         ...newPoolWindow(moqTarget, targetDate),
       },
       include: { partner: true, baskets: { include: { items: true } } },
     });
-  } else if (!pool.partnerId && partner) {
-    pool = await prisma.bulkPool.update({
-      where: { id: pool.id },
-      data: { partnerId: partner.id },
-      include: { partner: true },
-    });
   }
   if (!pool.partner) pool.partner = pool.partnerId ? await prisma.partner.findUnique({ where: { id: pool.partnerId } }) : null;
   return pool;
-}
-
-// Picks the best-fit confirmed partner of a category for a pool in a given
-// area, if one exists — used only to auto-attach a "partner store" badge to
-// a pool that already exists on its own; never a gate on whether the pool
-// itself can form. Same declared area first, then order volume, then name.
-export async function pickBestPartnerForCategory(area, category) {
-  const partners = await prisma.partner.findMany({
-    where: { type: category },
-    include: {
-      pools: {
-        where: { status: 'OPEN' },
-        include: { baskets: { include: { items: true } } },
-        orderBy: { createdAt: 'desc' },
-        take: 1,
-      },
-    },
-  });
-  if (partners.length === 0) return null;
-
-  const scored = partners.map((partner) => {
-    const openPool = partner.pools[0] || null;
-    const currentCases = openPool ? activeCases(openPool) : 0;
-    const progress = openPool ? Math.min(1, currentCases / openPool.moqTarget) : 0;
-    const sameArea = area && normaliseArea(partner.area) === normaliseArea(area) ? 1 : 0;
-
-    return { partner, progress, sameArea };
-  });
-
-  scored.sort((a, b) => {
-    if (b.sameArea !== a.sameArea) return b.sameArea - a.sameArea;
-    if (b.progress !== a.progress) return b.progress - a.progress;
-    return a.partner.name.localeCompare(b.partner.name);
-  });
-
-  return scored[0].partner;
 }
 
 // Emails the admin the first time a pool reaches a new SmartMatch tier, so
