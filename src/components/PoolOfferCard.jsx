@@ -4,8 +4,13 @@ import { useToast } from './ui/Toast.jsx';
 import { useCommunity } from '../context/CommunityContext.jsx';
 import FundingSourcePicker from './FundingSourcePicker.jsx';
 import { notifyBasketChanged } from '../lib/basketEvents.js';
+import { CATEGORY_LABEL } from '../data/poolCategories.js';
 
 const money = (n) => n == null || !Number.isFinite(Number(n)) ? 'Price to confirm' : 'R' + Number(n).toFixed(2);
+
+// Members never pick a merchant, so a group order is named by what it is and
+// where it is — never by a shop.
+const poolTitle = (pool) => `${CATEGORY_LABEL[pool.category] || 'Group'} order near ${pool.area}`;
 
 export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClose, variant = 'sheet', pool: feedPool = null, onOpen }) {
   const { accessToken } = useAuth();
@@ -55,19 +60,19 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
   if (variant === 'feed' && feedPool) {
     return <article className="w-full rounded-2xl border border-cream-dark bg-white p-4 text-left shadow-soft space-y-3">
       <div className="flex items-start justify-between gap-3">
-        <div><h3 className="font-bold text-ink">{feedPool.partnerName || feedPool.category} pool</h3><p className="text-xs text-ink-muted mt-1">{feedPool.distanceKm == null ? feedPool.area : feedPool.distanceKm + ' km away'} · {feedPool.participantCount} members{feedPool.deadline ? ' · Closes ' + new Date(feedPool.deadline).toLocaleDateString() : ''}</p>
+        <div><h3 className="font-bold text-ink">{poolTitle(feedPool)}</h3><p className="text-xs text-ink-muted mt-1">{feedPool.distanceKm == null ? feedPool.area : feedPool.distanceKm + ' km away'} · {feedPool.participantCount} members{feedPool.deadline ? ' · Closes ' + new Date(feedPool.deadline).toLocaleDateString() : ''}</p>
         {feedPool.clanMemberCount > 0 && <p className="text-xs font-semibold text-terracotta mt-1">{feedPool.clanMemberCount} clan member{feedPool.clanMemberCount === 1 ? '' : 's'} already joined</p>}</div>
         <span className="text-xs font-bold text-ink">{feedPool.currentCases}/{feedPool.moqTarget} cases</span>
       </div>
       <div className="h-2 rounded-full bg-cream-dark overflow-hidden"><div className="h-full bg-terracotta" style={{ width: Math.min(100, feedPool.moqTarget > 0 ? feedPool.currentCases / feedPool.moqTarget * 100 : 0) + '%' }} /></div>
-      <p className="text-xs text-ink-muted">{feedPool.nextTier ? 'Next tier: ' + feedPool.nextTier.name : 'Pool price awaits a real quote'}</p>
-      <button type="button" onClick={onOpen} className="w-full min-h-10 rounded-full border border-terracotta text-terracotta font-bold">Browse items</button>
+      <p className="text-xs text-ink-muted">{feedPool.nextTier ? 'Next tier: ' + feedPool.nextTier.name : 'Merchants send offers once the group grows'}</p>
+      <button type="button" onClick={onOpen} className="cursor-pointer w-full min-h-10 rounded-full border border-terracotta text-terracotta font-bold">Browse items</button>
     </article>;
   }
 
-  return <div className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center bg-ink/55 p-0 sm:p-4" role="dialog" aria-modal="true" aria-label="Pool offers">
+  return <div className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center bg-ink/55 p-0 sm:p-4" role="dialog" aria-modal="true" aria-label="Group orders">
     <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-cream p-5 space-y-4">
-      <div className="flex justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-terracotta">SmartMatch</p><h2 className="text-xl font-display font-bold text-ink">{cost?.label || result.sku?.name || 'Pool offers'}</h2><p className="text-sm text-ink-muted">Regular app price: {money(cost?.unitCost ?? result.sku?.casePriceZAR)}</p></div><button type="button" onClick={onClose} aria-label="Close" className="w-10 h-10 rounded-full bg-white text-ink">×</button></div>
+      <div className="flex justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-terracotta">SmartMatch</p><h2 className="text-xl font-display font-bold text-ink">{cost?.label || result.sku?.name || 'Group orders'}</h2><p className="text-sm text-ink-muted">Regular app price: {money(cost?.unitCost ?? result.sku?.casePriceZAR)}</p></div><button type="button" onClick={onClose} aria-label="Close" className="cursor-pointer w-10 h-10 rounded-full bg-white text-ink">×</button></div>
       <FundingSourcePicker value={fundingSource} onChange={(v) => { setFundingSource(v); if (v === 'PERSONAL') setStokvelId(''); }} stokvelId={stokvelId} onStokvelChange={setStokvelId} />
       {result.demand?.nearbyUpcomingCeremonies > 0 && <p className="rounded-xl bg-white p-3 text-sm text-ink">{result.demand.nearbyUpcomingCeremonies} nearby upcoming ceremonies also need this item.</p>}
       {!loading && (result.combinedOrderSuggestions || []).length > 0 && <section className="rounded-2xl border border-terracotta/30 bg-white p-4 space-y-3" aria-label="Combined bulk-buying opportunities">
@@ -81,31 +86,31 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
             <div>
               <p className="font-bold text-ink">{suggestion.area}</p>
               <p className="text-xs text-ink-muted mt-0.5">{suggestion.poolCount} open groups · {(suggestion.distinctCategories || []).join(', ') || 'Mixed products'}</p>
-              <p className="text-xs text-ink-muted mt-0.5">{suggestion.supplierName ? 'Supplier: ' + suggestion.supplierName : 'Supplier not selected — outlet coordination needed'}</p>
+              <p className="text-xs text-ink-muted mt-0.5">{suggestion.supplierName ? 'Merchant: ' + suggestion.supplierName : 'Merchants send offers on combined orders'}</p>
             </div>
             <div className="text-right shrink-0">
               <p className="font-bold text-ink">{money(suggestion.combinedOrderValueZAR)}</p>
               <p className="text-[11px] text-ink-muted">combined value</p>
             </div>
           </div>
-          <p className="text-sm font-semibold text-terracotta">Possible savings are unconfirmed until a supplier provides a written quote for this combined order.</p>
-          {suggestion.reachesThreePalletEquivalent && <p className="text-xs text-ink-muted">Indicative value is around {Number(suggestion.indicativePalletEquivalent).toFixed(2)} pallet-equivalents using a reference case price; the supplier must confirm mixed-product eligibility and the conversion.</p>}
+          <p className="text-sm font-semibold text-terracotta">Possible savings are unconfirmed until a merchant sends a written offer for this combined order.</p>
+          {suggestion.reachesThreePalletEquivalent && <p className="text-xs text-ink-muted">Indicative value is around {Number(suggestion.indicativePalletEquivalent).toFixed(2)} pallet-equivalents using a reference case price; the merchant must confirm mixed-product eligibility and the conversion.</p>}
           <p className="text-xs text-ink-muted">{suggestion.message}</p>
           <p className="text-xs text-ink-muted">This is an opportunity, not a confirmed quote or guaranteed saving. Pools and payments stay separate; each organiser must opt in before any combined order.</p>
         </article>)}
       </section>}
-      {loading && <p className="text-sm text-ink-muted">Finding suitable pools…</p>}
-      {!loading && !result.pools?.length && <p className="rounded-xl bg-white p-4 text-sm text-ink-muted">No suitable open pool yet. You can buy on your own now.</p>}
+      {loading && <p className="text-sm text-ink-muted">Finding suitable group orders…</p>}
+      {!loading && !result.pools?.length && <p className="rounded-xl bg-white p-4 text-sm text-ink-muted">No suitable open group order yet. You can buy on your own now.</p>}
       {(result.pools || []).map((pool) => <article key={pool.id} className="rounded-2xl border border-cream-dark bg-white p-4 space-y-3">
-        <div className="flex justify-between gap-3"><div><h3 className="font-bold text-ink">{pool.partnerName || pool.area} pool</h3><p className="text-xs text-ink-muted">{pool.distanceKm == null ? pool.area : pool.distanceKm + ' km away'} · {pool.participantCount} members{pool.deadline ? ' · Closes ' + new Date(pool.deadline).toLocaleDateString() : ''}</p>{pool.clanMemberCount > 0 && <p className="text-xs font-semibold text-terracotta">{pool.clanMemberCount} clan member{pool.clanMemberCount === 1 ? '' : 's'} already in this pool</p>}</div><span className="text-xs font-bold">{pool.currentCases}/{pool.moqTarget} cases</span></div>
+        <div className="flex justify-between gap-3"><div><h3 className="font-bold text-ink">{poolTitle(pool)}</h3><p className="text-xs text-ink-muted">{pool.distanceKm == null ? pool.area : pool.distanceKm + ' km away'} · {pool.participantCount} members{pool.deadline ? ' · Closes ' + new Date(pool.deadline).toLocaleDateString() : ''}</p>{pool.clanMemberCount > 0 && <p className="text-xs font-semibold text-terracotta">{pool.clanMemberCount} clan member{pool.clanMemberCount === 1 ? '' : 's'} already in this group</p>}</div><span className="text-xs font-bold">{pool.currentCases}/{pool.moqTarget} cases</span></div>
         <p className="text-xs font-bold text-ink-muted">Progress toward a possible bulk tier</p>
-        {pool.tierProgress != null ? <div className="h-2 rounded-full bg-cream-dark overflow-hidden"><div className="h-full bg-terracotta" style={{ width: Math.max(0, Math.min(100, pool.tierProgress)) + '%' }} /></div> : <p className="text-xs text-ink-muted">No quote-backed discount ladder is configured for this pool yet.</p>}
-        <p className="text-xs text-ink-muted">Supplier quote not confirmed. The current order uses the listed catalogue price; any bulk discount applies only after a supplier confirms it in writing.</p>
+        {pool.tierProgress != null ? <div className="h-2 rounded-full bg-cream-dark overflow-hidden"><div className="h-full bg-terracotta" style={{ width: Math.max(0, Math.min(100, pool.tierProgress)) + '%' }} /></div> : <p className="text-xs text-ink-muted">No quote-backed discount ladder is configured for this group yet.</p>}
+        <p className="text-xs text-ink-muted">You don't choose a shop. Merchants send offers on the whole group order, and the best one is confirmed once the group reaches its minimum. Until then, the listed catalogue price applies.</p>
         {pool.nextTier && <p className="text-xs text-ink-muted">Next tier: {pool.nextTier.name} · {Number(pool.nextTier.remaining).toFixed(2)} {pool.nextTier.unit} remaining</p>}
-        <p className="text-xs text-ink-muted">Supplier minimum: {pool.currentCases}/{pool.moqTarget} cases</p>
-        <button type="button" disabled={busy || (fundingSource === 'STOKVEL' && !stokvelId)} onClick={() => join(pool)} className="w-full min-h-12 rounded-full bg-terracotta text-white font-bold disabled:opacity-50">{busy ? 'Please wait…' : 'Join pool'}</button>
+        <p className="text-xs text-ink-muted">Group minimum: {pool.currentCases}/{pool.moqTarget} cases</p>
+        <button type="button" disabled={busy || (fundingSource === 'STOKVEL' && !stokvelId)} onClick={() => join(pool)} className="cursor-pointer w-full min-h-12 rounded-full bg-terracotta text-white font-bold disabled:opacity-50">{busy ? 'Please wait…' : 'Join this group'}</button>
       </article>)}
-      <button type="button" disabled={busy} onClick={buy} className="w-full min-h-12 rounded-full border-2 border-terracotta bg-white text-ink font-bold">Buy on my own</button>
+      <button type="button" disabled={busy} onClick={buy} className="cursor-pointer w-full min-h-12 rounded-full border-2 border-terracotta bg-white text-ink font-bold">Buy on my own</button>
     </div>
   </div>;
 }
