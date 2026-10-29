@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import { submitBasketToPool } from '../services/matchmakerService.js';
+import { submitBasketToPool, AREA_REQUIRED_MESSAGE } from '../services/matchmakerService.js';
 import { findSuggestedPoolsForItem, joinPoolWithItem, getNearbyDemandSignal, getCommunityFeed } from '../services/poolDiscoveryService.js';
 import { PALLET_CASES, palletsForCases, resolveTierLadder, getTierForMetric, getNextTierForMetric, amountToReachTier } from '../utils/smartMatchTiers.js';
 
@@ -63,21 +63,26 @@ export async function submitToPool(req, res) {
   try {
     const result = await submitBasketToPool(req.userId, basketId, targetDate, joinPoolId);
     const lines = result.submissions.map((s) => {
-      const base = s.matched
-        ? `${CATEGORY_LABEL[s.category]} matched${s.partnerName ? ` with ${s.partnerName}` : ''}! Group code: ${s.groupCode}`
-        : `${CATEGORY_LABEL[s.category]} pooling${s.partnerName ? ` with ${s.partnerName}` : ''} — ${s.currentCases}/${s.moqTarget} cases needed.`;
-      // Tells the truth when the pool they were invited to had already
-      // closed by the time they submitted — never silently substitutes a
-      // different pool without saying so.
+      const label = CATEGORY_LABEL[s.category];
+      const progress = `${s.currentCases}/${s.moqTarget} needed`;
+      let base;
+      if (s.matched) base = `${label} pool near ${s.area} reached its minimum order! Group code: ${s.groupCode}`;
+      else if (s.addedToExistingPool) base = `${label} added to your pool near ${s.area} — ${progress}.`;
+      else base = `${label} pooling near ${s.area} — ${progress}.`;
+      // Tells the truth when the pool they were invited to had already closed.
       if (s.joinedInvitedPool === false) {
-        return `${base} (The pool you were invited to had already closed, so you joined a new one in your own area instead.)`;
+        return `${base} (The pool you chose had already closed or was full, so your items went to another open pool near you.)`;
       }
       return base;
     });
 
     res.json({ ...result, message: lines.join(' ') || 'Nothing could be submitted.' });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({
+      error: error.message,
+      // Lets the cart screen show a "Set my area" button instead of just text.
+      code: error.message === AREA_REQUIRED_MESSAGE ? 'AREA_REQUIRED' : undefined,
+    });
   }
 }
 
@@ -99,9 +104,7 @@ export async function cancelParkedBasket(req, res) {
       return res.status(409).json({ error: `Only a parked basket can be withdrawn this way (this one is ${basket.status})` });
     }
 
-    // Use the same pool-row lock as matching. A conditional update alone is
-    // insufficient if the matcher already read PARKED and later overwrites
-    // CANCELLED with MATCHED inside its transaction.
+    // Use the same pool-row lock as matching.
     const updated = await prisma.$transaction(async (tx) => {
       if (basket.poolId) {
         await tx.$queryRaw`SELECT "id" FROM "BulkPool" WHERE "id" = ${basket.poolId} FOR UPDATE`;
@@ -158,9 +161,7 @@ export async function requestPoolPaymentRefund(req, res) {
     }
     if (payment.refundRequestedAt) return res.status(409).json({ error: 'A refund has already been requested for this payment' });
 
-    // Compare-and-set prevents two simultaneous requests from both being
-    // accepted and ensures a payment cannot become refund-eligible between a
-    // stale read and the write.
+    // Compare-and-set prevents two simultaneous requests from both being accepted.
     const request = await prisma.poolPayment.updateMany({
       where: { id: paymentId, userId: req.userId, status: 'CLEARED', refundRequestedAt: null, provider: { not: 'STOKVEL_FUNDS' } },
       data: { refundRequestedAt: new Date() },
@@ -170,11 +171,8 @@ export async function requestPoolPaymentRefund(req, res) {
     }
     const updated = await prisma.poolPayment.findUnique({ where: { id: paymentId } });
 
-    // Manual EFT: the supplier holds the money, so they're the one who can
-    // actually process this — notify them in-app, same as before. PayFast:
-    // iCamagu holds the money instead, so the supplier has nothing to
-    // process — email the admin, the only party who can (see
-    // notifyAdminOfPspRefundRequest / DemandDashboard's Refunds section).
+    // Manual EFT: the supplier holds the money, so notify them in-app.
+    // PayFast: iCamagu holds the money, so email the admin instead.
     if (payment.provider === 'MANUAL_EFT') {
       if (payment.pool.partner?.userId) {
         const { createNotification } = await import('../services/notificationDbService.js');
@@ -199,12 +197,9 @@ export async function requestPoolPaymentRefund(req, res) {
 
 /**
  * Every parked/matched basket the requesting member currently has, each
- * with its own live Smart Match progress. A member can have more than one
- * at once now that a single cart submission splits by category (drinks vs.
- * everything else) into separate pools — this used to assume just one.
- * Baskets in a pool aren't the "current" draft basket anymore (getMyBasket
- * only ever returns the active DRAFT), so this is the only place that
- * surfaces ongoing pool status back to the member.
+ * with its own live Smart Match progress. Baskets in the same pool are
+ * grouped into ONE entry, so a member sees one card per pool (not one per
+ * checkout) — older data can still hold several baskets in one pool.
  */
 export async function getMyPoolStatus(req, res) {
   try {
@@ -215,22 +210,27 @@ export async function getMyPoolStatus(req, res) {
     });
 
     const statuses = [];
+    const seenPools = new Map();
     for (const basket of baskets) {
       if (!basket.pool) continue;
 
+      // Same pool, same status: fold into the card already built for it.
+      const groupKey = `${basket.pool.id}:${basket.status}`;
+      if (seenPools.has(groupKey)) {
+        seenPools.get(groupKey).basketIds.push(basket.id);
+        continue;
+      }
+
       const activeBaskets = basket.pool.baskets.filter((b) => b.status !== 'CANCELLED');
       const currentCases = activeBaskets.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
-      // Real Rand pooled so far — only meaningful for an AMOUNT-basis pool,
-      // computed off each item's real casePriceZAR, never guessed.
       const currentAmountZAR = activeBaskets.reduce(
         (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity * parseFloat(i.sku?.casePriceZAR || 0), 0),
         0
       );
+      const myCases = activeBaskets
+        .filter((b) => b.userId === req.userId)
+        .reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
 
-      // SmartMatch tier standing — pallets for an alcohol pool, Rand pooled
-      // for a groceries/livestock one (see smartMatchTiers.js). The ladder
-      // itself carries each tier's real value (or null, "TBC") — nothing
-      // here is fabricated.
       const basis = basket.pool.tierBasis || 'PALLETS';
       const isAmount = basis === 'AMOUNT';
       const metric = isAmount ? currentAmountZAR : palletsForCases(currentCases);
@@ -239,14 +239,8 @@ export async function getMyPoolStatus(req, res) {
       const nextTier = getNextTierForMetric(metric, ladder);
       const remaining = amountToReachTier(metric, nextTier);
 
-      // The member's own payment on this pool, once one exists (created the
-      // moment the pool matches — see matchmakerService). Surfaced here too,
-      // not just on My Orders, so the Basket screen can show real end-to-end
-      // progress (Collecting → MOQ reached → Payment submitted → Payment
-      // confirmed → Ready for delivery) instead of stopping at "Matched!".
-      // Match the payment to this exact basket/order reference. A member can
-      // have multiple baskets in one pool; selecting the latest pool payment
-      // for every basket incorrectly duplicates one payment across all of them.
+      // The member's own payment on this pool, matched to this exact basket's
+      // order reference when there is one.
       const sameMemberBaskets = activeBaskets.filter((candidate) => candidate.userId === req.userId);
       const payment = basket.orderReference
         ? await prisma.poolPayment.findFirst({
@@ -262,17 +256,18 @@ export async function getMyPoolStatus(req, res) {
             })
           : null;
 
-      statuses.push({
+      const status = {
         basketId: basket.id,
+        // Every one of this member's parked baskets in this pool, so
+        // "Withdraw" can withdraw all of them at once.
+        basketIds: [basket.id],
         basketStatus: basket.status,
         poolId: basket.pool.id,
         category: basket.pool.category,
-        // A pool works fully with or without a confirmed supplier attached
-        // — this is null until one matches automatically or gets attached
-        // once a real deal is signed.
         partnerName: basket.pool.partner?.name || null,
         area: basket.pool.area,
         currentCases,
+        myCases,
         moqTarget: basket.pool.moqTarget,
         poolStatus: basket.pool.status,
         windowDeadline: basket.pool.deadline,
@@ -287,11 +282,11 @@ export async function getMyPoolStatus(req, res) {
           ladder,
           currentTier,
           nextTier,
-          // Still needed to reach nextTier, in whatever unit members act on:
-          // whole cases for a pallet pool, Rand for an amount pool.
           toNextTier: isAmount ? Math.ceil(remaining) : Math.ceil(remaining * PALLET_CASES),
         },
-      });
+      };
+      seenPools.set(groupKey, status);
+      statuses.push(status);
     }
 
     res.json(statuses);
@@ -303,11 +298,8 @@ export async function getMyPoolStatus(req, res) {
 
 /**
  * Minimal, authenticated preview of a specific pool, for a member who
- * followed a real "join this pool" invite link (see Basket.jsx /
- * inviteToSmartMatch and /pool/:id in App.jsx) before they've added
- * anything to their own basket yet. Real numbers only — same tier maths
- * as getMyPoolStatus — never fabricated for a pool the member hasn't
- * joined.
+ * followed a real "join this pool" invite link before they've added
+ * anything to their own basket yet. Real numbers only.
  */
 export async function getPoolSummary(req, res) {
   const { id } = req.params;
@@ -334,6 +326,8 @@ export async function getPoolSummary(req, res) {
       area: pool.area,
       partnerName: pool.partner?.name || null,
       status: pool.status,
+      currentCases,
+      moqTarget: pool.moqTarget,
       smartMatch: {
         basis,
         pallets: palletsForCases(currentCases),
