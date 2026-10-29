@@ -45,11 +45,13 @@ export default function StokvelPoolFundingRequests() {
     finally { setBusyId(null); }
   };
 
-  if (loading) return <section className="mx-4 my-4 rounded-2xl bg-white p-4 text-sm text-ink-muted">Loading stokvel funding requests…</section>;
+  // Stay silent while loading: this sits at the top of the page, and a
+  // loading box that vanishes a second later makes the header jump.
+  if (loading) return null;
   const pending = requests.filter((request) => request.status === 'PENDING_APPROVAL');
   if (!pending.length && !error) return null;
 
-  return <section className="mx-4 my-4 rounded-2xl border border-cream-dark bg-white p-4 space-y-3">
+  return <section className="mb-4 rounded-2xl border border-cream-dark bg-white p-4 space-y-3">
     <div><h2 className="font-display text-lg font-bold text-ink">Funding requests</h2><p className="text-sm text-ink-muted">Pool orders paid by a stokvel need two or more officials to approve.</p></div>
     {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
     {pending.map((request) => {

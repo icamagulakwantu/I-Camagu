@@ -54,7 +54,7 @@ export default function NearbyStokvels() {
   }
 
   return (
-    <div className="px-4 pt-3 bg-cream">
+    <div>
       <button type="button" onClick={() => setOpen((o) => !o)}
         className={`w-full bg-white border-2 border-sage-500/40 rounded-pill py-3 px-4 text-left font-bold text-ink flex items-center justify-between ${pressable}`}>
         <span>Find stokvels near you</span>

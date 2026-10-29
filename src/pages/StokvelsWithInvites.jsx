@@ -54,29 +54,40 @@ export default function StokvelsWithInvites(props) {
     setTourStokvelId(null)
   }, [tourStokvelId, user?.id])
 
-  return (
+  // Things that need an answer (invitations, funding approvals) go right under
+  // the header. Discovery and profile prompts go after the person's own
+  // stokvels, so the screen opens with its title like every other tab.
+  const topSlot = (
     <>
-      <div className="px-4 pt-6 bg-cream empty:hidden">
-        <MyStokvelInvites onJoined={() => setRefreshKey((k) => k + 1)} />
-      </div>
-      <ProfileCompletionCard />
+      <MyStokvelInvites onJoined={() => setRefreshKey((k) => k + 1)} />
+      <StokvelPoolFundingRequests />
+    </>
+  )
+
+  const bottomSlot = (
+    <>
       <NearbyStokvels />
       {(location.label || pools.length > 0) && (
         <button
           type="button"
           onClick={() => props.onNavigate?.('store')}
-          className="mx-4 mt-4 block w-[calc(100%-2rem)] rounded-2xl border border-cream-dark bg-white p-4 text-left shadow-sm transition hover:border-sage-400 hover:bg-sage-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500"
-          aria-label="Open Store and SmartMatch pools"
+          className="block w-full rounded-2xl border border-cream-dark bg-white p-4 text-left shadow-sm transition hover:border-sage-400 hover:bg-sage-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500"
+          aria-label="Open Bulk Buy group orders"
         >
           <span className="flex items-center justify-between gap-3">
-            <span className="text-xs font-bold uppercase tracking-wide text-ink-muted">SmartMatch community</span>
-            <span className="text-sm font-bold text-sage-700">Open Store →</span>
+            <span className="text-xs font-bold uppercase tracking-wide text-ink-muted">Bulk Buy</span>
+            <span className="text-sm font-bold text-sage-700">Open →</span>
           </span>
-          <span className="mt-1 block text-sm text-ink">{location.label ? 'Matching near ' + location.label : 'Your current pool pledges'}{pools.length > 0 ? ' · ' + pools.length + ' active pool pledge' + (pools.length === 1 ? '' : 's') : ''}</span>
+          <span className="mt-1 block text-sm text-ink">{location.label ? 'Group orders near ' + location.label : 'Your group order pledges'}{pools.length > 0 ? ' · ' + pools.length + ' active pledge' + (pools.length === 1 ? '' : 's') : ''}</span>
         </button>
       )}
-      <Stokvels key={refreshKey} {...props} />
-      <StokvelPoolFundingRequests />
+      <ProfileCompletionCard />
+    </>
+  )
+
+  return (
+    <>
+      <Stokvels key={refreshKey} {...props} topSlot={topSlot} bottomSlot={bottomSlot} />
       {tourStokvelId && <StokvelWelcomeTour stokvelId={tourStokvelId} onClose={closeTour} />}
     </>
   )
