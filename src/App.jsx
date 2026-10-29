@@ -1,25 +1,20 @@
 import { lazy, Suspense, useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
-import { CommunityProvider, useCommunity } from './context/CommunityContext.jsx'
-import PoolOfferCard from './components/PoolOfferCard.jsx'
+import { CommunityProvider } from './context/CommunityContext.jsx'
 import { BASKET_CHANGED_EVENT } from './lib/basketEvents.js'
-import { ToastProvider, useToast } from './components/ui/Toast.jsx'
-import { Skeleton } from './components/ui/Skeleton.jsx'
+import { ToastProvider } from './components/ui/Toast.jsx'
 import OfflineBanner from './components/OfflineBanner.jsx'
-
-// Screen Imports
 
 // Components
 import BottomNav from './components/BottomNav.jsx'
-import DidYouKnow from './components/DidYouKnow.jsx'
 import Icon from './components/Icon.jsx'
-import NotificationBell from './components/NotificationBell.jsx'
-import PinReminder from './components/PinReminder.jsx'
-import FirstVisitExplainer from './components/FirstVisitExplainer.jsx'
 import PendingStokvelJoin from './components/PendingStokvelJoin.jsx'
 import PendingClanJoin from './components/PendingClanJoin.jsx'
 import { PENDING_STOKVEL_KEY, PENDING_CLAN_KEY } from './lib/inviteLinks.js'
+
+// Home is the first screen, so it is loaded straight away.
+import Home from './pages/Home.jsx'
 
 // Load feature screens on demand so first-time and returning mobile visits do not
 // download every ceremony, admin, and community screen before the home screen.
@@ -68,8 +63,6 @@ const BudgetDashboard = lazy(() => import('./pages/BudgetDashboard.jsx'))
 const SupplierDashboard = lazy(() => import('./pages/SupplierDashboard.jsx'))
 const EkoyiniBooking = lazy(() => import('./pages/EkoyiniBooking.jsx'))
 
-const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
-
 const MORE_SCREENS = [
   'more', 'ceremony', 'timeline', 'budget', 'ekoyinibooking',
   'templates', 'family', 'ukugida', 'ukusoka', 'iziduko',
@@ -80,202 +73,10 @@ const MORE_SCREENS = [
   'notifications', 'account', 'help', 'activity',
 ]
 
-const CEREMONY_SCREENS = [
-  'ceremony', 'timeline', 'budget', 'templates', 'family', 'ukugida', 'ukusoka', 'hierarchy',
-]
-
-// ---------- Dashboard ----------
-function Dashboard({ onNavigate, basketCount = 0, onSelectCeremony }) {
-  const { user, accessToken } = useAuth()
-  const { feed, feedError, refreshPools, location } = useCommunity()
-  const { showToast } = useToast()
-  const [stokvels, setStokvels] = useState([])
-  const [ceremonies, setCeremonies] = useState([])
-  const [loadingStokvels, setLoadingStokvels] = useState(true)
-  const [loadingCeremonies, setLoadingCeremonies] = useState(true)
-
-  useEffect(() => {
-    if (!accessToken) return
-
-    setLoadingStokvels(true)
-    fetch('/api/stokvels/my', { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('Failed to load stokvels'))))
-      .then((data) => setStokvels(Array.isArray(data) ? data : []))
-      .catch((err) => { showToast(err.message, 'error'); setStokvels([]) })
-      .finally(() => setLoadingStokvels(false))
-
-    setLoadingCeremonies(true)
-    fetch('/api/ceremonies/my', { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('Failed to load ceremonies'))))
-      .then((data) => setCeremonies(Array.isArray(data) ? data : []))
-      .catch((err) => { showToast(err.message, 'error'); setCeremonies([]) })
-      .finally(() => setLoadingCeremonies(false))
-  }, [accessToken, showToast])
-
-  const leadCeremony = ceremonies[0] || null
-  const leadCeremonyItems = leadCeremony?.checklistItems || []
-  const leadCeremonyProgress = leadCeremonyItems.length
-    ? Math.round((leadCeremonyItems.filter((i) => i.isCompleted || i.isChecked).length / leadCeremonyItems.length) * 100)
-    : null
-
-  return (
-    <div className="px-5 pt-6 pb-28 max-w-md mx-auto">
-      {/* Brand mark */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-12 h-12" />
-          <span className="font-display font-bold text-2xl text-brand-black">iCamagu</span>
-        </div>
-        <NotificationBell onOpen={() => onNavigate('notifications')} />
-      </div>
-
-      {/* Home hero — contextual ceremony card or generic entry point */}
-      <button
-        type="button"
-        onClick={() => (leadCeremony?.id ? onSelectCeremony?.(leadCeremony.id) : onNavigate('ceremonyhub'))}
-        className={`relative w-full text-left overflow-hidden rounded-soft mb-5 shadow-soft ${pressable}`}
-      >
-        <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/45 to-ink/10" />
-        <div className="relative p-5 pt-16">
-          <p className="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide text-cream">
-            <img src="/icons/source/gateway-mark-1024.png" alt="" className="w-4 h-4" style={{ filter: 'brightness(0) invert(1)' }} />
-            Molo, {user?.firstName || 'friend'}
-          </p>
-          <h1 className="mt-1.5 font-display text-2xl leading-tight text-cream">
-            {leadCeremony ? leadCeremony.title : 'uMntu ngumntu ngabantu.'}
-          </h1>
-          <div className="mt-3 flex items-center justify-between border-t border-cream/20 pt-3">
-            <p className="tabular text-sm font-bold text-cream">
-              {leadCeremony
-                ? (leadCeremonyProgress != null ? `${leadCeremonyProgress}% prepared` : 'In progress')
-                : 'Start planning your first ceremony'}
-            </p>
-            <span className="inline-flex items-center gap-1.5 text-sm font-bold text-cream flex-shrink-0">
-              {leadCeremony ? 'Continue planning' : 'Get started'}
-              <Icon name="arrowRight" size={16} color="#ffffff" />
-            </span>
-          </div>
-        </div>
-      </button>
-
-      {feedError && (
-        <div role="status" className="mb-4 rounded-2xl border border-terracotta/30 bg-white p-4">
-          <p className="text-sm font-bold text-ink">The community feed could not load.</p>
-          <p className="text-xs text-ink-muted mt-1">Your other iCamagu features remain available. Try again in a moment.</p>
-          <button type="button" onClick={() => refreshPools()} className="mt-3 min-h-11 rounded-full bg-terracotta px-4 text-sm font-bold text-white">Retry community feed</button>
-        </div>
-      )}
-
-      {(feed.pools?.length > 0 || feed.upcomingClanCeremonies?.length > 0 || feed.featuredLegends?.length > 0) && (
-        <section className="mb-6 space-y-3" aria-label="Community feed">
-          <div className="flex items-end justify-between gap-3">
-            <div><p className="eyebrow text-terracotta">Community</p><h2 className="font-display text-xl font-bold text-ink">Around you</h2></div>
-            {location.label && <span className="text-xs text-ink-muted">{location.label}</span>}
-          </div>
-          {feed.pools?.slice(0, 3).map((pool) => <PoolOfferCard key={pool.id} variant="feed" pool={pool} onOpen={() => onNavigate('store')} />)}
-          {feed.upcomingClanCeremonies?.length > 0 && <div className="rounded-2xl border border-cream-dark bg-white p-4"><p className="text-xs font-bold uppercase tracking-wide text-ink-muted mb-2">Upcoming family ceremonies</p>{feed.upcomingClanCeremonies.slice(0, 3).map((ceremony) => <div key={ceremony.id} className="py-2 border-t border-cream-dark/70 first:border-t-0"><p className="font-bold text-ink text-sm">{ceremony.title}</p><p className="text-xs text-ink-muted">{ceremony.eventDate ? new Date(ceremony.eventDate).toLocaleDateString() : 'Date to be confirmed'} · {ceremony.host?.firstName || 'Community member'}</p></div>)}</div>}
-          {feed.featuredLegends?.length > 0 && <div className="rounded-2xl bg-terracotta/10 p-4"><p className="text-xs font-bold uppercase tracking-wide text-terracotta mb-2">Featured legends</p>{feed.featuredLegends.slice(0, 2).map((legend) => <button key={legend.id} type="button" onClick={() => onNavigate('legends')} className="block w-full py-1 text-left"><span className="font-bold text-ink text-sm">{legend.title}</span><span className="block text-xs text-ink-muted line-clamp-2">{legend.bodyText}</span></button>)}</div>}
-        </section>
-      )}
-
-      {/* Ukugida */}
-      <p className="eyebrow text-ink-muted mb-2">Quick actions</p>
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <button
-          type="button"
-          onClick={() => onNavigate('ukugida')}
-          className={`bg-white border-2 border-terracotta/25 rounded-soft p-4 text-left shadow-soft ${pressable}`}
-        >
-          <div className="w-9 h-9 rounded-xl bg-terracotta/10 flex items-center justify-center mb-2">
-            <Icon name="send" size={18} color="#c45c26" />
-          </div>
-          <p className="font-bold text-sm text-ink">Ukugida</p>
-          <p className="text-[11px] text-ink-muted mt-0.5">Gift records & reciprocity</p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onNavigate('store')}
-          className={`bg-white border-2 border-terracotta/25 rounded-soft p-4 text-left shadow-soft ${pressable}`}
-        >
-          <div className="w-9 h-9 rounded-xl bg-terracotta/10 flex items-center justify-center mb-2">
-            <Icon name="cart" size={18} color="#c45c26" />
-          </div>
-          <p className="font-bold text-sm text-ink">SmartMatch</p>
-          <p className="text-[11px] text-ink-muted mt-0.5">Bulk alcohol, groceries & more</p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onNavigate('stokvels')}
-          className={`bg-white border-2 border-terracotta/25 rounded-soft p-4 text-left shadow-soft ${pressable}`}
-        >
-          <div className="w-9 h-9 rounded-xl bg-terracotta/10 flex items-center justify-center mb-2">
-            <Icon name="users" size={18} color="#c45c26" />
-          </div>
-          <p className="font-bold text-sm text-ink">Stokvels</p>
-          <p className="text-[11px] text-ink-muted mt-0.5">Pools & payout tracking</p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onNavigate('shrinefund')}
-          className={`text-left rounded-soft p-4 shadow-soft ${pressable}`}
-          style={{ background: 'linear-gradient(135deg, #c45c26 0%, #8c3b1a 100%)' }}
-        >
-          <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center mb-2">
-            <Icon name="flame" size={18} color="#ffffff" strokeWidth={1.5} />
-          </div>
-          <p className="font-bold text-sm text-white">Ubuhlanti</p>
-          <p className="text-[11px] text-white/75 mt-0.5">Community dev fund</p>
-        </button>
-      </div>
-
-      {/* Stokvels strip */}
-      {loadingStokvels ? (
-        <Skeleton className="h-20 w-full rounded-soft mb-6" />
-      ) : stokvels.length > 0 && (
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <p className="eyebrow text-ink-muted">Your stokvels</p>
-            <button type="button" onClick={() => onNavigate('stokvels')} className="text-xs font-bold text-terracotta">View all</button>
-          </div>
-          <div className="space-y-2">
-            {stokvels.slice(0, 2).map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => onNavigate('stokvels')}
-                className={`w-full bg-white border-2 border-terracotta/15 rounded-soft p-3.5 flex items-center justify-between gap-3 shadow-soft text-left ${pressable}`}
-              >
-                <div className="min-w-0">
-                  <p className="font-bold text-sm text-ink truncate">{s.name}</p>
-                  <p className="text-[11px] text-ink-muted mt-0.5">
-                    {s.memberCount || 0} member{s.memberCount !== 1 ? 's' : ''}
-                    {s.totalBalance != null ? ` · R${Number(s.totalBalance).toLocaleString('en-ZA')}` : ''}
-                  </p>
-                </div>
-                <Icon name="arrowRight" size={16} color="#8a8278" />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* First-visit explainer: how-it-works + sample ceremony, shown only
-          to brand-new users with no ceremonies or stokvels of their own yet.
-          Gives people something to look at and tap on without needing a
-          real ceremony to plan first. */}
-      {!loadingStokvels && !loadingCeremonies && stokvels.length === 0 && ceremonies.length === 0 && (
-        <FirstVisitExplainer onNavigate={onNavigate} />
-      )}
-
-      <DidYouKnow />
-      <PinReminder onNavigate={onNavigate} />
-    </div>
-  )
-}
+// Screens that belong to one ceremony plan. They light up the Ceremonies tab.
+// Ceremony tools opened from More (templates, ukugida, ...) light up More,
+// because that is where their Back button returns.
+const CEREMONY_SCREENS = ['ceremony', 'timeline', 'budget', 'ekoyinibooking']
 
 const SCREEN_PATHS = {
   home: '/',
@@ -345,7 +146,7 @@ function LostPage({ onNavigate }) {
         </p>
         <div className="mt-5 grid gap-2">
           <button type="button" onClick={() => onNavigate('home')} className="min-h-11 rounded-full bg-terracotta px-4 py-3 text-sm font-bold text-white">Go to Home</button>
-          <button type="button" onClick={() => onNavigate('store')} className="min-h-11 rounded-full border border-terracotta px-4 py-3 text-sm font-bold text-terracotta">Browse SmartMatch Store</button>
+          <button type="button" onClick={() => onNavigate('store')} className="min-h-11 rounded-full border border-terracotta px-4 py-3 text-sm font-bold text-terracotta">Browse Bulk Buy</button>
           <button type="button" onClick={() => onNavigate('ceremonyhub')} className="min-h-11 rounded-full border border-cream-dark px-4 py-3 text-sm font-bold text-ink">Open Ceremonies</button>
           <button type="button" onClick={() => onNavigate('more')} className="min-h-11 rounded-full border border-cream-dark px-4 py-3 text-sm font-bold text-ink">More help and features</button>
         </div>
@@ -539,7 +340,7 @@ function MainApp() {
       case 'ceremony':
         return (
           <CeremonyPlanner
-            onBack={goMore}
+            onBack={() => setScreen('ceremonyhub')}
             defaultType={ceremonyHubType}
             onViewTimeline={openTimeline}
             onViewBudget={openBudget}
@@ -630,7 +431,7 @@ function MainApp() {
       case 'profile':
         return <Profile onNavigate={setScreen} initialTab={profileInitialTab} onConsumeInitialTab={() => setProfileInitialTab(null)} />
       default:
-        return <Dashboard onNavigate={setScreen} basketCount={basketCount} onSelectCeremony={openExistingCeremony} />
+        return <Home onNavigate={setScreen} basketCount={basketCount} onSelectCeremony={openExistingCeremony} />
     }
   }
 

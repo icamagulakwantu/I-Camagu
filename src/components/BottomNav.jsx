@@ -1,11 +1,12 @@
 import Icon from './Icon.jsx'
 
 function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals = 0, unreadNotifications = 0 }) {
+  // Same order as the "Your path" map on Home: save, buy in bulk, ceremony.
   const tabs = [
     { id: 'home', label: 'Home', icon: 'home', badge: unreadNotifications },
+    { id: 'stokvels', label: 'Stokvels', icon: 'coins', badge: pendingApprovals },
+    { id: 'store', label: 'Bulk Buy', icon: 'cart', badge: basketCount },
     { id: 'ceremonyhub', label: 'Ceremonies', icon: 'calendar' },
-    { id: 'store', label: 'Store', icon: 'cart', badge: basketCount },
-    { id: 'stokvels', label: 'Stokvels', icon: 'users', badge: pendingApprovals },
     { id: 'more', label: 'More', icon: 'menu' },
   ]
 

@@ -5,77 +5,90 @@ import { cn } from '../lib/utils'
 import Icon from '../components/Icon.jsx'
 import AncestralRites from './AncestralRites.jsx'
 
-// Most-used screens, shown as a compact row of shortcuts at the top.
-const QUICK_LINKS = [
-  { id: 'myorders', icon: 'package', label: 'Orders' },
-  { id: 'rites', icon: 'footprints', label: 'Rites' },
-  { id: 'ubuhlanti', icon: 'flame', label: 'Ubuhlanti' },
-  { id: 'help', icon: 'help', label: 'Help' },
-]
-
-// Three plainly-named groups. Items in QUICK_LINKS are not repeated here.
-const SECTIONS = [
+// Colourful tile groups, one colour per kind of thing, matching Home:
+// terracotta = ceremony, sage = family & culture, ochre = money & services.
+// Nothing that already has its own bottom tab is repeated here.
+const TILE_GROUPS = [
   {
-    title: 'Inkcubeko yam',
-    english: 'My Culture',
+    title: 'Imisebenzi',
+    english: 'Ceremony tools',
+    color: '#c45c26',
     items: [
-      { id: 'ceremony', icon: 'clipboard', label: 'Ceremony Preparation' },
-      { id: 'templates', icon: 'template', label: 'Ceremony Templates' },
-      { id: 'hierarchy', icon: 'users', label: 'Umgidi Hierarchy' },
-      { id: 'family', icon: 'heart', label: 'Family Contributions' },
-      { id: 'iziduko', icon: 'link', label: 'Iziduko Network' },
-      { id: 'clangroups', icon: 'users', label: 'Clan Groups' },
-      { id: 'legends', icon: 'landmark', label: 'House of AmaXhosa' },
+      { id: 'templates', icon: 'template', label: 'Ceremony templates' },
+      { id: 'hierarchy', icon: 'users', label: 'Who brings what' },
+      { id: 'family', icon: 'heart', label: 'Family contributions' },
+      { id: 'ukugida', icon: 'send', label: 'Ukugida pledges' },
+      { id: 'umqombothi', icon: 'beer', label: 'Umqombothi brewing' },
       { id: 'ukusoka', icon: 'gift', label: 'Ukusoka' },
-      { id: 'umqombothi', icon: 'beer', label: 'Umqombothi Brewing' },
+      { id: 'rites', icon: 'footprints', label: 'Ancestral rites' },
+    ],
+  },
+  {
+    title: 'Usapho & Inkcubeko',
+    english: 'Family & culture',
+    color: '#4a7a4a',
+    items: [
+      { id: 'iziduko', icon: 'link', label: 'Find clan members' },
+      { id: 'clangroups', icon: 'users', label: 'Clan groups' },
+      { id: 'legends', icon: 'landmark', label: 'House of AmaXhosa' },
+      { id: 'portal', icon: 'image', label: 'Family archive' },
     ],
   },
   {
     title: 'Imali & Iinkonzo',
-    english: 'Money & Services',
+    english: 'Money & services',
+    color: '#c1922f',
     items: [
-      { id: 'ukugida', icon: 'send', label: 'Ukugida' },
-      { id: 'expenditure', icon: 'coins', label: 'My Spending' },
-      { id: 'ekoyini', icon: 'cocktail', label: 'Ekoyini Mobile Bar' },
-      { id: 'directory', icon: 'book', label: 'Directory' },
-      { id: 'supplier', icon: 'store', label: 'Supplier Dashboard' },
-      { id: 'portal', icon: 'image', label: 'Digital Portal' },
-    ],
-  },
-  {
-    title: 'Iakhawunti yam',
-    english: 'My Account',
-    items: [
-      { id: 'profile', icon: 'user', label: 'Profile' },
-      { id: 'activity', icon: 'activity', label: 'My Activity' },
-      { id: 'pin', icon: 'key', label: 'Security PIN' },
-      { id: 'account', icon: 'lock', label: 'Account & Privacy' },
-      { id: 'privacy', icon: 'file', label: 'Privacy Policy' },
-    ],
-  },
-  {
-    title: 'Admin Tools',
-    adminOnly: true,
-    items: [
-      { id: 'demandadmin', icon: 'coins', label: 'Demand & Suppliers' },
-      { id: 'ekoyiniadmin', icon: 'settings', label: 'Ekoyini Admin' },
-      { id: 'identityadmin', icon: 'key', label: 'Identity Admin' },
-      { id: 'marginadmin', icon: 'chart', label: 'Cost & Margin' },
+      { id: 'myorders', icon: 'package', label: 'My orders' },
+      { id: 'expenditure', icon: 'coins', label: 'My spending' },
+      { id: 'ubuhlanti', icon: 'flame', label: 'Ubuhlanti fund' },
+      { id: 'directory', icon: 'book', label: 'Healers, ingcibi & vendors' },
+      { id: 'ekoyini', icon: 'cocktail', label: 'Ekoyini mobile bar' },
+      { id: 'supplier', icon: 'store', label: 'Sell on iCamagu' },
     ],
   },
 ]
 
-const pressable = 'transition-transform duration-100 ease-out active:scale-[0.98]'
+const LIST_GROUPS = [
+  {
+    title: 'Iakhawunti yam',
+    english: 'My account',
+    items: [
+      { id: 'profile', icon: 'user', label: 'Profile' },
+      { id: 'activity', icon: 'activity', label: 'My activity' },
+      { id: 'pin', icon: 'key', label: 'Security PIN' },
+      { id: 'account', icon: 'lock', label: 'Account & privacy' },
+      { id: 'help', icon: 'help', label: 'Help' },
+      { id: 'privacy', icon: 'file', label: 'Privacy policy' },
+    ],
+  },
+  {
+    title: 'Admin tools',
+    adminOnly: true,
+    items: [
+      { id: 'demandadmin', icon: 'coins', label: 'Group orders & offers' },
+      { id: 'ekoyiniadmin', icon: 'settings', label: 'Ekoyini admin' },
+      { id: 'identityadmin', icon: 'key', label: 'Identity admin' },
+      { id: 'marginadmin', icon: 'chart', label: 'Cost & margin' },
+    ],
+  },
+]
+
+const pressable = 'transition-transform duration-100 ease-out active:scale-[0.97]'
+
+function GroupHeading({ title, english, color }) {
+  return (
+    <p className="flex items-center gap-2 px-1 pb-2">
+      <span className="eyebrow" style={color ? { color } : undefined}>{title}</span>
+      {english && <span className="text-xs text-ink-muted">· {english}</span>}
+    </p>
+  )
+}
 
 export default function More({ onNavigate }) {
   const { user, logout } = useAuth()
   const { showToast } = useToast()
   const [showRites, setShowRites] = useState(false)
-  const [collapsedSections, setCollapsedSections] = useState([])
-
-  const toggleSection = (title) => setCollapsedSections((current) =>
-    current.includes(title) ? current.filter((item) => item !== title) : [...current, title]
-  )
 
   const handleNav = (screen) => {
     if (screen === 'rites') { setShowRites(true); window.scrollTo(0, 0); return }
@@ -110,7 +123,7 @@ export default function More({ onNavigate }) {
         <button
           type="button"
           onClick={() => handleNav('profile')}
-          className={`card-paper mb-3 flex w-full items-center gap-3 px-4 py-3 text-left ${pressable}`}
+          className={`card-paper mb-5 flex w-full items-center gap-3 px-4 py-3 text-left ${pressable}`}
         >
           <span className="w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
             {user.profileImage
@@ -125,56 +138,47 @@ export default function More({ onNavigate }) {
         </button>
       )}
 
-      <div className="grid grid-cols-4 gap-2 mb-5">
-        {QUICK_LINKS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => handleNav(item.id)}
-            className={`card-paper flex flex-col items-center gap-1.5 px-1 py-3 ${pressable}`}
-          >
-            <span className="w-9 h-9 rounded-full bg-terracotta/10 flex items-center justify-center">
-              <Icon name={item.icon} size={17} color="#c45c26" />
-            </span>
-            <span className="text-xs font-semibold text-ink">{item.label}</span>
-          </button>
-        ))}
-      </div>
+      {TILE_GROUPS.map((group) => (
+        <section key={group.title} className="mb-5">
+          <GroupHeading title={group.title} english={group.english} color={group.color} />
+          <div className="grid grid-cols-3 gap-2">
+            {group.items.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleNav(item.id)}
+                className={`flex min-h-[96px] flex-col items-start justify-between gap-2 rounded-soft p-3 text-left ${pressable}`}
+                style={{ backgroundColor: `${group.color}17` }}
+              >
+                <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: group.color }}>
+                  <Icon name={item.icon} size={17} color="#ffffff" />
+                </span>
+                <span className="text-xs font-bold leading-tight text-ink">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      ))}
 
-      {SECTIONS.filter((section) => !section.adminOnly || user?.isAdmin).map((section) => {
-        const open = !collapsedSections.includes(section.title)
-        return (
-          <section key={section.title} className="mb-4">
-            <button
-              type="button"
-              onClick={() => toggleSection(section.title)}
-              aria-expanded={open}
-              className="w-full flex items-center gap-2 px-1 pb-1.5 text-left"
-            >
-              <span className="eyebrow text-terracotta">{section.title}</span>
-              {section.english && <span className="text-xs text-ink-muted">· {section.english}</span>}
-              <span className="flex-1" />
-              <Icon name={open ? 'arrowUp' : 'arrowDown'} size={15} color="#6b645a" />
-            </button>
-            {open && (
-              <div className="card-paper divide-y divide-terracotta/10 overflow-hidden">
-                {section.items.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => handleNav(item.id)}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-sage-50/50 active:bg-sage-50 transition-colors"
-                  >
-                    <Icon name={item.icon} size={17} color="#c45c26" />
-                    <span className="flex-1 min-w-0 text-sm font-semibold text-ink truncate">{item.label}</span>
-                    <Icon name="arrowRight" size={14} color="#6b645a" />
-                  </button>
-                ))}
-              </div>
-            )}
-          </section>
-        )
-      })}
+      {LIST_GROUPS.filter((group) => !group.adminOnly || user?.isAdmin).map((group) => (
+        <section key={group.title} className="mb-5">
+          <GroupHeading title={group.title} english={group.english} color="#2b2620" />
+          <div className="card-paper divide-y divide-terracotta/10 overflow-hidden">
+            {group.items.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleNav(item.id)}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-sage-50/50 active:bg-sage-50 transition-colors"
+              >
+                <Icon name={item.icon} size={17} color="#6b645a" />
+                <span className="flex-1 min-w-0 text-sm font-semibold text-ink truncate">{item.label}</span>
+                <Icon name="arrowRight" size={14} color="#6b645a" />
+              </button>
+            ))}
+          </div>
+        </section>
+      ))}
 
       <button
         type="button"
