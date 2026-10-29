@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
-import Icon from '../components/Icon.jsx'
 import { CATEGORY_LABEL } from '../data/poolCategories.js'
 
 const money = (n) => `R${Number(n || 0).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
@@ -11,22 +10,57 @@ const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96
 
 // Admin-only. Real, committed pooled demand across every category — not a
 // projection or an estimate, just what members have already put in a cart
-// and parked in a pool. This is the number a founder actually takes into a
-// supplier negotiation ("we already have R14,000 of alcohol orders ready in
-// Motherwell"), and the tool to attach a real confirmed supplier to a pool
-// once a deal is signed.
+// and parked in a group order. Members never choose a merchant: merchants
+// send offers on group orders, and the admin accepts the best offer here
+// once the order has reached its minimum.
 //
 // The Payouts tab is the one place this screen does touch real money: a
 // member paying online (PayFast) lands their payment in iCamagu's own
-// merchant account, not the supplier's — unlike manual EFT, where the
-// member pays the supplier directly. Until a real payout API exists for
-// that (Stitch/Ozow/PayFast payouts — a business relationship still to be
-// built), forwarding that money to the supplier is a manual bank transfer,
-// and this is where an admin tracks which ones are still outstanding.
+// merchant account, not the merchant's — unlike manual EFT, where the
+// member pays the merchant directly. Forwarding that money is a manual bank
+// transfer, and this is where an admin tracks which ones are outstanding.
 const TABS = [
-  { id: 'demand', label: 'Demand & Suppliers' },
+  { id: 'demand', label: 'Group orders & offers' },
   { id: 'payouts', label: 'Payouts' },
 ]
+
+function OfferList({ pool, acceptingId, onAccept }) {
+  const pending = pool.offers.filter((o) => o.status === 'PENDING')
+  if (pending.length === 0) {
+    return <p className="text-[11px] text-ink-muted mt-2">No merchant offers yet. Merchants of this kind see this order in their dashboard and can quote on it.</p>
+  }
+  const canAccept = pool.status === 'MATCHED'
+  return (
+    <div className="mt-3 pt-3 border-t border-terracotta/10">
+      <p className="text-[10px] font-black uppercase text-ink-muted mb-2">
+        Offers · cheapest first{canAccept ? '' : ' · can be accepted once the minimum is reached'}
+      </p>
+      <div className="space-y-2">
+        {pending.map((offer, index) => (
+          <div key={offer.id} className="bg-cream rounded-soft p-2.5 flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-ink truncate">
+                {offer.partnerName}{index === 0 && <span className="text-sage-600"> · best price</span>}
+              </p>
+              <p className="text-[10px] text-ink-muted truncate">{offer.partnerArea}{offer.note ? ` · ${offer.note}` : ''}</p>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <p className="tabular text-sm font-bold text-ink">{money(offer.totalPriceZAR)}</p>
+              <button
+                type="button"
+                onClick={() => onAccept(offer.id)}
+                disabled={!canAccept || acceptingId === offer.id}
+                className={`cursor-pointer bg-sage-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-pill ${pressable}`}
+              >
+                {acceptingId === offer.id ? '...' : 'Accept'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function DemandDashboard({ onBack }) {
   const { accessToken } = useAuth()
@@ -34,13 +68,11 @@ export default function DemandDashboard({ onBack }) {
   const [tab, setTab] = useState('demand')
   const [overview, setOverview] = useState(null)
   const [unassigned, setUnassigned] = useState([])
-  const [partners, setPartners] = useState([])
   const [pendingPayouts, setPendingPayouts] = useState([])
   const [pendingRefunds, setPendingRefunds] = useState([])
   const [loading, setLoading] = useState(true)
   const [denied, setDenied] = useState(false)
-  const [selectedPartner, setSelectedPartner] = useState({})
-  const [assigningId, setAssigningId] = useState(null)
+  const [acceptingId, setAcceptingId] = useState(null)
   const [forwardDrafts, setForwardDrafts] = useState({})
   const [forwardingId, setForwardingId] = useState(null)
   const [refundDrafts, setRefundDrafts] = useState({})
@@ -54,18 +86,16 @@ export default function DemandDashboard({ onBack }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [overviewRes, unassignedRes, partnersRes, payoutsRes, refundsRes] = await Promise.all([
+      const [overviewRes, unassignedRes, payoutsRes, refundsRes] = await Promise.all([
         authedFetch('/api/supplier/admin/demand-overview'),
         authedFetch('/api/supplier/admin/unassigned-pools'),
-        authedFetch('/api/supplier/admin/partners'),
         authedFetch('/api/basket/admin/pending-payouts'),
         authedFetch('/api/basket/admin/pending-refunds'),
       ])
       if (overviewRes.status === 403) { setDenied(true); return }
-      if (!overviewRes.ok || !unassignedRes.ok || !partnersRes.ok || !payoutsRes.ok || !refundsRes.ok) throw new Error('Could not load demand data')
+      if (!overviewRes.ok || !unassignedRes.ok || !payoutsRes.ok || !refundsRes.ok) throw new Error('Could not load demand data')
       setOverview(await overviewRes.json())
       setUnassigned(await unassignedRes.json())
-      setPartners(await partnersRes.json())
       setPendingPayouts(await payoutsRes.json())
       setPendingRefunds(await refundsRes.json())
     } catch (err) {
@@ -118,30 +148,25 @@ export default function DemandDashboard({ onBack }) {
     }
   }
 
-  const assignPartner = async (poolId) => {
-    const partnerId = selectedPartner[poolId]
-    if (!partnerId) return showToast('Choose a partner first', 'error')
-    setAssigningId(poolId)
+  const acceptOffer = async (offerId) => {
+    setAcceptingId(offerId)
     try {
-      const res = await authedFetch('/api/supplier/admin/assign-partner', {
-        method: 'POST',
-        body: JSON.stringify({ poolId, partnerId }),
-      })
+      const res = await authedFetch(`/api/supplier/admin/offers/${offerId}/accept`, { method: 'POST' })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not assign partner')
+      if (!res.ok) throw new Error(data.error || 'Could not accept offer')
       showToast(data.message, 'success')
       load()
     } catch (err) {
       showToast(err.message, 'error')
     } finally {
-      setAssigningId(null)
+      setAcceptingId(null)
     }
   }
 
   if (denied) {
     return (
       <div className="min-h-screen bg-cream px-4 pt-10">
-        <button onClick={onBack} className="text-sm text-ink-muted mb-4 block">← Back</button>
+        <button onClick={onBack} className="cursor-pointer text-sm text-ink-muted mb-4 block">← Back</button>
         <EmptyState emoji="🔒" title="Admin access required" description="This view isn't available on your account." />
       </div>
     )
@@ -150,9 +175,9 @@ export default function DemandDashboard({ onBack }) {
   return (
     <div className="min-h-screen pb-24 bg-cream">
       <div className="bg-gradient-to-br from-ink to-brand-black text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
-        <button onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
-        <h1 className="font-display font-bold text-2xl">Demand &amp; Suppliers</h1>
-        <p className="text-white/70 text-sm mt-1">Real pooled demand, for negotiating with real suppliers.</p>
+        <button onClick={onBack} className="cursor-pointer text-sm text-white/70 mb-3 block">← Back</button>
+        <h1 className="font-display font-bold text-2xl">Group orders &amp; offers</h1>
+        <p className="text-white/70 text-sm mt-1">Real pooled demand, and the offers merchants have sent on it.</p>
       </div>
 
       <div className="flex gap-2 px-4 mt-4">
@@ -161,7 +186,7 @@ export default function DemandDashboard({ onBack }) {
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`flex-1 py-2 rounded-pill text-xs font-bold transition-colors ${
+            className={`cursor-pointer flex-1 py-2 rounded-pill text-xs font-bold transition-colors ${
               tab === t.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
             }`}
           >
@@ -185,14 +210,14 @@ export default function DemandDashboard({ onBack }) {
               <p className="eyebrow text-cream/75 mb-1">Total committed demand (open + matched)</p>
               <p className="font-display font-extrabold text-3xl tabular">{money(overview?.totalValueZAR)}</p>
               <p className="text-xs text-cream/80 mt-1">
-                {overview?.totalPoolCount || 0} pool{overview?.totalPoolCount === 1 ? '' : 's'} · {overview?.totalMemberCount || 0} member{overview?.totalMemberCount === 1 ? '' : 's'} ready to buy
+                {overview?.totalPoolCount || 0} group order{overview?.totalPoolCount === 1 ? '' : 's'} · {overview?.totalMemberCount || 0} member{overview?.totalMemberCount === 1 ? '' : 's'} ready to buy
               </p>
             </div>
 
             <div>
               <p className="eyebrow mb-2">By category</p>
               {(overview?.categories || []).length === 0 ? (
-                <p className="text-sm text-ink-muted">No open or matched pools right now.</p>
+                <p className="text-sm text-ink-muted">No open or matched group orders right now.</p>
               ) : (
                 <div className="space-y-2">
                   {overview.categories.map((c) => (
@@ -200,8 +225,8 @@ export default function DemandDashboard({ onBack }) {
                       <div>
                         <p className="font-bold text-sm text-ink">{CATEGORY_LABEL[c.category] || c.category}</p>
                         <p className="text-xs text-ink-muted mt-0.5">
-                          {c.poolCount} pool{c.poolCount === 1 ? '' : 's'} · {c.cases} case{c.cases === 1 ? '' : 's'} · {c.memberCount} member{c.memberCount === 1 ? '' : 's'}
-                          {c.unassignedPoolCount > 0 && <span className="text-terracotta font-bold"> · {c.unassignedPoolCount} awaiting supplier</span>}
+                          {c.poolCount} order{c.poolCount === 1 ? '' : 's'} · {c.cases} case{c.cases === 1 ? '' : 's'} · {c.memberCount} member{c.memberCount === 1 ? '' : 's'}
+                          {c.unassignedPoolCount > 0 && <span className="text-terracotta font-bold"> · {c.unassignedPoolCount} awaiting a merchant</span>}
                         </p>
                       </div>
                       <p className="tabular font-display font-bold text-lg text-ink">{money(c.valueZAR)}</p>
@@ -212,47 +237,29 @@ export default function DemandDashboard({ onBack }) {
             </div>
 
             <div>
-              <p className="eyebrow mb-2">Pools awaiting a confirmed supplier</p>
+              <p className="eyebrow mb-2">Group orders awaiting a merchant</p>
               {unassigned.length === 0 ? (
-                <p className="text-sm text-ink-muted">Every open or matched pool already has a supplier attached.</p>
+                <p className="text-sm text-ink-muted">Every open or matched group order already has a merchant confirmed.</p>
               ) : (
                 <div className="space-y-3">
                   {unassigned.map((pool) => (
                     <div key={pool.id} className="card-paper p-4">
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between mb-1">
                         <div>
                           <p className="font-bold text-sm text-ink">{CATEGORY_LABEL[pool.category] || pool.category} — {pool.area}</p>
                           <p className="text-xs text-ink-muted mt-0.5">
-                            {pool.status === 'MATCHED' ? 'MOQ reached — ' : ''}{pool.cases}/{pool.moqTarget} cases · {pool.memberCount} member{pool.memberCount === 1 ? '' : 's'}
+                            {pool.status === 'MATCHED' ? 'Minimum reached — ' : ''}{pool.cases}/{pool.moqTarget} cases · {pool.memberCount} member{pool.memberCount === 1 ? '' : 's'}
                           </p>
                         </div>
                         <p className="tabular font-bold text-sm text-terracotta flex-shrink-0">{money(pool.valueZAR)}</p>
                       </div>
-                      <div className="flex gap-2">
-                        <select
-                          value={selectedPartner[pool.id] || ''}
-                          onChange={(e) => setSelectedPartner((prev) => ({ ...prev, [pool.id]: e.target.value }))}
-                          className="flex-1 border border-cream-dark rounded-soft px-3 py-2 text-xs font-bold bg-white"
-                        >
-                          <option value="">Choose a confirmed supplier...</option>
-                          {partners.filter((p) => p.type === pool.category).map((p) => (
-                            <option key={p.id} value={p.id}>{p.name} ({p.area})</option>
-                          ))}
-                        </select>
-                        <button
-                          type="button"
-                          onClick={() => assignPartner(pool.id)}
-                          disabled={assigningId === pool.id}
-                          className={`bg-sage-500 text-white text-xs font-bold px-4 rounded-pill ${pressable}`}
-                        >
-                          {assigningId === pool.id ? '...' : 'Attach'}
-                        </button>
-                      </div>
-                      {partners.filter((p) => p.type === pool.category).length === 0 && (
-                        <p className="text-[11px] text-ink-muted mt-2">
-                          No {(CATEGORY_LABEL[pool.category] || pool.category).toLowerCase()} suppliers registered yet — register one via the Supplier Dashboard once a deal is confirmed.
+                      {(pool.items || []).length > 0 && (
+                        <p className="text-[11px] text-ink-muted">
+                          {pool.items.slice(0, 6).map((item) => `${item.quantity} × ${item.name}`).join(' · ')}
+                          {pool.items.length > 6 ? ` · +${pool.items.length - 6} more` : ''}
                         </p>
                       )}
+                      <OfferList pool={pool} acceptingId={acceptingId} onAccept={acceptOffer} />
                     </div>
                   ))}
                 </div>
@@ -264,13 +271,13 @@ export default function DemandDashboard({ onBack }) {
             <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
               <p className="text-xs text-ink-muted leading-relaxed">
                 A member paying online lands their money in iCamagu's own PayFast account, not the
-                supplier's. Each of these still needs a real bank transfer to the supplier — mark it
+                merchant's. Each of these still needs a real bank transfer to the merchant — mark it
                 forwarded once that transfer is done, with the bank reference for the record.
               </p>
             </div>
 
             {pendingPayouts.length === 0 ? (
-              <EmptyState emoji="✅" title="Nothing outstanding" description="Every online payment has been forwarded to its supplier." />
+              <EmptyState emoji="✅" title="Nothing outstanding" description="Every online payment has been forwarded to its merchant." />
             ) : (
               <div className="space-y-3">
                 {pendingPayouts.map((p) => {
@@ -278,7 +285,7 @@ export default function DemandDashboard({ onBack }) {
                   return (
                     <div key={p.id} className="card-paper p-4">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="font-bold text-sm text-ink">{p.pool?.partner?.name || `${CATEGORY_LABEL[p.pool?.category] || p.pool?.category} pool`}</p>
+                        <p className="font-bold text-sm text-ink">{p.pool?.partner?.name || `${CATEGORY_LABEL[p.pool?.category] || p.pool?.category} order`}</p>
                         <p className="tabular font-display font-bold text-lg text-ink">{money(p.amountZAR)}</p>
                       </div>
                       <p className="text-xs text-ink-muted mb-1">
@@ -291,7 +298,7 @@ export default function DemandDashboard({ onBack }) {
                         </p>
                       ) : (
                         <p className="text-[11px] text-terracotta font-bold mb-3">
-                          No bank details on file for this supplier yet — add them via the Supplier Dashboard before transferring.
+                          No bank details on file for this merchant yet — ask them to add them before transferring.
                         </p>
                       )}
                       <div className="space-y-2">
@@ -313,9 +320,9 @@ export default function DemandDashboard({ onBack }) {
                           type="button"
                           onClick={() => forwardPayout(p.id)}
                           disabled={forwardingId === p.id}
-                          className={`w-full bg-sage-500 text-white text-xs font-bold py-2 rounded-pill ${pressable}`}
+                          className={`cursor-pointer w-full bg-sage-500 text-white text-xs font-bold py-2 rounded-pill ${pressable}`}
                         >
-                          {forwardingId === p.id ? 'Saving...' : 'Mark forwarded to supplier'}
+                          {forwardingId === p.id ? 'Saving...' : 'Mark forwarded to merchant'}
                         </button>
                       </div>
                     </div>
@@ -327,7 +334,7 @@ export default function DemandDashboard({ onBack }) {
             <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mt-6">
               <p className="text-xs text-ink-muted leading-relaxed">
                 A refund on an online payment is the same story in reverse — iCamagu holds that
-                money, so the supplier has no way to pay it back themselves. Process it here once
+                money, so the merchant has no way to pay it back themselves. Process it here once
                 the member has actually been refunded (by bank transfer), with a note for the record.
               </p>
             </div>
@@ -341,7 +348,7 @@ export default function DemandDashboard({ onBack }) {
                   return (
                     <div key={p.id} className="card-paper p-4">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="font-bold text-sm text-ink">{p.pool?.partner?.name || `${CATEGORY_LABEL[p.pool?.category] || p.pool?.category} pool`}</p>
+                        <p className="font-bold text-sm text-ink">{p.pool?.partner?.name || `${CATEGORY_LABEL[p.pool?.category] || p.pool?.category} order`}</p>
                         <p className="tabular font-display font-bold text-lg text-ink">{money(p.amountZAR)}</p>
                       </div>
                       <p className="text-xs text-ink-muted mb-1">
@@ -367,7 +374,7 @@ export default function DemandDashboard({ onBack }) {
                           type="button"
                           onClick={() => processRefundAdmin(p.id)}
                           disabled={refundingId === p.id}
-                          className={`w-full bg-terracotta text-white text-xs font-bold py-2 rounded-pill ${pressable}`}
+                          className={`cursor-pointer w-full bg-terracotta text-white text-xs font-bold py-2 rounded-pill ${pressable}`}
                         >
                           {refundingId === p.id ? 'Saving...' : 'Mark refunded'}
                         </button>
