@@ -1,6 +1,7 @@
 import prisma from '../config/db.js';
 import { isAdminEmail } from '../config/admin.js';
-import { getDemandOverview, listUnassignedPools, listPartnersForAssignment, assignPartnerToPool } from '../services/demandService.js';
+import { getDemandOverview, listUnassignedPools } from '../services/demandService.js';
+import { acceptOffer } from '../services/offerService.js';
 
 async function requireAdmin(req, res) {
   const user = await prisma.user.findUnique({ where: { id: req.userId }, select: { email: true } });
@@ -27,29 +28,17 @@ export async function getUnassigned(req, res) {
     res.json(await listUnassignedPools());
   } catch (error) {
     console.error('List unassigned pools error:', error.message);
-    res.status(500).json({ error: 'Could not fetch unassigned pools' });
+    res.status(500).json({ error: 'Could not fetch group orders' });
   }
 }
 
-export async function getPartnersList(req, res) {
+export async function acceptPoolOffer(req, res) {
   if (!(await requireAdmin(req, res))) return;
   try {
-    res.json(await listPartnersForAssignment());
+    const result = await acceptOffer(req.params.offerId);
+    res.json({ ...result, message: `${result.partnerName} confirmed for this group order. Members have been told to pay their share.` });
   } catch (error) {
-    console.error('List partners error:', error.message);
-    res.status(500).json({ error: 'Could not fetch partners' });
-  }
-}
-
-export async function assignPartner(req, res) {
-  if (!(await requireAdmin(req, res))) return;
-  const { poolId, partnerId } = req.body;
-  if (!poolId || !partnerId) return res.status(400).json({ error: 'poolId and partnerId are required' });
-  try {
-    const pool = await assignPartnerToPool(poolId, partnerId);
-    res.json({ pool, message: `${pool.partner.name} attached to this pool.` });
-  } catch (error) {
-    console.error('Assign partner error:', error.message);
-    res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not assign partner' });
+    console.error('Accept offer error:', error.message);
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not accept offer' });
   }
 }

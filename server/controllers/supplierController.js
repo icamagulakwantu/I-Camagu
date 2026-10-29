@@ -1,4 +1,5 @@
 import { registerAsSupplier, getSupplierProfile, getSupplierPools, confirmPoolPayment, processRefund, markPoolFulfilled } from '../services/supplierService.js';
+import { listOrderRequestsForMerchant, submitOffer } from '../services/offerService.js';
 
 export async function becomeSupplier(req, res) {
   try {
@@ -6,18 +7,18 @@ export async function becomeSupplier(req, res) {
     res.json({ partner });
   } catch (error) {
     console.error('Register supplier error:', error.message);
-    res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not register as supplier' });
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not register as merchant' });
   }
 }
 
 export async function getMySupplierProfile(req, res) {
   try {
     const partner = await getSupplierProfile(req.userId);
-    if (!partner) return res.status(404).json({ error: 'No supplier profile found' });
+    if (!partner) return res.status(404).json({ error: 'No merchant profile found' });
     res.json({ partner });
   } catch (error) {
     console.error('Get supplier profile error:', error.message);
-    res.status(500).json({ error: 'Could not fetch supplier profile' });
+    res.status(500).json({ error: 'Could not fetch merchant profile' });
   }
 }
 
@@ -28,6 +29,26 @@ export async function getMySupplierPools(req, res) {
   } catch (error) {
     console.error('Get supplier pools error:', error.message);
     res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not fetch pools' });
+  }
+}
+
+export async function getMyOrderRequests(req, res) {
+  try {
+    const requests = await listOrderRequestsForMerchant(req.userId);
+    res.json({ requests });
+  } catch (error) {
+    console.error('Get order requests error:', error.message);
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not fetch group orders' });
+  }
+}
+
+export async function sendPoolOffer(req, res) {
+  try {
+    const offer = await submitOffer(req.userId, req.params.poolId, req.body);
+    res.json({ offer, message: 'Offer sent. You\'ll be notified if it is accepted.' });
+  } catch (error) {
+    console.error('Send offer error:', error.message);
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not send offer' });
   }
 }
 

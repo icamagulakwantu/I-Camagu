@@ -1,7 +1,8 @@
 import prisma from '../config/db.js';
+import { listOffersForPools, summarisePool } from './offerService.js';
 
 // Real, aggregated pooled demand — the actual leverage a founder takes into
-// a supplier negotiation ("we already have R14,000 of committed alcohol
+// a merchant conversation ("we already have R14,000 of committed drinks
 // orders in Motherwell"). Every number here comes straight off real
 // baskets and real SKU prices; nothing estimated or projected. Pools that
 // have already been FULFILLED are excluded — that demand has already been
@@ -63,70 +64,27 @@ export async function getDemandOverview() {
   };
 }
 
-// Pools with real, matched (MOQ-reached) demand but no confirmed supplier
-// yet — exactly the "go negotiate with this in hand" list. Each one is a
-// concrete, real number: real cases, real Rand value, real member count,
-// real area.
+// Group orders with no merchant confirmed yet, each with the offers
+// merchants have sent (cheapest first). The admin accepts the best one once
+// the order has reached its minimum.
 export async function listUnassignedPools() {
   const pools = await prisma.bulkPool.findMany({
-    where: { partnerId: null },
+    where: { partnerId: null, status: { in: ['OPEN', 'MATCHED'] } },
     include: { baskets: { include: { items: { include: { sku: true } } } } },
     orderBy: { createdAt: 'desc' },
+    take: 100,
   });
+  const offers = await listOffersForPools(pools.map((pool) => pool.id));
 
-  return pools.map((pool) => {
-    const activeBaskets = pool.baskets.filter((b) => b.status !== 'CANCELLED');
-    const cases = activeBaskets.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);
-    const valueZAR = activeBaskets.reduce(
-      (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity * parseFloat(i.sku?.casePriceZAR || 0), 0),
-      0
-    );
-    return {
-      id: pool.id,
-      category: pool.category,
-      area: pool.area,
-      status: pool.status,
-      moqTarget: pool.moqTarget,
-      cases,
-      valueZAR: Math.round(valueZAR * 100) / 100,
-      memberCount: new Set(activeBaskets.map((b) => b.userId)).size,
-      createdAt: pool.createdAt,
-    };
-  });
-}
-
-export async function listPartnersForAssignment() {
-  return prisma.partner.findMany({ orderBy: [{ type: 'asc' }, { name: 'asc' }] });
-}
-
-// Manually attaches a confirmed supplier to a pool — the step that happens
-// once a real deal is signed, whether the pool was formed before or after
-// that conversation. Only ever moves a pool toward having a partner, never
-// blocks anything if skipped.
-export async function assignPartnerToPool(poolId, partnerId) {
-  const pool = await prisma.bulkPool.findUnique({ where: { id: poolId } });
-  if (!pool) {
-    const err = new Error('Pool not found');
-    err.status = 404;
-    throw err;
-  }
-  if (pool.status === 'FULFILLED') {
-    const err = new Error('This pool has already been fulfilled');
-    err.status = 409;
-    throw err;
-  }
-
-  const partner = await prisma.partner.findUnique({ where: { id: partnerId } });
-  if (!partner) {
-    const err = new Error('Partner not found');
-    err.status = 404;
-    throw err;
-  }
-  if (partner.type !== pool.category) {
-    const err = new Error(`This pool is for ${pool.category}, but ${partner.name} is a ${partner.type} supplier`);
-    err.status = 400;
-    throw err;
-  }
-
-  return prisma.bulkPool.update({ where: { id: poolId }, data: { partnerId }, include: { partner: true } });
+  return pools.map((pool) => ({
+    ...summarisePool(pool),
+    offers: (offers[pool.id] || []).map((offer) => ({
+      id: offer.id,
+      partnerName: offer.partnerName,
+      partnerArea: offer.partnerArea,
+      totalPriceZAR: offer.totalPriceZAR,
+      note: offer.note,
+      status: offer.status,
+    })),
+  }));
 }
