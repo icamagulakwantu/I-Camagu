@@ -7,10 +7,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Canonical scales — the single source of truth for iCamagu's palette.
+        // Canonical scales: the single source of truth for iCamagu's palette.
         // `brand.*` and `success` below are kept only as aliases onto these same
-        // values, so every existing bg-brand-*/text-brand-* class site keeps
-        // working without a rewrite, instead of carrying its own near-duplicate hex.
+        // values, so every existing bg-brand-*/text-brand-* class keeps working.
         sage: {
           50: '#f4f7f4',
           100: '#e3ebe3',
@@ -22,9 +21,9 @@ export default {
           700: '#334e33',
         },
         cream: {
-          DEFAULT: '#f5f3ee',
-          dark: '#e8e4db',
-          darker: '#d4d0c8',
+          DEFAULT: '#f5f1e8',
+          dark: '#e9e2d4',
+          darker: '#d6cdbb',
         },
         terracotta: {
           light: '#e07a3f',
@@ -39,14 +38,13 @@ export default {
         ink: {
           DEFAULT: '#2b2620',
           light: '#4a443d',
-          // Slightly darker than the original #8a8278 so hint text stays
-          // readable on cream (meets the 4.5:1 contrast guideline).
+          // Dark enough that hint text stays readable on cream (4.5:1).
           muted: '#6b645a',
         },
-        // Aliases — each points at one of the canonical values above.
+        // Aliases: each points at one of the canonical values above.
         brand: {
           blue: '#4a7a4a',
-          cream: '#f5f3ee',
+          cream: '#f5f1e8',
           black: '#2b2620',
           ochre: '#c1922f',
           gold: '#c1922f',
@@ -55,8 +53,10 @@ export default {
         success: '#3d623d',
       },
       fontFamily: {
-        display: ['Playfair Display', 'Georgia', 'serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
+        // Fraunces: a soft, high-contrast serif for headings (classy, warm).
+        // Manrope: a clear, friendly sans for everything people read and tap.
+        display: ['Fraunces', 'Georgia', 'serif'],
+        body: ['Manrope', 'system-ui', 'sans-serif'],
       },
       borderWidth: {
         '3': '3px',
@@ -69,9 +69,9 @@ export default {
         '4xl': '24px',
       },
       boxShadow: {
-        'soft': '0 2px 12px rgba(0,0,0,0.04)',
-        'card': '0 4px 20px rgba(0,0,0,0.06)',
-        'elevated': '0 12px 40px rgba(0,0,0,0.1)',
+        'soft': '0 1px 2px rgba(43,38,32,0.04), 0 6px 16px -10px rgba(74,45,24,0.22)',
+        'card': '0 2px 4px rgba(43,38,32,0.04), 0 18px 36px -22px rgba(74,45,24,0.45)',
+        'elevated': '0 12px 40px rgba(43,38,32,0.12)',
         'glow': '0 0 20px rgba(74,122,74,0.2)',
         'terracotta': '0 6px 24px rgba(196,92,38,0.3)',
       },
