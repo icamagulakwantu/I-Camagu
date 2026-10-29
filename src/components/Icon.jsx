@@ -44,12 +44,17 @@ const PATHS = {
   copy: <><rect x="9" y="9" width="11" height="12" rx="1.5" /><path d="M6 15H5a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 015 3h9A1.5 1.5 0 0115.5 4.5V6" /></>,
   arrowDown: <path d="M12 5v14M6 13l6 6 6-6" />,
   arrowUp: <path d="M12 19V5M6 11l6-6 6 6" />,
+  // Used by Bulk Buy's department toggle and the "Lost page" screen; they
+  // were referenced before but missing, so they rendered as blank space.
+  'chevron-down': <path d="M6 9l6 6 6-6" />,
+  'chevron-up': <path d="M6 15l6-6 6 6" />,
+  compass: <><circle cx="12" cy="12" r="8.5" /><path d="M15.5 8.5l-2 5-5 2 2-5z" /></>,
   camera: <><path d="M4 8h3l1.5-2h7L17 8h3v11H4z" /><circle cx="12" cy="13" r="3.3" /></>,
   video: <><rect x="3" y="6" width="12" height="12" rx="1.5" /><path d="M15 10l6-3v10l-6-3z" /></>,
   file: <><path d="M6 3.5h8l4 4v13H6z" /><path d="M14 3.5v4h4" /></>,
   info: <><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5.5" /><path d="M12 8v.1" /></>,
   search: <><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></>,
-  // Ceremony marks — line-art badges matching the Lovable reference set.
+  // Ceremony marks: line-art badges matching the Lovable reference set.
   // Geometry from Lucide (ISC), redrawn here so we don't pull in the package.
   shieldCheck: <><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /><path d="m9 12 2 2 4-4" /></>,
   drum: <><path d="m2 2 8 8" /><path d="m22 2-8 8" /><ellipse cx="12" cy="9" rx="10" ry="5" /><path d="M7 13.4v7.9" /><path d="M12 14v8" /><path d="M17 13.4v7.9" /><path d="M2 9v8a10 5 0 0 0 20 0V9" /></>,
@@ -70,11 +75,8 @@ function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.75, cla
       width={size} height={size} viewBox="0 0 24 24" fill="none"
       stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"
       className={className}
-      // Every call site in the app pairs this with a visible text label
-      // (a button's own label, a heading, adjacent copy) — the icon itself
-      // carries no information a screen reader needs to announce on top
-      // of that, and left unmarked, an unlabeled inline SVG's accessible
-      // name is inconsistent across browsers/screen readers.
+      // Every call site pairs this with a visible text label, so the icon
+      // itself is hidden from screen readers.
       aria-hidden="true"
     >
       {path}
