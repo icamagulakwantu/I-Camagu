@@ -5,9 +5,17 @@ import PoolOfferCard from '../components/PoolOfferCard.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
+import BeadBand from '../components/ui/BeadBand.jsx'
 import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf, aisleOf } from '../data/storeTaxonomy.js'
 import { unitOf, collectiveNoun } from '../data/bulkUnits.js'
+
+// How bulk buying works, in three short steps instead of one long paragraph.
+const HOW_IT_WORKS = [
+  { n: 1, title: 'Add to your basket', desc: 'Pick drinks, meat, groceries or livestock.' },
+  { n: 2, title: 'Join a group order', desc: 'Your order is pooled with others near you.' },
+  { n: 3, title: 'Pay the bulk price', desc: 'Supplier confirms stock and the final price first.' },
+]
 
 function Store({ onGoToBasket, basketCount }) {
   const { accessToken } = useAuth()
@@ -99,11 +107,12 @@ function Store({ onGoToBasket, basketCount }) {
   return (
     <div className="min-h-screen pb-36 bg-cream">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-30 bg-cream/95 backdrop-blur-xl border-b border-cream-dark px-5 py-4">
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <h1 className="font-display font-bold text-2xl text-ink leading-tight">SmartMatch</h1>
-            <p className="text-xs font-semibold text-ink-muted mt-0.5">{location.label ? 'Near ' + location.label : 'Bulk buying'}{!loadingPools && pools.length > 0 ? ' · ' + pools.length + ' active pool' + (pools.length === 1 ? '' : 's') : ''}</p>
+      <div className="sticky top-0 z-30 bg-cream/95 backdrop-blur-xl border-b border-ink/[0.06] px-5 pt-5 pb-4">
+        <div className="flex items-end justify-between gap-2">
+          <div className="min-w-0">
+            <p className="eyebrow mb-1 text-terracotta">Thengani kunye</p>
+            <h1 className="font-display font-semibold text-[2rem] leading-[1.05] tracking-tight text-ink">Bulk Buy</h1>
+            <p className="text-xs font-semibold text-ink-muted mt-1">{location.label ? 'Near ' + location.label : 'Group orders at bulk prices'}{!loadingPools && pools.length > 0 ? ' · ' + pools.length + ' active pool' + (pools.length === 1 ? '' : 's') : ''}</p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -148,13 +157,26 @@ function Store({ onGoToBasket, basketCount }) {
         )}
       </div>
 
-      {/* SmartMatch explainer */}
-      <div className="wash-ember grain card-paper mx-4 mt-4 p-4">
-        <p className="eyebrow text-cream/75 mb-1">How SmartMatch works</p>
-        <p className="text-sm font-bold leading-snug text-cream">
-          Add items to your cart and explore pools that bring community demand together by area and category. Alcohol, soft drinks, groceries, meat, livestock and household supplies are kept separate so you can find what you need. Supplier availability, final prices and any savings must be confirmed before an order is placed.
-        </p>
-      </div>
+      {/* How bulk buying works */}
+      {!isSearching && (
+        <div className="wash-ember grain mx-4 mt-4 overflow-hidden rounded-[22px] shadow-card">
+          <div className="relative p-4">
+            <p className="eyebrow text-ochre-light mb-3">How Bulk Buy works</p>
+            <ol className="space-y-2.5">
+              {HOW_IT_WORKS.map((s) => (
+                <li key={s.n} className="flex items-start gap-3">
+                  <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-cream/15 font-display text-sm font-semibold text-cream ring-1 ring-cream/30">{s.n}</span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-bold leading-tight text-cream">{s.title}</span>
+                    <span className="block text-xs leading-snug text-cream/80">{s.desc}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <BeadBand thin className="relative" />
+        </div>
+      )}
 
       {!isSearching && (
         <>
@@ -163,7 +185,7 @@ function Store({ onGoToBasket, basketCount }) {
               type="button"
               aria-expanded={departmentsOpen}
               onClick={() => setDepartmentsOpen((open) => !open)}
-              className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white border border-cream-dark px-4 py-3 text-left shadow-soft"
+              className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white border border-ink/[0.06] px-4 py-3 text-left shadow-soft"
             >
               <span>
                 <span className="block text-[10px] uppercase tracking-[0.14em] font-bold text-ink-muted">Browse departments</span>
@@ -185,11 +207,11 @@ function Store({ onGoToBasket, basketCount }) {
           )}
 
           {!departmentsOpen && activeDepartment && (
-            <div className="flex gap-2 px-4 mt-3 overflow-x-auto pb-1">
+            <div className="flex gap-2 px-4 mt-3 overflow-x-auto pb-1 no-scrollbar">
               <button
                 onClick={() => setActiveAisle('all')}
                 className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
-                  activeAisle === 'all' ? 'bg-terracotta text-white' : 'bg-white border border-ink/10 text-ink-muted'
+                  activeAisle === 'all' ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
                 }`}
               >
                 All {activeDepartment.short.toLowerCase()}
@@ -199,7 +221,7 @@ function Store({ onGoToBasket, basketCount }) {
                   key={a.id}
                   onClick={() => setActiveAisle(a.id)}
                   className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
-                    activeAisle === a.id ? 'bg-terracotta text-white' : 'bg-white border border-ink/10 text-ink-muted'
+                    activeAisle === a.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
                   }`}
                 >
                   {a.name}
@@ -217,11 +239,11 @@ function Store({ onGoToBasket, basketCount }) {
       )}
 
       {!isSearching && activeDepartment && (
-        <div className="px-5 mt-5">
+        <div className="px-5 mt-6">
           <div className="flex items-end justify-between gap-3">
             <div>
-              <p className="eyebrow text-terracotta/80">Shop by department</p>
-              <h2 className="font-display text-xl font-bold text-ink">{activeDepartment.name}</h2>
+              <p className="eyebrow text-terracotta">Shop by department</p>
+              <h2 className="font-display text-[1.4rem] font-semibold leading-tight text-ink">{activeDepartment.name}</h2>
               <p className="text-xs text-ink-muted mt-1">Choose a product, check its pack size, then add it to your basket.</p>
             </div>
             <span className="text-xs font-semibold text-ink-muted">{skus.length} item{skus.length === 1 ? '' : 's'}</span>
@@ -256,26 +278,33 @@ function Store({ onGoToBasket, basketCount }) {
               return (
                 <div key={sku.id} className="card-paper flex flex-col min-w-0 overflow-hidden p-3">
                   <div className="flex flex-col min-w-0">
-                    {sku.imageUrl && !failedImageIds.has(sku.id) ? (
-                      <img src={sku.imageUrl} alt={`${sku.name}${sku.bottleFormat ? `, ${sku.bottleFormat}` : ''}`} className="w-full h-32 object-contain bg-white rounded-xl mb-3" loading="lazy" decoding="async" onError={() => setFailedImageIds((current) => new Set(current).add(sku.id))} />
-                    ) : (
-                      <span className="w-full h-32 bg-terracotta/10 rounded-xl mb-3 flex items-center justify-center">
-                        <Icon name={dept.id === 'alcohol' ? 'cocktail' : 'package'} size={28} color="#c45c26" />
-                      </span>
-                    )}
+                    <div className="relative">
+                      {sku.imageUrl && !failedImageIds.has(sku.id) ? (
+                        <img src={sku.imageUrl} alt={`${sku.name}${sku.bottleFormat ? `, ${sku.bottleFormat}` : ''}`} className="w-full h-32 object-contain bg-white rounded-xl mb-3" loading="lazy" decoding="async" onError={() => setFailedImageIds((current) => new Set(current).add(sku.id))} />
+                      ) : (
+                        <span className="w-full h-32 bg-terracotta/10 rounded-xl mb-3 flex items-center justify-center">
+                          <Icon name={dept.id === 'alcohol' ? 'cocktail' : 'package'} size={28} color="#c45c26" />
+                        </span>
+                      )}
+                      {savings !== null && (
+                        <span className="absolute left-1.5 top-1.5 rounded-pill bg-sage-600 px-2 py-0.5 text-[10px] font-black text-white shadow-soft">
+                          Save R{savings.toFixed(0)}
+                        </span>
+                      )}
+                    </div>
                     <div className="min-w-0 py-1">
-                      <p className="eyebrow text-terracotta/70">{dept.short}</p>
-                      <h3 className="font-display font-bold text-sm text-ink leading-snug min-h-[2.5rem]">{sku.name}</h3>
+                      <p className="eyebrow text-terracotta/80">{dept.short}</p>
+                      <h3 className="font-display font-semibold text-[15px] text-ink leading-snug min-h-[2.5rem]">{sku.name}</h3>
                       <p className="text-[11px] text-ink-muted min-h-8 mt-1">
                         {sku.bottleFormat ? `${sku.bottleFormat} • ` : ''}
                         {sku.unitsPerCase > 1 ? `${sku.unitsPerCase} per ${unitOf(sku)}` : `per ${unitOf(sku)}`}
                       </p>
-                      <p className="text-sm font-bold text-terracotta">
-                        {casePrice != null ? `R${casePrice.toFixed(2)} / ${unitOf(sku)}` : 'Price coming soon'}
+                      <p className="text-sm font-bold text-ink tabular">
+                        {casePrice != null ? <>R{casePrice.toFixed(2)} <span className="font-medium text-ink-muted">/ {unitOf(sku)}</span></> : 'Price coming soon'}
                       </p>
-                      {savings !== null && (
-                        <p className="text-[11px] font-bold text-sage-700">
-                          Save R{savings.toFixed(2)} vs retail
+                      {savings !== null && retail && (
+                        <p className="text-[11px] text-ink-muted line-through tabular">
+                          R{retail.toFixed(2)} retail
                         </p>
                       )}
                       {collectiveNoun(sku) && (
@@ -286,7 +315,7 @@ function Store({ onGoToBasket, basketCount }) {
                     </div>
                   </div>
                   {casePrice != null ? (
-                    <div className="flex flex-col gap-2 mt-3">
+                    <div className="flex flex-col gap-2 mt-auto pt-3">
                       <button
                         onClick={() => addToBasket(sku)}
                         disabled={addingId === sku.id}
@@ -294,8 +323,8 @@ function Store({ onGoToBasket, basketCount }) {
                       >
                         {addingId === sku.id ? <Icon name="check" size={13} color="#fff" strokeWidth={2.5} /> : `Add ${unitOf(sku)}`}
                       </button>
-                      <button type="button" onClick={() => setOfferSku(sku)} className="w-full border border-terracotta text-terracotta text-xs font-bold px-3 py-2 rounded-pill">
-                        Pool offers
+                      <button type="button" onClick={() => setOfferSku(sku)} className="w-full bg-terracotta/10 text-terracotta-dark text-xs font-bold px-3 py-2 rounded-pill">
+                        Group offers
                       </button>
                     </div>
                   ) : (
@@ -320,11 +349,11 @@ function DeptTile({ label, xhosa, active, onClick }) {
       onClick={onClick}
       aria-pressed={active}
       className={`w-full min-h-16 flex flex-col items-start justify-center rounded-2xl px-3 py-3 text-left transition-colors active:scale-[0.97] ${
-        active ? 'bg-terracotta' : 'bg-white border border-cream-dark'
+        active ? 'bg-ink shadow-soft' : 'bg-white border border-ink/[0.06] shadow-soft'
       }`}
     >
       <span className={`text-[13px] font-bold leading-tight ${active ? 'text-white' : 'text-ink'}`}>{label}</span>
-      <span className={`text-[10px] mt-1 ${active ? 'text-white/70' : 'text-ink-muted'}`}>{xhosa}</span>
+      <span className={`text-[10px] mt-1 ${active ? 'text-ochre-light' : 'text-ink-muted'}`}>{xhosa}</span>
     </button>
   )
 }
