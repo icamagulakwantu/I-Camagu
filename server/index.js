@@ -16,6 +16,7 @@ import prisma from './config/db.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
 import { backfillHennessyProductImages } from './scripts/backfill-hennessy-product-images.js';
 import { backfillRequestedProductImages } from './scripts/backfill-requested-product-images.js';
+import { backfillUploadedProductImages } from './scripts/backfill-uploaded-product-images.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -189,6 +190,13 @@ if (startup.schemaReady) {
     await backfillRequestedProductImages();
   } catch (err) {
     console.error('Requested product image correction failed:', err?.message);
+  }
+  // Fill only blank image URLs for the newly uploaded, locally hosted assets.
+  // Existing catalogue images and all non-image SKU fields are preserved.
+  try {
+    await backfillUploadedProductImages();
+  } catch (err) {
+    console.error('Uploaded product image backfill failed:', err?.message);
   }
 }
 
