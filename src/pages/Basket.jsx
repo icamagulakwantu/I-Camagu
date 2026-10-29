@@ -309,7 +309,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
         <button
           type="button"
           onClick={onBack}
-          className="text-xs font-bold text-sage-600 hover:text-sage-700 uppercase tracking-wider flex items-center gap-1"
+          className="cursor-pointer text-xs font-bold text-sage-600 hover:text-sage-700 uppercase tracking-wider flex items-center gap-1"
         >
           ← Back to Store
         </button>
@@ -317,7 +317,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           <button
             type="button"
             onClick={shareBasket}
-            className="bg-terracotta text-cream text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform flex items-center gap-1.5"
+            className="cursor-pointer bg-terracotta text-cream text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform flex items-center gap-1.5"
           >
             {copied ? 'Copied!' : <><Icon name="share" size={12} color="#fdf8f0" /> Share Cart</>}
           </button>
@@ -334,7 +334,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
             <p className="text-[10px] font-black uppercase tracking-wider text-sage-700">
               {joiningPool.isMine ? 'Shopping for your pool' : 'You were invited to a pool'}
             </p>
-            <button type="button" onClick={dismissJoiningPool} className="text-ink/40 hover:text-ink/70 text-xs font-bold shrink-0">
+            <button type="button" onClick={dismissJoiningPool} className="cursor-pointer text-ink/40 hover:text-ink/70 text-xs font-bold shrink-0">
               {joiningPool.isMine ? 'Cancel' : 'Not now'}
             </button>
           </div>
@@ -361,14 +361,16 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">
             Smart Match — {CATEGORY_LABEL[poolStatus.category]}
           </p>
-          {poolStatus.partnerName && (
+          {/* Only shown once the admin has accepted a merchant's offer on this
+              group order — members never choose a merchant themselves. */}
+          {poolStatus.poolStatus !== 'OPEN' && poolStatus.partnerName && (
             <p className="text-[11px] font-bold text-white/90 mb-1 flex items-center gap-1">
-              <Icon name="check" size={11} color="#fff" /> Confirmed supplier: {poolStatus.partnerName}
+              <Icon name="check" size={11} color="#fff" /> Best offer confirmed: {poolStatus.partnerName}
             </p>
           )}
           <p className="text-sm font-bold mb-1">
             {poolStatus.poolStatus === 'OPEN'
-              ? `Pooling with other members near ${poolStatus.area}. More joined demand may help us request a better quote; any discount depends on confirmed supplier terms.`
+              ? `Pooling with other members near ${poolStatus.area}. Merchants send offers on the whole group order — the more people join, the stronger the offers can be.`
               : poolStatus.poolStatus === 'FULFILLED'
                 ? 'Delivered/collected — your order is complete.'
                 : 'Matched! Your order pooled with other members.'}
@@ -386,23 +388,23 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
               {poolStatus.poolStatus === 'FULFILLED' ? (
                 <p className="text-xs text-white/90 mb-2">This order is done — see the full record any time in My Orders.</p>
               ) : poolStatus.payment?.status === 'CLEARED' ? (
-                <p className="text-xs text-white/90 mb-2">Your payment is confirmed — waiting on the supplier to fulfil the order.</p>
+                <p className="text-xs text-white/90 mb-2">Your payment is confirmed — waiting on the merchant to fulfil the order.</p>
               ) : poolStatus.payment?.hasReference ? (
-                <p className="text-xs text-white/90 mb-2">Your EFT reference is in — waiting on the supplier to confirm receipt.</p>
+                <p className="text-xs text-white/90 mb-2">Your EFT reference is in — waiting on the merchant to confirm receipt.</p>
               ) : !poolStatus.partnerName ? (
                 <p className="text-xs text-white/90 mb-2">
-                  MOQ reached! We're finalizing a supplier for this pool now — payment details will show here as soon as one is confirmed.
+                  Minimum reached! Merchants are sending offers on this group order — payment details will show here once the best offer is confirmed.
                 </p>
               ) : (
                 <p className="text-xs text-white/90 mb-2">
-                  MOQ reached — pay your share (R{poolStatus.payment?.amountZAR ? Number(poolStatus.payment.amountZAR).toFixed(2) : '—'}) via EFT and enter your reference in My Orders.
+                  Minimum reached — pay your share (R{poolStatus.payment?.amountZAR ? Number(poolStatus.payment.amountZAR).toFixed(2) : '—'}) via EFT and enter your reference in My Orders.
                 </p>
               )}
               {onGoToOrders && (
                 <button
                   type="button"
                   onClick={onGoToOrders}
-                  className="bg-white text-terracotta text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform"
+                  className="cursor-pointer bg-white text-terracotta text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform"
                 >
                   Track my order →
                 </button>
@@ -484,14 +486,14 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                     type="button"
                     onClick={() => shopForPool(poolStatus)}
                     disabled={isShoppingThisPool}
-                    className="bg-white text-terracotta text-xs font-black px-3 py-2.5 rounded-pill shadow-soft active:scale-95 transition-transform flex items-center justify-center gap-1.5 disabled:opacity-80"
+                    className="cursor-pointer bg-white text-terracotta text-xs font-black px-3 py-2.5 rounded-pill shadow-soft active:scale-95 transition-transform flex items-center justify-center gap-1.5 disabled:opacity-80"
                   >
                     <Icon name="cart" size={12} color="#c45c26" /> {isShoppingThisPool ? 'Shopping for this' : 'Add to this pool'}
                   </button>
                   <button
                     type="button"
                     onClick={() => inviteToSmartMatch(poolStatus)}
-                    className="bg-white/15 border border-white/40 text-white text-xs font-black px-3 py-2.5 rounded-pill active:scale-95 transition-transform flex items-center justify-center gap-1.5"
+                    className="cursor-pointer bg-white/15 border border-white/40 text-white text-xs font-black px-3 py-2.5 rounded-pill active:scale-95 transition-transform flex items-center justify-center gap-1.5"
                   >
                     {invitedId === poolStatus.poolId ? 'Copied!' : <><Icon name="send" size={12} color="#fff" /> Invite</>}
                   </button>
@@ -500,7 +502,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                   type="button"
                   onClick={() => cancelParkedBasket(poolStatus)}
                   disabled={cancellingId === poolStatus.poolId}
-                  className="mt-2 text-xs font-bold text-white/85 underline disabled:opacity-50"
+                  className="cursor-pointer mt-2 text-xs font-bold text-white/85 underline disabled:opacity-50"
                 >
                   {cancellingId === poolStatus.poolId ? 'Withdrawing...' : 'Withdraw from this pool'}
                 </button>
@@ -570,7 +572,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                               type="button"
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
                               aria-label={`Decrease quantity of ${item.sku?.name || 'item'}`}
-                              className="w-11 h-11 rounded-pill bg-cream-dark text-ink font-bold active:scale-90 transition-transform"
+                              className="cursor-pointer w-11 h-11 rounded-pill bg-cream-dark text-ink font-bold active:scale-90 transition-transform"
                             >
                               −
                             </button>
@@ -579,7 +581,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                               type="button"
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               aria-label={`Increase quantity of ${item.sku?.name || 'item'}`}
-                              className="w-11 h-11 rounded-pill bg-sage-500 text-white font-bold active:scale-90 transition-transform"
+                              className="cursor-pointer w-11 h-11 rounded-pill bg-sage-500 text-white font-bold active:scale-90 transition-transform"
                             >
                               +
                             </button>
@@ -635,7 +637,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
               </div>
             ) : (
               <p className="text-xs text-ink-muted mb-3">
-                iCamagu pools your cart with other members buying the same kind of thing near you. Drinks and other items go to their own pools.
+                iCamagu pools your cart with other members buying the same kind of thing near you. You don't choose a shop — merchants send offers on the whole group order.
               </p>
             )}
 
@@ -657,7 +659,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
               type="button"
               onClick={submitToPool}
               disabled={submitting}
-              className="w-full bg-sage-500 hover:bg-sage-600 text-white font-bold py-3 rounded-pill shadow-glow active:scale-[0.96] transition-transform text-sm disabled:opacity-50"
+              className="cursor-pointer w-full bg-sage-500 hover:bg-sage-600 text-white font-bold py-3 rounded-pill shadow-glow active:scale-[0.96] transition-transform text-sm disabled:opacity-50"
             >
               {submitting ? 'Submitting...' : joiningPool || myOpenPools.length ? 'Add Cart to My Pool' : 'Submit Cart to Bulk Pool'}
             </button>
