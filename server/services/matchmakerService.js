@@ -4,6 +4,12 @@ import { notifyAdminOfSmartMatchTier } from './notificationService.js';
 import { newPoolWindow, isPoolWindowClosed } from '../utils/poolWindow.js';
 import { generateUniqueReference } from '../utils/referenceGenerator.js';
 
+// Legacy label for pools opened before an area was required. Never matched
+// into again, so members with a real area stop being routed to it.
+export const UNSPECIFIED_AREA = 'Unspecified';
+
+export const AREA_REQUIRED_MESSAGE = 'Please add your area (town or suburb) to your profile before joining a pool, so we can match you with people near you.';
+
 // Serialize a pool join against matching. The lock is held until the
 // caller's transaction commits, so a match cannot close the pool between the
 // status check and the new basket being created.
@@ -52,8 +58,6 @@ function generateGroupCode(tx) {
 // and it's what a supplier splitting a matched pool's physical stock (e.g.
 // 6 pallets) labels that member's portion with — so one glance at a
 // reference tells you both "who paid this" and "whose order this is".
-// Before this, every member in the same pool was told to use the pool's
-// shared groupCode for both, which couldn't distinguish either one.
 function generateOrderReference(tx) {
   return generateUniqueReference('ORD', async (code) => !!(await tx.basket.findUnique({ where: { orderReference: code } })));
 }
@@ -87,16 +91,6 @@ function tierBasisForCategory(category) {
   return category === 'TAVERN' ? 'PALLETS' : 'AMOUNT';
 }
 
-// Finds (or opens) the pool for this category+area — no Partner required.
-// Pool formation must never depend on a confirmed supplier existing yet
-// (the founder's explicit call): members can always form and join a pool;
-// which real distributor eventually fulfils it is a separate, later step.
-//
-// targetDate only matters when a *new* pool is being opened — it's the
-// date whoever starts the pool chose (e.g. "this is for December"), not a
-// fixed universal timer. Joining an already-open pool inherits whatever
-// deadline (or lack of one) that pool already has; one later member can't
-// silently shorten or remove the date everyone already in it is relying on.
 function normaliseArea(value) {
   return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .trim().toLocaleLowerCase().replace(/\s+/g, ' ');
@@ -111,30 +105,65 @@ function distanceKm(aLat, aLon, bLat, bLon) {
   return 6371 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
 }
 
-async function findOrCreateOpenPool(category, area, targetDate, user) {
+const activeCases = (pool) => pool.baskets
+  .filter((basket) => basket.status !== 'CANCELLED')
+  .reduce((sum, basket) => sum + basket.items.reduce((n, item) => n + item.quantity, 0), 0);
+
+// True when a pool can still take `incomingCases` more without closing or
+// hitting its cap — checked up front so a full pool is skipped instead of
+// failing the whole checkout inside lockOpenPoolForJoin.
+function poolCanTake(pool, incomingCases) {
+  const currentCases = activeCases(pool);
+  if (isPoolWindowClosed(pool, currentCases)) return false;
+  if (pool.capCases != null && currentCases + incomingCases > pool.capCases) return false;
+  return true;
+}
+
+// The open pool this member is ALREADY in for this category, if any. Shopping
+// again must add to that pool, not open (or land in) a different one — this
+// was the "every time I shop it creates a new pool" flaw.
+async function findMyOpenPool(userId, category, incomingCases) {
+  const parked = await prisma.basket.findMany({
+    where: {
+      userId,
+      status: 'PARKED',
+      pool: { category, status: 'OPEN', area: { not: UNSPECIFIED_AREA } },
+    },
+    orderBy: { updatedAt: 'desc' },
+    take: 5,
+    include: { pool: { include: { partner: true, baskets: { include: { items: true } } } } },
+  });
+  for (const basket of parked) {
+    if (basket.pool && poolCanTake(basket.pool, incomingCases)) return basket.pool;
+  }
+  return null;
+}
+
+// Finds (or opens) the pool for this category+area — no Partner required.
+// Pool formation must never depend on a confirmed supplier existing yet
+// (the founder's explicit call): members can always form and join a pool;
+// which real distributor eventually fulfils it is a separate, later step.
+//
+// targetDate only matters when a *new* pool is being opened — joining an
+// already-open pool inherits whatever deadline that pool already has.
+async function findOrCreateOpenPool(category, area, targetDate, user, incomingCases = 0) {
   const partner = await pickBestPartnerForCategory(area, category);
   const candidates = await prisma.bulkPool.findMany({
-    where: { category, status: 'OPEN' },
+    where: { category, status: 'OPEN', area: { not: UNSPECIFIED_AREA } },
     include: { partner: true, baskets: { include: { items: true } } },
     orderBy: { createdAt: 'desc' },
     take: 100,
   });
+  const hasUserCoordinates = Number.isFinite(user?.latitude) && Number.isFinite(user?.longitude);
   let pool = candidates.find((candidate) => {
-    const hasUserCoordinates = Number.isFinite(user?.latitude) && Number.isFinite(user?.longitude);
+    if (!poolCanTake(candidate, incomingCases)) return false;
     const hasPoolCoordinates = Number.isFinite(candidate.latitude) && Number.isFinite(candidate.longitude);
     if (hasUserCoordinates && hasPoolCoordinates) {
       return distanceKm(user.latitude, user.longitude, candidate.latitude, candidate.longitude) <= (candidate.radiusKm || 20);
     }
-    // Legacy pools without coordinates remain discoverable by normalized
-    // town names; case and surrounding whitespace no longer split a pool.
+    // Pools without coordinates remain discoverable by normalized town names.
     return normaliseArea(area) && normaliseArea(area) === normaliseArea(candidate.area);
-  });
-  if (pool) {
-    const currentCases = pool.baskets
-      .filter((basket) => basket.status !== 'CANCELLED')
-      .reduce((sum, basket) => sum + basket.items.reduce((n, item) => n + item.quantity, 0), 0);
-    if (isPoolWindowClosed(pool, currentCases)) pool = null;
-  }
+  }) || null;
   if (!pool) {
     // Use a supplier's recorded minimum when one exists. The 50-case value
     // remains a clearly documented fallback, not a substitute for real MOQ.
@@ -142,9 +171,9 @@ async function findOrCreateOpenPool(category, area, targetDate, user) {
     pool = await prisma.bulkPool.create({
       data: {
         category,
-        area: area || 'Unspecified',
-        latitude: Number.isFinite(user?.latitude) ? user.latitude : null,
-        longitude: Number.isFinite(user?.longitude) ? user.longitude : null,
+        area,
+        latitude: hasUserCoordinates ? user.latitude : null,
+        longitude: hasUserCoordinates ? user.longitude : null,
         createdById: user?.id || null,
         radiusKm: 20,
         moqTarget,
@@ -169,17 +198,7 @@ async function findOrCreateOpenPool(category, area, targetDate, user) {
 // Picks the best-fit confirmed partner of a category for a pool in a given
 // area, if one exists — used only to auto-attach a "partner store" badge to
 // a pool that already exists on its own; never a gate on whether the pool
-// itself can form. No manual choice for members either way: which outlet
-// is right depends on facts the app has (area, who's already close to
-// their bulk-pricing minimum), not something a member has a real basis to
-// pick between.
-//
-// Real distance would be the sharper signal, but today's real partners
-// carry no lat/lng at all (none has been entered yet) — scoring on it would
-// just be fabricated precision. So: same declared area first, then "order
-// volume" (prefer whichever partner's open pool is already furthest toward
-// its MOQ, so a pool helps an existing one clear instead of starting a
-// fresh wait from zero), then partner name for a stable result.
+// itself can form. Same declared area first, then order volume, then name.
 export async function pickBestPartnerForCategory(area, category) {
   const partners = await prisma.partner.findMany({
     where: { type: category },
@@ -196,9 +215,7 @@ export async function pickBestPartnerForCategory(area, category) {
 
   const scored = partners.map((partner) => {
     const openPool = partner.pools[0] || null;
-    const currentCases = openPool
-      ? openPool.baskets.filter((b) => b.status !== 'CANCELLED').reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0)
-      : 0;
+    const currentCases = openPool ? activeCases(openPool) : 0;
     const progress = openPool ? Math.min(1, currentCases / openPool.moqTarget) : 0;
     const sameArea = area && normaliseArea(partner.area) === normaliseArea(area) ? 1 : 0;
 
@@ -214,11 +231,8 @@ export async function pickBestPartnerForCategory(area, category) {
   return scored[0].partner;
 }
 
-// Real tier milestones — pallets for an alcohol pool, Rand pooled for a
-// groceries/livestock one (see smartMatchTiers.js) — applied to the pool's
-// real numbers. Emails the admin (never an external supplier or
-// manufacturer) the first time a pool reaches a new tier, so the founder
-// knows when there's genuinely enough volume to go negotiate.
+// Emails the admin the first time a pool reaches a new SmartMatch tier, so
+// the founder knows when there's genuinely enough volume to go negotiate.
 async function notifySmartMatchTierIfCrossed(pool, currentCases, currentAmountZAR) {
   const ladder = resolveTierLadder(pool);
   const metric = (pool.tierBasis || 'PALLETS') === 'AMOUNT' ? currentAmountZAR : palletsForCases(currentCases);
@@ -232,23 +246,25 @@ async function notifySmartMatchTierIfCrossed(pool, currentCases, currentAmountZA
   await notifyAdminOfSmartMatchTier(pool, tier, currentCases, currentAmountZAR);
 }
 
-// A member tapped a real "join this pool" invite link (see Basket.jsx /
-// inviteToSmartMatch) rather than arriving through normal category+area
-// auto-matching. The pool is still returned even if it's no longer OPEN
-// (its category is needed either way, to know which basket group the
-// invite was for) — callers check `.status === 'OPEN'` themselves before
-// treating it as joinable, so a closed/matched target degrades to "this
-// category falls back to normal auto-matching" instead of silently
-// losing track of what the invite was even for.
+// A pool the member chose explicitly — via an invite link OR the "Add to this
+// pool" button on a pool they're already in. Returned even if no longer OPEN
+// (its category is still needed); callers check `.status === 'OPEN'`.
 async function getInvitedPool(joinPoolId) {
   if (!joinPoolId) return null;
-  return prisma.bulkPool.findUnique({ where: { id: joinPoolId }, include: { partner: true } });
+  return prisma.bulkPool.findUnique({
+    where: { id: joinPoolId },
+    include: { partner: true, baskets: { include: { items: true } } },
+  });
 }
 
 // One parking primitive for both full-basket checkout and the ceremony
 // planner's item-level pool join. Existing draft items are moved atomically;
 // planner items are created directly in the parked basket, never as a second
 // draft cart (the user has at most one DRAFT basket).
+//
+// mergeIntoExisting: for plain checkout, if the member already has a plain
+// personal PARKED basket in this pool, the items join THAT basket — one spot
+// per member per pool, instead of a new card every time they shop.
 export async function parkItemsIntoPool({
   userId,
   poolId,
@@ -260,19 +276,32 @@ export async function parkItemsIntoPool({
   ceremonyCostItemId = null,
   fundingSource = 'PERSONAL',
   fundingStokvelId = null,
+  mergeIntoExisting = false,
 }) {
   if (!userId || !poolId) throw new Error('userId and poolId are required');
   if (!itemIds.length && !itemSpecs.length) throw new Error('At least one item is required');
   return prisma.$transaction(async (tx) => {
     // Calculate the exact incoming case count while holding the pool lock.
-    // Both invited joins and checklist-item joins pass through this path.
     const movedItems = itemIds.length
       ? await tx.basketItem.findMany({ where: { id: { in: itemIds } }, select: { quantity: true } })
       : [];
     const incomingCases = itemSpecs.reduce((sum, item) => sum + item.quantity, 0)
       + movedItems.reduce((sum, item) => sum + item.quantity, 0);
     await lockOpenPoolForJoin(tx, poolId, incomingCases);
-    const basket = await tx.basket.create({
+
+    const canMerge = mergeIntoExisting && !itemSpecs.length && !ceremonyId && !checklistItemId
+      && !ceremonyCostItemId && fundingSource === 'PERSONAL';
+    const existing = canMerge
+      ? await tx.basket.findFirst({
+          where: {
+            userId, poolId, status: 'PARKED', fundingSource: 'PERSONAL',
+            ceremonyId: null, checklistItemId: null, ceremonyCostItemId: null,
+          },
+          orderBy: { updatedAt: 'desc' },
+        })
+      : null;
+
+    const basket = existing || await tx.basket.create({
       data: {
         userId,
         status: 'PARKED',
@@ -285,7 +314,6 @@ export async function parkItemsIntoPool({
         stokvelId: fundingSource === 'STOKVEL' ? fundingStokvelId : null,
         ...(itemSpecs.length ? { items: { create: itemSpecs.map((item) => ({ skuId: item.skuId, quantity: item.quantity })) } } : {}),
       },
-      include: { items: { include: { sku: true } } },
     });
     if (itemIds.length) {
       const moved = await tx.basketItem.updateMany({
@@ -297,7 +325,10 @@ export async function parkItemsIntoPool({
       });
       if (moved.count !== itemIds.length) throw new Error('One or more basket items changed before they could be parked');
     }
-    return basket;
+    // Bump updatedAt so a merged basket sorts as the member's latest activity.
+    if (existing) await tx.basket.update({ where: { id: basket.id }, data: { status: 'PARKED' } });
+    const full = await tx.basket.findUnique({ where: { id: basket.id }, include: { items: { include: { sku: true } } } });
+    return { ...full, merged: Boolean(existing) };
   });
 }
 
@@ -312,9 +343,6 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
   if (!basket) throw new Error('Basket not found or already submitted');
   if (basket.items.length === 0) throw new Error('Basket is empty');
 
-  // Optional — "this cart is for December" instead of a fixed 72-hour
-  // window. Only matters if a brand-new pool ends up getting opened; an
-  // existing open pool keeps whatever deadline it already has.
   let parsedTargetDate = null;
   if (targetDate) {
     const d = new Date(targetDate);
@@ -323,19 +351,14 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
     parsedTargetDate = d;
   }
 
-  // A member's own declared area is what a pool is scoped by — a partner,
-  // if and when one gets attached, doesn't need to be in the same area
-  // (a national wholesaler like Makro isn't "local" the way a single
-  // tavern is); it's just the best-effort match for that category.
-  const area = user?.location?.trim() || 'Unspecified';
+  // A pool is scoped by the member's own declared area. Without one we used
+  // to file people under "Unspecified", splitting neighbours into separate
+  // pools — so an area is now required before pooling.
+  const area = user?.location?.trim();
+  if (!area) throw new Error(AREA_REQUIRED_MESSAGE);
 
-  // A basket can hold both alcohol and non-alcohol items, but a pool is
-  // always one category — split by what each item actually needs, and
-  // submit each group to its own pool. Every group gets a pool: forming
-  // and joining a pool must never depend on whether a confirmed supplier
-  // exists yet for that category (the founder's explicit call) — a real
-  // partner attaches automatically when one matches, or later once a deal
-  // is signed, but the pool itself always works.
+  // A basket can hold items from several categories, but a pool is always one
+  // category — split by what each item needs and submit each group to its own pool.
   const groups = new Map();
   for (const item of basket.items) {
     const category = categoryForSku(item.sku);
@@ -343,31 +366,34 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
     groups.get(category).push(item);
   }
 
-  // Resolved once, up front, so a multi-category basket can tell "this is
-  // the category the invite link was actually for" apart from "this
-  // category has nothing to do with the invite" when building submissions
-  // below — a joinPoolId only ever targets one category.
   const invitedPool = await getInvitedPool(joinPoolId);
   const joinPoolCategory = invitedPool?.category ?? null;
 
   const submissions = [];
 
   for (const [category, items] of groups) {
+    const incomingCases = items.reduce((sum, item) => sum + item.quantity, 0);
     const isInvitedCategory = Boolean(joinPoolId) && category === joinPoolCategory;
-    const invitedPoolStillJoinable = isInvitedCategory && invitedPool.status === 'OPEN';
-    const pool = invitedPoolStillJoinable ? invitedPool : (await findOrCreateOpenPool(category, area, parsedTargetDate, user));
+    const invitedPoolStillJoinable = isInvitedCategory && invitedPool.status === 'OPEN'
+      && poolCanTake(invitedPool, incomingCases);
 
-    // Each group gets its own basket row so it can be parked against its own
-    // pool independently of the others. It is created already PARKED, never
-    // as a second DRAFT: the database allows exactly one DRAFT basket per
-    // member (the member's open cart, which is still `basket` here), so
-    // creating another DRAFT is what failed with "Unique constraint failed
-    // on the fields: (userId)".
-    const groupBasket = await parkItemsIntoPool({
+    // Order of preference: the pool they explicitly chose, then the pool they
+    // are already in for this category, and only then the nearest open pool
+    // (or a brand-new one).
+    let pool = invitedPoolStillJoinable ? invitedPool : null;
+    let joinedOwnPool = false;
+    if (!pool) {
+      pool = await findMyOpenPool(userId, category, incomingCases);
+      joinedOwnPool = Boolean(pool);
+    }
+    if (!pool) pool = await findOrCreateOpenPool(category, area, parsedTargetDate, user, incomingCases);
+
+    const parked = await parkItemsIntoPool({
       userId,
       poolId: pool.id,
       sourceBasketId: basket.id,
       itemIds: items.map((item) => item.id),
+      mergeIntoExisting: true,
     });
 
     const result = await checkAndMatchPool(pool.id);
@@ -380,19 +406,16 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
       currentCases: result.currentCases,
       moqTarget: pool.moqTarget,
       groupCode: result.groupCode,
-      // Only defined for the category an invite link actually targeted:
-      // true means they landed in the exact pool they were invited to;
-      // false means that pool had already closed or matched by the time
-      // they submitted, so they were matched into a fresh one in their
-      // own area instead — surfaced honestly rather than silently
-      // substituted. undefined for every other category in the basket,
-      // since the invite never applied to those.
+      // true when the items went into a pool this member was already in
+      // (either chosen, or picked automatically) rather than a new one.
+      addedToExistingPool: joinedOwnPool || parked.merged,
+      // Only defined for the category an invite link targeted: false means
+      // that pool had closed, so they were matched elsewhere — said honestly.
       joinedInvitedPool: isInvitedCategory ? invitedPoolStillJoinable : undefined,
     });
   }
 
-  // Every item has now moved into its own parked basket, so the original
-  // open cart is empty. Remove it so the member starts a fresh cart next time.
+  // Every item has now moved into a parked basket, so the open cart is empty.
   await prisma.basket.deleteMany({ where: { id: basket.id, status: 'DRAFT', items: { none: {} } } });
 
   return { submissions };
@@ -410,8 +433,7 @@ export async function checkAndMatchPool(poolId) {
     (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0),
     0
   );
-  // Real Rand pooled so far — only used by AMOUNT-basis pools (groceries,
-  // livestock), computed off each item's real casePriceZAR, never guessed.
+  // Real Rand pooled so far — only used by AMOUNT-basis pools.
   const currentAmountZAR = activeBaskets.reduce(
     (sum, b) => sum + b.items.reduce((s, i) => s + i.quantity * parseFloat(i.sku?.casePriceZAR || 0), 0),
     0
@@ -423,25 +445,15 @@ export async function checkAndMatchPool(poolId) {
     return { matched: false, currentCases };
   }
 
-  // MOQ reached — but two members' submissions can both read the pool as
-  // still OPEN and both land here around the same time (this function is
-  // called from submitBasketToPool on every submission). Without a guard,
-  // both would try to create this pool's OrderConfirmationDocument, which
-  // is unique per poolId — the loser would throw a raw Prisma constraint
-  // error even though their own basket really had just been parked into
-  // the now-matched pool. The whole claim-through-payments sequence runs
-  // in one transaction: the OPEN -> MATCHED update only succeeds for one
-  // concurrent caller (Postgres row-locks it), and if anything after that
-  // fails, the transaction rolls back the status flip too — no pool stuck
-  // at MATCHED with no document, no half-created payments.
+  // MOQ reached. The whole claim-through-payments sequence runs in one
+  // transaction: the OPEN -> MATCHED update only succeeds for one concurrent
+  // caller, and if anything after that fails the status flip rolls back too.
   const matchResult = await prisma.$transaction(async (tx) => {
     const claim = await tx.bulkPool.updateMany({
       where: { id: pool.id, status: 'OPEN' },
       data: { status: 'MATCHED' },
     });
     if (claim.count === 0) {
-      // Another request won the state transition. Return the actual final
-      // state rather than incorrectly reporting CLOSED/expired pools as matched.
       const existing = await tx.bulkPool.findUnique({
         where: { id: pool.id },
         include: { orderDocument: true },
@@ -455,9 +467,8 @@ export async function checkAndMatchPool(poolId) {
       };
     }
 
-    // The row lock above waits for any in-flight join to commit. Read baskets
-    // again inside this transaction so a just-committed member is not omitted
-    // from the order document built from the earlier optimistic snapshot.
+    // Re-read baskets inside this transaction so a just-committed member is
+    // not omitted from the order document.
     const currentPool = await tx.bulkPool.findUnique({
       where: { id: pool.id },
       include: { baskets: { include: { items: { include: { sku: true } } } }, partner: true },
@@ -469,13 +480,10 @@ export async function checkAndMatchPool(poolId) {
       0
     );
     if (lockedCurrentCases < currentPool.moqTarget) {
-      // A cancellation may have reduced the total after the optimistic read.
-      // Re-open atomically rather than create an order below the MOQ.
       await tx.bulkPool.update({ where: { id: pool.id }, data: { status: 'OPEN' } });
       return { matched: false, currentCases: lockedCurrentCases };
     }
 
-    // Generate the Order Confirmation Document from the fresh, locked snapshot.
     const lineItemsBySku = {};
     for (const basket of currentActiveBaskets) {
       for (const item of basket.items) {
@@ -499,17 +507,13 @@ export async function checkAndMatchPool(poolId) {
         poolId: pool.id,
         groupCode: await generateGroupCode(tx),
         totalAmountZAR,
-        // Default safety measure per Section 4.2: collection points default to
-        // a location near a police station, mirroring real-world SAB delivery practice.
+        // Collection points default to a location near a police station.
         deliveryLocation: `Near the police station closest to ${currentPool.area} — exact location to be confirmed`,
         status: 'PENDING_MEMBER_CONFIRMATION',
       },
     });
 
     for (const basket of currentActiveBaskets) {
-      // One reference for this whole cart — same code on every line item,
-      // the basket itself, and the payment created for it below. See
-      // generateOrderReference above for why one code does both jobs.
       const orderReference = await generateOrderReference(tx);
       let memberAmountZAR = 0;
       for (const item of basket.items) {
@@ -529,9 +533,7 @@ export async function checkAndMatchPool(poolId) {
       await tx.basket.update({ where: { id: basket.id }, data: { status: 'MATCHED', orderReference } });
 
       // A stokvel-funded basket becomes an approval request, not a manual
-      // bank-transfer instruction to the member. The existing two-official
-      // rule is applied by stokvelPoolFundingController; approval authorizes
-      // the spend but settlement remains a separate real-money step.
+      // bank-transfer instruction to the member.
       if (basket.fundingSource === 'STOKVEL') {
         if (!basket.fundingStokvelId) throw new Error('Stokvel-funded basket has no selected stokvel');
         const stokvel = await tx.stokvel.findUnique({
