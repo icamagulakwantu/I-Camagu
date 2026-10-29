@@ -11,12 +11,11 @@ import { resolveOrderStage } from '../data/orderStages.js'
 import { OrderStageTracker } from '../components/ui/OrderStageTracker.jsx'
 import { CATEGORY_LABEL } from '../data/poolCategories.js'
 
-// A pool only has a deadline at all when whoever opened it set a real
-// target date (e.g. "this is for December") — no more fixed universal
-// window. Real data from BulkPool.deadline, no fabricated countdown. Close
-// in (hours/days) reads fine for a near-term deadline; a target date
-// that's genuinely far out reads better as the actual date than as
-// "closes in 83 days".
+// Same key the /pool/:id invite route uses — "Add to this pool" reuses it,
+// so a member's own pool and an invited pool follow exactly one join path.
+const JOIN_POOL_KEY = 'icamagu_join_pool_id'
+
+// A pool only has a deadline when whoever opened it set a real target date.
 function windowClosesLabel(windowDeadline) {
   const deadline = new Date(windowDeadline)
   const msLeft = deadline.getTime() - Date.now()
@@ -29,8 +28,7 @@ function windowClosesLabel(windowDeadline) {
   return `Pooling until ${deadline.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long' })}.`
 }
 
-// A tier's real value, worded for whichever basis this pool uses — a
-// case price for a pallet pool, a discount percentage for an amount pool.
+// A tier's real value — a case price (pallet pool) or % off (amount pool).
 // Null (no real quote entered yet) renders as nothing, never a guessed number.
 function tierValueLabel(tier, basis) {
   if (!tier || tier.value == null) return ''
@@ -47,16 +45,14 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
   const [copied, setCopied] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [targetDate, setTargetDate] = useState('')
-  // A single cart submission can now split into more than one pool — one
-  // per category (drinks, meat & livestock, groceries, produce), since a
-  // pool is always one category. So this is a list, not one.
+  // One entry per pool the member is in (the server groups their baskets).
   const [poolStatuses, setPoolStatuses] = useState([])
   const [cancellingId, setCancellingId] = useState(null)
   const [invitedId, setInvitedId] = useState(null)
-  // Set when this member arrived via a real "join this pool" invite link
-  // (see inviteToSmartMatch below and /pool/:id in App.jsx) and hasn't
-  // submitted yet — null once dismissed or consumed by a submission.
+  // The pool this cart is being shopped for — set by an invite link OR the
+  // "Add to this pool" button. Null means "match me automatically".
   const [joiningPool, setJoiningPool] = useState(null)
+  const [areaMissing, setAreaMissing] = useState(false)
 
   const fetchPoolStatus = useCallback(async () => {
     try {
@@ -101,24 +97,45 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
   }, [fetchBasket, fetchPoolStatus])
 
   useEffect(() => {
-    const pendingId = localStorage.getItem('icamagu_join_pool_id')
+    const pendingId = localStorage.getItem(JOIN_POOL_KEY)
     if (!pendingId || !accessToken) return
     fetch(`/api/basket/pool/${pendingId}/summary`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        // A pool that's gone or no longer OPEN can't be joined — don't
-        // keep prompting for it.
+        // A pool that's gone or no longer OPEN can't be joined.
         if (data && data.status === 'OPEN') setJoiningPool(data)
-        else localStorage.removeItem('icamagu_join_pool_id')
+        else localStorage.removeItem(JOIN_POOL_KEY)
       })
-      .catch(() => localStorage.removeItem('icamagu_join_pool_id'))
+      .catch(() => localStorage.removeItem(JOIN_POOL_KEY))
   }, [accessToken])
 
   const dismissJoiningPool = () => {
-    localStorage.removeItem('icamagu_join_pool_id')
+    localStorage.removeItem(JOIN_POOL_KEY)
     setJoiningPool(null)
+  }
+
+  // "Add to this pool": remember the pool, then send the member shopping.
+  // Whatever they submit next goes into this exact pool.
+  const shopForPool = (poolStatus) => {
+    localStorage.setItem(JOIN_POOL_KEY, poolStatus.poolId)
+    setJoiningPool({
+      id: poolStatus.poolId,
+      category: poolStatus.category,
+      area: poolStatus.area,
+      status: 'OPEN',
+      currentCases: poolStatus.currentCases,
+      moqTarget: poolStatus.moqTarget,
+      isMine: true,
+    })
+    const label = CATEGORY_LABEL[poolStatus.category].toLowerCase()
+    if ((basketData.items || []).length === 0) {
+      showToast(`Add ${label} items, then come back and submit — they'll go into this pool.`, 'info')
+      onBack()
+    } else {
+      showToast(`Your cart will be added to your ${label} pool near ${poolStatus.area} when you submit.`, 'info')
+    }
   }
 
   const updateQuantity = async (itemId, newQuantity) => {
@@ -152,12 +169,10 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
     }
   }
 
-  // No partner picker — a member has no real basis to choose between
-  // outlets, so the app matches each item to the right pool itself, based
-  // on category, location, and which pool is already closest to unlocking.
   const submitToPool = async () => {
     if (!basketData.basket?.id) return
     setSubmitting(true)
+    setAreaMissing(false)
     try {
       const res = await fetch('/api/basket/submit-to-pool', {
         method: 'POST',
@@ -172,12 +187,12 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
         }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to submit cart.')
+      if (!res.ok) {
+        if (data.code === 'AREA_REQUIRED') setAreaMissing(true)
+        throw new Error(data.error || 'Failed to submit cart.')
+      }
       showToast(data.message || 'Cart submitted successfully!', 'success')
       setTargetDate('')
-      // The join attempt is consumed either way — whether it landed them
-      // in the invited pool or, honestly, a fresh one because the invite
-      // had gone stale (see the message itself for which happened).
       if (joiningPool) dismissJoiningPool()
       fetchBasket()
       fetchPoolStatus()
@@ -189,21 +204,26 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
     }
   }
 
-  const cancelParkedBasket = async (basketId) => {
-    if (!basketId) return
-    setCancellingId(basketId)
+  // Withdraws every one of this member's parked baskets in the pool.
+  const cancelParkedBasket = async (poolStatus) => {
+    const ids = poolStatus.basketIds?.length ? poolStatus.basketIds : [poolStatus.basketId]
+    setCancellingId(poolStatus.poolId)
     try {
-      const res = await fetch('/api/basket/pool/cancel-basket', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ basketId }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not withdraw cart')
-      showToast(data.message || 'Withdrawn from pool', 'info')
-      setPoolStatuses((prev) => prev.filter((p) => p.basketId !== basketId))
+      for (const basketId of ids) {
+        const res = await fetch('/api/basket/pool/cancel-basket', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+          body: JSON.stringify({ basketId }),
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'Could not withdraw cart')
+      }
+      showToast('Withdrawn from pool', 'info')
+      if (joiningPool?.id === poolStatus.poolId) dismissJoiningPool()
+      setPoolStatuses((prev) => prev.filter((p) => p.poolId !== poolStatus.poolId))
     } catch (err) {
       showToast(err.message, 'error')
+      fetchPoolStatus()
     } finally {
       setCancellingId(null)
     }
@@ -226,10 +246,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
     }
   }
 
-  // Recruits more people into this SmartMatch pool — the whole point of
-  // showing tiers at all. Every number here is real (real cases or Rand,
-  // real partner/area); a tier's value only appears when a real negotiated
-  // figure exists for it, never a guessed discount.
+  // Recruits more people into this SmartMatch pool. Every number is real.
   const inviteToSmartMatch = (poolStatus) => {
     const sm = poolStatus.smartMatch
     const isAmount = sm.basis === 'AMOUNT'
@@ -237,23 +254,15 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       ? `R${sm.currentAmountZAR.toFixed(2)} pooled so far`
       : `${sm.pallets.toFixed(1)} pallets pooled so far`
     const lines = [
-      `Pooling a ${CATEGORY_LABEL[poolStatus.category].toLowerCase()} bulk order${poolStatus.partnerName ? ` with ${poolStatus.partnerName}` : ''} near ${poolStatus.area} on iCamagu SmartMatch.`,
+      `Pooling a ${CATEGORY_LABEL[poolStatus.category].toLowerCase()} bulk order near ${poolStatus.area} on iCamagu SmartMatch.`,
       sm.currentTier
         ? `We're at ${sm.currentTier.name} — ${standing}${tierValueLabel(sm.currentTier, sm.basis) ? ` (${tierValueLabel(sm.currentTier, sm.basis)})` : ''}.`
         : `We're at ${standing}${sm.nextTier ? ', working toward our first tier' : ''}.`,
       sm.nextTier &&
         `${isAmount ? `R${sm.toNextTier}` : `${sm.toNextTier} more cases`} unlocks ${sm.nextTier.name}${tierValueLabel(sm.nextTier, sm.basis) ? ` at ${tierValueLabel(sm.nextTier, sm.basis)}` : ''} for everyone in the pool.`,
-      // Tier names like "Amazibazana Goal" are a fixed, standard ladder
-      // used across every alcohol pool platform-wide — not specific to
-      // this group — spelled out here since it reads as a mismatched
-      // group name otherwise.
       !isAmount && (sm.currentTier || sm.nextTier) &&
         `(Tier names are standard across every iCamagu drinks pool, not specific to this group.)`,
       `Join and add your order:`,
-      // The actual point of the message — without this, "Join and add
-      // your order" had nothing to tap. Only buildable now that poolId
-      // comes back from /pool-status/my; tapping it lands the recipient
-      // in this exact pool, not just "somewhere in their own area."
       poolStatus.poolId ? `${window.location.origin}/pool/${poolStatus.poolId}` : null,
     ].filter(Boolean)
     const text = lines.join('\n\n')
@@ -262,7 +271,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       navigator.share({ title: 'Join our SmartMatch pool', text }).catch(() => {})
     } else {
       navigator.clipboard.writeText(text)
-      setInvitedId(poolStatus.basketId)
+      setInvitedId(poolStatus.poolId)
       showToast('Invite copied — paste it into WhatsApp', 'info')
       setTimeout(() => setInvitedId(null), 2000)
     }
@@ -279,8 +288,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
   }
 
   const itemsList = basketData.items || []
-  // Only counts items with a real, researched retailPriceZAR comparable —
-  // never a fabricated "you saved" figure.
+  // Only counts items with a real, researched retailPriceZAR comparable.
   const totalSavings = itemsList.reduce((sum, item) => {
     const retail = item.sku?.retailPriceZAR ? parseFloat(item.sku.retailPriceZAR) : null
     const casePrice = parseFloat(item.sku?.casePriceZAR || 0)
@@ -293,6 +301,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
     map[g].push(item)
     return map
   }, {})
+  const myOpenPools = poolStatuses.filter((p) => p.poolStatus === 'OPEN')
 
   return (
     <div className="min-h-screen pb-24 bg-cream px-4 pt-6 max-w-md mx-auto">
@@ -323,24 +332,32 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
         <div className="bg-white border-2 border-sage-600 rounded-soft p-4 mb-4 shadow-soft">
           <div className="flex items-start justify-between gap-2 mb-1">
             <p className="text-[10px] font-black uppercase tracking-wider text-sage-700">
-              You were invited to a pool
+              {joiningPool.isMine ? 'Shopping for your pool' : 'You were invited to a pool'}
             </p>
             <button type="button" onClick={dismissJoiningPool} className="text-ink/40 hover:text-ink/70 text-xs font-bold shrink-0">
-              Not now
+              {joiningPool.isMine ? 'Cancel' : 'Not now'}
             </button>
           </div>
           <p className="text-sm font-bold text-ink mb-1">
             {CATEGORY_LABEL[joiningPool.category]} pool near {joiningPool.area}
-            {joiningPool.partnerName ? ` with ${joiningPool.partnerName}` : ''}
           </p>
           <p className="text-xs text-ink/60">
-            Add {CATEGORY_LABEL[joiningPool.category].toLowerCase()} items and submit your cart to join this exact pool — not just a new one in your own area.
+            Add {CATEGORY_LABEL[joiningPool.category].toLowerCase()} items and submit your cart — they go straight into this pool.
+          </p>
+        </div>
+      )}
+
+      {areaMissing && (
+        <div role="alert" className="bg-white border-2 border-terracotta rounded-soft p-4 mb-4">
+          <p className="text-sm font-bold text-ink">Add your area first</p>
+          <p className="text-xs text-ink-muted mt-1">
+            SmartMatch pools people by town or suburb. Open <span className="font-bold">More → Profile</span>, add your area (for example "Motherwell"), then submit your cart again.
           </p>
         </div>
       )}
 
       {poolStatuses.map((poolStatus) => (
-        <div key={poolStatus.basketId} className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
+        <div key={`${poolStatus.poolId}:${poolStatus.basketStatus}`} className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
           <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">
             Smart Match — {CATEGORY_LABEL[poolStatus.category]}
           </p>
@@ -349,13 +366,16 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
               <Icon name="check" size={11} color="#fff" /> Confirmed supplier: {poolStatus.partnerName}
             </p>
           )}
-          <p className="text-sm font-bold mb-2">
+          <p className="text-sm font-bold mb-1">
             {poolStatus.poolStatus === 'OPEN'
-              ? `Pooling with other members near ${poolStatus.area}${poolStatus.partnerName ? ` via ${poolStatus.partnerName}` : ''}. More joined demand may help us request a better quote; any discount depends on confirmed supplier terms.`
+              ? `Pooling with other members near ${poolStatus.area}. More joined demand may help us request a better quote; any discount depends on confirmed supplier terms.`
               : poolStatus.poolStatus === 'FULFILLED'
-                ? `Delivered/collected — your order${poolStatus.partnerName ? ` from ${poolStatus.partnerName}` : ''} is complete.`
-                : `Matched! Your order pooled with other members${poolStatus.partnerName ? ` via ${poolStatus.partnerName}` : ''}.`}
+                ? 'Delivered/collected — your order is complete.'
+                : 'Matched! Your order pooled with other members.'}
           </p>
+          {poolStatus.myCases > 0 && (
+            <p className="text-[11px] text-white/85 mb-2">You've added {poolStatus.myCases} to this pool.</p>
+          )}
 
           <div className="mb-3">
             <OrderStageTracker currentIndex={resolveOrderStage(poolStatus.poolStatus, poolStatus.payment)} tone="dark" />
@@ -393,13 +413,11 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           {poolStatus.poolStatus === 'OPEN' && poolStatus.smartMatch && (() => {
             const sm = poolStatus.smartMatch
             const isAmount = sm.basis === 'AMOUNT'
-            // A band's own label — pallets read as "1-3P"; Rand thresholds
-            // read as a plain "R" figure, since there's no universal unit
-            // to abbreviate them to.
             const bandLabel = (tier, i, ladder) => {
               if (!isAmount) return `${tier.min}${i === ladder.length - 1 ? '+' : `-${ladder[i + 1].min - 1}`}P`
               return `R${tier.min.toLocaleString('en-ZA')}+`
             }
+            const isShoppingThisPool = joiningPool?.id === poolStatus.poolId
             return (
               <>
                 {sm.currentTier && (
@@ -409,23 +427,13 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                   </p>
                 )}
 
-                {/* The tier ladder: one segment per band, in whichever unit
-                    this pool is measured — pallets (alcohol) or Rand pooled
-                    (groceries, livestock). Filled tiers are behind us, the
-                    current tier fills to how far through its own band we
-                    are, tiers ahead sit empty. A tier's value shows only
-                    when a real quote has been entered for it — otherwise
-                    "TBC", never a guessed number. An AMOUNT pool with no
-                    ladder at all shows a plain running total instead, since
-                    there's no honest default band structure to draw. */}
+                {/* The tier ladder — a tier's value shows only when a real
+                    quote exists, otherwise "TBC", never a guessed number. */}
                 {sm.ladder ? (
                   <div className="grid gap-1 mb-1.5" style={{ gridTemplateColumns: `repeat(${sm.ladder.length}, minmax(0, 1fr))` }}>
                     {sm.ladder.map((tier, i) => {
                       const metric = isAmount ? sm.currentAmountZAR : sm.pallets
                       const isCurrent = sm.currentTier?.id === tier.id
-                      // The open-ended top tier has no real ceiling to size its
-                      // band against, so it borrows the previous band's width —
-                      // a visual nicety only, it doesn't affect any real number.
                       const prevSpan = i > 0 ? tier.min - sm.ladder[i - 1].min : isAmount ? 1000 : 4
                       const nextMin = i + 1 < sm.ladder.length ? sm.ladder[i + 1].min : tier.min + prevSpan
                       const span = Math.max(1, nextMin - tier.min)
@@ -471,23 +479,31 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                 {poolStatus.windowDeadline && (
                   <p className="text-[11px] text-white/75 mb-2">{windowClosesLabel(poolStatus.windowDeadline)}</p>
                 )}
-                <div className="flex items-center gap-3 flex-wrap">
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => shopForPool(poolStatus)}
+                    disabled={isShoppingThisPool}
+                    className="bg-white text-terracotta text-xs font-black px-3 py-2.5 rounded-pill shadow-soft active:scale-95 transition-transform flex items-center justify-center gap-1.5 disabled:opacity-80"
+                  >
+                    <Icon name="cart" size={12} color="#c45c26" /> {isShoppingThisPool ? 'Shopping for this' : 'Add to this pool'}
+                  </button>
                   <button
                     type="button"
                     onClick={() => inviteToSmartMatch(poolStatus)}
-                    className="bg-white text-terracotta text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform flex items-center gap-1.5"
+                    className="bg-white/15 border border-white/40 text-white text-xs font-black px-3 py-2.5 rounded-pill active:scale-95 transition-transform flex items-center justify-center gap-1.5"
                   >
-                    {invitedId === poolStatus.basketId ? 'Copied!' : <><Icon name="send" size={12} color="#c45c26" /> Invite on WhatsApp</>}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => cancelParkedBasket(poolStatus.basketId)}
-                    disabled={cancellingId === poolStatus.basketId}
-                    className="text-xs font-bold text-white/90 underline disabled:opacity-50"
-                  >
-                    {cancellingId === poolStatus.basketId ? 'Withdrawing...' : 'Withdraw from this pool'}
+                    {invitedId === poolStatus.poolId ? 'Copied!' : <><Icon name="send" size={12} color="#fff" /> Invite</>}
                   </button>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => cancelParkedBasket(poolStatus)}
+                  disabled={cancellingId === poolStatus.poolId}
+                  className="mt-2 text-xs font-bold text-white/85 underline disabled:opacity-50"
+                >
+                  {cancellingId === poolStatus.poolId ? 'Withdrawing...' : 'Withdraw from this pool'}
+                </button>
               </>
             )
           })()}
@@ -498,7 +514,9 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
         <EmptyState
           emoji="🛒"
           title="Your cart is empty"
-          description="Browse the Store to add items toward a collective order."
+          description={myOpenPools.length
+            ? 'Tap "Add to this pool" on a pool above, or browse the Store.'
+            : 'Browse the Store to add items toward a collective order.'}
           primaryLabel="Go to Store"
           onPrimary={onBack}
         />
@@ -595,15 +613,31 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
             )}
           </div>
 
-          {/* Submit to Bulk Pool — no partner picker. Which outlet a
-              member's order pools with isn't something they have a real
-              basis to choose (it depends on who's nearby and whose pool is
-              already closest to unlocking) — the app matches it automatically. */}
+          {/* Submit — the app picks the pool; the member is told which. */}
           <div className="bg-white border border-cream-dark rounded-soft p-4 shadow-soft">
             <p className="text-xs font-black uppercase text-ink-muted mb-1">Smart Match — Join a Bulk Order</p>
-            <p className="text-xs text-ink-muted mb-3">
-              iCamagu automatically pools your cart with other members buying the same kind of thing nearby — even across different stokvels — and matches you to whichever pool gets you to bulk pricing soonest. Drinks and other items are matched to their own pools.
-            </p>
+
+            {joiningPool ? (
+              <p className="text-xs text-ink mb-3">
+                Your {CATEGORY_LABEL[joiningPool.category].toLowerCase()} items will go into the pool near <span className="font-bold">{joiningPool.area}</span>.
+              </p>
+            ) : myOpenPools.length > 0 ? (
+              <div className="mb-3 rounded-soft bg-sage-50 border border-sage-200 p-3">
+                <p className="text-xs font-bold text-sage-700 mb-1">Your items will be added to the pools you're already in:</p>
+                <ul className="space-y-0.5">
+                  {myOpenPools.map((p) => (
+                    <li key={p.poolId} className="text-xs text-ink">
+                      {CATEGORY_LABEL[p.category]} — near {p.area} ({p.currentCases}/{p.moqTarget})
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-[11px] text-ink-muted mt-1">Other kinds of items join the nearest open pool, or start a new one.</p>
+              </div>
+            ) : (
+              <p className="text-xs text-ink-muted mb-3">
+                iCamagu pools your cart with other members buying the same kind of thing near you. Drinks and other items go to their own pools.
+              </p>
+            )}
 
             <label className="block text-[11px] font-bold text-ink-muted mb-1">
               Planning ahead? Set a target date (optional)
@@ -616,9 +650,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
               className="w-full border border-cream-dark rounded-soft px-3 py-2.5 mb-1 bg-cream text-xs font-bold text-ink"
             />
             <p className="text-[11px] text-ink-muted mb-3">
-              {targetDate
-                ? `Only applies if this starts a brand-new pool — it'll stay open to new members until then instead of closing quickly.`
-                : `Leave blank to pool as soon as possible — only applies if this starts a brand-new pool, not one you're joining.`}
+              Only applies if this starts a brand-new pool, not one you're joining.
             </p>
 
             <button
@@ -627,7 +659,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
               disabled={submitting}
               className="w-full bg-sage-500 hover:bg-sage-600 text-white font-bold py-3 rounded-pill shadow-glow active:scale-[0.96] transition-transform text-sm disabled:opacity-50"
             >
-              {submitting ? 'Submitting...' : 'Submit Cart to Bulk Pool'}
+              {submitting ? 'Submitting...' : joiningPool || myOpenPools.length ? 'Add Cart to My Pool' : 'Submit Cart to Bulk Pool'}
             </button>
           </div>
         </>
