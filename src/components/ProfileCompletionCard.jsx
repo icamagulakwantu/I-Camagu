@@ -107,7 +107,7 @@ export default function ProfileCompletionCard() {
   const inputClass = 'w-full border-2 border-ink/20 rounded-soft px-4 py-3 text-base focus:outline-none focus:border-sage-500'
 
   return (
-    <div className="px-4 pt-3 bg-cream">
+    <div>
       <div className="bg-white border-2 border-ochre/40 rounded-soft p-4 shadow-soft">
         <div className="flex items-center justify-between gap-2">
           <p className="font-display font-bold text-lg text-ink">Complete your profile</p>

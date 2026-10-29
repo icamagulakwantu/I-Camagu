@@ -49,7 +49,11 @@ const cardActive = "active:scale-[0.98] active:shadow-none"
 const pressable = "transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none"
 const inputStyle = "w-full border border-ink/30 rounded-soft px-3 py-2 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
 
-function Stokvels({ onBack, onOpenShrineFund }) {
+// topSlot / bottomSlot let the wrapper add invites, discovery and profile
+// cards to the list view only, below the page header, so the header always
+// sits at the top like every other tab and the extras never leak into the
+// create, join or detail views.
+function Stokvels({ onBack, onOpenShrineFund, topSlot = null, bottomSlot = null }) {
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
 
@@ -1243,7 +1247,12 @@ function Stokvels({ onBack, onOpenShrineFund }) {
       >
         ← Back
       </button>
-      <h2 className="font-display font-bold text-2xl text-ink mb-4">Stokvels</h2>
+      {/* Same header pattern as Ceremonies: eyebrow, title, short subtitle. */}
+      <p className="eyebrow mb-0.5">Yonga kunye</p>
+      <h1 className="font-display font-bold text-3xl text-ink">Stokvels</h1>
+      <p className="text-ink-muted text-sm mt-1 mb-5">Save together with people you trust, then buy in bulk for your ceremony.</p>
+
+      {topSlot}
 
       {!loading && myStokvels.length > 0 && (
         <div className="wash-sage grain relative mb-4 overflow-hidden rounded-soft px-5 py-5">
@@ -1258,23 +1267,6 @@ function Stokvels({ onBack, onOpenShrineFund }) {
             <Icon name="coins" size={32} color="#ffffff" />
           </div>
         </div>
-      )}
-
-      {onOpenShrineFund && (
-        <button
-          type="button"
-          onClick={onOpenShrineFund}
-          className={`w-full bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 text-left flex items-center justify-between ${pressable}`}
-        >
-          <div className="flex items-center gap-3">
-            <Icon name="flame" size={22} color="#ffffff" strokeWidth={1.5} />
-            <div>
-              <p className="font-display font-bold text-base leading-tight">Ubuhlanti bakwa Xhosa</p>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/80 mt-0.5">Shrine &amp; Development Fund — see it growing</p>
-            </div>
-          </div>
-          <Icon name="arrowRight" size={18} color="#ffffff" />
-        </button>
       )}
 
       <div className="flex gap-2 mb-4">
@@ -1350,6 +1342,32 @@ function Stokvels({ onBack, onOpenShrineFund }) {
                 </div>
               </button>
             ))}
+          </div>
+        </>
+      )}
+
+      {/* Discovery and extras come after the person's own stokvels. */}
+      {(bottomSlot || onOpenShrineFund) && (
+        <>
+          <SectionRule label="Grow your circle" />
+          <div className="space-y-3">
+            {bottomSlot}
+            {onOpenShrineFund && (
+              <button
+                type="button"
+                onClick={onOpenShrineFund}
+                className={`w-full bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 text-left flex items-center justify-between ${pressable}`}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon name="flame" size={22} color="#ffffff" strokeWidth={1.5} />
+                  <div>
+                    <p className="font-display font-bold text-base leading-tight">Ubuhlanti bakwa Xhosa</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white/80 mt-0.5">Shrine &amp; Development Fund — see it growing</p>
+                  </div>
+                </div>
+                <Icon name="arrowRight" size={18} color="#ffffff" />
+              </button>
+            )}
           </div>
         </>
       )}
