@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import Icon from '../components/Icon.jsx'
-import BeadBand from '../components/ui/BeadBand.jsx'
 import PageHeader from '../components/ui/PageHeader.jsx'
 import AncestralRites from './AncestralRites.jsx'
 
@@ -43,7 +42,7 @@ const TILE_GROUPS = [
     items: [
       { id: 'myorders', icon: 'package', label: 'My orders', desc: 'Track your bulk orders', keywords: 'delivery' },
       { id: 'expenditure', icon: 'coins', label: 'My spending', desc: 'Where the money went', keywords: 'budget' },
-      { id: 'ubuhlanti', icon: 'flame', label: 'Ubuhlanti fund', desc: 'Grow the Xhosa economy', keywords: 'shrine' },
+      { id: 'ubuhlanti', icon: 'flame', label: 'Ubuhlanti fund', desc: 'Grow our community economy', keywords: 'shrine' },
       { id: 'directory', icon: 'book', label: 'Healers, ingcibi & vendors', desc: 'Trusted traditional help', keywords: 'igqirha sangoma merchant' },
       { id: 'ekoyini', icon: 'cocktail', label: 'Ekoyini mobile bar', desc: 'Book a bar for your event' },
       { id: 'supplier', icon: 'store', label: 'Sell on iCamagu', desc: 'Supply stokvels and families', keywords: 'supplier producer' },
@@ -326,7 +325,6 @@ export default function More({ onNavigate }) {
       )}
 
       <footer className="flex flex-col items-center pb-4 text-center">
-        <BeadBand fade className="mb-4 w-40" />
         <p className="font-display text-base italic text-ink">Umntu ngumntu ngabantu</p>
         <p className="mt-1 text-xs text-ink-muted">A person is a person through other people.</p>
       </footer>

@@ -7,13 +7,16 @@ import Icon from '../components/Icon.jsx'
 const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
+// Copy note: the fund is rooted in Xhosa tradition but open to every family
+// living in our communities (Sotho, Zulu, Coloured and others in P.E. and
+// beyond), so ownership wording says "local community", never one nation.
 const PHASES = [
   {
     icon: 'store',
     accent: '#c45c26',
     phase: 'Phase 1 — Township & Rural Economy',
     headline: 'Keep the rand circulating in our communities.',
-    body: 'We start where the money already flows daily. Spaza shops, taverns, car washes, garages, school uniform manufacturing, and community banks. These are businesses our communities spend money in every single day — yet the profits leave. The fund takes a 40% community stake in these businesses, with 60% remaining in private Xhosa hands. Our rand stays home longer before it leaves.',
+    body: 'We start where the money already flows daily. Spaza shops, taverns, car washes, garages, school uniform manufacturing, and community banks. These are businesses our communities spend money in every single day — yet the profits leave. The fund takes a 40% community stake in these businesses, with 60% remaining in the hands of local owners from our own communities. Our rand stays home longer before it leaves.',
   },
   {
     icon: 'calendarRange',
@@ -26,7 +29,7 @@ const PHASES = [
     icon: 'coins',
     accent: '#4a7a4a',
     phase: 'Phase 3 — Primary Industries & Legacy',
-    headline: 'Mining, property, and nation-scale investment.',
+    headline: 'Mining, property, and large-scale community investment.',
     body: "Once the foundation is solid, the fund moves into primary industries — mining, agriculture, fisheries, property, and livestock economies of scale across the Eastern Cape's arable land and coastline. No single family or stokvel could build this alone. Together, we can.",
   },
 ]
@@ -108,9 +111,9 @@ function ShrineFund({ onBack }) {
             <Icon name="flame" size={26} color="#ffffff" strokeWidth={1.5} />
             <h1 className="font-display font-bold text-3xl leading-tight text-white">Ubuhlanti bakwa Xhosa</h1>
           </div>
-          <p className="text-white/90 text-sm font-bold">The Sovereign Xhosa Development Fund</p>
+          <p className="text-white/90 text-sm font-bold">Our Community Shrine &amp; Development Fund</p>
           <p className="text-white/75 text-sm mt-2 leading-relaxed">
-            A community-owned investment fund that starts at grass roots — township and rural economies — and grows into a legacy that serves the Xhosa nation for generations to come.
+            A community-owned investment fund, rooted in Xhosa tradition and open to every family in our communities. It starts at grass roots — township and rural economies — and grows into a legacy for generations to come.
           </p>
         </div>
       </div>
@@ -209,13 +212,16 @@ function ShrineFund({ onBack }) {
         <div className="bg-white border border-terracotta/15 rounded-soft p-5">
           <p className="eyebrow text-ink-muted mb-3">What this is</p>
           <p className="text-sm text-ink leading-relaxed">
-            This is not a fee. It is the sovereign seed capital of the Xhosa nation — a long-term, community-owned investment fund dedicated to building economies that keep our rand circulating within our communities for longer before it leaves.
+            This is not a fee. It is the seed capital of our communities — a long-term, community-owned investment fund dedicated to building economies that keep our rand circulating within our communities for longer before it leaves.
+          </p>
+          <p className="text-sm text-ink leading-relaxed mt-3">
+            Ubuhlanti — the homestead kraal — comes from Xhosa tradition, but its gate is open to every family who lives, works and celebrates in our communities, whatever their own customs.
           </p>
           <p className="text-sm text-ink leading-relaxed mt-3">
             Every contribution is voluntary: a stokvel member may choose to add a suggested share when they request their own payout, or anyone can donate directly from R1 upward. iCamagu also commits a share of its own platform profit to the fund as it grows.
           </p>
           <p className="text-sm font-bold text-ink leading-relaxed mt-3">
-            A fund built by the people, protected by the cloud, and dedicated to the advancement of the Xhosa nation for generations to come.
+            A fund built by the people, protected by the cloud, and dedicated to the advancement of our communities for generations to come.
           </p>
         </div>
 
@@ -231,7 +237,7 @@ function ShrineFund({ onBack }) {
           <div className="bg-terracotta/5 border border-terracotta/20 rounded-2xl px-4 py-3 mt-4">
             <p className="text-xs font-bold text-terracotta mb-1">The 60/40 ownership model</p>
             <p className="text-xs text-ink-muted leading-relaxed">
-              Every business the fund invests in is 60% privately owned and 40% community-owned — but private owners must be Xhosa people. Profit stays black. Ownership stays local. Community wealth grows with every business that succeeds.
+              Every business the fund invests in is 60% privately owned and 40% community-owned — and the private owners must come from the communities the business serves. Profit stays local. Ownership stays local. Community wealth grows with every business that succeeds.
             </p>
           </div>
         </div>
@@ -280,7 +286,7 @@ function ShrineFund({ onBack }) {
             This fund draws inspiration from models that have already changed lives. The Seminole Tribe of Florida built sovereign economic power through community-owned enterprise. The Grameen Bank proved that communities lending to themselves — without traditional collateral — can eliminate poverty at scale. Japan's public school meal programmes showed the world that community nutrition is a policy choice, not a luxury.
           </p>
           <p className="text-sm text-ink leading-relaxed mt-3">
-            We are not reinventing the wheel. We are taking what works, rooting it in Xhosa values, and building it here — starting in our townships and rural areas, growing into every community that is ready to build together.
+            We are not reinventing the wheel. We are taking what works, rooting it in the values of ubuntu that our communities share, and building it here — starting in our townships and rural areas, growing into every community that is ready to build together.
           </p>
         </div>
 

@@ -71,11 +71,11 @@ function PublicUbuhlanti() {
         <div className="relative max-w-xl mx-auto">
           <h1 className="font-display font-bold text-3xl leading-tight">Ubuhlanti bakwa Xhosa</h1>
           <p className="text-white/85 text-sm font-bold mt-1.5">
-            The Sovereign Xhosa Shrine &amp; Development Fund
+            Our Community Shrine &amp; Development Fund
           </p>
           <p className="text-white/80 text-sm mt-2 leading-relaxed">
-            Built together, one voluntary contribution at a time — visible to everyone, owned by no
-            one alone.
+            Rooted in Xhosa tradition, open to every family in our communities. Built together, one
+            voluntary contribution at a time — visible to everyone, owned by no one alone.
           </p>
         </div>
       </div>
@@ -184,10 +184,11 @@ function PublicUbuhlanti() {
         <div className="bg-white border border-terracotta/15 rounded-soft p-4 mt-4">
           <p className="text-xs font-black uppercase text-ink-muted mb-2">What this is</p>
           <p className="text-sm text-ink leading-relaxed">
-            This is not a fee — it is the sovereign seed capital of the Xhosa nation, a sacred
-            sanctuary in the spirit of a homestead kraal, and long-term investment in agricultural
-            research, fisheries, and livestock economies of scale across the Eastern Cape's arable
-            land and coastline that no single family or stokvel could build alone.
+            This is not a fee — it is the seed capital of our communities, a sacred sanctuary in the
+            spirit of a homestead kraal, and long-term investment in agricultural research,
+            fisheries, and livestock economies of scale across the Eastern Cape's arable land and
+            coastline that no single family or stokvel could build alone. Its roots are Xhosa; its
+            gate is open to every family who lives among us.
           </p>
           <p className="text-sm text-ink leading-relaxed mt-2">
             Every contribution is voluntary: a stokvel member may choose to add a suggested share
@@ -202,7 +203,7 @@ function PublicUbuhlanti() {
           </p>
           <p className="text-sm text-ink font-bold leading-relaxed mt-2">
             A fund built by the people, protected by the cloud, and dedicated to the advancement of
-            the Xhosa nation for generations to come.
+            our communities for generations to come.
           </p>
           <p className="text-[11px] text-ink-muted mt-3 italic">
             The exact governance process and how the fund is eventually deployed are still being
