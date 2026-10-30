@@ -8,6 +8,7 @@ import NotificationBell from '../components/NotificationBell.jsx'
 import PinReminder from '../components/PinReminder.jsx'
 import JourneyMap from '../components/home/JourneyMap.jsx'
 import CommunityShortcuts from '../components/home/CommunityShortcuts.jsx'
+import WhatsNew from '../components/home/WhatsNew.jsx'
 
 // Founder-supplied photo: women in umbhaco celebrating at an umgidi.
 const HERO_IMAGE = 'https://hercules-cdn.com/file_wxyYBh6l6xbEhksr09BuCEsR'
@@ -55,6 +56,7 @@ export default function Home({ onNavigate, basketCount = 0, onSelectCeremony }) 
   const { showToast } = useToast()
   const [stokvels, setStokvels] = useState([])
   const [ceremonies, setCeremonies] = useState([])
+  const [updates, setUpdates] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -72,7 +74,19 @@ export default function Home({ onNavigate, basketCount = 0, onSelectCeremony }) 
         setCeremonies(ceremonyData)
       })
       .finally(() => setLoading(false))
+
+    // "What's new" is a bonus: if it fails, Home quietly skips it.
+    fetch('/api/notifications/my', { headers })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => setUpdates(Array.isArray(data) ? data.filter((n) => !n.isRead) : []))
+      .catch(() => setUpdates([]))
   }, [accessToken, showToast])
+
+  const openUpdate = (n) => {
+    setUpdates((list) => list.filter((x) => x.id !== n.id))
+    fetch(`/api/notifications/${n.id}/read`, { method: 'PATCH', headers: { Authorization: `Bearer ${accessToken}` } }).catch(() => {})
+    onNavigate(n.linkScreen || 'notifications')
+  }
 
   const pools = feed.pools || []
   const totalSaved = stokvels.reduce((sum, s) => sum + (Number(s.totalBalance) || 0), 0)
@@ -148,6 +162,8 @@ export default function Home({ onNavigate, basketCount = 0, onSelectCeremony }) 
           </p>
         </div>
       </section>
+
+      <WhatsNew items={updates} onOpenItem={openUpdate} onSeeAll={() => onNavigate('notifications')} />
 
       <JourneyMap steps={steps} loading={loading} />
 
