@@ -16,13 +16,15 @@
 // old name never lingers; the real Can (500ml) row is restored under the
 // correct name in backfill-founder-sourced-skus.js.
 //
+// Black Label Dumpy (330ml) used to be removed here too. The founder has
+// since sent a real Black Label dumpy photo (30 Oct 2026) and asked for it
+// to be sold, so it is restored in backfill-founder-photos-oct-30.js.
+//
 // Idempotent — deleteMany on a (name, bottleFormat) pair that's already
 // gone is a no-op.
 import prisma from '../config/db.js';
 
 const NONEXISTENT_FORMATS = [
-  // Founder-confirmed catalogue correction: Carling Black Label is not sold as a South African dumpy. Keep quart and can formats; remove the invented dumpy variant.
-  { name: 'Black Label', bottleFormat: 'Dumpy (330ml)' },
   { name: 'Flying Fish Lemon', bottleFormat: 'Can (500ml)' },
   { name: 'Flying Fish Apple', bottleFormat: 'Can (500ml)' },
   { name: 'Savanna Angry Lemon', bottleFormat: 'Can (500ml)' },

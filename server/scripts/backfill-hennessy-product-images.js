@@ -15,10 +15,11 @@ import { fixPackSizes } from './fix-pack-sizes-oct-2026.js';
 import { backfillQuartGaps } from './backfill-quart-gaps.js';
 import { backfillFounderSourcedSkus } from './backfill-founder-sourced-skus.js';
 
+// Hennessy VS now uses the founder's own 750ml photo (backfill-founder-
+// photos-oct-30.js), so it is no longer listed here; keeping both would
+// rewrite its image back and forth on every boot.
 const PACKSHOTS_750ML = {
-  // Replaced the old retailer images after visual review: both old packshots included distracting black framing in the Store cards.
   // These replacement source listings explicitly identify the matching 750ml variant; verify commercial image-use permission and keep a fallback if hotlinking fails.
-  'Hennessy VS': 'https://d2sz1kgdtrlf1n.cloudfront.net/task_images/RCFc1724247307285-HennessyVSCognac750ml.png',
   'Hennessy VSOP': 'https://assets.woolworthsstatic.co.za/Hennessy-V-S-O-P-Privilege-Cognac-750-ml-3245990969402.jpg?V=SaGx&o=eyJidWNrZXQiOiJ3dy1vbmxpbmUtaW1hZ2UtcmVzaXplIiwia2V5IjoiaW1hZ2VzL2VsYXN0aWNlcmEvcHJvZHVjdHMvaGVyby8yMDIxLTA4LTAzLzMyNDU5OTA5Njk0MDJfaGVyby5qcGcifQ',
   'Hennessy XO': '/images/brands/hennessy-xo.png',
   'Remy Martin VSOP': 'https://cdn.shopify.com/s/files/1/0987/1588/products/remy-martin-vsop-cognac_1200x1200.jpg?v=1601327577',
@@ -130,24 +131,6 @@ async function repairGuinnessForeignExtraFormats() {
   console.log(`Guinness Foreign Extra format check: ${removed} invalid unlinked row(s) removed; ${quarantined} linked row(s) made unavailable; 325ml bottle ensured.`);
 }
 
-async function removeBlackLabelDumpies() {
-  const rows = await prisma.sku.findMany({
-    where: { name: 'Black Label', bottleFormat: { startsWith: 'Dumpy (' } },
-    select: { id: true, _count: { select: { basketItems: true, costItems: true } } },
-  });
-  let removed = 0;
-  for (const row of rows) {
-    if (row._count.basketItems > 0 || row._count.costItems > 0) {
-      await prisma.sku.update({ where: { id: row.id }, data: { casePriceZAR: null, imageUrl: null } });
-      console.warn('Black Label dumpy kept only to preserve linked history; made unavailable.');
-      continue;
-    }
-    const result = await prisma.sku.deleteMany({ where: { id: row.id } });
-    removed += result.count;
-  }
-  console.log(`Black Label dumpy cleanup checked: ${rows.length} invalid format row(s) found; ${removed} unlinked row(s) removed.`);
-}
-
 export async function backfillHennessyProductImages() {
   if (process.env.RUN_BOOT_STORE_CATALOGUE_REPAIR === 'true') {
     console.warn('RUN_BOOT_STORE_CATALOGUE_REPAIR=true: applying targeted Store image and pack-format corrections.');
@@ -159,7 +142,6 @@ export async function backfillHennessyProductImages() {
     await runRepairStep('verified quart gaps', backfillQuartGaps);
     await runRepairStep('founder-confirmed SKU formats', backfillFounderSourcedSkus);
     await runRepairStep('Amstel quart and can', ensureAmstelFormats);
-    await runRepairStep('Black Label nonexistent dumpy', removeBlackLabelDumpies);
     await runRepairStep('Guinness Foreign Extra bottle size', repairGuinnessForeignExtraFormats);
     await runRepairStep('brand image defaults', backfillBrandImages);
     await runRepairStep('product photo mappings', backfillExtractedBrandPhotos);

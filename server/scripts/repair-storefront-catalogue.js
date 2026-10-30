@@ -3,6 +3,9 @@
 // maintenance. Run only with RUN_BOOT_STORE_CATALOGUE_REPAIR=true, then unset it.
 // Images are assigned in precedence order: brand defaults -> real product photos
 // -> exact pack-format photos -> official cognac packshots -> broken-path cleanup.
+//
+// The Black Label dumpy is no longer removed here: the founder confirmed it
+// is a real product (30 Oct 2026, see backfill-founder-photos-oct-30.js).
 import prisma from '../config/db.js';
 import { upsertSkuByNameAndBottleFormat } from '../utils/upsertSku.js';
 import { backfillBrandImages } from './backfill-brand-images.js';
@@ -30,31 +33,8 @@ async function ensureAmstelFormats() {
   });
 }
 
-async function removeBlackLabelDumpies() {
-  const rows = await prisma.sku.findMany({
-    where: { name: 'Black Label', bottleFormat: { startsWith: 'Dumpy (' } },
-    select: { id: true, _count: { select: { basketItems: true, costItems: true } } },
-  });
-  let removed = 0;
-  for (const row of rows) {
-    if (row._count.basketItems > 0 || row._count.costItems > 0) {
-      // Preserve linked records; make the invalid variant unavailable and remove its misleading photo.
-      await prisma.sku.update({
-        where: { id: row.id },
-        data: { casePriceZAR: null, imageUrl: null },
-      });
-      console.warn('Black Label dumpy kept only to preserve linked history; made unavailable.');
-      continue;
-    }
-    const result = await prisma.sku.deleteMany({ where: { id: row.id } });
-    removed += result.count;
-  }
-  if (removed) console.log(`Removed ${removed} nonexistent Black Label dumpy SKU(s).`);
-}
-
 export async function repairStorefrontCatalogue() {
   await ensureAmstelFormats();
-  await removeBlackLabelDumpies();
   await backfillBrandImages();
   await backfillExtractedBrandPhotos();
   await backfillFormatSpecificPhotos();

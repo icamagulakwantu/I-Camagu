@@ -3,29 +3,18 @@
 // for 750ml bottle variants only. Never assign a 750ml image to a 375ml/other
 // SKU: clear the image for unmatched sizes so the Store shows its safe
 // placeholder until a matching packshot is verified. This changes imageUrl only.
+//
+// Strettons, Baileys, Jose Cuervo, Glenfiddich, J&B, Jameson Select, JW Red,
+// Glenlivet, Russian Bear and most Butlers liqueurs moved to the founder's
+// 30 Oct photo round (backfill-founder-photos-oct-30.js), which replaces
+// these older packshots. Leaving them here too would rewrite the image back
+// and forth on every boot.
 import prisma from '../config/db.js';
 
 const REQUESTED_PRODUCT_IMAGES = [
-  { names: ['Strettons London Dry'], image: 'strettons-london-dry.png' },
-  { names: ['Strettons Wild Berry'], image: 'strettons-wild-berry.png' },
-  { names: ['Baileys Irish Cream', 'Baileys Original Irish Cream'], image: 'baileys-original-irish-cream.png' },
-  { names: ['Jose Cuervo Especial Silver'], image: 'jose-cuervo-especial-silver.png' },
-  { names: ['Jose Cuervo Especial Reposado'], image: 'jose-cuervo-especial-reposado.png' },
-  { names: ['Glenfiddich 12', 'Glenfiddich 12 Year'], image: 'glenfiddich-12.png' },
-  { names: ['J&B', 'J&B Rare'], image: 'jb-rare.png' },
-  { names: ['Jameson Select Reserve'], image: 'jameson-select-reserve.png' },
-  { names: ['Johnnie Walker Red Label'], image: 'johnnie-walker-red-label.png' },
-  { names: ['Glenlivet', 'The Glenlivet 12 Year'], image: 'the-glenlivet-12.png' },
-  { names: ['Russian Bear', 'Russian Bear Standard'], image: 'russian-bear-standard.png' },
-  { names: ['Russian Bear Flavours'], image: 'russian-bear-flavours.png' },
-  { names: ['Banana Liqueur (Butlers)'], image: 'butlers-banana.png' },
-  { names: ['Blue Curacao (Butlers)'], image: 'butlers-blue-curacao.png' },
   { names: ['Cherry Kirsch Liqueur (Butlers)'], image: 'butlers-cherry-kirsch.png' },
   { names: ['Espresso/Coffee Liqueur (Butlers)'], image: 'butlers-espresso.png' },
-  { names: ['Ginger Liqueur (Butlers)'], image: 'butlers-ginger-liqueur.png' },
   { names: ['Peppermint Liqueur (Butlers)'], image: 'butlers-peppermint.png' },
-  { names: ['Strawberry Liqueur (Butlers)'], image: 'butlers-strawberry.png' },
-  { names: ['Triple Sec (Butlers)'], image: 'butlers-triple-sec.png' },
   { names: ['Van Der Hum Tangerine (Butlers)'], image: 'butlers-van-der-hum.png' },
 ];
 
@@ -36,16 +25,18 @@ const REQUESTED_PRODUCT_IMAGES = [
 // https://ngf.co.za/products/sprite-can-300ml,
 // https://www.ngf.co.za/product/stoney-ginger-beer-can-300ml/
 const VERIFIED_SOFT_DRINK_IMAGES = [
-  { nameContains: 'Coca-Cola', category: 'SOFT_DRINKS', format: '300ml', imageUrl: 'https://ngf.co.za/cdn/shop/files/coke-can-300ml.jpg?v=1790155408&width=1200' },
-  { nameContains: 'Fanta Orange', category: 'SOFT_DRINKS', format: '300ml', imageUrl: 'https://ngf.co.za/cdn/shop/files/fanta-orange-can-300ml.jpg?v=1790155408&width=1200' },
-  { nameContains: 'Sprite', category: 'SOFT_DRINKS', format: '300ml', imageUrl: 'https://ngf.co.za/cdn/shop/files/sprite-can-300ml.jpg?v=1790158666&width=1200' },
-  { nameContains: 'Stoney', category: 'SOFT_DRINKS', format: '300ml', imageUrl: 'https://www.ngf.co.za/wp-content/uploads/2023/11/wp-image-32261396005047-scaled-1.jpg' },
+  { nameContains: 'Coca-Cola', category: 'SOFT_DRINKS', format: 'Can (300ml)', imageUrl: 'https://ngf.co.za/cdn/shop/files/coke-can-300ml.jpg?v=1790155408&width=1200' },
+  { nameContains: 'Fanta Orange', category: 'SOFT_DRINKS', format: 'Can (300ml)', imageUrl: 'https://ngf.co.za/cdn/shop/files/fanta-orange-can-300ml.jpg?v=1790155408&width=1200' },
+  { nameContains: 'Sprite', category: 'SOFT_DRINKS', format: 'Can (300ml)', imageUrl: 'https://ngf.co.za/cdn/shop/files/sprite-can-300ml.jpg?v=1790158666&width=1200' },
+  { nameContains: 'Stoney', category: 'SOFT_DRINKS', format: 'Can (300ml)', imageUrl: 'https://www.ngf.co.za/wp-content/uploads/2023/11/wp-image-32261396005047-scaled-1.jpg' },
 ];
 
 async function backfillVerifiedSoftDrinkImages() {
   let updated = 0;
   let quarantined = 0;
   for (const entry of VERIFIED_SOFT_DRINK_IMAGES) {
+    // Scoped to the can row only: the new Bottle (300ml) rows carry the
+    // founder's own bottle photos (backfill-founder-photos-oct-30.js).
     const result = await prisma.sku.updateMany({
       where: { name: { contains: entry.nameContains }, category: entry.category, bottleFormat: { contains: entry.format }, OR: [{ imageUrl: null }, { imageUrl: { not: entry.imageUrl } }] },
       data: { imageUrl: entry.imageUrl },

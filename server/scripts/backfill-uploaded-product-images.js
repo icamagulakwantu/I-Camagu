@@ -10,6 +10,7 @@
 // differs, so it is safe on every boot. It changes imageUrl only, never prices,
 // stock, pack sizes or anything else.
 import prisma from '../config/db.js';
+import { backfillFounderPhotosOct30 } from './backfill-founder-photos-oct-30.js';
 
 const brandImage = (file) => `/images/brands/${encodeURIComponent(file)}`;
 
@@ -32,8 +33,8 @@ const FORMAT_IMAGES = [
 ];
 
 // Products where every pack size looks the same, matched by name only.
+// Boerewors moved to the 30 Oct founder photo round (better photo).
 const NAME_IMAGES = [
-  { name: 'Boerewors', file: 'boerewors.png' },
   { name: 'Chutney', file: 'chutney.png' },
   { name: 'Salt', file: 'salt.jpg' },
   { name: 'Strawberry Lips', file: 'strawberry-lips.jpg' },
@@ -60,6 +61,8 @@ export async function backfillUploadedProductImages() {
     updated += result.count;
   }
   if (updated) console.log(`Uploaded product image backfill: set ${updated} SKU image(s) from founder photos.`);
+  // Runs last so the newest founder photos win over every older mapping.
+  updated += await backfillFounderPhotosOct30();
   return updated;
 }
 
