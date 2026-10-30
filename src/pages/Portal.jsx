@@ -4,6 +4,8 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { cn } from '../lib/utils'
+import Icon from '../components/Icon.jsx'
+import { uploadPortalMedia, checkFile, UploadError } from '../lib/mediaUpload.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
@@ -16,6 +18,8 @@ export default function Portal({ onBack }) {
   const [newTitle, setNewTitle] = useState('')
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [progress, setProgress] = useState(null) // { current, total, fraction }
+  const [viewing, setViewing] = useState(null) // media item open full-screen
   const [selectedType, setSelectedType] = useState('all')
   const fileInputRef = useRef(null)
 
@@ -67,41 +71,46 @@ export default function Portal({ onBack }) {
     }
   }
 
-  // Upload file via FormData
+  // Upload one or more files, one at a time, with a progress bar.
   const handleFileSelect = async (e) => {
-    const file = e.target.files?.[0]
-    if (!file || !activePortal) return
+    const files = Array.from(e.target.files || [])
+    if (fileInputRef.current) fileInputRef.current.value = ''
+    if (files.length === 0 || !activePortal) return
 
-    if (file.size > 50 * 1024 * 1024) {
-      showToast('File too large. Max 50MB.', 'error')
-      return
+    const portalId = activePortal.id
+    let saved = 0
+    let lastError = null
+    setUploading(true)
+
+    for (const [index, file] of files.entries()) {
+      const problem = checkFile(file)
+      if (problem) { lastError = new UploadError(`${file.name}: ${problem}`); continue }
+      setProgress({ current: index + 1, total: files.length, fraction: 0 })
+      try {
+        const media = await uploadPortalMedia({
+          portalId,
+          file,
+          accessToken,
+          onProgress: (fraction) => setProgress({ current: index + 1, total: files.length, fraction }),
+        })
+        saved += 1
+        setActivePortal(prev => (prev?.id === portalId
+          ? { ...prev, media: [...(prev.media || []).filter(m => m.id !== media.id), media] }
+          : prev))
+      } catch (err) {
+        lastError = err
+        if (err.reason === 'SESSION_EXPIRED' || err.reason === 'OFFLINE') break
+      }
     }
 
-    setUploading(true)
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('portalId', activePortal.id)
-    formData.append('mediaType', file.type.startsWith('video/') ? 'VIDEO' : 'PHOTO')
-
-    try {
-      const res = await fetch('/api/portals/media', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${accessToken}` },
-        body: formData
-      })
-      const media = await res.json()
-      if (!res.ok) throw new Error(media.error || 'Upload failed')
-
-      setActivePortal(prev => ({
-        ...prev,
-        media: [...(prev?.media || []), media]
-      }))
-      showToast('Memory saved to archive', 'success')
-    } catch (err) {
-      showToast(err.message, 'error')
-    } finally {
-      setUploading(false)
-      if (fileInputRef.current) fileInputRef.current.value = ''
+    setUploading(false)
+    setProgress(null)
+    if (saved > 0) {
+      showToast(saved === 1 ? 'Memory saved to archive' : `${saved} memories saved to archive`, 'success')
+    }
+    if (lastError) {
+      // The short reference lets support tell causes apart from a screenshot.
+      showToast(lastError.reason ? `${lastError.message} (Ref: ${lastError.reason})` : lastError.message, 'error')
     }
   }
 
@@ -118,6 +127,7 @@ export default function Portal({ onBack }) {
         ...prev,
         media: prev.media.filter(m => m.id !== mediaId)
       }))
+      setViewing(null)
       showToast('Moved memory to trash', 'info')
     } catch (err) {
       showToast(err.message, 'error')
@@ -152,11 +162,12 @@ export default function Portal({ onBack }) {
         </div>
 
         {/* Upload Button */}
-        <div className="px-4 mt-5 flex gap-2">
+        <div className="px-4 mt-5">
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*,video/*"
+            multiple
             onChange={handleFileSelect}
             className="hidden"
           />
@@ -164,10 +175,18 @@ export default function Portal({ onBack }) {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className={`w-full bg-terracotta text-white font-bold py-3.5 rounded-pill shadow-glow ${pressable}`}
+            className={`w-full bg-terracotta text-white font-bold py-3.5 rounded-pill shadow-glow flex items-center justify-center gap-2 ${pressable}`}
           >
-            {uploading ? 'Uploading Memory...' : '📸 Add Photo or Video'}
+            <Icon name="camera" size={18} />
+            {uploading
+              ? (progress?.total > 1 ? `Saving ${progress.current} of ${progress.total}...` : 'Saving memory...')
+              : 'Add photos or videos'}
           </button>
+          {uploading && progress && (
+            <div className="mt-2 h-1.5 w-full rounded-full bg-cream-dark overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress.fraction * 100)} aria-valuemin={0} aria-valuemax={100}>
+              <div className="h-full bg-sage-500 transition-[width] duration-200" style={{ width: `${Math.max(4, Math.round(progress.fraction * 100))}%` }} />
+            </div>
+          )}
         </div>
 
         {/* Media Type Filter */}
@@ -184,7 +203,7 @@ export default function Portal({ onBack }) {
                   : 'bg-white border-2 border-cream-dark text-ink-muted hover:border-sage-300'
               )}
             >
-              {t === 'all' ? 'All' : t === 'photo' ? '📷 Photos' : '🎥 Videos'}
+              {t === 'all' ? 'All' : t === 'photo' ? 'Photos' : 'Videos'}
             </button>
           ))}
         </div>
@@ -193,7 +212,7 @@ export default function Portal({ onBack }) {
         <div className="px-4 mt-4">
           {filteredMedia.length === 0 ? (
             <EmptyState
-              emoji="🖼️"
+              icon="image"
               title="No memories in this portal"
               description="Upload the first photo or video to preserve this ceremony for future generations."
               primaryLabel="Upload First Memory"
@@ -203,26 +222,56 @@ export default function Portal({ onBack }) {
           ) : (
             <div className="grid grid-cols-3 gap-2">
               {filteredMedia.map((m) => (
-                <div key={m.id} className="relative aspect-square bg-cream-dark border-2 border-terracotta/25 rounded-soft overflow-hidden group">
-                  {m.mediaType === 'VIDEO' ? (
-                    <video src={m.url} controls className="w-full h-full object-cover" />
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setViewing(m)}
+                  aria-label={m.mediaType === 'VIDEO' ? 'Open video' : 'Open photo'}
+                  className="relative aspect-square bg-cream-dark border-2 border-terracotta/25 rounded-soft overflow-hidden active:scale-[0.97] transition-transform"
+                >
+                  {!m.url ? (
+                    <span className="flex h-full w-full items-center justify-center text-ink-muted">
+                      <Icon name="image" size={22} />
+                    </span>
+                  ) : m.mediaType === 'VIDEO' ? (
+                    <>
+                      <video src={`${m.url}#t=0.1`} muted playsInline preload="metadata" className="w-full h-full object-cover pointer-events-none" />
+                      <span className="absolute inset-0 flex items-center justify-center">
+                        <span className="h-9 w-9 rounded-full bg-black/55 text-white flex items-center justify-center">
+                          <Icon name="video" size={16} />
+                        </span>
+                      </span>
+                    </>
                   ) : (
                     <img src={m.url} alt="" loading="lazy" className="w-full h-full object-cover" />
                   )}
-                  <button
-                    type="button"
-                    onClick={() => deleteMedia(m.id)}
-                    aria-label="Delete photo"
-                    className="absolute top-1 right-1 w-7 h-7 bg-red-500/90 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    ✕
-                  </button>
-                </div>
+                </button>
               ))}
             </div>
           )}
         </div>
         <div className="h-8" />
+
+        {/* Full-screen viewer: works by tap on phones (the old hover-only delete button never showed there). */}
+        {viewing && (
+          <div className="fixed inset-0 z-50 bg-black/95 flex flex-col" role="dialog" aria-modal="true">
+            <div className="flex items-center justify-between px-4 pt-6 pb-3">
+              <button type="button" onClick={() => setViewing(null)} aria-label="Close" className={`h-10 w-10 rounded-full bg-white/10 text-white flex items-center justify-center ${pressable}`}>
+                <Icon name="close" size={20} />
+              </button>
+              <button type="button" onClick={() => deleteMedia(viewing.id)} className={`h-10 px-4 rounded-pill bg-white/10 text-white text-sm font-bold flex items-center gap-2 ${pressable}`}>
+                <Icon name="trash" size={16} /> Move to trash
+              </button>
+            </div>
+            <div className="flex-1 flex items-center justify-center px-2 pb-8 min-h-0">
+              {viewing.mediaType === 'VIDEO' ? (
+                <video src={viewing.url} controls autoPlay playsInline className="max-h-full max-w-full rounded-soft" />
+              ) : (
+                <img src={viewing.url} alt="" className="max-h-full max-w-full object-contain rounded-soft" />
+              )}
+            </div>
+          </div>
+        )}
       </div>
     )
   }
@@ -265,7 +314,7 @@ export default function Portal({ onBack }) {
           </div>
         ) : portals.length === 0 ? (
           <EmptyState
-            emoji="🖼️"
+            icon="image"
             title="No portals created yet"
             description="Create a portal above to archive family photos, videos, and ceremony memories."
             className="border-2 border-terracotta/25"

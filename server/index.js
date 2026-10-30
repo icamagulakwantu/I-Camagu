@@ -34,6 +34,7 @@ import identityRoutes from './routes/identity.js';
 import webhookRoutes from './routes/webhooks.js';
 import messageRoutes from './routes/message.js';
 import { checkRequiredEnvVars, envStatus } from './config/envCheck.js';
+import { storageStatus } from './services/storageService.js';
 import { initSentry, captureException, flush as flushSentry } from './config/sentry.js';
 import { installFatalHandlers } from './config/processHandlers.js';
 const __filename = fileURLToPath(import.meta.url);
@@ -113,6 +114,12 @@ app.get('/api/health', async (req, res) => {
 // unauthenticated: login itself may be the thing broken when this is needed.
 app.get('/api/health/env', (req, res) => {
   res.json(envStatus());
+});
+
+// Whether family photo storage actually works (bucket reachable with our
+// key) — yes/no plus a short reason code, never any secret.
+app.get('/api/health/storage', async (req, res) => {
+  res.json(await storageStatus());
 });
 
 app.use('/api/auth', authRoutes);
