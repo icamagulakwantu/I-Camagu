@@ -1,9 +1,9 @@
 import Icon from '../Icon.jsx'
-import BeadBand from './BeadBand.jsx'
 
-// One header for every main screen: back link, isiXhosa eyebrow, title,
-// short explanation, and a beaded underline. Using the same header
-// everywhere is what makes the tabs feel like one app.
+// One header for every main screen: back link, isiXhosa eyebrow, title and
+// a short explanation. Using the same header everywhere is what makes the
+// tabs feel like one app. (The beadwork stripe now lives only on the
+// bottom navigation, so headers stay clean.)
 export default function PageHeader({ eyebrow, title, subtitle, note, onBack, backLabel = 'Back', action = null, className = '' }) {
   return (
     <header className={`pb-5 ${className}`}>
@@ -25,7 +25,6 @@ export default function PageHeader({ eyebrow, title, subtitle, note, onBack, bac
       </div>
       {subtitle && <p className="mt-2 max-w-[36ch] text-sm leading-relaxed text-ink-muted">{subtitle}</p>}
       {note && <p className="mt-0.5 text-xs text-ink-muted/80">{note}</p>}
-      <BeadBand className="mt-4 w-24 rounded-sm" />
     </header>
   )
 }

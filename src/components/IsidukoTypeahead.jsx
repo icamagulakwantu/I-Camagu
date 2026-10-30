@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 
+// Every clan sits under one Xhosa umbrella, so suggestions show the clan and
+// its praise names only, never a sub-group heading (AbaThembu, AmaMpondo...).
 export default function IsidukoTypeahead({ label, value, onChange, nationLabel = '', required = false, placeholder = 'Type a clan or praise name' }) {
   const { accessToken } = useAuth();
   const [result, setResult] = useState({ results: [], advice: '' });
@@ -71,7 +73,6 @@ export default function IsidukoTypeahead({ label, value, onChange, nationLabel =
       {result.results.map((item) => <button key={item.id} type="button" onClick={() => { onChange(item.head); setNotice(''); setResult({ results: [], advice: '' }); }} className="w-full rounded-lg p-3 text-left hover:bg-cream focus:bg-cream">
         <span className="block font-bold text-ink">{item.display}</span>
         <span className="block text-xs text-ink-muted">{item.matchedName !== item.head ? item.matchedName + ' is a registered name for ' + item.head : item.head}</span>
-        {item.nation && <span className="block text-xs text-ink-muted">Nation: {item.nation}</span>}
         {item.possibleDistinct && <span className="block text-xs font-bold text-terracotta">Possible distinct spelling — please confirm carefully</span>}
         {item.fuzzy && <span className="block text-xs text-ink-muted">Suggestion only; tap to confirm</span>}
       </button>)}

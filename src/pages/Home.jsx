@@ -6,9 +6,11 @@ import PoolOfferCard from '../components/PoolOfferCard.jsx'
 import DidYouKnow from '../components/DidYouKnow.jsx'
 import NotificationBell from '../components/NotificationBell.jsx'
 import PinReminder from '../components/PinReminder.jsx'
-import BeadBand from '../components/ui/BeadBand.jsx'
 import JourneyMap from '../components/home/JourneyMap.jsx'
 import CommunityShortcuts from '../components/home/CommunityShortcuts.jsx'
+
+// Founder-supplied photo: women in umbhaco celebrating at an umgidi.
+const HERO_IMAGE = 'https://hercules-cdn.com/file_wxyYBh6l6xbEhksr09BuCEsR'
 
 // Step colours: sage = money saved, ochre = buying, terracotta = ceremony.
 const SAGE = '#4a7a4a'
@@ -134,9 +136,9 @@ export default function Home({ onNavigate, basketCount = 0, onSelectCeremony }) 
       {/* Hero: says what iCamagu is for. Not a button, so it never competes
           with the path below for the person's first tap. */}
       <section className="relative overflow-hidden rounded-[26px] mb-8 shadow-card">
-        <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1f1a15]/95 via-[#1f1a15]/55 to-[#1f1a15]/10" />
-        <div className="relative px-5 pb-6 pt-20">
+        <img src={HERO_IMAGE} alt="Women in umbhaco celebrating at an umgidi" className="absolute inset-0 w-full h-full object-cover object-[center_35%]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1f1a15]/95 via-[#1f1a15]/50 to-[#1f1a15]/5" />
+        <div className="relative px-5 pb-6 pt-44">
           <p className="eyebrow text-ochre-light">Molo, {user?.firstName || 'mhlobo'}</p>
           <h1 className="mt-2 font-display text-[1.85rem] font-semibold leading-[1.08] text-cream text-balance">
             Save together. Buy together. <em className="font-normal italic text-ochre-light">Honour tradition.</em>
@@ -145,7 +147,6 @@ export default function Home({ onNavigate, basketCount = 0, onSelectCeremony }) 
             Your stokvel, bulk group orders and ceremony planning in one place, so you know what tradition asks and never overpay.
           </p>
         </div>
-        <BeadBand className="relative" />
       </section>
 
       <JourneyMap steps={steps} loading={loading} />

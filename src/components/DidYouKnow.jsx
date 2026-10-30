@@ -1,10 +1,20 @@
 import { useState, useEffect } from 'react'
 
-const FALLBACK_LEGENDS = [
+// Founder-chosen people of today, with their own photos (hosted on the
+// Hercules CDN). They always show first; the community-reviewed legends
+// from /api/legends/featured follow after them.
+const FEATURED_PEOPLE = [
   {
-    category: 'Community Knowledge',
-    title: 'A living heritage',
-    bodyText: 'iCamagu is building a community-reviewed record of Xhosa history, heroes, heroines, language and ceremony for future generations.',
+    category: 'Fashion & Design',
+    title: 'Laduma Ngxokolo',
+    image: 'https://hercules-cdn.com/file_4NMV0NmqdNJmx9GTZpSrWTGR',
+    bodyText: 'The knitwear designer from Gqeberha behind MaXhosa Africa. He first created his patterns for amakrwala, the young men returning from ulwaluko, turning Xhosa beadwork into clothing now worn around the world.',
+  },
+  {
+    category: 'Sport',
+    title: 'Makazole Mapimpi',
+    image: 'https://hercules-cdn.com/file_y2v6F6YojuJsH4hhsPAcwNRN',
+    bodyText: 'The Springbok wing from Mdantsane who became the first Springbok to score a try in a Rugby World Cup final, in 2019. He went on to win a second World Cup with the Boks in 2023.',
   },
 ]
 
@@ -30,8 +40,13 @@ async function fetchPortrait(title) {
 
 const initials = (title) => wikiName(title).split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase()
 
+function mergeLegends(fromServer) {
+  const featuredTitles = new Set(FEATURED_PEOPLE.map((p) => p.title.toLowerCase()))
+  return [...FEATURED_PEOPLE, ...fromServer.filter((l) => !featuredTitles.has(String(l.title || '').toLowerCase()))]
+}
+
 export default function DidYouKnow() {
-  const [legends, setLegends] = useState(FALLBACK_LEGENDS)
+  const [legends, setLegends] = useState(FEATURED_PEOPLE)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [portrait, setPortrait] = useState(null)
 
@@ -39,22 +54,22 @@ export default function DidYouKnow() {
     fetch('/api/legends/featured')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setLegends(data)
-        else if (data && data.title) setLegends([data])
+        if (Array.isArray(data) && data.length > 0) setLegends(mergeLegends(data))
+        else if (data && data.title) setLegends(mergeLegends([data]))
       })
       .catch(() => {})
   }, [])
 
-  const current = legends[currentIndex] || FALLBACK_LEGENDS[0]
+  const current = legends[currentIndex] || FEATURED_PEOPLE[0]
 
   useEffect(() => {
     let alive = true
-    setPortrait(null)
-    if (current.title && current.category !== 'Community Knowledge') {
+    setPortrait(current.image || null)
+    if (!current.image && current.title && current.category !== 'Community Knowledge') {
       fetchPortrait(current.title).then((src) => { if (alive) setPortrait(src) })
     }
     return () => { alive = false }
-  }, [current.title, current.category])
+  }, [current.title, current.category, current.image])
 
   const handleNext = () => setCurrentIndex((prev) => (prev + 1) % legends.length)
   const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + legends.length) % legends.length)
@@ -77,7 +92,7 @@ export default function DidYouKnow() {
       </div>
 
       <div className="flex gap-4 items-start">
-        <div className="w-24 h-28 rounded-2xl overflow-hidden flex-shrink-0 bg-gradient-to-br from-terracotta to-brand-ochre flex items-center justify-center shadow-soft">
+        <div className="w-24 h-32 rounded-2xl overflow-hidden flex-shrink-0 bg-gradient-to-br from-terracotta to-brand-ochre flex items-center justify-center shadow-soft">
           {portrait ? (
             <img src={portrait} alt={current.title} className="w-full h-full object-cover object-top" loading="lazy"
               onError={() => setPortrait(null)} />
@@ -95,7 +110,7 @@ export default function DidYouKnow() {
           <p className="text-sm text-brand-black/75 mt-1 leading-relaxed">{current.bodyText || current.text}</p>
         </div>
       </div>
-      {portrait && <p className="text-[9px] text-brand-black/40 mt-2">Photo: Wikipedia / Wikimedia Commons</p>}
+      {portrait && !current.image && <p className="text-[9px] text-brand-black/40 mt-2">Photo: Wikipedia / Wikimedia Commons</p>}
     </div>
   )
 }

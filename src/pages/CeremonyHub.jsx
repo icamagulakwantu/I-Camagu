@@ -3,14 +3,15 @@ import { useAuth } from '../context/AuthContext.jsx'
 import CeremonyIcon from '../components/CeremonyIcon.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import PageHeader from '../components/ui/PageHeader.jsx'
-import BeadBand from '../components/ui/BeadBand.jsx'
 import Icon from '../components/Icon.jsx'
 
+// Founder-supplied photos, hosted on the Hercules CDN.
+const ULWALUKO_IMAGE = 'https://hercules-cdn.com/file_DyjWbFXGDDgiqgyH6wrcRaEx'
+const UMGIDI_IMAGE = 'https://hercules-cdn.com/file_wxyYBh6l6xbEhksr09BuCEsR'
+
 const CEREMONY_META = {
-  ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', image: '/images/ceremonies/ulwaluko.jpg' },
-  // Real South African traditional gathering photo, served from Unsplash's
-  // CDN; swap for a licensed local Umgidi photo if the family uploads one.
-  UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', image: 'https://images.unsplash.com/photo-1620464225966-8482645f2db1?auto=format&fit=crop&w=1200&q=80' },
+  ULWALUKO: { label: 'Ulwaluko', english: 'Initiation', desc: 'The passage into manhood — provisioning, seclusion and the return.', image: ULWALUKO_IMAGE },
+  UMGIDI: { label: 'Umgidi', english: 'Homecoming', desc: 'The feast that welcomes the initiate back into the homestead.', image: UMGIDI_IMAGE },
   INTAMBO_ENKULU: { label: 'Intambo Enkulu', english: 'The great bond', desc: 'The ceremony that binds two families together.', image: '/images/ceremonies/intambo-enkulu.jpg' },
   UKUKHAPHA: { label: 'Ukukhapha', english: 'Accompanying the departed', desc: 'The rite that walks a loved one to the ancestors.', image: '/images/ceremonies/ukukhapha.jpg' },
   INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: "A thanksgiving rite honouring a mother's provision.", image: '/images/ceremonies/inkobe-zika-mama.jpg' },
@@ -138,7 +139,6 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
                   Start planning {leadMeta.label} <Icon name="arrowRight" size={14} />
                 </span>
               </div>
-              <BeadBand className="relative" />
             </button>
           )}
 
