@@ -1,10 +1,14 @@
+import { useState } from 'react'
 import CeremonyIcon from '../../components/CeremonyIcon.jsx'
+import { useToast } from '../../components/ui/Toast.jsx'
 import { UNFORESEEN_PHASE } from '../../../shared/ceremonyCosts.js'
 import { buildListRows, countProgress, summariseRows } from '../../../shared/ceremonyList.js'
 import { cn } from '../../lib/utils'
 import Bi from './Bi.jsx'
 import MoneyCard from './MoneyCard.jsx'
 import SummaryActions from './SummaryActions.jsx'
+import JourneySteps from './JourneySteps.jsx'
+import { sharePlan, wasShared } from './share.js'
 import { BUTTONS, LABELS, STEPS } from './wizardText.js'
 import { CEREMONY_META, typeName } from './ceremonyMeta.js'
 import { planTitle } from './ceremonyForm.js'
@@ -12,6 +16,9 @@ import { formatDate, rand } from './format.js'
 import { pressable } from './styles.js'
 
 const stepLabel = (id) => STEPS.find((s) => s.id === id)
+
+// Journey colours match Home: terracotta = plan, ochre = money, sage = family.
+const COLORS = { plan: '#c45c26', budget: '#c1922f', share: '#4a7a4a', pledges: '#2f6b5a' }
 
 // Every section is one big tap that jumps straight back to its step.
 function SectionCard({ label, onClick, children }) {
@@ -27,6 +34,8 @@ function SectionCard({ label, onClick, children }) {
 }
 
 export default function Summary({ plan, pledges, accessToken, onEditStep, onOpenPledges, onViewTimeline, onBookEkoyini, onDeleted }) {
+  const { showToast } = useToast()
+  const [, setSharedTick] = useState(0)
   const ceremony = plan.ceremony || {}
   const budgetZAR = ceremony.budgetZAR != null && ceremony.budgetZAR !== '' ? parseFloat(ceremony.budgetZAR) : null
   const checklistItems = plan.checklistItems || []
@@ -42,9 +51,60 @@ export default function Summary({ plan, pledges, accessToken, onEditStep, onOpen
   const date = formatDate(ceremony.eventDate)
   const totalPledged = pledges.reduce((sum, p) => sum + (p.pledgedAmountZAR != null ? parseFloat(p.pledgedAmountZAR) : 0), 0)
 
+  const share = async (viaWhatsApp) => {
+    try {
+      await sharePlan({ plan, accessToken, viaWhatsApp })
+      setSharedTick((n) => n + 1)
+    } catch (err) {
+      showToast(err.message || 'Could not create the share link', 'error')
+    }
+  }
+
+  const shared = wasShared(plan)
+  const journey = [
+    {
+      id: 'plan', icon: 'clipboard', color: COLORS.plan, short: 'Plan',
+      xh: 'Cwangcisa', en: 'Plan the ceremony',
+      status: date ? `${percent}% ready` : 'Add a date',
+      done: Boolean(ceremony.eventDate),
+      hint: 'Give the ceremony a date so family can plan around it. Your checklist is already waiting.',
+      cta: 'Add the date',
+      onOpen: () => onEditStep('when'),
+    },
+    {
+      id: 'budget', icon: 'coins', color: COLORS.budget, short: 'Budget',
+      xh: 'Imali yakho', en: 'Set your budget',
+      status: budgetZAR != null ? rand(budgetZAR) : 'Not set',
+      done: budgetZAR != null,
+      hint: 'Say how much you can spend. Everything you pay comes off it, so you never overspend.',
+      cta: 'Set my budget',
+      onOpen: () => onEditStep('money'),
+    },
+    {
+      id: 'share', icon: 'share', color: COLORS.share, short: 'Share',
+      xh: 'Yazisa usapho', en: 'Tell your family',
+      status: shared ? 'Sent' : 'Not yet',
+      done: shared,
+      hint: 'Send the plan on WhatsApp. Family see what is still needed and can pledge from the link.',
+      cta: 'Share on WhatsApp',
+      onOpen: () => share(true),
+    },
+    {
+      id: 'pledges', icon: 'gift', color: COLORS.pledges, short: 'Ukugida',
+      xh: 'Ukugida', en: 'Family pledges',
+      status: pledges.length ? `${pledges.length} pledged` : 'None yet',
+      done: pledges.length > 0,
+      hint: 'As family promise goats, drinks or money, they show up here, so you know what is covered.',
+      cta: 'See pledges',
+      onOpen: onOpenPledges,
+    },
+  ]
+
   return (
     <div className="px-4 mt-4 space-y-3">
-      <p className="text-xs text-ink-muted"><Bi {...LABELS.tapToChange} /></p>
+      <JourneySteps steps={journey} />
+
+      <p className="text-xs text-ink-muted pt-1"><Bi {...LABELS.tapToChange} /></p>
 
       <SectionCard label={stepLabel('what')} onClick={() => onEditStep('what')}>
         <span className="flex items-center gap-3">
@@ -85,7 +145,7 @@ export default function Summary({ plan, pledges, accessToken, onEditStep, onOpen
       </SectionCard>
 
       <div className="pt-2">
-        <SummaryActions plan={plan} accessToken={accessToken} onViewTimeline={onViewTimeline} onBookEkoyini={onBookEkoyini} onDeleted={onDeleted} />
+        <SummaryActions plan={plan} onShare={share} accessToken={accessToken} onViewTimeline={onViewTimeline} onBookEkoyini={onBookEkoyini} onDeleted={onDeleted} />
       </div>
     </div>
   )

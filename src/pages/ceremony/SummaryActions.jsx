@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useToast } from '../../components/ui/Toast.jsx'
-import { shareToWhatsApp } from '../../lib/whatsapp.js'
 import Icon from '../../components/Icon.jsx'
 import { cn } from '../../lib/utils'
 import { request } from './api.js'
@@ -12,8 +11,9 @@ import { inputClass, pressable } from './styles.js'
 const ACTION_BUTTON = 'group flex min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border border-terracotta/15 bg-white px-2 py-3 text-center shadow-[0_8px_22px_-12px_rgba(43,38,32,0.28)] transition-all hover:border-sage-300 hover:bg-sage-50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 min-h-[76px] active:scale-[0.98]'
 
 // Everything a host can do with a finished plan: save it as a template, open
-// the timeline, book the bar, share it, or delete it.
-export default function SummaryActions({ plan, accessToken, onViewTimeline, onBookEkoyini, onDeleted }) {
+// the timeline, book the bar, share it, or delete it. Sharing is owned by the
+// Summary (onShare) so the journey map ticks "Share" as soon as it is sent.
+export default function SummaryActions({ plan, accessToken, onShare, onViewTimeline, onBookEkoyini, onDeleted }) {
   const { showToast } = useToast()
   const [templateOpen, setTemplateOpen] = useState(false)
   const [templateTitle, setTemplateTitle] = useState('')
@@ -39,17 +39,6 @@ export default function SummaryActions({ plan, accessToken, onViewTimeline, onBo
       showToast(err.message, 'error')
     } finally {
       setSavingTemplate(false)
-    }
-  }
-
-  const share = async (viaWhatsApp) => {
-    try {
-      const data = await request(`/api/ceremonies/plans/${plan.id}/share-link`, accessToken, { method: 'POST' })
-      const message = `${title} - my ceremony checklist on iCamagu\n${data.shareUrl}`
-      if (!viaWhatsApp && navigator.share) navigator.share({ title, text: message }).catch(() => {})
-      else shareToWhatsApp(message)
-    } catch (err) {
-      showToast(err.message, 'error')
     }
   }
 
@@ -84,11 +73,12 @@ export default function SummaryActions({ plan, accessToken, onViewTimeline, onBo
       </div>
 
       <div className="flex gap-2">
-        <button type="button" onClick={() => share(false)} className={cn('flex-1 h-14 border-2 border-terracotta text-terracotta rounded-pill flex items-center justify-center gap-2', pressable)}>
+        <button type="button" onClick={() => onShare(false)} className={cn('flex-1 h-14 border-2 border-terracotta text-terracotta rounded-pill flex items-center justify-center gap-2', pressable)}>
           <Icon name="share" size={16} /> <Bi {...BUTTONS.share} />
         </button>
-        <button type="button" onClick={() => share(true)} className={cn('flex-1 h-14 bg-[#25D366] text-white font-bold rounded-pill', pressable)}>WhatsApp</button>
+        <button type="button" onClick={() => onShare(true)} className={cn('flex-1 h-14 bg-[#25D366] text-white font-bold rounded-pill', pressable)}>WhatsApp</button>
       </div>
+      <p className="text-[11px] text-ink-muted text-center -mt-1">Family can pledge straight from the link. Sharing again replaces the old link.</p>
 
       {templateOpen && (
         <form onSubmit={saveTemplate} className="bg-white border-2 border-sage-500 rounded-soft p-4 space-y-3">
