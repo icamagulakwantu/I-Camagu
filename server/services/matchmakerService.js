@@ -3,12 +3,18 @@ import { resolveTierLadder, getTierForMetric, palletsForCases } from '../utils/s
 import { notifyAdminOfSmartMatchTier } from './notificationService.js';
 import { newPoolWindow, isPoolWindowClosed } from '../utils/poolWindow.js';
 import { generateUniqueReference } from '../utils/referenceGenerator.js';
+import {
+  DEFAULT_POOL_RADIUS_KM, PRIVATE_ORDER_RADIUS_KM, isPrivateOrderPool, poolDistanceKm, poolIsNear, resolveDelivery,
+} from '../utils/deliveryArea.js';
 
 // Legacy label for pools opened before an area was required. Never matched
 // into again, so members with a real area stop being routed to it.
 export const UNSPECIFIED_AREA = 'Unspecified';
 
-export const AREA_REQUIRED_MESSAGE = 'Please add your area (town or suburb) to your profile before joining a pool, so we can match you with people near you.';
+export const AREA_REQUIRED_MESSAGE = 'Please type the delivery address (street, suburb or town) so we know where this order is going.';
+
+// How a cart is checked out: pooled with neighbours, or a normal one-person order.
+export const CHECKOUT_MODES = ['POOL', 'SOLO'];
 
 // Default minimum (in cases) before a group order is MATCHED and merchants'
 // offers can be accepted. No merchant is chosen up front any more, so there
@@ -96,20 +102,6 @@ function tierBasisForCategory(category) {
   return category === 'TAVERN' ? 'PALLETS' : 'AMOUNT';
 }
 
-function normaliseArea(value) {
-  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .trim().toLocaleLowerCase().replace(/\s+/g, ' ');
-}
-
-function distanceKm(aLat, aLon, bLat, bLon) {
-  const radians = (value) => value * Math.PI / 180;
-  const dLat = radians(bLat - aLat);
-  const dLon = radians(bLon - aLon);
-  const h = Math.sin(dLat / 2) ** 2
-    + Math.cos(radians(aLat)) * Math.cos(radians(bLat)) * Math.sin(dLon / 2) ** 2;
-  return 6371 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
-}
-
 const activeCases = (pool) => pool.baskets
   .filter((basket) => basket.status !== 'CANCELLED')
   .reduce((sum, basket) => sum + basket.items.reduce((n, item) => n + item.quantity, 0), 0);
@@ -127,19 +119,23 @@ function poolCanTake(pool, incomingCases) {
 // The open pool this member is ALREADY in for this category, if any. Shopping
 // again must add to that pool, not open (or land in) a different one — this
 // was the "every time I shop it creates a new pool" flaw.
-async function findMyOpenPool(userId, category, incomingCases) {
+//
+// Only pools near THIS delivery count: a member who usually pools in Soweto
+// but is sending this order to Motherwell must not land in the Soweto pool.
+async function findMyOpenPool(userId, category, incomingCases, delivery) {
   const parked = await prisma.basket.findMany({
     where: {
       userId,
       status: 'PARKED',
-      pool: { category, status: 'OPEN', area: { not: UNSPECIFIED_AREA } },
+      pool: { category, status: 'OPEN', area: { not: UNSPECIFIED_AREA }, radiusKm: { gt: PRIVATE_ORDER_RADIUS_KM } },
     },
     orderBy: { updatedAt: 'desc' },
     take: 5,
     include: { pool: { include: { partner: true, baskets: { include: { items: true } } } } },
   });
   for (const basket of parked) {
-    if (basket.pool && poolCanTake(basket.pool, incomingCases)) return basket.pool;
+    if (!basket.pool || !poolCanTake(basket.pool, incomingCases)) continue;
+    if (poolIsNear(basket.pool, delivery, delivery.area)) return basket.pool;
   }
   return null;
 }
@@ -151,33 +147,28 @@ async function findMyOpenPool(userId, category, incomingCases) {
 //
 // targetDate only matters when a *new* pool is being opened — joining an
 // already-open pool inherits whatever deadline that pool already has.
-async function findOrCreateOpenPool(category, area, targetDate, user, incomingCases = 0) {
+async function findOrCreateOpenPool(category, delivery, targetDate, user, incomingCases = 0) {
   const candidates = await prisma.bulkPool.findMany({
-    where: { category, status: 'OPEN', area: { not: UNSPECIFIED_AREA } },
+    where: { category, status: 'OPEN', area: { not: UNSPECIFIED_AREA }, radiusKm: { gt: PRIVATE_ORDER_RADIUS_KM } },
     include: { partner: true, baskets: { include: { items: true } } },
     orderBy: { createdAt: 'desc' },
     take: 100,
   });
-  const hasUserCoordinates = Number.isFinite(user?.latitude) && Number.isFinite(user?.longitude);
-  let pool = candidates.find((candidate) => {
-    if (!poolCanTake(candidate, incomingCases)) return false;
-    const hasPoolCoordinates = Number.isFinite(candidate.latitude) && Number.isFinite(candidate.longitude);
-    if (hasUserCoordinates && hasPoolCoordinates) {
-      return distanceKm(user.latitude, user.longitude, candidate.latitude, candidate.longitude) <= (candidate.radiusKm || 20);
-    }
-    // Pools without coordinates remain discoverable by normalized town names.
-    return normaliseArea(area) && normaliseArea(area) === normaliseArea(candidate.area);
-  }) || null;
+  // Nearest joinable pool wins, not merely the newest one in range.
+  const nearby = candidates
+    .filter((candidate) => poolCanTake(candidate, incomingCases) && poolIsNear(candidate, delivery, delivery.area))
+    .sort((a, b) => poolDistanceKm(a, delivery, delivery.area) - poolDistanceKm(b, delivery, delivery.area));
+  let pool = nearby[0] || null;
   if (!pool) {
     const moqTarget = DEFAULT_MOQ_CASES;
     pool = await prisma.bulkPool.create({
       data: {
         category,
-        area,
-        latitude: hasUserCoordinates ? user.latitude : null,
-        longitude: hasUserCoordinates ? user.longitude : null,
+        area: delivery.area,
+        latitude: delivery.latitude,
+        longitude: delivery.longitude,
         createdById: user?.id || null,
-        radiusKm: 20,
+        radiusKm: DEFAULT_POOL_RADIUS_KM,
         moqTarget,
         status: 'OPEN',
         tierBasis: tierBasisForCategory(category),
@@ -189,6 +180,30 @@ async function findOrCreateOpenPool(category, area, targetDate, user, incomingCa
   }
   if (!pool.partner) pool.partner = pool.partnerId ? await prisma.partner.findUnique({ where: { id: pool.partnerId } }) : null;
   return pool;
+}
+
+// "Buy on my own": a one-person order. It reuses the pool machinery end to
+// end (order document, order reference, merchant offers, payments), so it is
+// stored as a private pool whose minimum is exactly this order — it matches
+// the moment it's placed and is never offered to anyone else to join.
+async function createPrivateOrderPool(category, delivery, targetDate, user, incomingCases) {
+  return prisma.bulkPool.create({
+    data: {
+      category,
+      area: delivery.area,
+      latitude: delivery.latitude,
+      longitude: delivery.longitude,
+      createdById: user?.id || null,
+      radiusKm: PRIVATE_ORDER_RADIUS_KM,
+      moqTarget: Math.max(1, incomingCases),
+      capCases: Math.max(1, incomingCases),
+      deadline: targetDate || null,
+      status: 'OPEN',
+      tierBasis: tierBasisForCategory(category),
+      partnerId: null,
+    },
+    include: { partner: true, baskets: { include: { items: true } } },
+  });
 }
 
 // Emails the admin the first time a pool reaches a new SmartMatch tier, so
@@ -209,12 +224,15 @@ async function notifySmartMatchTierIfCrossed(pool, currentCases, currentAmountZA
 // A pool the member chose explicitly — via an invite link OR the "Add to this
 // pool" button on a pool they're already in. Returned even if no longer OPEN
 // (its category is still needed); callers check `.status === 'OPEN'`.
-async function getInvitedPool(joinPoolId) {
-  if (!joinPoolId) return null;
-  return prisma.bulkPool.findUnique({
-    where: { id: joinPoolId },
+async function getInvitedPools(joinPoolIds) {
+  const ids = [...new Set((joinPoolIds || []).filter((id) => typeof id === 'string' && id))].slice(0, 10);
+  if (!ids.length) return new Map();
+  const pools = await prisma.bulkPool.findMany({
+    where: { id: { in: ids } },
     include: { partner: true, baskets: { include: { items: true } } },
   });
+  // Someone else's private order can never be joined, even with its id.
+  return new Map(pools.filter((pool) => !isPrivateOrderPool(pool)).map((pool) => [pool.category, pool]));
 }
 
 // One parking primitive for both full-basket checkout and the ceremony
@@ -292,13 +310,19 @@ export async function parkItemsIntoPool({
   });
 }
 
-export async function submitBasketToPool(userId, basketId, targetDate, joinPoolId) {
+// options.mode: 'POOL' (default) pools with neighbours; 'SOLO' is a normal
+// one-person order. options.delivery: the address typed at checkout
+// ({ address, area, latitude, longitude }); falls back to the profile.
+// joinPoolIds: pools the member picked (invite link, "Add to this pool", or
+// the pool finder) — at most one per category is used.
+export async function submitBasketToPool(userId, basketId, targetDate, joinPoolIds = [], options = {}) {
+  const mode = CHECKOUT_MODES.includes(options.mode) ? options.mode : 'POOL';
   const [basket, user] = await Promise.all([
     prisma.basket.findFirst({
       where: { id: basketId, userId, status: 'DRAFT' },
       include: { items: { include: { sku: true } } },
     }),
-    prisma.user.findUnique({ where: { id: userId }, select: { id: true, location: true, latitude: true, longitude: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { id: true, address: true, location: true, latitude: true, longitude: true } }),
   ]);
   if (!basket) throw new Error('Basket not found or already submitted');
   if (basket.items.length === 0) throw new Error('Basket is empty');
@@ -311,11 +335,10 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
     parsedTargetDate = d;
   }
 
-  // A pool is scoped by the member's own declared area. Without one we used
-  // to file people under "Unspecified", splitting neighbours into separate
-  // pools — so an area is now required before pooling.
-  const area = user?.location?.trim();
-  if (!area) throw new Error(AREA_REQUIRED_MESSAGE);
+  // Where this order is going decides which pools are "near" — the typed
+  // checkout address first, the profile only as a fallback.
+  const delivery = resolveDelivery(user, options.delivery);
+  if (!delivery.area) throw new Error(AREA_REQUIRED_MESSAGE);
 
   // A basket can hold items from several categories, but a pool is always one
   // category — split by what each item needs and submit each group to its own pool.
@@ -326,41 +349,50 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
     groups.get(category).push(item);
   }
 
-  const invitedPool = await getInvitedPool(joinPoolId);
-  const joinPoolCategory = invitedPool?.category ?? null;
+  const invitedPools = mode === 'POOL' ? await getInvitedPools(joinPoolIds) : new Map();
 
   const submissions = [];
 
   for (const [category, items] of groups) {
     const incomingCases = items.reduce((sum, item) => sum + item.quantity, 0);
-    const isInvitedCategory = Boolean(joinPoolId) && category === joinPoolCategory;
-    const invitedPoolStillJoinable = isInvitedCategory && invitedPool.status === 'OPEN'
+    const invitedPool = invitedPools.get(category) || null;
+    const invitedPoolStillJoinable = Boolean(invitedPool) && invitedPool.status === 'OPEN'
       && poolCanTake(invitedPool, incomingCases);
 
-    // Order of preference: the pool they explicitly chose, then the pool they
-    // are already in for this category, and only then the nearest open pool
-    // (or a brand-new one).
-    let pool = invitedPoolStillJoinable ? invitedPool : null;
+    let pool = null;
     let joinedOwnPool = false;
-    if (!pool) {
-      pool = await findMyOpenPool(userId, category, incomingCases);
-      joinedOwnPool = Boolean(pool);
+    if (mode === 'SOLO') {
+      pool = await createPrivateOrderPool(category, delivery, parsedTargetDate, user, incomingCases);
+    } else {
+      // Order of preference: the pool they explicitly chose, then the pool
+      // they are already in near this address, and only then the nearest
+      // open pool (or a brand-new one).
+      pool = invitedPoolStillJoinable ? invitedPool : null;
+      if (!pool) {
+        pool = await findMyOpenPool(userId, category, incomingCases, delivery);
+        joinedOwnPool = Boolean(pool);
+      }
+      if (!pool) pool = await findOrCreateOpenPool(category, delivery, parsedTargetDate, user, incomingCases);
     }
-    if (!pool) pool = await findOrCreateOpenPool(category, area, parsedTargetDate, user, incomingCases);
 
     const parked = await parkItemsIntoPool({
       userId,
       poolId: pool.id,
       sourceBasketId: basket.id,
       itemIds: items.map((item) => item.id),
-      mergeIntoExisting: true,
+      mergeIntoExisting: mode === 'POOL',
     });
 
-    const result = await checkAndMatchPool(pool.id);
+    const result = await checkAndMatchPool(pool.id, {
+      deliveryLocation: mode === 'SOLO' ? delivery.address || delivery.area : null,
+    });
     submissions.push({
       category,
+      mode,
+      poolId: pool.id,
       partnerName: pool.partner?.name || null,
       area: pool.area,
+      deliveryAddress: delivery.address,
       windowDeadline: pool.deadline,
       matched: result.matched,
       currentCases: result.currentCases,
@@ -369,19 +401,21 @@ export async function submitBasketToPool(userId, basketId, targetDate, joinPoolI
       // true when the items went into a pool this member was already in
       // (either chosen, or picked automatically) rather than a new one.
       addedToExistingPool: joinedOwnPool || parked.merged,
-      // Only defined for the category an invite link targeted: false means
-      // that pool had closed, so they were matched elsewhere — said honestly.
-      joinedInvitedPool: isInvitedCategory ? invitedPoolStillJoinable : undefined,
+      // Only defined when the member picked a pool for this category: false
+      // means that pool had closed, so they were matched elsewhere.
+      joinedInvitedPool: invitedPool ? invitedPoolStillJoinable : undefined,
     });
   }
 
   // Every item has now moved into a parked basket, so the open cart is empty.
   await prisma.basket.deleteMany({ where: { id: basket.id, status: 'DRAFT', items: { none: {} } } });
 
-  return { submissions };
+  return { submissions, delivery, mode };
 }
 
-export async function checkAndMatchPool(poolId) {
+// options.deliveryLocation: an exact address (private orders); shared pools
+// keep the collection-point wording until a location is confirmed.
+export async function checkAndMatchPool(poolId, options = {}) {
   const pool = await prisma.bulkPool.findUnique({
     where: { id: poolId },
     include: { baskets: { include: { items: { include: { sku: true } } } }, partner: true },
@@ -468,7 +502,9 @@ export async function checkAndMatchPool(poolId) {
         groupCode: await generateGroupCode(tx),
         totalAmountZAR,
         // Collection points default to a location near a police station.
-        deliveryLocation: `Near the police station closest to ${currentPool.area} — exact location to be confirmed`,
+        deliveryLocation: options.deliveryLocation
+          ? `Deliver to: ${options.deliveryLocation}`
+          : `Near the police station closest to ${currentPool.area} — exact location to be confirmed`,
         status: 'PENDING_MEMBER_CONFIRMATION',
       },
     });

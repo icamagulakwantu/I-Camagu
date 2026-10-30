@@ -1,5 +1,8 @@
 import prisma from '../config/db.js';
-import { submitBasketToPool, AREA_REQUIRED_MESSAGE } from '../services/matchmakerService.js';
+import { submitBasketToPool, AREA_REQUIRED_MESSAGE, UNSPECIFIED_AREA } from '../services/matchmakerService.js';
+import { searchAddresses, reverseLookup } from '../services/geocodeService.js';
+import { POOL_FINDER_RADIUS_KM, PRIVATE_ORDER_RADIUS_KM, hasCoordinates, isPrivateOrderPool, poolDistanceKm } from '../utils/deliveryArea.js';
+import { isPoolWindowClosed } from '../utils/poolWindow.js';
 import { findSuggestedPoolsForItem, joinPoolWithItem, getNearbyDemandSignal, getCommunityFeed } from '../services/poolDiscoveryService.js';
 import { PALLET_CASES, palletsForCases, resolveTierLadder, getTierForMetric, getNextTierForMetric, amountToReachTier } from '../utils/smartMatchTiers.js';
 
@@ -55,23 +58,31 @@ export async function getPoolDemandSignal(req, res) {
 }
 
 export async function submitToPool(req, res) {
-  const { basketId, targetDate, joinPoolId } = req.body;
+  const { basketId, targetDate, joinPoolId, joinPoolIds, mode, delivery } = req.body;
   if (!basketId) {
     return res.status(400).json({ error: 'basketId is required' });
   }
+  // joinPoolId is the older single-pool field; still accepted.
+  const chosenPools = [...(Array.isArray(joinPoolIds) ? joinPoolIds : []), ...(joinPoolId ? [joinPoolId] : [])];
 
   try {
-    const result = await submitBasketToPool(req.userId, basketId, targetDate, joinPoolId);
+    const result = await submitBasketToPool(req.userId, basketId, targetDate, chosenPools, {
+      mode,
+      delivery: delivery && typeof delivery === 'object' ? delivery : null,
+    });
     const lines = result.submissions.map((s) => {
       const label = CATEGORY_LABEL[s.category];
+      if (s.mode === 'SOLO') {
+        return `${label} order placed${s.groupCode ? ` (order ${s.groupCode})` : ''} — merchants can now send offers. We'll notify you when one is confirmed.`;
+      }
       const progress = `${s.currentCases}/${s.moqTarget} needed`;
       let base;
       if (s.matched) base = `${label} pool near ${s.area} reached its minimum order! Group code: ${s.groupCode}`;
       else if (s.addedToExistingPool) base = `${label} added to your pool near ${s.area} — ${progress}.`;
       else base = `${label} pooling near ${s.area} — ${progress}.`;
-      // Tells the truth when the pool they were invited to had already closed.
+      // Tells the truth when the pool they picked had already closed.
       if (s.joinedInvitedPool === false) {
-        return `${base} (The pool you chose had already closed or was full, so your items went to another open pool near you.)`;
+        return `${base} (The pool you chose had already closed or was full, so your items went to another open pool near your address.)`;
       }
       return base;
     });
@@ -80,9 +91,96 @@ export async function submitToPool(req, res) {
   } catch (error) {
     res.status(400).json({
       error: error.message,
-      // Lets the cart screen show a "Set my area" button instead of just text.
+      // Lets the cart screen focus the address box instead of just showing text.
       code: error.message === AREA_REQUIRED_MESSAGE ? 'AREA_REQUIRED' : undefined,
     });
+  }
+}
+
+// Address suggestions while typing at checkout (South Africa only).
+export async function searchDeliveryAddress(req, res) {
+  try {
+    res.json({ suggestions: await searchAddresses(req.query.q) });
+  } catch (error) {
+    console.error('Address search error:', error.message);
+    // Typing still works without suggestions, so never block checkout.
+    res.json({ suggestions: [], unavailable: true });
+  }
+}
+
+// "Use my current location" -> a readable address.
+export async function reverseDeliveryAddress(req, res) {
+  const latitude = Number(req.query.lat);
+  const longitude = Number(req.query.lon);
+  if (!hasCoordinates({ latitude, longitude })) return res.status(400).json({ error: 'A valid location is required' });
+  try {
+    const place = await reverseLookup(latitude, longitude);
+    res.json({ place: place || { label: '', address: '', area: '', latitude, longitude } });
+  } catch (error) {
+    console.error('Reverse address error:', error.message);
+    res.json({ place: { label: '', address: '', area: '', latitude, longitude }, unavailable: true });
+  }
+}
+
+/**
+ * The pool finder: open group orders near ANY address the member types —
+ * not just their profile area — for the kinds of items in their cart.
+ * Query: lat, lon (optional), area (optional), categories=TAVERN,GROCERY
+ */
+export async function getPoolsNearAddress(req, res) {
+  const point = req.query.lat && req.query.lon
+    ? { latitude: Number(req.query.lat), longitude: Number(req.query.lon) }
+    : null;
+  const area = String(req.query.area || '').trim().slice(0, 80);
+  const usePoint = point && hasCoordinates(point) ? point : null;
+  if (!usePoint && !area) return res.json({ pools: [] });
+  const categories = String(req.query.categories || '').split(',').filter((c) => CATEGORY_LABEL[c]);
+
+  try {
+    const pools = await prisma.bulkPool.findMany({
+      where: {
+        status: 'OPEN',
+        area: { not: UNSPECIFIED_AREA },
+        radiusKm: { gt: PRIVATE_ORDER_RADIUS_KM },
+        ...(categories.length ? { category: { in: categories } } : {}),
+      },
+      include: {
+        baskets: {
+          where: { status: { not: 'CANCELLED' } },
+          select: { userId: true, items: { select: { quantity: true } } },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+    });
+
+    const results = pools.map((pool) => {
+      const currentCases = pool.baskets.reduce((sum, b) => sum + b.items.reduce((n, i) => n + i.quantity, 0), 0);
+      const distance = poolDistanceKm(pool, usePoint, area);
+      return {
+        id: pool.id,
+        category: pool.category,
+        area: pool.area,
+        distanceKm: distance == null ? null : Math.round(distance * 10) / 10,
+        currentCases,
+        moqTarget: pool.moqTarget,
+        members: new Set(pool.baskets.map((b) => b.userId)).size,
+        isMine: pool.baskets.some((b) => b.userId === req.userId),
+        deadline: pool.deadline,
+        progress: pool.moqTarget ? Math.min(1, currentCases / pool.moqTarget) : 0,
+        closed: isPoolWindowClosed(pool, currentCases),
+      };
+    })
+      .filter((pool) => !pool.closed && pool.distanceKm != null && pool.distanceKm <= POOL_FINDER_RADIUS_KM)
+      // Your own pool first, then the closest, then the fullest (closest to ordering).
+      .sort((a, b) => (b.isMine - a.isMine) || (a.distanceKm - b.distanceKm) || (b.progress - a.progress))
+      .slice(0, 12)
+      .map(({ closed, ...pool }) => pool);
+
+    res.json({ pools: results, radiusKm: POOL_FINDER_RADIUS_KM });
+  } catch (error) {
+    console.error('Pools near address error:', error.message);
+    res.status(500).json({ error: 'Could not find pools near that address' });
   }
 }
 
@@ -264,6 +362,8 @@ export async function getMyPoolStatus(req, res) {
         basketStatus: basket.status,
         poolId: basket.pool.id,
         category: basket.pool.category,
+        // A "buy on my own" order: shown as an order, not a pool to grow.
+        isPrivate: isPrivateOrderPool(basket.pool),
         partnerName: basket.pool.partner?.name || null,
         area: basket.pool.area,
         currentCases,
@@ -308,7 +408,10 @@ export async function getPoolSummary(req, res) {
       where: { id },
       include: { partner: true, baskets: { include: { items: { include: { sku: true } } } } },
     });
-    if (!pool) return res.status(404).json({ error: 'Pool not found' });
+    // Private orders are only visible to the member who placed them.
+    if (!pool || (isPrivateOrderPool(pool) && !pool.baskets.some((b) => b.userId === req.userId))) {
+      return res.status(404).json({ error: 'Pool not found' });
+    }
 
     const activeBaskets = pool.baskets.filter((b) => b.status !== 'CANCELLED');
     const currentCases = activeBaskets.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.quantity, 0), 0);

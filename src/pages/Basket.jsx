@@ -10,6 +10,7 @@ import { unitOf, quantityLabel } from '../data/bulkUnits.js'
 import { resolveOrderStage } from '../data/orderStages.js'
 import { OrderStageTracker } from '../components/ui/OrderStageTracker.jsx'
 import { CATEGORY_LABEL } from '../data/poolCategories.js'
+import CheckoutPanel from '../components/checkout/CheckoutPanel.jsx'
 
 // Same key the /pool/:id invite route uses — "Add to this pool" reuses it,
 // so a member's own pool and an invited pool follow exactly one join path.
@@ -36,7 +37,7 @@ function tierValueLabel(tier, basis) {
 }
 
 export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
-  const { accessToken } = useAuth()
+  const { accessToken, user, updateUser } = useAuth()
   const { refreshPools } = useCommunity()
   const { showToast } = useToast()
 
@@ -44,7 +45,6 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [targetDate, setTargetDate] = useState('')
   // One entry per pool the member is in (the server groups their baskets).
   const [poolStatuses, setPoolStatuses] = useState([])
   const [cancellingId, setCancellingId] = useState(null)
@@ -169,7 +169,9 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
     }
   }
 
-  const submitToPool = async () => {
+  // One checkout for both paths: pooled ("Buy together") or a normal
+  // one-person order ("Buy on my own"), delivered to any typed address.
+  const submitCheckout = async ({ mode, delivery, joinPoolIds, targetDate }) => {
     if (!basketData.basket?.id) return
     setSubmitting(true)
     setAreaMissing(false)
@@ -180,19 +182,14 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({
-          basketId: basketData.basket.id,
-          targetDate: targetDate || undefined,
-          joinPoolId: joiningPool?.id || undefined,
-        }),
+        body: JSON.stringify({ basketId: basketData.basket.id, mode, delivery, joinPoolIds, targetDate }),
       })
       const data = await res.json()
       if (!res.ok) {
         if (data.code === 'AREA_REQUIRED') setAreaMissing(true)
         throw new Error(data.error || 'Failed to submit cart.')
       }
-      showToast(data.message || 'Cart submitted successfully!', 'success')
-      setTargetDate('')
+      showToast(data.message || 'Order placed!', 'success', 6000)
       if (joiningPool) dismissJoiningPool()
       fetchBasket()
       fetchPoolStatus()
@@ -201,6 +198,26 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       showToast(err.message, 'error')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  // "Save as my usual address" — fills the profile so next time is one tap.
+  const saveDeliveryAsProfile = async (delivery) => {
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({
+          address: delivery.address,
+          location: delivery.area || undefined,
+          ...(delivery.latitude != null && delivery.longitude != null
+            ? { latitude: delivery.latitude, longitude: delivery.longitude }
+            : {}),
+        }),
+      })
+      if (res.ok) updateUser(await res.json())
+    } catch {
+      // Saving is a convenience; the order still goes through.
     }
   }
 
@@ -347,19 +364,10 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
         </div>
       )}
 
-      {areaMissing && (
-        <div role="alert" className="bg-white border-2 border-terracotta rounded-soft p-4 mb-4">
-          <p className="text-sm font-bold text-ink">Add your area first</p>
-          <p className="text-xs text-ink-muted mt-1">
-            SmartMatch pools people by town or suburb. Open <span className="font-bold">More → Profile</span>, add your area (for example "Motherwell"), then submit your cart again.
-          </p>
-        </div>
-      )}
-
       {poolStatuses.map((poolStatus) => (
         <div key={`${poolStatus.poolId}:${poolStatus.basketStatus}`} className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
           <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">
-            Smart Match — {CATEGORY_LABEL[poolStatus.category]}
+            {poolStatus.isPrivate ? 'My own order' : 'Smart Match'} — {CATEGORY_LABEL[poolStatus.category]}
           </p>
           {/* Only shown once the admin has accepted a merchant's offer on this
               group order — members never choose a merchant themselves. */}
@@ -373,9 +381,11 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
               ? `Pooling with other members near ${poolStatus.area}. Merchants send offers on the whole group order — the more people join, the stronger the offers can be.`
               : poolStatus.poolStatus === 'FULFILLED'
                 ? 'Delivered/collected — your order is complete.'
-                : 'Matched! Your order pooled with other members.'}
+                : poolStatus.isPrivate
+                  ? `Order placed for delivery to ${poolStatus.area}.`
+                  : 'Matched! Your order pooled with other members.'}
           </p>
-          {poolStatus.myCases > 0 && (
+          {poolStatus.myCases > 0 && !poolStatus.isPrivate && (
             <p className="text-[11px] text-white/85 mb-2">You've added {poolStatus.myCases} to this pool.</p>
           )}
 
@@ -393,7 +403,9 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                 <p className="text-xs text-white/90 mb-2">Your EFT reference is in — waiting on the merchant to confirm receipt.</p>
               ) : !poolStatus.partnerName ? (
                 <p className="text-xs text-white/90 mb-2">
-                  Minimum reached! Merchants are sending offers on this group order — payment details will show here once the best offer is confirmed.
+                  {poolStatus.isPrivate
+                    ? 'Merchants are sending offers on your order — payment details will show here once the best offer is confirmed.'
+                    : 'Minimum reached! Merchants are sending offers on this group order — payment details will show here once the best offer is confirmed.'}
                 </p>
               ) : (
                 <p className="text-xs text-white/90 mb-2">
@@ -615,55 +627,19 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
             )}
           </div>
 
-          {/* Submit — the app picks the pool; the member is told which. */}
-          <div className="bg-white border border-cream-dark rounded-soft p-4 shadow-soft">
-            <p className="text-xs font-black uppercase text-ink-muted mb-1">Smart Match — Join a Bulk Order</p>
-
-            {joiningPool ? (
-              <p className="text-xs text-ink mb-3">
-                Your {CATEGORY_LABEL[joiningPool.category].toLowerCase()} items will go into the pool near <span className="font-bold">{joiningPool.area}</span>.
-              </p>
-            ) : myOpenPools.length > 0 ? (
-              <div className="mb-3 rounded-soft bg-sage-50 border border-sage-200 p-3">
-                <p className="text-xs font-bold text-sage-700 mb-1">Your items will be added to the pools you're already in:</p>
-                <ul className="space-y-0.5">
-                  {myOpenPools.map((p) => (
-                    <li key={p.poolId} className="text-xs text-ink">
-                      {CATEGORY_LABEL[p.category]} — near {p.area} ({p.currentCases}/{p.moqTarget})
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-[11px] text-ink-muted mt-1">Other kinds of items join the nearest open pool, or start a new one.</p>
-              </div>
-            ) : (
-              <p className="text-xs text-ink-muted mb-3">
-                iCamagu pools your cart with other members buying the same kind of thing near you. You don't choose a shop — merchants send offers on the whole group order.
-              </p>
-            )}
-
-            <label className="block text-[11px] font-bold text-ink-muted mb-1">
-              Planning ahead? Set a target date (optional)
-            </label>
-            <input
-              type="date"
-              value={targetDate}
-              onChange={(e) => setTargetDate(e.target.value)}
-              min={new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)}
-              className="w-full border border-cream-dark rounded-soft px-3 py-2.5 mb-1 bg-cream text-xs font-bold text-ink"
-            />
-            <p className="text-[11px] text-ink-muted mb-3">
-              Only applies if this starts a brand-new pool, not one you're joining.
-            </p>
-
-            <button
-              type="button"
-              onClick={submitToPool}
-              disabled={submitting}
-              className="cursor-pointer w-full bg-sage-500 hover:bg-sage-600 text-white font-bold py-3 rounded-pill shadow-glow active:scale-[0.96] transition-transform text-sm disabled:opacity-50"
-            >
-              {submitting ? 'Submitting...' : joiningPool || myOpenPools.length ? 'Add Cart to My Pool' : 'Submit Cart to Bulk Pool'}
-            </button>
-          </div>
+          {/* Checkout — buy together or on my own, delivered anywhere. */}
+          <CheckoutPanel
+            accessToken={accessToken}
+            user={user}
+            items={itemsList}
+            totalZAR={basketData.totalZAR}
+            joiningPool={joiningPool}
+            onDismissJoiningPool={dismissJoiningPool}
+            submitting={submitting}
+            onSubmit={submitCheckout}
+            areaMissing={areaMissing}
+            onSaveAddress={saveDeliveryAsProfile}
+          />
         </>
       )}
     </div>
