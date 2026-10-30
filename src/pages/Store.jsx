@@ -5,7 +5,6 @@ import PoolOfferCard from '../components/PoolOfferCard.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
-import BeadBand from '../components/ui/BeadBand.jsx'
 import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf, aisleOf } from '../data/storeTaxonomy.js'
 import { unitOf, collectiveNoun } from '../data/bulkUnits.js'
@@ -174,7 +173,6 @@ function Store({ onGoToBasket, basketCount }) {
               ))}
             </ol>
           </div>
-          <BeadBand thin className="relative" />
         </div>
       )}
 

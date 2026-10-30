@@ -5,8 +5,8 @@ import { captureLocation } from '../lib/geolocation.js'
 import Icon from '../components/Icon.jsx'
 import IsidukoTypeahead from '../components/IsidukoTypeahead.jsx'
 
-const NATION_OPTIONS = ['AmaXhosa', 'AbaThembu', 'AmaBomvana', 'AmaGqunukhwebe', 'AbeSuthu / AmaVundle', 'AmaMpondo', 'AmaMpondomise', 'AmaMfengu', 'AmaHlubi', 'AmaBhaca', 'AmaXesibe', 'AmaQwathi', 'Not sure / another nation']
-
+// No nation / sub-group picker (AbaThembu, AmaMpondo...): every clan sits
+// under one Xhosa umbrella, so members only give their iziduko.
 const STEPS = ['welcome', 'ancestry', 'details']
 
 // Each welcome card is a direct shortcut: tapping it finishes onboarding and
@@ -69,7 +69,6 @@ function Onboarding({ onDone }) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
 
-  const [nationLabel, setNationLabel] = useState(user?.nationLabel || '')
   const [paternalIziduko, setPaternalIziduko] = useState(user?.paternalIziduko || '')
   const [maternalIziduko, setMaternalIziduko] = useState(user?.maternalIziduko || '')
   const [paternalGrandmotherIziduko, setPaternalGrandmotherIziduko] = useState(user?.paternalGrandmotherIziduko || '')
@@ -151,7 +150,7 @@ function Onboarding({ onDone }) {
       const res = await fetch('/api/user/iziduko', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko, nationLabel }),
+        body: JSON.stringify({ paternalIziduko, maternalIziduko, paternalGrandmotherIziduko, maternalGrandmotherIziduko }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Could not save your clan lines')
@@ -266,18 +265,12 @@ function Onboarding({ onDone }) {
           <div className="space-y-2">
             {!user?.paternalIziduko && (
               <>
-                <IsidukoTypeahead label="Isiduko sikaTata (Paternal)" value={paternalIziduko} nationLabel={nationLabel} required onChange={setPaternalIziduko} placeholder="Type your father’s clan or praise name" />
-                <IsidukoTypeahead label="Isiduko sikaMama (Maternal)" value={maternalIziduko} nationLabel={nationLabel} required onChange={setMaternalIziduko} placeholder="Type your mother’s clan or praise name" />
+                <IsidukoTypeahead label="Isiduko sikaTata (Paternal)" value={paternalIziduko} required onChange={setPaternalIziduko} placeholder="Type your father’s clan or praise name" />
+                <IsidukoTypeahead label="Isiduko sikaMama (Maternal)" value={maternalIziduko} required onChange={setMaternalIziduko} placeholder="Type your mother’s clan or praise name" />
               </>
             )}
-            <IsidukoTypeahead label="Paternal grandmother’s Isiduko" value={paternalGrandmotherIziduko} nationLabel={nationLabel} onChange={setPaternalGrandmotherIziduko} />
-            <IsidukoTypeahead label="Maternal grandmother’s Isiduko" value={maternalGrandmotherIziduko} nationLabel={nationLabel} onChange={setMaternalGrandmotherIziduko} />
-            <label className="block text-sm font-bold text-ink">Your nation / community label
-              <select value={nationLabel} onChange={(event) => setNationLabel(event.target.value)} className="mt-2 w-full min-h-12 rounded-xl border border-cream-dark bg-white px-3 text-ink">
-                <option value="">Choose your own label</option>
-                {NATION_OPTIONS.map((nation) => <option key={nation} value={nation}>{nation}</option>)}
-              </select>
-            </label>
+            <IsidukoTypeahead label="Paternal grandmother’s Isiduko" value={paternalGrandmotherIziduko} onChange={setPaternalGrandmotherIziduko} />
+            <IsidukoTypeahead label="Maternal grandmother’s Isiduko" value={maternalGrandmotherIziduko} onChange={setMaternalGrandmotherIziduko} />
             <div className="rounded-2xl border border-cream-dark bg-white p-4 mt-3">
               <p className="font-bold text-ink">Add your location pin</p>
               <p className="text-xs text-ink-muted mt-1">The Store uses your location to find nearby group orders. Your exact coordinates are used for matching, not shown as a public address.</p>
