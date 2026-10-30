@@ -4,6 +4,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
+import ClanSearch from '../components/ClanSearch.jsx'
 
 const TIER_COLOR = { 1: 'bg-terracotta text-white', 2: 'bg-terracotta/20 text-terracotta', 3: 'bg-sage-500 text-white', 4: 'bg-sage-100 text-sage-700', 5: 'bg-cream-dark text-ink-muted' }
 // Short badge text for the feed card overlay — the full explanatory label
@@ -145,6 +146,9 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
       </div>
 
       <div className="px-4 mt-4">
+        {/* Anyone can search clans, even before their own profile is complete */}
+        <ClanSearch onPickClan={onGoToClanLines} />
+
         <div className="flex bg-white border-2 border-terracotta/25 rounded-pill p-1 mb-4">
           {TABS.map((t) => (
             <button

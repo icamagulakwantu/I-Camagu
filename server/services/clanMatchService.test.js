@@ -8,7 +8,7 @@ vi.mock('../config/db.js', () => ({
 }));
 
 import prisma from '../config/db.js';
-import { matchClan, normaliseIsiduko, submitIsidukoForReview } from './clanMatchService.js';
+import { matchClan, normaliseIsiduko, searchClans, submitIsidukoForReview } from './clanMatchService.js';
 
 const groups = [
   { id: 'tshawe-id', clanName: 'Tshawe', nationLabel: 'AmaXhosa', aliases: [{ aliasForm: 'Mdange' }] },
@@ -68,5 +68,43 @@ describe('conservative isiduko matching', () => {
     expect(result.status).toBe('PENDING_REVIEW');
     expect(prisma.clanGroup.findMany).not.toHaveBeenCalled();
     expect(prisma.isidukoSubmission.create).toHaveBeenCalledOnce();
+  });
+});
+
+describe('clan directory search', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    prisma.clanGroup.findMany.mockResolvedValue(groups);
+  });
+
+  it('lists every clan A-Z with praise names and no sub-group label when nothing is typed', async () => {
+    const result = await searchClans('');
+    expect(result.results.map((item) => item.head)).toEqual(['Cirha', 'Khwemte', 'Tshawe', 'Zangwa', 'Zangwe']);
+    expect(result.results.find((item) => item.head === 'Tshawe').praises).toEqual(['Mdange']);
+    expect(result.results.every((item) => !('nation' in item))).toBe(true);
+  });
+
+  it('finds a clan from part of a praise name', async () => {
+    const result = await searchClans('mda');
+    expect(result.results).toHaveLength(1);
+    expect(result.results[0]).toMatchObject({ head: 'Tshawe', matchedName: 'Mdange', matchedAs: 'alias' });
+  });
+
+  it('lists every clan starting with the typed letters, ignoring the Ama prefix', async () => {
+    const result = await searchClans('AmaZang');
+    expect(result.results.map((item) => item.head)).toEqual(['Zangwa', 'Zangwe']);
+    expect(result.suggestions).toBe(false);
+  });
+
+  it('falls back to close spellings when nothing contains the text', async () => {
+    const result = await searchClans('Cira');
+    expect(result.suggestions).toBe(true);
+    expect(result.results[0].head).toBe('Cirha');
+  });
+
+  it('respects the result limit but reports the full total', async () => {
+    const result = await searchClans('', { limit: 2 });
+    expect(result.results).toHaveLength(2);
+    expect(result.total).toBe(5);
   });
 });

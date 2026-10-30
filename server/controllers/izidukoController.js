@@ -10,7 +10,7 @@ import {
 } from '../services/izidukoService.js';
 import { createNotification } from '../services/notificationDbService.js';
 import prisma from '../config/db.js';
-import { matchClan, submitIsidukoForReview } from '../services/clanMatchService.js';
+import { matchClan, searchClans, submitIsidukoForReview } from '../services/clanMatchService.js';
 
 export async function matchIsidukoName(req, res) {
   try {
@@ -19,6 +19,17 @@ export async function matchIsidukoName(req, res) {
   } catch (error) {
     console.error('Isiduko matching error:', error.message);
     res.status(500).json({ error: 'Could not search registered clan names' });
+  }
+}
+
+// GET /api/iziduko/clans?q=&limit= — the "Find your clan" search bar.
+export async function searchClanDirectory(req, res) {
+  try {
+    const result = await searchClans(req.query.q, { limit: req.query.limit });
+    res.json(result);
+  } catch (error) {
+    console.error('Clan search error:', error.message);
+    res.status(500).json({ error: 'Could not search clans right now' });
   }
 }
 

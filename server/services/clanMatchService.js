@@ -130,6 +130,70 @@ export async function matchClan(query) {
   };
 }
 
+function praiseNamesFor(clan) {
+  return [...new Set(
+    clan.names
+      .filter((name) => name.kind === 'alias')
+      .map((name) => String(name.label || '').trim())
+      .filter((label) => label && label !== clan.head),
+  )];
+}
+
+function toSearchResult(clan, matched) {
+  return {
+    id: clan.id,
+    head: clan.head,
+    praises: praiseNamesFor(clan),
+    matchedName: matched.label,
+    matchedAs: matched.kind,
+  };
+}
+
+// Search-as-you-type for the "Find your clan" directory. Unlike matchClan
+// (which confirms one identity), this lists every clan whose name or praise
+// name contains the typed text, like the Bulk Buy search. All clans sit under
+// the one Xhosa umbrella, so no sub-group label is returned.
+export async function searchClans(query, { limit = 40 } = {}) {
+  const rawQuery = String(query || '').trim().slice(0, 120);
+  const q = normaliseIsiduko(rawQuery);
+  const safeLimit = Math.min(Math.max(Number.parseInt(limit, 10) || 40, 1), 100);
+  const index = await buildClanIndex();
+
+  const found = [];
+  for (const clan of index) {
+    if (!q) {
+      found.push({ rank: 3, result: toSearchResult(clan, clan.names[0]) });
+      continue;
+    }
+    let best = null;
+    for (const name of clan.names) {
+      const candidate = normaliseIsiduko(name.label);
+      const rank = candidate === q ? 0 : candidate.startsWith(q) ? 1 : candidate.includes(q) ? 2 : -1;
+      if (rank >= 0 && (!best || rank < best.rank)) best = { rank, name };
+    }
+    if (best) found.push({ rank: best.rank, result: toSearchResult(clan, best.name) });
+  }
+  found.sort((a, b) => a.rank - b.rank || a.result.head.localeCompare(b.result.head));
+
+  // Nothing contains the text: fall back to close spellings (e.g. "Cira" -> Cirha)
+  if (found.length === 0 && q.length >= 2) {
+    const fuzzy = await matchClan(rawQuery);
+    const byId = new Map(index.map((clan) => [clan.id, clan]));
+    const results = fuzzy.results
+      .map((item) => byId.get(item.id))
+      .filter(Boolean)
+      .map((clan) => toSearchResult(clan, clan.names[0]));
+    return { query: rawQuery, total: results.length, suggestions: results.length > 0, results: results.slice(0, safeLimit) };
+  }
+
+  return {
+    query: rawQuery,
+    total: found.length,
+    suggestions: false,
+    results: found.slice(0, safeLimit).map((item) => item.result),
+  };
+}
+
 export async function submitIsidukoForReview({ userId, typedText, nationLabel }) {
   const text = String(typedText || '').trim();
   const normalisedText = normaliseIsiduko(text);
