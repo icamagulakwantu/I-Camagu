@@ -1,7 +1,7 @@
 import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { getCatalogue, getCategories } from '../controllers/catalogueController.js';
-import { submitToPool, getMyOrderDocuments, confirmOrderLine, getMyPoolPayments, submitPoolPaymentReference, getMyPoolStatus, getPoolSummary, cancelParkedBasket, requestPoolPaymentRefund, suggestPoolsForItem, joinPoolWithChecklistItem, getPoolDemandSignal, getSmartMatchCommunityFeed } from '../controllers/poolController.js';
+import { submitToPool, getMyOrderDocuments, confirmOrderLine, getMyPoolPayments, submitPoolPaymentReference, getMyPoolStatus, getPoolSummary, cancelParkedBasket, requestPoolPaymentRefund, suggestPoolsForItem, joinPoolWithChecklistItem, getPoolDemandSignal, getSmartMatchCommunityFeed, searchDeliveryAddress, reverseDeliveryAddress, getPoolsNearAddress } from '../controllers/poolController.js';
 import { getMyBasket, addItem, updateItem, removeItem } from '../controllers/basketController.js';
 import { getCatalogueMargins, setSkuCostPrice, setSkuRetailPrice } from '../controllers/marginController.js';
 import { getOnlinePaymentStatus, initiatePoolPaymentOnline, getPendingSupplierPayouts, forwardSupplierPayout, getPendingSupplierRefunds, processSupplierRefund } from '../controllers/paymentController.js';
@@ -18,6 +18,9 @@ router.post('/order-documents/confirm-line', requireAuth, confirmOrderLine);
 router.delete('/items/:itemId', requireAuth, removeItem);
 
 router.post('/submit-to-pool', requireAuth, submitToPool);
+router.get('/address/search', requireAuth, searchDeliveryAddress);
+router.get('/address/reverse', requireAuth, reverseDeliveryAddress);
+router.get('/pools/near', requireAuth, getPoolsNearAddress);
 router.get('/feed', requireAuth, getSmartMatchCommunityFeed);
 router.get('/pool/suggestions', requireAuth, suggestPoolsForItem);
 router.post('/pool/join-item', requireAuth, joinPoolWithChecklistItem);
