@@ -1,8 +1,8 @@
 // Address lookup for checkout — OpenStreetMap's free Nominatim service, so no
 // API key is needed. Their usage policy asks for a real User-Agent and at most
 // one request a second, so requests are queued and results cached.
-const NOMINATIM_URL = 'https://nominatim.openstreetmap.org';
-const USER_AGENT = 'iCamagu/1.0 (icamagulakwantu@gmail.com)';
+const GEOCODER_BASE_URL = String(process.env.GEOCODER_BASE_URL || 'https://nominatim.openstreetmap.org').replace(/\/+$/, '');
+const USER_AGENT = process.env.GEOCODER_USER_AGENT || 'iCamagu/1.0 (iCamagu address lookup)';
 const CACHE_LIMIT = 500;
 const MIN_GAP_MS = 1100;
 
@@ -28,7 +28,7 @@ function throttled(task) {
 }
 
 async function callNominatim(path, params) {
-  const url = `${NOMINATIM_URL}/${path}?${new URLSearchParams({ format: 'jsonv2', addressdetails: '1', ...params })}`;
+  const url = `${GEOCODER_BASE_URL}/${path}?${new URLSearchParams({ format: 'jsonv2', addressdetails: '1', ...params })}`;
   const res = await throttled(() => fetch(url, {
     headers: { 'User-Agent': USER_AGENT, 'Accept-Language': 'en' },
     signal: AbortSignal.timeout(6000),
