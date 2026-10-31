@@ -19,6 +19,7 @@ import Home from './pages/Home.jsx'
 // Load feature screens on demand so first-time and returning mobile visits do not
 // download every ceremony, admin, and community screen before the home screen.
 const Login = lazy(() => import('./pages/Login.jsx'))
+const Landing = lazy(() => import('./pages/Landing.jsx'))
 const Username = lazy(() => import('./pages/Username.jsx'))
 const Onboarding = lazy(() => import('./pages/Onboarding.jsx'))
 const Store = lazy(() => import('./pages/Store.jsx'))
@@ -465,6 +466,9 @@ function MainApp() {
 function AuthenticatedApp() {
   const { accessToken, user, checkingSession } = useAuth()
   const [onboardingComplete, setOnboardingComplete] = useState(false)
+  // Invites remain in their existing localStorage keys while the visitor learns about iCamagu.
+  // The Landing is always first for signed-out visitors, including stokvel, clan and pool invites.
+  const [showAuth, setShowAuth] = useState(false)
 
   if (checkingSession) {
     return (
@@ -477,7 +481,15 @@ function AuthenticatedApp() {
     )
   }
 
-  if (!accessToken) return <Login />
+  if (!accessToken) {
+    if (showAuth) return <Login />
+    return (
+      <Landing
+        onJoin={() => setShowAuth(true)}
+        onSignIn={() => setShowAuth(true)}
+      />
+    )
+  }
   if (!user?.username) return <Username />
 
   const onboardingDone = onboardingComplete || (user?.id && localStorage.getItem(`icamagu_onboarding_done:${user.id}`) === '1')
