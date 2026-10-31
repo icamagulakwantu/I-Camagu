@@ -105,7 +105,7 @@ export default function Landing({ onJoin, onSignIn }) {
 
         <div className="relative z-10 mx-auto max-w-lg px-5 pb-12 pt-8">
           <div className="mb-8 flex items-center gap-2.5">
-            <img src="/icons/source/gateway-mark-96.png" alt="" width="44" height="44" className="h-11 w-11" />
+            <img src="/icons/source/gateway-mark-1024.png" alt="" width="44" height="44" className="h-11 w-11" />
             <div>
               <p className="font-display text-2xl font-semibold tracking-tight text-cream">iCamagu</p>
               <p className="text-xs font-medium tracking-wide text-ochre-light/90">uMntu ngumntu ngabantu</p>
