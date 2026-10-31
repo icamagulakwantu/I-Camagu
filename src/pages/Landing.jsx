@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Icon from '../components/Icon.jsx'
 
 /**
@@ -76,6 +76,16 @@ const PILLARS = [
 ]
 
 export default function Landing({ onJoin, onSignIn }) {
+  const [inviteType, setInviteType] = useState(null)
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('icamagu_join_stokvel_id')) setInviteType('stokvel')
+      else if (localStorage.getItem('icamagu_join_clan_code')) setInviteType('clan')
+      else if (localStorage.getItem('icamagu_join_pool_id')) setInviteType('pool')
+    } catch { /* storage unavailable */ }
+  }, [])
+
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search)
@@ -113,6 +123,13 @@ export default function Landing({ onJoin, onSignIn }) {
           </div>
 
           <p className="eyebrow mb-3 text-ochre-light">Culture before capital</p>
+          {inviteType && (
+            <div className="mb-4 rounded-2xl border border-ochre-light/35 bg-white/10 px-4 py-3 text-sm leading-relaxed text-cream">
+              {inviteType === 'stokvel' && 'You have been invited to join a stokvel on iCamagu. Learn how the platform works, then join to continue with your invitation.'}
+              {inviteType === 'clan' && 'You have been invited to a family clan group on iCamagu. Learn how the platform works, then join to continue with your invitation.'}
+              {inviteType === 'pool' && 'You have been invited to a SmartMatch group order on iCamagu. Learn how the platform works, then join to continue with your invitation.'}
+            </div>
+          )}
           <h1 className="font-display text-[2.15rem] font-semibold leading-[1.08] text-cream text-balance">
             Plan the ceremony.{' '}
             <span className="text-ochre-light">Share the load.</span>{' '}
