@@ -11,6 +11,8 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import { readFile } from 'node:fs/promises';
+import { getSharePreview, isPreviewCrawler, renderSharePreview } from './utils/sharePreview.js';
 import { fileURLToPath } from 'url';
 import prisma from './config/db.js';
 import { ensureCeremonyBudgetColumns } from './scripts/ensure-schema.js';
@@ -143,6 +145,21 @@ app.use('/api/supplier', supplierRoutes);
 app.use('/api/identity', identityRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/messages', messageRoutes);
+
+// WhatsApp/social crawlers receive route-specific, privacy-safe metadata.
+// The response never looks up tokens or reads private ceremony/group records.
+app.get(['/share/:token', '/pool/:id', '/join/stokvel/:id', '/join/clan/:code'], (req, res, next) => {
+  const preview = getSharePreview(req.path);
+  if (!preview || !isPreviewCrawler(req.get('user-agent'))) return next();
+
+  readFile(path.join(__dirname, '..', 'dist', 'index.html'), 'utf8')
+    .then((html) => {
+      const baseUrl = (process.env.APP_URL || 'https://i-camagu.co.za').replace(/\\/+$/, '');
+      const shareUrl = baseUrl + req.path;
+      res.type('html').send(renderSharePreview(html, preview, shareUrl));
+    })
+    .catch(next);
+});
 
 // Serve the built frontend
 app.use(express.static(path.join(__dirname, '..', 'dist')));
