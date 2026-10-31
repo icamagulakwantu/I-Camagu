@@ -24,12 +24,23 @@ describe('backfillHennessyProductImages', () => {
       .map(([args]) => args)
       .filter((args) => typeof args.data?.imageUrl === 'string');
 
-    expect(assignments).toHaveLength(7);
+    expect(assignments).toHaveLength(6);
     for (const args of assignments) {
       expect(args.where.OR).toEqual([
         { imageUrl: null },
         { imageUrl: { not: args.data.imageUrl } },
       ]);
     }
+
+    // Hennessy VS has a founder-sourced image handled by a separate repair;
+    // only its unsupported 375ml inherited image is cleared here.
+    expect(mockPrisma.sku.updateMany).toHaveBeenCalledWith({
+      where: {
+        name: 'Hennessy VS',
+        bottleFormat: { contains: '375ml' },
+        imageUrl: { not: null },
+      },
+      data: { imageUrl: null },
+    });
   });
 });
