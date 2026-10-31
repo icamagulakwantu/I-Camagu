@@ -3,9 +3,12 @@ import { useAuth } from '../context/AuthContext.jsx'
 import Icon from './Icon.jsx'
 
 function PinReminder({ onNavigate }) {
-  const { accessToken } = useAuth()
+  const { accessToken, user } = useAuth()
   const [hasPinSet, setHasPinSet] = useState(true)
-  const [dismissed, setDismissed] = useState(false)
+  const dismissedKey = user?.id ? `icamagu_pin_reminder_dismissed:${user.id}` : null
+  const [dismissed, setDismissed] = useState(() => {
+    try { return Boolean(dismissedKey && localStorage.getItem(dismissedKey)) } catch { return false }
+  })
 
   useEffect(() => {
     if (!accessToken) return
@@ -22,10 +25,13 @@ function PinReminder({ onNavigate }) {
       <Icon name="key" size={20} color="#c45c26" />
       <div className="flex-1">
         <p className="text-xs font-bold text-ink">Set your security PIN</p>
-        <p className="text-[11px] text-ink-muted">Needed before you can approve payouts or confirm contributions.</p>
+        <p className="text-xs text-ink-muted">Needed before you can approve payouts or confirm contributions.</p>
       </div>
       <button onClick={() => onNavigate('pin')} className="text-xs bg-terracotta text-white font-bold px-3 py-1.5 rounded-pill flex-shrink-0">Set now</button>
-      <button onClick={() => setDismissed(true)} className="text-ink-muted flex-shrink-0"><Icon name="close" size={14} /></button>
+      <button onClick={() => {
+        try { if (dismissedKey) localStorage.setItem(dismissedKey, '1') } catch { /* storage unavailable */ }
+        setDismissed(true)
+      }} className="text-ink-muted flex-shrink-0"><Icon name="close" size={14} /></button>
     </div>
   )
 }
