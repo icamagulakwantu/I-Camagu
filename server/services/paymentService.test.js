@@ -11,7 +11,7 @@ const mockPrisma = {
 vi.mock('../config/db.js', () => ({ default: mockPrisma }));
 vi.mock('./notificationDbService.js', () => ({ createNotification: vi.fn() }));
 
-const { isOnlinePaymentConfigured, isOnlinePaymentEligible, initiatePoolPayment, markRefundProcessed, listPendingSupplierRefunds, listPendingSupplierPayouts, markPayoutForwarded } = await import('./paymentService.js');
+const { getPaymentMode, isOnlinePaymentConfigured, isOnlinePaymentEligible, initiatePoolPayment, handlePayFastWebhook, markRefundProcessed, listPendingSupplierRefunds, listPendingSupplierPayouts, markPayoutForwarded } = await import('./paymentService.js');
 
 const ORIGINAL_ENV = { ...process.env };
 
@@ -25,6 +25,32 @@ function setPayfastEnv(vars) {
 afterEach(() => {
   process.env = { ...ORIGINAL_ENV };
   vi.clearAllMocks();
+});
+
+describe('RECORD_ONLY policy gate', () => {
+  it('defaults to RECORD_ONLY when PAYMENT_MODE is absent', () => {
+    delete process.env.PAYMENT_MODE;
+    expect(getPaymentMode()).toBe('RECORD_ONLY');
+  });
+
+  it('fails closed for unknown PAYMENT_MODE values', () => {
+    process.env.PAYMENT_MODE = 'record-ish';
+    expect(getPaymentMode()).toBe('RECORD_ONLY');
+  });
+
+  it('blocks PayFast webhooks before adapter verification or database access', async () => {
+    delete process.env.PAYMENT_MODE;
+    await expect(handlePayFastWebhook('m_payment_id=pay_1')).rejects.toMatchObject({ status: 403 });
+    expect(mockPrisma.poolPayment.findUnique).not.toHaveBeenCalled();
+    expect(mockPrisma.poolPayment.update).not.toHaveBeenCalled();
+  });
+
+  it('blocks supplier payout and refund queues before database reads', async () => {
+    delete process.env.PAYMENT_MODE;
+    await expect(listPendingSupplierPayouts()).rejects.toMatchObject({ status: 403 });
+    await expect(listPendingSupplierRefunds()).rejects.toMatchObject({ status: 403 });
+    expect(mockPrisma.poolPayment.findMany).not.toHaveBeenCalled();
+  });
 });
 
 describe('isOnlinePaymentConfigured / isOnlinePaymentEligible', () => {
@@ -46,14 +72,14 @@ describe('isOnlinePaymentConfigured / isOnlinePaymentEligible', () => {
   it('blocks direct checkout API calls before accessing payment records', async () => {
     setPayfastEnv({ PAYFAST_MERCHANT_ID: '10000100', PAYFAST_MERCHANT_KEY: '46f0cd694581a', PAYFAST_SANDBOX: 'false' });
     await expect(initiatePoolPayment('user_1', 'pay_1', 'https://example.test'))
-      .rejects.toMatchObject({ status: 503 });
+      .rejects.toMatchObject({ status: 403 });
     expect(mockPrisma.poolPayment.findUnique).not.toHaveBeenCalled();
     expect(mockPrisma.poolPayment.update).not.toHaveBeenCalled();
   });
 });
 
 describe('markRefundProcessed', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); process.env.PAYMENT_MODE = 'PSP_ENABLED'; });
 
   it('refuses a manual-EFT payment — that refund is the supplier\'s to process, not the admin\'s', async () => {
     mockPrisma.poolPayment.findUnique.mockResolvedValue({
@@ -137,6 +163,7 @@ describe('markRefundProcessed', () => {
 });
 
 describe('PSP supplier payout routing', () => {
+  beforeEach(() => { process.env.PAYMENT_MODE = 'PSP_ENABLED'; });
   it('excludes both manual EFT and Stokvel-funded payments from the PSP payout queue', async () => {
     mockPrisma.poolPayment.findMany.mockResolvedValue([]);
     await listPendingSupplierPayouts();

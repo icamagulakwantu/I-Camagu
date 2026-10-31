@@ -39,7 +39,7 @@ export async function getPendingSupplierPayouts(req, res) {
     res.json(await listPendingSupplierPayouts());
   } catch (error) {
     console.error('List pending supplier payouts error:', error.message);
-    res.status(500).json({ error: 'Could not fetch pending payouts' });
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not fetch pending payouts' });
   }
 }
 
@@ -70,7 +70,7 @@ export async function getPendingSupplierRefunds(req, res) {
     res.json(await listPendingSupplierRefunds());
   } catch (error) {
     console.error('List pending supplier refunds error:', error.message);
-    res.status(500).json({ error: 'Could not fetch pending refunds' });
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not fetch pending refunds' });
   }
 }
 

@@ -17,6 +17,23 @@
 import prisma from '../config/db.js';
 import { PayFastAdapter } from '../adapters/PayFastAdapter.js';
 
+const PSP_ENABLED_MODE = 'PSP_ENABLED';
+
+// Missing or unknown configuration always means record-only. PSP workflows
+// require an explicit, reviewed opt-in; the 2026 default never touches funds.
+export function getPaymentMode() {
+  const configured = String(process.env.PAYMENT_MODE || 'RECORD_ONLY').trim().toUpperCase();
+  return configured === PSP_ENABLED_MODE ? PSP_ENABLED_MODE : 'RECORD_ONLY';
+}
+
+function assertPspPaymentsEnabled() {
+  if (getPaymentMode() === 'RECORD_ONLY') {
+    const err = new Error('PSP payment workflows are disabled in RECORD_ONLY mode. Members pay suppliers or recipients directly.');
+    err.status = 403;
+    throw err;
+  }
+}
+
 function getAdapter() {
   const { PAYFAST_MERCHANT_ID, PAYFAST_MERCHANT_KEY, PAYFAST_PASSPHRASE, PAYFAST_SANDBOX } = process.env;
   if (!PAYFAST_MERCHANT_ID || !PAYFAST_MERCHANT_KEY) return null;
@@ -58,7 +75,7 @@ export async function initiatePoolPayment(userId, paymentId, baseUrl) {
   // payment row. Hiding the frontend button is not a security boundary.
   if (!isOnlinePaymentConfigured()) {
     const err = new Error('Online checkout is disabled under iCamagu’s current no-custody policy. Pay the supplier or intended recipient directly and record the reference here.');
-    err.status = 503;
+    err.status = 403;
     throw err;
   }
 
@@ -105,6 +122,7 @@ export async function initiatePoolPayment(userId, paymentId, baseUrl) {
 }
 
 export async function handlePayFastWebhook(rawBody) {
+  assertPspPaymentsEnabled();
   const adapter = getAdapter();
   if (!adapter) throw new Error('PayFast is not configured');
 
@@ -172,6 +190,7 @@ export async function handlePayFastWebhook(rawBody) {
 // tracked owner — an admin would have no way to tell what's already been
 // forwarded from what's still sitting there.
 export async function listPendingSupplierPayouts() {
+  assertPspPaymentsEnabled();
   const payments = await prisma.poolPayment.findMany({
     where: { provider: { notIn: ['MANUAL_EFT', 'STOKVEL_FUNDS'] }, status: 'CLEARED', payoutForwardedAt: null },
     include: {
@@ -184,6 +203,7 @@ export async function listPendingSupplierPayouts() {
 }
 
 export async function markPayoutForwarded(paymentId, { reference, note }) {
+  assertPspPaymentsEnabled();
   const payment = await prisma.poolPayment.findUnique({ where: { id: paymentId } });
   if (!payment) {
     const err = new Error('Payment not found');
@@ -228,6 +248,7 @@ export async function markPayoutForwarded(paymentId, { reference, note }) {
 // the supplier has nothing to refund and nothing to click. Without this,
 // a PSP refund request had no valid path to actually being resolved.
 export async function listPendingSupplierRefunds() {
+  assertPspPaymentsEnabled();
   return prisma.poolPayment.findMany({
     where: { provider: { notIn: ['MANUAL_EFT', 'STOKVEL_FUNDS'] }, refundRequestedAt: { not: null }, status: { not: 'REFUNDED' } },
     include: {
@@ -239,6 +260,7 @@ export async function listPendingSupplierRefunds() {
 }
 
 export async function markRefundProcessed(paymentId, { feeZAR, note }) {
+  assertPspPaymentsEnabled();
   const payment = await prisma.poolPayment.findUnique({ where: { id: paymentId } });
   if (!payment) {
     const err = new Error('Payment not found');

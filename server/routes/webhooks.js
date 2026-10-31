@@ -34,7 +34,7 @@ router.post('/payfast', express.text({ type: '*/*' }), async (req, res) => {
     // that's worth an email, not just a log line someone has to go looking
     // for. Not awaited: a slow or broken email send must never delay the
     // response PayFast is waiting on for its own retry timing.
-    if (!UNVERIFIED_WEBHOOK_PATTERNS.some((pattern) => pattern.test(error.message))) {
+    if (error.status !== 403 && !UNVERIFIED_WEBHOOK_PATTERNS.some((pattern) => pattern.test(error.message))) {
       const paymentId = new URLSearchParams(req.body).get('m_payment_id');
       notifyAdminOfPaymentWebhookFailure(paymentId, error.message);
     }
@@ -42,7 +42,7 @@ router.post('/payfast', express.text({ type: '*/*' }), async (req, res) => {
     // recovery path for a transient failure (a DB blip, a brief outage) on
     // an otherwise-genuine notification. A forged or unverifiable one never
     // reaches the point where failing to process it costs anything real.
-    res.status(500).send('ERROR');
+    res.status(error.status || 500).send(error.status === 403 ? 'DISABLED' : 'ERROR');
   }
 });
 
