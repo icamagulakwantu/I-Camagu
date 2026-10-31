@@ -416,7 +416,7 @@ function MainApp() {
       case 'pin':
         return <PinSetup onBack={goMore} />
       case 'stokvels':
-        return <Stokvels onBack={goHome} onNavigate={setScreen} onOpenShrineFund={() => setScreen('shrinefund')} />
+        return <Stokvels onBack={goHome} onNavigate={setScreen} />
       case 'notifications':
         return <Notifications onBack={goHome} onNavigate={setScreen} />
       case 'activity':

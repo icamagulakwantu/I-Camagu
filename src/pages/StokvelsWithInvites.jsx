@@ -16,7 +16,7 @@ const baselineKey = (userId) => `icamagu_tour_baseline:${userId}`
 // one-time welcome tour for any stokvel they have just joined.
 export default function StokvelsWithInvites(props) {
   const { accessToken, user } = useAuth()
-  const { location, pools } = useCommunity()
+  const { location } = useCommunity()
   const [refreshKey, setRefreshKey] = useState(0)
   const [tourStokvelId, setTourStokvelId] = useState(null)
 
@@ -67,20 +67,7 @@ export default function StokvelsWithInvites(props) {
   const bottomSlot = (
     <>
       <NearbyStokvels />
-      {(location.label || pools.length > 0) && (
-        <button
-          type="button"
-          onClick={() => props.onNavigate?.('store')}
-          className="block w-full rounded-2xl border border-cream-dark bg-white p-4 text-left shadow-sm transition hover:border-sage-400 hover:bg-sage-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500"
-          aria-label="Open Bulk Buy group orders"
-        >
-          <span className="flex items-center justify-between gap-3">
-            <span className="text-xs font-bold uppercase tracking-wide text-ink-muted">Bulk Buy</span>
-            <span className="text-sm font-bold text-sage-700">Open →</span>
-          </span>
-          <span className="mt-1 block text-sm text-ink">{location.label ? 'Group orders near ' + location.label : 'Your group order pledges'}{pools.length > 0 ? ' · ' + pools.length + ' active pledge' + (pools.length === 1 ? '' : 's') : ''}</span>
-        </button>
-      )}
+
       <ProfileCompletionCard />
     </>
   )

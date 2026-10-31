@@ -53,7 +53,7 @@ const inputStyle = "w-full border border-ink/30 rounded-soft px-3 py-2 text-sm f
 // cards to the list view only, below the page header, so the header always
 // sits at the top like every other tab and the extras never leak into the
 // create, join or detail views.
-function Stokvels({ onBack, onOpenShrineFund, topSlot = null, bottomSlot = null }) {
+function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
 
@@ -1273,7 +1273,7 @@ function Stokvels({ onBack, onOpenShrineFund, topSlot = null, bottomSlot = null 
         <button
           type="button"
           onClick={() => { setError(''); setView('create'); }}
-          className={`flex-1 bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
+          className={`flex-1 bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
         >
           + Create
         </button>
@@ -1293,13 +1293,9 @@ function Stokvels({ onBack, onOpenShrineFund, topSlot = null, bottomSlot = null 
         </div>
       ) : myStokvels.length === 0 ? (
         <EmptyState
-          emoji="🏘️"
+          icon="users"
           title="No stokvels yet"
           description="Join a community savings group or start your own to pool resources together."
-          primaryLabel="Create Stokvel"
-          onPrimary={() => setView('create')}
-          secondaryLabel="Join with Code"
-          onSecondary={() => setView('join')}
         />
       ) : (
         <>
@@ -1346,29 +1342,11 @@ function Stokvels({ onBack, onOpenShrineFund, topSlot = null, bottomSlot = null 
         </>
       )}
 
-      {/* Discovery and extras come after the person's own stokvels. */}
-      {(bottomSlot || onOpenShrineFund) && (
+      {/* Discovery stays below the member's own stokvels. Ubuhlanti is in More. */}
+      {bottomSlot && (
         <>
           <SectionRule label="Grow your circle" />
-          <div className="space-y-3">
-            {bottomSlot}
-            {onOpenShrineFund && (
-              <button
-                type="button"
-                onClick={onOpenShrineFund}
-                className={`w-full bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 text-left flex items-center justify-between ${pressable}`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon name="flame" size={22} color="#ffffff" strokeWidth={1.5} />
-                  <div>
-                    <p className="font-display font-bold text-base leading-tight">Ubuhlanti bakwa Xhosa</p>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-white/80 mt-0.5">Shrine &amp; Development Fund — see it growing</p>
-                  </div>
-                </div>
-                <Icon name="arrowRight" size={18} color="#ffffff" />
-              </button>
-            )}
-          </div>
+          <div className="space-y-3">{bottomSlot}</div>
         </>
       )}
     </div>
