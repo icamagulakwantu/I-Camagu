@@ -219,3 +219,12 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [x] The audit changed from 4 critical / 12 high / 37 moderate / 8 low findings to 3 critical / 7 high / 28 moderate / 6 low findings (44 remaining findings across 25 unique advisories).
 - [ ] Resolve the remaining Vite/Vitest/Tinypool advisories. The three critical advisories are in the Vitest/Tinypool test toolchain; Vite 5 still has high/moderate development-server advisories. A Vite 6 / Vitest 4 candidate was attempted in isolation but Yarn 1.22.22 failed with a package-linking invariant, so no such upgrade was merged or deployed. Use a compatible dependency/package-manager migration and rerun tests/build/PWA smoke before changing these major versions.
 - [ ] Review the remaining `brace-expansion`, `esbuild`, `uuid`, `deepmerge` and `serialize-javascript` advisories individually. Do not label the dependency set clean until the residual advisories are patched or documented with explicit risk acceptance.
+
+
+## Delivery-pack Landing implementation — 1 November 2026
+
+- [ ] Landing implementation submitted for review in PR (CI evidence pending): logged-out visitors are routed to the supplied public marketing page; both Join free and Sign in open the existing Login screen. Auth, onboarding, ledger, PIN and authenticated routes are unchanged.
+- [ ] Campaign attribution accepts only 1–40 ASCII alphanumeric characters from `?src=` and stores the value in `sessionStorage` as `icamagu_campaign_src`; invalid values are ignored.
+- [ ] Landing content retains the no-custody statement, stokvel negotiating-power story, Ubuhlanti, visible cultural/community features, and an explicitly empty Living proof slot. No testimonials or usage metrics are fabricated.
+- [ ] Verify PR CI for `yarn test` and `yarn build`. Manual staging checks: logged-out `/` shows Landing; Join free and Sign in show the existing Login; logged-in `/` still opens Home; valid and invalid `?src=` values follow the validation rule. Do not test against production accounts or data.
+- Rollback: revert the Landing PR. This removes the landing page and restores the prior logged-out Login route; no database or migration rollback is involved.
