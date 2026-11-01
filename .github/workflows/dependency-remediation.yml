@@ -87,5 +87,5 @@ jobs:
           fi
       - name: Apply committed migrations to disposable PostgreSQL
         run: yarn prisma migrate deploy --schema=prisma/schema.prisma
-      - name: Run real PostgreSQL financial integrity tests
-        run: yarn vitest run --no-file-parallelism server/services/ledgerService.integration.test.js server/controllers/stokvelFinanceController.integration.test.js server/controllers/stokvelPoolFundingController.integration.test.js server/controllers/contributionExpense.integration.test.js server/services/matchmakerService.pool-lock.integration.test.js
+      - name: Run full suite with PostgreSQL integration enabled
+        run: yarn test
