@@ -100,6 +100,9 @@ async function actorName(userId, db = prisma) {
 
 // Append-only: there is deliberately no update or delete endpoint for this table.
 export async function logAudit(stokvelId, userId, action, details = null) {
+  // Finance controllers can append audit events without passing through the
+  // records routes' guard(). Ensure the lazily managed table exists here too.
+  await ensureTables();
   const name = await actorName(userId);
   await prisma.$executeRaw`
     INSERT INTO "StokvelAuditLog" ("id", "stokvelId", "actorId", "actorName", "action", "details")
