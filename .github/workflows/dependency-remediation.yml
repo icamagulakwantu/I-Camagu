@@ -76,7 +76,7 @@ jobs:
           corepack enable
           corepack prepare yarn@4.9.2 --activate
       - name: Resolve and install candidate dependency tree
-        run: yarn install
+        run: YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install
       - name: Generate Prisma client
         run: yarn prisma:generate
       - name: Require reviewed versioned migrations
