@@ -1,0 +1,83 @@
+name: Dependency remediation candidate
+
+on:
+  push:
+    branches:
+      - security/dependency-remediation
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22.12.0'
+      - name: Activate pinned Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@4.9.2 --activate
+          yarn --version
+      - name: Resolve and install candidate dependency tree
+        run: yarn install
+      - name: Generate Prisma client
+        run: yarn prisma:generate
+      - name: Check runtime targets
+        run: yarn check:runtime-targets
+      - name: Run complete unit and service test suite
+        run: yarn test
+      - name: Build frontend and PWA
+        run: yarn build
+      - name: Run dependency advisory audit
+        continue-on-error: true
+        run: yarn npm audit --all --json > dependency-audit.json
+      - name: Upload generated lockfile and audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-remediation-candidate
+          path: |
+            yarn.lock
+            dependency-audit.json
+          if-no-files-found: warn
+          retention-days: 7
+
+  postgres-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: icamagu_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d icamagu_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/icamagu_test?schema=public
+      RUN_POSTGRES_INTEGRATION: 'true'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22.12.0'
+      - name: Activate pinned Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@4.9.2 --activate
+      - name: Resolve and install candidate dependency tree
+        run: yarn install
+      - name: Generate Prisma client
+        run: yarn prisma:generate
+      - name: Create disposable PostgreSQL schema
+        run: yarn prisma db push --schema=prisma/schema.prisma
+      - name: Run real PostgreSQL financial integrity tests
+        run: yarn vitest run --no-file-parallelism server/services/ledgerService.integration.test.js server/controllers/stokvelFinanceController.integration.test.js server/controllers/stokvelPoolFundingController.integration.test.js server/controllers/contributionExpense.integration.test.js server/services/matchmakerService.pool-lock.integration.test.js
