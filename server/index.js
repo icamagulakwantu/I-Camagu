@@ -154,7 +154,7 @@ app.get(['/share/:token', '/pool/:id', '/join/stokvel/:id', '/join/clan/:code'],
 
   readFile(path.join(__dirname, '..', 'dist', 'index.html'), 'utf8')
     .then((html) => {
-      const baseUrl = (process.env.APP_URL || 'https://i-camagu.co.za').replace(/\\/+$/, '');
+      const baseUrl = (process.env.APP_URL || 'https://i-camagu.co.za').replace(/\/+$/, '');
       const shareUrl = baseUrl + req.path;
       res.type('html').send(renderSharePreview(html, preview, shareUrl));
     })
