@@ -66,10 +66,9 @@ integrationDescribe('PostgreSQL loan controller integration (real database)', ()
       ],
     }));
 
-    // Trigger the controller's lazy table creation, then all tests use those real tables.
-    const response = responseRecorder();
-    await voteLoan({ params: { stokvelId, loanId: 'not-a-real-loan' }, body: { approve: true }, userId: officialAUserId }, response);
-    expect(response.statusCode).toBe(404);
+    // Start without the lazily managed audit table. The first finance audit
+    // write below must create it itself, without relying on a records-route guard.
+    await prisma.$executeRawUnsafe('DROP TABLE IF EXISTS "StokvelAuditLog"');
   });
 
   afterAll(async () => {
@@ -128,6 +127,13 @@ integrationDescribe('PostgreSQL loan controller integration (real database)', ()
     expect(Number(repayments[0].total)).toBe(60);
     expect(repayments[0].count).toBe(1);
     expect((await prisma.$queryRaw`SELECT "status" FROM "StokvelLoan" WHERE "id" = ${loanId}`)[0].status).toBe('APPROVED');
+    const auditRows = await prisma.$queryRaw`
+      SELECT COUNT(*)::int AS count
+      FROM "StokvelAuditLog"
+      WHERE "stokvelId" = ${stokvelId} AND "actorId" IN (${officialAUserId}, ${officialBUserId})
+        AND "action" = 'Recorded a loan repayment'
+    `;
+    expect(auditRows[0].count).toBe(1);
     expect((await verifyLedger(stokvelId)).ok).toBe(true);
     expect((await checkStokvelBalance(stokvelId)).agrees).toBe(true);
   });
