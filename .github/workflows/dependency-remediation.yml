@@ -32,9 +32,12 @@ jobs:
         run: yarn test
       - name: Build frontend and PWA
         run: yarn build
-      - name: Run dependency advisory audit
+      - name: Audit production dependency tree
         continue-on-error: true
-        run: yarn npm audit --all --json > dependency-audit.json
+        run: yarn npm audit --recursive --environment production --json > dependency-audit-production.json
+      - name: Audit all dependency groups
+        continue-on-error: true
+        run: yarn npm audit --recursive --json > dependency-audit-all.json
       - name: Upload generated lockfile and audit report
         if: always()
         uses: actions/upload-artifact@v4
@@ -42,7 +45,8 @@ jobs:
           name: dependency-remediation-candidate
           path: |
             yarn.lock
-            dependency-audit.json
+            dependency-audit-production.json
+            dependency-audit-all.json
           if-no-files-found: warn
           retention-days: 7
 
