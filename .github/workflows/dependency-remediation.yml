@@ -23,7 +23,7 @@ jobs:
           corepack prepare yarn@4.9.2 --activate
           yarn --version
       - name: Resolve and install candidate dependency tree
-        run: yarn install
+        run: YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install
       - name: Generate Prisma client
         run: yarn prisma:generate
       - name: Check runtime targets
@@ -79,7 +79,13 @@ jobs:
         run: yarn install
       - name: Generate Prisma client
         run: yarn prisma:generate
-      - name: Create disposable PostgreSQL schema
-        run: yarn prisma db push --schema=prisma/schema.prisma
+      - name: Require reviewed versioned migrations
+        run: |
+          if ! find prisma/migrations -mindepth 2 -maxdepth 2 -type f -name migration.sql | grep -q .; then
+            echo 'No versioned Prisma migrations are committed; refusing to substitute prisma db push for migration validation.' >&2
+            exit 1
+          fi
+      - name: Apply committed migrations to disposable PostgreSQL
+        run: yarn prisma migrate deploy --schema=prisma/schema.prisma
       - name: Run real PostgreSQL financial integrity tests
         run: yarn vitest run --no-file-parallelism server/services/ledgerService.integration.test.js server/controllers/stokvelFinanceController.integration.test.js server/controllers/stokvelPoolFundingController.integration.test.js server/controllers/contributionExpense.integration.test.js server/services/matchmakerService.pool-lock.integration.test.js
