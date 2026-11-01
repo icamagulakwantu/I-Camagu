@@ -219,3 +219,18 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [x] The audit changed from 4 critical / 12 high / 37 moderate / 8 low findings to 3 critical / 7 high / 28 moderate / 6 low findings (44 remaining findings across 25 unique advisories).
 - [ ] Resolve the remaining Vite/Vitest/Tinypool advisories. The three critical advisories are in the Vitest/Tinypool test toolchain; Vite 5 still has high/moderate development-server advisories. A Vite 6 / Vitest 4 candidate was attempted in isolation but Yarn 1.22.22 failed with a package-linking invariant, so no such upgrade was merged or deployed. Use a compatible dependency/package-manager migration and rerun tests/build/PWA smoke before changing these major versions.
 - [ ] Review the remaining `brace-expansion`, `esbuild`, `uuid`, `deepmerge` and `serialize-javascript` advisories individually. Do not label the dependency set clean until the residual advisories are patched or documented with explicit risk acceptance.
+
+
+## Dependency remediation candidate — 1 November 2026
+
+**Status: isolated validation only; do not merge or deploy.** Candidate branch: `security/dependency-remediation`. No changes have been made to `main`, the production Render service, or the production database.
+
+- [x] Candidate pins Node `22.12.0` for CI and Yarn `4.9.2`; Yarn Classic v1 lockfile migration is generated only on the candidate branch. The candidate uses `node-modules` linking to preserve compatibility with Prisma and existing tooling.
+- [x] Build-only packages (`vite`, `vitest`, `@vitejs/plugin-react`, `vite-plugin-pwa`, `tailwindcss`, `postcss`, `autoprefixer`) are classified as development dependencies, not production runtime dependencies.
+- [x] CI now has separate recursive production-environment and all-dependency Yarn audit reports. The audit is report-only; no advisory is ignored or hidden. Do not mark the audit complete until both raw reports are reviewed and each remaining advisory is documented.
+- [x] Candidate unit/build job on SHA `0f208c11240a5e86cd7638048701e8210140d6e1` passed install, Prisma client generation, runtime-target check, tests and PWA build. This run reported 48 test files passed and 5 skipped (315 tests passed and 14 skipped); it does not satisfy the no-skips / full database-test release gate.
+- [ ] The PostgreSQL candidate job correctly refuses to use `prisma db push` as a migration substitute. It fails because the repository has no reviewed timestamped Prisma migration SQL. Do not bypass this check. The existing baseline procedure in `prisma/migrations/README.md` requires an owner-authorized schema-only Supabase snapshot, schema comparison, disposable/staging restore, and review before a baseline can be adopted.
+- [ ] Run the entire Vitest suite with `RUN_POSTGRES_INTEGRATION=true` against disposable PostgreSQL after a reviewed migration baseline is available; require zero skipped tests and compare the suite count with the current 53 files / 329 tests.
+- [ ] Render production service `I-Camagu-1` currently deploys `main` with build command `yarn install --production=false && yarn build` and start command `yarn start`. The Yarn 4 migration is not Render-validated. A staging service/deploy must prove Node/Yarn activation, immutable lockfile install, build, start, health and rollback before production is considered.
+- [ ] Physical Android verification remains outstanding: installed app first open, offline behavior, and update from the existing installed service-worker version.
+- [ ] Preserve the current Yarn Classic lockfile and Render rollback target until staging and manual device checks pass. Do not bundle this dependency release with landing-page, RECORD_ONLY, or feature work.
