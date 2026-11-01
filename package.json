@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12.0"
   },
   "type": "module",
   "scripts": {
@@ -22,7 +22,7 @@
   "dependencies": {
     "@prisma/client": "^5.20.0",
     "@sentry/node": "^10.75.0",
-    "@vitejs/plugin-react": "^4.3.2",
+    "@vitejs/plugin-react": "^6.1.2",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
@@ -39,12 +39,12 @@
     "resend": "^4.0.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss": "^3.4.13",
-    "vite": "^5.4.8",
-    "vite-plugin-pwa": "^0.20.5"
+    "vite": "^8.3.0",
+    "vite-plugin-pwa": "^2.0.0"
   },
   "devDependencies": {
     "prisma": "^5.20.0",
-    "vitest": "^2.1.8"
+    "vitest": "^5.0.0"
   },
   "resolutions": {
     "proxy-addr": "2.0.8",
@@ -53,5 +53,6 @@
     "source-map-js": "1.2.2",
     "fast-uri": "3.1.9",
     "postcss-selector-parser": "6.1.5"
-  }
+  },
+  "packageManager": "yarn@4.9.2"
 }
