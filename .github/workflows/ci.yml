@@ -89,6 +89,9 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Check server entrypoint syntax
+        run: node --check server/index.js
+
       - name: Reject hosted-editor runtime targets
         run: yarn check:runtime-targets
 
