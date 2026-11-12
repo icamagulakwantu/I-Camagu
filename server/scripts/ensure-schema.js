@@ -9,6 +9,10 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "emailVerificationRequired" BOOLEAN NOT NULL DEFAULT false;');
   // Campaign attribution (?src=) recorded on new accounts. Nullable: existing accounts have none.
   await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "signupSource" TEXT;');
+  // Merchant verification. Existing merchants start unverified until an admin checks them.
+  await prisma.$executeRawUnsafe('ALTER TABLE "Partner" ADD COLUMN IF NOT EXISTS "verifiedAt" TIMESTAMP(3);');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Partner" ADD COLUMN IF NOT EXISTS "verifiedById" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Partner" ADD COLUMN IF NOT EXISTS "verificationNote" TEXT;');
   // New ceremony types remain draft-only in the API until their checklists are reviewed.
   // Postgres enum additions are idempotent and do not rewrite existing rows.
   await prisma.$executeRawUnsafe('ALTER TYPE "CeremonyType" ADD VALUE IF NOT EXISTS \'IMBELEKO\';');

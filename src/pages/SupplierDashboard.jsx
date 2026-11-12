@@ -135,7 +135,7 @@ function RegisterForm({ onRegistered }) {
 
 // Group orders this merchant can quote on. One offer per order; sending again
 // updates it. Other merchants' prices are never shown, only how many offers.
-function OrderRequests({ requests, onSent }) {
+function OrderRequests({ requests, onSent, verified }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   const [drafts, setDrafts] = useState({})
@@ -168,6 +168,17 @@ function OrderRequests({ requests, onSent }) {
 
   return (
     <div className="mb-6">
+      {!verified && (
+        <div role="status" className="mb-4 flex gap-3 rounded-[18px] bg-[#1c1612] p-4 text-cream">
+          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-ochre-light text-[#1c1612]"><Icon name="shieldCheck" size={18} /></span>
+          <span className="min-w-0">
+            <span className="block text-sm font-extrabold">Waiting for verification</span>
+            <span className="mt-1 block text-[13px] leading-relaxed text-[#c9bfb2]">
+              iCamagu checks every merchant before they can quote, because members pay merchants directly. You can see group orders now and send offers once you are verified. We will notify you.
+            </span>
+          </span>
+        </div>
+      )}
       <p className="eyebrow mb-1">Group orders to quote on</p>
       <p className="text-xs text-ink-muted mb-3">Send one total price for the whole order. The best offer is accepted once the group reaches its minimum.</p>
       {requests.length === 0 ? (
@@ -207,15 +218,16 @@ function OrderRequests({ requests, onSent }) {
                     placeholder="Your total price, R"
                     value={draft.totalPriceZAR ?? (pool.myOffer?.totalPriceZAR ?? '')}
                     onChange={(e) => setDraft(pool.id, 'totalPriceZAR', e.target.value)}
-                    className="flex-1 min-w-0 border border-cream-dark rounded-soft px-3 py-2 text-xs"
+                    disabled={!verified}
+                    className="flex-1 min-w-0 border border-cream-dark rounded-soft px-3 py-2 text-xs disabled:opacity-50"
                   />
                   <button
                     type="button"
                     onClick={() => send(pool)}
-                    disabled={sendingId === pool.id}
-                    className={`cursor-pointer bg-sage-500 text-white text-xs font-bold px-4 rounded-pill ${pressable}`}
+                    disabled={!verified || sendingId === pool.id}
+                    className={`cursor-pointer bg-sage-500 text-white text-xs font-bold px-4 rounded-pill disabled:cursor-not-allowed ${pressable}`}
                   >
-                    {sendingId === pool.id ? '...' : pool.myOffer ? 'Update offer' : 'Send offer'}
+                    {!verified ? 'After verification' : sendingId === pool.id ? '...' : pool.myOffer ? 'Update offer' : 'Send offer'}
                   </button>
                 </div>
                 <input
@@ -223,7 +235,8 @@ function OrderRequests({ requests, onSent }) {
                   placeholder="Note (optional) — e.g. delivery included"
                   value={draft.note ?? (pool.myOffer?.note ?? '')}
                   onChange={(e) => setDraft(pool.id, 'note', e.target.value)}
-                  className="w-full border border-cream-dark rounded-soft px-3 py-2 text-xs mt-2"
+                  disabled={!verified}
+                  className="w-full border border-cream-dark rounded-soft px-3 py-2 text-xs mt-2 disabled:opacity-50"
                 />
               </div>
             )
@@ -348,7 +361,7 @@ function SupplierDashboard({ onBack }) {
         <RegisterForm onRegistered={(p) => { setPartner(p); load() }} />
       ) : (
         <div className="px-4 mt-4">
-          <OrderRequests requests={requests} onSent={load} />
+          <OrderRequests requests={requests} onSent={load} verified={Boolean(partner.verifiedAt)} />
 
           <p className="eyebrow mb-2">Your confirmed orders</p>
           {pools.length === 0 ? (

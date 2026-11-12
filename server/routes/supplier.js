@@ -1,7 +1,7 @@
 import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { becomeSupplier, getMySupplierProfile, getMySupplierPools, getMyOrderRequests, sendPoolOffer, confirmSupplierPoolPayment, processSupplierRefund, fulfillSupplierPool } from '../controllers/supplierController.js';
-import { getOverview, getUnassigned, acceptPoolOffer } from '../controllers/demandController.js';
+import { getOverview, getUnassigned, acceptPoolOffer, listMerchants, verifyMerchant } from '../controllers/demandController.js';
 
 const router = express.Router();
 
@@ -20,5 +20,7 @@ router.post('/pools/:poolId/fulfill', requireAuth, fulfillSupplierPool);
 router.get('/admin/demand-overview', requireAuth, getOverview);
 router.get('/admin/unassigned-pools', requireAuth, getUnassigned);
 router.post('/admin/offers/:offerId/accept', requireAuth, acceptPoolOffer);
+router.get('/admin/merchants', requireAuth, listMerchants);
+router.post('/admin/merchants/:partnerId/verification', requireAuth, verifyMerchant);
 
 export default router;

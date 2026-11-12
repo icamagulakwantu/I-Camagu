@@ -854,6 +854,13 @@ model Partner {
   moq       Int?
   createdAt DateTime    @default(now())
 
+  // Only a verified merchant can send offers on group orders, and an admin
+  // cannot accept an offer from one that is not verified. Set by an admin,
+  // with a note of what was checked (registration, bank details, contact).
+  verifiedAt        DateTime?
+  verifiedById      String?
+  verificationNote  String?
+
   // Settlement destination for a PSP-routed pool payout (Stitch/Ozow-style
   // same-day pass-through). Null until a real banking relationship exists
   // for this partner — a pool works with no Partner at all (see BulkPool),

@@ -21,8 +21,64 @@ const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96
 // transfer, and this is where an admin tracks which ones are outstanding.
 const TABS = [
   { id: 'demand', label: 'Group orders & offers' },
+  { id: 'merchants', label: 'Merchants' },
   { id: 'payouts', label: 'Payouts' },
 ]
+
+// Merchants must be verified before they can quote, and before an admin can
+// accept their offer, because members pay merchants directly. Verifying needs
+// a note of what was checked.
+function MerchantList({ merchants, drafts, setDraft, savingId, onSave }) {
+  if (merchants.length === 0) {
+    return <EmptyState emoji="🏪" title="No merchants yet" description="Merchants who register under Sell on iCamagu appear here for checking." />
+  }
+  const waiting = merchants.filter((m) => !m.verifiedAt).length
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-ink-muted">
+        {waiting ? `${waiting} waiting for verification. ` : 'Everyone is verified. '}
+        Check the business before verifying: company or trading registration, a bank letter in the business name, and a phone call to the contact.
+      </p>
+      {merchants.map((m) => (
+        <div key={m.id} className="card-paper p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-ink">{m.name}</p>
+              <p className="text-xs text-ink-muted">{CATEGORY_LABEL[m.type] || m.type} · {m.area} · joined {new Date(m.createdAt).toLocaleDateString('en-ZA')}</p>
+              <p className="text-xs text-ink-muted mt-1">{[m.contactName, m.contactPhone, m.contactEmail].filter(Boolean).join(' · ') || 'No contact on file'}</p>
+              <p className="text-xs text-ink-muted">{m.hasBankDetails ? 'Bank details on file' : 'No bank details yet'}</p>
+            </div>
+            <span className={`flex-shrink-0 rounded-pill px-2 py-0.5 text-xs font-black uppercase ${m.verifiedAt ? 'bg-sage-500 text-white' : 'bg-terracotta/15 text-terracotta-dark'}`}>
+              {m.verifiedAt ? 'Verified' : 'Waiting'}
+            </span>
+          </div>
+          {m.verifiedAt ? (
+            <div className="mt-3 flex items-center justify-between gap-3 border-t border-terracotta/10 pt-3">
+              <p className="min-w-0 text-xs text-ink-muted">Verified {new Date(m.verifiedAt).toLocaleDateString('en-ZA')}{m.verificationNote ? ` · ${m.verificationNote}` : ''}</p>
+              <button type="button" onClick={() => onSave(m, false)} disabled={savingId === m.id} className={`cursor-pointer flex-shrink-0 rounded-pill border border-terracotta/40 px-3 py-1.5 text-xs font-bold text-terracotta-dark ${pressable}`}>
+                {savingId === m.id ? '...' : 'Remove verification'}
+              </button>
+            </div>
+          ) : (
+            <div className="mt-3 flex gap-2 border-t border-terracotta/10 pt-3">
+              <input
+                type="text"
+                value={drafts[m.id] || ''}
+                onChange={(e) => setDraft(m.id, e.target.value)}
+                placeholder="What did you check?"
+                aria-label={`What you checked for ${m.name}`}
+                className="min-w-0 flex-1 rounded-soft border border-cream-dark px-3 py-2 text-xs"
+              />
+              <button type="button" onClick={() => onSave(m, true)} disabled={savingId === m.id} className={`cursor-pointer flex-shrink-0 rounded-pill bg-sage-500 px-4 text-xs font-bold text-white ${pressable}`}>
+                {savingId === m.id ? '...' : 'Verify'}
+              </button>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
 
 function OfferList({ pool, acceptingId, onAccept }) {
   const pending = pool.offers.filter((o) => o.status === 'PENDING')
@@ -42,6 +98,9 @@ function OfferList({ pool, acceptingId, onAccept }) {
               <p className="text-xs font-bold text-ink truncate">
                 {offer.partnerName}{index === 0 && <span className="text-sage-600"> · best price</span>}
               </p>
+              <p className={`text-xs font-bold ${offer.partnerVerified ? 'text-sage-600' : 'text-terracotta-dark'}`}>
+                {offer.partnerVerified ? 'Verified merchant' : 'Not verified, check them in Merchants first'}
+              </p>
               <p className="text-xs text-ink-muted truncate">{offer.partnerArea}{offer.note ? ` · ${offer.note}` : ''}</p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -49,7 +108,7 @@ function OfferList({ pool, acceptingId, onAccept }) {
               <button
                 type="button"
                 onClick={() => onAccept(offer.id)}
-                disabled={!canAccept || acceptingId === offer.id}
+                disabled={!canAccept || !offer.partnerVerified || acceptingId === offer.id}
                 className={`cursor-pointer bg-sage-500 text-white text-xs font-bold px-3 py-1.5 rounded-pill ${pressable}`}
               >
                 {acceptingId === offer.id ? '...' : 'Accept'}
@@ -77,6 +136,9 @@ export default function DemandDashboard({ onBack }) {
   const [forwardingId, setForwardingId] = useState(null)
   const [refundDrafts, setRefundDrafts] = useState({})
   const [refundingId, setRefundingId] = useState(null)
+  const [merchants, setMerchants] = useState([])
+  const [merchantDrafts, setMerchantDrafts] = useState({})
+  const [savingMerchantId, setSavingMerchantId] = useState(null)
 
   const authedFetch = useCallback((url, options = {}) => fetch(url, {
     ...options,
@@ -86,14 +148,16 @@ export default function DemandDashboard({ onBack }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [overviewRes, unassignedRes, payoutsRes, refundsRes] = await Promise.all([
+      const [overviewRes, unassignedRes, payoutsRes, refundsRes, merchantsRes] = await Promise.all([
         authedFetch('/api/supplier/admin/demand-overview'),
         authedFetch('/api/supplier/admin/unassigned-pools'),
         authedFetch('/api/basket/admin/pending-payouts'),
         authedFetch('/api/basket/admin/pending-refunds'),
+        authedFetch('/api/supplier/admin/merchants'),
       ])
       if (overviewRes.status === 403) { setDenied(true); return }
-      if (!overviewRes.ok || !unassignedRes.ok || !payoutsRes.ok || !refundsRes.ok) throw new Error('Could not load demand data')
+      if (!overviewRes.ok || !unassignedRes.ok || !payoutsRes.ok || !refundsRes.ok || !merchantsRes.ok) throw new Error('Could not load demand data')
+      setMerchants(await merchantsRes.json())
       setOverview(await overviewRes.json())
       setUnassigned(await unassignedRes.json())
       setPendingPayouts(await payoutsRes.json())
@@ -106,6 +170,27 @@ export default function DemandDashboard({ onBack }) {
   }, [authedFetch, showToast])
 
   useEffect(() => { load() }, [load])
+
+  const saveMerchant = async (merchant, verified) => {
+    const note = (merchantDrafts[merchant.id] || '').trim()
+    if (verified && !note) return showToast('Write down what you checked before verifying', 'error')
+    setSavingMerchantId(merchant.id)
+    try {
+      const res = await authedFetch(`/api/supplier/admin/merchants/${merchant.id}/verification`, {
+        method: 'POST',
+        body: JSON.stringify({ verified, note: note || undefined }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not update the merchant')
+      showToast(data.message, 'success')
+      setMerchantDrafts((prev) => ({ ...prev, [merchant.id]: undefined }))
+      load()
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setSavingMerchantId(null)
+    }
+  }
 
   const forwardPayout = async (paymentId) => {
     const draft = forwardDrafts[paymentId] || {}
@@ -191,6 +276,9 @@ export default function DemandDashboard({ onBack }) {
             }`}
           >
             {t.label}
+            {t.id === 'merchants' && merchants.some((m) => !m.verifiedAt) && (
+              <span className={tab === t.id ? 'text-white/80' : 'text-terracotta'}> ({merchants.filter((m) => !m.verifiedAt).length})</span>
+            )}
             {t.id === 'payouts' && (pendingPayouts.length + pendingRefunds.length) > 0 && (
               <span className={tab === t.id ? 'text-white/80' : 'text-terracotta'}> ({pendingPayouts.length + pendingRefunds.length})</span>
             )}
@@ -204,6 +292,14 @@ export default function DemandDashboard({ onBack }) {
             <Skeleton className="h-24 w-full rounded-soft" />
             <Skeleton className="h-24 w-full rounded-soft" />
           </div>
+        ) : tab === 'merchants' ? (
+          <MerchantList
+            merchants={merchants}
+            drafts={merchantDrafts}
+            setDraft={(id, value) => setMerchantDrafts((prev) => ({ ...prev, [id]: value }))}
+            savingId={savingMerchantId}
+            onSave={saveMerchant}
+          />
         ) : tab === 'demand' ? (
           <>
             <div className="wash-ember grain rounded-soft p-5 text-white">

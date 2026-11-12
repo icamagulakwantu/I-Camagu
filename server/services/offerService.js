@@ -75,7 +75,8 @@ export async function listOffersForPools(poolIds) {
   if (!poolIds.length) return {};
   const rows = await prisma.$queryRaw`
     SELECT o."id", o."poolId", o."partnerId", o."totalPriceZAR", o."note", o."status", o."updatedAt",
-           p."name" AS "partnerName", p."area" AS "partnerArea"
+           p."name" AS "partnerName", p."area" AS "partnerArea",
+           (p."verifiedAt" IS NOT NULL) AS "partnerVerified"
     FROM "PoolOffer" o
     JOIN "Partner" p ON p."id" = o."partnerId"
     WHERE o."poolId" IN (${Prisma.join(poolIds)})
@@ -126,8 +127,11 @@ export async function listOrderRequestsForMerchant(userId) {
 }
 
 // One offer per merchant per pool; sending again updates it (until accepted).
+export const NOT_VERIFIED_MESSAGE = 'Your merchant profile is waiting for iCamagu to verify it. You can send offers once it is verified.';
+
 export async function submitOffer(userId, poolId, { totalPriceZAR, note } = {}) {
   const partner = await requireMerchant(userId);
+  if (!partner.verifiedAt) throw httpError(403, NOT_VERIFIED_MESSAGE);
   const price = Number(totalPriceZAR);
   if (!Number.isFinite(price) || price <= 0) throw httpError(400, 'Enter your total price for the whole order (more than R0)');
 
@@ -168,6 +172,7 @@ export async function acceptOffer(offerId) {
 
     const partner = await tx.partner.findUnique({ where: { id: offer.partnerId } });
     if (!partner) throw httpError(404, 'Merchant not found');
+    if (!partner.verifiedAt) throw httpError(409, 'Verify this merchant before accepting their offer');
 
     await tx.bulkPool.update({ where: { id: pool.id }, data: { partnerId: partner.id } });
     await tx.$executeRaw`
@@ -192,4 +197,60 @@ export async function acceptOffer(offerId) {
   }
 
   return { poolId: result.pool.id, partnerName: result.partner.name };
+}
+
+// ---------- Merchant verification (admin) ----------
+
+// Every merchant, those waiting for verification first. Bank details are
+// reported as present or missing, never their values.
+export async function listMerchantsForAdmin() {
+  const partners = await prisma.partner.findMany({
+    include: { user: { select: { firstName: true, lastName: true, email: true, phoneNumber: true } } },
+    orderBy: { createdAt: 'desc' },
+  });
+  return partners
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      type: p.type,
+      area: p.area,
+      createdAt: p.createdAt,
+      contactName: p.user ? `${p.user.firstName || ''} ${p.user.lastName || ''}`.trim() : null,
+      contactEmail: p.user?.email || null,
+      contactPhone: p.user?.phoneNumber || null,
+      hasBankDetails: Boolean(p.bankName && p.bankAccountNumber),
+      verifiedAt: p.verifiedAt,
+      verificationNote: p.verificationNote,
+    }))
+    .sort((a, b) => Number(Boolean(a.verifiedAt)) - Number(Boolean(b.verifiedAt)));
+}
+
+// Verifying needs a note of what was checked; revoking clears it and stops
+// new offers. Offers already accepted are not undone.
+export async function setMerchantVerification(partnerId, adminId, { verified, note } = {}) {
+  const partner = await prisma.partner.findUnique({ where: { id: partnerId } });
+  if (!partner) throw httpError(404, 'Merchant not found');
+  const cleanNote = String(note || '').trim().slice(0, 500);
+  if (verified && !cleanNote) throw httpError(400, 'Write down what you checked, e.g. company registration, bank letter, phone call');
+  const updated = await prisma.partner.update({
+    where: { id: partnerId },
+    data: verified
+      ? { verifiedAt: new Date(), verifiedById: adminId, verificationNote: cleanNote }
+      : { verifiedAt: null, verifiedById: adminId, verificationNote: cleanNote || null },
+  });
+  if (partner.userId) {
+    try {
+      await createNotification(
+        partner.userId,
+        verified ? 'MERCHANT_VERIFIED' : 'MERCHANT_UNVERIFIED',
+        verified
+          ? `${partner.name} is verified. You can now send offers on group orders.`
+          : `${partner.name} is no longer verified, so you cannot send new offers. Contact iCamagu for help.`,
+        'supplier',
+      );
+    } catch (error) {
+      console.error('Merchant verification saved, but the notification failed:', error?.message);
+    }
+  }
+  return { id: updated.id, verifiedAt: updated.verifiedAt, verificationNote: updated.verificationNote };
 }
