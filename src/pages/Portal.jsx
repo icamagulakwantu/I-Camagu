@@ -6,6 +6,8 @@ import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { cn } from '../lib/utils'
 import Icon from '../components/Icon.jsx'
 import { uploadPortalMedia, checkFile, UploadError } from '../lib/mediaUpload.js'
+import HeroHeader from '../components/ui/HeroHeader.jsx'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
@@ -145,24 +147,18 @@ export default function Portal({ onBack }) {
   if (activePortal) {
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        {/* Header */}
-        <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-8 rounded-b-[2.5rem] relative overflow-hidden">
-          <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
-          <div className="relative">
-            <button 
-              type="button" 
-              onClick={() => { setActivePortal(null); fetchPortals(); }} 
-              className={`text-sm text-white/70 mb-3 block ${pressable}`}
-            >
-              ← All portals
-            </button>
-            <h1 className="font-display font-bold text-3xl">{activePortal.title}</h1>
-            <p className="text-white/70 text-sm mt-1">A generational archive for your family</p>
-          </div>
-        </div>
+        <HeroHeader
+          image={CEREMONY_IMAGE.WEDDING}
+          eyebrow="Imbali yosapho · Family archive"
+          title={activePortal.title}
+          subtitle="A generational archive for your family."
+          onBack={() => { setActivePortal(null); fetchPortals(); }}
+          backLabel="All archives"
+          className="!pb-16"
+        />
 
         {/* Upload Button */}
-        <div className="px-4 mt-5">
+        <div className="relative z-10 -mt-10 px-4">
           <input
             ref={fileInputRef}
             type="file"
@@ -280,19 +276,19 @@ export default function Portal({ onBack }) {
   return (
     <div className="min-h-screen pb-24 bg-cream">
       {/* Header */}
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-8 rounded-b-[2.5rem] relative overflow-hidden">
-        <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
-        <div className="relative">
-          <button type="button" onClick={onBack} className={`text-sm text-white/70 mb-3 block ${pressable}`}>← Back</button>
-          <h1 className="font-display font-bold text-3xl">Digital Portal</h1>
-          <p className="text-white/70 text-sm mt-1">Generational family archives</p>
-        </div>
-      </div>
+      <HeroHeader
+        image={CEREMONY_IMAGE.WEDDING}
+        eyebrow="Imbali yosapho · Family archive"
+        title="Keep the family's"
+        accent="story."
+        subtitle="Photos and records from every ceremony, kept safe for the children who come after us."
+        onBack={onBack}
+      />
 
-      <div className="px-4 mt-5">
+      <div className="relative z-10 -mt-12 px-4">
         {/* Create Portal Form */}
-        <form onSubmit={createPortal} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 shadow-soft space-y-3">
-          <p className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Create New Portal</p>
+        <form onSubmit={createPortal} className="mb-4 space-y-3 rounded-[24px] bg-white p-5 shadow-[0_22px_44px_-22px_rgba(28,22,18,0.55)]">
+          <p className="eyebrow">Start a new archive</p>
           <input
             type="text"
             placeholder="e.g. Lindani's Umgidi — 2026"
@@ -302,7 +298,7 @@ export default function Portal({ onBack }) {
             required
           />
           <button type="submit" className={`w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill ${pressable}`}>
-            + Create Portal
+            + Create archive
           </button>
         </form>
 
@@ -315,8 +311,8 @@ export default function Portal({ onBack }) {
         ) : portals.length === 0 ? (
           <EmptyState
             icon="image"
-            title="No portals created yet"
-            description="Create a portal above to archive family photos, videos, and ceremony memories."
+            title="No archives yet"
+            description="Start one above for a ceremony or a branch of the family, then add photos and videos."
             className="border-2 border-terracotta/25"
           />
         ) : (

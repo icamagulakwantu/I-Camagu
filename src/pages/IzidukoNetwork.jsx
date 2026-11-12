@@ -5,6 +5,8 @@ import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 import ClanSearch from '../components/ClanSearch.jsx'
+import HeroHeader from '../components/ui/HeroHeader.jsx'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 const TIER_COLOR = { 1: 'bg-terracotta text-white', 2: 'bg-terracotta/20 text-terracotta', 3: 'bg-sage-500 text-white', 4: 'bg-sage-100 text-sage-700', 5: 'bg-cream-dark text-ink-muted' }
 // Short badge text for the feed card overlay — the full explanatory label
@@ -139,13 +141,16 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
-        <button onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
-        <h1 className="font-display font-bold text-2xl">Iziduko Network</h1>
-        <p className="text-white/70 text-sm mt-1">Find your people — bloodline, not just a database.</p>
-      </div>
+      <HeroHeader
+        image={CEREMONY_IMAGE.UMGIDI}
+        eyebrow="Iziduko · Find your people"
+        title="Bloodline,"
+        accent="not a database."
+        subtitle="Say your clan names and find relatives, in the Eastern Cape, Joburg or across the world."
+        onBack={onBack}
+      />
 
-      <div className="px-4 mt-4">
+      <div className="relative z-10 -mt-12 px-4">
         {/* Anyone can search clans, even before their own profile is complete */}
         <ClanSearch onPickClan={onGoToClanLines} />
 

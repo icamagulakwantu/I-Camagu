@@ -4,6 +4,8 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 import { clanInviteMessage, clanInviteUrl, whatsappShareUrl } from '../lib/inviteLinks.js'
+import HeroHeader from '../components/ui/HeroHeader.jsx'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 const inputClass = 'w-full border-2 border-ink/20 rounded-soft px-4 py-3 text-base focus:outline-none focus:border-sage-500'
@@ -222,16 +224,19 @@ export default function ClanGroups({ onBack, onGoToClanLines, initialGroupId, on
 
   return (
     <div className="min-h-screen pb-28 bg-cream">
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
-        <button type="button" onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
-        <h1 className="font-display font-bold text-2xl">Clan Groups</h1>
-        <p className="text-white/80 text-sm mt-1">Your clan, together in one safe place.</p>
-      </div>
+      <HeroHeader
+        image={CEREMONY_IMAGE.UMGIDI}
+        eyebrow="Iqela lesiduko · Clan groups"
+        title="Your clan,"
+        accent="together."
+        subtitle="One safe place for the family to talk and plan, from the homestead to London and Berlin."
+        onBack={onBack}
+      />
 
       {openId ? (
         <GroupDetail groupId={openId} onBack={closeDetail} authedFetch={authedFetch} />
       ) : (
-        <div className="px-4 mt-5 space-y-6">
+        <div className="relative z-10 -mt-12 space-y-6 px-4">
           {!creating ? (
             <button type="button" onClick={() => setCreating(true)}
               className={`w-full bg-terracotta text-white font-bold py-4 rounded-pill text-base flex items-center justify-center gap-2 shadow-soft ${pressable}`}>
