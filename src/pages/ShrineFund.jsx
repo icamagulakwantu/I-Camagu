@@ -21,14 +21,14 @@ const PHASES = [
   },
   {
     icon: 'calendarRange',
-    accent: '#b88a2c',
+    accent: '#c1922f',
     phase: 'Phase 2 — Food & Secondary Industries',
     headline: 'Own the food value chain.',
     body: 'From township food access to farming, processing, and distribution. Every community deserves nutritious food at fair prices. We model what schools in Japan have shown the world — that when children eat well, communities thrive. We move into food production, packaging, and local supply networks, targeting the Eastern Cape and beyond.',
   },
   {
     icon: 'coins',
-    accent: '#2e4a2e',
+    accent: '#1c1612',
     phase: 'Phase 3 — Primary Industries & Legacy',
     headline: 'Mining, property, and large-scale community investment.',
     body: "Once the foundation is solid, the fund moves into primary industries — mining, agriculture, fisheries, property, and livestock economies of scale across the Eastern Cape's arable land and coastline. No single family or stokvel could build this alone. Together, we can.",
@@ -275,8 +275,8 @@ function ShrineFund({ onBack }) {
           <div className="grid grid-cols-2 gap-x-2.5 gap-y-5 pt-3">
             {PILLARS.map((pl) => (
               <div key={pl.label} className="relative rounded-[20px] bg-cream px-3.5 pb-3.5 pt-8">
-                <span aria-hidden="true" className="absolute -top-4 left-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-white" style={{ boxShadow: '0 0 0 4px #2e4a2e' }}>
-                  <Icon name={pl.icon} size={19} color="#2e4a2e" />
+                <span aria-hidden="true" className="absolute -top-4 left-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-white" style={{ boxShadow: '0 0 0 4px #1c1612' }}>
+                  <Icon name={pl.icon} size={19} color="#1c1612" />
                 </span>
                 <p className="text-[14px] font-bold leading-tight text-ink">{pl.label}</p>
                 <p className="mt-1 text-[12px] leading-snug text-ink-muted">{pl.desc}</p>

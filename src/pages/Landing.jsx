@@ -52,19 +52,19 @@ const FLOW = [
   },
   {
     icon: 'heartHandshake',
-    color: '#b88a2c',
+    color: '#a3471a',
     title: 'Family pledges in one place',
     body: 'Share one link. Relatives at home and abroad pledge what they will bring or give, and you can see what is covered and what is still needed.',
   },
   {
     icon: 'cart',
-    color: '#2e4a2e',
+    color: '#1c1612',
     title: 'Buy together for better prices',
     body: 'Families and stokvels pool their orders for drinks, meat, livestock and groceries, and unlock bulk discounts no single household gets.',
   },
   {
     icon: 'coins',
-    color: '#3d5a80',
+    color: '#a3471a',
     title: 'Stokvels that run properly',
     body: 'Group savings with simple systems: a ledger every member can see, approvals, and every contribution, payout and loan interest recorded.',
   },
@@ -288,7 +288,7 @@ export default function Landing({ onJoin, onSignIn }) {
         </div>
         <div className="flex gap-3.5 rounded-[22px] border border-ink/[0.06] bg-white px-5 py-4 shadow-soft">
           <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-sage/10" aria-hidden>
-            <Icon name="lock" size={18} color="#2e4a2e" />
+            <Icon name="lock" size={18} color="#1c1612" />
           </span>
           <div>
             <p className="text-[15px] font-bold text-ink">

@@ -8,13 +8,13 @@ import Icon from '../components/Icon.jsx'
 const TYPE_STYLE = {
   PAYOUT_APPROVAL_NEEDED: { icon: 'send', color: '#c45c26' },
   POOL_CHANGED: { icon: 'cart', color: '#c1922f' },
-  CONTRIBUTION_CONFIRMED: { icon: 'check', color: '#4a7a4a' },
+  CONTRIBUTION_CONFIRMED: { icon: 'check', color: '#3a2f27' },
   QUOTE_STATUS: { icon: 'cocktail', color: '#c1922f' },
-  ORDER_MATCHED: { icon: 'package', color: '#4a7a4a' },
+  ORDER_MATCHED: { icon: 'package', color: '#3a2f27' },
   GROUP_EXPENSE_RECORDED: { icon: 'coins', color: '#c1922f' },
   REFUND_REQUESTED: { icon: 'send', color: '#c45c26' },
-  REFUND_PROCESSED: { icon: 'check', color: '#4a7a4a' },
-  ORDER_FULFILLED: { icon: 'package', color: '#4a7a4a' },
+  REFUND_PROCESSED: { icon: 'check', color: '#3a2f27' },
+  ORDER_FULFILLED: { icon: 'package', color: '#3a2f27' },
   PLEDGE_RECEIVED: { icon: 'gift', color: '#2f6b5a' },
 }
 const DEFAULT_STYLE = { icon: 'bell', color: '#c45c26' }

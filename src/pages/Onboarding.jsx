@@ -30,14 +30,14 @@ const FEATURES = [
   },
   {
     icon: 'coins',
-    accent: '#4a7a4a',
+    accent: '#3a2f27',
     label: 'Stokvels',
     headline: 'Siza ndawonye · Save and pay out fairly',
     path: '/stokvels',
   },
   {
     icon: 'link',
-    accent: '#3d623d',
+    accent: '#2a221c',
     label: 'Iziduko Network',
     headline: 'Find relatives through your clan names',
     path: '/me/iziduko',
@@ -260,7 +260,7 @@ function Onboarding({ onDone }) {
               {localPreview || user?.profileImage ? (
                 <img src={localPreview || user.profileImage} alt="" className={`w-full h-full object-cover ${uploading ? 'opacity-60' : ''}`} />
               ) : (
-                <Icon name="camera" size={24} color="#4a7a4a" />
+                <Icon name="camera" size={24} color="#3a2f27" />
               )}
             </button>
             <p className="text-xs text-ink-muted">JPG or PNG, up to 1.5MB</p>

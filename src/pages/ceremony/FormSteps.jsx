@@ -45,7 +45,7 @@ export function TypeStep({ form, setForm, ceremonyTypes, locked }) {
               <span className="block text-base font-bold text-ink">{typeName(typeId)}</span>
               <span className="block text-xs text-ink-muted">{CEREMONY_META[typeId]?.desc || 'Ceremony planning'}</span>
             </span>
-            {selected && <Icon name="check" size={22} color="#4a7a4a" strokeWidth={2.5} />}
+            {selected && <Icon name="check" size={22} color="#3a2f27" strokeWidth={2.5} />}
           </button>
         )
       })}

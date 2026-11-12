@@ -45,7 +45,7 @@ function CommunityVerification({ targetType, targetId, confirmCount = 0, dispute
               myVote === 'CONFIRM' ? 'bg-sage-500 border-sage-500 text-white' : 'border-sage-500 text-sage-600'
             }`}
           >
-            <Icon name="check" size={12} color={myVote === 'CONFIRM' ? '#fff' : '#4a7a4a'} /> Confirm
+            <Icon name="check" size={12} color={myVote === 'CONFIRM' ? '#fff' : '#3a2f27'} /> Confirm
           </button>
           <button
             type="button"

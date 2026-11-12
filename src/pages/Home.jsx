@@ -346,7 +346,7 @@ function MoneyTiles({ stokvels, totalSaved, pools, basketCount, onNavigate }) {
   const tiles = [
     {
       id: 'stokvels',
-      bg: 'bg-[#2e4a2e]', disc: 'bg-[#b9d3b0] text-[#1f3320]', icon: 'coins',
+      bg: 'bg-[#1c1612]', disc: 'bg-[#e0a94e] text-[#1c1612]', icon: 'coins',
       title: 'Stokvels',
       detail: stokvels.length ? `${plural(stokvels.length, 'stokvel')} · ${rand(totalSaved)} saved` : 'Start one, or join with an invite link',
       action: stokvels.length ? 'Open' : 'Start',
@@ -354,7 +354,7 @@ function MoneyTiles({ stokvels, totalSaved, pools, basketCount, onNavigate }) {
     },
     {
       id: 'store',
-      bg: 'bg-[#6e5418]', disc: 'bg-[#f3dca8] text-[#3d2e0c]', icon: 'cart',
+      bg: 'bg-[#a3471a]', disc: 'bg-[#fffdf9] text-[#a3471a]', icon: 'cart',
       title: 'Bulk Buy',
       detail: basketCount > 0
         ? `${plural(basketCount, 'item')} in your basket`
@@ -447,7 +447,7 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
     })
   }
   if (basketCount > 0) {
-    needs.push({ id: 'basket', icon: 'cart', tile: 'bg-[#f3e6cf] text-[#6e5418]', title: 'Finish your order', detail: `${plural(basketCount, 'item')} waiting in your basket`, onOpen: () => onNavigate('basket') })
+    needs.push({ id: 'basket', icon: 'cart', tile: 'bg-[#f3e6cf] text-[#a3471a]', title: 'Finish your order', detail: `${plural(basketCount, 'item')} waiting in your basket`, onOpen: () => onNavigate('basket') })
   }
   if (lead && !lead.eventDate) {
     needs.push({ id: 'date', icon: 'calendar', tile: 'bg-[#f6e2d6] text-terracotta-dark', title: `Give ${lead.title} a date`, detail: 'Family can plan around it once it has one', onOpen: () => onSelectCeremony?.(lead.id) })

@@ -287,7 +287,7 @@ function Directory({ onBack }) {
               {uploadingDoc ? (
                 'Uploading document...'
               ) : idDocUrl ? (
-                <><Icon name="check" size={13} color="#4a7a4a" /> ID/FICA document attached</>
+                <><Icon name="check" size={13} color="#3a2f27" /> ID/FICA document attached</>
               ) : (
                 <><Icon name="file" size={13} /> Upload ID/FICA document (optional, speeds up verification)</>
               )}

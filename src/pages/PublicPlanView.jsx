@@ -141,7 +141,7 @@ function PublicPlanView({ token }) {
           {thanks ? (
             <div className="text-center py-2">
               <div className="mx-auto w-14 h-14 rounded-full bg-sage-100 flex items-center justify-center">
-                <Icon name="heartHandshake" size={26} color="#4a7a4a" />
+                <Icon name="heartHandshake" size={26} color="#3a2f27" />
               </div>
               <p className="font-display text-xl font-semibold text-ink mt-3">Enkosi! Your pledge is in.</p>
               <p className="text-sm text-ink-muted mt-1">The family can now see you'll bring {thanks}.</p>

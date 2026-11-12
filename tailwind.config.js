@@ -10,17 +10,19 @@ export default {
         // Canonical scales: the single source of truth for iCamagu's palette.
         // `brand.*` and `success` below are kept only as aliases onto these same
         // values, so every existing bg-brand-*/text-brand-* class keeps working.
+        // One palette across the app: near-black, terracotta, gold and cream.
+        // "sage" was a green; it is kept as a name (used widely) but now
+        // holds warm dark neutrals, so every former green is on-palette.
         sage: {
-          // Deep sage: the family & culture colour on panels and icons.
-          DEFAULT: '#2e4a2e',
-          50: '#f4f7f4',
-          100: '#e3ebe3',
-          200: '#c5d6c5',
-          300: '#9bb89b',
-          400: '#6a936a',
-          500: '#4a7a4a',
-          600: '#3d623d',
-          700: '#334e33',
+          DEFAULT: '#1c1612',
+          50: '#f6f1ea',
+          100: '#ece3d6',
+          200: '#dccdb8',
+          300: '#bfa98c',
+          400: '#8c7a66',
+          500: '#3a2f27',
+          600: '#2a221c',
+          700: '#1c1612',
         },
         cream: {
           DEFAULT: '#f5f1e8',
@@ -45,14 +47,14 @@ export default {
         },
         // Aliases: each points at one of the canonical values above.
         brand: {
-          blue: '#4a7a4a',
+          blue: '#3a2f27',
           cream: '#f5f1e8',
           black: '#2b2620',
           ochre: '#c1922f',
           gold: '#c1922f',
-          sageLight: '#9bb89b',
+          sageLight: '#bfa98c',
         },
-        success: '#3d623d',
+        success: '#2a221c',
       },
       fontFamily: {
         // Fraunces: a soft, high-contrast serif for headings (classy, warm).

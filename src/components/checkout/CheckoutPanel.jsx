@@ -221,11 +221,11 @@ export default function CheckoutPanel({
         <ul className="space-y-1 mb-3">
           {summary.map((line) => (
             <li key={line} className="text-xs leading-snug flex gap-1.5">
-              <Icon name="check" size={12} color="#9bb89b" className="mt-0.5 shrink-0" /> <span>{line}</span>
+              <Icon name="check" size={12} color="#bfa98c" className="mt-0.5 shrink-0" /> <span>{line}</span>
             </li>
           ))}
           <li className="text-xs leading-snug flex gap-1.5">
-            <Icon name="shieldCheck" size={12} color="#9bb89b" className="mt-0.5 shrink-0" />
+            <Icon name="shieldCheck" size={12} color="#bfa98c" className="mt-0.5 shrink-0" />
             <span>iCamagu never holds your money. You pay the merchant once their offer is confirmed.</span>
           </li>
         </ul>

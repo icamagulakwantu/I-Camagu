@@ -418,7 +418,7 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
                 className="w-full border-2 border-dashed border-ink/30 rounded-soft py-3 text-sm font-bold text-ink-muted flex items-center justify-center gap-2"
               >
                 {idDocumentUrl ? (
-                  <><Icon name="check" size={14} color="#4a7a4a" /> ID photo attached</>
+                  <><Icon name="check" size={14} color="#3a2f27" /> ID photo attached</>
                 ) : (
                   <><Icon name="camera" size={14} /> Attach a photo of your ID</>
                 )}

@@ -14,6 +14,9 @@ import { notifyBasketChanged } from '../lib/basketEvents.js'
 // the department rail rising out of it, and product cards whose price tab and
 // add button break out of the photo.
 
+// Department tiles whose picture is a photograph rather than a packshot.
+const PHOTO_TILES = new Set(['meat', 'livestock', 'nonconsumables'])
+
 const DEPARTMENT_ICON = {
   alcohol: 'beer',
   softdrinks: 'bottle',
@@ -32,11 +35,11 @@ const isPhotograph = (sku) => PHOTO_DEPARTMENTS.has(departmentOf(sku).id) || ais
 
 // Placeholder colours per department, for products still waiting for a photo.
 const PLACEHOLDER_TONE = {
-  alcohol: 'from-[#f3e6cf] to-[#ead6b3] text-[#6e5418]',
+  alcohol: 'from-[#f3e6cf] to-[#ead6b3] text-[#a3471a]',
   softdrinks: 'from-[#e4ecdf] to-[#cfdec7] text-sage-700',
   meat: 'from-[#f6e2d6] to-[#eccab6] text-terracotta-dark',
-  livestock: 'from-[#efe4d2] to-[#e2d0b4] text-[#6e5418]',
-  groceries: 'from-[#f1ead9] to-[#e5d9bf] text-[#6e5418]',
+  livestock: 'from-[#efe4d2] to-[#e2d0b4] text-[#a3471a]',
+  groceries: 'from-[#f1ead9] to-[#e5d9bf] text-[#a3471a]',
   nonconsumables: 'from-[#ebe5dc] to-[#dcd3c6] text-ink',
   other: 'from-[#ebe5dc] to-[#dcd3c6] text-ink',
 }
@@ -313,29 +316,25 @@ function Store({ onGoToBasket, basketCount }) {
                   aria-pressed={active}
                   className={`pressable flex w-[112px] flex-col overflow-hidden rounded-[20px] text-left shadow-[0_16px_30px_-20px_rgba(43,30,18,0.65)] ring-2 ${active ? 'bg-ochre-light text-[#1c1612] ring-ochre-light' : 'bg-[#fffdf9] text-ink ring-transparent'}`}
                 >
-                  {/* Real products, standing on the tile's lower edge. */}
+                  {/* One real product per tile, standing on its lower edge;
+                      photographs (animals, meat, blankets) fill the tile. */}
                   <span className={`relative block h-[78px] ${active ? 'bg-[#f3d9a4]' : 'bg-[#f3ece1]'}`}>
                     {d.image ? (
-                      <>
-                        {d.accent && (
-                          <img src={d.accent} alt="" loading="lazy" className="absolute bottom-0 right-2 h-[58px] w-[44px] object-contain object-bottom mix-blend-multiply" />
-                        )}
-                        <img
-                          src={d.image}
-                          alt=""
-                          loading="lazy"
-                          className={d.id === 'nonconsumables'
-                            ? 'absolute inset-0 h-full w-full object-cover'
-                            : `absolute bottom-0 h-[72px] object-contain object-bottom mix-blend-multiply ${d.accent ? 'left-2 w-[60px]' : 'left-1/2 w-[92px] -translate-x-1/2'}`}
-                        />
-                      </>
+                      <img
+                        src={d.image}
+                        alt=""
+                        loading="lazy"
+                        className={PHOTO_TILES.has(d.id)
+                          ? 'absolute inset-0 h-full w-full object-cover'
+                          : 'absolute inset-x-0 bottom-0 mx-auto h-[70px] w-[90px] object-contain object-bottom mix-blend-multiply'}
+                      />
                     ) : (
                       <span className="flex h-full items-center justify-center text-terracotta-dark"><Icon name={DEPARTMENT_ICON[d.id] || 'package'} size={24} /></span>
                     )}
                   </span>
                   <span className="min-w-0 px-2.5 pb-2.5 pt-2">
                     <span className="block truncate text-[13px] font-extrabold leading-tight">{d.short}</span>
-                    <span className={`block truncate text-xs ${active ? 'text-[#3d2e0c]' : 'text-ink-muted'}`}>{d.xhosa}</span>
+                    <span className={`block truncate text-xs ${active ? 'text-[#a3471a]' : 'text-ink-muted'}`}>{d.xhosa}</span>
                   </span>
                 </button>
               </li>

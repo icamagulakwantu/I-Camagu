@@ -457,7 +457,7 @@ function SupplierDashboard({ onBack }) {
                                   {confirmingId === p.id ? '...' : 'Confirm received'}
                                 </button>
                               ) : (
-                                <span className="text-xs font-bold text-sage-600 flex-shrink-0 flex items-center gap-1"><Icon name="check" size={11} color="#4a7a4a" /> Cleared</span>
+                                <span className="text-xs font-bold text-sage-600 flex-shrink-0 flex items-center gap-1"><Icon name="check" size={11} color="#3a2f27" /> Cleared</span>
                               )}
                             </div>
                             {p.refundRequestedAt && p.status !== 'REFUNDED' && (

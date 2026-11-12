@@ -23,8 +23,9 @@ const withSections = (aisle) => ({
   categories: aisle.sections.flatMap((section) => section.categories),
 })
 
-// image: a real product photo for the department tile (packshots on white,
-// or a photograph); accent: an optional second product layered beside it.
+// image: one real product photo for the department tile (a packshot on
+// white, or a photograph). One product per tile: pairs of products at
+// different real sizes looked wrong side by side.
 export const DEPARTMENTS = [
   {
     id: 'alcohol',
@@ -32,7 +33,6 @@ export const DEPARTMENTS = [
     short: 'Alcohol',
     xhosa: 'Utywala',
     image: '/images/brands/hennessy-xo.png',
-    accent: '/images/brands/castle-lager.png',
     aisles: [
       { id: 'beer', name: 'Beer', categories: ['BEER'] },
       { id: 'ciders', name: 'Ciders & coolers', categories: ['CIDER_RTD'] },
@@ -67,7 +67,6 @@ export const DEPARTMENTS = [
     short: 'Soft drinks',
     xhosa: 'Iziselo ezinganxilisiyo',
     image: '/images/brands/images%20(9).jpeg',
-    accent: '/images/brands/images%20(2).jpeg',
     aisles: [
       { id: 'soft', name: 'Soft drinks', categories: ['SOFT_DRINKS', 'JUICE', 'ENERGY_DRINK'] },
       { id: 'water', name: 'Water & ice', categories: ['WATER', 'ICE'] },
@@ -79,7 +78,8 @@ export const DEPARTMENTS = [
     name: 'Meat & poultry',
     short: 'Meat',
     xhosa: 'Inyama',
-    image: '/images/brands/boerewors.png',
+    // Founder's own photo (30 Oct round), as on the Whole Chicken product.
+    image: 'https://hercules-cdn.com/file_XPFTde3NRaR0itfh1NJ8HuQ2',
     aisles: [
       { id: 'meat', name: 'Meat & poultry', categories: ['MEAT'] },
     ],
@@ -100,7 +100,6 @@ export const DEPARTMENTS = [
     short: 'Groceries',
     xhosa: 'Ukutya',
     image: '/images/brands/baked-beans.jpg',
-    accent: '/images/brands/chutney.png',
     aisles: [
       { id: 'grains', name: 'Grains & dry goods', categories: ['DRY_GOODS', 'GROCERY_BULK', 'GROCERY'] },
       { id: 'tinned', name: 'Tinned goods', categories: ['CANNED_GOODS'] },

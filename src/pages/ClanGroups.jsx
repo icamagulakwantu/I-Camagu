@@ -115,7 +115,7 @@ function GroupDetail({ groupId, onBack, authedFetch }) {
           {group.members.map((m) => (
             <li key={m.userId} className="py-2.5 flex items-center gap-3">
               <span className="w-9 h-9 rounded-full bg-sage-50 flex items-center justify-center flex-shrink-0">
-                <Icon name="user" size={16} color="#4a7a4a" />
+                <Icon name="user" size={16} color="#3a2f27" />
               </span>
               <span className="flex-1 min-w-0">
                 <span className="block font-bold text-sm text-ink truncate">

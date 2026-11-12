@@ -62,7 +62,7 @@ function IzidukoProfileView({ userId, onBack, onMessage }) {
                 {profile.profileImage ? (
                   <img src={profile.profileImage} alt={`${profile.firstName} ${profile.lastName}`} className="absolute inset-0 w-full h-full object-cover" />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center"><Icon name="user" size={48} color="#4a7a4a" /></div>
+                  <div className="absolute inset-0 flex items-center justify-center"><Icon name="user" size={48} color="#3a2f27" /></div>
                 )}
               </div>
               <div className="p-4">

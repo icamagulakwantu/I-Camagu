@@ -88,7 +88,7 @@ export default function AddressField({ accessToken, value, onChange, autoFocus =
   return (
     <div className="relative">
       <div className={`flex items-center gap-2 bg-cream border-2 rounded-soft px-3 transition-colors ${highlight ? 'border-terracotta' : 'border-cream-dark focus-within:border-sage-500'}`}>
-        <Icon name="mapPin" size={16} color="#4a7a4a" />
+        <Icon name="mapPin" size={16} color="#3a2f27" />
         <input
           ref={inputRef}
           type="text"
@@ -132,7 +132,7 @@ export default function AddressField({ accessToken, value, onChange, autoFocus =
         disabled={locating}
         className="cursor-pointer mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-sage-700 hover:text-sage-600 disabled:opacity-60"
       >
-        <Icon name="compass" size={13} color="#4a7a4a" /> {locating ? 'Finding you…' : 'Use my current location'}
+        <Icon name="compass" size={13} color="#3a2f27" /> {locating ? 'Finding you…' : 'Use my current location'}
       </button>
       {hint && <p className="text-xs text-ink-muted mt-1">{hint}</p>}
     </div>

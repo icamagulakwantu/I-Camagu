@@ -100,7 +100,7 @@ function ResetPassword({ token }) {
             </div>
             {matches !== null && (
               <p className={`text-xs font-bold mt-1 flex items-center gap-1 ${matches ? 'text-sage-600' : 'text-terracotta'}`}>
-                {matches ? <><Icon name="check" size={11} color="#4a7a4a" /> Passwords match</> : 'Passwords do not match'}
+                {matches ? <><Icon name="check" size={11} color="#3a2f27" /> Passwords match</> : 'Passwords do not match'}
               </p>
             )}
           </div>

@@ -31,7 +31,7 @@ const TILE_GROUPS = [
     title: 'Usapho & Inkcubeko',
     english: 'Family & culture',
     line: 'Your clan, your history, your people.',
-    color: '#2e4a2e',
+    color: '#1c1612',
     items: [
       { id: 'iziduko', icon: 'link', label: 'Find clan members', desc: 'Siblings and clan by iziduko', keywords: 'clanmatch family' },
       { id: 'clangroups', icon: 'users', label: 'Clan groups', desc: 'Talk and plan with your clan' },
@@ -43,7 +43,7 @@ const TILE_GROUPS = [
     title: 'Imali & Iinkonzo',
     english: 'Money & services',
     line: 'Orders, spending and the people who serve our ceremonies.',
-    color: '#7a5414',
+    color: '#a3471a',
     items: [
       { id: 'myorders', icon: 'package', label: 'My orders', desc: 'Track your bulk orders', keywords: 'delivery' },
       { id: 'expenditure', icon: 'coins', label: 'My spending', desc: 'Where the money went', keywords: 'budget' },
@@ -56,7 +56,7 @@ const TILE_GROUPS = [
 
 // The Shrine Fund gets its own banner: it is the nation-building heart of
 // the app, not one tool among many.
-const FUND_ITEM = { id: 'ubuhlanti', icon: 'flame', label: 'Ubuhlanti Shrine Fund', desc: 'Together we build greatness', keywords: 'shrine fund donate pledge', color: '#7a5414' }
+const FUND_ITEM = { id: 'ubuhlanti', icon: 'flame', label: 'Ubuhlanti Shrine Fund', desc: 'Together we build greatness', keywords: 'shrine fund donate pledge', color: '#a3471a' }
 
 const LIST_GROUPS = [
   {

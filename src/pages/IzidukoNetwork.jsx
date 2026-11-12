@@ -19,7 +19,7 @@ const LINE_LABEL = { paternal: 'Paternal', maternal: 'Maternal', 'paternal grand
 function Avatar({ src, size = 'w-12 h-12' }) {
   return (
     <div className={`${size} rounded-full bg-sage-50 flex items-center justify-center text-xl overflow-hidden flex-shrink-0`}>
-      {src ? <img src={src} alt="" className="w-full h-full object-cover" /> : <Icon name="user" size={18} color="#4a7a4a" />}
+      {src ? <img src={src} alt="" className="w-full h-full object-cover" /> : <Icon name="user" size={18} color="#3a2f27" />}
     </div>
   )
 }
@@ -240,7 +240,7 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
                       <div className="p-4">
                         {m.connectionStatus === 'connected' && (
                           <div className="space-y-2">
-                            <span className="text-xs font-bold text-sage-600 flex items-center gap-1 justify-center py-1"><Icon name="check" size={12} color="#4a7a4a" /> Connected</span>
+                            <span className="text-xs font-bold text-sage-600 flex items-center gap-1 justify-center py-1"><Icon name="check" size={12} color="#3a2f27" /> Connected</span>
                             <div className="flex gap-2">
                               <button
                                 onClick={() => onViewProfile?.(m.id)}
@@ -392,7 +392,7 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-sm text-ink">{c.firstName} {c.lastName}</p>
                           <p className="text-xs text-ink-muted">{c.paternalIziduko} · {c.maternalIziduko}</p>
-                          {c.phoneNumber && <p className="text-xs text-sage-600 font-bold mt-1 flex items-center gap-1"><Icon name="phone" size={11} color="#4a7a4a" /> {c.phoneNumber}</p>}
+                          {c.phoneNumber && <p className="text-xs text-sage-600 font-bold mt-1 flex items-center gap-1"><Icon name="phone" size={11} color="#3a2f27" /> {c.phoneNumber}</p>}
                         </div>
                       </div>
                       <div className="flex gap-2 mt-3">

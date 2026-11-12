@@ -153,7 +153,7 @@ export default function Ekoyini({ onBack }) {
             )}
           >
             <div className="w-12 h-12 rounded-full bg-sage-50 flex items-center justify-center flex-shrink-0">
-              <Icon name={pkg.icon} size={22} color="#4a7a4a" />
+              <Icon name={pkg.icon} size={22} color="#3a2f27" />
             </div>
             <div className="flex-1">
               <div className="flex justify-between items-center">

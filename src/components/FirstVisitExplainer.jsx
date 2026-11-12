@@ -8,8 +8,8 @@ import Icon from './Icon.jsx'
 const SHORTCUTS = [
   { screen: 'ceremonyhub', icon: 'calendarRange', accent: '#c45c26', title: 'Plan a ceremony', desc: 'Checklist, budget and family pledges' },
   { screen: 'store', icon: 'cart', accent: '#c1922f', title: 'Shop together', desc: 'Pool orders for bulk prices' },
-  { screen: 'stokvels', icon: 'coins', accent: '#4a7a4a', title: 'Stokvels', desc: 'Save and pay out fairly' },
-  { screen: 'iziduko', icon: 'link', accent: '#3d623d', title: 'Find your clan', desc: 'Connect through iziduko' },
+  { screen: 'stokvels', icon: 'coins', accent: '#3a2f27', title: 'Stokvels', desc: 'Save and pay out fairly' },
+  { screen: 'iziduko', icon: 'link', accent: '#2a221c', title: 'Find your clan', desc: 'Connect through iziduko' },
 ]
 
 export default function FirstVisitExplainer({ onNavigate }) {
