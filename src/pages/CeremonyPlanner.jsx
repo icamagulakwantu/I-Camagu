@@ -354,7 +354,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             <Skeleton className="h-20 w-full" />
           </div>
         ) : plans.length === 0 ? (
-          <EmptyState emoji="📋" title="No plans yet" description="Tap "Start a new ceremony" above to plan your first one." />
+          <EmptyState emoji="📋" title="No plans yet" description="Tap ‘Start a new ceremony’ above to plan your first one." />
         ) : (
           <div className="space-y-2">
             {plans.map((plan) => {
