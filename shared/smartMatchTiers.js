@@ -19,15 +19,15 @@
 // currentAmountZAR). No fabricated volume, no fabricated savings.
 export const PALLET_CASES = 56;
 
-// Founder's pallet bands (12 Nov 2026): 1-5, 5-18, 18-36 and above 36
-// pallets. The savings target is up to 15% through the first three bands
-// and 20% above 36 pallets; each tier's real case price (value) stays
-// null until a supplier quotes it.
+// Founder's pallet bands. Isizwe Tier (18 pallets, covering 10 to 18) was
+// added on 12 Nov 2026. Each tier's real case price (value) stays null
+// until a supplier quotes it.
 export const DEFAULT_PALLET_TIERS = [
   { id: 1, name: 'Amazibazana Goal', min: 1, value: null },
-  { id: 2, name: 'Clan Tier', min: 5, value: null },
-  { id: 3, name: 'Eastern Cape Tier', min: 18, value: null },
-  { id: 4, name: 'Max Tier', min: 36, value: null },
+  { id: 2, name: 'Clan Tier', min: 4, value: null },
+  { id: 3, name: 'Eastern Cape Tier', min: 8, value: null },
+  { id: 4, name: 'Max Tier', min: 10, value: null },
+  { id: 5, name: 'Isizwe Tier', min: 18, value: null },
 ];
 
 export function palletsForCases(cases) {

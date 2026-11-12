@@ -67,12 +67,10 @@ describe('getTierForMetric', () => {
     expect(getTierForMetric(5, null)).toBeNull();
   });
 
-  it("uses the founder's alcohol bands: 1-5, 5-18, 18-36 and above 36 pallets", () => {
-    expect(DEFAULT_PALLET_TIERS.map((t) => t.min)).toEqual([1, 5, 18, 36]);
-    expect(getTierForMetric(4.9, DEFAULT_PALLET_TIERS).name).toBe('Amazibazana Goal');
-    expect(getTierForMetric(5, DEFAULT_PALLET_TIERS).name).toBe('Clan Tier');
-    expect(getTierForMetric(35, DEFAULT_PALLET_TIERS).name).toBe('Eastern Cape Tier');
-    expect(getTierForMetric(36, DEFAULT_PALLET_TIERS).name).toBe('Max Tier');
+  it("uses the founder's alcohol bands, with Isizwe Tier added at 18 pallets", () => {
+    expect(DEFAULT_PALLET_TIERS.map((t) => t.min)).toEqual([1, 4, 8, 10, 18]);
+    expect(getTierForMetric(17.9, DEFAULT_PALLET_TIERS).name).toBe('Max Tier');
+    expect(getTierForMetric(18, DEFAULT_PALLET_TIERS).name).toBe('Isizwe Tier');
     expect(DEFAULT_PALLET_TIERS.every((t) => t.value === null)).toBe(true);
   });
 });

@@ -209,7 +209,7 @@ function Login() {
           {step === 'email' && (
             <div className="mt-4 rounded-2xl border border-cream/15 bg-white/10 backdrop-blur-sm px-3.5 py-3">
               <p className="text-cream text-sm font-bold">SmartMatch Pool</p>
-              <p className="text-cream/85 text-xs leading-snug mt-0.5">Join with other people nearby to pool demand and buy alcohol, groceries or livestock together. The bigger the group order, the bigger the saving: up to 15% from 1 to 36 pallets, and 20% once a group passes 36 pallets, depending on supplier quotes.</p>
+              <p className="text-cream/85 text-xs leading-snug mt-0.5">Join with other people nearby to pool demand and buy alcohol, groceries or livestock together. The bigger the group order, the bigger the saving: up to 15% on group orders, and up to 20% on the very largest, depending on supplier quotes and group size.</p>
             </div>
           )}
         </div>
