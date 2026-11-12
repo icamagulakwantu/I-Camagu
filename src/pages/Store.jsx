@@ -24,6 +24,23 @@ const DEPARTMENT_ICON = {
   other: 'store',
 }
 
+// Livestock, meat and fresh produce come as photographs, which look best
+// filling their tile. Everything else is a packshot on a white background,
+// shown whole on a warm tile with the white blended away.
+const PHOTO_DEPARTMENTS = new Set(['livestock', 'meat'])
+const isPhotograph = (sku) => PHOTO_DEPARTMENTS.has(departmentOf(sku).id) || aisleOf(sku).id === 'produce'
+
+// Placeholder colours per department, for products still waiting for a photo.
+const PLACEHOLDER_TONE = {
+  alcohol: 'from-[#f3e6cf] to-[#ead6b3] text-[#6e5418]',
+  softdrinks: 'from-[#e4ecdf] to-[#cfdec7] text-sage-700',
+  meat: 'from-[#f6e2d6] to-[#eccab6] text-terracotta-dark',
+  livestock: 'from-[#efe4d2] to-[#e2d0b4] text-[#6e5418]',
+  groceries: 'from-[#f1ead9] to-[#e5d9bf] text-[#6e5418]',
+  nonconsumables: 'from-[#ebe5dc] to-[#dcd3c6] text-ink',
+  other: 'from-[#ebe5dc] to-[#dcd3c6] text-ink',
+}
+
 // How bulk buying works, in three short steps.
 const HOW_IT_WORKS = [
   { n: 1, title: 'Add items', desc: 'Drinks, meat, groceries or livestock' },
@@ -41,24 +58,30 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
   const dept = departmentOf(sku)
   const unit = unitOf(sku)
   const flock = collectiveNoun(sku)
+  const photo = isPhotograph(sku)
   const pack = [sku.bottleFormat, sku.unitsPerCase > 1 ? `${sku.unitsPerCase} per ${unit}` : `per ${unit}`].filter(Boolean).join(' · ')
 
   return (
     <li className="flex min-w-0 flex-col">
       {/* Photo, with the price tab and the add button breaking out of it */}
       <div className="relative">
-        <div className="flex h-[148px] items-center justify-center overflow-hidden rounded-[20px] bg-white shadow-[0_14px_28px_-22px_rgba(43,30,18,0.55)]">
+        <div className="h-[148px] overflow-hidden rounded-[20px] bg-[#f6f1e7] shadow-[0_14px_28px_-22px_rgba(43,30,18,0.55)]">
           {sku.imageUrl && !imageFailed ? (
             <img
               src={sku.imageUrl}
               alt={`${sku.name}${sku.bottleFormat ? `, ${sku.bottleFormat}` : ''}`}
-              className="h-full w-full object-contain p-3"
+              className={photo ? 'h-full w-full object-cover' : 'h-full w-full object-contain p-3 mix-blend-multiply'}
               loading="lazy"
               decoding="async"
               onError={onImageError}
             />
           ) : (
-            <Icon name={DEPARTMENT_ICON[dept.id] || 'package'} size={32} color="#a3471a" />
+            <span className={`flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br ${PLACEHOLDER_TONE[dept.id] || PLACEHOLDER_TONE.other}`}>
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/60">
+                <Icon name={DEPARTMENT_ICON[dept.id] || 'package'} size={26} />
+              </span>
+              <span className="text-xs font-bold opacity-80">Photo coming soon</span>
+            </span>
           )}
         </div>
         {savings !== null && (
