@@ -634,6 +634,10 @@ model Sku {
   retailPriceSource    String?
   retailPriceCheckedAt DateTime?
   retailPriceNote      String?
+  // Set when a product is no longer sold. A retired product is hidden from
+  // the catalogue and cannot be added to a basket or pool, but rows that
+  // existing orders point at are kept so their history stays intact.
+  retiredAt         DateTime?
   createdAt         DateTime @default(now())
 
   basketItems BasketItem[]

@@ -10,7 +10,8 @@ export async function getCatalogue(req, res) {
   const { category, search } = req.query;
 
   try {
-    const where = {};
+    // Retired products are no longer sold, so they never reach the Store.
+    const where = { retiredAt: null };
     if (category) where.category = category;
     if (search) where.name = { contains: search, mode: 'insensitive' };
 
@@ -36,7 +37,7 @@ export async function getCatalogue(req, res) {
 
 export async function getCategories(req, res) {
   try {
-    const skus = await prisma.sku.findMany({ select: { category: true }, distinct: ['category'] });
+    const skus = await prisma.sku.findMany({ where: { retiredAt: null }, select: { category: true }, distinct: ['category'] });
     res.json(skus.map(s => s.category));
   } catch (error) {
     console.error('Get categories error:', error.message);

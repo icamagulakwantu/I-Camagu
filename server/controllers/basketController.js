@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import { PUBLIC_SKU_SELECT, toPublicItem, isOrderable } from '../utils/skuVisibility.js';
+import { PUBLIC_SKU_SELECT, toPublicItem, isOrderable, isRetired } from '../utils/skuVisibility.js';
 import { parsePositiveIntegerQuantity } from '../utils/quantity.js';
 
 // One open (DRAFT) basket per member. Two tabs/requests racing here could
@@ -60,6 +60,7 @@ export async function addItem(req, res) {
           try {
                   const sku = await prisma.sku.findUnique({ where: { id: skuId } });
                       if (!sku) return res.status(404).json({ error: 'SKU not found' });
+                          if (isRetired(sku)) return res.status(409).json({ error: `${sku.name} is no longer sold on iCamagu.` });
                           if (!isOrderable(sku)) return res.status(409).json({ error: `${sku.name} is in the catalogue but doesn't have a price yet — check back once it's been priced.` });
 
                           const basket = await getOrCreateDraftBasket(req.userId);

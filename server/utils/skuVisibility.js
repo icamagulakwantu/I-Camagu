@@ -28,7 +28,11 @@ export function isVerifiedRetail(sku, now = Date.now()) {
 // downstream (Store's Add button, the basket-add endpoint) treats it as
 // purchasable until this is true.
 export function isOrderable(sku) {
-  return sku?.casePriceZAR != null;
+  return sku?.casePriceZAR != null && !sku?.retiredAt;
+}
+
+export function isRetired(sku) {
+  return Boolean(sku?.retiredAt);
 }
 
 // Strips the retail price from a catalogue row unless it has been verified,

@@ -20,6 +20,7 @@ import { ensureOfferSchema } from './services/offerService.js';
 import { backfillHennessyProductImages } from './scripts/backfill-hennessy-product-images.js';
 import { backfillRequestedProductImages } from './scripts/backfill-requested-product-images.js';
 import { backfillUploadedProductImages } from './scripts/backfill-uploaded-product-images.js';
+import { cleanUpCatalogueNov2026 } from './scripts/catalogue-cleanup-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -224,6 +225,15 @@ if (startup.schemaReady) {
     await backfillUploadedProductImages();
   } catch (err) {
     console.error('Uploaded product image backfill failed:', err?.message);
+  }
+  // Founder's 12 Nov 2026 catalogue review: retire products not sold, fix
+  // categories and pack names, remove images of the wrong pack, and price the
+  // 300ml soft drinks and Black Label dumpy. Runs after the image scripts so
+  // nothing above puts a wrong image back. Idempotent.
+  try {
+    await cleanUpCatalogueNov2026();
+  } catch (err) {
+    console.error('Catalogue clean-up (Nov 2026) failed:', err?.message);
   }
 }
 

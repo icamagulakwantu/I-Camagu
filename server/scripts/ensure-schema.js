@@ -9,6 +9,8 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "emailVerificationRequired" BOOLEAN NOT NULL DEFAULT false;');
   // Campaign attribution (?src=) recorded on new accounts. Nullable: existing accounts have none.
   await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "signupSource" TEXT;');
+  // Products no longer sold are retired rather than deleted when orders reference them.
+  await prisma.$executeRawUnsafe('ALTER TABLE "Sku" ADD COLUMN IF NOT EXISTS "retiredAt" TIMESTAMP(3);');
   // Merchant verification. Existing merchants start unverified until an admin checks them.
   await prisma.$executeRawUnsafe('ALTER TABLE "Partner" ADD COLUMN IF NOT EXISTS "verifiedAt" TIMESTAMP(3);');
   await prisma.$executeRawUnsafe('ALTER TABLE "Partner" ADD COLUMN IF NOT EXISTS "verifiedById" TEXT;');

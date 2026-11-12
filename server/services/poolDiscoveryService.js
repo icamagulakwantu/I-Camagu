@@ -266,7 +266,8 @@ export async function joinPoolWithItem(userId, input) {
   ]);
   if (!user) throw new Error('User not found');
   if (!pool || pool.status !== 'OPEN') throw new Error('This pool is no longer open');
-  if (!sku || !sku.casePriceZAR) throw new Error('This catalogue item is not yet priced and cannot be ordered');
+  if (!sku || sku.retiredAt) throw new Error('This product is no longer sold on iCamagu');
+  if (!sku.casePriceZAR) throw new Error('This catalogue item is not yet priced and cannot be ordered');
   if (categoryForSku(sku) !== pool.category) throw new Error('This pool is for a different item category');
   if (fundingSource === 'STOKVEL') {
     if (!stokvelId) throw new Error('Choose a stokvel to fund this order');
