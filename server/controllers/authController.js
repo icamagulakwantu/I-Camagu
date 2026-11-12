@@ -6,6 +6,7 @@ import { generateTokenPair, rotateToken } from '../services/tokenService.js';
 import { hashPassword, verifyPassword } from '../services/passwordService.js';
 import { verifyGoogleToken } from '../services/googleAuthService.js';
 import { isAdminEmail } from '../config/admin.js';
+import { cleanCampaignSource } from '../../shared/campaignSource.js';
 
 // Render does not set NODE_ENV for Node services unless you add it yourself,
 // so keying `secure` off NODE_ENV alone silently ships the refresh cookie
@@ -86,7 +87,7 @@ export async function registerWithPassword(req, res) {
   // them just adds friction to account creation. Still accepted here if a
   // caller does send it (kept optional, not removed) so nothing breaks for
   // an existing client sending the old shape.
-  const { email, password, firstName, lastName, paternalIziduko, maternalIziduko } = req.body;
+  const { email, password, firstName, lastName, paternalIziduko, maternalIziduko, signupSource } = req.body;
 
   if (!email || !password || !firstName || !lastName) {
     return res.status(400).json({ error: 'Email, password, first name and surname are required' });
@@ -123,7 +124,7 @@ export async function registerWithPassword(req, res) {
 
     const passwordHash = await hashPassword(password);
     const user = await prisma.user.create({
-      data: { email: cleanEmail(email).toLowerCase(), passwordHash, firstName, lastName, paternalIziduko: paternalIziduko || null, maternalIziduko: maternalIziduko || null, emailVerificationRequired: true },
+      data: { email: cleanEmail(email).toLowerCase(), passwordHash, firstName, lastName, paternalIziduko: paternalIziduko || null, maternalIziduko: maternalIziduko || null, emailVerificationRequired: true, signupSource: cleanCampaignSource(signupSource) },
     });
 
     const { syncUserClanGroups } = await import('../services/izidukoService.js');
@@ -178,7 +179,7 @@ export async function loginWithPassword(req, res) {
 // (The ACCOUNT_EXISTS reply is fine for SEC-02: only someone Google has
 // confirmed owns this email can see it.)
 export async function googleAuth(req, res) {
-  const { idToken } = req.body;
+  const { idToken, signupSource } = req.body;
   if (!idToken) return res.status(400).json({ error: 'idToken is required' });
 
   let googleData;
@@ -227,6 +228,7 @@ export async function googleAuth(req, res) {
           data: {
             email: googleData.email, googleId: googleData.googleId,
             firstName: googleData.firstName, lastName: googleData.lastName,
+            signupSource: cleanCampaignSource(signupSource),
           },
         });
       }
@@ -244,14 +246,14 @@ export async function googleAuth(req, res) {
 // OTP flow — kept as a fallback. The screen does not use this endpoint, but
 // it no longer hands back an internal user id.
 export async function register(req, res) {
-  const { email, firstName, lastName, paternalIziduko, maternalIziduko } = req.body;
+  const { email, firstName, lastName, paternalIziduko, maternalIziduko, signupSource } = req.body;
   if (!email || !firstName || !lastName || !paternalIziduko || !maternalIziduko) {
     return res.status(400).json({ error: 'Email, first name, surname, and both Iziduko are required' });
   }
   try {
     const user = await prisma.user.upsert({
       where: { email }, update: {},
-      create: { email, firstName, lastName, paternalIziduko, maternalIziduko },
+      create: { email, firstName, lastName, paternalIziduko, maternalIziduko, signupSource: cleanCampaignSource(signupSource) },
     });
     const { syncUserClanGroups } = await import('../services/izidukoService.js');
     await syncUserClanGroups(user);

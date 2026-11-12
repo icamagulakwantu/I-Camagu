@@ -2,6 +2,14 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import Icon from '../components/Icon.jsx'
+import { CAMPAIGN_SOURCE_STORAGE_KEY, cleanCampaignSource } from '../../shared/campaignSource.js'
+
+// The campaign code the Landing page saved, if any. The server only records it
+// when this request creates a new account, so it is safe to send on sign-in too.
+function storedSignupSource() {
+  try { return cleanCampaignSource(localStorage.getItem(CAMPAIGN_SOURCE_STORAGE_KEY)) || undefined }
+  catch { return undefined }
+}
 
 // SEC-02: the screen no longer asks the server whether an email has an
 // account. After the email step everyone sees the same choices: sign in with
@@ -68,7 +76,7 @@ function Login() {
     try {
       const res = await fetch('/api/auth/google', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', body: JSON.stringify({ idToken: response.credential }),
+        credentials: 'include', body: JSON.stringify({ idToken: response.credential, signupSource: storedSignupSource() }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.detail || data.error || 'Google sign-in failed')
@@ -112,7 +120,7 @@ function Login() {
       const res = await fetch('/api/auth/register-password', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email, password, firstName, lastName }),
+        body: JSON.stringify({ email, password, firstName, lastName, signupSource: storedSignupSource() }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Registration failed')

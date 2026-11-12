@@ -125,6 +125,10 @@ model User {
   maternalGrandmotherIziduko String?
   nationLabel            String?
   pinHash                String?
+  // Campaign code (?src=) from the landing page link a new account signed up
+  // through, e.g. a pamphlet QR code. Set once at account creation; never
+  // returned to clients.
+  signupSource           String?
 
   // Identity verification — the ID number is encrypted at rest (AES-256-GCM,
   // see server/services/encryptionService.js), never stored or returned in

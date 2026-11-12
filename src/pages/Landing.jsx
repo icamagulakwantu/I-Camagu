@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Icon from '../components/Icon.jsx'
+import { CAMPAIGN_SOURCE_STORAGE_KEY as SRC_KEY, cleanCampaignSource } from '../../shared/campaignSource.js'
 
 /**
  * Public marketing page shown before sign-in.
@@ -8,7 +9,6 @@ import Icon from '../components/Icon.jsx'
  * Keep the no-custody claim disabled until the server-side policy is independently verified.
  */
 const NO_CUSTODY_LIVE = false
-const SRC_KEY = 'icamagu_campaign_src'
 
 const STEPS = [
   {
@@ -89,8 +89,8 @@ export default function Landing({ onJoin, onSignIn }) {
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search)
-      const src = params.get('src')
-      if (src && /^[a-zA-Z0-9_-]{1,40}$/.test(src) && !localStorage.getItem(SRC_KEY)) {
+      const src = cleanCampaignSource(params.get('src'))
+      if (src && !localStorage.getItem(SRC_KEY)) {
         localStorage.setItem(SRC_KEY, src)
       }
     } catch {

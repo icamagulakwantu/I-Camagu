@@ -7,6 +7,8 @@ import prisma from '../config/db.js';
 export async function ensureCeremonyBudgetColumns() {
   // Existing accounts remain usable; only password registrations explicitly set this flag.
   await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "emailVerificationRequired" BOOLEAN NOT NULL DEFAULT false;');
+  // Campaign attribution (?src=) recorded on new accounts. Nullable: existing accounts have none.
+  await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "signupSource" TEXT;');
   // New ceremony types remain draft-only in the API until their checklists are reviewed.
   // Postgres enum additions are idempotent and do not rewrite existing rows.
   await prisma.$executeRawUnsafe('ALTER TYPE "CeremonyType" ADD VALUE IF NOT EXISTS \'IMBELEKO\';');

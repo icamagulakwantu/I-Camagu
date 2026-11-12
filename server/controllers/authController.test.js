@@ -23,6 +23,7 @@ vi.mock('../config/admin.js', () => ({ isAdminEmail }));
 
 const auth = await import('./authController.js');
 const tokenService = await import('../services/tokenService.js');
+const googleAuthService = await import('../services/googleAuthService.js');
 
 function fakeRes() {
   const res = { statusCode: 200, body: undefined };
@@ -93,6 +94,51 @@ describe('password registration verification', () => {
     await vi.waitFor(() => expect(send).toHaveBeenCalledWith(expect.objectContaining({
       to: 'new@example.com', subject: 'Verify your iCamagu email',
     })));
+  });
+});
+
+describe('campaign attribution on sign-up', () => {
+  const NEW_USER = { id: 'user-3', email: 'new@example.com', firstName: 'New', lastName: 'Member' };
+
+  it('records a valid campaign code on a new password account', async () => {
+    prisma.user.findUnique.mockResolvedValueOnce(null);
+    prisma.user.create.mockResolvedValueOnce({ ...NEW_USER, emailVerificationRequired: true });
+    await call(auth.registerWithPassword, {
+      email: 'new@example.com', password: 'password123', firstName: 'New', lastName: 'Member', signupSource: 'pamphlet_EL-1',
+    });
+    expect(prisma.user.create).toHaveBeenCalledWith({ data: expect.objectContaining({ signupSource: 'pamphlet_EL-1' }) });
+  });
+
+  it('stores nothing for a missing or invalid campaign code', async () => {
+    for (const signupSource of [undefined, 'not valid!', 'a'.repeat(41), { evil: true }]) {
+      prisma.user.findUnique.mockResolvedValueOnce(null);
+      prisma.user.create.mockResolvedValueOnce({ ...NEW_USER, emailVerificationRequired: true });
+      await call(auth.registerWithPassword, {
+        email: 'new@example.com', password: 'password123', firstName: 'New', lastName: 'Member', signupSource,
+      });
+      expect(prisma.user.create).toHaveBeenLastCalledWith({ data: expect.objectContaining({ signupSource: null }) });
+    }
+  });
+
+  it('does not touch an existing account when a campaign code is sent', async () => {
+    prisma.user.findUnique.mockResolvedValueOnce(MEMBER);
+    await call(auth.registerWithPassword, {
+      email: 'member@example.com', password: 'password123', firstName: 'Member', lastName: 'Existing', signupSource: 'pamphlet1',
+    });
+    expect(prisma.user.create).not.toHaveBeenCalled();
+    expect(prisma.user.update).not.toHaveBeenCalled();
+  });
+
+  it('records a valid campaign code on a new Google account and never returns it', async () => {
+    googleAuthService.verifyGoogleToken.mockResolvedValueOnce({
+      email: 'new@example.com', emailVerified: true, googleId: 'google-3', firstName: 'New', lastName: 'Member',
+    });
+    prisma.user.findUnique.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
+    prisma.user.create.mockResolvedValueOnce({ ...NEW_USER, googleId: 'google-3', signupSource: 'qr1' });
+    const result = await call(auth.googleAuth, { idToken: 'token', signupSource: 'qr1' });
+    expect(result.status).toBe(200);
+    expect(prisma.user.create).toHaveBeenCalledWith({ data: expect.objectContaining({ signupSource: 'qr1' }) });
+    expect(result.body.user.signupSource).toBeUndefined();
   });
 });
 
