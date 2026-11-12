@@ -2,18 +2,20 @@ import { useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import Icon from '../components/Icon.jsx'
-import PageHeader from '../components/ui/PageHeader.jsx'
 import AncestralRites from './AncestralRites.jsx'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 // One colour per kind of thing, matching Home:
 // terracotta = ceremony, sage = family & culture, ochre = money & services.
+// Each group is a coloured panel with its tools rising out of it as cards.
 // Nothing that already has its own bottom tab is repeated here. Every tile
 // carries a short line saying what it is for, so nobody has to guess.
 const TILE_GROUPS = [
   {
     title: 'Imisebenzi',
     english: 'Ceremony tools',
-    color: '#c45c26',
+    line: 'Everything to run the day the way it should be run.',
+    color: '#a3471a',
     items: [
       { id: 'templates', icon: 'template', label: 'Ceremony templates', desc: 'Ready-made plans to start from' },
       { id: 'hierarchy', icon: 'users', label: 'Who brings what', desc: 'Give each group its items' },
@@ -28,7 +30,8 @@ const TILE_GROUPS = [
   {
     title: 'Usapho & Inkcubeko',
     english: 'Family & culture',
-    color: '#4a7a4a',
+    line: 'Your clan, your history, your people.',
+    color: '#2e4a2e',
     items: [
       { id: 'iziduko', icon: 'link', label: 'Find clan members', desc: 'Siblings and clan by iziduko', keywords: 'clanmatch family' },
       { id: 'clangroups', icon: 'users', label: 'Clan groups', desc: 'Talk and plan with your clan' },
@@ -39,17 +42,21 @@ const TILE_GROUPS = [
   {
     title: 'Imali & Iinkonzo',
     english: 'Money & services',
-    color: '#c1922f',
+    line: 'Orders, spending and the people who serve our ceremonies.',
+    color: '#7a5414',
     items: [
       { id: 'myorders', icon: 'package', label: 'My orders', desc: 'Track your bulk orders', keywords: 'delivery' },
       { id: 'expenditure', icon: 'coins', label: 'My spending', desc: 'Where the money went', keywords: 'budget' },
-      { id: 'ubuhlanti', icon: 'flame', label: 'Ubuhlanti fund', desc: 'Grow our community economy', keywords: 'shrine' },
       { id: 'directory', icon: 'book', label: 'Healers, ingcibi & vendors', desc: 'Trusted traditional help', keywords: 'igqirha sangoma merchant' },
       { id: 'ekoyini', icon: 'cocktail', label: 'Ekoyini mobile bar', desc: 'Book a bar for your event' },
       { id: 'supplier', icon: 'store', label: 'Sell on iCamagu', desc: 'Supply stokvels and families', keywords: 'supplier producer' },
     ],
   },
 ]
+
+// The Shrine Fund gets its own banner: it is the nation-building heart of
+// the app, not one tool among many.
+const FUND_ITEM = { id: 'ubuhlanti', icon: 'flame', label: 'Ubuhlanti Shrine Fund', desc: 'Together we build greatness', keywords: 'shrine fund donate pledge', color: '#7a5414' }
 
 const LIST_GROUPS = [
   {
@@ -130,6 +137,7 @@ export default function More({ onNavigate }) {
   const listGroups = useMemo(() => LIST_GROUPS.filter((g) => !g.adminOnly || isAdmin), [isAdmin])
   const allItems = useMemo(() => [
     ...TILE_GROUPS.flatMap((g) => g.items.map((i) => ({ ...i, color: g.color }))),
+    FUND_ITEM,
     ...listGroups.flatMap((g) => g.items),
   ], [listGroups])
 
@@ -173,61 +181,66 @@ export default function More({ onNavigate }) {
   const initials = [user?.firstName, user?.lastName].filter(Boolean).map((n) => n[0]).join('').toUpperCase()
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-cream px-5 pb-28 pt-6">
-      <PageHeader
-        eyebrow="Konke okunye"
-        title="More"
-        subtitle="Every tool for your ceremony, your family and your money."
-      />
-
-      {user && (
-        <button
-          type="button"
-          onClick={() => handleNav('profile')}
-          className="umbhaco grain pressable mb-5 w-full overflow-hidden rounded-[24px] px-5 pb-10 pt-5 text-left shadow-card"
-        >
-          <span className="relative z-10 flex items-center gap-4">
-            <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-cream/15 ring-2 ring-ochre-light/80 ring-offset-2 ring-offset-terracotta-dark">
-              {user.profileImage
-                ? <img src={user.profileImage} alt="" className="h-full w-full object-cover" />
-                : <span className="font-display text-xl font-semibold text-cream">{initials || <Icon name="user" size={22} color="#f5f3ee" />}</span>}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="eyebrow block text-cream/75">{user.paternalIziduko ? `Clan · ${user.paternalIziduko}` : 'Your profile'}</span>
-              <span className="mt-0.5 block truncate font-display text-xl font-semibold text-cream">{fullName || 'Your profile'}</span>
-              <span className="mt-0.5 block text-xs text-cream/85">
-                {user.paternalIziduko ? 'View and edit your profile' : 'Add your iziduko so your clan can find you'}
+    <div className="mx-auto min-h-screen max-w-md bg-cream pb-28">
+      {/* Hero: who you are, on a ceremony photo. The search rises out of it. */}
+      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-16 pt-7 text-cream">
+        <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 to-[#1c1612]" />
+        <div className="relative">
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Konke okunye · Everything else</p>
+          <h1 className="mt-1 font-display text-[2rem] font-semibold leading-tight">Your whole iCamagu</h1>
+          {user && (
+            <button
+              type="button"
+              onClick={() => handleNav('profile')}
+              className="pressable mt-5 flex w-full items-center gap-3.5 rounded-[22px] border border-cream/15 bg-white/[0.08] p-3 text-left backdrop-blur-sm"
+            >
+              <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-[18px] bg-terracotta-dark ring-2 ring-ochre-light/70">
+                {user.profileImage
+                  ? <img src={user.profileImage} alt="" className="h-full w-full object-cover" />
+                  : <span className="font-display text-xl font-semibold text-cream">{initials || <Icon name="user" size={22} color="#fffdf9" />}</span>}
               </span>
-            </span>
-            <Icon name="arrowRight" size={18} color="#f5f3ee" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-display text-lg font-semibold text-cream">{fullName || 'Your profile'}</span>
+                <span className="mt-0.5 block truncate text-xs text-cream/80">
+                  {user.paternalIziduko ? `Clan · ${user.paternalIziduko}` : 'Add your iziduko so your clan can find you'}
+                </span>
+              </span>
+              <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-cream/10">
+                <Icon name="arrowRight" size={16} color="#fffdf9" />
+              </span>
+            </button>
+          )}
+        </div>
+      </header>
+
+      <div className="relative z-10 -mt-7 px-5">
+        <label className="relative block">
+          <span className="sr-only">Search tools</span>
+          <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
+            <Icon name="search" size={17} color={MUTED} />
           </span>
-        </button>
-      )}
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search, e.g. umqombothi, clan, orders"
+            className="h-14 w-full rounded-[20px] border border-ink/[0.06] bg-white pl-11 pr-11 text-[15px] shadow-[0_16px_36px_-18px_rgba(28,22,18,0.45)] focus:border-terracotta focus:outline-none"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              aria-label="Clear search"
+              className="absolute inset-y-0 right-1.5 flex w-10 items-center justify-center"
+            >
+              <Icon name="close" size={16} color={MUTED} />
+            </button>
+          )}
+        </label>
+      </div>
 
-      <label className="relative mb-6 block">
-        <span className="sr-only">Search tools</span>
-        <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
-          <Icon name="search" size={17} color={MUTED} />
-        </span>
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search, e.g. umqombothi, pledges, orders"
-          className="h-12 w-full rounded-pill border border-ink/10 bg-white pl-11 pr-11 text-sm shadow-soft focus:border-terracotta focus:outline-none"
-        />
-        {query && (
-          <button
-            type="button"
-            onClick={() => setQuery('')}
-            aria-label="Clear search"
-            className="absolute inset-y-0 right-1.5 flex w-10 items-center justify-center"
-          >
-            <Icon name="close" size={16} color={MUTED} />
-          </button>
-        )}
-      </label>
-
+      <div className="px-5 pt-6">
       {q ? (
         <section className="mb-6" aria-live="polite">
           <GroupHeading title="Iziphumo" english={`${results.length} result${results.length === 1 ? '' : 's'}`} />
@@ -246,7 +259,7 @@ export default function More({ onNavigate }) {
         <>
           {recentItems.length > 0 && (
             <section className="mb-7">
-              <GroupHeading title="Kutshanje" english="Recently used" />
+              <p className="eyebrow mb-2.5 px-0.5">Kutshanje · Recently used</p>
               <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
                 {recentItems.map((item) => (
                   <button
@@ -265,25 +278,50 @@ export default function More({ onNavigate }) {
             </section>
           )}
 
+          {/* The Shrine Fund: the nation-building heart of the app. */}
+          <button
+            type="button"
+            onClick={() => handleNav(FUND_ITEM.id)}
+            className="pressable relative mb-8 block w-full overflow-hidden rounded-[26px] bg-[#1c1612] p-5 text-left text-cream shadow-[0_22px_44px_-24px_rgba(28,22,18,0.85)]"
+          >
+            <span aria-hidden="true" className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-ochre-light/15" />
+            <span aria-hidden="true" className="absolute -bottom-14 right-10 h-28 w-28 rounded-full bg-terracotta-dark/40" />
+            <span className="relative flex items-start gap-3.5">
+              <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-ochre-light">
+                <Icon name="flame" size={22} color="#1c1612" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[11px] font-extrabold uppercase tracking-[0.18em] text-ochre-light">Ubuhlanti · Shrine Fund</span>
+                <span className="mt-1 block font-display text-[1.35rem] font-semibold leading-tight">Together we build greatness.</span>
+                <span className="mt-1.5 block text-[13px] leading-snug text-cream/80">Our own seed capital, owned by the community. Pledge from R1.</span>
+              </span>
+            </span>
+          </button>
+
           {TILE_GROUPS.map((group) => (
-            <section key={group.title} className="mb-7">
-              <GroupHeading title={group.title} english={group.english} color={group.color} />
-              <div className="grid grid-cols-3 gap-2.5">
-                {group.items.map((item) => (
+            <section key={group.title} className="mb-8 rounded-[28px] p-3 pb-3.5" style={{ backgroundColor: group.color }}>
+              <div className="px-2 pb-4 pt-2 text-cream">
+                <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-cream/70">{group.english}</p>
+                <h2 className="mt-0.5 font-display text-[1.45rem] font-semibold leading-tight">{group.title}</h2>
+                <p className="mt-0.5 text-[13px] text-cream/80">{group.line}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-x-2.5 gap-y-5 pt-3">
+                {group.items.map((item, i) => (
                   <button
                     key={item.id}
                     type="button"
                     onClick={() => handleNav(item.id)}
-                    className="pressable relative flex min-h-[124px] flex-col items-start gap-2.5 overflow-hidden rounded-[18px] border border-ink/[0.06] bg-white p-3 text-left shadow-soft"
+                    className={`pressable relative rounded-[20px] bg-cream px-3.5 pb-3.5 pt-8 text-left shadow-[0_12px_24px_-16px_rgba(0,0,0,0.6)] ${group.items.length % 2 === 1 && i === group.items.length - 1 ? 'col-span-2' : ''}`}
                   >
-                    <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[3px]" style={{ backgroundColor: group.color }} />
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: `${group.color}1a` }}>
-                      <Icon name={item.icon} size={19} color={group.color} />
+                    <span
+                      aria-hidden="true"
+                      className="absolute -top-4 left-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-white"
+                      style={{ boxShadow: `0 0 0 4px ${group.color}` }}
+                    >
+                      <Icon name={item.icon} size={20} color={group.color} />
                     </span>
-                    <span className="min-w-0">
-                      <span className="block text-[12.5px] font-bold leading-tight text-ink">{item.label}</span>
-                      <span className="mt-1 line-clamp-2 block text-[10.5px] leading-snug text-ink-muted">{item.desc}</span>
-                    </span>
+                    <span className="block text-[14px] font-bold leading-tight text-ink">{item.label}</span>
+                    <span className="mt-1 line-clamp-2 block text-[12px] leading-snug text-ink-muted">{item.desc}</span>
                   </button>
                 ))}
               </div>
@@ -329,6 +367,7 @@ export default function More({ onNavigate }) {
         <p className="font-display text-base italic text-ink">Umntu ngumntu ngabantu</p>
         <p className="mt-1 text-xs text-ink-muted">A person is a person through other people.</p>
       </footer>
+      </div>
     </div>
   )
 }

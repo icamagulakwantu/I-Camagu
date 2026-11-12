@@ -284,7 +284,6 @@ function ClanPanel({ user, clanCeremonies, onNavigate }) {
   const clan = user?.paternalIziduko
   return (
     <section aria-label="Your clan" className="relative mx-4 mt-10 overflow-hidden rounded-[28px] bg-[#1c1612] text-cream">
-      <div aria-hidden="true" className="bead-band-thin" />
       <div className="px-5 pb-5 pt-5">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">

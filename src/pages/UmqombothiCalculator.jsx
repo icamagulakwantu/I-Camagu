@@ -101,7 +101,6 @@ function UmqombothiCalculator({ onBack, guestCount = null, ceremonyTitle = '' })
 
         {/* Result */}
         <section aria-live="polite" className="overflow-hidden rounded-[24px] bg-[#1c1612] text-cream">
-          <div aria-hidden="true" className="bead-band-thin" />
           <div className="p-5">
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ochre-light">You need to brew</p>
             <p className="mt-1 font-display text-[2.6rem] font-semibold leading-none tabular-nums">{litres} L</p>

@@ -2,8 +2,7 @@ import Icon from '../Icon.jsx'
 
 // One header for every main screen: back link, isiXhosa eyebrow, title and
 // a short explanation. Using the same header everywhere is what makes the
-// tabs feel like one app. (The beadwork stripe now lives only on the
-// bottom navigation, so headers stay clean.)
+// tabs feel like one app.
 export default function PageHeader({ eyebrow, title, subtitle, note, onBack, backLabel = 'Back', action = null, className = '' }) {
   return (
     <header className={`pb-5 ${className}`}>

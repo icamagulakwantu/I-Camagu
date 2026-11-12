@@ -199,32 +199,6 @@
     linear-gradient(150deg, #cf6a33 0%, #b04f20 50%, #7a3315 100%);
 }
 
-/* isiXhosa beadwork strip: white ground with black, red, turquoise and
-   gold beads. A signature accent, never a full background. */
-.bead-band,
-.bead-band-thin {
-  background-color: #f5f3ee;
-  background-image:
-    repeating-linear-gradient(90deg,
-      #2b2620 0 6px, #f5f3ee 6px 8px,
-      #c45c26 8px 14px, #f5f3ee 14px 16px,
-      #2b2620 16px 22px, #f5f3ee 22px 24px,
-      #2f8f8a 24px 30px, #f5f3ee 30px 32px,
-      #2b2620 32px 38px, #f5f3ee 38px 40px,
-      #c1922f 40px 46px, #f5f3ee 46px 48px);
-}
-.bead-band {
-  height: 6px;
-  box-shadow: 0 -1px 0 rgba(43, 38, 32, 0.12), 0 1px 0 rgba(43, 38, 32, 0.12);
-}
-.bead-band-thin {
-  height: 3px;
-}
-.bead-fade {
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
-}
-
 /* Section eyebrow: small caps label. Wrapped in :where() so a text-color
    utility on the same element always wins. */
 :where(.eyebrow) {

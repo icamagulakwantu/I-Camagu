@@ -152,7 +152,6 @@ export default function CeremonyHome({
         {/* ---------- Next step ---------- */}
         {next ? (
           <section aria-label="Next step" className="overflow-hidden rounded-[26px] bg-[#1c1612] text-cream">
-            <div aria-hidden="true" className="bead-band-thin" />
             <div className="p-5">
               <ol className="mb-4 flex items-center gap-1.5" aria-label="Setting up">
                 {steps.map((s) => (
