@@ -239,4 +239,6 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [x] Fixed: ukusoka entries could be attached to another person's ceremony; the handler now refuses ceremonies the person does not host (tests added).
 - [ ] Decide what merchant verification means (business registration, bank details, contact) and add a verified flag that admins set before a merchant's offers can be accepted. Until then, admins must check each merchant by hand before accepting an offer.
 - [ ] Repeat the critical cross-user paths with two real test accounts on staging; the source review does not replace this.
-- [ ] Distributed rate limiting and the registration timing review remain open.
+- [x] Rate limiting is shared across instances: counts live in PostgreSQL (`RateLimitCounter`, created on first use) with one atomic upsert per request, so both Render services and restarts share one allowance. If the database is unreachable it falls back to per-process memory limits. Visitor IPs are stored only as hashes and expired rows are cleaned up. Proven by `server/middleware/rateLimiter.integration.test.js` in the CI PostgreSQL job (two instances share a limit; 20 simultaneous requests let exactly 5 through).
+- [ ] If the public domain is put behind a second proxy (for example Cloudflare in front of Render), review Express's `trust proxy` setting, which currently trusts one hop; otherwise every visitor would share one rate-limit counter.
+- [ ] The registration timing review remains open.
