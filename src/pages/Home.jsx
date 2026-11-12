@@ -21,6 +21,19 @@ const HERO_IMAGE = 'https://hercules-cdn.com/file_wxyYBh6l6xbEhksr09BuCEsR'
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`
 const rand = (n) => `R${Math.round(Number(n) || 0).toLocaleString('en-ZA')}`
 
+// The first unfinished, required step: what the host should do next.
+function nextStep(ceremony) {
+  const items = ceremony?.checklistItems || []
+  return items.find((i) => !(i.isCompleted || i.isChecked) && !i.isOptional) || null
+}
+
+// One-tap starts for the ceremonies families plan most.
+const QUICK_START = [
+  { type: 'UMGIDI', label: 'Umgidi' },
+  { type: 'WEDDING', label: 'Wedding' },
+  { type: 'ULWALUKO', label: 'Ulwaluko' },
+]
+
 function checklistCounts(ceremony) {
   const items = ceremony?.checklistItems || []
   const done = items.filter((i) => i.isCompleted || i.isChecked).length
@@ -66,17 +79,20 @@ function SectionTitle({ eyebrow, title, actionLabel, onAction }) {
 
 // ---------- Hero ----------
 
-function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony }) {
+function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, onOpenType }) {
   const days = daysUntil(lead?.eventDate)
   const { done, total } = checklistCounts(lead)
   const remaining = Math.max(total - done, 0)
   const progress = total ? Math.round((done / total) * 100) : 0
   const today = new Date().toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long' })
+  const step = nextStep(lead)
+  // Your own ceremony's photo when you have one; the umgidi photo otherwise.
+  const photo = lead ? ceremonyImage(lead.type) : HERO_IMAGE
 
   return (
     <section className="relative h-[430px] overflow-hidden rounded-b-[36px] text-cream">
-      <img src={HERO_IMAGE} alt="Women in umbhaco celebrating at an umgidi" className="absolute inset-0 h-full w-full object-cover object-[center_32%]" />
-      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,15,11,0.6)_0%,rgba(20,15,11,0.05)_28%,rgba(20,15,11,0.35)_55%,rgba(20,15,11,0.94)_100%)]" />
+      <img src={photo} alt="" className="absolute inset-0 h-full w-full object-cover object-[center_32%]" />
+      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,15,11,0.6)_0%,rgba(20,15,11,0.25)_22%,rgba(20,15,11,0.7)_48%,rgba(20,15,11,0.96)_100%)]" />
 
       <header className="relative flex items-center justify-between px-5 pt-5">
         <div className="flex items-center gap-2.5">
@@ -129,6 +145,11 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony })
                   {lead.eventDate ? shortDate(lead.eventDate, true) : 'No date yet'}
                   {total > 0 && ` · ${remaining === 0 ? 'everything is ready' : `${plural(remaining, 'thing')} still to do`}`}
                 </span>
+                {step && (
+                  <span className="mt-1 block truncate text-sm font-bold text-cream">
+                    <span className="text-ochre-light">Next:</span> {step.label}
+                  </span>
+                )}
                 <span className="mt-2 block h-1 overflow-hidden rounded-full bg-cream/25">
                   <span className="block h-full rounded-full bg-ochre-light" style={{ width: `${Math.max(progress, 3)}%` }} />
                 </span>
@@ -141,11 +162,24 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony })
         ) : (
           <>
             <h1 className="mt-2 font-display text-[2.3rem] font-semibold leading-[1.02] tracking-tight text-balance">
-              Save together. Buy together. <em className="font-medium text-ochre-light">Honour tradition.</em>
+              What are we <em className="font-medium text-ochre-light">celebrating?</em>
             </h1>
-            <button type="button" onClick={() => onNavigate('ceremonyhub')} className="pressable mt-4 flex h-11 items-center gap-1.5 rounded-full bg-cream px-5 text-sm font-extrabold text-ink">
-              Plan a ceremony <Icon name="arrowRight" size={15} />
-            </button>
+            <p className="mt-2 text-sm text-cream/85">Pick a ceremony and get its plan: steps, roles, timeline and budget.</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {QUICK_START.map((q) => (
+                <button
+                  key={q.type}
+                  type="button"
+                  onClick={() => (onOpenType ? onOpenType(q.type) : onNavigate('ceremonyhub'))}
+                  className="pressable flex h-11 items-center rounded-full bg-cream px-4 text-sm font-extrabold text-ink"
+                >
+                  {q.label}
+                </button>
+              ))}
+              <button type="button" onClick={() => onNavigate('ceremonyhub')} className="pressable flex h-11 items-center gap-1.5 rounded-full border border-cream/40 px-4 text-sm font-extrabold text-cream">
+                Other <Icon name="arrowRight" size={15} />
+              </button>
+            </div>
           </>
         )}
       </div>
@@ -386,7 +420,7 @@ function MoneyTiles({ stokvels, totalSaved, pools, basketCount, onNavigate }) {
 
 // ---------- Home ----------
 
-export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0, unreadNotifications = 0, onSelectCeremony }) {
+export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0, unreadNotifications = 0, onSelectCeremony, onOpenType }) {
   const { user, accessToken } = useAuth()
   const { feed, feedError, refreshPools, location } = useCommunity()
   const { showToast } = useToast()
@@ -458,13 +492,15 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
 
   return (
     <div className="mx-auto max-w-md pb-32">
-      <Hero user={user} lead={lead} unreadNotifications={unreadNotifications} onNavigate={onNavigate} onSelectCeremony={onSelectCeremony} />
+      <Hero user={user} lead={lead} unreadNotifications={unreadNotifications} onNavigate={onNavigate} onSelectCeremony={onSelectCeremony} onOpenType={onOpenType} />
 
       <NeedsYou items={needs} loading={loading} />
 
-      <CeremonyRail ceremonies={orderedCeremonies} loading={loading} onSelectCeremony={onSelectCeremony} onNavigate={onNavigate} />
-
-      <ClanPanel user={user} clanCeremonies={feed.upcomingClanCeremonies || []} onNavigate={onNavigate} />
+      {/* With no ceremony yet the hero already asks what you are planning, so
+          the rail would only repeat it. */}
+      {(loading || ceremonies.length > 0) && (
+        <CeremonyRail ceremonies={orderedCeremonies} loading={loading} onSelectCeremony={onSelectCeremony} onNavigate={onNavigate} />
+      )}
 
       <MoneyTiles stokvels={stokvels} totalSaved={totalSaved} pools={pools} basketCount={basketCount} onNavigate={onNavigate} />
 
@@ -490,6 +526,9 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
         </section>
       )}
 
+      {/* Clan comes after the everyday money tools: used less often, still close. */}
+      <ClanPanel user={user} clanCeremonies={feed.upcomingClanCeremonies || []} onNavigate={onNavigate} />
+
       {/* Culture: a card with a folder tab standing up from its top edge. */}
       <section aria-label="Did you know" className="mx-4 mt-14">
         <span className="relative z-10 ml-5 inline-flex items-center gap-2 rounded-t-[14px] bg-[#1c1612] px-4 pb-2 pt-2 text-xs font-extrabold uppercase tracking-[0.16em] text-ochre-light">
@@ -502,6 +541,18 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
           </button>
         </div>
       </section>
+
+      {/* The Shrine Fund: the nation-building purpose behind everything above. */}
+      <button
+        type="button"
+        onClick={() => onNavigate('shrinefund')}
+        className="pressable relative mx-4 mt-8 block w-[calc(100%-2rem)] overflow-hidden rounded-[24px] bg-terracotta-dark p-5 text-left text-cream"
+      >
+        <span aria-hidden="true" className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-ochre-light/20" />
+        <span className="relative block text-[11px] font-extrabold uppercase tracking-[0.18em] text-ochre-light">Ubuhlanti · Shrine Fund</span>
+        <span className="relative mt-1 block font-display text-[1.3rem] font-semibold leading-tight">Together we build greatness.</span>
+        <span className="relative mt-1 block text-[13px] text-cream/85">Our own seed capital, owned by the community. Pledge from R1 →</span>
+      </button>
 
       <p className="mt-10 text-center font-display text-sm italic text-ink-muted">Umntu ngumntu ngabantu</p>
     </div>
