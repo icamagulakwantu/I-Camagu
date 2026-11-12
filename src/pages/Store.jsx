@@ -6,7 +6,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import Icon from '../components/Icon.jsx'
-import { DEPARTMENTS, departmentOf, aisleOf } from '../data/storeTaxonomy.js'
+import { DEPARTMENTS, departmentOf, aisleOf, sectionOf } from '../data/storeTaxonomy.js'
 import { unitOf, collectiveNoun } from '../data/bulkUnits.js'
 import { notifyBasketChanged } from '../lib/basketEvents.js'
 
@@ -70,7 +70,7 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
             <img
               src={sku.imageUrl}
               alt={`${sku.name}${sku.bottleFormat ? `, ${sku.bottleFormat}` : ''}`}
-              className={photo ? 'h-full w-full object-cover' : 'h-full w-full object-contain p-3 mix-blend-multiply'}
+              className={photo ? 'h-full w-full object-cover' : 'h-full w-full object-contain px-6 pb-5 pt-3 mix-blend-multiply'}
               loading="lazy"
               decoding="async"
               onError={onImageError}
@@ -127,6 +127,7 @@ function Store({ onGoToBasket, basketCount }) {
   const [allSkus, setAllSkus] = useState([])
   const [activeDept, setActiveDept] = useState(DEPARTMENTS[0].id)
   const [activeAisle, setActiveAisle] = useState('all')
+  const [activeSection, setActiveSection] = useState('all')
   const [loading, setLoading] = useState(true)
   const [catalogueError, setCatalogueError] = useState(false)
   const [catalogueRetry, setCatalogueRetry] = useState(0)
@@ -165,6 +166,11 @@ function Store({ onGoToBasket, basketCount }) {
   const pickDept = (id) => {
     setActiveDept(id)
     setActiveAisle('all')
+    setActiveSection('all')
+  }
+  const pickAisle = (id) => {
+    setActiveAisle(id)
+    setActiveSection('all')
   }
 
   const activeDepartment = DEPARTMENTS.find((d) => d.id === activeDept)
@@ -189,9 +195,40 @@ function Store({ onGoToBasket, basketCount }) {
     return allSkus.filter((s) => {
       if (departmentOf(s).id !== activeDept) return false
       if (activeAisle !== 'all' && aisleOf(s).id !== activeAisle) return false
+      if (activeSection !== 'all' && sectionOf(s)?.id !== activeSection) return false
       return true
     })
-  }, [allSkus, activeDept, activeAisle, isSearching, searchQuery])
+  }, [allSkus, activeDept, activeAisle, activeSection, isSearching, searchQuery])
+
+  // Products in shelf order (aisle, then type, then name and pack), grouped
+  // under a heading per shelf, e.g. Beer, Ciders & coolers, Whisky, Gin.
+  const groups = useMemo(() => {
+    if (isSearching) return [{ key: 'search', label: null, items: skus }]
+    const map = new Map()
+    for (const sku of skus) {
+      const dept = departmentOf(sku)
+      const aisle = aisleOf(sku)
+      const section = sectionOf(sku)
+      const aisleIndex = dept.aisles.indexOf(aisle)
+      const sectionIndex = section ? aisle.sections.indexOf(section) : 0
+      const key = `${String(aisleIndex).padStart(2, '0')}-${String(sectionIndex).padStart(2, '0')}`
+      if (!map.has(key)) map.set(key, { key, label: section?.name || aisle.name, items: [] })
+      map.get(key).items.push(sku)
+    }
+    const sorted = [...map.values()].sort((a, b) => a.key.localeCompare(b.key))
+    for (const group of sorted) {
+      group.items.sort((a, b) => a.name.localeCompare(b.name) || String(a.bottleFormat || '').localeCompare(String(b.bottleFormat || '')))
+    }
+    // One heading is noise: only label groups when there is more than one.
+    if (sorted.length === 1) sorted[0].label = null
+    return sorted
+  }, [skus, isSearching])
+
+  // Aisles and shelves that actually have products, so no chip leads nowhere.
+  const deptSkus = useMemo(() => allSkus.filter((s) => departmentOf(s).id === activeDept), [allSkus, activeDept])
+  const liveAisles = activeDepartment ? activeDepartment.aisles.filter((a) => deptSkus.some((s) => aisleOf(s).id === a.id)) : []
+  const currentAisle = activeDepartment?.aisles.find((a) => a.id === activeAisle)
+  const liveSections = currentAisle?.sections ? currentAisle.sections.filter((sec) => deptSkus.some((s) => sectionOf(s)?.id === sec.id)) : []
 
   const addToBasket = async (sku) => {
     setAddingId(sku.id)
@@ -274,12 +311,29 @@ function Store({ onGoToBasket, basketCount }) {
                   type="button"
                   onClick={() => { setSearchQuery(''); pickDept(d.id) }}
                   aria-pressed={active}
-                  className={`pressable flex h-[104px] w-[100px] flex-col justify-between rounded-[20px] p-3 text-left shadow-[0_16px_30px_-20px_rgba(43,30,18,0.65)] ${active ? 'bg-ochre-light text-[#1c1612]' : 'bg-[#fffdf9] text-ink'}`}
+                  className={`pressable flex w-[112px] flex-col overflow-hidden rounded-[20px] text-left shadow-[0_16px_30px_-20px_rgba(43,30,18,0.65)] ring-2 ${active ? 'bg-ochre-light text-[#1c1612] ring-ochre-light' : 'bg-[#fffdf9] text-ink ring-transparent'}`}
                 >
-                  <span className={`flex h-9 w-9 items-center justify-center rounded-full ${active ? 'bg-[#1c1612] text-ochre-light' : 'bg-cream-dark text-terracotta-dark'}`}>
-                    <Icon name={DEPARTMENT_ICON[d.id] || 'package'} size={18} />
+                  {/* Real products, standing on the tile's lower edge. */}
+                  <span className={`relative block h-[78px] ${active ? 'bg-[#f3d9a4]' : 'bg-[#f3ece1]'}`}>
+                    {d.image ? (
+                      <>
+                        {d.accent && (
+                          <img src={d.accent} alt="" loading="lazy" className="absolute bottom-0 right-2 h-[58px] w-[44px] object-contain object-bottom mix-blend-multiply" />
+                        )}
+                        <img
+                          src={d.image}
+                          alt=""
+                          loading="lazy"
+                          className={d.id === 'nonconsumables'
+                            ? 'absolute inset-0 h-full w-full object-cover'
+                            : `absolute bottom-0 h-[72px] object-contain object-bottom mix-blend-multiply ${d.accent ? 'left-2 w-[60px]' : 'left-1/2 w-[92px] -translate-x-1/2'}`}
+                        />
+                      </>
+                    ) : (
+                      <span className="flex h-full items-center justify-center text-terracotta-dark"><Icon name={DEPARTMENT_ICON[d.id] || 'package'} size={24} /></span>
+                    )}
                   </span>
-                  <span className="min-w-0">
+                  <span className="min-w-0 px-2.5 pb-2.5 pt-2">
                     <span className="block truncate text-[13px] font-extrabold leading-tight">{d.short}</span>
                     <span className={`block truncate text-xs ${active ? 'text-[#3d2e0c]' : 'text-ink-muted'}`}>{d.xhosa}</span>
                   </span>
@@ -327,17 +381,32 @@ function Store({ onGoToBasket, basketCount }) {
             </div>
             <span className="flex-shrink-0 pb-1 text-xs font-bold tabular-nums text-ink-muted">{skus.length} item{skus.length === 1 ? '' : 's'}</span>
           </div>
-          {activeDepartment.aisles.length > 1 && (
+          {liveAisles.length > 1 && (
             <div className="mt-3 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {[{ id: 'all', name: `All ${activeDepartment.short.toLowerCase()}` }, ...activeDepartment.aisles].map((a) => (
+              {[{ id: 'all', name: 'All' }, ...liveAisles].map((a) => (
                 <button
                   key={a.id}
                   type="button"
-                  onClick={() => setActiveAisle(a.id)}
+                  onClick={() => pickAisle(a.id)}
                   aria-pressed={activeAisle === a.id}
                   className={`pressable min-h-9 flex-shrink-0 rounded-full px-3.5 text-[13px] font-bold ${activeAisle === a.id ? 'bg-[#1c1612] text-cream' : 'border border-ink/10 bg-[#fffdf9] text-ink-muted'}`}
                 >
                   {a.name}
+                </button>
+              ))}
+            </div>
+          )}
+          {liveSections.length > 1 && (
+            <div className="mt-2 flex gap-1.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {[{ id: 'all', name: `All ${currentAisle.name.toLowerCase()}` }, ...liveSections].map((sec) => (
+                <button
+                  key={sec.id}
+                  type="button"
+                  onClick={() => setActiveSection(sec.id)}
+                  aria-pressed={activeSection === sec.id}
+                  className={`pressable min-h-9 flex-shrink-0 rounded-full px-3 text-xs font-extrabold ${activeSection === sec.id ? 'bg-terracotta-dark text-white' : 'bg-cream-dark text-ink'}`}
+                >
+                  {sec.name}
                 </button>
               ))}
             </div>
@@ -362,20 +431,32 @@ function Store({ onGoToBasket, basketCount }) {
         ) : skus.length === 0 ? (
           <EmptyState emoji="📦" title="No items found" description={isSearching ? 'Try another product name, size or category, or clear your search.' : 'Try another department or aisle.'} />
         ) : (
-          <ul className="grid grid-cols-2 gap-x-3 gap-y-6">
-            {skus.map((sku) => (
-              <ProductCard
-                key={sku.id}
-                sku={sku}
-                showDepartment={isSearching}
-                adding={addingId === sku.id}
-                imageFailed={failedImageIds.has(sku.id)}
-                onImageError={() => setFailedImageIds((current) => new Set(current).add(sku.id))}
-                onAdd={() => addToBasket(sku)}
-                onOffers={() => setOfferSku(sku)}
-              />
+          <div className="space-y-8">
+            {groups.map((group) => (
+              <section key={group.key} aria-label={group.label || undefined}>
+                {group.label && (
+                  <h3 className="mb-3 flex items-baseline gap-2 px-1">
+                    <span className="font-display text-[1.15rem] font-semibold text-ink">{group.label}</span>
+                    <span className="text-xs font-bold tabular-nums text-ink-muted">{group.items.length}</span>
+                  </h3>
+                )}
+                <ul className="grid grid-cols-2 gap-x-3 gap-y-6">
+                  {group.items.map((sku) => (
+                    <ProductCard
+                      key={sku.id}
+                      sku={sku}
+                      showDepartment={isSearching}
+                      adding={addingId === sku.id}
+                      imageFailed={failedImageIds.has(sku.id)}
+                      onImageError={() => setFailedImageIds((current) => new Set(current).add(sku.id))}
+                      onAdd={() => addToBasket(sku)}
+                      onOffers={() => setOfferSku(sku)}
+                    />
+                  ))}
+                </ul>
+              </section>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 

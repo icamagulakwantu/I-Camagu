@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { DEPARTMENTS, departmentOf, aisleOf } from './storeTaxonomy.js';
+import { DEPARTMENTS, departmentOf, aisleOf, sectionOf } from './storeTaxonomy.js';
 
 describe('SmartMatch store taxonomy', () => {
   it('keeps alcohol separate from soft drinks and water', () => {
@@ -13,6 +13,19 @@ describe('SmartMatch store taxonomy', () => {
     expect(aisleOf({ category: 'MIXER' }).id).toBe('mixers');
     // Extreme Energy is an alcoholic beverage and must stay in Alcohol.
     expect(departmentOf({ category: 'CIDER_RTD', name: 'Extreme Energy' }).id).toBe('alcohol');
+  });
+
+  it('organises spirits, ciders, liqueurs and wine into their own shelves', () => {
+    expect(aisleOf({ category: 'WHISKY' }).id).toBe('spirits');
+    expect(sectionOf({ category: 'WHISKY' }).id).toBe('whisky');
+    expect(sectionOf({ category: 'VODKA_PREMIUM' }).id).toBe('vodka');
+    expect(sectionOf({ category: 'COGNAC' }).id).toBe('cognac');
+    expect(aisleOf({ category: 'CIDER_RTD' }).id).toBe('ciders');
+    expect(aisleOf({ category: 'BEER' }).id).toBe('beer');
+    expect(aisleOf({ category: 'LIQUEUR' }).id).toBe('liqueurs');
+    expect(sectionOf({ category: 'CHAMPAGNE' }).id).toBe('bubbly');
+    expect(aisleOf({ category: 'WATER' }).id).toBe('water');
+    expect(sectionOf({ category: 'BEER' })).toBeNull();
   });
 
   it('normalises category casing and whitespace before assigning a department', () => {
