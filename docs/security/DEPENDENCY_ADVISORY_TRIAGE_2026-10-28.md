@@ -55,3 +55,20 @@ The `qs@6.16.1` resolution intentionally crosses Express's narrow `~6.15.1` rang
 ## Important release boundary
 
 These audit results do not authorize turning on payment processing. The 2026 no-custody policy remains in force. Dependency remediation also does not replace route-level authorization review, production database/migration verification, backup restoration testing, private-media policy tests, verified email delivery, Android/PWA testing, or founder/community sign-off.
+
+## Update — 12 November 2026: Vite 6, Vitest 4, vite-plugin-pwa 1
+
+The earlier Vite 6 / Vitest 4 attempt failed with Yarn 1.22.22's "could not find a copy of vite to link" invariant. Pinning one Vite version for the whole tree (`"resolutions": { "vite": "^6.4.4" }`) and reinstalling from a clean `node_modules` avoids it.
+
+- Upgraded: `vite` 5.4.21 → 6.4.6, `vitest` 2.1.9 → 4.1.12, `vite-plugin-pwa` 0.20.5 → 1.3.0, `@vitejs/plugin-react` → 4.7.x.
+- Checked: all unit tests, the real-PostgreSQL integration suite exactly as CI runs it, the production build with the service worker and manifest, `vite preview` and the dev server, and the Home screen rendered at phone width.
+- Audit: 3 critical / 7 high / 30 moderate / 6 low → **0 critical / 4 high / 6 moderate / 3 low**.
+
+### Remaining advisories and why they are accepted for launch
+
+| Package | Severity | Where it comes from | Why it is accepted |
+|---|---|---|---|
+| `brace-expansion`, `minimatch`, `glob` | 4 high, 3 moderate | `vite-plugin-pwa` → `workbox-build` (build time only) | Denial-of-service on crafted glob patterns. They only process the app's own build configuration on the build machine and never ship to users. Re-check when `workbox-build` updates its `glob`. |
+| `serialize-javascript` | 2 low | `workbox-build` → `@rollup/plugin-terser` (build time only) | XSS only when serialising untrusted input into a page; here it serialises the app's own service-worker config at build time. |
+| `uuid` | moderate | `google-auth-library` → `gaxios` (runtime) | Affects v3/v5/v6 only when a caller passes an output buffer; the Google client uses v4 without a buffer. Re-check when `google-auth-library` updates. |
+| `deepmerge` | low | `resend` → `@react-email/render` → `html-to-text` (runtime) | No patched version exists. The app sends HTML it builds itself, not untrusted objects merged by this path. |

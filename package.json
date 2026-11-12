@@ -22,7 +22,7 @@
   "dependencies": {
     "@prisma/client": "^5.20.0",
     "@sentry/node": "^10.75.0",
-    "@vitejs/plugin-react": "^4.3.2",
+    "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
@@ -39,12 +39,12 @@
     "resend": "^4.0.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss": "^3.4.13",
-    "vite": "^5.4.8",
-    "vite-plugin-pwa": "^0.20.5"
+    "vite": "^6.4.4",
+    "vite-plugin-pwa": "^1.0.3"
   },
   "devDependencies": {
     "prisma": "^5.20.0",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.12"
   },
   "resolutions": {
     "proxy-addr": "2.0.8",
@@ -52,6 +52,7 @@
     "qs": "6.16.1",
     "source-map-js": "1.2.2",
     "fast-uri": "3.1.9",
-    "postcss-selector-parser": "6.1.5"
+    "postcss-selector-parser": "6.1.5",
+    "vite": "^6.4.4"
   }
 }
