@@ -19,6 +19,7 @@ import { STEPS, BUTTONS } from './ceremony/wizardText.js'
 import {
   EMPTY_FORM, FORM_STEP_IDS, STEP_COMPONENTS, formFromPlan, formToPayload, planTitle, stepIsValid,
 } from './ceremony/ceremonyForm.js'
+import { CEREMONY_IMAGE, ceremonyImage } from '../data/ceremonyImages.js'
 
 const INVALID_MESSAGE = {
   what: 'Please choose the kind of ceremony',
@@ -248,13 +249,15 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
 
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        <div className="bg-gradient-to-br from-terracotta to-ochre text-white px-5 pt-12 pb-6 rounded-b-[2.5rem] relative overflow-hidden">
-          <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
+        <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src={ceremonyImage(activePlan?.ceremonyType)} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
           <div className="relative">
-            <button type="button" onClick={goBack} className={cn('text-sm text-white/80 mb-3 block text-left', pressable)}>
+            <button type="button" onClick={goBack} className={cn('mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm text-left', pressable)}>
               <Bi {...(stepId === 'summary' ? { xh: 'Buyela kwimisebenzi yam', en: 'Back to my ceremonies' } : BUTTONS.back)} />
             </button>
-            <h1 className="font-display font-bold text-2xl break-words">{activePlan ? planTitle(activePlan) : 'New ceremony'}</h1>
+            <h1 className="font-display font-semibold text-[2rem] leading-[1.08] break-words">{activePlan ? planTitle(activePlan) : 'New ceremony'}</h1>
             {/* The step counter belongs to the set-up wizard. On the summary it
                 read "Step 6 of 6" with a full bar while the ceremony itself
                 could still be 0% ready, so it is hidden there. */}
@@ -270,6 +273,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             )}
           </div>
         </div>
+      </header>
 
         {stepId !== 'summary' && (
           <h2 className="px-5 mt-6 text-2xl text-ink"><Bi xh={step.xh} en={step.en} enClassName="text-base" /></h2>
@@ -323,16 +327,19 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   // ----- My ceremonies -----
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-terracotta to-ochre text-white px-5 pt-12 pb-8 rounded-b-[2.5rem] relative overflow-hidden">
-        <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
+      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
         <div className="relative">
-          <button type="button" onClick={onBack} className={cn('text-sm text-white/80 mb-3 block text-left', pressable)}>
+        <div className="relative">
+          <button type="button" onClick={onBack} className={cn('mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm text-left', pressable)}>
             <Bi {...BUTTONS.back} />
           </button>
-          <h1 className="font-display font-bold text-3xl">Ceremony Prep</h1>
-          <p className="text-white/80 text-sm mt-1">Plan every detail, one step at a time</p>
+          <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">Ceremony planning</h1>
+          <p className="text-white/80 text-sm mt-1">Structure for every ceremony: its steps, roles, timeline and budget, so it is done properly and with dignity.</p>
         </div>
       </div>
+      </header>
 
       <div className="px-4 mt-5">
         <button type="button" onClick={startNew} className={cn('w-full h-16 rounded-pill bg-terracotta text-white', pressable)}>
@@ -347,7 +354,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             <Skeleton className="h-20 w-full" />
           </div>
         ) : plans.length === 0 ? (
-          <EmptyState emoji="📋" title="No plans yet" description="Tap the green button above to plan your first ceremony." />
+          <EmptyState emoji="📋" title="No plans yet" description="Tap "Start a new ceremony" above to plan your first one." />
         ) : (
           <div className="space-y-2">
             {plans.map((plan) => {

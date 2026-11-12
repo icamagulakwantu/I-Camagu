@@ -349,11 +349,15 @@ function SupplierDashboard({ onBack }) {
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
-        <button onClick={onBack} className="cursor-pointer text-sm text-white/70 mb-3 block">← Back</button>
-        <h1 className="font-display font-bold text-2xl">Merchant Dashboard</h1>
+      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
+        <button onClick={onBack} className="cursor-pointer mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm">← Back</button>
+        <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">Merchant Dashboard</h1>
         <p className="text-white/70 text-sm mt-1">{partner ? `${partner.name} · ${partner.area}` : 'Quote on group orders, then track payments'}</p>
       </div>
+      </header>
 
       {loading ? (
         <div className="px-4 mt-4 space-y-2"><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div>

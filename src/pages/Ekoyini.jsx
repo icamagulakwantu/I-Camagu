@@ -119,20 +119,23 @@ export default function Ekoyini({ onBack }) {
   return (
     <div className="min-h-screen pb-24 bg-cream">
       {/* Header */}
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-8 rounded-b-[2.5rem] relative overflow-hidden">
-        <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
+      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
         <div className="relative">
           <div className="flex justify-between items-start">
-            <button type="button" onClick={onBack} className={`text-sm text-white/70 mb-3 block ${pressable}`}>← Back</button>
+            <button type="button" onClick={onBack} className={`mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm ${pressable}`}>← Back</button>
             <button type="button" onClick={() => setShowMyRequests(true)} className={`flex items-center gap-1.5 text-xs font-bold text-white/90 bg-white/10 px-3 py-1.5 rounded-pill ${pressable}`}>
               <Icon name="clipboard" size={14} color="#fff" />
               My Requests
             </button>
           </div>
-          <h1 className="font-display font-bold text-3xl">Ekoyini Mobile Bar</h1>
+          <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">Ekoyini Mobile Bar</h1>
           <p className="text-white/70 text-sm mt-1">Premium bar service for your ceremony</p>
         </div>
       </div>
+      </header>
 
       {/* Package Selection */}
       <div className="px-4 mt-6 space-y-3">

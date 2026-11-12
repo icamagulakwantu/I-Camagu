@@ -9,6 +9,7 @@ import { planTitle } from './ceremonyForm.js'
 import Bi from './Bi.jsx'
 import { BUTTONS } from './wizardText.js'
 import { inputClass, pressable } from './styles.js'
+import { CEREMONY_IMAGE } from '../../data/ceremonyImages.js'
 
 const EMPTY_PLEDGE = { contributorName: '', pledgeItem: '', pledgeValue: '' }
 
@@ -56,13 +57,17 @@ export default function Pledges({ plan, accessToken, pledges, setPledges, onBack
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-8 rounded-b-[2.5rem]">
-        <button type="button" onClick={onBack} className={cn('text-sm text-white/80 mb-3 block', pressable)}>
+      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src={CEREMONY_IMAGE.WEDDING} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
+        <button type="button" onClick={onBack} className={cn('mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm', pressable)}>
           <Bi {...BUTTONS.back} className="text-left" />
         </button>
-        <h1 className="font-display font-bold text-3xl">Family pledges</h1>
+        <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">Family pledges</h1>
         <p className="text-white/80 text-sm mt-1">{planTitle(plan)}</p>
       </div>
+      </header>
 
       <div className="mx-4 mt-5">
         <button type="button" onClick={() => setShowForm((v) => !v)} className={cn('w-full h-14 rounded-pill bg-sage-600 text-white mb-3', pressable)}>

@@ -661,15 +661,18 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
 
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem] shadow-md">
+        <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
           <button
             type="button"
             onClick={() => { setError(''); setView('list'); }}
-            className={`text-sm text-white/80 mb-3 block ${pressable}`}
+            className={`mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm ${pressable}`}
           >
             ← All stokvels
           </button>
-          <h1 className="font-display font-bold text-2xl">{stokvel.name}</h1>
+          <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">{stokvel.name}</h1>
           <p className="text-white/70 text-xs uppercase mt-1 tracking-wider">{stokvelType(stokvel.type).label}</p>
           <p className="text-white/90 text-sm mt-2">Ref: <strong className="font-mono bg-white/10 px-2 py-0.5 rounded">{myReferenceCode}</strong></p>
           <button
@@ -691,7 +694,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
           >
             <Icon name="share" size={13} color="#fff" /> Invite on WhatsApp
           </a>
-          <p className="font-display font-bold text-3xl mt-2">R{balance.toFixed(2)}</p>
+          <p className="font-display font-semibold text-[2rem] leading-[1.08] mt-2">R{balance.toFixed(2)}</p>
           {(Number(stokvel.groupLedger?.interestEarned || 0) > 0 || Number(stokvel.groupLedger?.groupExpenses || 0) > 0) && (
             <p className="text-xs text-white/70 mt-1">
               {Number(stokvel.groupLedger?.interestEarned || 0) > 0 && <>+R{Number(stokvel.groupLedger.interestEarned).toFixed(2)} interest</>}
@@ -701,6 +704,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
           )}
           {isOfficial && <p className="text-xs text-white/90 font-bold mt-2 bg-white/20 inline-block px-2.5 py-1 rounded-pill">You are an official</p>}
         </div>
+      </header>
 
         <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-1">
           {tabs.map((t) => (

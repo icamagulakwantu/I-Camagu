@@ -5,6 +5,7 @@ import { cn } from '../lib/utils'
 import { captureLocation } from '../lib/geolocation.js'
 import Icon from '../components/Icon.jsx'
 import IsidukoTypeahead from '../components/IsidukoTypeahead.jsx'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 // No nation / sub-group picker: every clan sits under one Xhosa umbrella.
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96]'
@@ -213,7 +214,10 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-6 rounded-b-[2.5rem] relative overflow-hidden">
+      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
         <div className="relative flex items-center gap-4">
           <button
             type="button"
@@ -230,7 +234,7 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePictureSelect} className="hidden" />
 
           <div>
-            <h1 className="font-display font-bold text-2xl">{user?.firstName || ''} {user?.lastName || ''}</h1>
+            <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">{user?.firstName || ''} {user?.lastName || ''}</h1>
             <p className="text-white/70 text-sm">@{user?.username || ''}</p>
             <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs underline mt-1 text-white/80 block">
               Change photo
@@ -238,6 +242,7 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
           </div>
         </div>
       </div>
+      </header>
 
       {/* Tabs */}
       <div className="px-4 -mt-4 relative z-10">

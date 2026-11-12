@@ -4,6 +4,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import PledgeShareCard from '../components/PledgeShareCard.jsx'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
@@ -97,8 +98,10 @@ export default function FamilyContributions({ onBack }) {
   if (activePlan) {
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-8 rounded-b-[2.5rem] relative overflow-hidden">
-          <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
+        <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src={CEREMONY_IMAGE.WEDDING} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
           <div className="relative">
             <button
               type="button"
@@ -106,14 +109,15 @@ export default function FamilyContributions({ onBack }) {
                 setActivePlan(null)
                 setShowForm(false)
               }}
-              className={`text-sm text-white/70 mb-3 block ${pressable}`}
+              className={`mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm ${pressable}`}
             >
               ← All plans
             </button>
-            <h1 className="font-display font-bold text-3xl">{activePlan.title}</h1>
+            <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">{activePlan.title}</h1>
             <p className="text-white/70 text-sm mt-1">Track family pledges and responsibilities for this ceremony.</p>
           </div>
         </div>
+      </header>
 
         <div className="px-4 mt-5">
           <PledgeShareCard planId={activePlan.id} planTitle={activePlan.title} />
@@ -209,20 +213,23 @@ export default function FamilyContributions({ onBack }) {
   // --- VIEW 2: PLAN SELECTION LIST ---
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-8 rounded-b-[2.5rem] relative overflow-hidden">
-        <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
+      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src={CEREMONY_IMAGE.WEDDING} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
         <div className="relative">
           <button
             type="button"
             onClick={onBack}
-            className={`text-sm text-white/70 mb-3 block ${pressable}`}
+            className={`mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm ${pressable}`}
           >
             ← Back
           </button>
-          <h1 className="font-display font-bold text-3xl">Family Contributions</h1>
-          <p className="text-white/70 text-sm mt-1">Select a ceremony plan to manage contributions</p>
+          <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">Family pledges</h1>
+          <p className="text-white/70 text-sm mt-1">Choose a ceremony to see what relatives have pledged to bring or give.</p>
         </div>
       </div>
+      </header>
 
       <div className="px-4 mt-6">
         <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider mb-3">Your Ceremony Plans</h3>

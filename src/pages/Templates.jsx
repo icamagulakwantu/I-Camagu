@@ -5,6 +5,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import CeremonyIcon from '../components/CeremonyIcon.jsx'
+import { CEREMONY_IMAGE, ceremonyImage } from '../data/ceremonyImages.js'
 
 const typeLabel = (type) => (type || '').replace(/_/g, ' ')
 
@@ -81,16 +82,20 @@ function Templates({ onBack }) {
     const { tasks, shopping } = countsOf(activeTemplate)
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        <div className="bg-gradient-to-br from-terracotta to-ochre text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
-          <button type="button" onClick={() => setActiveTemplate(null)} className="text-sm text-white/80 mb-3 block">← All templates</button>
+        <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src={ceremonyImage(activeTemplate.ceremonyType)} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
+          <button type="button" onClick={() => setActiveTemplate(null)} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm">← All templates</button>
           <div className="flex items-center gap-3">
             <div className="rounded-2xl bg-white/90 p-1.5"><CeremonyIcon type={activeTemplate.ceremonyType} size={44} /></div>
             <div className="min-w-0">
-              <h1 className="font-display font-bold text-2xl break-words">{activeTemplate.title}</h1>
+              <h1 className="font-display font-semibold text-[2rem] leading-[1.08] break-words">{activeTemplate.title}</h1>
               <p className="text-white/80 text-sm capitalize">{typeLabel(activeTemplate.ceremonyType).toLowerCase()}</p>
             </div>
           </div>
         </div>
+      </header>
 
         <div className="px-4 mt-5 space-y-4">
           <div className="grid grid-cols-2 gap-3">
@@ -140,11 +145,15 @@ function Templates({ onBack }) {
   // ----- All templates -----
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
-        <button type="button" onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
-        <h1 className="font-display font-bold text-2xl">My Templates</h1>
+      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
+        <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm">← Back</button>
+        <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">My Templates</h1>
         <p className="text-white/80 text-sm mt-1">Save a ceremony once, reuse its checklist and shopping list next time.</p>
       </div>
+      </header>
 
       <div className="px-4 mt-4">
         {loading ? (

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 // Public, no-login view of Ubuhlanti bakwa Xhosa, reached at /ubuhlanti.
 // The fund is meant to be open to everyone — not only iCamagu members — so
@@ -66,10 +67,12 @@ function PublicUbuhlanti() {
 
   return (
     <div className="min-h-screen bg-cream pb-16">
-      <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white px-5 pt-12 pb-10 rounded-b-[2.5rem] relative overflow-hidden">
-        <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/10 rounded-full" />
+      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src={CEREMONY_IMAGE.ULWALUKO} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
         <div className="relative max-w-xl mx-auto">
-          <h1 className="font-display font-bold text-3xl leading-tight">Ubuhlanti bakwa Xhosa</h1>
+          <h1 className="font-display font-semibold text-[2rem] leading-[1.08] leading-tight">Ubuhlanti bakwa Xhosa</h1>
           <p className="text-white/85 text-sm font-bold mt-1.5">
             Our Community Shrine &amp; Development Fund
           </p>
@@ -79,6 +82,7 @@ function PublicUbuhlanti() {
           </p>
         </div>
       </div>
+      </header>
 
       <div className="px-4 -mt-6 max-w-xl mx-auto">
         <div className="bg-white border-2 border-terracotta/25 rounded-soft p-6 shadow-card text-center">

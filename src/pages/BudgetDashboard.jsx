@@ -41,10 +41,14 @@ function BudgetDashboard({ planId, planTitle, onBack }) {
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
-        <button onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
-        <h1 className="font-display font-bold text-2xl">Budget — {planTitle}</h1>
+      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="relative">
+        <button onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm">← Back</button>
+        <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">Budget — {planTitle}</h1>
       </div>
+      </header>
       <div className="px-4 mt-4">
         {allocated == null ? (
           <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4"><p className="font-bold text-ink">No budget set yet</p><p className="text-sm text-ink-muted mt-1">Set a budget from the ceremony Budget &amp; Costs tab.</p></div>
