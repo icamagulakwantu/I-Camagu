@@ -581,6 +581,8 @@ model Basket {
   fundingRequests StokvelPoolFunding[]
 
   @@index([ceremonyId])
+  // Also created at start-up by server/scripts/ensure-schema.js.
+  @@index([ceremonyCostItemId])
 }
 
 model BasketItem {
@@ -1167,6 +1169,10 @@ model Ceremony {
   barBookings      BarServiceBooking[]
   tourismPackage   TourismPackage?
   ukusokaEntries   UkusokaEntry[]
+
+  // Also created at start-up by server/scripts/ensure-schema.js; declared here
+  // so the Prisma schema matches the deployed database.
+  @@index([visibility, eventDate])
 }
 
 // ---------- CEREMONY CHECKLIST & COST ITEMS ----------
