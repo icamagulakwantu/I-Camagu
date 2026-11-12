@@ -263,6 +263,24 @@
   );
 }
 
+/* Rings over the ember wash. Both classes set background-image, so on their
+   own the later .rings rule wiped out the ember gradient and left white text
+   on a transparent header. Layer the rings over the gradient instead. */
+.wash-ember.rings {
+  background-image:
+    radial-gradient(
+      circle at 82% 18%,
+      transparent 0 26px,
+      rgba(255, 255, 255, 0.08) 26px 27px,
+      transparent 27px 52px,
+      rgba(255, 255, 255, 0.06) 52px 53px,
+      transparent 53px 84px,
+      rgba(255, 255, 255, 0.04) 84px 85px,
+      transparent 85px
+    ),
+    linear-gradient(155deg, #c45c26 0%, #a34a20 55%, #4a2d18 100%);
+}
+
 /* Card with an ochre spine on the leading edge, like a bound ledger */
 .card-spine {
   position: relative;

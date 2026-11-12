@@ -8,6 +8,7 @@ import NotificationBell from '../components/NotificationBell.jsx'
 import PinReminder from '../components/PinReminder.jsx'
 import JourneyMap from '../components/home/JourneyMap.jsx'
 import CommunityShortcuts from '../components/home/CommunityShortcuts.jsx'
+import { daysUntil, describeCountdown, nextCeremony } from '../lib/countdown.js'
 
 // Founder-supplied photo: women in umbhaco celebrating at an umgidi.
 const HERO_IMAGE = 'https://hercules-cdn.com/file_wxyYBh6l6xbEhksr09BuCEsR'
@@ -24,13 +25,6 @@ function ceremonyProgress(ceremony) {
   const items = ceremony?.checklistItems || []
   if (!items.length) return null
   return Math.round((items.filter((i) => i.isCompleted || i.isChecked).length / items.length) * 100)
-}
-
-function daysUntil(dateValue) {
-  if (!dateValue) return null
-  const ms = new Date(dateValue).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)
-  const days = Math.round(ms / 86400000)
-  return days >= 0 ? days : null
 }
 
 function SectionHeading({ eyebrow, title, actionLabel, onAction }) {
@@ -77,7 +71,7 @@ export default function Home({ onNavigate, basketCount = 0, onSelectCeremony }) 
 
   const pools = feed.pools || []
   const totalSaved = stokvels.reduce((sum, s) => sum + (Number(s.totalBalance) || 0), 0)
-  const leadCeremony = ceremonies[0] || null
+  const leadCeremony = nextCeremony(ceremonies)
   const progress = ceremonyProgress(leadCeremony)
   const countdown = daysUntil(leadCeremony?.eventDate)
 
@@ -100,12 +94,13 @@ export default function Home({ onNavigate, basketCount = 0, onSelectCeremony }) 
       xhosa: 'Thengani kunye · Buy together',
       title: 'Buy in bulk, pay less',
       status: basketCount > 0
-        ? `${plural(basketCount, 'item')} in your basket`
+        ? `${plural(basketCount, 'item')} in your basket · finish your order`
         : pools.length
           ? `${plural(pools.length, 'group order')} near you`
           : 'Group orders for drinks, meat & groceries',
       action: basketCount > 0 ? 'Basket' : 'Shop',
-      done: basketCount > 0,
+      // Items waiting in a basket are not a finished step.
+      done: false,
       onOpen: () => onNavigate(basketCount > 0 ? 'basket' : 'store'),
     },
     {
@@ -114,7 +109,7 @@ export default function Home({ onNavigate, basketCount = 0, onSelectCeremony }) 
       xhosa: 'Lungiselela umsitho · Prepare',
       title: leadCeremony ? leadCeremony.title : 'Plan your ceremony',
       status: leadCeremony
-        ? `${progress ?? 0}% prepared${countdown != null ? ` · ${countdown === 0 ? 'today' : `${plural(countdown, 'day')} to go`}` : ''}`
+        ? `${progress ?? 0}% prepared${countdown != null ? ` · ${describeCountdown(countdown)}` : ''}`
         : 'What tradition asks, what it costs, who brings what',
       progress: leadCeremony ? (progress ?? 0) : null,
       action: leadCeremony ? 'Continue' : 'Plan',

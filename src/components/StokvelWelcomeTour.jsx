@@ -1,16 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { stokvelType } from '../data/stokvelTypes.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 const money = (n) => `R${Number(n).toLocaleString('en-ZA', { maximumFractionDigits: 2 })}`
 
-const TYPE_PURPOSE = {
-  ALCOHOL_BULK_POOL: 'Members buy drinks together in bulk to save money.',
-  UMGALELO_ROTATING: 'Everyone pays in each month and one member receives the pot in turn.',
-  CEREMONY_SAVINGS: 'Members save together for ceremonies such as umgidi, funerals and weddings.',
-  EXISTING_STOKVEL_UPGRADE: 'An existing stokvel that now keeps its records on iCamagu.',
-  RECIPROCAL_GIFTING: 'Members give to each other at ceremonies and are repaid in kind.',
-}
 
 const OFFICIAL_ROLE = { CHAIRPERSON: 'Chairperson', TREASURER: 'Treasurer', SECRETARY: 'Secretary' }
 
@@ -27,7 +21,7 @@ function Row({ label, value }) {
 // Builds the four tour screens from what the stokvel has actually set up, so
 // nothing is invented. Anything the organiser has not filled in is left out.
 function buildSteps(stokvel, rules, referenceCode) {
-  const purpose = rules?.purpose || TYPE_PURPOSE[stokvel.type] || ''
+  const purpose = rules?.purpose || stokvelType(stokvel.type).purpose
   const contribution = rules?.contributionAmount || stokvel.contributionAmount
   const officials = (stokvel.officials || []).map((o) => {
     const member = stokvel.members?.find((m) => m.userId === o.userId)

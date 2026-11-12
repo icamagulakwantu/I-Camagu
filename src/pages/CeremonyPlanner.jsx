@@ -235,12 +235,19 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
               <Bi {...(stepId === 'summary' ? { xh: 'Buyela kwimisebenzi yam', en: 'Back to my ceremonies' } : BUTTONS.back)} />
             </button>
             <h1 className="font-display font-bold text-2xl break-words">{activePlan ? planTitle(activePlan) : 'New ceremony'}</h1>
-            <div className="mt-4 flex items-center justify-between text-xs text-white/80">
-              <span><Bi xh={`Inyathelo ${stepIndex + 1} / ${STEPS.length}`} en={`Step ${stepIndex + 1} of ${STEPS.length}`} /></span>
-            </div>
-            <div className="mt-2 w-full h-3 bg-white/20 rounded-full overflow-hidden" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
-              <div className="h-full bg-white rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
-            </div>
+            {/* The step counter belongs to the set-up wizard. On the summary it
+                read "Step 6 of 6" with a full bar while the ceremony itself
+                could still be 0% ready, so it is hidden there. */}
+            {stepId !== 'summary' && (
+              <>
+                <div className="mt-4 flex items-center justify-between text-xs text-white/80">
+                  <span><Bi xh={`Inyathelo ${stepIndex + 1} / ${STEPS.length}`} en={`Step ${stepIndex + 1} of ${STEPS.length}`} /></span>
+                </div>
+                <div className="mt-2 w-full h-3 bg-white/20 rounded-full overflow-hidden" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
+                  <div className="h-full bg-white rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+                </div>
+              </>
+            )}
           </div>
         </div>
 

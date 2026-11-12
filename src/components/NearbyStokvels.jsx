@@ -1,16 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from './ui/Toast.jsx'
+import { stokvelType } from '../data/stokvelTypes.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
-const TYPE_LABEL = {
-  ALCOHOL_BULK_POOL: 'Bulk buying',
-  UMGALELO_ROTATING: 'Monthly savings',
-  CEREMONY_SAVINGS: 'Ceremony savings',
-  EXISTING_STOKVEL_UPGRADE: 'Community stokvel',
-  RECIPROCAL_GIFTING: 'Gift sharing',
-}
 
 // A closed "Find stokvels near you" bar. Opening it shows stokvels that chose
 // to be shown, with the ones in the person's own area first. "Ask to join"
@@ -83,7 +77,7 @@ export default function NearbyStokvels() {
                     <span className="text-xs font-black uppercase bg-sage-50 text-sage-700 px-2 py-1 rounded-pill flex-shrink-0">Near you</span>
                   )}
                 </div>
-                <p className="text-xs text-ink-muted mt-0.5">{TYPE_LABEL[s.type] || 'Stokvel'} · {s.area} · {s.memberCount} member{s.memberCount === 1 ? '' : 's'}</p>
+                <p className="text-xs text-ink-muted mt-0.5">{stokvelType(s.type).short} · {s.area} · {s.memberCount} member{s.memberCount === 1 ? '' : 's'}</p>
                 <p className="text-sm text-ink mt-2">{s.purpose}</p>
                 <button type="button" disabled={busyId === s.id || asked[s.id]} onClick={() => ask(s)}
                   className={`mt-3 w-full bg-sage-500 text-white font-bold py-3 rounded-pill text-base ${pressable}`}>

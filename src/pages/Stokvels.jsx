@@ -14,13 +14,18 @@ import Statement from './stokvel/Statement.jsx'
 import TradeCredit from './stokvel/TradeCredit.jsx'
 import SmartMatchLink from './stokvel/SmartMatchLink.jsx'
 
-const STOKVEL_TYPES = [
-  'ALCOHOL_BULK_POOL',
-  'UMGALELO_ROTATING',
-  'CEREMONY_SAVINGS',
-  'EXISTING_STOKVEL_UPGRADE',
-  'RECIPROCAL_GIFTING'
-]
+import { STOKVEL_TYPES, stokvelType } from '../data/stokvelTypes.js'
+import { stokvelInviteMessage, stokvelInviteUrl, whatsappShareUrl } from '../lib/inviteLinks.js'
+
+// Joining accepts the invite link an organiser shares, or the bare id.
+export function stokvelIdFromInput(value) {
+  const text = String(value || '').trim()
+  const match = text.match(/\/join\/stokvel\/([^/?#\s]+)/)
+  if (match) {
+    try { return decodeURIComponent(match[1]) } catch { return match[1] }
+  }
+  return text
+}
 
 // Stokvel detail used to be one long scroll — announcements, a contribution
 // form, rotation order, a payout form, organiser settings and officials-only
@@ -316,9 +321,9 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
   const joinStokvel = async (e) => {
     e.preventDefault()
     if (isJoining) return
-    const trimmedId = joinId.trim()
+    const trimmedId = stokvelIdFromInput(joinId)
     if (!trimmedId) {
-      setError('Please enter a valid Stokvel ID')
+      setError('Paste the invite link the organiser sent you')
       return
     }
 
@@ -330,7 +335,15 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({ stokvelId: trimmedId }),
       })
-      const data = await res.json()
+      const data = await res.json().catch(() => ({}))
+      // Same as joining through an invite link: a request that an official
+      // must accept is good news, not an error.
+      if (data.requested) {
+        setJoinId('')
+        setView('list')
+        showToast(data.error || 'Request sent. An official must accept you first.', 'info')
+        return
+      }
       if (!res.ok) throw new Error(data.error || 'Failed to join stokvel')
 
       setJoinId('')
@@ -549,10 +562,11 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
             onChange={(e) => setNewType(e.target.value)}
             className={inputStyle}
           >
-            {STOKVEL_TYPES.map(t => (
-              <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
+            {STOKVEL_TYPES.map((t) => (
+              <option key={t.id} value={t.id}>{t.label}</option>
             ))}
           </select>
+          <p className="px-2 text-xs leading-relaxed text-ink-muted">{stokvelType(newType).purpose}</p>
           <input
             type="number"
             placeholder="Contribution amount (ZAR, optional)"
@@ -590,7 +604,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
         <form onSubmit={joinStokvel} className={`${cardBase} space-y-3`}>
           <input
             type="text"
-            placeholder="Stokvel ID (ask the organiser)"
+            placeholder="Paste the invite link or code"
             value={joinId}
             onChange={(e) => setJoinId(e.target.value)}
             className={inputStyle}
@@ -656,18 +670,27 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
             ← All stokvels
           </button>
           <h1 className="font-display font-bold text-2xl">{stokvel.name}</h1>
-          <p className="text-white/70 text-xs uppercase mt-1 tracking-wider">{stokvel.type.replace(/_/g, ' ')}</p>
+          <p className="text-white/70 text-xs uppercase mt-1 tracking-wider">{stokvelType(stokvel.type).label}</p>
           <p className="text-white/90 text-sm mt-2">Ref: <strong className="font-mono bg-white/10 px-2 py-0.5 rounded">{myReferenceCode}</strong></p>
           <button
             type="button"
             onClick={() => {
-              navigator.clipboard?.writeText(stokvel.id)
-              showToast('Stokvel ID copied — share it with people you want to invite', 'success')
+              Promise.resolve(navigator.clipboard?.writeText(stokvelInviteUrl(stokvel.id)))
+                .then(() => showToast('Invite link copied. Send it to the people you want to invite.', 'success'))
+                .catch(() => showToast('Could not copy the link. Use WhatsApp instead.', 'error'))
             }}
             className={`text-xs text-white/80 mt-1.5 flex items-center gap-1 ${pressable}`}
           >
-<Icon name="copy" size={13} color="#fff" /> Copy Stokvel ID to invite members
+            <Icon name="copy" size={13} color="#fff" /> Copy invite link
           </button>
+          <a
+            href={whatsappShareUrl(stokvelInviteMessage(stokvel.name, stokvel.id))}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`text-xs text-white/80 mt-1.5 flex items-center gap-1 ${pressable}`}
+          >
+            <Icon name="share" size={13} color="#fff" /> Invite on WhatsApp
+          </a>
           <p className="font-display font-bold text-3xl mt-2">R{balance.toFixed(2)}</p>
           {(Number(stokvel.groupLedger?.interestEarned || 0) > 0 || Number(stokvel.groupLedger?.groupExpenses || 0) > 0) && (
             <p className="text-xs text-white/70 mt-1">

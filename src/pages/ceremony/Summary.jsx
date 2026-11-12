@@ -65,7 +65,11 @@ export default function Summary({ plan, pledges, accessToken, onEditStep, onOpen
     {
       id: 'plan', icon: 'clipboard', color: COLORS.plan, short: 'Plan',
       xh: 'Cwangcisa', en: 'Plan the ceremony',
-      status: date ? `${percent}% ready` : 'Add a date',
+      // The tick means "has a date". Checklist progress lives on the shopping
+      // list card below, so it is not shown here next to a tick.
+      status: ceremony.eventDate
+        ? new Date(ceremony.eventDate).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })
+        : 'Add a date',
       done: Boolean(ceremony.eventDate),
       hint: 'Give the ceremony a date so family can plan around it. Your checklist is already waiting.',
       cta: 'Add the date',
