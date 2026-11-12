@@ -1261,53 +1261,75 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
   }
 
   // --- VIEW: STOKVEL LIST (DEFAULT) ---
+  const combined = myStokvels.reduce((sum, m) => sum + Number(m.stokvel?.groupLedger?.totalBalance || 0), 0)
+  const mine = myStokvels.reduce((sum, m) => sum + Number(m.myBalance || 0), 0)
+  const rand = (n, digits = 2) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`
+
   return (
-    <div className="min-h-screen pb-24 bg-cream px-4 pt-6">
-      <button
-        type="button"
-        onClick={() => onBack?.()}
-        className={`text-sm text-ink-muted mb-4 ${pressable}`}
-      >
-        ← Back
-      </button>
-      {/* Same header pattern as Ceremonies: eyebrow, title, short subtitle. */}
-      <p className="eyebrow mb-0.5">Yonga kunye</p>
-      <h1 className="font-display font-bold text-3xl text-ink">Stokvels</h1>
-      <p className="text-ink-muted text-sm mt-1 mb-5">Save together with people you trust, then buy in bulk for your ceremony.</p>
-
-      {topSlot}
-
-      {!loading && myStokvels.length > 0 && (
-        <div className="wash-sage grain relative mb-4 overflow-hidden rounded-soft px-5 py-5">
-          <div className="relative flex items-start justify-between gap-4">
-            <div>
-              <p className="eyebrow text-cream/70">Combined balance</p>
-              <p className="tabular mt-2 font-display text-3xl text-cream">
-                R{myStokvels.reduce((sum, m) => sum + Number(m.stokvel?.groupLedger?.totalBalance || 0), 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-              <p className="mt-1 text-xs text-cream/80">Across {myStokvels.length} group{myStokvels.length === 1 ? '' : 's'}</p>
-            </div>
-            <Icon name="coins" size={32} color="#ffffff" />
-          </div>
+    <div className="mx-auto min-h-screen max-w-md bg-cream pb-28">
+      {/* Hero: why we save together. The balance card rises out of it. */}
+      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-20 pt-6 text-cream">
+        <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/50 to-[#1c1612]" />
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => onBack?.()}
+            className={`mb-6 flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm ${pressable}`}
+          >
+            <Icon name="arrowLeft" size={14} color="#fffdf9" /> Back
+          </button>
+          <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Yonga kunye · Save together</p>
+          <h1 className="mt-2 font-display text-[2.3rem] font-semibold leading-[1.04] text-balance">
+            Stokvels: <span className="italic text-ochre-light">we carry each other.</span>
+          </h1>
+          <p className="mt-3 text-[15px] leading-relaxed text-cream/85">
+            Save with people you trust, then buy the feast in bulk when your ceremony comes.
+          </p>
         </div>
-      )}
+      </header>
 
-      <div className="flex gap-2 mb-4">
-        <button
-          type="button"
-          onClick={() => { setError(''); setView('create'); }}
-          className={`flex-1 bg-terracotta text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
-        >
-          + Create
-        </button>
-        <button
-          type="button"
-          onClick={() => { setError(''); setView('join'); }}
-          className={`flex-1 border-2 border-terracotta/25 text-ink font-bold py-2.5 rounded-pill text-sm ${pressable}`}
-        >
-          Join
-        </button>
+      <div className="relative z-10 -mt-12 px-4">
+        <section aria-label="Your savings" className="rounded-[26px] bg-white p-5 shadow-[0_22px_44px_-22px_rgba(28,22,18,0.55)]">
+          {!loading && myStokvels.length > 0 ? (
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="eyebrow">Your savings</p>
+                <p className="tabular mt-1 font-display text-[2.2rem] font-semibold leading-none text-ink">{rand(mine)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[11px] font-bold text-ink-muted">Your groups hold</p>
+                <p className="tabular font-display text-lg font-semibold text-sage">{rand(combined, 0)}</p>
+                <p className="text-[11px] text-ink-muted">across {myStokvels.length} group{myStokvels.length === 1 ? '' : 's'}</p>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="eyebrow">Start your circle</p>
+              <p className="mt-1 font-display text-xl font-semibold leading-snug text-ink">Start one for your family, or join one with a code.</p>
+            </div>
+          )}
+          <div className="mt-5 flex gap-2">
+            <button
+              type="button"
+              onClick={() => { setError(''); setView('create'); }}
+              className={`flex min-h-[48px] flex-1 items-center justify-center gap-1.5 rounded-full bg-terracotta text-sm font-bold text-white shadow-terracotta ${pressable}`}
+            >
+              <Icon name="plus" size={16} color="#ffffff" /> Start a stokvel
+            </button>
+            <button
+              type="button"
+              onClick={() => { setError(''); setView('join'); }}
+              className={`min-h-[48px] flex-1 rounded-full bg-cream-dark text-sm font-bold text-ink ${pressable}`}
+            >
+              Join with a code
+            </button>
+          </div>
+        </section>
       </div>
+
+      <div className="px-4 pt-5">
+      {topSlot}
 
       {loading ? (
         <div className="space-y-2">
@@ -1318,7 +1340,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
         <EmptyState
           icon="users"
           title="No stokvels yet"
-          description="Join a community savings group or start your own to pool resources together."
+          description="When the family saves together, the umgidi, the wedding and the next season are already covered. Start one or join with a code above."
         />
       ) : (
         <>
@@ -1329,11 +1351,11 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
                 key={m.id || m.stokvelId}
                 type="button"
                 onClick={() => { setDetailTab('overview'); fetchDetail(m.stokvelId) }}
-                className={`w-full text-left bg-white border border-terracotta/15 rounded-soft overflow-hidden shadow-soft ${pressable}`}
+                className={`w-full overflow-hidden rounded-[22px] border border-ink/[0.06] bg-white text-left shadow-soft ${pressable}`}
               >
                 <div className="flex items-center gap-3 p-4">
-                  <span className="w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0">
-                    <Icon name="landmark" size={18} color="#c45c26" />
+                  <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-sage">
+                    <Icon name="landmark" size={19} color="#fffdf9" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="font-display font-bold text-base text-ink leading-tight">{m.stokvel?.name || 'Unnamed Stokvel'}</p>
@@ -1343,7 +1365,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
                   </div>
                   <Icon name="arrowRight" size={16} color="#8a8278" />
                 </div>
-                <div className="border-t border-cream-dark/70 px-4 py-3 flex items-end justify-between gap-3">
+                <div className="mx-2 mb-2 flex items-end justify-between gap-3 rounded-[16px] bg-cream px-3.5 py-3">
                   <div>
                     {/* This member's own confirmed contributions — not the
                         group total, which is a different (larger) number. */}
@@ -1372,6 +1394,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
           <div className="space-y-3">{bottomSlot}</div>
         </>
       )}
+      </div>
     </div>
   )
 }

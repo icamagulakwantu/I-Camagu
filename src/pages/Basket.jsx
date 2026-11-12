@@ -527,11 +527,11 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       {itemsList.length === 0 ? (
         <EmptyState
           emoji="🛒"
-          title="Your cart is empty"
+          title="Let\u2019s fill the table"
           description={myOpenPools.length
-            ? 'Tap "Add to this pool" on a pool above, or browse the Store.'
-            : 'Browse the Store to add items toward a collective order.'}
-          primaryLabel="Go to Store"
+            ? 'Tap "Add to this pool" on a pool above, or browse Bulk Buy.'
+            : 'Drinks, meat, livestock and groceries for the celebration, bought together at member prices.'}
+          primaryLabel="Go to Bulk Buy"
           onPrimary={onBack}
         />
       ) : (

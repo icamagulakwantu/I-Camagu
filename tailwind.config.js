@@ -11,6 +11,8 @@ export default {
         // `brand.*` and `success` below are kept only as aliases onto these same
         // values, so every existing bg-brand-*/text-brand-* class keeps working.
         sage: {
+          // Deep sage: the family & culture colour on panels and icons.
+          DEFAULT: '#2e4a2e',
           50: '#f4f7f4',
           100: '#e3ebe3',
           200: '#c5d6c5',

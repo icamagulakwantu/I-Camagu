@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { captureLocation } from '../lib/geolocation.js'
 import Icon from '../components/Icon.jsx'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 import IsidukoTypeahead from '../components/IsidukoTypeahead.jsx'
 
 // No nation / sub-group picker (AbaThembu, AmaMpondo...): every clan sits
@@ -191,16 +192,20 @@ function Onboarding({ onDone }) {
 
       {step === 'welcome' && (
         <div className="w-full max-w-sm animate-slide-up">
-          <div className="wash-ember rings rounded-t-soft px-6 pt-6 pb-5">
-            <div className="flex items-center gap-2.5 mb-3">
-              <img src="/icons/source/gateway-mark-1024.png" alt="iCamagu" className="w-8 h-8" style={{ filter: 'brightness(0) invert(1)' }} />
-              <span className="font-display font-bold text-xl text-white">iCamagu</span>
+          <div className="relative overflow-hidden rounded-t-[28px] bg-[#1c1612] px-6 pb-6 pt-6">
+            <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/30 to-[#1c1612]" />
+            <div className="relative">
+              <div className="flex items-center gap-2.5 mb-4">
+                <img src="/icons/source/gateway-mark-1024.png" alt="iCamagu" className="w-8 h-8" />
+                <span className="font-display font-bold text-xl text-cream">iCamagu</span>
+              </div>
+              <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light mb-1.5">Wamkelekile, {user?.firstName || 'mhlobo'}</p>
+              <h1 className="font-display font-semibold text-[1.75rem] leading-tight text-cream text-balance">
+                Konke okufunwa ngumsebenzi wakho. <span className="italic text-ochre-light">Ndawonye.</span>
+              </h1>
+              <p className="text-cream/85 text-sm mt-2">Everything your celebration needs, with the whole family, in one place.</p>
             </div>
-            <p className="eyebrow text-white/70 mb-1">Molo, {user?.firstName || 'mhlobo'}</p>
-            <h1 className="font-display font-bold text-2xl leading-tight text-white">
-              Konke okufunwa ngumsebenzi wakho. Ndawonye.
-            </h1>
-            <p className="text-white/80 text-sm mt-1">Everything your ceremony needs, in one place.</p>
           </div>
 
           <div className="bg-white/95 backdrop-blur-md border-x-2 border-terracotta/20 px-4 pt-4 pb-2">
@@ -226,7 +231,7 @@ function Onboarding({ onDone }) {
             </div>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-md border-x-2 border-b-2 border-terracotta/20 rounded-b-soft px-4 pb-5 pt-3">
+          <div className="bg-white/95 backdrop-blur-md border-x-2 border-b-2 border-terracotta/20 rounded-b-[28px] px-4 pb-5 pt-3">
             <button onClick={() => setStep('ancestry')} className="w-full wash-ember text-white font-bold py-3.5 rounded-pill shadow-terracotta text-[15px] pressable">
               Set up my profile &rarr;
             </button>

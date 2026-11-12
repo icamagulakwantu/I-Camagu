@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import Icon from '../components/Icon.jsx'
@@ -177,41 +178,44 @@ function Login() {
     <div className="min-h-screen icamagu-bg flex flex-col items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm animate-slide-up">
 
-        <div className="wash-ember rounded-t-soft px-6 pt-6 pb-5">
+        <div className="relative overflow-hidden rounded-t-[28px] bg-[#1c1612] px-6 pb-6 pt-6">
+          <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/30 to-[#1c1612]" />
+          <div className="relative">
           <div className="flex items-center gap-2.5 mb-5">
             <img
               src="/icons/source/gateway-mark-1024.png"
               alt="iCamagu"
               className="w-9 h-9"
-              style={{ filter: 'brightness(0) saturate(100%) invert(18%) sepia(28%) saturate(1715%) hue-rotate(335deg) brightness(92%) contrast(91%)' }}
             />
-            <span className="font-display font-bold text-2xl text-[#4b281b]">iCamagu</span>
+            <span className="font-display font-bold text-2xl text-cream">iCamagu</span>
           </div>
-          <h1 className="font-display font-bold text-[1.65rem] leading-tight text-[#4b281b] text-balance">
-            {step === 'email' && 'Your people. Your plans. Together.'}
+          <h1 className="font-display font-semibold text-[1.75rem] leading-tight text-cream text-balance">
+            {step === 'email' && 'Siyavuya. Let\u2019s plan the celebration.'}
             {step === 'register' && 'Joyina iCamagu'}
             {step === 'password-login' && 'Wamkelekile'}
             {step === 'forgot-password' && 'Reset your password'}
             {step === 'otp-verify' && 'Check your inbox'}
           </h1>
-          {step === 'register' && <p className="text-[#4b281b]/85 text-sm mt-1">Join iCamagu</p>}
-          {step === 'password-login' && <p className="text-[#4b281b]/85 text-sm mt-1">Welcome back</p>}
-          <p className="text-[#4b281b]/90 text-sm mt-2 leading-snug break-words">
-            {step === 'email' && 'Plan ceremonies, organise your stokvel and buy together in one place.'}
+          {step === 'register' && <p className="text-cream/80 text-sm mt-1">Join iCamagu</p>}
+          {step === 'password-login' && <p className="text-cream/80 text-sm mt-1">Welcome back</p>}
+          <p className="text-cream/85 text-sm mt-2 leading-snug break-words">
+            {step === 'email' && 'Your son\u2019s umgidi, your wedding, your stokvel and the feast, with the whole family in one place.'}
             {step === 'register' && `Create your account for ${email}.`}
             {step === 'password-login' && email}
             {step === 'forgot-password' && `We'll send a reset link to ${email}`}
             {step === 'otp-verify' && `If an iCamagu account uses ${email}, we've sent it a 6-digit code.`}
           </p>
           {step === 'email' && (
-            <div className="mt-4 rounded-2xl border border-[#4b281b]/15 bg-white/45 px-3.5 py-3">
-              <p className="text-[#4b281b] text-sm font-bold">SmartMatch Pool</p>
-              <p className="text-[#4b281b]/90 text-xs leading-snug mt-0.5">Join with other people nearby to pool demand and buy alcohol, groceries or livestock together. SmartMatch helps groups work toward better bulk pricing, with savings of up to 20% on eligible orders depending on supplier quotes and group size.</p>
+            <div className="mt-4 rounded-2xl border border-cream/15 bg-white/10 backdrop-blur-sm px-3.5 py-3">
+              <p className="text-cream text-sm font-bold">SmartMatch Pool</p>
+              <p className="text-cream/85 text-xs leading-snug mt-0.5">Join with other people nearby to pool demand and buy alcohol, groceries or livestock together. SmartMatch helps groups work toward better bulk pricing, with savings of up to 20% on eligible orders depending on supplier quotes and group size.</p>
             </div>
           )}
         </div>
+        </div>
 
-        <div className="bg-white/95 backdrop-blur-md border-x-2 border-b-2 border-terracotta/20 rounded-b-soft px-6 py-6 shadow-elevated">
+        <div className="bg-white/95 backdrop-blur-md border-x-2 border-b-2 border-terracotta/20 rounded-b-[28px] px-6 py-6 shadow-elevated">
 
           {meta && step !== 'email' && (
             <div className="flex items-center gap-1.5 mb-5">
