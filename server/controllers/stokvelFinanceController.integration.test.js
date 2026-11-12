@@ -66,6 +66,11 @@ integrationDescribe('PostgreSQL loan controller integration (real database)', ()
       ],
     }));
 
+    // Trigger the controller's lazy loan-table creation, then all tests use those real tables.
+    const response = responseRecorder();
+    await voteLoan({ params: { stokvelId, loanId: 'not-a-real-loan' }, body: { approve: true }, userId: officialAUserId }, response);
+    expect(response.statusCode).toBe(404);
+
     // Start without the lazily managed audit table. The first finance audit
     // write below must create it itself, without relying on a records-route guard.
     await prisma.$executeRawUnsafe('DROP TABLE IF EXISTS "StokvelAuditLog"');
