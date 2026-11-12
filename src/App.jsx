@@ -432,7 +432,7 @@ function MainApp() {
       case 'profile':
         return <Profile onNavigate={setScreen} initialTab={profileInitialTab} onConsumeInitialTab={() => setProfileInitialTab(null)} />
       default:
-        return <Home onNavigate={setScreen} basketCount={basketCount} onSelectCeremony={openExistingCeremony} />
+        return <Home onNavigate={setScreen} basketCount={basketCount} pendingApprovals={pendingApprovals} unreadNotifications={unreadNotifications} onSelectCeremony={openExistingCeremony} />
     }
   }
 
