@@ -266,7 +266,7 @@ export default function CeremonyHome({
           <h2 className="mb-3 mt-0.5 font-display text-[1.45rem] font-semibold leading-tight tracking-tight text-ink">Prepare, buy and book</h2>
           <div className="overflow-hidden rounded-[22px] bg-[#fffdf9] shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
             <Row icon="cart" tile="bg-[#f3e6cf] text-[#6e5418]" title="Buy in bulk" detail="Livestock, drinks and groceries at group prices" onClick={() => onNavigate?.('store')} />
-            <Row icon="beer" tile="bg-sage-100 text-sage-700" title="Brew umqombothi" detail={ceremony.guestCount != null ? `Steps and quantities · ${ceremony.guestCount} guests` : 'Steps and quantities'} onClick={() => onNavigate?.('umqombothi')} />
+            <Row icon="beer" tile="bg-sage-100 text-sage-700" title="Brew umqombothi" detail={ceremony.guestCount != null ? `How much to brew for ${ceremony.guestCount} guests` : 'Steps and quantities'} onClick={() => onNavigate?.('umqombothi')} />
             {plan.ceremonyId && <Row icon="cocktail" tile="bg-[#1c1612] text-ochre-light" title="Ekoyini mobile bar" detail="Book a bar for the day" onClick={() => onBookEkoyini?.(plan.ceremonyId, title)} />}
             <Row icon="heartHandshake" tile="bg-[#f6e2d6] text-terracotta-dark" title="Healers, ingcibi & vendors" detail="Trusted traditional help" onClick={() => onNavigate?.('directory')} />
             <Row icon="clock" tile="bg-cream-dark text-ink" title="The day, step by step" detail="What happens, and in what order" onClick={() => onViewTimeline?.(type)} />

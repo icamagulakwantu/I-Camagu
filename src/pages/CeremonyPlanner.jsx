@@ -228,7 +228,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         onViewBudget={onViewBudget}
         onBookEkoyini={onBookEkoyini}
         onOpenHierarchy={(ceremonyId) => onOpenTool?.('hierarchy', ceremonyId)}
-        onNavigate={(tool) => onOpenTool?.(tool, activePlan.ceremonyId)}
+        onNavigate={(tool) => onOpenTool?.(tool, activePlan.ceremonyId, { title: planTitle(activePlan), guestCount: activePlan.ceremony?.guestCount ?? null })}
         onDeleted={handleDeleted}
       />
     )

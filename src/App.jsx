@@ -191,11 +191,14 @@ function MainApp() {
   const [hierarchyCeremonyId, setHierarchyCeremonyId] = useState(null)
   // Set while a tool was opened from a ceremony page, so Back returns there.
   const [returnToCeremonyId, setReturnToCeremonyId] = useState(null)
+  // What the tool needs to know about that ceremony (its title and guests).
+  const [toolCeremony, setToolCeremony] = useState(null)
 
   // Keep the browser address in sync with screen navigation so refresh, share
   // and the browser back button return to a meaningful place in the app.
   const setScreen = (nextScreen) => {
     setReturnToCeremonyId(null)
+    setToolCeremony(null)
     setScreenState(nextScreen)
     navigate(SCREEN_PATHS[nextScreen] || '/')
   }
@@ -296,10 +299,13 @@ function MainApp() {
 
   // Tools opened from a ceremony page (who brings what, umqombothi, healers)
   // return to that ceremony when their back button is pressed.
-  const openToolFromCeremony = (tool, ceremonyId) => {
+  const openToolFromCeremony = (tool, ceremonyId, ceremony = null) => {
     if (tool === 'hierarchy') setHierarchyCeremonyId(ceremonyId || null)
     setScreen(tool)
-    if (tool !== 'store') setReturnToCeremonyId(ceremonyId || null)
+    if (tool !== 'store') {
+      setReturnToCeremonyId(ceremonyId || null)
+      setToolCeremony(ceremony)
+    }
   }
   const backFromTool = () => {
     if (returnToCeremonyId) openExistingCeremony(returnToCeremonyId)
@@ -428,7 +434,7 @@ function MainApp() {
       case 'directory':
         return <Directory onBack={backFromTool} />
       case 'umqombothi':
-        return <UmqombothiCalculator onBack={backFromTool} />
+        return <UmqombothiCalculator onBack={backFromTool} guestCount={toolCeremony?.guestCount ?? null} ceremonyTitle={toolCeremony?.title || ''} />
       case 'pin':
         return <PinSetup onBack={goMore} />
       case 'stokvels':
@@ -454,7 +460,7 @@ function MainApp() {
 
   const activeTab =
     screen === 'home' ? 'home'
-    : screen === 'ceremonyhub' || CEREMONY_SCREENS.includes(screen) ? 'ceremonyhub'
+    : screen === 'ceremonyhub' || CEREMONY_SCREENS.includes(screen) || returnToCeremonyId ? 'ceremonyhub'
     : screen === 'store' || screen === 'basket' || screen === 'myorders' ? 'store'
     : screen === 'stokvels' ? 'stokvels'
     : MORE_SCREENS.includes(screen) ? 'more'
