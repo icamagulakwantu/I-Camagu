@@ -4,6 +4,8 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
+import HeroHeader from '../components/ui/HeroHeader.jsx'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 import { isAdminEmail } from '../lib/admin.js'
 import CommunityVerification from '../components/CommunityVerification.jsx'
 
@@ -202,24 +204,24 @@ function Directory({ onBack }) {
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
-        <button onClick={onBack} className="text-sm text-white/80 hover:text-white mb-3 block transition-colors">
-          ← Back
-        </button>
-        <h1 className="font-display font-bold text-2xl">Directory</h1>
-        <p className="text-white/80 text-sm mt-1">Practitioners, vendors, and verified farms.</p>
-      </div>
+      <HeroHeader
+        image={CEREMONY_IMAGE.ULWALUKO}
+        eyebrow="Abantu abathembekileyo · Trusted people"
+        title="Only the verified."
+        accent="Only the trusted."
+        subtitle="Ingcibi, amakhankatha, advisors, vendors and farms. iCamagu is the trust source: if an ingcibi is not verified here, choose one who is."
+        onBack={onBack}
+      />
 
-      <div className="px-4 mt-4">
+      <div className="relative z-10 -mt-12 px-4">
         {/* Navigation Tabs */}
-        <div className="flex gap-2 mb-4">
+        <div className="mb-4 flex gap-2 rounded-full bg-white p-1.5 shadow-[0_18px_36px_-20px_rgba(28,22,18,0.55)]">
           <button 
             onClick={() => handleTabSwitch('practitioners')}
             className={`flex-1 py-2.5 rounded-pill text-sm font-bold transition-colors ${
               tab === 'practitioners' 
-                ? 'bg-sage-500 text-white shadow-sm' 
-                : 'bg-white border-2 border-terracotta/20 text-ink-muted'
+                ? 'bg-[#1c1612] text-cream' 
+                : 'text-ink-muted'
             }`}
           >
             Practitioners
@@ -228,8 +230,8 @@ function Directory({ onBack }) {
             onClick={() => handleTabSwitch('vendors')}
             className={`flex-1 py-2.5 rounded-pill text-sm font-bold transition-colors ${
               tab === 'vendors' 
-                ? 'bg-sage-500 text-white shadow-sm' 
-                : 'bg-white border-2 border-terracotta/20 text-ink-muted'
+                ? 'bg-[#1c1612] text-cream' 
+                : 'text-ink-muted'
             }`}
           >
             Vendors & Farms
@@ -381,6 +383,11 @@ function Directory({ onBack }) {
                   <p className="text-xs text-ink-muted mt-1 font-medium">
                     {p.role.replace(/_/g, ' ')} • {p.area}
                   </p>
+                  {p.contactWithheld && (
+                    <p className="mt-2 rounded-xl bg-cream px-3 py-2 text-xs leading-snug text-ink">
+                      <span className="font-bold">Not yet verified.</span> Contact details are shared once this ingcibi is verified. Until then, please choose a verified ingcibi.
+                    </p>
+                  )}
                   {p.contactInfo && (
                     <a
                       href={/^\d/.test(p.contactInfo) ? `https://wa.me/${p.contactInfo.replace(/\D/g, '')}` : `mailto:${p.contactInfo}`}

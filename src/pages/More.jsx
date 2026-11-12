@@ -21,7 +21,7 @@ const TILE_GROUPS = [
       { id: 'hierarchy', icon: 'users', label: 'Who brings what', desc: 'Give each group its items' },
       // Family pledges for a ceremony live on the ceremony page. This is the
       // separate record of gifts exchanged between families over the years.
-      { id: 'ukugida', icon: 'send', label: 'Gift exchange', desc: 'Gifts given and received', keywords: 'ukugida reciprocity return gifts' },
+      { id: 'ukugida', icon: 'send', label: 'Ukugida', desc: 'Gifts guests bring, and what you return', keywords: 'gift exchange reciprocity return gifts bottle case' },
       { id: 'umqombothi', icon: 'beer', label: 'Umqombothi brewing', desc: 'Steps and quantities', keywords: 'beer brew traditional' },
       { id: 'ukusoka', icon: 'gift', label: 'Ukusoka', desc: 'Preparing with the ingcibi', keywords: 'circumcision initiation' },
       { id: 'rites', icon: 'footprints', label: 'Ancestral rites', desc: 'Each step and its meaning', keywords: 'ancestors amasiko' },

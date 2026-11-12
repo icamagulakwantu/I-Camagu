@@ -12,8 +12,6 @@ import { CAMPAIGN_SOURCE_STORAGE_KEY as SRC_KEY, cleanCampaignSource } from '../
  */
 const NO_CUSTODY_LIVE = false
 
-const HERO_IMAGE = CEREMONY_IMAGE.UMGIDI
-
 // The celebrations people come to iCamagu to plan, in the words they use.
 const CELEBRATIONS = [
   {
@@ -36,39 +34,39 @@ const CELEBRATIONS = [
     key: 'ulwaluko',
     image: CEREMONY_IMAGE.ULWALUKO,
     name: 'Ulwaluko',
-    tag: 'His passage',
-    line: 'Prepare his journey to manhood with dignity and care.',
-    needs: ['Roles & elders', 'Blankets', 'Provisions', 'Budget'],
+    tag: 'Guidance for mothers',
+    line: 'Step-by-step guidance for a mother preparing her son, from a verified ingcibi to his return.',
+    needs: ['Verified ingcibi', 'Before the mountain', 'Mountain phase', 'His return'],
   },
 ]
 
 const MORE_CEREMONIES = ['Intambo Enkulu', 'Inkobe zikaMama', 'Ukubuyisa', 'Umsebenzi weGqirha', 'Ukukhapha']
 
-// How a celebration comes together, as the family lives it.
+// What each part of the app is for, said plainly.
 const FLOW = [
   {
     icon: 'clipboard',
     color: '#a3471a',
-    title: 'Your plan, ready',
-    body: 'Pick the ceremony and get its checklist, roles, timeline and budget, in the order our elders run it.',
+    title: 'A clear plan for every ceremony',
+    body: 'Each ceremony comes with its steps, roles, timeline and budget, so it is done properly, with dignity, and the same way every time.',
   },
   {
     icon: 'heartHandshake',
     color: '#b88a2c',
-    title: 'The family pulls together',
-    body: 'Send one link. Malume in Mthatha, your sister in London, cousins in Berlin: each pledges a sheep, the umqombothi or money. That is ukugida.',
+    title: 'Family pledges in one place',
+    body: 'Share one link. Relatives at home and abroad pledge what they will bring or give, and you can see what is covered and what is still needed.',
   },
   {
     icon: 'cart',
     color: '#2e4a2e',
-    title: 'Buy the feast together',
-    body: 'Drinks, meat, livestock and groceries at member prices, ordered as a group so the bulk price is yours.',
+    title: 'Buy together for better prices',
+    body: 'Families and stokvels pool their orders for drinks, meat, livestock and groceries, and unlock bulk discounts no single household gets.',
   },
   {
     icon: 'coins',
     color: '#3d5a80',
-    title: 'Save for the next one',
-    body: 'Run your stokvel with clear books, approvals and statements, so next season is already covered.',
+    title: 'Stokvels that run properly',
+    body: 'Group savings with simple systems: a ledger every member can see, approvals, and every contribution, payout and loan interest recorded.',
   },
 ]
 
@@ -129,13 +127,12 @@ export default function Landing({ onJoin, onSignIn }) {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-cream text-ink">
-      {/* —— Hero: the celebration itself —— */}
-      <header className="relative min-h-[620px] overflow-hidden bg-[#1c1612]">
-        <img src={HERO_IMAGE} alt="Women in umbhaco celebrating at an umgidi" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/70 via-[#1c1612]/25 to-[#1c1612]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_0%_100%,rgba(163,71,26,0.55),transparent_60%)]" />
+      {/* —— Hero: clean type on a warm dark ground; the photos live in the cards below —— */}
+      <header className="relative overflow-hidden bg-[#1c1612]">
+        <div aria-hidden="true" className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-terracotta-dark/50 blur-2xl" />
+        <div aria-hidden="true" className="absolute -left-20 top-1/2 h-60 w-60 rounded-full bg-ochre/20 blur-2xl" />
 
-        <div className="relative z-10 mx-auto flex min-h-[620px] max-w-lg flex-col px-5 pb-28 pt-6">
+        <div className="relative z-10 mx-auto flex max-w-lg flex-col px-5 pb-32 pt-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <img src="/icons/source/gateway-mark-1024.png" alt="" width="40" height="40" className="h-10 w-10" />
@@ -150,9 +147,9 @@ export default function Landing({ onJoin, onSignIn }) {
             </button>
           </div>
 
-          <div className="mt-auto">
+          <div className="mt-12">
             {inviteType && (
-              <div className="mb-4 rounded-2xl border border-ochre-light/40 bg-black/35 px-4 py-3 text-sm leading-relaxed text-cream backdrop-blur-sm">
+              <div className="mb-6 rounded-2xl border border-ochre-light/40 bg-white/[0.06] px-4 py-3 text-sm leading-relaxed text-cream">
                 {inviteType === 'stokvel' && 'You have been invited to join a stokvel on iCamagu. Join free to continue with your invitation.'}
                 {inviteType === 'clan' && 'You have been invited to a family clan group on iCamagu. Join free to continue with your invitation.'}
                 {inviteType === 'pool' && 'You have been invited to a SmartMatch group order on iCamagu. Join free to continue with your invitation.'}
@@ -164,8 +161,8 @@ export default function Landing({ onJoin, onSignIn }) {
               <span className="italic text-ochre-light">Plan like a family.</span>
             </h1>
             <p className="mt-4 max-w-md text-[16px] leading-relaxed text-cream/90">
-              Your son&rsquo;s umgidi. Your wedding. Every ceremony that makes us amaXhosa, planned, funded and
-              celebrated together, with family at home and across the world.
+              Your son&rsquo;s umgidi. Your wedding. Every ceremony that makes us amaXhosa, planned with
+              structure, funded together and celebrated with family at home and across the world.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <button
@@ -182,7 +179,7 @@ export default function Landing({ onJoin, onSignIn }) {
       </header>
 
       {/* —— The celebrations, rising out of the hero —— */}
-      <section aria-labelledby="celebrate-heading" className="relative z-20 -mt-20">
+      <section aria-labelledby="celebrate-heading" className="relative z-20 -mt-24">
         <h2 id="celebrate-heading" className="sr-only">Ceremonies you can plan</h2>
         <div className="no-scrollbar flex snap-x snap-mandatory gap-3.5 overflow-x-auto px-5 pb-10">
           {CELEBRATIONS.map((c) => <CelebrationCard key={c.key} item={c} />)}
@@ -228,8 +225,8 @@ export default function Landing({ onJoin, onSignIn }) {
             We are proud of who we are.
           </h2>
           <p className="relative mt-3 text-[15px] leading-relaxed text-cream/90">
-            Say your iziduko and find your people, in Mthatha, Gqeberha, Joburg, London or Berlin. Learn the
-            rites from the elders who know them, and teach the young ones why they matter.
+            ClanMatch brings long-lost families and siblings back together through iziduko, whether they live in
+            Mthatha, Joburg, London or Berlin. One family at a time, we unite the Xhosa nation.
           </p>
           <div className="relative mt-6 rounded-[22px] bg-cream p-4 text-ink">
             <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Did you know</p>
@@ -244,11 +241,9 @@ export default function Landing({ onJoin, onSignIn }) {
       {/* —— Ubuhlanti: the Shrine Fund —— */}
       <section aria-labelledby="fund-heading" className="mx-auto max-w-lg px-5 pt-14">
         <div className="relative overflow-hidden rounded-[30px] bg-[#1c1612] text-cream shadow-[0_28px_56px_-28px_rgba(28,22,18,0.9)]">
-          <div className="relative h-44">
-            <img src={CEREMONY_IMAGE.ULWALUKO} alt="" className="h-full w-full object-cover opacity-80" loading="lazy" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#1c1612] to-[#1c1612]/10" />
-          </div>
-          <div className="relative -mt-16 px-6 pb-7">
+          <div aria-hidden="true" className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-ochre-light/15" />
+          <div aria-hidden="true" className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-terracotta-dark/35" />
+          <div className="relative px-6 pb-7 pt-8">
             <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Ubuhlanti bakwaXhosa · The Shrine Fund</p>
             <h2 id="fund-heading" className="mt-2 font-display text-[2.1rem] font-semibold leading-[1.04] text-balance">
               Together we can build greatness.
@@ -277,10 +272,23 @@ export default function Landing({ onJoin, onSignIn }) {
       </section>
 
       {/* —— Trust —— */}
-      <section className="mx-auto max-w-lg px-5 pt-10">
+      <section aria-labelledby="trust-heading" className="mx-auto max-w-lg space-y-3 px-5 pt-10">
+        <h2 id="trust-heading" className="sr-only">Trust</h2>
+        <div className="flex gap-3.5 rounded-[22px] border border-ink/[0.06] bg-white px-5 py-4 shadow-soft">
+          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-terracotta-dark/10" aria-hidden>
+            <Icon name="shieldCheck" size={19} color="#a3471a" />
+          </span>
+          <div>
+            <p className="text-[15px] font-bold text-ink">Only verified ingcibi</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
+              iCamagu is the trust source. An ingcibi&rsquo;s contact details are only shared once they are verified.
+              If yours is not in the app, choose one who is.
+            </p>
+          </div>
+        </div>
         <div className="flex gap-3.5 rounded-[22px] border border-ink/[0.06] bg-white px-5 py-4 shadow-soft">
           <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-sage/10" aria-hidden>
-            <Icon name="shieldCheck" size={19} color="#2e4a2e" />
+            <Icon name="lock" size={18} color="#2e4a2e" />
           </span>
           <div>
             <p className="text-[15px] font-bold text-ink">
@@ -297,8 +305,8 @@ export default function Landing({ onJoin, onSignIn }) {
 
       {/* —— Final call —— */}
       <section className="mx-auto max-w-lg px-5 pb-14 pt-10">
-        <div className="relative overflow-hidden rounded-[30px] bg-[#1c1612] px-6 pb-7 pt-9 text-center text-cream">
-          <img src={CEREMONY_IMAGE.WEDDING} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" loading="lazy" />
+        <div className="relative overflow-hidden rounded-[30px] bg-terracotta-dark px-6 pb-7 pt-9 text-center text-cream">
+          <div aria-hidden="true" className="absolute -right-14 -top-14 h-44 w-44 rounded-full bg-ochre-light/20" />
           <div className="relative">
             <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Masiqale</p>
             <p className="mt-2 font-display text-[1.9rem] font-semibold leading-tight text-balance">
@@ -307,7 +315,7 @@ export default function Landing({ onJoin, onSignIn }) {
             <button
               type="button"
               onClick={onJoin}
-              className="pressable mt-6 min-h-[52px] w-full rounded-full bg-terracotta px-6 text-[16px] font-bold text-white shadow-terracotta"
+              className="pressable mt-6 min-h-[52px] w-full rounded-full bg-cream px-6 text-[16px] font-bold text-terracotta-dark"
             >
               Start planning, free →
             </button>

@@ -9,11 +9,11 @@ const sharedThisVisit = new Set()
 export const wasShared = (plan) => Boolean(plan?.shareToken) || sharedThisVisit.has(plan?.id)
 
 // One message for every share button, so family always get the same clear
-// invitation: see what is needed, then pledge what they will bring (ukugida).
+// invitation: see what is needed, then pledge what they will bring.
 export async function sharePlan({ plan, accessToken, viaWhatsApp }) {
   const { shareUrl } = await request(`/api/ceremonies/plans/${plan.id}/share-link`, accessToken, { method: 'POST' })
   const title = planTitle(plan)
-  const message = `${title}\nI'm preparing this ceremony on iCamagu. See what is still needed and pledge what you'll bring (ukugida):\n${shareUrl}`
+  const message = `${title}\nI'm preparing this ceremony on iCamagu. See what is still needed and pledge what you'll bring:\n${shareUrl}`
   sharedThisVisit.add(plan.id)
   if (!viaWhatsApp && navigator.share) {
     await navigator.share({ title, text: message }).catch(() => {})

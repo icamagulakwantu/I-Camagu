@@ -97,7 +97,7 @@ export default function CeremonyHome({
     { id: 'date', short: 'Date', done: Boolean(ceremony.eventDate), eyebrow: 'Next · Usuku', title: 'Give the ceremony a date', text: 'Family plan travel and leave around it. Your checklist is already waiting.', cta: 'Add the date', icon: 'calendar', onClick: () => onEditStep('when') },
     { id: 'budget', short: 'Budget', done: budgetZAR != null, eyebrow: 'Next · Imali', title: 'Set your budget', text: 'Say how much you can spend. Everything you pay comes off it, so you never overspend.', cta: 'Set my budget', icon: 'coins', onClick: () => onEditStep('money') },
     { id: 'share', short: 'Family', done: shared, eyebrow: 'Next · Yazisa usapho', title: 'Tell the family', text: 'Send the plan to the family group. Relatives see what is still needed and pledge from the link, wherever they live.', share: true },
-    { id: 'pledges', short: 'Pledges', done: pledges.length > 0, eyebrow: 'Next · Ukugida', title: 'Collect the pledges', text: 'As family promise goats, drinks or money, add them here so you know what is covered.', cta: 'Add a pledge', icon: 'gift', onClick: onOpenPledges },
+    { id: 'pledges', short: 'Pledges', done: pledges.length > 0, eyebrow: 'Next · Pledges', title: 'Collect the pledges', text: 'As family promise goats, drinks or money, add them here so you know what is covered.', cta: 'Add a pledge', icon: 'gift', onClick: onOpenPledges },
   ]
   const next = steps.find((s) => !s.done)
 

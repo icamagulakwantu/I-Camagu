@@ -1281,10 +1281,11 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
           </button>
           <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Yonga kunye · Save together</p>
           <h1 className="mt-2 font-display text-[2.3rem] font-semibold leading-[1.04] text-balance">
-            Stokvels: <span className="italic text-ochre-light">we carry each other.</span>
+            Stokvels that <span className="italic text-ochre-light">run properly.</span>
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-cream/85">
-            Save with people you trust, then buy the feast in bulk when your ceremony comes.
+            Simple systems for group savings: a ledger every member can see, approvals, and every contribution,
+            payout and loan interest recorded. Pool together for bulk discounts.
           </p>
         </div>
       </header>
@@ -1340,7 +1341,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
         <EmptyState
           icon="users"
           title="No stokvels yet"
-          description="When the family saves together, the umgidi, the wedding and the next season are already covered. Start one or join with a code above."
+          description="Start your group\u2019s stokvel or join one with a code. Every contribution, payout and loan is recorded, and every member can see the books."
         />
       ) : (
         <>

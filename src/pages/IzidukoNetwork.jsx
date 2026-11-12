@@ -146,7 +146,7 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
         eyebrow="Iziduko · Find your people"
         title="Bloodline,"
         accent="not a database."
-        subtitle="Say your clan names and find relatives, in the Eastern Cape, Joburg or across the world."
+        subtitle="ClanMatch brings long-lost families and siblings back together through iziduko, uniting the Xhosa nation one family at a time."
         onBack={onBack}
       />
 

@@ -4,6 +4,17 @@ import { isAdminEmail } from '../config/admin.js';
 // Configuration
 const MAX_DOC_SIZE_BYTES = 2_000_000; // ~2MB Limit
 
+// The founder's rule: the app is the trust source for ingcibi. An ingcibi
+// who is not yet verified is still listed (so the community can confirm
+// them), but their contact details are withheld, so families can only
+// reach a verified one.
+export const CONTACT_REQUIRES_VERIFICATION = new Set(['INGCIBI']);
+
+export function publicPractitioner(p) {
+  if (p.isVerified || !CONTACT_REQUIRES_VERIFICATION.has(p.role)) return p;
+  return { ...p, contactInfo: null, contactWithheld: true };
+}
+
 /**
  * Fetch practitioners filtered by role and area, prioritizing verified profiles
  */
@@ -29,7 +40,7 @@ export async function getPractitioners(req, res) {
       },
     });
 
-    res.json(practitioners);
+    res.json(practitioners.map(publicPractitioner));
   } catch (error) {
     console.error('Get practitioners error:', error.message);
     res.status(500).json({ error: 'Could not fetch practitioners' });

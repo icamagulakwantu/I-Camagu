@@ -3,6 +3,8 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
+import HeroHeader from '../components/ui/HeroHeader.jsx'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 const CATEGORIES = ['CLOTHING', 'BEDDING', 'TOILETRIES', 'OTHER']
 
@@ -54,15 +56,18 @@ function Ukusoka({ onBack }) {
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-10 pb-6 rounded-b-[2.5rem]">
-        <button onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
-        <h1 className="font-display font-bold text-2xl">Ukusoka</h1>
-        <p className="text-white/70 text-sm mt-1">What the initiate receives — clothes, bedding, and more from family and community.</p>
-      </div>
+      <HeroHeader
+        image={CEREMONY_IMAGE.ULWALUKO}
+        eyebrow="Ukusoka · Gifts for the initiate"
+        title="Everything he receives,"
+        accent="recorded."
+        subtitle="Clothes, bedding and more from family and community, written down so nothing is forgotten and every giver is thanked."
+        onBack={onBack}
+      />
 
-      <div className="px-4 mt-4">
+      <div className="relative z-10 -mt-12 px-4">
         <input placeholder="Who is being gifted? (initiate's name)" value={initiateName} onChange={(e) => setInitiateName(e.target.value)}
-          className="w-full border-2 border-terracotta/20 rounded-soft px-3 py-2.5 text-sm mb-3 bg-white" />
+          className="mb-3 h-14 w-full rounded-[20px] border border-ink/[0.06] bg-white px-4 text-[15px] shadow-[0_16px_36px_-18px_rgba(28,22,18,0.45)] focus:border-terracotta focus:outline-none" />
 
         <button onClick={() => setShowForm(!showForm)} disabled={!initiateName}
           className="w-full bg-sage-500 text-white font-bold py-3 rounded-pill mb-4 disabled:opacity-40">

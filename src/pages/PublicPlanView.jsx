@@ -5,7 +5,7 @@ const inputClass = 'w-full h-12 rounded-2xl border-2 border-cream-dark bg-white 
 const EMPTY = { pledgerName: '', relationship: '', pledgedItem: '', pledgedAmountZAR: '' }
 
 // Public copy of a ceremony shared by the host. Family see what is still
-// needed and can pledge what they will bring (ukugida) with no account. The
+// needed and can pledge what they will bring with no account. The
 // pledge list is anonymous here: only the host sees names and amounts.
 function PublicPlanView({ token }) {
   const [plan, setPlan] = useState(null)
@@ -152,7 +152,7 @@ function PublicPlanView({ token }) {
           ) : (
             <form onSubmit={submit} className="space-y-3">
               <div>
-                <p className="eyebrow text-sage-700">Ukugida · Pledge</p>
+                <p className="eyebrow text-sage-700">Isithembiso · Pledge</p>
                 <h2 className="font-display text-xl font-semibold text-ink">What will you bring?</h2>
               </div>
               <input className={inputClass} placeholder="Your name (e.g. Uncle Sipho)" value={form.pledgerName} onChange={(e) => setForm((f) => ({ ...f, pledgerName: e.target.value }))} maxLength={60} />

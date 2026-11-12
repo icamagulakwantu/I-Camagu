@@ -7,6 +7,8 @@ import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { cn } from '../lib/utils'
 import Icon from '../components/Icon.jsx'
 import ScrollableLabel from '../components/ScrollableLabel.jsx'
+import HeroHeader from '../components/ui/HeroHeader.jsx'
+import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
@@ -120,24 +122,24 @@ export default function Ukugida({ onBack }) {
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-sage-500 to-sage-600 text-white px-5 pt-12 pb-8 rounded-b-[2.5rem] relative overflow-hidden">
-        <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
-        <div className="relative">
-          <button type="button" onClick={onBack} className={`text-sm text-white/70 mb-3 block ${pressable}`}>← Back</button>
-          <h1 className="font-display font-bold text-3xl">Gift exchange</h1>
-          <p className="text-white/80 text-sm mt-1">Gifts your family has given and received, so they can be returned in kind. A ceremony's own pledges are on its page.</p>
-          <div className="mt-4 bg-white/10 backdrop-blur rounded-soft p-3 border border-white/20">
-            <p className="text-xs font-bold text-white/70 uppercase tracking-wider">Net Balance</p>
+      <HeroHeader
+        image={CEREMONY_IMAGE.WEDDING}
+        eyebrow="Ukugida · Gift exchange"
+        title="What they bring,"
+        accent="what you return."
+        subtitle="Ukugida is the gift extended family, friends and community bring when they come to your ceremony, or send with someone to drop off: usually a bottle, or a case of beer or cider. Keep a record, so you can return it in kind at theirs."
+        onBack={onBack}
+      >
+          <div className="mt-5 rounded-[20px] border border-cream/15 bg-white/10 p-3.5 backdrop-blur-sm">
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/75">Net balance</p>
             <p className={cn(
-              'font-display font-bold text-2xl mt-1',
-              balance >= 0 ? 'text-white' : 'text-terracotta-light'
+              'font-display font-semibold text-2xl mt-1',
+              balance >= 0 ? 'text-cream' : 'text-ochre-light'
             )}>
               {balance >= 0 ? '+' : ''}{balance} items
             </p>
           </div>
-        </div>
-      </div>
+      </HeroHeader>
 
       {/* Toggle */}
       <div className="px-4 mt-5">
@@ -306,7 +308,7 @@ export default function Ukugida({ onBack }) {
           <EmptyState
             emoji="🎁"
             title="No entries yet"
-            description="Track what your family gives and receives. Build reciprocity for generations."
+            description="Record the bottles and cases guests bring to your ceremonies, and what you take to theirs."
             primaryLabel="Record First Gift"
             onPrimary={() => setShowForm(true)}
             className="border-2 border-terracotta/25"
