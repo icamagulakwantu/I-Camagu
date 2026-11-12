@@ -65,6 +65,18 @@ function sendQuietly(message, label) {
 
 // A real bcrypt hash of a random password, so a sign-in attempt for an email
 // with no account does the same slow check as one with an account.
+// Registration and password reset must not reveal whether an email already
+// has an account through how long the reply takes. Both paths do the same
+// slow password hash, and the reply is never sent sooner than this floor,
+// which hides the remaining difference in database work. Tests use 0.
+export const ACCOUNT_REPLY_FLOOR_MS = Number(process.env.ACCOUNT_REPLY_FLOOR_MS
+  ?? (process.env.NODE_ENV === 'test' ? 0 : 900));
+
+async function waitUntilFloor(startedAt) {
+  const remaining = ACCOUNT_REPLY_FLOOR_MS - (Date.now() - startedAt);
+  if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
+}
+
 let dummyHashPromise = null;
 function dummyHash() {
   if (!dummyHashPromise) dummyHashPromise = hashPassword(crypto.randomBytes(16).toString('hex'));
@@ -109,20 +121,21 @@ export async function registerWithPassword(req, res) {
     return res.status(403).json({ error: 'Administrator accounts must use verified Google sign-in. Contact support if you need access restored.' });
   }
 
+  const startedAt = Date.now();
   try {
-    // Still reveals that an account exists (SEC-02 residual): fixing that needs
-    // an email-confirmation step on sign-up. Rate limited by authLimiter.
     const existing = await prisma.user.findUnique({ where: { email: cleanEmail(email).toLowerCase() } });
+    // Hash on both paths, so an existing address is not answered faster.
+    const passwordHash = await hashPassword(password);
     if (existing) {
       // Keep registration from revealing whether an email is registered. A
       // code is sent to the owner of that address; entering it follows the
       // normal OTP login path and never changes the existing password.
       const code = await createOtp(existing.id);
       sendQuietly({ from: FROM_ADDRESS, to: existing.email, subject: 'Your iCamagu login code', html: otpEmail(code) }, 'Registration existing-account code');
+      await waitUntilFloor(startedAt);
       return res.status(201).json({ needsEmailVerification: true, message: 'If you can use this email, check your inbox for a code to continue.' });
     }
 
-    const passwordHash = await hashPassword(password);
     const user = await prisma.user.create({
       data: { email: cleanEmail(email).toLowerCase(), passwordHash, firstName, lastName, paternalIziduko: paternalIziduko || null, maternalIziduko: maternalIziduko || null, emailVerificationRequired: true, signupSource: cleanCampaignSource(signupSource) },
     });
@@ -138,6 +151,7 @@ export async function registerWithPassword(req, res) {
       html: `<p>Welcome to iCamagu.</p><p>Enter this 6-digit code to verify your email and finish creating your account:</p><h2>${code}</h2><p>The code expires in 10 minutes. If you did not create this account, ignore this email.</p>`,
     }, 'Registration verification');
     // Do not issue a session until the person proves they control the email.
+    await waitUntilFloor(startedAt);
     res.status(201).json({ needsEmailVerification: true, message: 'If you can use this email, check your inbox for a code to continue.' });
   } catch (error) {
     console.error('Register with password error:', error.message);
@@ -271,12 +285,14 @@ export async function register(req, res) {
 export async function login(req, res) {
   const email = cleanEmail(req.body?.email).toLowerCase();
   if (!email) return res.status(400).json({ error: 'Email is required' });
+  const startedAt = Date.now();
   try {
     const user = await prisma.user.findUnique({ where: { email } });
     if (user) {
       const code = await createOtp(user.id);
       sendQuietly({ from: FROM_ADDRESS, to: email, subject: 'Your iCamagu login code', html: otpEmail(code) }, 'Login code');
     }
+    await waitUntilFloor(startedAt);
     res.json({ message: OTP_SENT_MESSAGE });
   } catch (error) {
     console.error('Login error:', error.message);
@@ -392,9 +408,13 @@ export async function requestPasswordReset(req, res) {
     return res.json(genericReply);
   }
 
+  const startedAt = Date.now();
   try {
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || !user.passwordHash) return res.json(genericReply);
+    if (!user || !user.passwordHash) {
+      await waitUntilFloor(startedAt);
+      return res.json(genericReply);
+    }
 
     const rawToken = crypto.randomBytes(32).toString('hex');
     const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
@@ -415,6 +435,7 @@ export async function requestPasswordReset(req, res) {
              <p>If you didn't request this, you can safely ignore this email.</p>`,
     }, 'Password reset');
 
+    await waitUntilFloor(startedAt);
     res.json(genericReply);
   } catch (error) {
     console.error('Request password reset error:', error.message);
