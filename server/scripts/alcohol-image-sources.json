@@ -25,7 +25,6 @@
   { "product": "Pongracz Brut", "slug": "pongracz-brut", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Wine/White-Wine/White-Blends/Pongr%C3%A1cz-Brut-Cap-Classique-Bottle-750ml/p/10131303EA" },
   { "product": "Krone Borealis Brut (MCC)", "slug": "krone-borealis-brut", "sourceUrl": "https://www.woolworths.co.za/prod/_/A-6005176000018" },
   { "product": "JC Le Roux Le Domaine", "slug": "jc-le-roux-le-domaine", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Wine/Champagne-and-Sparkling-Wine/White-Sparkling-Wine/J-C-Le-Roux-Le-Domaine-Premium-Sparkling-White-Wine-Bottles-6-x-750ml/p/10145891PK2" },
-
   { "product": "Absolut Original Blue", "slug": "absolut-original-blue", "sourceUrl": "https://www.bjs.com/product/absolut-vodka-750ml/3000000000001708051", "imageOnly": true, "note": "Foreign (US) retailer — image only, per the founder: never used as a price source. Real cost/retail pricing comes from Makro/Ultra in person." },
   { "product": "Smirnoff Red No. 21", "slug": "smirnoff-red-no21", "sourceUrl": "https://www.ocado.com/products/smirnoff-red-label-vodka/16600011", "imageOnly": true, "note": "Foreign (UK) retailer — image only." },
   { "product": "Tanqueray London Dry Export", "slug": "tanqueray-london-dry-export", "sourceUrl": "https://www.target.com/p/tanqueray-london-dry-gin-750ml-bottle/-/A-13355117", "imageOnly": true, "note": "Foreign (US) retailer — image only." },
@@ -37,7 +36,6 @@
   { "product": "El Jimador Blanco/Reposado", "slug": "el-jimador-blanco", "sourceUrl": "https://www.totalwine.com/spirits/tequila/blancosilver/el-jimador-blanco-tequila/p/104417750", "imageOnly": true, "note": "Foreign (US) retailer, Blanco variant shown — image only." },
   { "product": "Baileys Original Irish Cream", "slug": "baileys-original-irish-cream", "sourceUrl": "https://www.lcbo.com/en/baileys-original-irish-cream-5959", "imageOnly": true, "note": "Foreign (Canada) retailer — image only." },
   { "product": "Kahlua Coffee Liqueur", "slug": "kahlua-coffee-liqueur", "sourceUrl": "https://www.target.com/p/-/A-13396903", "imageOnly": true, "note": "Foreign (US) retailer — image only. This target.com URL has no product slug, so it's more likely than the others to fail; if it does, grab the photo by hand." },
-
   { "product": "Bisquit & Dubouche VS", "slug": "bisquit-dubouche-vs", "sourceUrl": "https://www.woolworths.co.za/prod/WCellar/Spirits/Brandy-Cognac/Bisquit-Dubouch-V-S-Cognac-750-ml/_/A-3700637900670" },
   { "product": "Cape Velvet Cream", "slug": "cape-velvet-cream", "sourceUrl": "https://www.agrimark.co.za/product/cape-velvet-750ml" },
   { "product": "Sambuca Lupini Black/Gold", "slug": "sambuca-lupini-black-gold", "sourceUrl": "https://www.woolworths.co.za/prod/WCellar/Spirits/Other-Spirits/Liqueurs-Aperitif/Lupini-Black-Sambuca-750-ml/_/A-6001398117770" },
@@ -51,12 +49,10 @@
   { "product": "Hunter's Dry/Gold", "slug": "hunters-dry-gold", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Beer-and-Cider/Cider/Hunter%27s-Gold-Cider-Can-440ml/p/10450253EA", "note": "Gold variant shown — the SKU name covers Dry/Gold as one line." },
   { "product": "Smirnoff Spin/Storm", "slug": "smirnoff-spin-storm", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Spirit-Coolers/Spirit-and-Wine-Coolers/Fruit-Spirit-Coolers/Smirnoff-Storm-Berry-Twist-Spirit-Cooler-Cans-6-x-440ml/p/10616794PK1", "note": "Storm Berry Twist variant shown — the SKU name covers Spin/Storm as one line." },
   { "product": "Strongbow Gold/Apple", "slug": "strongbow-gold-apple", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Beer-and-Cider/Cider/Strongbow-Gold-Apple-Cider-Cans-6-x-440ml/p/10532805PK1" },
-
   { "product": "Savanna Dry/Light", "slug": "savanna-dry-light", "sourceUrl": "https://www.woolworths.co.za/prod/A-6001108045171", "needsReview": true, "note": "Source page shows glass BOTTLES — our SKU only has Can/Dumpy/Quart variants, no bottle format at all. Visually a different container. Download for a look, don't apply blind." },
   { "product": "Sol", "slug": "sol", "sourceUrl": "https://www.woolworths.co.za/prod/WCellar/Beer-Cider/Sol-Beer-Bottles-6-x-330ml/_/A-6009705712625", "needsReview": true, "note": "Same issue as Savanna Dry/Light — source is glass bottles, our SKU is Can/Dumpy only." },
   { "product": "Flowstone African Bush Botanical", "slug": "flowstone-african-bush-botanical", "sourceUrl": "https://www.wineofthemonth.co.za/flowstone-marula-gin-750ml", "needsReview": true, "note": "Source page is the Marula variant of Flowstone gin, not 'African Bush Botanical' by name — could be a different product in the same range. Confirm before using." },
   { "product": "Jameson Original Irish", "slug": "jameson-original-irish", "sourceUrl": "https://leonandsonwine.com/collections/scotch-irish-japanese-whisky/products/jameson-irish-whiskey-750ml", "needsReview": true, "note": "Unfamiliar retailer domain — couldn't confirm this is a legitimate, currently-operating wine retailer. Confirm the site and photo before using." },
-
   { "product": "Wyborowa Vodka", "slug": "wyborowa-vodka", "sourceUrl": "https://www.thewhiskyexchange.com/p/73014/wyborowa-vodka", "imageOnly": true, "note": "Foreign (UK) retailer — image only." },
   { "product": "Disaronno Amaretto Liqueur", "slug": "disaronno-amaretto", "sourceUrl": "https://www.totalwine.com/spirits/deals/liqueurs-cordials-schnapps/nuts-amaretto/disaronno-originale-amaretto-liqueur/p/489750", "imageOnly": true, "note": "Foreign (US) retailer — image only." },
   { "product": "Jagermeister Herbal Liqueur", "slug": "jagermeister-herbal-liqueur", "sourceUrl": "https://www.target.com/p/-/A-14777656", "imageOnly": true, "note": "Foreign (US) retailer — image only." },
@@ -65,11 +61,9 @@
   { "product": "Tequila Rose Cream Liqueur", "slug": "tequila-rose-cream-liqueur", "sourceUrl": "https://www.dublinandcorkdutyfree.ie/alcohol/spirits/international-spirits/tequila-rose-liqueur-/389645.html", "imageOnly": true, "note": "Foreign (Ireland) retailer — image only." },
   { "product": "Drambuie Honey/Scotch", "slug": "drambuie-honey-scotch", "sourceUrl": "https://www.walmart.com/ip/Drambuie-Scotch-Whisky-Liqueur-750ml-Glass-Bottle-40-ABV-80-Proof/430478069", "imageOnly": true, "note": "Foreign (US) retailer — image only." },
   { "product": "Frangelico Hazelnut Liqueur", "slug": "frangelico-hazelnut-liqueur", "sourceUrl": "https://www.totalwine.com/spirits/liqueurscordialsschnapps/nuts-amaretto/frangelico/p/2781750", "imageOnly": true, "note": "Foreign (US) retailer — image only." },
-
   { "product": "Tanqueray Flor de Sevilla", "slug": "tanqueray-flor-de-sevilla", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Spirits-and-Liqueurs/Gin/Tanqueray-Gin-Flor-De-Sevilla-750ml/p/10702534EA" },
   { "product": "Belgravia G&T (Asstd)", "slug": "belgravia-gt", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Spirit-Coolers/Spirit-and-Wine-Coolers/Spirit-Premixes/Belgravia-Gin-and-Dry-Lemon-Cans-24-x-440ml/p/10711431PK2", "note": "Source shows a 440ml can; our SKU is Can (500ml) / Dumpy (275ml) — same can-format look, volume label differs. No source found closer to either exact size." },
   { "product": "Ponchos Blanco/Caramel Tequila", "slug": "ponchos-tequila", "sourceUrl": "https://www.danmurphys.com.au/product/DM_769367/ponchos-1910-caramel-tequila-750ml", "imageOnly": true, "note": "Foreign (Australia) retailer, Caramel variant shown — image only." },
-
   { "product": "Wellington VO", "slug": "wellington-vo", "sourceUrl": "https://www.makro.co.za/wellington-vo-brandy/p/itm301775be1aca7" },
   { "product": "Moet & Chandon Imperial Brut", "slug": "moet-chandon-imperial-brut", "sourceUrl": "https://www.makro.co.za/moet-chandon-imperial-brut-champagne-sparkling-wine/p/itm194cb314a6b0d" },
   { "product": "Kopparberg Strawberry/Lime", "slug": "kopparberg-strawberry-lime", "sourceUrl": "https://www.makro.co.za/kopparberg-strawberry-lime-cider/p/itm740db0185ece0" },
@@ -92,7 +86,6 @@
   { "product": "Belvedere Pure Vodka", "slug": "belvedere-pure-vodka", "sourceUrl": "https://mothercityliquor.co.za/products/belvederevodka750ml" },
   { "product": "Grey Goose Luxury", "slug": "grey-goose-luxury", "sourceUrl": "https://mothercityliquor.co.za/products/greygoose750ml" },
   { "product": "Chivas Regal 12 Year Old", "slug": "chivas-regal-12yo", "sourceUrl": "https://mothercityliquor.co.za/collections/all/products/chivasregal12yo" },
-
   { "product": "Veuve Clicquot Yellow Label", "slug": "veuve-clicquot-yellow-label", "sourceUrl": "https://shop.captains.co.za/en-za/spirits/brands=veuve-clicquot/", "needsReview": true, "note": "This is a brand category/listing page, not a single product page — its og:image is likely a generic banner, not the bottle. Confirm before using." },
   { "product": "Breezer (Red/Watermelon)", "slug": "breezer-red-watermelon", "sourceUrl": "https://www.makro.co.za/liquor/beer-cider/ready-to-drink/breezer~brand/pr?sid=lqw%2Coru%2Cder", "needsReview": true, "note": "Category/search results page, not a single product page. Also only Watermelon variant confirmed, not Red." },
   { "product": "Bisquit & Dubouche VSOP", "slug": "bisquit-dubouche-vsop", "sourceUrl": "https://shop.captains.co.za/en-za/cognac/", "needsReview": true, "note": "Category page, not a single product page — and only a 6/case option was found (we need 12/case)." },
@@ -106,7 +99,6 @@
   { "product": "Johnnie Walker Double Black", "slug": "johnnie-walker-double-black", "sourceUrl": "https://mothercityliquor.co.za/collections/scotch-whisky?grid_list=grid-view&page=1", "needsReview": true, "note": "Category page, not a single product page." },
   { "product": "Patron Reposado", "slug": "patron-reposado", "sourceUrl": "https://www.makro.co.za/liquor/spirits/tequila/pr?sid=all%2Clqw%2Cihq%2Cmc7", "needsReview": true, "note": "Category page, not a single product page." },
   { "product": "Firstwatch Whisky", "slug": "firstwatch-whisky", "sourceUrl": "https://firstwatchwhisky.co.za/", "needsReview": true, "note": "Brand homepage, not a product page — its own site doesn't expose a separate product URL." },
-
   { "product": "Banana Liqueur (Butlers)", "slug": "banana-liqueur-butlers", "sourceUrl": "https://shop.captains.co.za/en-za/spirits/butlers-banana-creme-de-liqueur-750ml-butlba750" },
   { "product": "Blue Curacao (Butlers)", "slug": "blue-curacao-butlers", "sourceUrl": "https://shop.captains.co.za/en-za/spirits/butlers-blue-curacao-liqueur-750ml-butlbl750" },
   { "product": "Cherry Kirsch Liqueur (Butlers)", "slug": "cherry-kirsch-liqueur-butlers", "sourceUrl": "https://shop.captains.co.za/en-za/spirits/butlers-cherry-kirsch-liqueur-750ml-butlch750" },
@@ -118,7 +110,6 @@
   { "product": "Van Der Hum Tangerine (Butlers)", "slug": "van-der-hum-tangerine-butlers", "sourceUrl": "https://shop.captains.co.za/en-za/spirits/butlers-van-der-hum-liqueur-750ml-butlv750" },
   { "product": "Blue Curacao (Peddler's)", "slug": "blue-curacao-peddlers", "sourceUrl": "https://shop.captains.co.za/en-za/spirits/peddler-blue-curacao-liqueur-750ml-pedlbc750" },
   { "product": "Triple Sec (Peddler's)", "slug": "triple-sec-peddlers", "sourceUrl": "https://mothercityliquor.co.za/products/peddlers-triple-sec-liqueur" },
-
   { "product": "Monin Agave", "slug": "monin-agave", "sourceUrl": "https://shop.captains.co.za/en-za/monin-agave-700ml-moniag700" },
   { "product": "Monin Almond Orgeat", "slug": "monin-almond-orgeat", "sourceUrl": "https://shop.captains.co.za/en-za/monin-almond-orgeat-700ml-monial700" },
   { "product": "Monin Blue Curaçao Syrup", "slug": "monin-blue-curacao-syrup", "sourceUrl": "https://shop.captains.co.za/en-za/monin-blue-curacao-syrup-700ml-328-moniblc700" },
@@ -133,7 +124,6 @@
   { "product": "Monin Popcorn", "slug": "monin-popcorn", "sourceUrl": "https://shop.captains.co.za/en-za/cold-drinks/monin-popcorn-700ml-monipoc700" },
   { "product": "Monin White Chocolate", "slug": "monin-white-chocolate", "sourceUrl": "https://shop.captains.co.za/en-za/monin-white-chocolate-700ml-moniwccb700" },
   { "product": "Monin Spicy Mango", "slug": "monin-spicy-mango", "sourceUrl": "https://shop.captains.co.za/en-us/cold-drinks/monin-spicy-mango-700ml-monispm700", "note": "Distributor confirms this flavour exists but flags it as not in the current first-page SA assortment — check it's still actually stocked before relying on it." },
-
   { "product": "Castle Lager", "slug": "castle-lager", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Beer-and-Cider/Beer/Castle-Lager-Beer-Bottles-24-x-330ml/p/10131238PK2", "note": "Replaces an old generic logo badge with a real photo. Source shows 330ml bottles; our SKU is a 500ml can — closest found, same brand." },
   { "product": "Castle Lite", "slug": "castle-lite", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Beer-and-Cider/Beer/Castle-Lite-Beer-Cans-24-x-410ml/p/10743021PK2", "note": "Replaces an old generic logo badge. Source shows 410ml cans vs our 500ml can — same can format, closest found." },
   { "product": "Castle Milk Stout", "slug": "castle-milk-stout", "sourceUrl": "https://www.shoprite.co.za/All-Departments/Drinks/Beer-and-Cider/Stout/Castle-Milk-Stout-Bottles-12-x-750ml-/p/10125601PK1", "note": "Replaces an old generic logo badge. Exact match to our Quart (750ml) format." },
@@ -146,5 +136,11 @@
   { "product": "Lion Lager", "slug": "lion-lager", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Beer-and-Cider/Beer/Lion-Lager-Beer-Can-500ml/p/10541860EA", "note": "Replaces an old generic logo badge. Exact match — Can 500ml." },
   { "product": "Hansa Pilsener", "slug": "hansa-pilsener", "sourceUrl": "https://www.pnp.co.za/hansa-pilsener-local-beer-24-x-330ml/p/000000000000500369_CS", "note": "Replaces an old generic logo badge. Source shows a 330ml can vs our 500ml can — closest found." },
   { "product": "Guinness Foreign Extra", "slug": "guinness", "sourceUrl": "https://www.mcgrocer.ae/products/guinness-foreign-extra-stout-beer-bottle", "imageOnly": true, "note": "Replaces an old generic logo badge. Foreign (UAE) retailer, image only — 330ml bottle vs our 500ml can, closest found." },
-  { "product": "Budweiser", "slug": "budweiser", "sourceUrl": "https://www.ubereats.com/store/londis-bucaneer/rO3daaScVBave8IOESLxZA/70fd4d3c-bcd3-56e7-bb08-7b1fd9f8376f/70fd4d3c-bcd3-56e7-bb08-7b1fd9f8376f/e3a692b6-3e05-597b-9cf7-b0d8f181aa6f", "imageOnly": true, "note": "Replaces an old generic logo badge. UK Uber Eats listing (founder-approved source) — 660ml bottle vs our 500ml can, closest found." }
+  { "product": "Budweiser", "slug": "budweiser", "sourceUrl": "https://www.ubereats.com/store/londis-bucaneer/rO3daaScVBave8IOESLxZA/70fd4d3c-bcd3-56e7-bb08-7b1fd9f8376f/70fd4d3c-bcd3-56e7-bb08-7b1fd9f8376f/e3a692b6-3e05-597b-9cf7-b0d8f181aa6f", "imageOnly": true, "note": "Replaces an old generic logo badge. UK Uber Eats listing (founder-approved source) — 660ml bottle vs our 500ml can, closest found." },
+  { "product": "Valpre Sparkling Water", "slug": "valpre-sparkling-water-1l", "expectedFormat": "1L", "sourceUrl": "https://www.shoprite.co.za/All-Departments/Drinks/Bottled-Water/Sparkling-Water/Valpr%C3%A9-Sparkling-Spring-Water-1L/p/10125367EA", "note": "Valpre Sparkling Spring Water 1L single bottle (12 Nov 2026)." },
+  { "product": "Valpre Still Water", "slug": "valpre-still-water-1-5l", "expectedFormat": "1.5L", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Bottled-Water/Still-Water/Valpr%C3%A9-Still-Spring-Water-1-5L/p/10126530EA", "note": "Valpre Still Spring Water 1.5L single bottle (12 Nov 2026)." },
+  { "product": "Valpre Still Water", "slug": "valpre-still-water-500ml", "expectedFormat": "500ml", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Bottled-Water/Still-Water/Valpr%C3%A9-Still-Spring-Water-6-x-500ml/p/10130000PK1", "note": "Valpre Still Spring Water 6 x 500ml pack (12 Nov 2026)." },
+  { "product": "Tsitsikamma Still Water", "slug": "tsitsikamma-still-water-1-5l", "expectedFormat": "1.5L", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Bottled-Water/Still-Water/Tsitsikamma-Still-Spring-Water-1-5L/p/10177867EA", "note": "Tsitsikamma Still Spring Water 1.5L single bottle (12 Nov 2026)." },
+  { "product": "Tsitsikamma Still Water", "slug": "tsitsikamma-still-water-500ml", "expectedFormat": "500ml", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Bottled-Water/Still-Water/Tsitsikamma-Still-Spring-Water-6-x-500ml/p/10175558PK1", "note": "Tsitsikamma Still Spring Water 6 x 500ml pack (12 Nov 2026)." },
+  { "product": "Tsitsikamma Sparkling Water", "slug": "tsitsikamma-sparkling-water-500ml", "expectedFormat": "500ml", "sourceUrl": "https://www.checkers.co.za/All-Departments/Drinks/Bottled-Water/Sparkling-Water/Tsitsikamma-Sparkling-Spring-Water-6-x-500ml/p/10175553PK1", "note": "Tsitsikamma Sparkling Spring Water 6 x 500ml pack (12 Nov 2026)." }
 ]

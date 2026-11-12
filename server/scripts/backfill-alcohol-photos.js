@@ -32,6 +32,8 @@ const MANIFEST_PATH = path.join(__dirname, 'alcohol-image-sources.json');
 const args = process.argv.slice(2);
 const FORCE = args.includes('--force');
 const INCLUDE_FLAGGED = args.includes('--include-flagged');
+// --only=slug-a,slug-b processes just those manifest entries.
+const ONLY = (args.find((a) => a.startsWith('--only=')) || '').slice('--only='.length).split(',').map((s) => s.trim()).filter(Boolean);
 
 // Real retailer product pages return their photo in the standard e-commerce
 // og:image meta tag — the same convention every major SA retailer (Checkers,
@@ -141,7 +143,9 @@ async function processEntry(entry) {
 }
 
 async function main() {
-  const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+  const allEntries = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+  const manifest = ONLY.length ? allEntries.filter((entry) => ONLY.includes(entry.slug)) : allEntries;
+  if (ONLY.length) console.log(`Only processing ${manifest.length} of ${allEntries.length} entries: ${ONLY.join(', ')}`);
   let failures = 0;
   for (const entry of manifest) {
     try {
