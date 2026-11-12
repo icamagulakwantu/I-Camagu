@@ -10,7 +10,7 @@ import { buildListRows, countProgress } from '../../shared/ceremonyList.js'
 import { request } from './ceremony/api.js'
 import Bi from './ceremony/Bi.jsx'
 import ShoppingList from './ceremony/ShoppingList.jsx'
-import Summary from './ceremony/Summary.jsx'
+import CeremonyHome from './ceremony/CeremonyHome.jsx'
 import Pledges from './ceremony/Pledges.jsx'
 import { typeName } from './ceremony/ceremonyMeta.js'
 import { formatDate } from './ceremony/format.js'
@@ -35,7 +35,7 @@ const planProgress = (plan) => countProgress(buildListRows({
 // A guided plan: What, When, Who is coming, Money, Shopping list, then a
 // summary where any section can be tapped to edit. Props are unchanged from
 // the old planner so App.jsx needs no edit.
-export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, onBookEkoyini, selectedCeremonyId }) {
+export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, onViewBudget, onBookEkoyini, onOpenTool, selectedCeremonyId }) {
   const { accessToken } = useAuth()
   const { setActiveCeremony } = useCommunity()
   const { showToast } = useToast()
@@ -214,7 +214,27 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     return <Pledges plan={activePlan} accessToken={accessToken} pledges={pledges} setPledges={setPledges} onBack={() => setShowPledges(false)} />
   }
 
-  // ----- Guided steps and summary -----
+  // ----- The ceremony page -----
+  if (activePlan && stepId === 'summary') {
+    return (
+      <CeremonyHome
+        plan={activePlan}
+        pledges={pledges}
+        accessToken={accessToken}
+        onBack={onBack}
+        onEditStep={editStep}
+        onOpenPledges={() => setShowPledges(true)}
+        onViewTimeline={onViewTimeline}
+        onViewBudget={onViewBudget}
+        onBookEkoyini={onBookEkoyini}
+        onOpenHierarchy={(ceremonyId) => onOpenTool?.('hierarchy', ceremonyId)}
+        onNavigate={(tool) => onOpenTool?.(tool, activePlan.ceremonyId)}
+        onDeleted={handleDeleted}
+      />
+    )
+  }
+
+  // ----- Guided steps -----
   if (activePlan || creating) {
     const step = STEPS[stepIndex]
     const FormStep = STEP_COMPONENTS[stepId]
@@ -264,19 +284,6 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
             legacyItems={activePlan.checklistItems || []}
             onEditBudget={() => editStep('money')}
             onItemsChanged={syncPlanItems}
-          />
-        )}
-
-        {stepId === 'summary' && (
-          <Summary
-            plan={activePlan}
-            pledges={pledges}
-            accessToken={accessToken}
-            onEditStep={editStep}
-            onOpenPledges={() => setShowPledges(true)}
-            onViewTimeline={onViewTimeline}
-            onBookEkoyini={onBookEkoyini}
-            onDeleted={handleDeleted}
           />
         )}
 

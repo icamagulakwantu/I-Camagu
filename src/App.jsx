@@ -189,10 +189,13 @@ function MainApp() {
   const [clanGroupId, setClanGroupId] = useState(null)
   // Hierarchy: optionally pre-select a ceremony from CeremonyHub
   const [hierarchyCeremonyId, setHierarchyCeremonyId] = useState(null)
+  // Set while a tool was opened from a ceremony page, so Back returns there.
+  const [returnToCeremonyId, setReturnToCeremonyId] = useState(null)
 
   // Keep the browser address in sync with screen navigation so refresh, share
   // and the browser back button return to a meaningful place in the app.
   const setScreen = (nextScreen) => {
+    setReturnToCeremonyId(null)
     setScreenState(nextScreen)
     navigate(SCREEN_PATHS[nextScreen] || '/')
   }
@@ -291,6 +294,18 @@ function MainApp() {
     navigate(groupId ? '/me/clan-groups/' + encodeURIComponent(groupId) : '/me/clan-groups')
   }
 
+  // Tools opened from a ceremony page (who brings what, umqombothi, healers)
+  // return to that ceremony when their back button is pressed.
+  const openToolFromCeremony = (tool, ceremonyId) => {
+    if (tool === 'hierarchy') setHierarchyCeremonyId(ceremonyId || null)
+    setScreen(tool)
+    if (tool !== 'store') setReturnToCeremonyId(ceremonyId || null)
+  }
+  const backFromTool = () => {
+    if (returnToCeremonyId) openExistingCeremony(returnToCeremonyId)
+    else goMore()
+  }
+
   // Open Hierarchy, optionally with a pre-selected ceremony
   const openHierarchyForCeremony = (ceremonyId) => {
     setHierarchyCeremonyId(ceremonyId || null)
@@ -346,6 +361,7 @@ function MainApp() {
             onViewTimeline={openTimeline}
             onViewBudget={openBudget}
             onBookEkoyini={openEkoyiniBooking}
+            onOpenTool={openToolFromCeremony}
             selectedCeremonyId={selectedCeremonyId}
           />
         )
@@ -400,7 +416,7 @@ function MainApp() {
       case 'demandadmin':
         return <DemandDashboard onBack={goMore} />
       case 'hierarchy':
-        return <Hierarchy onBack={goMore} initialCeremonyId={hierarchyCeremonyId} />
+        return <Hierarchy onBack={backFromTool} initialCeremonyId={hierarchyCeremonyId} />
       case 'myorders':
         return <MyOrders onBack={() => setScreen('store')} />
       case 'expenditure':
@@ -410,9 +426,9 @@ function MainApp() {
       case 'legends':
         return <LegendsExplore onBack={goMore} />
       case 'directory':
-        return <Directory onBack={goMore} />
+        return <Directory onBack={backFromTool} />
       case 'umqombothi':
-        return <UmqombothiCalculator onBack={goMore} />
+        return <UmqombothiCalculator onBack={backFromTool} />
       case 'pin':
         return <PinSetup onBack={goMore} />
       case 'stokvels':

@@ -13,7 +13,9 @@ const ACTION_BUTTON = 'group flex min-w-0 flex-col items-center justify-center g
 // Everything a host can do with a finished plan: save it as a template, open
 // the timeline, book the bar, share it, or delete it. Sharing is owned by the
 // Summary (onShare) so the journey map ticks "Share" as soon as it is sent.
-export default function SummaryActions({ plan, accessToken, onShare, onViewTimeline, onBookEkoyini, onDeleted }) {
+// variant="manage" shows only Save as template and Delete: the ceremony page
+// already offers sharing, the timeline and the bar elsewhere.
+export default function SummaryActions({ plan, accessToken, onShare, onViewTimeline, onBookEkoyini, onDeleted, variant = 'full' }) {
   const { showToast } = useToast()
   const [templateOpen, setTemplateOpen] = useState(false)
   const [templateTitle, setTemplateTitle] = useState('')
@@ -53,8 +55,18 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
     }
   }
 
+  const manage = variant === 'manage'
+
   return (
     <div className="space-y-3">
+      {manage && (
+        <button type="button" onClick={openTemplate} className={cn('flex w-full items-center gap-3 rounded-[18px] bg-[#fffdf9] px-4 py-3.5 text-left shadow-soft', pressable)}>
+          <Icon name="template" size={18} color="#a3471a" />
+          <span className="flex-1 text-sm font-extrabold text-ink">Save as a template</span>
+          <span className="text-xs text-ink-muted">Reuse this plan</span>
+        </button>
+      )}
+      {!manage && (
       <div className={cn('grid gap-2', plan.ceremonyId ? 'grid-cols-3' : 'grid-cols-2')}>
         <button type="button" onClick={openTemplate} className={cn(ACTION_BUTTON, pressable)}>
           <Icon name="template" color="#c45c26" />
@@ -71,14 +83,17 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
           </button>
         )}
       </div>
+      )}
 
+      {!manage && (
       <div className="flex gap-2">
         <button type="button" onClick={() => onShare(false)} className={cn('flex-1 h-14 border-2 border-terracotta text-terracotta rounded-pill flex items-center justify-center gap-2', pressable)}>
           <Icon name="share" size={16} /> <Bi {...BUTTONS.share} />
         </button>
         <button type="button" onClick={() => onShare(true)} className={cn('flex-1 h-14 bg-[#25D366] text-white font-bold rounded-pill', pressable)}>WhatsApp</button>
       </div>
-      <p className="text-xs text-ink-muted text-center -mt-1">Family can pledge straight from the link. Sharing again replaces the old link.</p>
+      )}
+      {!manage && <p className="text-xs text-ink-muted text-center -mt-1">Family can pledge straight from the link. Sharing again replaces the old link.</p>}
 
       {templateOpen && (
         <form onSubmit={saveTemplate} className="bg-white border-2 border-sage-500 rounded-soft p-4 space-y-3">
