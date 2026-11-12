@@ -93,7 +93,7 @@ This is a living engineering plan based on source review of the repository. It i
 
 ### SmartMatch
 - Show pool progress, deadline, group size and expected Rand savings with clear caveats until supplier quotes are confirmed.
-- Preserve the documented ladder (Amazibazana Goal → Clan → Eastern Cape → Max) and do not display unverified prices as quotes.
+- Preserve the documented ladder (Amazibazana Goal 1+ → Clan 5+ → Eastern Cape 18+ → Max 36+ pallets) and do not display unverified prices as quotes.
 - Make pool state transitions explicit and auditable: OPEN → MATCHED → QUOTED → CONFIRMED → FULFILLED / PARTIAL / FAILED.
 - Treat SKU-level supplier minimums, delivery, substitutions, refunds and payment reconciliation as unresolved until real supplier data is available.
 

@@ -82,8 +82,10 @@ const BANKS = [
 // Instead of keeping money in the bank, the stokvel pre-commits a portion
 // as a purchase order to an iCamagu-partnered supplier. The supplier
 // guarantees goods at cost price. The "interest" equivalent is the discount
-// vs. retail (typically 15-25% on alcohol and groceries).
-const RETAILER_DISCOUNT = 0.20 // 20% average discount vs retail
+// vs. retail.
+// The founder's target for most group orders (1 to 36 pallets); only the
+// largest orders, above 36 pallets, reach 20%. Estimates stay conservative.
+const RETAILER_DISCOUNT = 0.15
 
 const money = (n) =>
   `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
