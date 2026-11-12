@@ -125,8 +125,8 @@ export default function Ukugida({ onBack }) {
         <div className="absolute -top-1/4 -right-1/4 w-64 h-64 bg-white/5 rounded-full" />
         <div className="relative">
           <button type="button" onClick={onBack} className={`text-sm text-white/70 mb-3 block ${pressable}`}>← Back</button>
-          <h1 className="font-display font-bold text-3xl">Ukugida</h1>
-          <p className="text-white/70 text-sm mt-1">Track gifts given and received</p>
+          <h1 className="font-display font-bold text-3xl">Gift exchange</h1>
+          <p className="text-white/80 text-sm mt-1">Gifts your family has given and received, so they can be returned in kind. A ceremony's own pledges are on its page.</p>
           <div className="mt-4 bg-white/10 backdrop-blur rounded-soft p-3 border border-white/20">
             <p className="text-xs font-bold text-white/70 uppercase tracking-wider">Net Balance</p>
             <p className={cn(
