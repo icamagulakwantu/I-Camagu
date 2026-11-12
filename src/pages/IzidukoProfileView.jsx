@@ -78,19 +78,19 @@ function IzidukoProfileView({ userId, onBack, onMessage }) {
               <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider mb-3">Iziduko (Clan Lines)</h3>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-sage-50 rounded-2xl p-4">
-                  <p className="text-[10px] font-bold text-sage-600 uppercase tracking-wider">Paternal</p>
+                  <p className="text-xs font-bold text-sage-600 uppercase tracking-wider">Paternal</p>
                   <p className="font-bold text-ink">{profile.paternalIziduko || '—'}</p>
                 </div>
                 <div className="bg-cream rounded-2xl p-4 border-2 border-cream-dark">
-                  <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Maternal</p>
+                  <p className="text-xs font-bold text-ink-muted uppercase tracking-wider">Maternal</p>
                   <p className="font-bold text-ink">{profile.maternalIziduko || '—'}</p>
                 </div>
                 <div className="bg-sage-50 rounded-2xl p-4">
-                  <p className="text-[10px] font-bold text-sage-600 uppercase tracking-wider">Paternal grandmother</p>
+                  <p className="text-xs font-bold text-sage-600 uppercase tracking-wider">Paternal grandmother</p>
                   <p className="font-bold text-ink">{profile.paternalGrandmotherIziduko || '—'}</p>
                 </div>
                 <div className="bg-cream rounded-2xl p-4 border-2 border-cream-dark">
-                  <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Maternal grandmother</p>
+                  <p className="text-xs font-bold text-ink-muted uppercase tracking-wider">Maternal grandmother</p>
                   <p className="font-bold text-ink">{profile.maternalGrandmotherIziduko || '—'}</p>
                 </div>
               </div>

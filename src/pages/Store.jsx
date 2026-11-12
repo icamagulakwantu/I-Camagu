@@ -131,7 +131,7 @@ function Store({ onGoToBasket, basketCount }) {
             >
               <Icon name="cart" size={20} color="#2b2620" />
               {basketCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-terracotta text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-terracotta text-white text-xs font-black w-5 h-5 rounded-full flex items-center justify-center">
                   {basketCount}
                 </span>
               )}
@@ -186,7 +186,7 @@ function Store({ onGoToBasket, basketCount }) {
               className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white border border-ink/[0.06] px-4 py-3 text-left shadow-soft"
             >
               <span>
-                <span className="block text-[10px] uppercase tracking-[0.14em] font-bold text-ink-muted">Browse departments</span>
+                <span className="block text-xs uppercase tracking-[0.14em] font-bold text-ink-muted">Browse departments</span>
                 <span className="block text-sm font-bold text-ink mt-0.5">{activeDepartment?.name || 'Choose a department'}</span>
               </span>
               <span className="flex items-center gap-2 text-xs font-bold text-terracotta">
@@ -208,7 +208,7 @@ function Store({ onGoToBasket, basketCount }) {
             <div className="flex gap-2 px-4 mt-3 overflow-x-auto pb-1 no-scrollbar">
               <button
                 onClick={() => setActiveAisle('all')}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
+                className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-xs font-bold transition-colors ${
                   activeAisle === 'all' ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
                 }`}
               >
@@ -218,7 +218,7 @@ function Store({ onGoToBasket, basketCount }) {
                 <button
                   key={a.id}
                   onClick={() => setActiveAisle(a.id)}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-xs font-bold transition-colors ${
                     activeAisle === a.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
                   }`}
                 >
@@ -285,7 +285,7 @@ function Store({ onGoToBasket, basketCount }) {
                         </span>
                       )}
                       {savings !== null && (
-                        <span className="absolute left-1.5 top-1.5 rounded-pill bg-sage-600 px-2 py-0.5 text-[10px] font-black text-white shadow-soft">
+                        <span className="absolute left-1.5 top-1.5 rounded-pill bg-sage-600 px-2 py-0.5 text-xs font-black text-white shadow-soft">
                           Save R{savings.toFixed(0)}
                         </span>
                       )}
@@ -293,7 +293,7 @@ function Store({ onGoToBasket, basketCount }) {
                     <div className="min-w-0 py-1">
                       <p className="eyebrow text-terracotta/80">{dept.short}</p>
                       <h3 className="font-display font-semibold text-[15px] text-ink leading-snug min-h-[2.5rem]">{sku.name}</h3>
-                      <p className="text-[11px] text-ink-muted min-h-8 mt-1">
+                      <p className="text-xs text-ink-muted min-h-8 mt-1">
                         {sku.bottleFormat ? `${sku.bottleFormat} • ` : ''}
                         {sku.unitsPerCase > 1 ? `${sku.unitsPerCase} per ${unitOf(sku)}` : `per ${unitOf(sku)}`}
                       </p>
@@ -301,12 +301,12 @@ function Store({ onGoToBasket, basketCount }) {
                         {casePrice != null ? <>R{casePrice.toFixed(2)} <span className="font-medium text-ink-muted">/ {unitOf(sku)}</span></> : 'Price coming soon'}
                       </p>
                       {savings !== null && retail && (
-                        <p className="text-[11px] text-ink-muted line-through tabular">
+                        <p className="text-xs text-ink-muted line-through tabular">
                           R{retail.toFixed(2)} retail
                         </p>
                       )}
                       {collectiveNoun(sku) && (
-                        <p className="text-[11px] text-ink-muted">
+                        <p className="text-xs text-ink-muted">
                           Bought per head — pooled together they make a {collectiveNoun(sku)}
                         </p>
                       )}
@@ -326,7 +326,7 @@ function Store({ onGoToBasket, basketCount }) {
                       </button>
                     </div>
                   ) : (
-                    <span className="text-[10px] text-ink-muted/60 font-bold px-3 mt-3 text-center">
+                    <span className="text-xs text-ink-muted/60 font-bold px-3 mt-3 text-center">
                       Not yet<br />orderable
                     </span>
                   )}
@@ -351,7 +351,7 @@ function DeptTile({ label, xhosa, active, onClick }) {
       }`}
     >
       <span className={`text-[13px] font-bold leading-tight ${active ? 'text-white' : 'text-ink'}`}>{label}</span>
-      <span className={`text-[10px] mt-1 ${active ? 'text-ochre-light' : 'text-ink-muted'}`}>{xhosa}</span>
+      <span className={`text-xs mt-1 ${active ? 'text-ochre-light' : 'text-ink-muted'}`}>{xhosa}</span>
     </button>
   )
 }

@@ -86,7 +86,7 @@ function PublicUbuhlanti() {
             <div className="h-12 w-48 mx-auto bg-cream-dark/50 rounded animate-pulse" />
           ) : (
             <>
-              <p className="text-[11px] font-black uppercase tracking-widest text-ink-muted mb-1">
+              <p className="text-xs font-black uppercase tracking-widest text-ink-muted mb-1">
                 Total raised, all-time
               </p>
               <p className="font-display font-extrabold text-4xl text-terracotta">
@@ -98,7 +98,7 @@ function PublicUbuhlanti() {
 
         {!loading && (
           <div className="bg-white border border-terracotta/15 rounded-soft p-4 mt-4">
-            <p className="text-[11px] font-black uppercase tracking-widest text-ink-muted mb-2">
+            <p className="text-xs font-black uppercase tracking-widest text-ink-muted mb-2">
               Where the fund has been invested
             </p>
             {data?.allocationsBySector?.length ? (
@@ -158,7 +158,7 @@ function PublicUbuhlanti() {
             onChange={(e) => setDonorEmail(e.target.value)}
             className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta"
           />
-          <p className="text-[11px] text-ink-muted leading-relaxed">
+          <p className="text-xs text-ink-muted leading-relaxed">
             We don't yet have a live payment gateway or bank details on file — submitting this
             records your pledge, and someone from iCamagu will personally follow up to complete the
             transfer.
@@ -205,7 +205,7 @@ function PublicUbuhlanti() {
             A fund built by the people, protected by the cloud, and dedicated to the advancement of
             our communities for generations to come.
           </p>
-          <p className="text-[11px] text-ink-muted mt-3 italic">
+          <p className="text-xs text-ink-muted mt-3 italic">
             The exact governance process and how the fund is eventually deployed are still being
             finalised — this page will grow more detailed as those decisions are made.
           </p>

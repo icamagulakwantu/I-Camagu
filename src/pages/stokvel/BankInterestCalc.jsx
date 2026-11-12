@@ -135,7 +135,7 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
         <p className="eyebrow text-ink-muted">Group savings details</p>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-[11px] font-bold text-ink-muted mb-1 block">Group balance (R)</label>
+            <label className="text-xs font-bold text-ink-muted mb-1 block">Group balance (R)</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-muted">R</span>
               <input type="number" min="0" step="100" placeholder="e.g. 15000"
@@ -144,7 +144,7 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
             </div>
           </div>
           <div>
-            <label className="text-[11px] font-bold text-ink-muted mb-1 block">Duration (months)</label>
+            <label className="text-xs font-bold text-ink-muted mb-1 block">Duration (months)</label>
             <select value={months} onChange={(e) => setMonths(e.target.value)}
               className="w-full border border-ink/20 rounded-2xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-terracotta/60">
               <option value="1">1 month</option>
@@ -163,7 +163,7 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <p className="eyebrow text-ink-muted">Bank comparison</p>
-              <p className="text-[10px] text-ink-muted">{mo} month{mo !== 1 ? 's' : ''} · simple interest</p>
+              <p className="text-xs text-ink-muted">{mo} month{mo !== 1 ? 's' : ''} · simple interest</p>
             </div>
             {displayed.map((b, i) => {
               const pct = best.interest > 0 ? (b.interest / best.interest) * 100 : 0
@@ -173,13 +173,13 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-0.5">
                         {i === 0 && (
-                          <span className="text-[9px] font-black bg-terracotta text-white px-1.5 py-0.5 rounded-full uppercase">Best</span>
+                          <span className="text-xs font-black bg-terracotta text-white px-1.5 py-0.5 rounded-full uppercase">Best</span>
                         )}
                         <p className="font-bold text-sm text-ink">{b.name}</p>
                       </div>
-                      <p className="text-[11px] text-ink-muted">{b.product} · {b.rate}% p.a.</p>
+                      <p className="text-xs text-ink-muted">{b.product} · {b.rate}% p.a.</p>
                       {b.minBalance > 0 && bal < b.minBalance && (
-                        <p className="text-[11px] text-terracotta mt-0.5">
+                        <p className="text-xs text-terracotta mt-0.5">
                           Min balance R{b.minBalance.toLocaleString()} required
                         </p>
                       )}
@@ -192,10 +192,10 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
                       <p className="font-display font-bold text-base text-terracotta">
                         {b.minBalance > 0 && bal < b.minBalance ? 'N/A' : money(b.interest)}
                       </p>
-                      <p className="text-[10px] text-ink-muted">interest earned</p>
+                      <p className="text-xs text-ink-muted">interest earned</p>
                     </div>
                   </div>
-                  <p className="text-[10px] text-ink-muted mt-2 leading-relaxed">{b.notes}</p>
+                  <p className="text-xs text-ink-muted mt-2 leading-relaxed">{b.notes}</p>
                 </div>
               )
             })}
@@ -205,7 +205,7 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
                 {showAll ? 'Show fewer' : `Show all ${bankResults.length} banks`}
               </button>
             )}
-            <p className="text-[10px] text-ink-muted px-1 leading-relaxed">
+            <p className="text-xs text-ink-muted px-1 leading-relaxed">
               Rates are approximate and change frequently. Verify with your bank before committing. Always ask your bank about their dedicated stokvel account options.
             </p>
           </div>
@@ -221,13 +221,13 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
             </p>
 
             <div>
-              <label className="text-[11px] font-bold text-ink-muted mb-1 block">
+              <label className="text-xs font-bold text-ink-muted mb-1 block">
                 % of balance to pre-commit to SmartMatch: <span className="text-terracotta">{tradePercent}%</span>
               </label>
               <input type="range" min="10" max="90" step="10"
                 value={tradePercent} onChange={(e) => setTradePercent(e.target.value)}
                 className="w-full accent-terracotta" />
-              <div className="flex justify-between text-[10px] text-ink-muted mt-0.5">
+              <div className="flex justify-between text-xs text-ink-muted mt-0.5">
                 <span>10% — mostly bank</span>
                 <span>90% — mostly SmartMatch</span>
               </div>
@@ -235,21 +235,21 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
 
             <div className="grid grid-cols-2 gap-2 text-center">
               <div className="bg-cream rounded-2xl p-3">
-                <p className="text-[10px] font-black uppercase text-ink-muted">Bank interest</p>
+                <p className="text-xs font-black uppercase text-ink-muted">Bank interest</p>
                 <p className="font-display font-bold text-base text-ink mt-0.5">{money(bankOnRemainder)}</p>
-                <p className="text-[10px] text-ink-muted">on {money(bankAmount)}</p>
+                <p className="text-xs text-ink-muted">on {money(bankAmount)}</p>
               </div>
               <div className="bg-terracotta/8 rounded-2xl p-3">
-                <p className="text-[10px] font-black uppercase text-terracotta">SmartMatch saving</p>
+                <p className="text-xs font-black uppercase text-terracotta">SmartMatch saving</p>
                 <p className="font-display font-bold text-base text-terracotta mt-0.5">{money(retailSaving)}</p>
-                <p className="text-[10px] text-ink-muted">on {money(tradeAmount)} of goods</p>
+                <p className="text-xs text-ink-muted">on {money(tradeAmount)} of goods</p>
               </div>
             </div>
 
             <div className="flex items-center justify-between border-t border-terracotta/15 pt-3">
               <div>
-                <p className="text-[11px] font-black text-ink">Combined benefit</p>
-                <p className="text-[10px] text-ink-muted">bank interest + retail savings</p>
+                <p className="text-xs font-black text-ink">Combined benefit</p>
+                <p className="text-xs text-ink-muted">bank interest + retail savings</p>
               </div>
               <p className="font-display font-bold text-xl text-terracotta">{money(totalTradeModel)}</p>
             </div>
@@ -262,7 +262,7 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
               </div>
             )}
 
-            <p className="text-[10px] text-ink-muted leading-relaxed">
+            <p className="text-xs text-ink-muted leading-relaxed">
               The {Math.round(RETAILER_DISCOUNT * 100)}% retail saving is an estimate based on average bulk-vs-retail price differences on alcohol and groceries. Actual savings depend on which products you order through SmartMatch.
             </p>
           </div>

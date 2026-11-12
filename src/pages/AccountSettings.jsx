@@ -71,7 +71,7 @@ function AccountSettings({ onBack, onOpenPrivacy }) {
           identical white card — this is the one action here that can't be
           undone. */}
       <div className="mt-8">
-        <p className="text-[10px] font-black uppercase tracking-wider text-terracotta mb-2">Danger zone</p>
+        <p className="text-xs font-black uppercase tracking-wider text-terracotta mb-2">Danger zone</p>
         <div className="bg-terracotta/5 border-2 border-terracotta rounded-soft p-4">
           <p className="font-bold text-sm text-terracotta mb-2">Delete your account</p>
           <ul className="text-xs text-ink-muted mb-3 space-y-1 list-disc pl-4">

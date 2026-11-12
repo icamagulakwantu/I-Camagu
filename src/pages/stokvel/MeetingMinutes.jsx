@@ -122,23 +122,23 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
             <p className="eyebrow text-ink-muted">Meeting details</p>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Date *</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Date *</label>
                 <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inp} required />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Location</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Location</label>
                 <input type="text" placeholder="e.g. Mama Grace's home" value={location}
                   onChange={(e) => setLocation(e.target.value)} className={inp} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Chairperson</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Chairperson</label>
                 <input type="text" placeholder="Name" value={chairperson}
                   onChange={(e) => setChairperson(e.target.value)} className={inp} />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Secretary</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Secretary</label>
                 <input type="text" placeholder="Name" value={secretary}
                   onChange={(e) => setSecretary(e.target.value)} className={inp} />
               </div>
@@ -149,7 +149,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
           <div className="card-paper p-4 space-y-3">
             <p className="eyebrow text-ink-muted">Attendance</p>
             <div>
-              <label className="text-[11px] font-bold text-ink-muted mb-1 block">
+              <label className="text-xs font-bold text-ink-muted mb-1 block">
                 Present (one name per line)
               </label>
               <textarea rows={4} placeholder={"Thandi Dlamini\nNomvula Khumalo\nSipho Zulu"}
@@ -157,7 +157,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
                 className={`${inp} resize-none`} />
             </div>
             <div>
-              <label className="text-[11px] font-bold text-ink-muted mb-1 block">
+              <label className="text-xs font-bold text-ink-muted mb-1 block">
                 Apologies (one name per line)
               </label>
               <textarea rows={2} placeholder="Bongani Ndlovu"
@@ -176,10 +176,10 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
             {agendaItems.map((item, i) => (
               <div key={i} className="border border-terracotta/15 rounded-2xl p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-[11px] font-black text-ink-muted uppercase">Item {i + 1}</p>
+                  <p className="text-xs font-black text-ink-muted uppercase">Item {i + 1}</p>
                   {agendaItems.length > 1 && (
                     <button type="button" onClick={() => removeAgenda(i)}
-                      className="text-[11px] text-terracotta font-bold">Remove</button>
+                      className="text-xs text-terracotta font-bold">Remove</button>
                   )}
                 </div>
                 <input type="text" placeholder="Agenda title (e.g. Contribution increase)"
@@ -205,10 +205,10 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
             {actionItems.map((item, i) => (
               <div key={i} className="border border-terracotta/15 rounded-2xl p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-[11px] font-black text-ink-muted uppercase">Action {i + 1}</p>
+                  <p className="text-xs font-black text-ink-muted uppercase">Action {i + 1}</p>
                   {actionItems.length > 1 && (
                     <button type="button" onClick={() => removeAction(i)}
-                      className="text-[11px] text-terracotta font-bold">Remove</button>
+                      className="text-xs text-terracotta font-bold">Remove</button>
                   )}
                 </div>
                 <input type="text" placeholder="Task description"
@@ -231,12 +231,12 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
             <p className="eyebrow text-ink-muted">Next meeting</p>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Date</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Date</label>
                 <input type="date" value={nextMeetingDate}
                   onChange={(e) => setNextMeetingDate(e.target.value)} className={inp} />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Location</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Location</label>
                 <input type="text" placeholder="Venue" value={nextMeetingLocation}
                   onChange={(e) => setNextMeetingLocation(e.target.value)} className={inp} />
               </div>
@@ -308,7 +308,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
                   {/* Attendance */}
                   {(m.attendees?.length > 0 || m.apologies?.length > 0) && (
                     <div>
-                      <p className="text-[11px] font-black uppercase text-ink-muted mb-1">Attendance</p>
+                      <p className="text-xs font-black uppercase text-ink-muted mb-1">Attendance</p>
                       {m.attendees?.length > 0 && (
                         <p className="text-xs text-ink"><span className="font-bold">Present:</span> {m.attendees.join(', ')}</p>
                       )}
@@ -321,7 +321,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
                   {/* Agenda */}
                   {m.agendaItems?.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-black uppercase text-ink-muted mb-2">Agenda</p>
+                      <p className="text-xs font-black uppercase text-ink-muted mb-2">Agenda</p>
                       <div className="space-y-2">
                         {m.agendaItems.map((a, i) => (
                           <div key={i} className="border-l-2 border-terracotta/30 pl-3">
@@ -341,7 +341,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
                   {/* Action items */}
                   {m.actionItems?.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-black uppercase text-ink-muted mb-2">Action items</p>
+                      <p className="text-xs font-black uppercase text-ink-muted mb-2">Action items</p>
                       <div className="space-y-1.5">
                         {m.actionItems.map((a, i) => (
                           <div key={i} className="flex items-start justify-between gap-2">
@@ -349,11 +349,11 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
                               <span className="w-4 h-4 rounded-full border-2 border-terracotta/40 flex-shrink-0 mt-0.5" />
                               <div>
                                 <p className="text-xs text-ink">{a.task}</p>
-                                {a.owner && <p className="text-[11px] text-ink-muted">{a.owner}</p>}
+                                {a.owner && <p className="text-xs text-ink-muted">{a.owner}</p>}
                               </div>
                             </div>
                             {a.dueDate && (
-                              <p className="text-[10px] text-ink-muted flex-shrink-0">{fmt(a.dueDate)}</p>
+                              <p className="text-xs text-ink-muted flex-shrink-0">{fmt(a.dueDate)}</p>
                             )}
                           </div>
                         ))}
@@ -364,7 +364,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
                   {/* Next meeting */}
                   {m.nextMeetingDate && (
                     <div className="bg-terracotta/5 rounded-2xl px-3 py-2">
-                      <p className="text-[11px] font-black uppercase text-terracotta mb-0.5">Next meeting</p>
+                      <p className="text-xs font-black uppercase text-terracotta mb-0.5">Next meeting</p>
                       <p className="text-xs text-ink">
                         {fmt(m.nextMeetingDate)}
                         {m.nextMeetingLocation ? ` at ${m.nextMeetingLocation}` : ''}

@@ -85,7 +85,7 @@ function ResetPassword({ token }) {
                     <div key={i} className={`h-1 flex-1 rounded-pill ${i <= strength.bars ? (strength.bars === 1 ? 'bg-terracotta' : strength.bars === 2 ? 'bg-brand-ochre' : 'bg-sage-500') : 'bg-ink/10'}`} />
                   ))}
                 </div>
-                <span className={`text-[11px] font-bold ${strength.color}`}>{strength.label}</span>
+                <span className={`text-xs font-bold ${strength.color}`}>{strength.label}</span>
               </div>
             )}
           </div>
@@ -99,7 +99,7 @@ function ResetPassword({ token }) {
               </button>
             </div>
             {matches !== null && (
-              <p className={`text-[11px] font-bold mt-1 flex items-center gap-1 ${matches ? 'text-sage-600' : 'text-terracotta'}`}>
+              <p className={`text-xs font-bold mt-1 flex items-center gap-1 ${matches ? 'text-sage-600' : 'text-terracotta'}`}>
                 {matches ? <><Icon name="check" size={11} color="#4a7a4a" /> Passwords match</> : 'Passwords do not match'}
               </p>
             )}

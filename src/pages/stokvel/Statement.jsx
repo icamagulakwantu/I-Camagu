@@ -159,13 +159,13 @@ function StatementReport({ stokvelId, stokvelName }) {
                 <div key={i} className="flex items-center justify-between gap-3 px-4 py-2.5">
                   <div className="min-w-0">
                     <p className="text-sm font-bold text-ink truncate">{e.type} · {e.who}</p>
-                    <p className="text-[11px] text-ink-muted">{fmtDate(e.date)}</p>
+                    <p className="text-xs text-ink-muted">{fmtDate(e.date)}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className={`text-sm font-bold ${e.amount < 0 ? 'text-terracotta' : 'text-sage-700'}`}>
                       {e.amount < 0 ? '-' : '+'}{money(Math.abs(e.amount))}
                     </p>
-                    <p className="text-[10px] text-ink-muted">{money(e.running)}</p>
+                    <p className="text-xs text-ink-muted">{money(e.running)}</p>
                   </div>
                 </div>
               ))}

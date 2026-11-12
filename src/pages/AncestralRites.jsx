@@ -163,7 +163,7 @@ export default function AncestralRites({ onBack, onOpenUbuhlanti, onOpenProfile 
                   <button key={k} type="button" onClick={() => setForm({ ...form, rite: k })}
                     className={`w-full text-left px-4 py-2.5 rounded-2xl border-2 ${pressable} ${form.rite === k ? 'border-terracotta bg-terracotta/5' : 'border-terracotta/15 bg-white'}`}>
                     <span className="font-bold text-sm text-ink">{r.label}</span>
-                    <span className="block text-[11px] text-ink-muted">{r.hint}</span>
+                    <span className="block text-xs text-ink-muted">{r.hint}</span>
                   </button>
                 ))}
               </div>
@@ -193,24 +193,24 @@ export default function AncestralRites({ onBack, onOpenUbuhlanti, onOpenProfile 
                         <p className="font-bold text-ink truncate">{r.ancestorName}</p>
                         <p className="text-xs text-ink-muted">{RITES[r.rite]?.label} · {r.gender === 'FEMALE' ? 'Female' : 'Male'}</p>
                       </div>
-                      <span className={`text-[10px] font-bold px-2 py-1 rounded-pill flex-shrink-0 ${r.waiting ? 'bg-ink/10 text-ink-muted' : STATUS[r.status].cls}`}>
+                      <span className={`text-xs font-bold px-2 py-1 rounded-pill flex-shrink-0 ${r.waiting ? 'bg-ink/10 text-ink-muted' : STATUS[r.status].cls}`}>
                         {r.waiting ? 'Waiting' : STATUS[r.status].label}
                       </span>
                     </div>
-                    {r.waiting && <p className="text-[11px] text-ink-muted mt-2">Do the older generation's rites first.</p>}
+                    {r.waiting && <p className="text-xs text-ink-muted mt-2">Do the older generation's rites first.</p>}
                     {r.notes && <p className="text-xs text-ink mt-2 leading-relaxed">{r.notes}</p>}
-                    <p className="text-[10px] text-ink-muted mt-2">Added by {r.addedBy}{r.updatedBy ? ` · updated by ${r.updatedBy}` : ''}</p>
+                    <p className="text-xs text-ink-muted mt-2">Added by {r.addedBy}{r.updatedBy ? ` · updated by ${r.updatedBy}` : ''}</p>
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {Object.entries(STATUS).filter(([k]) => k !== r.status).map(([k, s]) => (
                         <button key={k} type="button" onClick={() => setStatus(r.id, k)}
-                          className={`text-[11px] font-bold px-3 py-1.5 rounded-pill border-2 border-terracotta/20 bg-white text-ink ${pressable}`}>
+                          className={`text-xs font-bold px-3 py-1.5 rounded-pill border-2 border-terracotta/20 bg-white text-ink ${pressable}`}>
                           Mark {s.label.toLowerCase()}
                         </button>
                       ))}
                       {r.mine && (confirmDelete === r.id ? (
-                        <button type="button" onClick={() => remove(r.id)} className={`text-[11px] font-bold px-3 py-1.5 rounded-pill bg-terracotta text-white ${pressable}`}>Yes, remove</button>
+                        <button type="button" onClick={() => remove(r.id)} className={`text-xs font-bold px-3 py-1.5 rounded-pill bg-terracotta text-white ${pressable}`}>Yes, remove</button>
                       ) : (
-                        <button type="button" onClick={() => setConfirmDelete(r.id)} className={`text-[11px] font-bold px-3 py-1.5 rounded-pill text-ink-muted ${pressable}`}>Remove</button>
+                        <button type="button" onClick={() => setConfirmDelete(r.id)} className={`text-xs font-bold px-3 py-1.5 rounded-pill text-ink-muted ${pressable}`}>Remove</button>
                       ))}
                     </div>
                   </div>

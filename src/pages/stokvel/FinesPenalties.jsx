@@ -174,7 +174,7 @@ export default function FinesPenalties({ stokvelId, members = [], isOrganiser })
       <div className="flex gap-2">
         {['outstanding', 'paid', 'all'].map((f) => (
           <button key={f} type="button" onClick={() => setActiveFilter(f)}
-            className={`flex-1 rounded-pill py-1.5 text-[11px] font-bold transition-colors capitalize ${
+            className={`flex-1 rounded-pill py-1.5 text-xs font-bold transition-colors capitalize ${
               activeFilter === f ? 'bg-terracotta text-white' : 'bg-white border border-ink/10 text-ink-muted'
             }`}>
             {f}
@@ -202,7 +202,7 @@ export default function FinesPenalties({ stokvelId, members = [], isOrganiser })
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-bold text-sm text-ink">{f.memberName || 'Member'}</p>
-                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                    <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded-full ${
                       f.paid ? 'bg-sage-100 text-sage-700' : 'bg-terracotta/10 text-terracotta'
                     }`}>
                       {f.paid ? 'Paid' : 'Outstanding'}
@@ -218,7 +218,7 @@ export default function FinesPenalties({ stokvelId, members = [], isOrganiser })
                   <p className="font-bold text-sm text-terracotta">{money(f.amount)}</p>
                   {!f.paid && isOrganiser && (
                     <button type="button" onClick={() => markPaid(f.id)}
-                      className={`text-[11px] font-bold text-sage-600 mt-1 ${pressable}`}>
+                      className={`text-xs font-bold text-sage-600 mt-1 ${pressable}`}>
                       Mark paid
                     </button>
                   )}

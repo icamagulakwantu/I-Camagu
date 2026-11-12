@@ -21,7 +21,7 @@ export default function ActionCard({ children, onClick, className = '', badge = 
     >
       <span className="motif-thresholds absolute -right-6 -top-6 h-20 w-20 rounded-full opacity-40" />
       {badge !== null && badge !== undefined && Number(badge) > 0 && (
-        <span className="absolute top-2 right-2 bg-brand-ochre text-brand-cream text-[10px] font-black w-5 h-5 rounded-pill flex items-center justify-center shadow-sm">
+        <span className="absolute top-2 right-2 bg-brand-ochre text-brand-cream text-xs font-black w-5 h-5 rounded-pill flex items-center justify-center shadow-sm">
           {badge}
         </span>
       )}

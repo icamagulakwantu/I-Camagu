@@ -223,7 +223,7 @@ function Login() {
                   }`}
                 />
               ))}
-              <span className="text-[10px] font-bold text-ink-muted uppercase tracking-wide ml-1">{meta.title}</span>
+              <span className="text-xs font-bold text-ink-muted uppercase tracking-wide ml-1">{meta.title}</span>
             </div>
           )}
 
@@ -270,7 +270,7 @@ function Login() {
                 <div className="flex-1 h-px bg-cream-dark" />
               </div>
               <div ref={googleBtnRef} className="flex justify-center" />
-              <p className="text-center text-[11px] text-ink-muted pt-1">
+              <p className="text-center text-xs text-ink-muted pt-1">
                 Free to join · No card required
               </p>
             </form>
@@ -318,7 +318,7 @@ function Login() {
                 </button>
               </div>
               {confirmPassword.length > 0 && (
-                <p className={`text-[11px] font-bold ${confirmPassword === password ? 'text-sage-600' : 'text-terracotta'}`} role="status">
+                <p className={`text-xs font-bold ${confirmPassword === password ? 'text-sage-600' : 'text-terracotta'}`} role="status">
                   {confirmPassword === password ? 'Passwords match' : 'Passwords do not match yet'}
                 </p>
               )}
@@ -436,7 +436,7 @@ function Login() {
               >
                 {loading ? 'Verifying...' : 'Verify & Log In →'}
               </button>
-              <p className="text-center text-[11px] text-ink-muted">
+              <p className="text-center text-xs text-ink-muted">
                 No email after a few minutes? Check your spam folder, or create an account if you are new.
               </p>
               <button

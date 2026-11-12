@@ -11,7 +11,7 @@ const inputClass = 'w-full border-2 border-ink/20 rounded-soft px-4 py-3 text-ba
 function GroupCard({ group, actionLabel, onAction, busy }) {
   return (
     <div className="bg-white border-2 border-terracotta/15 rounded-soft p-4 shadow-soft">
-      <p className="text-[11px] font-black uppercase tracking-wide text-terracotta">{group.clanName}</p>
+      <p className="text-xs font-black uppercase tracking-wide text-terracotta">{group.clanName}</p>
       <p className="font-display font-bold text-lg text-ink leading-tight mt-0.5">{group.name}</p>
       <p className="text-xs text-ink-muted mt-0.5">{group.memberCount} member{group.memberCount === 1 ? '' : 's'}</p>
       {group.description && <p className="text-sm text-ink mt-2">{group.description}</p>}
@@ -80,7 +80,7 @@ function GroupDetail({ groupId, onBack, authedFetch }) {
       </button>
 
       <div>
-        <p className="text-[11px] font-black uppercase tracking-wide text-terracotta">{group.clanName}</p>
+        <p className="text-xs font-black uppercase tracking-wide text-terracotta">{group.clanName}</p>
         <h2 className="font-display font-bold text-2xl text-ink leading-tight">{group.name}</h2>
         {group.description && <p className="text-sm text-ink-muted mt-1">{group.description}</p>}
       </div>
@@ -119,7 +119,7 @@ function GroupDetail({ groupId, onBack, authedFetch }) {
                 <span className="block font-bold text-sm text-ink truncate">
                   {m.firstName || 'Member'} {m.lastName || ''}{m.userId === user?.id ? ' (you)' : ''}
                 </span>
-                {m.role === 'CREATOR' && <span className="block text-[11px] text-terracotta font-bold">Started the group</span>}
+                {m.role === 'CREATOR' && <span className="block text-xs text-terracotta font-bold">Started the group</span>}
               </span>
               {isCreator && m.role !== 'CREATOR' && (
                 <button type="button" disabled={busy}

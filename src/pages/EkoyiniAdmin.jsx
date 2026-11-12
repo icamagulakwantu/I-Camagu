@@ -71,7 +71,7 @@ function EkoyiniAdmin({ onBack }) {
                   <p className="font-bold text-sm">{q.fullName} {q.surname}</p>
                   <p className="text-xs text-ink-muted">{q.clientEmail} · {q.cellPhone}</p>
                 </div>
-                <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-pill ${STATUS_COLORS[q.status]}`}>{q.status}</span>
+                <span className={`text-xs font-black uppercase px-2 py-1 rounded-pill ${STATUS_COLORS[q.status]}`}>{q.status}</span>
               </div>
               <p className="text-xs text-ink-muted mb-1 flex items-center gap-1.5">
                 <Icon name="calendar" size={12} /> {new Date(q.eventDate).toLocaleDateString()}

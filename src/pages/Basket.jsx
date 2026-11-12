@@ -348,7 +348,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       {joiningPool && (
         <div className="bg-white border-2 border-sage-600 rounded-soft p-4 mb-4 shadow-soft">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <p className="text-[10px] font-black uppercase tracking-wider text-sage-700">
+            <p className="text-xs font-black uppercase tracking-wider text-sage-700">
               {joiningPool.isMine ? 'Shopping for your pool' : 'You were invited to a pool'}
             </p>
             <button type="button" onClick={dismissJoiningPool} className="cursor-pointer text-ink/40 hover:text-ink/70 text-xs font-bold shrink-0">
@@ -366,13 +366,13 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
 
       {poolStatuses.map((poolStatus) => (
         <div key={`${poolStatus.poolId}:${poolStatus.basketStatus}`} className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
-          <p className="text-[10px] font-black uppercase tracking-wider text-white/80 mb-1">
+          <p className="text-xs font-black uppercase tracking-wider text-white/80 mb-1">
             {poolStatus.isPrivate ? 'My own order' : 'Smart Match'} — {CATEGORY_LABEL[poolStatus.category]}
           </p>
           {/* Only shown once the admin has accepted a merchant's offer on this
               group order — members never choose a merchant themselves. */}
           {poolStatus.poolStatus !== 'OPEN' && poolStatus.partnerName && (
-            <p className="text-[11px] font-bold text-white/90 mb-1 flex items-center gap-1">
+            <p className="text-xs font-bold text-white/90 mb-1 flex items-center gap-1">
               <Icon name="check" size={11} color="#fff" /> Best offer confirmed: {poolStatus.partnerName}
             </p>
           )}
@@ -386,7 +386,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                   : 'Matched! Your order pooled with other members.'}
           </p>
           {poolStatus.myCases > 0 && !poolStatus.isPrivate && (
-            <p className="text-[11px] text-white/85 mb-2">You've added {poolStatus.myCases} to this pool.</p>
+            <p className="text-xs text-white/85 mb-2">You've added {poolStatus.myCases} to this pool.</p>
           )}
 
           <div className="mb-3">
@@ -435,7 +435,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
             return (
               <>
                 {sm.currentTier && (
-                  <p className="text-[11px] font-black uppercase tracking-wide text-white bg-white/20 inline-flex items-center gap-1 px-2 py-1 rounded-pill mb-2">
+                  <p className="text-xs font-black uppercase tracking-wide text-white bg-white/20 inline-flex items-center gap-1 px-2 py-1 rounded-pill mb-2">
                     <Icon name="check" size={11} color="#fff" strokeWidth={2.5} /> {sm.currentTier.name} unlocked
                     {tierValueLabel(sm.currentTier, sm.basis) && ` · ${tierValueLabel(sm.currentTier, sm.basis)}`}
                   </p>
@@ -461,8 +461,8 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                               style={{ width: `${Math.round(fillFraction * 100)}%` }}
                             />
                           </div>
-                          <p className="text-[9px] text-white/80 mt-0.5 truncate">{bandLabel(tier, i, sm.ladder)}</p>
-                          <p className="text-[9px] font-bold text-white truncate">
+                          <p className="text-xs text-white/80 mt-0.5 truncate">{bandLabel(tier, i, sm.ladder)}</p>
+                          <p className="text-xs font-bold text-white truncate">
                             {tier.value != null ? (isAmount ? `${tier.value}%` : `R${Number(tier.value).toFixed(0)}`) : 'TBC'}
                           </p>
                         </div>
@@ -474,7 +474,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                 )}
 
                 {sm.ladder && !isAmount && (
-                  <p className="text-[10px] text-white/60 mb-1.5">
+                  <p className="text-xs text-white/60 mb-1.5">
                     Tier names like "{sm.ladder[0].name}" are standard across every iCamagu drinks pool — not specific to this group.
                   </p>
                 )}
@@ -491,7 +491,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                   <p className="text-xs text-white/90 mb-1">Top tier reached — thank the people who joined you.</p>
                 )}
                 {poolStatus.windowDeadline && (
-                  <p className="text-[11px] text-white/75 mb-2">{windowClosesLabel(poolStatus.windowDeadline)}</p>
+                  <p className="text-xs text-white/75 mb-2">{windowClosesLabel(poolStatus.windowDeadline)}</p>
                 )}
                 <div className="grid grid-cols-2 gap-2 mt-2">
                   <button

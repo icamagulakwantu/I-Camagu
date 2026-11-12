@@ -80,7 +80,7 @@ export default function DidYouKnow() {
     <div className="relative select-none text-left">
       <div className="flex justify-between items-start gap-3 mb-3">
         <div>
-          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-brand-ochre">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-ochre">
             Did you know? · {currentIndex + 1} of {legends.length}
           </p>
           <p className="font-display font-bold text-2xl text-brand-black leading-tight mt-0.5">Xhosa Greatness</p>
@@ -102,7 +102,7 @@ export default function DidYouKnow() {
         </div>
         <div className="min-w-0">
           {current.category && (
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-brand-sage block">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-brand-sage block">
               {current.category}
             </span>
           )}
@@ -110,7 +110,7 @@ export default function DidYouKnow() {
           <p className="text-sm text-brand-black/75 mt-1 leading-relaxed">{current.bodyText || current.text}</p>
         </div>
       </div>
-      {portrait && !current.image && <p className="text-[9px] text-brand-black/40 mt-2">Photo: Wikipedia / Wikimedia Commons</p>}
+      {portrait && !current.image && <p className="text-xs text-brand-black/40 mt-2">Photo: Wikipedia / Wikimedia Commons</p>}
     </div>
   )
 }

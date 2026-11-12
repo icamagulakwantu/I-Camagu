@@ -116,7 +116,7 @@ export default function PinSetup({ onBack }) {
             <button type="button" onClick={() => setShowConfirmPin((v) => !v)} aria-label={showConfirmPin ? 'Hide confirm PIN' : 'Show confirm PIN'} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted"><Icon name={showConfirmPin ? 'eye-off' : 'eye'} size={18} /></button>
           </div>
           {confirmPin.length > 0 && (
-            <p className={`text-[11px] font-bold text-center flex items-center justify-center gap-1 ${confirmPin === pin ? 'text-sage-600' : 'text-terracotta'}`}>
+            <p className={`text-xs font-bold text-center flex items-center justify-center gap-1 ${confirmPin === pin ? 'text-sage-600' : 'text-terracotta'}`}>
               {confirmPin === pin ? <><Icon name="check" size={11} color="#4a7a4a" /> PINs match</> : 'PINs do not match yet'}
             </p>
           )}

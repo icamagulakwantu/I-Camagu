@@ -178,7 +178,7 @@ function MyOrders({ onBack }) {
                 </div>
                 <p className="text-xs text-brand-black/50 mb-2 flex items-center gap-1"><Icon name="mapPin" size={12} /> {doc.deliveryLocation}</p>
                 {payment?.paymentReference && (
-                  <p className="text-[11px] text-brand-black/50 mb-2">
+                  <p className="text-xs text-brand-black/50 mb-2">
                     Your reference: <span className="font-mono font-bold text-brand-blue">{payment.paymentReference}</span> — the same code goes on your EFT and identifies your share at collection.
                   </p>
                 )}
@@ -217,7 +217,7 @@ function MyOrders({ onBack }) {
                             </p>
                           )
                         ) : payment.provider === 'STOKVEL_FUNDS' ? (
-                          <p className="text-[11px] text-brand-black/60">
+                          <p className="text-xs text-brand-black/60">
                             {payment.status === 'PENDING_SETTLEMENT'
                               ? 'Your Stokvel funding request has the required approvals and is awaiting settlement. You do not need to pay separately.'
                               : payment.status === 'DECLINED'
@@ -225,7 +225,7 @@ function MyOrders({ onBack }) {
                                 : 'This share is being funded through your Stokvel and is awaiting the required officials’ approval. Do not make a separate EFT payment.'}
                           </p>
                         ) : !payment.pool?.partner ? (
-                          <p className="text-[11px] text-brand-black/50">
+                          <p className="text-xs text-brand-black/50">
                             MOQ reached — we're finalizing a supplier for this pool now. Payment details will show here as soon as one is confirmed.
                           </p>
                         ) : (
@@ -245,29 +245,29 @@ function MyOrders({ onBack }) {
                                 >
                                   {payingOnlineId === payment.id ? 'Redirecting...' : `Pay ${money(payment.amountZAR)} online (test mode)`}
                                 </button>
-                                <p className="text-[10px] text-brand-black/40 text-center mb-3">— or pay by manual EFT instead —</p>
+                                <p className="text-xs text-brand-black/40 text-center mb-3">— or pay by manual EFT instead —</p>
                               </>
                             )}
                             {payment.provider !== 'MANUAL_EFT' ? (
-                              <p className="text-[11px] text-terracotta font-bold mb-2">
+                              <p className="text-xs text-terracotta font-bold mb-2">
                                 This payment is recorded with {payment.provider}. Do not make a second EFT transfer while it is being reconciled. If the status remains pending, contact the iCamagu admin through the app.
                               </p>
                             ) : (
                               <>
                                 {payment.pool?.partner?.bankName && payment.pool?.partner?.bankAccountHolder && payment.pool?.partner?.bankAccountNumber ? (
                                   <div className="rounded-soft border border-sage-200 bg-sage-50 p-3 mb-3">
-                                    <p className="text-[10px] font-black uppercase tracking-wide text-ink-muted mb-1">Supplier bank details on file</p>
+                                    <p className="text-xs font-black uppercase tracking-wide text-ink-muted mb-1">Supplier bank details on file</p>
                                     <p className="text-xs font-bold text-ink">{payment.pool.partner.bankName} · {payment.pool.partner.bankAccountHolder}</p>
                                     <p className="text-xs text-ink">Account: {payment.pool.partner.bankAccountNumber}</p>
                                     {payment.pool.partner.bankBranchCode && <p className="text-xs text-ink">Branch code: {payment.pool.partner.bankBranchCode}</p>}
-                                    <p className="text-[10px] text-ink-muted mt-1">Confirm these details with the supplier before transferring.</p>
+                                    <p className="text-xs text-ink-muted mt-1">Confirm these details with the supplier before transferring.</p>
                                   </div>
                                 ) : (
-                                  <p className="text-[11px] text-terracotta font-bold mb-2">
+                                  <p className="text-xs text-terracotta font-bold mb-2">
                                     Supplier bank details are not on file. Do not transfer money yet; ask the supplier or iCamagu admin for verified details. If you have already paid the supplier directly, you can still enter your reference below.
                                   </p>
                                 )}
-                                <p className="text-[11px] text-brand-black/50 mb-2">
+                                <p className="text-xs text-brand-black/50 mb-2">
                                   {payment.pool?.partner?.bankName && payment.pool?.partner?.bankAccountHolder && payment.pool?.partner?.bankAccountNumber
                                     ? `Pay ${money(payment.amountZAR)} via EFT using ${payment.paymentReference ? `reference "${payment.paymentReference}"` : 'your own reference'} — this code is yours alone, not shared with the rest of the pool, so the supplier can tell your payment apart from everyone else's. Then enter your reference below so they can confirm receipt.`
                                     : 'Only record a reference if you have already paid directly to the supplier using independently verified details.'}
@@ -287,22 +287,22 @@ function MyOrders({ onBack }) {
                                     {submittingId === payment.id ? '...' : 'Save'}
                                   </button>
                                 </div>
-                                <p className="text-[10px] text-brand-black/40 mt-1">Awaiting supplier confirmation.</p>
+                                <p className="text-xs text-brand-black/40 mt-1">Awaiting supplier confirmation.</p>
                               </>
                             )}
                           </div>
                         )}
                         {payment.provider === 'STOKVEL_FUNDS' ? (
-                          <p className="text-[11px] text-brand-black/60 mt-2">
+                          <p className="text-xs text-brand-black/60 mt-2">
                             For a Stokvel-funded order, contact your Chair/Treasurer to discuss cancellation or a refund. This screen does not submit a refund request for Stokvel funds; if you previously submitted one, officials must resolve it through the Stokvel process.
                           </p>
                         ) : payment.refundRequestedAt ? (
-                          <p className="text-[11px] text-terracotta font-bold mt-2">Refund requested — awaiting supplier</p>
+                          <p className="text-xs text-terracotta font-bold mt-2">Refund requested — awaiting supplier</p>
                         ) : (
                           <button
                             onClick={() => requestRefund(payment.id)}
                             disabled={requestingRefundId === payment.id}
-                            className="text-[11px] text-terracotta font-bold underline mt-2"
+                            className="text-xs text-terracotta font-bold underline mt-2"
                           >
                             {requestingRefundId === payment.id ? 'Requesting...' : 'Request a refund'}
                           </button>

@@ -61,7 +61,7 @@ export default function AddMemberPanel({ stokvelId }) {
 
   return (
     <div className="mb-4 pb-4 border-b border-terracotta/15">
-      <p className="text-[10px] font-black uppercase tracking-wider text-ink-muted mb-1">Add someone</p>
+      <p className="text-xs font-black uppercase tracking-wider text-ink-muted mb-1">Add someone</p>
       <p className="text-xs text-ink-muted mb-2">
         Type a name. Your family from the iziduko network show first. They get a message and choose to join.
       </p>
@@ -84,7 +84,7 @@ export default function AddMemberPanel({ stokvelId }) {
           <li key={p.userId} className="flex items-center gap-3 p-3">
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold text-ink truncate">{p.name}</p>
-              <p className="text-[11px] text-ink-muted">{p.isFamily ? 'Family connection' : p.username ? `@${p.username}` : ''}</p>
+              <p className="text-xs text-ink-muted">{p.isFamily ? 'Family connection' : p.username ? `@${p.username}` : ''}</p>
             </div>
             {p.alreadyMember ? (
               <span className="text-xs font-semibold text-ink-muted">Already in</span>

@@ -67,11 +67,11 @@ function MyQuoteRequests({ onBack }) {
                   </p>
                   <p className="text-xs text-ink-muted">{q.venueArea}{q.city ? `, ${q.city}` : ''} · {q.guestCount} guests</p>
                 </div>
-                <span className={cn('text-[10px] font-bold uppercase px-2 py-1 rounded-pill whitespace-nowrap', STATUS_STYLE[q.status] || 'bg-brand-black/10 text-brand-black/60')}>
+                <span className={cn('text-xs font-bold uppercase px-2 py-1 rounded-pill whitespace-nowrap', STATUS_STYLE[q.status] || 'bg-brand-black/10 text-brand-black/60')}>
                   {STATUS_LABEL[q.status] || q.status}
                 </span>
               </div>
-              <p className="text-[11px] text-ink-muted/70 mt-2">Submitted {new Date(q.createdAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+              <p className="text-xs text-ink-muted/70 mt-2">Submitted {new Date(q.createdAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
             </div>
           ))}
         </div>

@@ -47,7 +47,7 @@ export default function LendingTargets({ stokvelId }) {
   return (
     <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
       <div>
-        <p className="text-[10px] font-black uppercase text-ink-muted">Umbutho lending target</p>
+        <p className="text-xs font-black uppercase text-ink-muted">Umbutho lending target</p>
         <p className="text-xs text-ink-muted mt-0.5">Lend money out, bring it back with interest. The interest you bring back counts towards your target.</p>
       </div>
 
@@ -62,7 +62,7 @@ export default function LendingTargets({ stokvelId }) {
               <div className="h-2.5 rounded-full bg-ink/10 overflow-hidden mt-1.5">
                 <div className="h-full bg-terracotta rounded-full transition-all duration-500" style={{ width: `${me.percent}%` }} />
               </div>
-              <p className="text-[11px] text-ink-muted mt-1.5">
+              <p className="text-xs text-ink-muted mt-1.5">
                 {me.raised >= me.target ? 'Target reached. Well done.' : `${money(me.target - me.raised)} still to raise · ${me.rounds} round(s) recorded`}
               </p>
             </>
@@ -107,7 +107,7 @@ export default function LendingTargets({ stokvelId }) {
           <label className="text-xs text-ink-muted">Target each member must raise (R)
             <input type="number" min="1" step="1" value={target} onChange={(e) => setTarget(e.target.value)} className={`${inp} mt-1`} required />
           </label>
-          <p className="text-[11px] text-ink-muted">This sets the same target for every member.</p>
+          <p className="text-xs text-ink-muted">This sets the same target for every member.</p>
           <div className="flex gap-2">
             <button type="submit" disabled={saving} className={`flex-1 py-2 ${primaryBtn}`}>{saving ? 'Saving...' : 'Save target'}</button>
             <button type="button" onClick={() => setMode(null)} className={`flex-1 py-2 ${secondaryBtn}`}>Cancel</button>
@@ -117,7 +117,7 @@ export default function LendingTargets({ stokvelId }) {
 
       {data.members.length > 1 && (
         <div className="space-y-2 pt-1">
-          <p className="text-[10px] font-black uppercase text-ink-muted">Group progress</p>
+          <p className="text-xs font-black uppercase text-ink-muted">Group progress</p>
           {data.members.map((m) => (
             <div key={m.memberId}>
               <div className="flex justify-between text-xs">

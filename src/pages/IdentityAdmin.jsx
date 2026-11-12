@@ -78,13 +78,13 @@ function IdentityAdmin({ onBack }) {
 
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <div>
-                  <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-1">Profile photo</p>
+                  <p className="text-xs font-bold text-ink-muted uppercase tracking-wider mb-1">Profile photo</p>
                   <div className="w-full aspect-square rounded-soft bg-cream overflow-hidden flex items-center justify-center">
                     {p.profileImage ? <img src={p.profileImage} alt="Profile" className="w-full h-full object-cover" /> : <Icon name="user" size={28} color="#8a8278" />}
                   </div>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-1">ID document</p>
+                  <p className="text-xs font-bold text-ink-muted uppercase tracking-wider mb-1">ID document</p>
                   <div className="w-full aspect-square rounded-soft bg-cream overflow-hidden flex items-center justify-center">
                     {p.idDocumentUrl ? <img src={p.idDocumentUrl} alt="ID document" className="w-full h-full object-cover" /> : <Icon name="file" size={28} color="#8a8278" />}
                   </div>

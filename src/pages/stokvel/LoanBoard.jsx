@@ -110,11 +110,11 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
     <div className="space-y-4">
       <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 grid grid-cols-2 gap-3">
         <div>
-          <p className="text-[10px] font-black uppercase text-ink-muted">Owed back to group</p>
+          <p className="text-xs font-black uppercase text-ink-muted">Owed back to group</p>
           <p className="font-display font-bold text-xl text-ink mt-0.5">{money(outstanding)}</p>
         </div>
         <div>
-          <p className="text-[10px] font-black uppercase text-ink-muted">Available in group</p>
+          <p className="text-xs font-black uppercase text-ink-muted">Available in group</p>
           <p className="font-display font-bold text-xl text-ink mt-0.5">{money(groupBalance)}</p>
         </div>
         <p className="col-span-2 text-xs text-ink-muted">
@@ -125,7 +125,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
       {/* Signpost: the loan steps, so nobody gets lost halfway */}
       <div className="rounded-soft border-2 border-brand-ochre/40 bg-brand-ochre/10 px-4 py-3">
         <p className="text-xs font-bold text-ink">How a group loan works</p>
-        <ol className="text-[11px] text-ink-muted mt-1 space-y-0.5 list-decimal pl-4">
+        <ol className="text-xs text-ink-muted mt-1 space-y-0.5 list-decimal pl-4">
           <li>Borrower asks, takes a photo and signs on this phone.</li>
           <li>Officials vote. {requiredApprovals} approval{requiredApprovals === 1 ? '' : 's'} release the loan.</li>
           <li>Officials record each repayment until it is paid back.</li>
@@ -173,7 +173,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
             </p>
           )}
           {preview > 0 && !(agreement.borrowerPhoto && agreement.signature && agreement.agreed) && (
-            <p className="text-[11px] font-bold text-brand-ochre">To send: take the photo, sign, and tick that you agree.</p>
+            <p className="text-xs font-bold text-brand-ochre">To send: take the photo, sign, and tick that you agree.</p>
           )}
           <div className="flex gap-2">
             <button type="submit" disabled={saving || !termsReady || !agreement.borrowerPhoto || !agreement.signature || !agreement.agreed}
@@ -201,15 +201,15 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
                 <p className="font-bold text-sm text-ink truncate">{l.borrowerName}</p>
                 <p className="text-xs text-ink-muted">{fmtDate(l.createdAt)} · {l.repayMonths} month(s) · {l.interestPercent}% interest{l.rateBasis ? ` (${RATE_BASIS_OPTIONS.find((o) => o.value === l.rateBasis)?.label.toLowerCase() || ''})` : ''}</p>
               </div>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-pill flex-shrink-0 ${STATUS_STYLE[l.status]}`}>{STATUS_LABEL[l.status]}</span>
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-pill flex-shrink-0 ${STATUS_STYLE[l.status]}`}>{STATUS_LABEL[l.status]}</span>
             </div>
             <p className="font-display font-bold text-lg text-ink">{money(l.amount)}</p>
             {l.reason && <p className="text-xs text-ink-muted">{l.reason}</p>}
             {l.agreement ? (
               <button type="button" onClick={() => setViewAgreement(l)} className="flex items-center gap-1.5 text-xs font-bold text-sage-700">
-                <span className="text-[10px] bg-sage-100 px-2 py-0.5 rounded-pill">Signed agreement</span> View photo and signature
+                <span className="text-xs bg-sage-100 px-2 py-0.5 rounded-pill">Signed agreement</span> View photo and signature
               </button>
-            ) : !l.agreedAt && <p className="text-[11px] text-brand-ochre font-bold">No signed agreement on file</p>}
+            ) : !l.agreedAt && <p className="text-xs text-brand-ochre font-bold">No signed agreement on file</p>}
 
             {l.status === 'PENDING' && (
               <p className="text-xs text-ink">{yes} of {requiredApprovals} approvals{l.votes.length ? ` · voted: ${l.votes.map((v) => v.name).join(', ')}` : ''}</p>
@@ -229,7 +229,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
 
             {(l.status === 'APPROVED' || l.status === 'REPAID') && (
               <div>
-                <div className="flex justify-between text-[11px] text-ink-muted mb-1">
+                <div className="flex justify-between text-xs text-ink-muted mb-1">
                   <span>Repaid {money(l.repaid)} of {money(l.totalDue)}</span>
                   <span>{money(l.monthlyInstalment)}/month</span>
                 </div>

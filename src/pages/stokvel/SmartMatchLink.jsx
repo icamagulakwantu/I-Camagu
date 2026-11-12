@@ -54,7 +54,7 @@ export default function SmartMatchLink({ groupBalance, memberCount }) {
   return (
     <div className="space-y-4">
       <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4">
-        <p className="text-[10px] font-black uppercase tracking-widest text-white/80">Savings into buying power</p>
+        <p className="text-xs font-black uppercase tracking-widest text-white/80">Savings into buying power</p>
         <p className="text-sm mt-1">
           Use the group pot for a SmartMatch bulk order: alcohol, groceries or meat at supplier prices, not retail.
         </p>
@@ -74,7 +74,7 @@ export default function SmartMatchLink({ groupBalance, memberCount }) {
             <div key={s.id} className="flex items-center gap-3 px-3 py-2.5">
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-ink truncate">{s.name}</p>
-                <p className="text-[11px] text-ink-muted">{money(s.casePriceZAR)} per case{s.unitsPerCase ? ` of ${s.unitsPerCase}` : ''}</p>
+                <p className="text-xs text-ink-muted">{money(s.casePriceZAR)} per case{s.unitsPerCase ? ` of ${s.unitsPerCase}` : ''}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button type="button" onClick={() => change(s.id, -1)} disabled={!qty[s.id]}

@@ -97,7 +97,7 @@ export default function Constitution({ stokvelId, isOrganiser }) {
   const Field = ({ label, value }) =>
     value ? (
       <div>
-        <p className="text-[11px] font-black uppercase text-ink-muted mb-0.5">{label}</p>
+        <p className="text-xs font-black uppercase text-ink-muted mb-0.5">{label}</p>
         <p className="text-sm text-ink">{value}</p>
       </div>
     ) : null
@@ -141,10 +141,10 @@ export default function Constitution({ stokvelId, isOrganiser }) {
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs text-ink font-semibold">{entry.action}</p>
-                  <p className="text-[11px] text-ink-muted mt-0.5">
+                  <p className="text-xs text-ink-muted mt-0.5">
                     {entry.actorName || 'Admin'} &bull; {fmt(entry.createdAt)}
                   </p>
-                  {entry.details && <p className="text-[11px] text-ink-muted">{entry.details}</p>}
+                  {entry.details && <p className="text-xs text-ink-muted">{entry.details}</p>}
                 </div>
               </div>
             ))
@@ -161,14 +161,14 @@ export default function Constitution({ stokvelId, isOrganiser }) {
           <div className="card-paper p-4 space-y-3">
             <p className="eyebrow text-ink-muted">Purpose & meetings</p>
             <div>
-              <label className="text-[11px] font-bold text-ink-muted mb-1 block">Group purpose</label>
+              <label className="text-xs font-bold text-ink-muted mb-1 block">Group purpose</label>
               <textarea rows={2} placeholder="What is this stokvel for?"
                 value={draft.purpose} onChange={(e) => setDraft((d) => ({ ...d, purpose: e.target.value }))}
                 className={`${inp} resize-none`} />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Meeting frequency</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Meeting frequency</label>
                 <select value={draft.meetingFrequency}
                   onChange={(e) => setDraft((d) => ({ ...d, meetingFrequency: e.target.value }))} className={inp}>
                   <option>Weekly</option>
@@ -178,14 +178,14 @@ export default function Constitution({ stokvelId, isOrganiser }) {
                 </select>
               </div>
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Meeting day</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Meeting day</label>
                 <input type="text" placeholder="e.g. Last Saturday"
                   value={draft.meetingDay} onChange={(e) => setDraft((d) => ({ ...d, meetingDay: e.target.value }))}
                   className={inp} />
               </div>
             </div>
             <div>
-              <label className="text-[11px] font-bold text-ink-muted mb-1 block">Usual meeting location</label>
+              <label className="text-xs font-bold text-ink-muted mb-1 block">Usual meeting location</label>
               <input type="text" placeholder="e.g. Rotating, or a fixed address"
                 value={draft.meetingLocation} onChange={(e) => setDraft((d) => ({ ...d, meetingLocation: e.target.value }))}
                 className={inp} />
@@ -197,13 +197,13 @@ export default function Constitution({ stokvelId, isOrganiser }) {
             <p className="eyebrow text-ink-muted">Contributions & penalties</p>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Contribution (R)</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Contribution (R)</label>
                 <input type="number" min="0" placeholder="500"
                   value={draft.contributionAmount}
                   onChange={(e) => setDraft((d) => ({ ...d, contributionAmount: e.target.value }))} className={inp} />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Due by (day of month)</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Due by (day of month)</label>
                 <input type="number" min="1" max="31" placeholder="1"
                   value={draft.contributionDueDay}
                   onChange={(e) => setDraft((d) => ({ ...d, contributionDueDay: e.target.value }))} className={inp} />
@@ -211,13 +211,13 @@ export default function Constitution({ stokvelId, isOrganiser }) {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Late fine (R)</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Late fine (R)</label>
                 <input type="number" min="0" placeholder="50"
                   value={draft.lateFineAmount}
                   onChange={(e) => setDraft((d) => ({ ...d, lateFineAmount: e.target.value }))} className={inp} />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Fine after (days)</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Fine after (days)</label>
                 <input type="number" min="1" placeholder="3"
                   value={draft.lateFineDays}
                   onChange={(e) => setDraft((d) => ({ ...d, lateFineDays: e.target.value }))} className={inp} />
@@ -225,13 +225,13 @@ export default function Constitution({ stokvelId, isOrganiser }) {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Absence fine (R)</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Absence fine (R)</label>
                 <input type="number" min="0" placeholder="50"
                   value={draft.absenceFineAmount}
                   onChange={(e) => setDraft((d) => ({ ...d, absenceFineAmount: e.target.value }))} className={inp} />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Max absences</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Max absences</label>
                 <input type="number" min="1" placeholder="3"
                   value={draft.maxAbsences}
                   onChange={(e) => setDraft((d) => ({ ...d, maxAbsences: e.target.value }))} className={inp} />
@@ -243,7 +243,7 @@ export default function Constitution({ stokvelId, isOrganiser }) {
           <div className="card-paper p-4 space-y-3">
             <p className="eyebrow text-ink-muted">Payout rules</p>
             <div>
-              <label className="text-[11px] font-bold text-ink-muted mb-1 block">Payout order</label>
+              <label className="text-xs font-bold text-ink-muted mb-1 block">Payout order</label>
               <select value={draft.payoutOrder}
                 onChange={(e) => setDraft((d) => ({ ...d, payoutOrder: e.target.value }))} className={inp}>
                 <option value="rotating">Rotating (Umgalelo)</option>
@@ -255,7 +255,7 @@ export default function Constitution({ stokvelId, isOrganiser }) {
               </select>
             </div>
             <div>
-              <label className="text-[11px] font-bold text-ink-muted mb-1 block">Payout schedule / notes</label>
+              <label className="text-xs font-bold text-ink-muted mb-1 block">Payout schedule / notes</label>
               <textarea rows={2} placeholder="Describe when and how payouts happen..."
                 value={draft.payoutSchedule}
                 onChange={(e) => setDraft((d) => ({ ...d, payoutSchedule: e.target.value }))}
@@ -267,14 +267,14 @@ export default function Constitution({ stokvelId, isOrganiser }) {
           <div className="card-paper p-4 space-y-3">
             <p className="eyebrow text-ink-muted">Membership & banking</p>
             <div>
-              <label className="text-[11px] font-bold text-ink-muted mb-1 block">Membership requirements</label>
+              <label className="text-xs font-bold text-ink-muted mb-1 block">Membership requirements</label>
               <textarea rows={2} placeholder="Who can join? Any entrance fee?"
                 value={draft.membershipRequirements}
                 onChange={(e) => setDraft((d) => ({ ...d, membershipRequirements: e.target.value }))}
                 className={`${inp} resize-none`} />
             </div>
             <div>
-              <label className="text-[11px] font-bold text-ink-muted mb-1 block">Termination / expulsion rules</label>
+              <label className="text-xs font-bold text-ink-muted mb-1 block">Termination / expulsion rules</label>
               <textarea rows={2} placeholder="What happens if a member leaves or is expelled?"
                 value={draft.terminationRules}
                 onChange={(e) => setDraft((d) => ({ ...d, terminationRules: e.target.value }))}
@@ -282,20 +282,20 @@ export default function Constitution({ stokvelId, isOrganiser }) {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Bank</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Bank</label>
                 <input type="text" placeholder="e.g. Capitec"
                   value={draft.bankName}
                   onChange={(e) => setDraft((d) => ({ ...d, bankName: e.target.value }))} className={inp} />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-ink-muted mb-1 block">Account holder</label>
+                <label className="text-xs font-bold text-ink-muted mb-1 block">Account holder</label>
                 <input type="text" placeholder="Group name or signatories"
                   value={draft.bankAccountHolder}
                   onChange={(e) => setDraft((d) => ({ ...d, bankAccountHolder: e.target.value }))} className={inp} />
               </div>
             </div>
             <div>
-              <label className="text-[11px] font-bold text-ink-muted mb-1 block">Signatories (names)</label>
+              <label className="text-xs font-bold text-ink-muted mb-1 block">Signatories (names)</label>
               <input type="text" placeholder="e.g. Thandi Dlamini, Nomvula Khumalo"
                 value={draft.signatories}
                 onChange={(e) => setDraft((d) => ({ ...d, signatories: e.target.value }))} className={inp} />
@@ -304,7 +304,7 @@ export default function Constitution({ stokvelId, isOrganiser }) {
 
           {/* Additional rules */}
           <div className="card-paper p-4">
-            <label className="text-[11px] font-bold text-ink-muted mb-1 block">Additional rules</label>
+            <label className="text-xs font-bold text-ink-muted mb-1 block">Additional rules</label>
             <textarea rows={4} placeholder="Any other rules the group has agreed on..."
               value={draft.additionalRules}
               onChange={(e) => setDraft((d) => ({ ...d, additionalRules: e.target.value }))}

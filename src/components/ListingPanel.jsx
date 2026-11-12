@@ -44,7 +44,7 @@ export default function ListingPanel({ stokvelId }) {
 
   return (
     <div className="mb-4 pb-4 border-b border-terracotta/15">
-      <p className="text-[10px] font-black uppercase tracking-wider text-ink-muted mb-1">Show my stokvel to people nearby</p>
+      <p className="text-xs font-black uppercase tracking-wider text-ink-muted mb-1">Show my stokvel to people nearby</p>
       <p className="text-xs text-ink-muted mb-2">
         {form.isPublic ? 'On. People in your area can see this stokvel and ask to join. You decide who you invite.' : 'Off. Only people you invite can see this stokvel.'}
       </p>

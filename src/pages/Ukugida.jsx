@@ -128,7 +128,7 @@ export default function Ukugida({ onBack }) {
           <h1 className="font-display font-bold text-3xl">Ukugida</h1>
           <p className="text-white/70 text-sm mt-1">Track gifts given and received</p>
           <div className="mt-4 bg-white/10 backdrop-blur rounded-soft p-3 border border-white/20">
-            <p className="text-[10px] font-bold text-white/70 uppercase tracking-wider">Net Balance</p>
+            <p className="text-xs font-bold text-white/70 uppercase tracking-wider">Net Balance</p>
             <p className={cn(
               'font-display font-bold text-2xl mt-1',
               balance >= 0 ? 'text-white' : 'text-terracotta-light'
@@ -340,8 +340,8 @@ export default function Ukugida({ onBack }) {
                   <p className="text-xs text-ink-muted mt-0.5">
                     {entry.direction === 'RECEIVED' ? 'From' : 'To'}: <strong className="text-ink">{entry.counterpartyName}</strong>
                   </p>
-                  {entry.ceremonyLabel && <p className="text-[11px] text-ink-muted mt-0.5">{entry.ceremonyLabel}</p>}
-                  <p className="text-[10px] text-ink-muted mt-0.5">{new Date(entry.eventDate).toLocaleDateString()}</p>
+                  {entry.ceremonyLabel && <p className="text-xs text-ink-muted mt-0.5">{entry.ceremonyLabel}</p>}
+                  <p className="text-xs text-ink-muted mt-0.5">{new Date(entry.eventDate).toLocaleDateString()}</p>
                 </div>
                 <button
                   onClick={() => deleteEntry(entry.id)}

@@ -27,7 +27,7 @@ export default function CommunityShortcuts({ onNavigate, clanCeremonies = [] }) 
             </span>
             <span>
               <span className="block text-[13px] font-bold text-ink leading-tight">{s.title}</span>
-              <span className="mt-1 block text-[11px] text-ink-muted leading-snug">{s.desc}</span>
+              <span className="mt-1 block text-xs text-ink-muted leading-snug">{s.desc}</span>
             </span>
           </button>
         ))}
@@ -42,7 +42,7 @@ export default function CommunityShortcuts({ onNavigate, clanCeremonies = [] }) 
                 {ceremony.eventDate ? (
                   <>
                     <span className="font-display text-base font-semibold text-terracotta">{new Date(ceremony.eventDate).getDate()}</span>
-                    <span className="text-[9px] font-bold uppercase text-terracotta/80">{new Date(ceremony.eventDate).toLocaleDateString('en-ZA', { month: 'short' })}</span>
+                    <span className="text-xs font-bold uppercase text-terracotta/80">{new Date(ceremony.eventDate).toLocaleDateString('en-ZA', { month: 'short' })}</span>
                   </>
                 ) : (
                   <Icon name="calendar" size={16} color="#c45c26" />

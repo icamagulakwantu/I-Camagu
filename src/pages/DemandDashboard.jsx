@@ -27,12 +27,12 @@ const TABS = [
 function OfferList({ pool, acceptingId, onAccept }) {
   const pending = pool.offers.filter((o) => o.status === 'PENDING')
   if (pending.length === 0) {
-    return <p className="text-[11px] text-ink-muted mt-2">No merchant offers yet. Merchants of this kind see this order in their dashboard and can quote on it.</p>
+    return <p className="text-xs text-ink-muted mt-2">No merchant offers yet. Merchants of this kind see this order in their dashboard and can quote on it.</p>
   }
   const canAccept = pool.status === 'MATCHED'
   return (
     <div className="mt-3 pt-3 border-t border-terracotta/10">
-      <p className="text-[10px] font-black uppercase text-ink-muted mb-2">
+      <p className="text-xs font-black uppercase text-ink-muted mb-2">
         Offers · cheapest first{canAccept ? '' : ' · can be accepted once the minimum is reached'}
       </p>
       <div className="space-y-2">
@@ -42,7 +42,7 @@ function OfferList({ pool, acceptingId, onAccept }) {
               <p className="text-xs font-bold text-ink truncate">
                 {offer.partnerName}{index === 0 && <span className="text-sage-600"> · best price</span>}
               </p>
-              <p className="text-[10px] text-ink-muted truncate">{offer.partnerArea}{offer.note ? ` · ${offer.note}` : ''}</p>
+              <p className="text-xs text-ink-muted truncate">{offer.partnerArea}{offer.note ? ` · ${offer.note}` : ''}</p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <p className="tabular text-sm font-bold text-ink">{money(offer.totalPriceZAR)}</p>
@@ -50,7 +50,7 @@ function OfferList({ pool, acceptingId, onAccept }) {
                 type="button"
                 onClick={() => onAccept(offer.id)}
                 disabled={!canAccept || acceptingId === offer.id}
-                className={`cursor-pointer bg-sage-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-pill ${pressable}`}
+                className={`cursor-pointer bg-sage-500 text-white text-xs font-bold px-3 py-1.5 rounded-pill ${pressable}`}
               >
                 {acceptingId === offer.id ? '...' : 'Accept'}
               </button>
@@ -254,7 +254,7 @@ export default function DemandDashboard({ onBack }) {
                         <p className="tabular font-bold text-sm text-terracotta flex-shrink-0">{money(pool.valueZAR)}</p>
                       </div>
                       {(pool.items || []).length > 0 && (
-                        <p className="text-[11px] text-ink-muted">
+                        <p className="text-xs text-ink-muted">
                           {pool.items.slice(0, 6).map((item) => `${item.quantity} × ${item.name}`).join(' · ')}
                           {pool.items.length > 6 ? ` · +${pool.items.length - 6} more` : ''}
                         </p>
@@ -297,7 +297,7 @@ export default function DemandDashboard({ onBack }) {
                           {p.pool.partner.bankBranchCode ? ` · branch ${p.pool.partner.bankBranchCode}` : ''}
                         </p>
                       ) : (
-                        <p className="text-[11px] text-terracotta font-bold mb-3">
+                        <p className="text-xs text-terracotta font-bold mb-3">
                           No bank details on file for this merchant yet — ask them to add them before transferring.
                         </p>
                       )}

@@ -28,7 +28,7 @@ class ErrorBoundary extends Component {
           </button>
           <details className="mt-6 text-left max-w-xs">
             <summary className="text-xs text-ink-muted cursor-pointer">Technical details</summary>
-            <p className="text-[10px] text-ink-muted mt-2 break-all">{this.state.error?.message}</p>
+            <p className="text-xs text-ink-muted mt-2 break-all">{this.state.error?.message}</p>
           </details>
         </div>
       )

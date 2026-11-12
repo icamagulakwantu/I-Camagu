@@ -131,7 +131,7 @@ function ShrineFund({ onBack }) {
             </>
           ) : (
             <>
-              <p className="text-[11px] font-black uppercase tracking-widest text-ink-muted mb-1">Total raised, all-time</p>
+              <p className="text-xs font-black uppercase tracking-widest text-ink-muted mb-1">Total raised, all-time</p>
               <p className="font-display font-extrabold text-4xl text-terracotta">{money(data?.totalAmount || 0)}</p>
             </>
           )}
@@ -141,15 +141,15 @@ function ShrineFund({ onBack }) {
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-white border border-terracotta/15 rounded-soft p-3 text-center">
               <p className="font-display font-bold text-lg text-ink">{data?.payoutContributionCount || 0}</p>
-              <p className="text-[9px] font-bold text-ink-muted uppercase tracking-wide mt-0.5 leading-tight">Payout contributions</p>
+              <p className="text-xs font-bold text-ink-muted uppercase tracking-wide mt-0.5 leading-tight">Payout contributions</p>
             </div>
             <div className="bg-white border border-terracotta/15 rounded-soft p-3 text-center">
               <p className="font-display font-bold text-lg text-ink">{data?.donationCount || 0}</p>
-              <p className="text-[9px] font-bold text-ink-muted uppercase tracking-wide mt-0.5 leading-tight">Public donations</p>
+              <p className="text-xs font-bold text-ink-muted uppercase tracking-wide mt-0.5 leading-tight">Public donations</p>
             </div>
             <div className="bg-white border border-terracotta/15 rounded-soft p-3 text-center">
               <p className="font-display font-bold text-lg text-ink">{data?.suggestedRate ? `${(data.suggestedRate * 100).toFixed(0)}%` : '3%'}</p>
-              <p className="text-[9px] font-bold text-ink-muted uppercase tracking-wide mt-0.5 leading-tight">Suggested contribution rate</p>
+              <p className="text-xs font-bold text-ink-muted uppercase tracking-wide mt-0.5 leading-tight">Suggested contribution rate</p>
             </div>
           </div>
         )}
@@ -157,7 +157,7 @@ function ShrineFund({ onBack }) {
         {/* Allocations */}
         {!loading && !loadFailed && (
           <div className="bg-white border border-terracotta/15 rounded-soft p-4">
-            <p className="text-[11px] font-black uppercase tracking-widest text-ink-muted mb-2">Where the fund has been invested</p>
+            <p className="text-xs font-black uppercase tracking-widest text-ink-muted mb-2">Where the fund has been invested</p>
             {data?.allocationsBySector?.length ? (
               <>
                 <div className="space-y-2">
@@ -199,7 +199,7 @@ function ShrineFund({ onBack }) {
               className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta" />
             <input type="email" placeholder="Email (optional, so we can follow up)" value={donorEmail} onChange={(e) => setDonorEmail(e.target.value)}
               className="w-full h-12 border-2 border-cream-dark rounded-soft px-4 text-sm focus:outline-none focus:border-terracotta" />
-            <p className="text-[11px] text-ink-muted leading-relaxed">
+            <p className="text-xs text-ink-muted leading-relaxed">
               We don't yet have a live payment gateway — submitting this records your pledge, and someone from iCamagu will personally follow up to complete the transfer.
             </p>
             <button type="submit" disabled={submitting} className={`w-full bg-ink text-white font-bold py-3 rounded-pill ${pressable}`}>
@@ -253,7 +253,7 @@ function ShrineFund({ onBack }) {
                     <Icon name={p.icon} size={18} color={p.accent} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest mb-0.5" style={{ color: p.accent }}>{p.phase}</p>
+                    <p className="text-xs font-black uppercase tracking-widest mb-0.5" style={{ color: p.accent }}>{p.phase}</p>
                     <p className="font-bold text-sm text-ink leading-snug">{p.headline}</p>
                     <p className="text-xs text-ink-muted leading-relaxed mt-1.5">{p.body}</p>
                   </div>
@@ -273,7 +273,7 @@ function ShrineFund({ onBack }) {
                   <Icon name={p.icon} size={16} color="#4a7a4a" />
                 </div>
                 <p className="font-bold text-xs text-ink leading-snug">{p.label}</p>
-                <p className="text-[10px] text-ink-muted leading-relaxed mt-1">{p.desc}</p>
+                <p className="text-xs text-ink-muted leading-relaxed mt-1">{p.desc}</p>
               </div>
             ))}
           </div>
@@ -292,7 +292,7 @@ function ShrineFund({ onBack }) {
 
         {/* Disclaimer */}
         <div className="pb-4">
-          <p className="text-[11px] text-ink-muted italic leading-relaxed">
+          <p className="text-xs text-ink-muted italic leading-relaxed">
             The exact governance process and how the fund is eventually deployed are still being finalised — this page will grow more detailed as those decisions are made.
           </p>
         </div>

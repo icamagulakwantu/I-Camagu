@@ -14,14 +14,14 @@ function CommunityVerification({ targetType, targetId, confirmCount = 0, dispute
   return (
     <div className="mt-3 pt-3 border-t border-terracotta/10">
       <div className="flex items-center justify-between mb-1.5">
-        <p className="text-[10px] font-black uppercase text-ink-muted tracking-wider">Community Verification</p>
+        <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Community Verification</p>
         {trusted && (
-          <span className="text-[10px] font-black text-white bg-sage-500 px-2 py-0.5 rounded-pill flex items-center gap-1">
+          <span className="text-xs font-black text-white bg-sage-500 px-2 py-0.5 rounded-pill flex items-center gap-1">
             <Icon name="users" size={10} color="#fff" /> Community Trusted
           </span>
         )}
         {disputed && (
-          <span className="text-[10px] font-black text-terracotta bg-terracotta/10 px-2 py-0.5 rounded-pill">
+          <span className="text-xs font-black text-terracotta bg-terracotta/10 px-2 py-0.5 rounded-pill">
             Disputed — under review
           </span>
         )}
@@ -32,7 +32,7 @@ function CommunityVerification({ targetType, targetId, confirmCount = 0, dispute
           <div className="h-full bg-sage-500 rounded-pill transition-all" style={{ width: `${progressPct}%` }} />
         </div>
       )}
-      <p className="text-[11px] text-ink-muted mb-2">
+      <p className="text-xs text-ink-muted mb-2">
         {confirmCount}/{CONFIRMS_NEEDED} confirms · {disputeCount}/{MAX_DISPUTES} disputes max
       </p>
 

@@ -205,7 +205,7 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
               </div>
             ) : (
               <div>
-                <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-pill ${BOOKING_STATUS_COLOR[booking.status] || 'bg-cream-dark text-ink-muted'}`}>
+                <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-pill ${BOOKING_STATUS_COLOR[booking.status] || 'bg-cream-dark text-ink-muted'}`}>
                   {booking.status}
                 </span>
 
@@ -219,9 +219,9 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
                         <div key={t.id} className="flex items-center justify-between bg-cream rounded-soft p-2.5">
                           <div>
                             <p className="text-sm font-bold text-ink">{t.colorLabel}</p>
-                            <p className="text-[11px] text-ink-muted">{t.entitlement}{t.guestCount ? ` · ${t.guestCount} guests` : ''}</p>
+                            <p className="text-xs text-ink-muted">{t.entitlement}{t.guestCount ? ` · ${t.guestCount} guests` : ''}</p>
                           </div>
-                          <button onClick={() => removeTier(t.id)} className="text-[11px] text-terracotta font-bold underline">Remove</button>
+                          <button onClick={() => removeTier(t.id)} className="text-xs text-terracotta font-bold underline">Remove</button>
                         </div>
                       ))}
                     </div>
@@ -262,7 +262,7 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
               {tourism && (
                 <button
                   onClick={toggleTourism}
-                  className={`text-[11px] font-bold px-3 py-1 rounded-pill ${tourism.isEnabled ? 'bg-sage-500 text-white' : 'border-2 border-terracotta/20 text-ink-muted'} ${pressable}`}
+                  className={`text-xs font-bold px-3 py-1 rounded-pill ${tourism.isEnabled ? 'bg-sage-500 text-white' : 'border-2 border-terracotta/20 text-ink-muted'} ${pressable}`}
                 >
                   {tourism.isEnabled ? 'Enabled' : 'Disabled'}
                 </button>
@@ -299,7 +299,7 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
                   <p className="text-xs font-bold text-ink">Bookings log</p>
                   <button
                     type="button" onClick={() => setShowBookingForm(!showBookingForm)}
-                    className={`text-[11px] font-bold text-sage-600 ${pressable}`}
+                    className={`text-xs font-bold text-sage-600 ${pressable}`}
                   >
                     {showBookingForm ? 'Cancel' : '+ Log a booking'}
                   </button>
@@ -341,9 +341,9 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
                       <div key={b.id} className="flex items-center justify-between bg-cream rounded-soft p-2.5">
                         <div>
                           <p className="text-xs font-bold text-ink">{b.tourismCompanyName}</p>
-                          <p className="text-[10px] text-ink-muted">{b.groupSize} people · R{parseFloat(b.totalPaidZAR).toFixed(0)}</p>
+                          <p className="text-xs text-ink-muted">{b.groupSize} people · R{parseFloat(b.totalPaidZAR).toFixed(0)}</p>
                         </div>
-                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-pill ${BOOKING_STATUS_COLOR[b.status] || 'bg-cream-dark text-ink-muted'}`}>
+                        <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-pill ${BOOKING_STATUS_COLOR[b.status] || 'bg-cream-dark text-ink-muted'}`}>
                           {b.status}
                         </span>
                       </div>

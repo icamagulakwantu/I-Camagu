@@ -102,11 +102,11 @@ function PublicPlanView({ token }) {
         </p>
         <div className="mt-5 grid grid-cols-2 gap-2">
           <div className="rounded-2xl bg-cream/10 p-3 ring-1 ring-cream/20">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-cream/70">Prepared</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-cream/70">Prepared</p>
             <p className="font-display text-2xl font-semibold">{percent}%</p>
           </div>
           <div className="rounded-2xl bg-cream/10 p-3 ring-1 ring-cream/20">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-cream/70">Pledges</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-cream/70">Pledges</p>
             <p className="font-display text-2xl font-semibold">{pledges.length}</p>
           </div>
         </div>
@@ -163,7 +163,7 @@ function PublicPlanView({ token }) {
               <button type="submit" disabled={sending} className="w-full h-14 rounded-pill bg-sage-600 text-white font-bold text-base active:scale-[0.98] transition-transform disabled:opacity-60">
                 {sending ? 'Saving...' : 'Pledge it'}
               </button>
-              <p className="text-[11px] text-ink-muted text-center">Only the host sees your name and amount. No account needed. iCamagu never holds money.</p>
+              <p className="text-xs text-ink-muted text-center">Only the host sees your name and amount. No account needed. iCamagu never holds money.</p>
             </form>
           )}
         </section>

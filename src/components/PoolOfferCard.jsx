@@ -90,7 +90,7 @@ export default function PoolOfferCard({ cost, ceremonyId, checklistItemId, onClo
             </div>
             <div className="text-right shrink-0">
               <p className="font-bold text-ink">{money(suggestion.combinedOrderValueZAR)}</p>
-              <p className="text-[11px] text-ink-muted">combined value</p>
+              <p className="text-xs text-ink-muted">combined value</p>
             </div>
           </div>
           <p className="text-sm font-semibold text-terracotta">Possible savings are unconfirmed until a merchant sends a written offer for this combined order.</p>

@@ -25,7 +25,7 @@ function ProgressBar({ current, target }) {
   const pct = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0
   return (
     <div>
-      <div className="flex justify-between text-[10px] font-bold text-ink-muted mb-1">
+      <div className="flex justify-between text-xs font-bold text-ink-muted mb-1">
         <span>{current} / {target} cases</span>
         <span>{pct}%</span>
       </div>
@@ -114,7 +114,7 @@ function RegisterForm({ onRegistered }) {
             <Icon name="mapPin" size={12} />
             {locating ? 'Locating...' : coords ? <>Location captured <Icon name="check" size={12} /></> : 'Pin exact location (recommended)'}
           </button>
-          <p className="text-[10px] text-ink-muted -mt-1">Group orders near you are shown first, and it helps plan delivery.</p>
+          <p className="text-xs text-ink-muted -mt-1">Group orders near you are shown first, and it helps plan delivery.</p>
           <input
             type="number" min="0" placeholder="Minimum order quantity (optional, cases)" value={moq}
             onChange={(e) => setMoq(e.target.value)}
@@ -181,23 +181,23 @@ function OrderRequests({ requests, onSent }) {
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <div className="min-w-0">
                     <p className="font-bold text-sm text-ink">{CATEGORY_LABEL[pool.category] || pool.category} order near {pool.area}</p>
-                    <p className="text-[11px] text-ink-muted mt-0.5">
+                    <p className="text-xs text-ink-muted mt-0.5">
                       {pool.memberCount} member{pool.memberCount === 1 ? '' : 's'} · catalogue value {money(pool.valueZAR)}
                       {pool.nearYou && <span className="text-sage-600 font-bold"> · near you</span>}
                     </p>
                   </div>
-                  <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-pill flex-shrink-0 ${pool.status === 'MATCHED' ? 'bg-sage-500 text-white' : 'bg-terracotta/20 text-terracotta'}`}>
+                  <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-pill flex-shrink-0 ${pool.status === 'MATCHED' ? 'bg-sage-500 text-white' : 'bg-terracotta/20 text-terracotta'}`}>
                     {pool.status === 'MATCHED' ? 'Ready to confirm' : 'Still filling'}
                   </span>
                 </div>
                 <div className="my-2"><ProgressBar current={pool.cases} target={pool.moqTarget} /></div>
                 {(pool.items || []).length > 0 && (
-                  <p className="text-[11px] text-ink-muted mb-2">
+                  <p className="text-xs text-ink-muted mb-2">
                     {pool.items.slice(0, 6).map((item) => `${item.quantity} × ${item.name}`).join(' · ')}
                     {pool.items.length > 6 ? ` · +${pool.items.length - 6} more` : ''}
                   </p>
                 )}
-                <p className="text-[11px] text-ink-muted mb-2">
+                <p className="text-xs text-ink-muted mb-2">
                   {pool.offerCount} offer{pool.offerCount === 1 ? '' : 's'} so far
                   {pool.myOffer && <> · <span className="font-bold text-ink">your offer: {money(pool.myOffer.totalPriceZAR)}</span></>}
                 </p>
@@ -358,17 +358,17 @@ function SupplierDashboard({ onBack }) {
               {pools.map((pool) => (
                 <div key={pool.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-pill ${
+                    <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-pill ${
                       pool.status === 'FULFILLED' ? 'bg-ink text-white' : pool.status === 'MATCHED' ? 'bg-sage-500 text-white' : 'bg-terracotta/20 text-terracotta'
                     }`}>
                       {pool.status === 'FULFILLED' ? 'Fulfilled' : pool.status === 'MATCHED' ? 'Matched' : 'Open'}
                     </span>
-                    <span className="text-[10px] text-ink-muted">{pool.participantCount} member{pool.participantCount === 1 ? '' : 's'}</span>
+                    <span className="text-xs text-ink-muted">{pool.participantCount} member{pool.participantCount === 1 ? '' : 's'}</span>
                   </div>
 
                   <ProgressBar current={pool.currentCases} target={pool.moqTarget} />
                   {pool.status === 'OPEN' && windowLabel(pool.deadline, pool.capCases, pool.currentCases) && (
-                    <p className="text-[10px] text-ink-muted mt-1">{windowLabel(pool.deadline, pool.capCases, pool.currentCases)}</p>
+                    <p className="text-xs text-ink-muted mt-1">{windowLabel(pool.deadline, pool.capCases, pool.currentCases)}</p>
                   )}
 
                   <div className="flex gap-4 mt-3 text-xs">
@@ -385,8 +385,8 @@ function SupplierDashboard({ onBack }) {
                   {pool.orderDocument && (
                     <div className="mt-3 pt-3 border-t border-terracotta/10">
                       <p className="text-xs font-bold text-ink">Order {pool.orderDocument.groupCode}</p>
-                      <p className="text-[10px] text-ink-muted">{pool.orderDocument.deliveryLocation}</p>
-                      <p className="text-[10px] text-ink-muted mt-1">
+                      <p className="text-xs text-ink-muted">{pool.orderDocument.deliveryLocation}</p>
+                      <p className="text-xs text-ink-muted mt-1">
                         {pool.orderDocument.confirmed}/{pool.orderDocument.totalLines} members confirmed · Total {money(pool.orderDocument.totalAmountZAR)}
                       </p>
                     </div>
@@ -394,16 +394,16 @@ function SupplierDashboard({ onBack }) {
 
                   {(pool.distribution || []).length > 0 && (
                     <div className="mt-3 pt-3 border-t border-terracotta/10">
-                      <p className="text-[10px] font-black uppercase text-ink-muted mb-2">Split by reference — for dividing up the stock</p>
+                      <p className="text-xs font-black uppercase text-ink-muted mb-2">Split by reference — for dividing up the stock</p>
                       <div className="space-y-2">
                         {pool.distribution.map((group) => (
                           <div key={group.orderReference} className="bg-cream rounded-soft p-2.5">
                             <div className="flex items-center justify-between mb-1">
                               <p className="font-mono text-xs font-bold text-brand-blue">{group.orderReference || 'No reference'}</p>
-                              {group.memberName && <p className="text-[10px] text-ink-muted truncate">{group.memberName}</p>}
+                              {group.memberName && <p className="text-xs text-ink-muted truncate">{group.memberName}</p>}
                             </div>
                             {group.items.map((item, idx) => (
-                              <p key={idx} className="text-[10px] text-ink-muted">
+                              <p key={idx} className="text-xs text-ink-muted">
                                 {item.quantity} {item.unitType.toLowerCase()}(s) — {item.description}
                               </p>
                             ))}
@@ -415,47 +415,47 @@ function SupplierDashboard({ onBack }) {
 
                   {(pool.payments || []).length > 0 && (
                     <div className="mt-3 pt-3 border-t border-terracotta/10">
-                      <p className="text-[10px] font-black uppercase text-ink-muted mb-2">Member Payments</p>
+                      <p className="text-xs font-black uppercase text-ink-muted mb-2">Member Payments</p>
                       <div className="space-y-2">
                         {pool.payments.map((p) => (
                           <div key={p.id} className="bg-cream rounded-soft p-2.5">
                             <div className="flex items-center justify-between">
                               <div className="min-w-0">
                                 <p className="text-xs font-bold text-ink truncate">{p.memberName}</p>
-                                <p className="text-[10px] text-ink-muted">
+                                <p className="text-xs text-ink-muted">
                                   {money(p.amountZAR)}{p.paymentReference ? ` · expect ref: ${p.paymentReference}` : ''}
                                 </p>
-                                <p className="text-[10px] text-ink-muted">
+                                <p className="text-xs text-ink-muted">
                                   {p.providerReference ? `Member entered: ${p.providerReference}` : 'Member hasn\'t entered a reference yet'}
                                 </p>
                               </div>
                               {p.status === 'REFUNDED' ? (
-                                <span className="text-[10px] font-bold text-terracotta flex-shrink-0">Refunded</span>
+                                <span className="text-xs font-bold text-terracotta flex-shrink-0">Refunded</span>
                               ) : p.status === 'PENDING' ? (
                                 <button
                                   onClick={() => confirmPayment(p.id)}
                                   disabled={confirmingId === p.id}
-                                  className={`cursor-pointer text-[11px] font-bold text-white bg-sage-500 px-3 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
+                                  className={`cursor-pointer text-xs font-bold text-white bg-sage-500 px-3 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
                                 >
                                   {confirmingId === p.id ? '...' : 'Confirm received'}
                                 </button>
                               ) : (
-                                <span className="text-[10px] font-bold text-sage-600 flex-shrink-0 flex items-center gap-1"><Icon name="check" size={11} color="#4a7a4a" /> Cleared</span>
+                                <span className="text-xs font-bold text-sage-600 flex-shrink-0 flex items-center gap-1"><Icon name="check" size={11} color="#4a7a4a" /> Cleared</span>
                               )}
                             </div>
                             {p.refundRequestedAt && p.status !== 'REFUNDED' && (
                               <div className="flex items-center justify-between mt-2 pt-2 border-t border-terracotta/10">
-                                <span className="text-[10px] font-bold text-terracotta">Refund requested</span>
+                                <span className="text-xs font-bold text-terracotta">Refund requested</span>
                                 {p.provider === 'MANUAL_EFT' ? (
                                   <button
                                     onClick={() => processRefund(p.id)}
                                     disabled={refundingId === p.id}
-                                    className={`cursor-pointer text-[11px] font-bold text-white bg-terracotta px-3 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
+                                    className={`cursor-pointer text-xs font-bold text-white bg-terracotta px-3 py-1.5 rounded-pill flex-shrink-0 ${pressable}`}
                                   >
                                     {refundingId === p.id ? '...' : 'Process refund'}
                                   </button>
                                 ) : (
-                                  <span className="text-[10px] text-ink-muted flex-shrink-0 text-right">
+                                  <span className="text-xs text-ink-muted flex-shrink-0 text-right">
                                     Paid online — iCamagu will refund this directly
                                   </span>
                                 )}

@@ -31,9 +31,9 @@ export default function StokvelInvite({ stokvelId, stokvelName }) {
 
   return (
     <div className="mb-4 pb-4 border-b border-terracotta/15">
-      <p className="text-[10px] font-black uppercase tracking-wider text-ink-muted mb-2">Invite people</p>
+      <p className="text-xs font-black uppercase tracking-wider text-ink-muted mb-2">Invite people</p>
       <p className="text-xs text-ink-muted mb-2">Send this link. New people register first, then are added to this stokvel automatically.</p>
-      <p className="text-[11px] font-mono bg-cream rounded-soft px-3 py-2 break-all select-all text-ink">{url}</p>
+      <p className="text-xs font-mono bg-cream rounded-soft px-3 py-2 break-all select-all text-ink">{url}</p>
       <div className="flex gap-2 mt-2">
         <button type="button" onClick={copyLink} className={`flex-1 border-2 border-sage-500 text-sage-600 font-bold py-2 rounded-pill text-sm flex items-center justify-center gap-1.5 ${pressable}`}>
           <Icon name="copy" size={14} /> Copy link

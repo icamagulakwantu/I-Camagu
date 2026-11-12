@@ -39,11 +39,11 @@ export default function JourneyMap({ steps, loading }) {
                 </span>
                 <span className="min-w-0 flex-1 pt-0.5">
                   <span className="flex items-center gap-2">
-                    <span className="block text-[10px] font-extrabold uppercase tracking-widest" style={{ color: step.color }}>
+                    <span className="block text-xs font-extrabold uppercase tracking-widest" style={{ color: step.color }}>
                       {step.xhosa}
                     </span>
                     {isNext && (
-                      <span className="rounded-pill px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white" style={{ backgroundColor: step.color }}>
+                      <span className="rounded-pill px-1.5 py-0.5 text-xs font-black uppercase tracking-wider text-white" style={{ backgroundColor: step.color }}>
                         Next
                       </span>
                     )}

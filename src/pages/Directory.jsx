@@ -291,7 +291,7 @@ function Directory({ onBack }) {
               )}
             </button>
             {!idDocUrl && !uploadingDoc && (
-              <p className="text-[10px] text-ink-muted text-center -mt-2">Image or PDF, up to 1.5MB</p>
+              <p className="text-xs text-ink-muted text-center -mt-2">Image or PDF, up to 1.5MB</p>
             )}
             <input
               ref={fileInputRef}
@@ -369,11 +369,11 @@ function Directory({ onBack }) {
                   <div className="flex justify-between items-start">
                     <p className="font-bold text-sm text-ink">{p.name}</p>
                     {p.isVerified ? (
-                      <span className="text-[10px] font-black text-white bg-sage-500 px-2 py-0.5 rounded-pill flex items-center gap-1">
+                      <span className="text-xs font-black text-white bg-sage-500 px-2 py-0.5 rounded-pill flex items-center gap-1">
                         <Icon name="check" size={10} color="#fff" /> Verified
                       </span>
                     ) : (
-                      <span className="text-[10px] font-black text-ink-muted bg-cream-dark px-2 py-0.5 rounded-pill">
+                      <span className="text-xs font-black text-ink-muted bg-cream-dark px-2 py-0.5 rounded-pill">
                         Pending
                       </span>
                     )}
@@ -446,7 +446,7 @@ function Directory({ onBack }) {
                     <button
                       type="button"
                       onClick={() => removeVendor(v.id)}
-                      className="text-[11px] text-terracotta font-bold underline mt-2"
+                      className="text-xs text-terracotta font-bold underline mt-2"
                     >
                       Remove listing
                     </button>

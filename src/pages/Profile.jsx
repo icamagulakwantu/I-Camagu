@@ -330,19 +330,19 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
           ) : (
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-sage-50 rounded-2xl p-4">
-                <p className="text-[10px] font-bold text-sage-600 uppercase tracking-wider">Paternal</p>
+                <p className="text-xs font-bold text-sage-600 uppercase tracking-wider">Paternal</p>
                 <p className="font-bold text-ink">{user?.paternalIziduko || '—'}</p>
               </div>
               <div className="bg-cream rounded-2xl p-4 border-2 border-cream-dark">
-                <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Maternal</p>
+                <p className="text-xs font-bold text-ink-muted uppercase tracking-wider">Maternal</p>
                 <p className="font-bold text-ink">{user?.maternalIziduko || '—'}</p>
               </div>
               <div className="bg-sage-50 rounded-2xl p-4">
-                <p className="text-[10px] font-bold text-sage-600 uppercase tracking-wider">Paternal grandmother</p>
+                <p className="text-xs font-bold text-sage-600 uppercase tracking-wider">Paternal grandmother</p>
                 <p className="font-bold text-ink">{user?.paternalGrandmotherIziduko || '—'}</p>
               </div>
               <div className="bg-cream rounded-2xl p-4 border-2 border-cream-dark">
-                <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Maternal grandmother</p>
+                <p className="text-xs font-bold text-ink-muted uppercase tracking-wider">Maternal grandmother</p>
                 <p className="font-bold text-ink">{user?.maternalGrandmotherIziduko || '—'}</p>
               </div>
             </div>
@@ -356,7 +356,7 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
             <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Identity Verification</h3>
             {identity && (
               <span className={cn(
-                'text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-pill border flex items-center gap-1',
+                'text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-pill border flex items-center gap-1',
                 IDENTITY_STATUS_META[identity.status]?.bg, IDENTITY_STATUS_META[identity.status]?.border, IDENTITY_STATUS_META[identity.status]?.text
               )}>
                 <Icon name={IDENTITY_STATUS_META[identity.status]?.icon} size={11} />
@@ -418,7 +418,7 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
                   <><Icon name="camera" size={14} /> Attach a photo of your ID</>
                 )}
               </button>
-              <p className="text-[11px] text-ink-muted -mt-1 flex items-start gap-1">
+              <p className="text-xs text-ink-muted -mt-1 flex items-start gap-1">
                 <Icon name="key" size={11} className="mt-0.5 flex-shrink-0" /> Only an admin reviewing your submission can see this photo — it's never shown to other members or on your public profile.
               </p>
               <label className="flex items-start gap-2 pt-1 cursor-pointer">

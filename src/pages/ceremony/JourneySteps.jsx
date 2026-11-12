@@ -44,8 +44,8 @@ export default function JourneySteps({ steps }) {
                     ? <Icon name="check" size={17} color="#ffffff" strokeWidth={2.6} />
                     : <Icon name={step.icon} size={17} />}
                 </span>
-                <span className="block text-[11px] font-bold leading-tight text-ink">{step.short}</span>
-                <span className="block text-[10px] leading-tight text-ink-muted">{step.status}</span>
+                <span className="block text-xs font-bold leading-tight text-ink">{step.short}</span>
+                <span className="block text-xs leading-tight text-ink-muted">{step.status}</span>
               </button>
             </li>
           )
@@ -54,7 +54,7 @@ export default function JourneySteps({ steps }) {
 
       {next ? (
         <div className="mt-4 rounded-2xl p-3.5" style={{ backgroundColor: `${next.color}14` }}>
-          <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: next.color }}>
+          <p className="text-xs font-black uppercase tracking-widest" style={{ color: next.color }}>
             Next · {next.xh}
           </p>
           <p className="mt-0.5 text-sm font-bold text-ink">{next.en}</p>

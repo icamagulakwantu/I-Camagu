@@ -55,7 +55,7 @@ function Activity({ onBack }) {
                                                                                                                                 <p className="text-sm text-ink">{item.text}</p>
                                                                                                                                                 <p className="text-xs text-ink-muted">{new Date(item.date).toLocaleDateString()}</p>
                                                                                                                                                               </div>
-                                                                                                                                                                            {item.status && <span className={`text-[10px] font-black uppercase ${STATUS_COLOR[item.status] || 'text-ink-muted'}`}>{item.status.replace(/_/g, ' ')}</span>}
+                                                                                                                                                                            {item.status && <span className={`text-xs font-black uppercase ${STATUS_COLOR[item.status] || 'text-ink-muted'}`}>{item.status.replace(/_/g, ' ')}</span>}
                                                                                                                                                                                         </div>
                                                                     ))}
                                                                             </div>

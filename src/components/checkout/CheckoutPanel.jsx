@@ -141,7 +141,7 @@ export default function CheckoutPanel({
                   <Icon name={m.icon} size={16} color={active ? '#fff' : '#2b2620'} />
                 </span>
                 <p className="text-sm font-black text-ink">{m.title}</p>
-                <p className="text-[11px] text-ink-muted leading-snug mt-0.5">{m.blurb}</p>
+                <p className="text-xs text-ink-muted leading-snug mt-0.5">{m.blurb}</p>
               </button>
             )
           })}
@@ -160,7 +160,7 @@ export default function CheckoutPanel({
               autoFocus={!profileDelivery}
               highlight={areaMissing}
             />
-            <p className="text-[11px] text-ink-muted mt-2">
+            <p className="text-xs text-ink-muted mt-2">
               It can be anywhere: you can live in Joburg and send this to family in Gqeberha.
             </p>
             {areaMissing && (
@@ -178,7 +178,7 @@ export default function CheckoutPanel({
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold text-ink truncate">{areaLabel || delivery.address}</p>
-              <p className="text-[11px] text-ink-muted truncate">{delivery.address}</p>
+              <p className="text-xs text-ink-muted truncate">{delivery.address}</p>
             </div>
             <button type="button" onClick={() => setEditingAddress(true)} className="cursor-pointer text-xs font-black text-sage-700 underline shrink-0">
               Change
@@ -193,7 +193,7 @@ export default function CheckoutPanel({
           <StepLabel n={3} text={`Pools near ${areaLabel || 'this address'}`} />
           <NearbyPoolList pools={pools} loading={loadingPools} chosenIds={chosenIds} onToggle={togglePool} areaLabel={areaLabel} />
           {pools.length > 0 && (
-            <p className="text-[11px] text-ink-muted mt-2">
+            <p className="text-xs text-ink-muted mt-2">
               Tap a pool to join it. Not picking one? We'll put you in the closest open pool for each kind of item.
             </p>
           )}
@@ -212,12 +212,12 @@ export default function CheckoutPanel({
           min={tomorrow()}
           className="mt-2 w-full border border-cream-dark rounded-soft px-3 py-2.5 bg-cream text-xs font-bold text-ink"
         />
-        {mode === 'POOL' && <p className="text-[11px] text-ink-muted mt-1">Only used if this starts a new pool.</p>}
+        {mode === 'POOL' && <p className="text-xs text-ink-muted mt-1">Only used if this starts a new pool.</p>}
       </details>
 
       {/* Summary + action */}
       <div className="rounded-soft bg-ink text-cream p-4">
-        <p className="text-[10px] font-black uppercase tracking-wider text-cream/60 mb-1">What happens next</p>
+        <p className="text-xs font-black uppercase tracking-wider text-cream/60 mb-1">What happens next</p>
         <ul className="space-y-1 mb-3">
           {summary.map((line) => (
             <li key={line} className="text-xs leading-snug flex gap-1.5">
@@ -250,7 +250,7 @@ export default function CheckoutPanel({
 function StepLabel({ n, text }) {
   return (
     <p className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-ink mb-2">
-      <span className="w-5 h-5 rounded-full bg-terracotta text-white text-[10px] flex items-center justify-center">{n}</span>
+      <span className="w-5 h-5 rounded-full bg-terracotta text-white text-xs flex items-center justify-center">{n}</span>
       {text}
     </p>
   )

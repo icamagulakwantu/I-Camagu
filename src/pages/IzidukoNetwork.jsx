@@ -213,10 +213,10 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
                       <div className="relative aspect-[4/5]">
                         <img src={m.profileImage} alt={`${m.firstName} ${m.lastName}`} className="absolute inset-0 w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/10 to-transparent" />
-                        <span className={`absolute top-3 left-3 text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-pill ${TIER_COLOR[m.tier]}`}>
+                        <span className={`absolute top-3 left-3 text-xs font-black uppercase tracking-wide px-2.5 py-1 rounded-pill ${TIER_COLOR[m.tier]}`}>
                           {TIER_BADGE[m.tier]}
                         </span>
-                        <span className="absolute top-3 right-3 text-[10px] font-bold text-white bg-black/30 backdrop-blur px-2.5 py-1 rounded-pill">
+                        <span className="absolute top-3 right-3 text-xs font-bold text-white bg-black/30 backdrop-blur px-2.5 py-1 rounded-pill">
                           {m.matchedLines.length} of 4 lines
                         </span>
                         <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -224,7 +224,7 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
                           <p className="text-xs text-white/80 mt-1">{m.label}</p>
                           <div className="flex flex-wrap gap-1.5 mt-2">
                             {m.matchedLines.map((line) => (
-                              <span key={line} className="text-[10px] font-bold text-white bg-white/20 backdrop-blur px-2 py-1 rounded-pill">
+                              <span key={line} className="text-xs font-bold text-white bg-white/20 backdrop-blur px-2 py-1 rounded-pill">
                                 {LINE_LABEL[line] || line}
                               </span>
                             ))}
@@ -359,11 +359,11 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
                           <Avatar src={r.recipient.profileImage} size="w-10 h-10" />
                           <div className="flex-1 min-w-0">
                             <p className="font-bold text-sm text-ink">{r.recipient.firstName} {r.recipient.lastName}</p>
-                            <p className="text-[10px] text-ink-muted">Awaiting reply</p>
+                            <p className="text-xs text-ink-muted">Awaiting reply</p>
                           </div>
                           <button
                             onClick={() => withdraw(r.id)} disabled={busyId === r.id}
-                            className={`text-[10px] font-bold text-terracotta underline ${pressable}`}
+                            className={`text-xs font-bold text-terracotta underline ${pressable}`}
                           >
                             Withdraw
                           </button>
@@ -427,7 +427,7 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
                         <div className="flex items-center justify-between gap-2">
                           <p className="font-bold text-sm text-ink truncate">{c.user.firstName} {c.user.lastName}</p>
                           {c.lastMessage && (
-                            <span className="text-[10px] text-ink-muted flex-shrink-0">
+                            <span className="text-xs text-ink-muted flex-shrink-0">
                               {new Date(c.lastMessage.createdAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}
                             </span>
                           )}
@@ -437,7 +437,7 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
                         </p>
                       </div>
                       {c.unreadCount > 0 && (
-                        <span className="w-5 h-5 rounded-full bg-terracotta text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                        <span className="w-5 h-5 rounded-full bg-terracotta text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
                           {c.unreadCount}
                         </span>
                       )}

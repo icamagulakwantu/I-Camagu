@@ -88,14 +88,14 @@ function LegendsExplore({ onBack }) {
           <div key={legend.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
             <div className="flex items-center justify-between gap-2 mb-1">
               <p className="text-xs font-black uppercase text-brand-ochre">{legend.category}</p>
-              <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-pill bg-cream-dark text-brand-black/60">
+              <span className="text-xs font-bold uppercase px-2 py-0.5 rounded-pill bg-cream-dark text-brand-black/60">
                 {STATUS_LABEL[legend.verificationStatus] || 'Pending community review'}
               </span>
             </div>
             <p className="font-bold text-sm mb-1">{legend.title}</p>
             <p className="text-xs text-brand-black/70">{legend.bodyText}</p>
-            {legend.sourceNote && <p className="text-[10px] text-brand-black/50 mt-2">Source note: {legend.sourceNote}</p>}
-            <p className="text-[10px] text-brand-black/40 mt-2">iCamagu does not treat AI-generated or unverified entries as established historical fact.</p>
+            {legend.sourceNote && <p className="text-xs text-brand-black/50 mt-2">Source note: {legend.sourceNote}</p>}
+            <p className="text-xs text-brand-black/40 mt-2">iCamagu does not treat AI-generated or unverified entries as established historical fact.</p>
             {isAdmin && legend.verificationStatus !== 'VERIFIED' && (
               <div className="flex gap-2 mt-3">
                 <button

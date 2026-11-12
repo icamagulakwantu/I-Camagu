@@ -17,7 +17,7 @@ export function OrderStageTracker({ currentIndex, tone = 'light' }) {
                 style={{ width: done ? '100%' : '0%' }}
               />
             </div>
-            <p className={`text-[9px] mt-1 leading-tight ${
+            <p className={`text-xs mt-1 leading-tight ${
               i === currentIndex
                 ? (isDark ? 'font-bold text-white' : 'font-bold text-terracotta')
                 : (isDark ? 'text-white/70' : 'text-ink-muted')

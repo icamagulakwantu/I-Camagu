@@ -45,7 +45,7 @@ export default function MyStokvelInvites({ onJoined }) {
     <div className="mb-4 space-y-3">
       {invites.map((invite) => (
         <div key={invite.id} className="bg-white border-2 border-terracotta rounded-soft p-4 shadow-soft">
-          <p className="text-[10px] font-black uppercase tracking-widest text-terracotta">You are invited</p>
+          <p className="text-xs font-black uppercase tracking-widest text-terracotta">You are invited</p>
           <p className="font-display font-bold text-lg text-ink mt-1">{invite.stokvelName}</p>
           <p className="text-sm text-ink-muted">{invite.invitedBy} invited you to join this stokvel.</p>
           <div className="flex gap-2 mt-3">

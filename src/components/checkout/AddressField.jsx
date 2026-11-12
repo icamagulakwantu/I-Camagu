@@ -102,7 +102,7 @@ export default function AddressField({ accessToken, value, onChange, autoFocus =
           aria-label="Delivery address"
           className="flex-1 min-w-0 bg-transparent py-3 text-sm font-semibold text-ink placeholder:text-ink/35 outline-none"
         />
-        {searching && <span className="text-[10px] font-bold text-ink-muted">Searching…</span>}
+        {searching && <span className="text-xs font-bold text-ink-muted">Searching…</span>}
       </div>
 
       {open && suggestions.length > 0 && (
@@ -118,7 +118,7 @@ export default function AddressField({ accessToken, value, onChange, autoFocus =
                 <Icon name="mapPin" size={14} color="#c45c26" className="mt-0.5 shrink-0" />
                 <span className="min-w-0">
                   <span className="block text-sm font-bold text-ink truncate">{place.area || place.label}</span>
-                  <span className="block text-[11px] text-ink-muted truncate">{place.label}</span>
+                  <span className="block text-xs text-ink-muted truncate">{place.label}</span>
                 </span>
               </button>
             </li>
@@ -134,7 +134,7 @@ export default function AddressField({ accessToken, value, onChange, autoFocus =
       >
         <Icon name="compass" size={13} color="#4a7a4a" /> {locating ? 'Finding you…' : 'Use my current location'}
       </button>
-      {hint && <p className="text-[11px] text-ink-muted mt-1">{hint}</p>}
+      {hint && <p className="text-xs text-ink-muted mt-1">{hint}</p>}
     </div>
   )
 }

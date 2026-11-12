@@ -31,7 +31,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
                     <span className={`relative flex h-8 w-12 items-center justify-center rounded-full transition-colors duration-200 ${active ? 'bg-terracotta shadow-[0_6px_16px_-6px_rgba(196,92,38,0.9)]' : ''}`}>
                       <Icon name={tab.icon} size={19} color={active ? '#fff' : 'rgba(245,243,238,0.72)'} strokeWidth={active ? 2 : 1.7} />
                       {tab.badge > 0 && (
-                        <span className="absolute -top-1.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-pill bg-brand-ochre text-brand-black text-[10px] font-black flex items-center justify-center ring-2 ring-brand-black">{tab.badge > 99 ? '99+' : tab.badge}</span>
+                        <span className="absolute -top-1.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-pill bg-brand-ochre text-brand-black text-xs font-black flex items-center justify-center ring-2 ring-brand-black">{tab.badge > 99 ? '99+' : tab.badge}</span>
                       )}
                     </span>
                     <span className={`max-w-full truncate text-[11px] sm:text-xs leading-tight text-center tracking-wide ${active ? 'font-bold text-white' : 'font-medium text-cream/70'}`}>

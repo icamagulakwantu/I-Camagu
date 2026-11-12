@@ -78,7 +78,7 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
         </button>
         <button type="button" onClick={() => onShare(true)} className={cn('flex-1 h-14 bg-[#25D366] text-white font-bold rounded-pill', pressable)}>WhatsApp</button>
       </div>
-      <p className="text-[11px] text-ink-muted text-center -mt-1">Family can pledge straight from the link. Sharing again replaces the old link.</p>
+      <p className="text-xs text-ink-muted text-center -mt-1">Family can pledge straight from the link. Sharing again replaces the old link.</p>
 
       {templateOpen && (
         <form onSubmit={saveTemplate} className="bg-white border-2 border-sage-500 rounded-soft p-4 space-y-3">

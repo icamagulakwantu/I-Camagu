@@ -58,7 +58,7 @@ function LeaveStokvelButton({ stokvelId, stokvelName, isOrganiser, onLeft }) {
       <StokvelApprovalsPanel stokvelId={stokvelId} />
       <OfficialsPanel stokvelId={stokvelId} />
       <StokvelInvite stokvelId={stokvelId} stokvelName={stokvelName} />
-      <p className="text-[10px] font-black uppercase tracking-wider text-terracotta mb-2">Leave group</p>
+      <p className="text-xs font-black uppercase tracking-wider text-terracotta mb-2">Leave group</p>
       {!confirm ? (
         <button
           type="button"

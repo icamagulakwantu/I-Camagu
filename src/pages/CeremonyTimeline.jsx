@@ -36,7 +36,7 @@ function CeremonyTimeline({ ceremonyType, onBack }) {
                                                             <div className="space-y-3">
                                                                   {phase.checklist.map((step, idx) => (
                                                                         <div key={`${phase.key}-${idx}`} className="flex items-start gap-3">
-                                                                              <div className="w-6 h-6 rounded-full bg-sage-500 text-white flex items-center justify-center flex-shrink-0 text-[10px] font-black">
+                                                                              <div className="w-6 h-6 rounded-full bg-sage-500 text-white flex items-center justify-center flex-shrink-0 text-xs font-black">
                                                                                     {idx + 1}
                                                                               </div>
                                                                               <p className="text-sm font-bold text-ink pt-0.5">{step}</p>

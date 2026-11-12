@@ -750,7 +750,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
 
               {announcements[0] && (
                 <button type="button" onClick={() => setDetailTab('announcements')} className="w-full text-left bg-sage-50 rounded-soft p-3">
-                  <p className="text-[10px] font-black uppercase text-sage-700 mb-1">Latest announcement</p>
+                  <p className="text-xs font-black uppercase text-sage-700 mb-1">Latest announcement</p>
                   <p className="text-sm text-ink line-clamp-2">{announcements[0].message}</p>
                 </button>
               )}
@@ -767,7 +767,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
                     <div key={m.userId} className="flex items-center justify-between py-2 border-b border-cream-dark/70 last:border-0">
                       <div className="min-w-0">
                         <p className="font-bold text-sm text-ink truncate">{m.user.firstName} {m.user.lastName}</p>
-                        <p className="text-[10px] text-ink-muted">
+                        <p className="text-xs text-ink-muted">
                           {official ? 'Official' : 'Member'}
                           {stokvel.organiserId === m.userId ? ' · Organiser' : ''}
                         </p>
@@ -805,7 +805,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
                 {announcements.map((a) => (
                   <div key={a.id} className="bg-sage-50 rounded-soft p-2.5">
                     <p className="text-sm text-ink">{a.message}</p>
-                    <p className="text-[10px] text-ink-muted mt-1">
+                    <p className="text-xs text-ink-muted mt-1">
                       {a.postedBy?.firstName} {a.postedBy?.lastName} · {new Date(a.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                     </p>
                   </div>
@@ -854,7 +854,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
                 <div key={c.id} className="bg-white border-2 border-terracotta rounded-soft p-3 mb-2 flex justify-between items-center shadow-sm">
                   <div className="min-w-0">
                     <p className="text-sm font-bold">R{Number(c.amount || 0).toFixed(2)}</p>
-                    <p className="text-[11px] text-ink-muted truncate">{memberName(c.memberId)}</p>
+                    <p className="text-xs text-ink-muted truncate">{memberName(c.memberId)}</p>
                   </div>
                   <button
                     type="button"
@@ -882,11 +882,11 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
                     <div key={c.id} className="flex items-center justify-between py-1.5 border-b border-cream-dark/70 last:border-0">
                       <div className="min-w-0">
                         <p className="text-sm text-ink truncate">{memberName(c.memberId)}</p>
-                        <p className="text-[10px] text-ink-muted">{new Date(c.createdAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                        <p className="text-xs text-ink-muted">{new Date(c.createdAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="tabular text-sm font-bold text-ink">R{Number(c.amount || 0).toFixed(2)}</p>
-                        <p className={`text-[10px] font-bold ${c.status === 'CONFIRMED' ? 'text-sage-600' : 'text-brand-ochre'}`}>{c.status}</p>
+                        <p className={`text-xs font-bold ${c.status === 'CONFIRMED' ? 'text-sage-600' : 'text-brand-ochre'}`}>{c.status}</p>
                       </div>
                     </div>
                   )
@@ -953,7 +953,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
                     return (
                       <div key={mUserId} className={`flex items-center justify-between px-3 py-2 rounded-soft ${isNext ? 'bg-sage-50 border-2 border-sage-500' : 'bg-cream'}`}>
                         <span className="text-sm font-bold text-ink">{idx + 1}. {name}</span>
-                        {isNext && <span className="text-[10px] font-black text-sage-600 uppercase">Next</span>}
+                        {isNext && <span className="text-xs font-black text-sage-600 uppercase">Next</span>}
                       </div>
                     )
                   })}
@@ -1070,7 +1070,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
                     className={inputStyle} min="0" step="any"
                   />
                   <div>
-                    <label className="text-[10px] text-ink-muted block mb-1">Target date (optional)</label>
+                    <label className="text-xs text-ink-muted block mb-1">Target date (optional)</label>
                     <input
                       type="date" value={editTargetDate}
                       onChange={(e) => setEditTargetDate(e.target.value)}
@@ -1108,7 +1108,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
                     {recordingInterest ? '...' : 'Add'}
                   </button>
                 </div>
-                <p className="text-[10px] text-ink-muted">Adds to the group balance, e.g. bank/savings interest received this cycle.</p>
+                <p className="text-xs text-ink-muted">Adds to the group balance, e.g. bank/savings interest received this cycle.</p>
               </form>
 
               <form onSubmit={recordExpense} className="space-y-2 pt-2 border-t border-terracotta/10">
@@ -1131,14 +1131,14 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
                   onChange={(e) => setExpenseNote(e.target.value)}
                   className={inputStyle}
                 />
-                <p className="text-[10px] text-ink-muted">Deducts from the group balance — money spent directly by the group, not paid out to a member.</p>
+                <p className="text-xs text-ink-muted">Deducts from the group balance — money spent directly by the group, not paid out to a member.</p>
               </form>
 
               <div className="pt-2 border-t border-terracotta/10">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold text-ink">Bereavement mode</p>
-                    <p className="text-[10px] text-ink-muted mt-0.5">
+                    <p className="text-xs text-ink-muted mt-0.5">
                       {stokvel.bereavementActive ? 'Active — flagged as a sensitive period for this group.' : 'Not active.'}
                     </p>
                   </div>
@@ -1324,12 +1324,12 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
                   <div>
                     {/* This member's own confirmed contributions — not the
                         group total, which is a different (larger) number. */}
-                    <p className="text-[10px] font-black uppercase tracking-widest text-ink-muted">Your balance</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-ink-muted">Your balance</p>
                     <p className="tabular font-display font-bold text-2xl text-ink mt-0.5">
                       R{Number(m.myBalance || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   </div>
-                  <p className="text-[11px] text-ink-muted text-right leading-snug">
+                  <p className="text-xs text-ink-muted text-right leading-snug">
                     Group holds<br />
                     <span className="font-bold text-ink tabular">
                       R{Number(m.stokvel?.groupLedger?.totalBalance || 0).toLocaleString('en-ZA', { maximumFractionDigits: 0 })}
@@ -1361,7 +1361,7 @@ function SectionRule({ label, trailing }) {
     <div className="flex items-center gap-3 mt-5 mb-3">
       <p className="eyebrow text-ink-muted whitespace-nowrap">{label}</p>
       <span className="h-px flex-1 bg-terracotta/25" />
-      {trailing && <p className="text-[11px] text-ink-muted whitespace-nowrap">{trailing}</p>}
+      {trailing && <p className="text-xs text-ink-muted whitespace-nowrap">{trailing}</p>}
     </div>
   )
 }

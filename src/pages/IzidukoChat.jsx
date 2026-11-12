@@ -126,7 +126,7 @@ function IzidukoChat({ userId, onBack, onViewProfile }) {
                 <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[75%] rounded-2xl px-3.5 py-2.5 ${mine ? 'bg-terracotta text-white' : 'bg-white border-2 border-terracotta/15 text-ink'}`}>
                     <p className="text-sm whitespace-pre-wrap break-words">{m.body}</p>
-                    <p className={`text-[10px] mt-1 ${mine ? 'text-white/70' : 'text-ink-muted'}`}>{timeLabel(m.createdAt)}</p>
+                    <p className={`text-xs mt-1 ${mine ? 'text-white/70' : 'text-ink-muted'}`}>{timeLabel(m.createdAt)}</p>
                   </div>
                 </div>
               )

@@ -50,7 +50,7 @@ export default function NearbyPoolList({ pools, loading, chosenIds, onToggle, ar
                   {chosen && <Icon name="check" size={12} color="#fff" strokeWidth={3} />}
                 </span>
               </div>
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 text-[11px] text-ink-muted">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 text-xs text-ink-muted">
                 {pool.isMine && <span className="font-black text-terracotta uppercase tracking-wide">You're in this one</span>}
                 <span>{distanceLabel(pool.distanceKm)}</span>
                 <span>· {pool.members} {pool.members === 1 ? 'member' : 'members'}</span>
@@ -58,7 +58,7 @@ export default function NearbyPoolList({ pools, loading, chosenIds, onToggle, ar
               <div className="mt-2 h-1.5 w-full rounded-pill bg-cream-dark overflow-hidden">
                 <div className="h-full rounded-pill bg-gradient-to-r from-sage-500 to-brand-ochre" style={{ width: `${Math.max(4, percent)}%` }} />
               </div>
-              <p className="mt-1 text-[10px] font-bold text-ink-muted">{pool.currentCases}/{pool.moqTarget} toward the group order ({percent}%)</p>
+              <p className="mt-1 text-xs font-bold text-ink-muted">{pool.currentCases}/{pool.moqTarget} toward the group order ({percent}%)</p>
             </button>
           </li>
         )

@@ -131,7 +131,7 @@ export default function StokvelWelcomeTour({ stokvelId, onClose }) {
     <div className="fixed inset-0 z-50 bg-ink/60 flex items-end sm:items-center justify-center p-4" role="dialog" aria-modal="true">
       <div className="bg-cream w-full max-w-md rounded-soft shadow-soft p-5">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[11px] font-black uppercase tracking-widest text-terracotta">Step {step + 1} of {steps.length}</p>
+          <p className="text-xs font-black uppercase tracking-widest text-terracotta">Step {step + 1} of {steps.length}</p>
           <button type="button" onClick={onClose} className="text-sm text-ink-muted font-semibold px-2 py-1">Skip</button>
         </div>
         <div className="flex gap-1.5 mb-4">

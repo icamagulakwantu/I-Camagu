@@ -80,7 +80,7 @@ export default function NearbyStokvels() {
                 <div className="flex items-start justify-between gap-2">
                   <p className="font-display font-bold text-lg text-ink">{s.name}</p>
                   {s.isNearYou && (
-                    <span className="text-[10px] font-black uppercase bg-sage-50 text-sage-700 px-2 py-1 rounded-pill flex-shrink-0">Near you</span>
+                    <span className="text-xs font-black uppercase bg-sage-50 text-sage-700 px-2 py-1 rounded-pill flex-shrink-0">Near you</span>
                   )}
                 </div>
                 <p className="text-xs text-ink-muted mt-0.5">{TYPE_LABEL[s.type] || 'Stokvel'} · {s.area} · {s.memberCount} member{s.memberCount === 1 ? '' : 's'}</p>

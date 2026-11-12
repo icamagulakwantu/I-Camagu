@@ -114,7 +114,7 @@ export default function Books({ stokvelId }) {
             <span className="font-bold text-ink">{money(r.value)}</span>
           </div>
         ))}
-        <p className="text-[11px] text-ink-muted mt-2 leading-relaxed">
+        <p className="text-xs text-ink-muted mt-2 leading-relaxed">
           These records are written automatically when money is confirmed. Nobody can edit or delete them. A mistake is fixed by adding a visible correction.
         </p>
       </div>
@@ -142,14 +142,14 @@ export default function Books({ stokvelId }) {
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-ink truncate">#{e.seq} · {kindLabel(e.kind)}</p>
-                  <p className="text-[11px] text-ink-muted truncate">{fmtDate(e.createdAt)}{e.memo ? ` · ${e.memo}` : ''}</p>
+                  <p className="text-xs text-ink-muted truncate">{fmtDate(e.createdAt)}{e.memo ? ` · ${e.memo}` : ''}</p>
                 </div>
                 <p className="text-sm font-bold text-ink flex-shrink-0">{money(entryAmount(e))}</p>
               </div>
               {openId === e.id && (
                 <div className="mt-2 bg-cream/60 rounded-xl p-2 space-y-1">
                   {e.lines.map((l, i) => (
-                    <div key={i} className="flex justify-between text-[11px]">
+                    <div key={i} className="flex justify-between text-xs">
                       <span className="text-ink-muted">{SUMMARY.find((s) => s.account === l.account)?.label || l.account}</span>
                       <span className="font-bold text-ink">{l.amountCents > 0 ? 'In ' : 'Out '}{money(Math.abs(l.amountCents) / 100)}</span>
                     </div>

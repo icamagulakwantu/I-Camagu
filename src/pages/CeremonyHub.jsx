@@ -113,7 +113,7 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
             className={`flex-1 rounded-pill py-2 px-2 transition-colors duration-200 ${tab === t.id ? 'bg-ink text-white shadow-soft' : 'text-ink-muted'}`}
           >
             <span className="block text-[13px] font-bold">{t.xhosa}</span>
-            <span className={`block text-[10px] font-medium ${tab === t.id ? 'text-white/70' : 'text-ink-muted/80'}`}>{t.english}</span>
+            <span className={`block text-xs font-medium ${tab === t.id ? 'text-white/70' : 'text-ink-muted/80'}`}>{t.english}</span>
           </button>
         ))}
       </div>
@@ -151,7 +151,7 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
                   <CeremonyIcon type={type} size={48} />
                   <div className="min-w-0 flex-1">
                     <p className="font-display text-[17px] font-semibold text-ink">{meta.label || type.replace(/_/g, ' ')}</p>
-                    {meta.english && <p className="text-[10px] uppercase tracking-[0.12em] text-ochre-dark font-bold mt-0.5">{meta.english}</p>}
+                    {meta.english && <p className="text-xs uppercase tracking-[0.12em] text-ochre-dark font-bold mt-0.5">{meta.english}</p>}
                     <p className="text-xs text-ink-muted mt-1 line-clamp-1">{meta.desc || 'Ceremony planning and preparation'}</p>
                   </div>
                   <Icon name="arrowRight" size={16} color="#6b645a" />
@@ -183,7 +183,7 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
                       <span className="block text-xs text-ink-muted mt-0.5">{meta.label || c.type.replace(/_/g, ' ')}</span>
                     </span>
                   </button>
-                  <span className={`text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-pill flex-shrink-0 ${getStatusStyle(c.status)}`}>
+                  <span className={`text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-pill flex-shrink-0 ${getStatusStyle(c.status)}`}>
                     {STATUS_LABEL[statusKey(c.status)] || c.status}
                   </span>
                   <button
@@ -199,7 +199,7 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
                 {confirmDeleteId === c.id && (
                   <div className="border-t border-ink/[0.06] px-5 py-3 bg-terracotta/5">
                     <p className="text-xs font-bold text-ink mb-1">Delete this ceremony permanently?</p>
-                    <p className="text-[11px] text-ink-muted mb-2.5">This removes the ceremony, checklist, budget and pledges. This cannot be undone.</p>
+                    <p className="text-xs text-ink-muted mb-2.5">This removes the ceremony, checklist, budget and pledges. This cannot be undone.</p>
                     <div className="flex gap-2">
                       <button
                         type="button"
@@ -228,7 +228,7 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
                   >
                     <span className="min-w-0">
                       <span className="block text-xs font-bold text-ink leading-tight">Who brings what</span>
-                      <span className="block text-[11px] text-ink-muted mt-0.5">Give alcohol, food & supplies to each of the 14 groups</span>
+                      <span className="block text-xs text-ink-muted mt-0.5">Give alcohol, food & supplies to each of the 14 groups</span>
                     </span>
                     <span className="flex flex-shrink-0 items-center gap-1 text-xs font-bold text-terracotta">
                       Open <Icon name="arrowRight" size={12} color="#c45c26" />

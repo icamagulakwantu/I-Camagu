@@ -293,7 +293,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
                         <p key={a.id} className="text-xs text-brand-black/60">
                           {a.quantity} {a.unitType.toLowerCase()}(s) of {a.itemDescription}
                           {entry?.source === 'store' && (
-                            <span className="ml-1.5 text-[9px] font-bold bg-sage-100 text-sage-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide">
+                            <span className="ml-1.5 text-xs font-bold bg-sage-100 text-sage-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide">
                               {money(Number(entry.price))} in-app
                             </span>
                           )}
@@ -311,7 +311,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
               <p className="text-xs font-black text-sage-700 mb-1">
                 {storeMatchCount} item{storeMatchCount > 1 ? 's' : ''} matched to live iCamagu store prices
               </p>
-              <p className="text-[10px] text-sage-600 leading-relaxed">
+              <p className="text-xs text-sage-600 leading-relaxed">
                 These are the prices currently listed in iCamagu. Supplier availability, current quotes and any bulk discount can change; compare like-for-like offers before ordering.
               </p>
             </div>
@@ -331,7 +331,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
                 <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3 mb-2">
                   <div>
                     <p className="text-xs font-black uppercase text-ink-muted">Price per unit (ZAR)</p>
-                    <p className="text-[10px] text-ink-muted leading-relaxed mt-0.5">
+                    <p className="text-xs text-ink-muted leading-relaxed mt-0.5">
                       Store prices are auto-filled. You can override any price manually.
                     </p>
                   </div>
@@ -343,7 +343,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
                         <div className="flex items-center justify-between gap-2">
                           <label className="text-xs text-ink font-semibold flex-1 capitalize">{key}</label>
                           {isStore && (
-                            <span className="text-[9px] font-bold bg-sage-100 text-sage-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide flex-shrink-0">
+                            <span className="text-xs font-bold bg-sage-100 text-sage-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide flex-shrink-0">
                               iCamagu price
                             </span>
                           )}
@@ -362,7 +362,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
                           />
                         </div>
                         {isStore && entry.skuName && (
-                          <p className="text-[10px] text-sage-600">
+                          <p className="text-xs text-sage-600">
                             Matched to "{entry.skuName}" in store{entry.units > 1 ? ` — case price divided by ${entry.units} units` : ''}
                           </p>
                         )}
@@ -400,7 +400,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
                         </div>
                         <div className="text-right flex-shrink-0">
                           <span className="text-sm font-bold text-ink">{item.quantity} {item.unitType.toLowerCase()}(s)</span>
-                          {item.unitPrice > 0 && <p className="text-[10px] text-ink-muted">{money(item.lineTotal)}</p>}
+                          {item.unitPrice > 0 && <p className="text-xs text-ink-muted">{money(item.lineTotal)}</p>}
                         </div>
                       </div>
                     ))}
@@ -451,7 +451,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
                       : 'Add all to SmartMatch basket'}
                   </button>
                   <div className="bg-sage-50 border border-sage-200 rounded-2xl px-3 py-2.5">
-                    <p className="text-[10px] font-bold text-sage-700 leading-relaxed">
+                    <p className="text-xs font-bold text-sage-700 leading-relaxed">
                       Use SmartMatch to coordinate demand with other community members. A bulk discount applies only when the supplier confirms the eligible products, minimum quantity and final price.
                     </p>
                   </div>

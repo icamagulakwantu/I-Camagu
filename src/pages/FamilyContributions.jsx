@@ -185,7 +185,7 @@ export default function FamilyContributions({ onBack }) {
                     <div className="flex items-center space-x-2">
                       <p className="font-bold text-sm text-ink">{pledge.pledgerName}</p>
                       {pledge.relationship && (
-                        <span className="text-[10px] bg-cream-dark text-ink-muted px-2 py-0.5 rounded-pill">
+                        <span className="text-xs bg-cream-dark text-ink-muted px-2 py-0.5 rounded-pill">
                           {pledge.relationship}
                         </span>
                       )}

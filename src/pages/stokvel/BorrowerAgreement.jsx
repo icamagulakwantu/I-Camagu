@@ -109,7 +109,7 @@ function SignaturePad({ onChange }) {
       <canvas ref={canvasRef}
         onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerLeave={end}
         className="w-full h-32 bg-cream border-2 border-terracotta/25 rounded-soft touch-none" />
-      {!signed && <p className="text-[11px] text-ink-muted mt-1">Sign with your finger inside the box.</p>}
+      {!signed && <p className="text-xs text-ink-muted mt-1">Sign with your finger inside the box.</p>}
     </div>
   )
 }

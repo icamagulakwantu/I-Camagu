@@ -157,7 +157,7 @@ export default function MarginAdmin({ onBack }) {
                 <button
                   key={id}
                   onClick={() => setFilter(id)}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-[11px] font-bold transition-colors ${
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-pill text-xs font-bold transition-colors ${
                     filter === id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
                   }`}
                 >
@@ -183,19 +183,19 @@ export default function MarginAdmin({ onBack }) {
                   <div className="flex justify-between items-start gap-3">
                     <div className="min-w-0">
                       <p className="font-bold text-sm text-ink">{r.name}</p>
-                      <p className="text-[11px] text-ink-muted">
+                      <p className="text-xs text-ink-muted">
                         {r.bottleFormat ? `${r.bottleFormat} · ` : ''}{r.unitsPerCase} per {r.bulkUnit}
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-[10px] uppercase tracking-wide text-ink-muted">We charge</p>
+                      <p className="text-xs uppercase tracking-wide text-ink-muted">We charge</p>
                       <p className="font-display font-bold text-sm text-ink tabular">{money(r.casePriceZAR)}</p>
                     </div>
                   </div>
 
                   <div className="flex items-end gap-2 mt-3">
                     <div className="flex-1">
-                      <label className="text-[10px] uppercase tracking-wide text-ink-muted block mb-1">
+                      <label className="text-xs uppercase tracking-wide text-ink-muted block mb-1">
                         We pay (per {r.bulkUnit})
                       </label>
                       <input
@@ -247,12 +247,12 @@ export default function MarginAdmin({ onBack }) {
                   />
 
                   {r.belowCost && (
-                    <p className="text-[11px] font-bold text-terracotta mt-2">
+                    <p className="text-xs font-bold text-terracotta mt-2">
                       Selling below cost — losing {money(Math.abs(r.marginPerCase))} every {r.bulkUnit}.
                     </p>
                   )}
                   {!r.belowCost && r.aboveRetail && (
-                    <p className="text-[11px] font-bold text-brand-ochre mt-2">
+                    <p className="text-xs font-bold text-brand-ochre mt-2">
                       We charge more than the shop does. A member who checks will find that out.
                     </p>
                   )}
@@ -283,9 +283,9 @@ function RetailEditor({ row, draft, onChange, onSave, saving }) {
   return (
     <div className="mt-3 pt-3 border-t border-cream-dark/60">
       <div className="flex items-center justify-between gap-2 mb-2">
-        <label className="text-[10px] uppercase tracking-wide text-ink-muted">Shop charges</label>
+        <label className="text-xs uppercase tracking-wide text-ink-muted">Shop charges</label>
         {row.retailPriceZAR != null && (
-          <span className={`text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-pill ${
+          <span className={`text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-pill ${
             row.retailPriceSource === 'VERIFIED'
               ? 'bg-sage-100 text-sage-700'
               : 'bg-brand-ochre/15 text-brand-ochre'
@@ -307,7 +307,7 @@ function RetailEditor({ row, draft, onChange, onSave, saving }) {
           {[['ESTIMATE', 'Estimate'], ['VERIFIED', 'Checked']].map(([id, label]) => (
             <button
               key={id} type="button" onClick={() => onChange({ source: id })}
-              className={`px-3 h-[36px] text-[11px] font-bold transition-colors ${
+              className={`px-3 h-[36px] text-xs font-bold transition-colors ${
                 d.source === id ? 'bg-ink text-white' : 'bg-white text-ink-muted'
               }`}
             >
@@ -334,7 +334,7 @@ function RetailEditor({ row, draft, onChange, onSave, saving }) {
         >
           {saving ? '...' : 'Save shop price'}
         </button>
-        <p className="text-[10px] text-ink-muted leading-tight">
+        <p className="text-xs text-ink-muted leading-tight">
           {needsNote
             ? 'A checked price needs the shop and date — that note is the evidence.'
             : verified
@@ -353,7 +353,7 @@ function Stat({ n, of, label, tone }) {
       <p className={`font-display font-bold text-lg ${colour} tabular`}>
         {n}{of != null && <span className="text-ink-muted text-xs">/{of}</span>}
       </p>
-      <p className="text-[9px] font-bold text-ink-muted uppercase tracking-wide mt-0.5 leading-tight">{label}</p>
+      <p className="text-xs font-bold text-ink-muted uppercase tracking-wide mt-0.5 leading-tight">{label}</p>
     </div>
   )
 }
@@ -362,7 +362,7 @@ function Field({ label, value, tone }) {
   const colour = tone === 'bad' ? 'text-terracotta' : tone === 'good' ? 'text-sage-600' : 'text-ink-muted'
   return (
     <div>
-      <p className="text-[9px] uppercase tracking-wide text-ink-muted">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-ink-muted">{label}</p>
       <p className={`font-bold tabular ${colour}`}>{value}</p>
     </div>
   )

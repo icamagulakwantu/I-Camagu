@@ -80,7 +80,7 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
   return (
     <div className="space-y-4">
       <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4">
-        <p className="text-[10px] font-black uppercase tracking-widest text-white/80">Bank or retailer?</p>
+        <p className="text-xs font-black uppercase tracking-widest text-white/80">Bank or retailer?</p>
         <p className="text-sm mt-1">
           On {money(sim)} over {simMonths} months, a bank at about {BANK_RATE}% pays roughly <strong>{money(bankEarns)}</strong>.
           A {discount || 0}% discount from a retailer you already buy from saves <strong>{money(retailerSaves)}</strong>.
@@ -88,17 +88,17 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
         <p className="font-display font-bold text-lg mt-2">
           {better >= 0 ? `Retailer wins by ${money(better)}` : `Bank wins by ${money(-better)}`}
         </p>
-        <p className="text-[11px] text-white/80 mt-1">The money also stays in your community for longer before it leaves.</p>
+        <p className="text-xs text-white/80 mt-1">The money also stays in your community for longer before it leaves.</p>
       </div>
 
       {credits && active.length > 0 && (
         <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 grid grid-cols-2 gap-3">
           <div>
-            <p className="text-[10px] font-black uppercase text-ink-muted">Committed to retailers</p>
+            <p className="text-xs font-black uppercase text-ink-muted">Committed to retailers</p>
             <p className="font-display font-bold text-xl text-ink">{money(committed)}</p>
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase text-ink-muted">Expected saving</p>
+            <p className="text-xs font-black uppercase text-ink-muted">Expected saving</p>
             <p className="font-display font-bold text-xl text-sage-700">{money(savedTotal)}</p>
           </div>
         </div>
@@ -154,7 +154,7 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
         <div key={c.id} className="bg-white border border-terracotta/15 rounded-soft p-4 space-y-1">
           <div className="flex items-start justify-between gap-2">
             <p className="font-bold text-sm text-ink truncate">{c.retailer}</p>
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-pill ${STATUS_STYLE[c.status]}`}>{c.status.toLowerCase()}</span>
+            <span className={`text-xs font-bold px-2 py-0.5 rounded-pill ${STATUS_STYLE[c.status]}`}>{c.status.toLowerCase()}</span>
           </div>
           <p className="text-xs text-ink-muted">{fmtDate(c.createdAt)} · {c.discountPercent}% off · {c.months} month(s)</p>
           {c.purpose && <p className="text-xs text-ink">{c.purpose}</p>}

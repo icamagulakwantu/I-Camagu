@@ -230,7 +230,7 @@ function Onboarding({ onDone }) {
             <button onClick={() => setStep('ancestry')} className="w-full wash-ember text-white font-bold py-3.5 rounded-pill shadow-terracotta text-[15px] pressable">
               Set up my profile &rarr;
             </button>
-            <p className="text-center text-[11px] text-ink-muted mt-2">Amanyathelo amabini · Two quick steps</p>
+            <p className="text-center text-xs text-ink-muted mt-2">Amanyathelo amabini · Two quick steps</p>
           </div>
         </div>
       )}
@@ -258,7 +258,7 @@ function Onboarding({ onDone }) {
                 <Icon name="camera" size={24} color="#4a7a4a" />
               )}
             </button>
-            <p className="text-[10px] text-ink-muted">JPG or PNG, up to 1.5MB</p>
+            <p className="text-xs text-ink-muted">JPG or PNG, up to 1.5MB</p>
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoSelect} className="hidden" />
           </div>
 
@@ -306,7 +306,7 @@ function Onboarding({ onDone }) {
               <Icon name="mapPin" size={12} />
               {locating ? 'Locating...' : coords ? <><span>Location captured</span><Icon name="check" size={12} /></> : 'Use my current location'}
             </button>
-            <p className="text-[10px] text-ink-muted -mt-1">Helps us match you with the nearest suppliers and pools — not shared with other members.</p>
+            <p className="text-xs text-ink-muted -mt-1">Helps us match you with the nearest suppliers and pools — not shared with other members.</p>
             <input type="number" placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} className="w-full border border-ink/30 rounded-soft px-4 py-2.5 text-sm" />
           </div>
 
