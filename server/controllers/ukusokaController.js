@@ -6,6 +6,15 @@ export async function addUkusokaEntry(req, res) {
     return res.status(400).json({ error: 'initiateName, giverName, itemDescription, category, and dateReceived are required' });
   }
   try {
+    // An entry may only be linked to a ceremony this person hosts: linked
+    // entries show inside that ceremony, so anyone else's would be planted
+    // in a stranger's ceremony.
+    if (ceremonyId) {
+      const ceremony = await prisma.ceremony.findUnique({ where: { id: ceremonyId }, select: { hostId: true } });
+      if (!ceremony || ceremony.hostId !== req.userId) {
+        return res.status(403).json({ error: 'You can only link an entry to your own ceremony' });
+      }
+    }
     const entry = await prisma.ukusokaEntry.create({
       data: {
         recordedById: req.userId,

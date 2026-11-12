@@ -231,3 +231,12 @@ Recent startup logs show both services can connect to PostgreSQL, but also show 
 - [ ] After deployment, confirm on both Render services that start-up logs show `Start-up database check passed.` and that a staging sign-up through `/?src=test1` stores `signupSource = 'test1'`. Do not test against production accounts.
 - [ ] Reporting: there is no admin view of sign-ups by campaign yet. Query `SELECT "signupSource", COUNT(*) FROM "User" GROUP BY 1` read-only through the authorised database owner until one is built.
 - Rollback: revert the attribution commit. The nullable column can stay in place harmlessly; dropping it is optional and must go through the database owner.
+
+
+## Authorization audit — 12 November 2026
+
+- [x] Source review of all 239 API routes and the routes in `server/index.js`, recorded in [`docs/security/AUTHORIZATION_AUDIT_2026-11-12.md`](security/AUTHORIZATION_AUDIT_2026-11-12.md). Stokvel, ceremony, Bulk Buy, supplier, clan, message, family-archive and admin routes check membership, role, ownership or admin status on the server.
+- [x] Fixed: ukusoka entries could be attached to another person's ceremony; the handler now refuses ceremonies the person does not host (tests added).
+- [ ] Decide what merchant verification means (business registration, bank details, contact) and add a verified flag that admins set before a merchant's offers can be accepted. Until then, admins must check each merchant by hand before accepting an offer.
+- [ ] Repeat the critical cross-user paths with two real test accounts on staging; the source review does not replace this.
+- [ ] Distributed rate limiting and the registration timing review remain open.
