@@ -16,6 +16,7 @@ const NO_CUSTODY_LIVE = false
 const CELEBRATIONS = [
   {
     key: 'umgidi',
+    icon: 'drum',
     image: CEREMONY_IMAGE.UMGIDI,
     name: 'Umgidi',
     tag: 'His homecoming',
@@ -24,6 +25,7 @@ const CELEBRATIONS = [
   },
   {
     key: 'wedding',
+    icon: 'heartHandshake',
     image: CEREMONY_IMAGE.WEDDING,
     name: 'Umtshato',
     tag: 'Your wedding',
@@ -32,6 +34,7 @@ const CELEBRATIONS = [
   },
   {
     key: 'ulwaluko',
+    icon: 'footprints',
     image: CEREMONY_IMAGE.ULWALUKO,
     name: 'Ulwaluko',
     tag: 'Guidance for mothers',
@@ -77,21 +80,31 @@ const FUND_POINTS = [
   { icon: 'users', title: 'Decided by us', body: 'Projects need majority support and a clear return for the community.' },
 ]
 
+// Dark card: the photo fades into the card, and a small gold badge with the
+// ceremony's icon sits on the seam between photo and text.
 function CelebrationCard({ item }) {
   return (
-    <article className="relative w-[78%] max-w-[300px] flex-shrink-0 snap-start overflow-hidden rounded-[26px] bg-white shadow-[0_24px_48px_-28px_rgba(163,71,26,0.55)]">
+    <article className="relative w-[78%] max-w-[300px] flex-shrink-0 snap-start overflow-hidden rounded-[26px] bg-[#1c1612] shadow-[0_24px_48px_-24px_rgba(28,22,18,0.7)]">
       <div className="relative h-52">
         <img src={item.image} alt="" className="h-full w-full object-cover" loading="lazy" />
-        <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-terracotta-dark">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1c1612] via-[#1c1612]/25 to-transparent" />
+        <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-terracotta-dark">
           {item.tag}
         </span>
+        <h3 className="absolute bottom-3 left-4 font-display text-[1.7rem] font-semibold leading-none text-cream">{item.name}</h3>
       </div>
-      <div className="px-4 pb-4 pt-3.5">
-        <h3 className="font-display text-[1.6rem] font-semibold leading-none text-ink">{item.name}</h3>
-        <p className="mt-2 text-[14px] leading-snug text-ink-muted">{item.line}</p>
+      <span
+        aria-hidden="true"
+        className="absolute right-4 top-[11.5rem] flex h-11 w-11 items-center justify-center rounded-full bg-ochre-light ring-4 ring-[#1c1612]"
+      >
+        <Icon name={item.icon} size={19} color="#1c1612" />
+      </span>
+      <div className="px-4 pb-4 pt-3">
+        <span aria-hidden="true" className="block h-px w-10 bg-ochre-light/70" />
+        <p className="mt-3 text-[14px] leading-snug text-cream/90">{item.line}</p>
         <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={`What ${item.name} needs`}>
           {item.needs.map((n) => (
-            <li key={n} className="rounded-full bg-[#fbe9d7] px-2.5 py-1 text-[11px] font-bold text-terracotta-dark">{n}</li>
+            <li key={n} className="rounded-full border border-ochre-light/35 px-2.5 py-1 text-[11px] font-bold text-ochre-light">{n}</li>
           ))}
         </ul>
       </div>
