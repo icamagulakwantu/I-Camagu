@@ -144,10 +144,7 @@ export default function Landing({ onJoin, onSignIn }) {
 
         <div className="relative z-10 mx-auto flex max-w-lg flex-col px-5 pb-32 pt-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <img src="/icons/source/gateway-mark-1024.png" alt="" width="40" height="40" className="h-10 w-10" />
-              <p className="font-display text-xl font-semibold tracking-tight text-ink">iCamagu</p>
-            </div>
+            <img src="/images/brand/logo-horizontal.png" alt="i-Camagu" width="132" height="55" className="h-[52px] w-auto" />
             <button
               type="button"
               onClick={onSignIn}
@@ -334,7 +331,8 @@ export default function Landing({ onJoin, onSignIn }) {
             </button>
           </div>
         </div>
-        <p className="mt-8 text-center font-display text-base italic text-ink">Umntu ngumntu ngabantu</p>
+        <img src="/images/brand/logo-stacked.png" alt="i-Camagu" loading="lazy" className="mx-auto mt-10 h-40 w-auto" />
+        <p className="mt-4 text-center font-display text-base italic text-ink">Umntu ngumntu ngabantu</p>
         <p className="mt-1 text-center text-xs text-ink-muted">i-camagu.co.za · Made in South Africa, for amaXhosa everywhere</p>
       </section>
     </div>

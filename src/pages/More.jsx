@@ -364,6 +364,7 @@ export default function More({ onNavigate }) {
       )}
 
       <footer className="flex flex-col items-center pb-4 text-center">
+        <img src="/images/brand/wordmark.png" alt="i-Camagu" loading="lazy" className="mb-3 h-9 w-auto opacity-90" />
         <p className="font-display text-base italic text-ink">Umntu ngumntu ngabantu</p>
         <p className="mt-1 text-xs text-ink-muted">A person is a person through other people.</p>
       </footer>

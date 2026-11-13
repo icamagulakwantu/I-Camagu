@@ -496,7 +496,7 @@ function AuthenticatedApp() {
     return (
       <div className="icamagu-bg flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <img src="/icons/source/gateway-mark-1024.png" alt="iCamagu" className="w-16 h-16 mx-auto mb-4 animate-pulse" />
+          <img src="/images/brand/icon-128.png" alt="iCamagu" className="w-16 h-16 mx-auto mb-4 rounded-2xl animate-pulse" />
           <p className="text-brand-black/50 font-bold text-sm">Loading...</p>
         </div>
       </div>
