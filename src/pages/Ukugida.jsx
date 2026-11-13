@@ -286,7 +286,7 @@ export default function Ukugida({ onBack }) {
           onClick={() => {
             const summary = `My Ukugida (reciprocity) record:\n\n` +
               entries.map(e => `${e.direction === 'GIVEN' ? '→ Gave' : '← Received'}: ${e.itemDescription} ${e.counterpartyName ? `(${e.direction === 'GIVEN' ? 'to' : 'from'} ${e.counterpartyName})` : ''}`).join('\n') +
-              `\n\nTracked on iCamagu 🌾`
+              `\n\nTracked on i-Camagu 🌾`
             shareToWhatsApp(summary)
           }}
           className="w-full bg-[#25D366] text-white font-bold py-2.5 rounded-pill text-sm mb-4"

@@ -163,7 +163,7 @@ function ShrineFund({ onBack }) {
               <input type="text" placeholder="Your name (optional, you may stay anonymous)" value={donorName} onChange={(e) => setDonorName(e.target.value)} className={field} />
               <input type="email" placeholder="Email (optional, so we can follow up)" value={donorEmail} onChange={(e) => setDonorEmail(e.target.value)} className={field} />
               <p className="text-xs leading-relaxed text-ink-muted">
-                We don&rsquo;t yet have a live payment gateway. Submitting records your pledge, and someone from iCamagu will personally follow up to complete the transfer.
+                We don&rsquo;t yet have a live payment gateway. Submitting records your pledge, and someone from i-Camagu will personally follow up to complete the transfer.
               </p>
               <button type="submit" disabled={submitting} className={`w-full rounded-full bg-[#1f3320] py-3.5 font-bold text-white ${pressable}`}>
                 {submitting ? 'Submitting...' : 'Pledge this donation'}
@@ -211,7 +211,7 @@ function ShrineFund({ onBack }) {
             Ubuhlanti, the homestead kraal, comes from Xhosa tradition, but its gate is open to every family who lives, works and celebrates in our communities, whatever their own customs.
           </p>
           <p className="relative mt-3 text-[14px] leading-relaxed text-cream/90">
-            Every contribution is voluntary: a stokvel member may choose to add a suggested share when they request their own payout, or anyone can donate directly from R1 upward. iCamagu also commits a share of its own platform profit to the fund as it grows.
+            Every contribution is voluntary: a stokvel member may choose to add a suggested share when they request their own payout, or anyone can donate directly from R1 upward. i-Camagu also commits a share of its own platform profit to the fund as it grows.
           </p>
           <p className="relative mt-4 font-display text-lg italic text-ochre-light">
             Built by the people, for the advancement of our communities for generations to come.
@@ -223,7 +223,7 @@ function ShrineFund({ onBack }) {
           <p className="eyebrow text-sage">Decided by us</p>
           <h2 className="mt-1 font-display text-[1.45rem] font-semibold leading-tight text-ink">How it is governed</h2>
           <p className="mt-3 text-sm leading-relaxed text-ink">
-            What the fund builds is decided by the community, not by iCamagu alone. A standing committee is drawn from the structures where our communities already gather: imibutho, schools, community organisations, local social media pages, and WhatsApp groups that represent real neighbourhoods.
+            What the fund builds is decided by the community, not by i-Camagu alone. A standing committee is drawn from the structures where our communities already gather: imibutho, schools, community organisations, local social media pages, and WhatsApp groups that represent real neighbourhoods.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-ink">
             Committee members are selected on merit and willingness to serve, not through elections that can be manipulated. Projects put to the community must pass two tests: they must have majority support, and they must be demonstrably profitable or carry a clear, measurable impact milestone that benefits the broader community.

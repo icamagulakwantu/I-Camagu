@@ -3,7 +3,7 @@
 // published in September 2026: Shoprite listed the 750ml bottle at R64.99,
 // Market Liquors listed the 2 Litre box at R121.99.
 //
-// No real iCamagu supplier quote exists for either format, so casePriceZAR
+// No real i-Camagu supplier quote exists for either format, so casePriceZAR
 // here is derived from those retail prices (10% below the retail-comparable
 // for the case, matching the discount every other verified single-unit item
 // in the catalogue already carries) rather than a negotiated trade price.

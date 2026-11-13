@@ -93,7 +93,7 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "ShrineTithe" ADD COLUMN IF NOT EXISTS "referenceUrl" TEXT;'
   );
-  // What iCamagu pays a supplier per case — admin-only, never exposed on the
+  // What i-Camagu pays a supplier per case — admin-only, never exposed on the
   // public catalogue. Nullable: unknown cost is honest, a guessed one is not.
   await prisma.$executeRawUnsafe(
     'ALTER TABLE "Sku" ADD COLUMN IF NOT EXISTS "costPriceZAR" DECIMAL(10,2);'
@@ -205,9 +205,9 @@ export async function ensureCeremonyBudgetColumns() {
     'ALTER TABLE "PoolPayment" ADD COLUMN IF NOT EXISTS "settledAt" TIMESTAMP(3);'
   );
   // Tracks the manual bank transfer that moves a PSP-collected payment
-  // (provider e.g. 'PAYFAST') on from iCamagu's own merchant account to the
+  // (provider e.g. 'PAYFAST') on from i-Camagu's own merchant account to the
   // supplier — a real gap the PayFast integration opened up (PayFast pays
-  // iCamagu, not the supplier directly), to be closed later by a real
+  // i-Camagu, not the supplier directly), to be closed later by a real
   // payout API once a PSP relationship exists for it. Manual-EFT payments
   // never touch these; the member already paid the supplier directly.
   await prisma.$executeRawUnsafe(

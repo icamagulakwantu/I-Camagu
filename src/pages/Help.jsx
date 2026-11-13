@@ -4,8 +4,8 @@ function Help({ onBack }) {
     { q: 'Why do I need a PIN?', a: 'Your security PIN is required before approving payouts or confirming contributions — an extra layer of protection for real money, separate from your login.' },
     { q: 'What is Ubuhlanti bakwa Xhosa?', a: "A community shrine and development fund, rooted in Xhosa tradition and open to every family in our communities. It is built entirely from voluntary contributions, never a forced deduction. You can opt in to add a suggested share when you request a stokvel payout, or donate directly from R1 upward. See the Ubuhlanti page under More for the full total and how it's governed." },
     { q: 'Can I delete my ceremony plan or stokvel?', a: 'Yes. Stokvels can only be deleted once their balance is zero, to protect real funds. Ceremony plans can be deleted from the plan detail screen.' },
-    { q: 'How does bulk buying work?', a: 'Add items to your cart and submit it. iCamagu groups your order with other members near you buying the same kind of thing. Merchants then send offers on the whole group order, and once the order reaches its minimum the best offer is confirmed. You don\'t need to choose a shop — you\'ll see who is supplying your order, and how to pay your share, in My Orders.' },
-    { q: 'Is my data safe?', a: 'iCamagu keeps access tokens out of browser storage, financial actions can require PIN confirmation, and you can export or delete your account from Account & Privacy.' },
+    { q: 'How does bulk buying work?', a: 'Add items to your cart and submit it. i-Camagu groups your order with other members near you buying the same kind of thing. Merchants then send offers on the whole group order, and once the order reaches its minimum the best offer is confirmed. You don\'t need to choose a shop — you\'ll see who is supplying your order, and how to pay your share, in My Orders.' },
+    { q: 'Is my data safe?', a: 'i-Camagu keeps access tokens out of browser storage, financial actions can require PIN confirmation, and you can export or delete your account from Account & Privacy.' },
   ]
 
   return (

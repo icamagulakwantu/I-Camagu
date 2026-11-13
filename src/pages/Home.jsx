@@ -97,7 +97,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
       <header className="relative flex items-center justify-between px-5 pt-5">
         <div className="flex items-center gap-2.5">
           <img src="/images/brand/icon-128.png" alt="" width="34" height="34" className="h-[34px] w-[34px] rounded-[10px] ring-1 ring-cream/30" />
-          <span className="font-display text-[1.4rem] font-semibold tracking-tight">iCamagu</span>
+          <span className="font-display text-[1.4rem] font-semibold tracking-tight">i-Camagu</span>
         </div>
         <div className="flex items-center gap-2.5">
           <button
@@ -502,6 +502,9 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
         <CeremonyRail ceremonies={orderedCeremonies} loading={loading} onSelectCeremony={onSelectCeremony} onNavigate={onNavigate} />
       )}
 
+      {/* Your clan is the foundation of who you are, so it comes before money. */}
+      <ClanPanel user={user} clanCeremonies={feed.upcomingClanCeremonies || []} onNavigate={onNavigate} />
+
       <MoneyTiles stokvels={stokvels} totalSaved={totalSaved} pools={pools} basketCount={basketCount} onNavigate={onNavigate} />
 
       {feedError && (
@@ -525,9 +528,6 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
           </div>
         </section>
       )}
-
-      {/* Clan comes after the everyday money tools: used less often, still close. */}
-      <ClanPanel user={user} clanCeremonies={feed.upcomingClanCeremonies || []} onNavigate={onNavigate} />
 
       {/* Culture: a card with a folder tab standing up from its top edge. */}
       <section aria-label="Did you know" className="mx-4 mt-14">

@@ -434,7 +434,7 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
                   className="mt-0.5 flex-shrink-0"
                 />
                 <span className="text-xs text-ink-muted leading-snug">
-                  I agree that iCamagu can collect and encrypt my ID number and ID document photo to verify my identity, as described in the{' '}
+                  I agree that i-Camagu can collect and encrypt my ID number and ID document photo to verify my identity, as described in the{' '}
                   <button
                     type="button"
                     onClick={() => onNavigate?.('privacy')}

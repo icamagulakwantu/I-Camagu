@@ -1,5 +1,5 @@
 // server/adapters/ManualEFTAdapter.js
-// iCamagu — Manual EFT Adapter (stub)
+// i-Camagu — Manual EFT Adapter (stub)
 // No live bank APIs. Records are created manually by officials
 // until African Bank / GoTyme agreements are signed.
 // Culture before capital. 🌾
@@ -48,7 +48,7 @@ export class ManualEFTAdapter extends BankingAdapter {
 
   async initiatePayout(subAccountRef, amount, destination) {
     // Manual EFT: creates a PENDING_APPROVAL payout record
-    // Actual bank transfer happens outside iCamagu
+    // Actual bank transfer happens outside i-Camagu
     return {
       id: `payout-${Date.now()}`,
       subAccountRef,

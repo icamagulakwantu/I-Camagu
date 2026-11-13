@@ -425,7 +425,7 @@ function Store({ onGoToBasket, basketCount }) {
           <EmptyState
             emoji="📦"
             title="Products couldn't load"
-            description="Check your connection, then try again. Your basket and other iCamagu features are unchanged."
+            description="Check your connection, then try again. Your basket and other i-Camagu features are unchanged."
             primaryLabel="Try again"
             onPrimary={() => setCatalogueRetry((attempt) => attempt + 1)}
           />

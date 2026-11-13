@@ -209,7 +209,7 @@ function Directory({ onBack }) {
         eyebrow="Abantu abathembekileyo · Trusted people"
         title="Only the verified."
         accent="Only the trusted."
-        subtitle="Ingcibi, amakhankatha, advisors, vendors and farms. iCamagu is the trust source: if an ingcibi is not verified here, choose one who is."
+        subtitle="Ingcibi, amakhankatha, advisors, vendors and farms. i-Camagu is the trust source: if an ingcibi is not verified here, choose one who is."
         onBack={onBack}
       />
 

@@ -1,6 +1,6 @@
 // Eight single-unit grocery/household items (unitsPerCase: 1, so
 // casePriceZAR is a genuine per-unit price, not a case total) were priced
-// ABOVE their own researched retail comparable — the opposite of iCamagu's
+// ABOVE their own researched retail comparable — the opposite of i-Camagu's
 // whole point. The frontend already hides the "Save Rxx" badge whenever
 // this happens (Store.jsx, Basket.jsx), so no customer ever saw a false
 // claim, but the underlying price was still wrong.

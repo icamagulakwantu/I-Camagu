@@ -1,5 +1,5 @@
 // server/adapters/BankingAdapter.js
-// iCamagu — Abstract Banking Adapter
+// i-Camagu — Abstract Banking Adapter
 // Defines the contract all bank adapters must implement.
 // Manual EFT only until bank agreements are in place.
 // Culture before capital. 🌾

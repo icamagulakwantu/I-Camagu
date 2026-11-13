@@ -23,7 +23,7 @@ export function requireAuth(req, res, next) {
 
 // For endpoints genuinely open to the public that still want to know who the
 // user is when they happen to be signed in — e.g. an Ubuhlanti bakwa Xhosa
-// donation, which anyone may make with or without an iCamagu account. Never
+// donation, which anyone may make with or without an i-Camagu account. Never
 // rejects: a missing or bad token just means req.userId stays undefined.
 export function optionalAuth(req, res, next) {
   const authHeader = req.headers.authorization;

@@ -1,23 +1,23 @@
 const PREVIEWS = [
   {
     pattern: /^\/share\/[^/]+\/?$/,
-    title: 'A family ceremony plan on iCamagu',
-    description: 'Open iCamagu to view and take part in a shared family ceremony plan.',
+    title: 'A family ceremony plan on i-Camagu',
+    description: 'Open i-Camagu to view and take part in a shared family ceremony plan.',
   },
   {
     pattern: /^\/pool\/[^/]+\/?$/,
-    title: 'A group order on iCamagu',
+    title: 'A group order on i-Camagu',
     description: 'Join a SmartMatch group order and buy together with your community.',
   },
   {
     pattern: /^\/join\/stokvel\/[^/]+\/?$/,
-    title: 'Join a stokvel on iCamagu',
-    description: 'Your group has invited you to organise savings together on iCamagu.',
+    title: 'Join a stokvel on i-Camagu',
+    description: 'Your group has invited you to organise savings together on i-Camagu.',
   },
   {
     pattern: /^\/join\/clan\/[^/]+\/?$/,
-    title: 'Join your clan group on iCamagu',
-    description: 'Your family has invited you to connect and plan together on iCamagu.',
+    title: 'Join your clan group on i-Camagu',
+    description: 'Your family has invited you to connect and plan together on i-Camagu.',
   },
 ];
 

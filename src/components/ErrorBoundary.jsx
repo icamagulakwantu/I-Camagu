@@ -11,7 +11,7 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('iCamagu crashed:', error, errorInfo)
+    console.error('i-Camagu crashed:', error, errorInfo)
   }
 
   render() {
@@ -24,7 +24,7 @@ class ErrorBoundary extends Component {
             A part of the app hit an error. Your data is safe — try reloading.
           </p>
           <button onClick={() => window.location.reload()} className="bg-sage-500 text-white font-bold px-6 py-3 rounded-pill">
-            Reload iCamagu
+            Reload i-Camagu
           </button>
           <details className="mt-6 text-left max-w-xs">
             <summary className="text-xs text-ink-muted cursor-pointer">Technical details</summary>

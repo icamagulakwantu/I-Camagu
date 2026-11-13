@@ -4,7 +4,7 @@ import { RETAIL_SOURCES, RETAIL_VERIFIED } from '../utils/skuVisibility.js';
 
 // Admin-only view of what we pay and what a shop charges.
 //
-// Cost price is what iCamagu pays a supplier and must never reach a member;
+// Cost price is what i-Camagu pays a supplier and must never reach a member;
 // every route here checks admin first. Member-facing endpoints go through
 // PUBLIC_SKU_SELECT in utils/skuVisibility.js, which omits cost entirely, so
 // it only ever leaves the server through this controller.

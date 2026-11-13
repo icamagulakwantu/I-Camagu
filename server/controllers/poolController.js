@@ -270,7 +270,7 @@ export async function requestPoolPaymentRefund(req, res) {
     const updated = await prisma.poolPayment.findUnique({ where: { id: paymentId } });
 
     // Manual EFT: the supplier holds the money, so notify them in-app.
-    // PayFast: iCamagu holds the money, so email the admin instead.
+    // PayFast: i-Camagu holds the money, so email the admin instead.
     if (payment.provider === 'MANUAL_EFT') {
       if (payment.pool.partner?.userId) {
         const { createNotification } = await import('../services/notificationDbService.js');
@@ -285,7 +285,7 @@ export async function requestPoolPaymentRefund(req, res) {
     } else {
       const { notifyAdminOfPspRefundRequest } = await import('../services/notificationService.js');
       await notifyAdminOfPspRefundRequest(payment, `${payment.user.firstName} ${payment.user.lastName}`);
-      res.json({ payment: updated, message: 'Refund requested — this was paid online, so iCamagu will process the refund directly.' });
+      res.json({ payment: updated, message: 'Refund requested — this was paid online, so i-Camagu will process the refund directly.' });
     }
   } catch (error) {
     console.error('Request pool payment refund error:', error.message);

@@ -6,7 +6,7 @@ const mockPrisma = {
 };
 vi.mock('../config/db.js', () => ({ default: mockPrisma }));
 
-const { isAcceptedConnection, getConnectedUserProfile } = await import('./izidukoService.js');
+const { isAcceptedConnection, getConnectedUserProfile, isNear } = await import('./izidukoService.js');
 
 describe('isAcceptedConnection', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -56,5 +56,23 @@ describe('getConnectedUserProfile', () => {
     expect(selectArg.identityVerificationStatus).toBeUndefined();
     expect(selectArg.email).toBeUndefined();
     expect(selectArg.passwordHash).toBeUndefined();
+  });
+});
+
+describe('isNear', () => {
+  const gqeberha = { latitude: -33.96, longitude: 25.6 };
+  const kariega = { latitude: -33.77, longitude: 25.4 };
+  const joburg = { latitude: -26.2, longitude: 28.05 };
+
+  it('counts clan members in the same metro as near', () => {
+    expect(isNear(gqeberha, kariega)).toBe(true);
+  });
+
+  it('does not count another province as near', () => {
+    expect(isNear(gqeberha, joburg)).toBe(false);
+  });
+
+  it('is false when either person has no saved location', () => {
+    expect(isNear(gqeberha, { latitude: null, longitude: null })).toBe(false);
   });
 });

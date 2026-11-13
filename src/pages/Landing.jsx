@@ -5,14 +5,14 @@ import { CAMPAIGN_SOURCE_STORAGE_KEY as SRC_KEY, cleanCampaignSource } from '../
 
 /**
  * Public page shown before sign-in. It should feel like the morning of an
- * umgidi: proud, loud and full of family, and say plainly what iCamagu does
+ * umgidi: proud, loud and full of family, and say plainly what i-Camagu does
  * for that day. No invented testimonials or numbers.
  * ?src= is stored once on first touch for campaign attribution.
  * Keep the no-custody claim disabled until the server-side policy is independently verified.
  */
 const NO_CUSTODY_LIVE = false
 
-// The celebrations people come to iCamagu to plan, in the words they use.
+// The celebrations people come to i-Camagu to plan, in the words they use.
 const CELEBRATIONS = [
   {
     key: 'umgidi',
@@ -112,6 +112,88 @@ function CelebrationCard({ item }) {
   )
 }
 
+// Public clan search: anyone can find their clan and its praise names before
+// joining. The server returns clan names and praises only, never people.
+function ClanFinder({ onJoin }) {
+  const [query, setQuery] = useState('')
+  const [state, setState] = useState({ status: 'idle', results: [] })
+  const trimmed = query.trim()
+
+  useEffect(() => {
+    if (trimmed.length < 2) { setState({ status: 'idle', results: [] }); return undefined }
+    let cancelled = false
+    setState((current) => ({ ...current, status: 'loading' }))
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/iziduko/public/clans?${new URLSearchParams({ q: trimmed, limit: '6' })}`)
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'Search failed')
+        if (!cancelled) setState({ status: 'ready', results: data.results || [], suggestions: Boolean(data.suggestions) })
+      } catch {
+        if (!cancelled) setState({ status: 'error', results: [] })
+      }
+    }, 280)
+    return () => { cancelled = true; clearTimeout(timer) }
+  }, [trimmed])
+
+  return (
+    <div className="mt-6">
+      <label className="relative block">
+        <span className="sr-only">Search your clan name</span>
+        <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
+          <Icon name="search" size={18} color="#6b645a" />
+        </span>
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Type your clan name, e.g. Cirha, Zangwa, Jola"
+          className="h-14 w-full rounded-[18px] border-0 bg-cream pl-11 pr-4 text-[15px] text-ink shadow-[0_14px_30px_-18px_rgba(0,0,0,0.6)] focus:outline-none focus:ring-2 focus:ring-ochre-light"
+        />
+      </label>
+      <div aria-live="polite" className="mt-3 space-y-2">
+        {state.status === 'loading' && <p className="text-sm text-cream/75">Searching the clans…</p>}
+        {state.status === 'error' && <p className="text-sm text-cream/85">The clan search could not load. Try again in a moment.</p>}
+        {state.status === 'ready' && state.results.length === 0 && (
+          <p className="text-sm text-cream/85">
+            We could not find &ldquo;{trimmed}&rdquo; yet. Join and add it: every clan belongs here, and the community helps confirm it.
+          </p>
+        )}
+        {state.status === 'ready' && state.suggestions && state.results.length > 0 && (
+          <p className="text-sm text-cream/85">Did you mean one of these?</p>
+        )}
+        {state.results.map((clan) => (
+          <div key={clan.id} className="flex items-start gap-3 rounded-[18px] bg-white/[0.08] p-3.5">
+            <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-ochre-light font-display text-lg font-semibold text-[#1f3320]">
+              {clan.head.replace(/^Ama/, '').charAt(0)}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-display text-lg font-semibold leading-tight text-cream">{clan.head}</span>
+              {clan.praises?.length > 0 && <span className="mt-0.5 block text-[13px] leading-snug text-cream/80">{clan.praises.join(' · ')}</span>}
+            </span>
+          </div>
+        ))}
+        {state.results.length > 0 && (
+          <button
+            type="button"
+            onClick={onJoin}
+            className="pressable mt-2 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-ochre-light text-[15px] font-extrabold text-[#1f3320]"
+          >
+            Join and find your clan family <Icon name="arrowRight" size={16} color="#1f3320" />
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// What clan matching does, in plain words.
+const CLAN_POINTS = [
+  { icon: 'search', title: 'Find your clan and its praises', body: 'Search your isiduko and see it with its izinqulo, the praise names that carry your ancestors.' },
+  { icon: 'users', title: 'Find your bloodline', body: 'Members of your clan share one root ancestor, even if he lived eight generations ago. i-Camagu brings that family back together.' },
+  { icon: 'mapPin', title: 'Your clan, where you live', body: 'AmaCirha in Gqeberha, AmaZangwa in Joburg or London: see your clan near you and start clan groups together.' },
+]
+
 export default function Landing({ onJoin, onSignIn }) {
   const [inviteType, setInviteType] = useState(null)
 
@@ -157,9 +239,9 @@ export default function Landing({ onJoin, onSignIn }) {
           <div className="mt-12">
             {inviteType && (
               <div className="mb-6 rounded-2xl border border-terracotta/25 bg-white/80 px-4 py-3 text-sm leading-relaxed text-ink">
-                {inviteType === 'stokvel' && 'You have been invited to join a stokvel on iCamagu. Join free to continue with your invitation.'}
-                {inviteType === 'clan' && 'You have been invited to a family clan group on iCamagu. Join free to continue with your invitation.'}
-                {inviteType === 'pool' && 'You have been invited to a SmartMatch group order on iCamagu. Join free to continue with your invitation.'}
+                {inviteType === 'stokvel' && 'You have been invited to join a stokvel on i-Camagu. Join free to continue with your invitation.'}
+                {inviteType === 'clan' && 'You have been invited to a family clan group on i-Camagu. Join free to continue with your invitation.'}
+                {inviteType === 'pool' && 'You have been invited to a SmartMatch group order on i-Camagu. Join free to continue with your invitation.'}
               </div>
             )}
             <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-terracotta-dark">Siyavuya · We celebrate</p>
@@ -179,6 +261,12 @@ export default function Landing({ onJoin, onSignIn }) {
               >
                 Start planning, free →
               </button>
+              <a
+                href="#clan"
+                className="pressable flex min-h-[52px] items-center justify-center gap-2 rounded-full border-2 border-[#2e4a2e]/25 bg-white/70 px-7 text-[16px] font-bold text-[#2e4a2e]"
+              >
+                <Icon name="search" size={17} color="#2e4a2e" /> Find your clan
+              </a>
             </div>
             <p className="mt-3 text-xs text-ink-muted">Free to join · Works on slow data · Install from your browser</p>
           </div>
@@ -195,6 +283,36 @@ export default function Landing({ onJoin, onSignIn }) {
           <p className="text-[13px] leading-relaxed text-ink-muted">
             And <span className="font-bold text-ink">{MORE_CEREMONIES.join(', ')}</span>: each with its own plan.
           </p>
+        </div>
+      </section>
+
+      {/* —— Clan: the foundation. A traditional social network under one kingdom —— */}
+      <section id="clan" aria-labelledby="clan-heading" className="mx-auto max-w-lg scroll-mt-6 px-5 pt-10">
+        <div className="relative overflow-hidden rounded-[30px] bg-[#2e4a2e] px-6 pb-7 pt-8 text-cream shadow-[0_28px_56px_-28px_rgba(31,51,32,0.9)]">
+          <div aria-hidden="true" className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-ochre-light/15" />
+          <p className="relative text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Isiduko sakho · Your clan</p>
+          <h2 id="clan-heading" className="relative mt-2 font-display text-[2.1rem] font-semibold leading-[1.05] text-balance">
+            Your clan is your <span className="italic text-ochre-light">first family.</span>
+          </h2>
+          <p className="relative mt-3 text-[15px] leading-relaxed text-cream/90">
+            A clan network, not just a social network. Every clan, under one kingdom: the Xhosa nation we come from and belong to.
+          </p>
+          <div className="relative">
+            <ClanFinder onJoin={onJoin} />
+          </div>
+          <ul className="relative mt-6 space-y-2">
+            {CLAN_POINTS.map((point) => (
+              <li key={point.title} className="flex items-start gap-3 rounded-[18px] border border-cream/10 bg-white/[0.06] p-3.5">
+                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-ochre-light/20">
+                  <Icon name={point.icon} size={17} color="#e0a94e" />
+                </span>
+                <span>
+                  <span className="block text-[14px] font-bold leading-tight text-cream">{point.title}</span>
+                  <span className="mt-0.5 block text-[13px] leading-snug text-cream/75">{point.body}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -232,8 +350,8 @@ export default function Landing({ onJoin, onSignIn }) {
             We are proud of who we are.
           </h2>
           <p className="relative mt-3 text-[15px] leading-relaxed text-cream/90">
-            ClanMatch brings long-lost families and siblings back together through iziduko, whether they live in
-            Mthatha, Joburg, London or Berlin. One family at a time, we unite the Xhosa nation.
+            Learn the rites from the elders who know them, the kings and heroes who carried our name, and the
+            reasons behind every ceremony. Then pass it on to the young ones.
           </p>
           <div className="relative mt-6 rounded-[22px] bg-cream p-4 text-ink">
             <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Did you know</p>
@@ -288,7 +406,7 @@ export default function Landing({ onJoin, onSignIn }) {
           <div>
             <p className="text-[15px] font-bold text-ink">Only verified ingcibi</p>
             <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
-              iCamagu is the trust source. An ingcibi&rsquo;s contact details are only shared once they are verified.
+              i-Camagu is the trust source. An ingcibi&rsquo;s contact details are only shared once they are verified.
               If yours is not in the app, choose one who is.
             </p>
           </div>
@@ -303,8 +421,8 @@ export default function Landing({ onJoin, onSignIn }) {
             </p>
             <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
               {NO_CUSTODY_LIVE
-                ? 'iCamagu never holds, pools or transfers your funds. You pay the merchant or the person you are giving to directly, and we keep the record.'
-                : 'You pay the merchant or the person you are giving to directly. iCamagu keeps the record, so the books stay clear for everyone.'}
+                ? 'i-Camagu never holds, pools or transfers your funds. You pay the merchant or the person you are giving to directly, and we keep the record.'
+                : 'You pay the merchant or the person you are giving to directly. i-Camagu keeps the record, so the books stay clear for everyone.'}
             </p>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 // Public, no-login view of Ubuhlanti bakwa Xhosa, reached at /ubuhlanti.
-// The fund is meant to be open to everyone — not only iCamagu members — so
+// The fund is meant to be open to everyone — not only i-Camagu members — so
 // this page renders outside the authenticated app and talks to the public
 // shrine-fund endpoints. Same honest copy as the in-app screen: no live
 // payment gateway exists yet, so a donation here records a pledge and a
@@ -164,7 +164,7 @@ function PublicUbuhlanti() {
           />
           <p className="text-xs text-ink-muted leading-relaxed">
             We don't yet have a live payment gateway or bank details on file — submitting this
-            records your pledge, and someone from iCamagu will personally follow up to complete the
+            records your pledge, and someone from i-Camagu will personally follow up to complete the
             transfer.
           </p>
           {feedback && (
@@ -197,10 +197,10 @@ function PublicUbuhlanti() {
           <p className="text-sm text-ink leading-relaxed mt-2">
             Every contribution is voluntary: a stokvel member may choose to add a suggested share
             when they request their own payout, or anyone can donate directly from R1 upward.
-            iCamagu also commits a share of its own platform profit to the fund as it grows.
+            i-Camagu also commits a share of its own platform profit to the fund as it grows.
           </p>
           <p className="text-sm text-ink leading-relaxed mt-2">
-            What the fund builds next is decided by the community, not by iCamagu alone — put to a
+            What the fund builds next is decided by the community, not by i-Camagu alone — put to a
             majority vote, with a standing committee drawn from churches, Amaqhirha and Amaxhwele
             (traditional healers), and community leaders, visionaries, thinkers, and academics
             weighing each opportunity.
@@ -217,7 +217,7 @@ function PublicUbuhlanti() {
 
         <p className="text-center text-xs text-ink-muted mt-6">
           <a href="/" className="font-bold text-terracotta underline">
-            Open iCamagu
+            Open i-Camagu
           </a>
         </p>
       </div>

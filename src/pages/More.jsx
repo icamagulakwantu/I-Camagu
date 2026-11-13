@@ -12,6 +12,18 @@ import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 // carries a short line saying what it is for, so nobody has to guess.
 const TILE_GROUPS = [
   {
+    title: 'Usapho & Inkcubeko',
+    english: 'Family & culture',
+    line: 'Your clan, your history, your people.',
+    color: '#2e4a2e',
+    items: [
+      { id: 'iziduko', icon: 'link', label: 'ClanMatch', desc: 'Your clan, its praises and your bloodline', keywords: 'clanmatch family find clan members iziduko praises izinqulo' },
+      { id: 'clangroups', icon: 'users', label: 'Clan groups', desc: 'Talk and plan with your clan' },
+      { id: 'legends', icon: 'landmark', label: 'House of AmaXhosa', desc: 'History, kings and legends', keywords: 'did you know heritage' },
+      { id: 'portal', icon: 'image', label: 'Family archive', desc: 'Photos and family records' },
+    ],
+  },
+  {
     title: 'Imisebenzi',
     english: 'Ceremony tools',
     line: 'Everything to run the day the way it should be run.',
@@ -28,28 +40,16 @@ const TILE_GROUPS = [
     ],
   },
   {
-    title: 'Usapho & Inkcubeko',
-    english: 'Family & culture',
-    line: 'Your clan, your history, your people.',
-    color: '#2e4a2e',
-    items: [
-      { id: 'iziduko', icon: 'link', label: 'Find clan members', desc: 'Siblings and clan by iziduko', keywords: 'clanmatch family' },
-      { id: 'clangroups', icon: 'users', label: 'Clan groups', desc: 'Talk and plan with your clan' },
-      { id: 'legends', icon: 'landmark', label: 'House of AmaXhosa', desc: 'History, kings and legends', keywords: 'did you know heritage' },
-      { id: 'portal', icon: 'image', label: 'Family archive', desc: 'Photos and family records' },
-    ],
-  },
-  {
     title: 'Imali & Iinkonzo',
     english: 'Money & services',
     line: 'Orders, spending and the people who serve our ceremonies.',
-    color: '#a3471a',
+    color: '#2e4a2e',
     items: [
       { id: 'myorders', icon: 'package', label: 'My orders', desc: 'Track your bulk orders', keywords: 'delivery' },
       { id: 'expenditure', icon: 'coins', label: 'My spending', desc: 'Where the money went', keywords: 'budget' },
       { id: 'directory', icon: 'book', label: 'Healers, ingcibi & vendors', desc: 'Trusted traditional help', keywords: 'igqirha sangoma merchant' },
       { id: 'ekoyini', icon: 'cocktail', label: 'Ekoyini mobile bar', desc: 'Book a bar for your event' },
-      { id: 'supplier', icon: 'store', label: 'Sell on iCamagu', desc: 'Supply stokvels and families', keywords: 'supplier producer' },
+      { id: 'supplier', icon: 'store', label: 'Sell on i-Camagu', desc: 'Supply stokvels and families', keywords: 'supplier producer' },
     ],
   },
 ]
@@ -188,7 +188,7 @@ export default function More({ onNavigate }) {
         <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 to-[#1f3320]" />
         <div className="relative">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Konke okunye · Everything else</p>
-          <h1 className="mt-1 font-display text-[2rem] font-semibold leading-tight">Your whole iCamagu</h1>
+          <h1 className="mt-1 font-display text-[2rem] font-semibold leading-tight">Your whole i-Camagu</h1>
           {user && (
             <button
               type="button"
@@ -342,7 +342,7 @@ export default function More({ onNavigate }) {
       {/* Asks first: a stray tap on Log out is easy on a phone. */}
       {confirmLogout ? (
         <div className="card-paper mb-8 p-4">
-          <p className="text-sm font-bold text-ink">Log out of iCamagu?</p>
+          <p className="text-sm font-bold text-ink">Log out of i-Camagu?</p>
           <p className="mt-0.5 text-xs text-ink-muted">Your stokvels and plans stay safe. You can sign back in any time.</p>
           <div className="mt-3 flex gap-2">
             <button type="button" onClick={handleLogout} className="pressable flex-1 rounded-pill bg-terracotta py-2.5 text-sm font-bold text-white">

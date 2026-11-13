@@ -41,7 +41,7 @@ router.get('/margins', requireAuth, getCatalogueMargins);
 router.patch('/margins/:skuId/cost', requireAuth, setSkuCostPrice);
 router.patch('/margins/:skuId/retail', requireAuth, setSkuRetailPrice);
 
-// Admin-only: PSP-collected payments iCamagu is still holding, awaiting a
+// Admin-only: PSP-collected payments i-Camagu is still holding, awaiting a
 // manual transfer to the supplier. Each handler checks admin itself.
 router.get('/admin/pending-payouts', requireAuth, getPendingSupplierPayouts);
 router.post('/admin/pending-payouts/:paymentId/forward', requireAuth, forwardSupplierPayout);

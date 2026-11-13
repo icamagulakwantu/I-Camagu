@@ -25,7 +25,7 @@ describe('processRefund (supplier-side)', () => {
 
   it('refuses a PayFast-collected payment — the supplier never held that money', async () => {
     mockPrisma.poolPayment.findUnique.mockResolvedValue({ ...basePayment, provider: 'PAYFAST' });
-    await expect(processRefund('supplier_1', 'pay_1')).rejects.toThrow(/iCamagu holds that money/);
+    await expect(processRefund('supplier_1', 'pay_1')).rejects.toThrow(/i-Camagu holds that money/);
     expect(mockPrisma.poolPayment.update).not.toHaveBeenCalled();
   });
 

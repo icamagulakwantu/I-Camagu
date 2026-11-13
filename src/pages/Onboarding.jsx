@@ -197,8 +197,8 @@ function Onboarding({ onDone }) {
             <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/30 to-[#1f3320]" />
             <div className="relative">
               <div className="flex items-center gap-2.5 mb-4">
-                <img src="/images/brand/icon-128.png" alt="iCamagu" className="w-9 h-9 rounded-[10px] ring-1 ring-cream/30" />
-                <span className="font-display font-bold text-xl text-cream">iCamagu</span>
+                <img src="/images/brand/icon-128.png" alt="i-Camagu" className="w-9 h-9 rounded-[10px] ring-1 ring-cream/30" />
+                <span className="font-display font-bold text-xl text-cream">i-Camagu</span>
               </div>
               <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light mb-1.5">Wamkelekile, {user?.firstName || 'mhlobo'}</p>
               <h1 className="font-display font-semibold text-[1.75rem] leading-tight text-cream text-balance">
@@ -318,7 +318,7 @@ function Onboarding({ onDone }) {
           {error && <p className="text-terracotta text-sm mt-3">{error}</p>}
 
           <button onClick={saveDetailsAndFinish} disabled={saving} className="w-full wash-ember text-white font-bold py-3.5 rounded-pill disabled:opacity-50 mt-5 pressable shadow-terracotta">
-            {saving ? 'Saving...' : 'Finish & enter iCamagu →'}
+            {saving ? 'Saving...' : 'Finish & enter i-Camagu →'}
           </button>
           <button type="button" onClick={() => finishOnboarding()} className="w-full text-xs text-ink-muted underline mt-2.5">Skip for now</button>
         </div>

@@ -89,7 +89,7 @@ export async function confirmPoolPayment(userId, paymentId) {
  * Only ever valid for a manual-EFT payment: the supplier physically holds
  * that money because the member paid them directly, so "process refund"
  * genuinely records something the supplier just did. A PAYFAST-collected
- * payment never reached the supplier — it's sitting in iCamagu's own
+ * payment never reached the supplier — it's sitting in i-Camagu's own
  * merchant account (see paymentService.js) — so a supplier clicking this
  * for one would mark it REFUNDED while no money actually moved back to the
  * member. See paymentService.listPendingSupplierRefunds /
@@ -113,7 +113,7 @@ export async function processRefund(userId, paymentId, feeZAR) {
   }
   if (payment.provider !== 'MANUAL_EFT') {
     const err = new Error(
-      'This was a PayFast payment — iCamagu holds that money, not you. An admin needs to process this refund.'
+      'This was a PayFast payment — i-Camagu holds that money, not you. An admin needs to process this refund.'
     );
     err.status = 409;
     throw err;

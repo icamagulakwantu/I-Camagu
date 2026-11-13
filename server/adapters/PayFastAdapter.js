@@ -1,5 +1,5 @@
 // server/adapters/PayFastAdapter.js
-// iCamagu — PayFast Adapter (sandbox-first)
+// i-Camagu — PayFast Adapter (sandbox-first)
 // Real PSP integration for PoolPayment (SmartMatch bulk order payments).
 // Defaults to PayFast's public sandbox (sandbox.payfast.co.za) until real
 // merchant credentials and PAYFAST_SANDBOX=false are set — see

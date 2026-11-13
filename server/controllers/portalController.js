@@ -14,7 +14,7 @@ const MEDIA_TYPES = new Set(['PHOTO', 'VIDEO']);
 // returned too ("Ref: ...") so the founder can tell causes apart from a
 // screenshot, without exposing any server detail.
 const STORAGE_MESSAGES = {
-  NOT_CONFIGURED: 'Photo storage is not switched on for iCamagu yet.',
+  NOT_CONFIGURED: 'Photo storage is not switched on for i-Camagu yet.',
   KEY_REJECTED: 'Photo storage refused our server key.',
   BUCKET_UNAVAILABLE: 'The family photo store could not be opened.',
   STORAGE_UNREACHABLE: 'Photo storage could not be reached. Please try again in a minute.',

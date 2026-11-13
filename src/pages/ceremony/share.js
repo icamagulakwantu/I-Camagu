@@ -13,7 +13,7 @@ export const wasShared = (plan) => Boolean(plan?.shareToken) || sharedThisVisit.
 export async function sharePlan({ plan, accessToken, viaWhatsApp }) {
   const { shareUrl } = await request(`/api/ceremonies/plans/${plan.id}/share-link`, accessToken, { method: 'POST' })
   const title = planTitle(plan)
-  const message = `${title}\nI'm preparing this ceremony on iCamagu. See what is still needed and pledge what you'll bring:\n${shareUrl}`
+  const message = `${title}\nI'm preparing this ceremony on i-Camagu. See what is still needed and pledge what you'll bring:\n${shareUrl}`
   sharedThisVisit.add(plan.id)
   if (!viaWhatsApp && navigator.share) {
     await navigator.share({ title, text: message }).catch(() => {})

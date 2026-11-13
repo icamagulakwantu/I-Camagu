@@ -1,4 +1,4 @@
-// Canonical wording for public iCamagu UI. Use this file rather than
+// Canonical wording for public i-Camagu UI. Use this file rather than
 // scattering competing spellings or translations across components.
 export const GLOSSARY = Object.freeze({
   isiduko: { xh: 'Isiduko', en: 'Clan identity / lineage' },

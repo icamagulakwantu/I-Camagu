@@ -598,7 +598,7 @@ const UMSEBENZI_WEGQIRHA_COST_PROFILE = {
 };
 
 // ============================================================================
-// EXPORTS — Unified registry for the iCamagu calculator
+// EXPORTS — Unified registry for the i-Camagu calculator
 // ============================================================================
 
 export const CEREMONY_COST_PROFILES = {

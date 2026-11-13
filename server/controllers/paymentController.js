@@ -31,7 +31,7 @@ export async function initiatePoolPaymentOnline(req, res) {
 }
 
 // GET /api/basket/admin/pending-payouts — admin-only. Every PSP-collected
-// payment iCamagu is still holding, awaiting a manual transfer to the
+// payment i-Camagu is still holding, awaiting a manual transfer to the
 // supplier it's actually for.
 export async function getPendingSupplierPayouts(req, res) {
   if (!(await requireAdmin(req, res))) return;

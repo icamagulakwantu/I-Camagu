@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 // Who emails come from. Resend's test address (onboarding@resend.dev) only
 // delivers to the Resend account owner, so real members never got their
 // login codes. Once the i-camagu.co.za domain is verified in Resend, set the
-// EMAIL_FROM secret on Render, e.g.  iCamagu <no-reply@i-camagu.co.za>
+// EMAIL_FROM secret on Render, e.g.  i-Camagu <no-reply@i-camagu.co.za>
 export const FROM_ADDRESS = process.env.EMAIL_FROM || 'onboarding@resend.dev';
 
 // A missing key must never crash the whole server at boot — every route

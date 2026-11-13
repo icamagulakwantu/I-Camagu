@@ -72,7 +72,7 @@ export async function notifyEkoyiniOfQuoteRequest(q) {
                                                                                                                                                                                                                                                                                                                                                                                                                                           ${row('Setup Restrictions', q.setupRestrictions)}
                                                                                                                                                                                                                                                                                                                                                                                                                                                   ${row('Preferred Payment', q.preferredPaymentMethod)}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                          <p style="color:#888;font-size:12px;">Submitted via iCamagu — Quote ID: ${q.id}</p>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                          <p style="color:#888;font-size:12px;">Submitted via i-Camagu — Quote ID: ${q.id}</p>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                 `,
               });
       } catch (error) {
@@ -168,7 +168,7 @@ export async function notifyAdminOfPaymentWebhookFailure(paymentId, errorMessage
     await resend.emails.send({
       from: 'onboarding@resend.dev',
       to: ADMIN_EMAILS,
-      subject: `iCamagu: a verified PayFast payment failed to process${paymentId ? ` (${paymentId})` : ''}`,
+      subject: `i-Camagu: a verified PayFast payment failed to process${paymentId ? ` (${paymentId})` : ''}`,
       html: `
         <h2>A PayFast webhook passed verification but failed to process</h2>
         <p>PayFast confirmed this notification is genuinely theirs, but recording it against our own PoolPayment failed — this payment may be settled on PayFast's side without being reflected here yet.</p>
@@ -193,10 +193,10 @@ export async function notifyAdminOfPspRefundRequest(payment, memberName) {
     await resend.emails.send({
       from: 'onboarding@resend.dev',
       to: ADMIN_EMAILS,
-      subject: `iCamagu: a PayFast refund needs processing — R${parseFloat(payment.amountZAR).toFixed(2)}`,
+      subject: `i-Camagu: a PayFast refund needs processing — R${parseFloat(payment.amountZAR).toFixed(2)}`,
       html: `
         <h2>A member requested a refund on a PayFast-collected payment</h2>
-        <p>iCamagu holds this money, not the supplier — only an admin can process it (Payouts tab &rarr; Refunds).</p>
+        <p>i-Camagu holds this money, not the supplier — only an admin can process it (Payouts tab &rarr; Refunds).</p>
         ${row('Member', memberName)}
         ${row('Amount', `R${parseFloat(payment.amountZAR).toFixed(2)}`)}
         ${row('Payment reference', payment.paymentReference)}
@@ -219,8 +219,8 @@ export async function notifyPayoutCleared(recipientEmail, recipientName, amount,
         <p>Your payout from <strong>${stokvelName}</strong> has been approved and cleared.</p>
         <p><strong>Amount: R${amount.toFixed(2)}</strong></p>
         ${contributionAmount ? `<p style="color:#888;font-size:13px;">Includes a R${contributionAmount.toFixed(2)} voluntary Ubuhlanti bakwa Xhosa contribution, as you chose when requesting this payout — itemised transparently as always.</p>` : ''}
-        <p>Log in to iCamagu to see your full ledger.</p>
-        <p>Culture before capital.<br/>— iCamagu</p>
+        <p>Log in to i-Camagu to see your full ledger.</p>
+        <p>Culture before capital.<br/>— i-Camagu</p>
       `,
     });
   } catch (error) {

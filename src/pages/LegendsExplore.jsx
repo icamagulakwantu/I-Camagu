@@ -102,7 +102,7 @@ function LegendsExplore({ onBack }) {
             <p className="mb-1 font-display text-lg font-semibold leading-tight text-ink">{legend.title}</p>
             <p className="text-[13px] leading-relaxed text-ink-muted">{legend.bodyText}</p>
             {legend.sourceNote && <p className="text-xs text-brand-black/50 mt-2">Source note: {legend.sourceNote}</p>}
-            <p className="text-xs text-brand-black/40 mt-2">iCamagu does not treat AI-generated or unverified entries as established historical fact.</p>
+            <p className="text-xs text-brand-black/40 mt-2">i-Camagu does not treat AI-generated or unverified entries as established historical fact.</p>
             {isAdmin && legend.verificationStatus !== 'VERIFIED' && (
               <div className="flex gap-2 mt-3">
                 <button

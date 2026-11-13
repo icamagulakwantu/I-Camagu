@@ -15,7 +15,7 @@ const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96
 // once the order has reached its minimum.
 //
 // The Payouts tab is the one place this screen does touch real money: a
-// member paying online (PayFast) lands their payment in iCamagu's own
+// member paying online (PayFast) lands their payment in i-Camagu's own
 // merchant account, not the merchant's — unlike manual EFT, where the
 // member pays the merchant directly. Forwarding that money is a manual bank
 // transfer, and this is where an admin tracks which ones are outstanding.
@@ -30,7 +30,7 @@ const TABS = [
 // a note of what was checked.
 function MerchantList({ merchants, drafts, setDraft, savingId, onSave }) {
   if (merchants.length === 0) {
-    return <EmptyState emoji="🏪" title="No merchants yet" description="Merchants who register under Sell on iCamagu appear here for checking." />
+    return <EmptyState emoji="🏪" title="No merchants yet" description="Merchants who register under Sell on i-Camagu appear here for checking." />
   }
   const waiting = merchants.filter((m) => !m.verifiedAt).length
   return (
@@ -366,7 +366,7 @@ export default function DemandDashboard({ onBack }) {
           <>
             <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
               <p className="text-xs text-ink-muted leading-relaxed">
-                A member paying online lands their money in iCamagu's own PayFast account, not the
+                A member paying online lands their money in i-Camagu's own PayFast account, not the
                 merchant's. Each of these still needs a real bank transfer to the merchant — mark it
                 forwarded once that transfer is done, with the bank reference for the record.
               </p>
@@ -429,7 +429,7 @@ export default function DemandDashboard({ onBack }) {
 
             <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mt-6">
               <p className="text-xs text-ink-muted leading-relaxed">
-                A refund on an online payment is the same story in reverse — iCamagu holds that
+                A refund on an online payment is the same story in reverse — i-Camagu holds that
                 money, so the merchant has no way to pay it back themselves. Process it here once
                 the member has actually been refunded (by bank transfer), with a note for the record.
               </p>

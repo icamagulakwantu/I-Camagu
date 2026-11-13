@@ -80,7 +80,7 @@ const BANKS = [
 
 // The retailer trade credit model:
 // Instead of keeping money in the bank, the stokvel pre-commits a portion
-// as a purchase order to an iCamagu-partnered supplier. The supplier
+// as a purchase order to an i-Camagu-partnered supplier. The supplier
 // guarantees goods at cost price. The "interest" equivalent is the discount
 // vs. retail.
 // The founder's target for most group orders; only the very largest reach
@@ -128,7 +128,7 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
       <div>
         <h3 className="font-display font-bold text-lg text-ink">Bank Interest Calculator</h3>
         <p className="text-xs text-ink-muted mt-0.5">
-          See how much your group balance earns across SA banks, and compare that to the iCamagu SmartMatch trade model.
+          See how much your group balance earns across SA banks, and compare that to the i-Camagu SmartMatch trade model.
         </p>
       </div>
 
@@ -216,10 +216,10 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
           <div className="card-paper border-2 border-terracotta/30 p-4 space-y-3">
             <div className="flex items-center gap-2.5">
               <Icon name="cart" size={18} color="#c45c26" />
-              <p className="font-bold text-sm text-ink">The iCamagu SmartMatch alternative</p>
+              <p className="font-bold text-sm text-ink">The i-Camagu SmartMatch alternative</p>
             </div>
             <p className="text-xs text-ink-muted leading-relaxed">
-              Instead of keeping all your money in a bank, split it: keep a portion earning interest, and pre-commit the rest as a bulk purchase order through iCamagu SmartMatch. The supplier gives you goods at cost — the saving is your "interest".
+              Instead of keeping all your money in a bank, split it: keep a portion earning interest, and pre-commit the rest as a bulk purchase order through i-Camagu SmartMatch. The supplier gives you goods at cost — the saving is your "interest".
             </p>
 
             <div>

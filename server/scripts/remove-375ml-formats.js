@@ -1,4 +1,4 @@
-// The founder decided iCamagu won't carry a 375ml ("half-jack") size for
+// The founder decided i-Camagu won't carry a 375ml ("half-jack") size for
 // any spirit — every alcohol brand that had one alongside its 750ml row
 // loses the smaller format entirely, not just the ones missing a photo.
 // No live basket referenced any of these at the time this was written.

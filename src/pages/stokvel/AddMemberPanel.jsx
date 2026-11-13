@@ -4,7 +4,7 @@ import { useToast } from '../../components/ui/Toast.jsx'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
-// "Add someone": find a person already on iCamagu (your family connections
+// "Add someone": find a person already on i-Camagu (your family connections
 // show first, or search by name) and send them an invitation. They are only
 // added once they accept, like adding someone to a WhatsApp group.
 export default function AddMemberPanel({ stokvelId }) {

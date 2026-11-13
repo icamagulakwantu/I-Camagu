@@ -13,8 +13,8 @@ workbox: {
   navigateFallbackDenylist: [/^\/api\//],
 },
       manifest: {
-        name: 'iCamagu',
-        short_name: 'iCamagu',
+        name: 'i-Camagu',
+        short_name: 'i-Camagu',
         description: 'Ceremony planning, stokvel savings, and bulk purchasing for Xhosa communities',
         theme_color: '#c45c26',
         background_color: '#f5f3ee',

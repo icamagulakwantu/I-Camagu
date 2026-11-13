@@ -1,7 +1,7 @@
 import Icon from './Icon.jsx'
 
 // Scaled down from what larger heritage platforms use (e.g. 10 confirms / 2
-// disputes) to fit iCamagu's smaller, growing community — raise these as the
+// disputes) to fit i-Camagu's smaller, growing community — raise these as the
 // user base grows.
 export const CONFIRMS_NEEDED = 5
 export const MAX_DISPUTES = 2

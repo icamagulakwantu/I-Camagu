@@ -51,7 +51,7 @@ export default function PledgeShareCard({ planId, planTitle }) {
     setBusy(true)
     try {
       const link = await getLink()
-      shareToWhatsApp(`See the family pledges for ${planTitle} on iCamagu. Register to take part: ${link}`)
+      shareToWhatsApp(`See the family pledges for ${planTitle} on i-Camagu. Register to take part: ${link}`)
     } catch (err) {
       showToast(err.message, 'error')
     } finally {
@@ -62,7 +62,7 @@ export default function PledgeShareCard({ planId, planTitle }) {
   return (
     <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 shadow-soft mb-4">
       <p className="font-bold text-sm text-ink">Share these pledges</p>
-      <p className="text-xs text-ink-muted mt-1">Anyone with the link can view the list, but must register to use iCamagu.</p>
+      <p className="text-xs text-ink-muted mt-1">Anyone with the link can view the list, but must register to use i-Camagu.</p>
       <div className="flex gap-2 mt-3">
         <button type="button" disabled={busy} onClick={copy} className={`flex-1 bg-sage-500 text-white text-sm font-bold py-2.5 rounded-pill ${pressable}`}>Copy link</button>
         <button type="button" disabled={busy} onClick={whatsapp} className={`flex-1 bg-terracotta text-white text-sm font-bold py-2.5 rounded-pill ${pressable}`}>WhatsApp</button>

@@ -4,7 +4,7 @@ import { getSharePreview, isPreviewCrawler, renderSharePreview } from './sharePr
 describe('privacy-safe share previews', () => {
   it('uses generic copy for private ceremony links without exposing the token', () => {
     const preview = getSharePreview('/share/private-token-123');
-    expect(preview.title).toBe('A family ceremony plan on iCamagu');
+    expect(preview.title).toBe('A family ceremony plan on i-Camagu');
     expect(preview.description).not.toContain('private-token-123');
   });
 
@@ -13,9 +13,9 @@ describe('privacy-safe share previews', () => {
   });
 
   it('uses generic descriptions for stokvel, clan and pool invitations', () => {
-    expect(getSharePreview('/join/stokvel/abc').title).toBe('Join a stokvel on iCamagu');
-    expect(getSharePreview('/join/clan/abc').title).toBe('Join your clan group on iCamagu');
-    expect(getSharePreview('/pool/abc').title).toBe('A group order on iCamagu');
+    expect(getSharePreview('/join/stokvel/abc').title).toBe('Join a stokvel on i-Camagu');
+    expect(getSharePreview('/join/clan/abc').title).toBe('Join your clan group on i-Camagu');
+    expect(getSharePreview('/pool/abc').title).toBe('A group order on i-Camagu');
   });
 
   it('only serves crawler-specific previews to known social crawlers', () => {
@@ -24,9 +24,9 @@ describe('privacy-safe share previews', () => {
   });
 
   it('replaces title and metadata without inserting private source data', () => {
-    const html = '<title>iCamagu</title><meta name="description" content="default" /><meta property="og:title" content="default" /><meta property="og:description" content="default" /><meta property="og:url" content="https://example.test/" />';
+    const html = '<title>i-Camagu</title><meta name="description" content="default" /><meta property="og:title" content="default" /><meta property="og:description" content="default" /><meta property="og:url" content="https://example.test/" />';
     const rendered = renderSharePreview(html, getSharePreview('/share/secret'), 'https://example.test/share/secret');
-    expect(rendered).toContain('A family ceremony plan on iCamagu');
+    expect(rendered).toContain('A family ceremony plan on i-Camagu');
     expect(rendered).not.toContain('private name');
   });
 });

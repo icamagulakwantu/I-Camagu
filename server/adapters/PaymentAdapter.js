@@ -1,5 +1,5 @@
 // server/adapters/PaymentAdapter.js
-// iCamagu — Abstract Payment Service Provider (PSP) Adapter
+// i-Camagu — Abstract Payment Service Provider (PSP) Adapter
 // Mirrors BankingAdapter.js's role for bank rails: defines the contract any
 // real gateway (PayFast today; Stitch/Ozow could follow later) must
 // implement, so paymentService and the controllers that call it never need
@@ -13,7 +13,7 @@ export class PaymentAdapter {
 
   // Starts a hosted checkout session for one PoolPayment. Returns
   // { redirectUrl } — where the member's browser should go to pay.
-  // iCamagu never touches card/bank credentials directly; PCI/security
+  // i-Camagu never touches card/bank credentials directly; PCI/security
   // scope for the actual payment instrument stays entirely with the PSP.
   createPaymentSession(payment, { returnUrl, cancelUrl, notifyUrl, itemName, buyerEmail }) {
     throw new Error('createPaymentSession() must be implemented by subclass');

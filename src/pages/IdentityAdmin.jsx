@@ -51,7 +51,7 @@ function IdentityAdmin({ onBack }) {
     return (
       <div className="min-h-screen bg-cream px-4 pt-10">
         <button onClick={onBack} className="text-sm text-ink-muted mb-4 block">← Back</button>
-        <EmptyState emoji="🔒" title="Admins only" description="This screen is restricted to iCamagu admins." />
+        <EmptyState emoji="🔒" title="Admins only" description="This screen is restricted to i-Camagu admins." />
       </div>
     )
   }

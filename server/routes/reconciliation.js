@@ -1,5 +1,5 @@
 // server/routes/reconciliation.js
-// iCamagu — Reconciliation Routes
+// i-Camagu — Reconciliation Routes
 // Culture before capital. 🌾
 
 import express from 'express';

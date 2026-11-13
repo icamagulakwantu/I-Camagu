@@ -1,5 +1,5 @@
 // server/services/reconciliationService.js
-// iCamagu — Three-Layer Reconciliation Engine
+// i-Camagu — Three-Layer Reconciliation Engine
 // RawBankLog → StokvelGroupLedger → Member Contribution
 // Culture before capital.
 

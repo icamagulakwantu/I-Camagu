@@ -227,6 +227,11 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
                         <div className="absolute bottom-0 left-0 right-0 p-4">
                           <p className="font-display font-bold text-2xl text-white leading-tight">{m.firstName} {m.lastName}</p>
                           <p className="text-xs text-white/80 mt-1">{m.label}</p>
+                          {m.nearYou && (
+                            <span className="mt-2 inline-flex items-center gap-1 rounded-pill bg-ochre-light px-2.5 py-1 text-xs font-extrabold text-ink">
+                              <Icon name="mapPin" size={12} /> Lives near you
+                            </span>
+                          )}
                           <div className="flex flex-wrap gap-1.5 mt-2">
                             {m.matchedLines.map((line) => (
                               <span key={line} className="text-xs font-bold text-white bg-white/20 backdrop-blur px-2 py-1 rounded-pill">

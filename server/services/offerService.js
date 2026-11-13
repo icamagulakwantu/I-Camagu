@@ -127,7 +127,7 @@ export async function listOrderRequestsForMerchant(userId) {
 }
 
 // One offer per merchant per pool; sending again updates it (until accepted).
-export const NOT_VERIFIED_MESSAGE = 'Your merchant profile is waiting for iCamagu to verify it. You can send offers once it is verified.';
+export const NOT_VERIFIED_MESSAGE = 'Your merchant profile is waiting for i-Camagu to verify it. You can send offers once it is verified.';
 
 export async function submitOffer(userId, poolId, { totalPriceZAR, note } = {}) {
   const partner = await requireMerchant(userId);
@@ -245,7 +245,7 @@ export async function setMerchantVerification(partnerId, adminId, { verified, no
         verified ? 'MERCHANT_VERIFIED' : 'MERCHANT_UNVERIFIED',
         verified
           ? `${partner.name} is verified. You can now send offers on group orders.`
-          : `${partner.name} is no longer verified, so you cannot send new offers. Contact iCamagu for help.`,
+          : `${partner.name} is no longer verified, so you cannot send new offers. Contact i-Camagu for help.`,
         'supplier',
       );
     } catch (error) {

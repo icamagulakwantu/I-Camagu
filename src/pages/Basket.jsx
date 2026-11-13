@@ -271,14 +271,14 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       ? `R${sm.currentAmountZAR.toFixed(2)} pooled so far`
       : `${sm.pallets.toFixed(1)} pallets pooled so far`
     const lines = [
-      `Pooling a ${CATEGORY_LABEL[poolStatus.category].toLowerCase()} bulk order near ${poolStatus.area} on iCamagu SmartMatch.`,
+      `Pooling a ${CATEGORY_LABEL[poolStatus.category].toLowerCase()} bulk order near ${poolStatus.area} on i-Camagu SmartMatch.`,
       sm.currentTier
         ? `We're at ${sm.currentTier.name} — ${standing}${tierValueLabel(sm.currentTier, sm.basis) ? ` (${tierValueLabel(sm.currentTier, sm.basis)})` : ''}.`
         : `We're at ${standing}${sm.nextTier ? ', working toward our first tier' : ''}.`,
       sm.nextTier &&
         `${isAmount ? `R${sm.toNextTier}` : `${sm.toNextTier} more cases`} unlocks ${sm.nextTier.name}${tierValueLabel(sm.nextTier, sm.basis) ? ` at ${tierValueLabel(sm.nextTier, sm.basis)}` : ''} for everyone in the pool.`,
       !isAmount && (sm.currentTier || sm.nextTier) &&
-        `(Tier names are standard across every iCamagu drinks pool, not specific to this group.)`,
+        `(Tier names are standard across every i-Camagu drinks pool, not specific to this group.)`,
       `Join and add your order:`,
       poolStatus.poolId ? `${window.location.origin}/pool/${poolStatus.poolId}` : null,
     ].filter(Boolean)
@@ -475,7 +475,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
 
                 {sm.ladder && !isAmount && (
                   <p className="text-xs text-white/60 mb-1.5">
-                    Tier names like "{sm.ladder[0].name}" are standard across every iCamagu drinks pool — not specific to this group.
+                    Tier names like "{sm.ladder[0].name}" are standard across every i-Camagu drinks pool — not specific to this group.
                   </p>
                 )}
 

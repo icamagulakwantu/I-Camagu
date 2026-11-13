@@ -79,7 +79,7 @@ function PublicPlanView({ token }) {
         </div>
         <p className="font-bold text-ink mb-1">{error}</p>
         <p className="text-sm text-ink-muted">Ask the family to send you a new link.</p>
-        <a href="/" className="mt-4 text-sage-600 underline text-sm">Go to iCamagu</a>
+        <a href="/" className="mt-4 text-sage-600 underline text-sm">Go to i-Camagu</a>
       </div>
     )
   }
@@ -98,7 +98,7 @@ function PublicPlanView({ token }) {
         <p className="eyebrow text-ochre-light">Uyamenywa · You're invited to help</p>
         <h1 className="font-display font-semibold text-[1.9rem] leading-tight mt-2 text-balance">{plan.title}</h1>
         <p className="text-sm text-cream/85 mt-2 leading-relaxed">
-          The family is preparing this ceremony on iCamagu. See what is still needed and pledge what you'll bring.
+          The family is preparing this ceremony on i-Camagu. See what is still needed and pledge what you'll bring.
         </p>
         <div className="mt-5 grid grid-cols-2 gap-2">
           <div className="rounded-2xl bg-cream/10 p-3 ring-1 ring-cream/20">
@@ -163,7 +163,7 @@ function PublicPlanView({ token }) {
               <button type="submit" disabled={sending} className="w-full h-14 rounded-pill bg-sage-600 text-white font-bold text-base active:scale-[0.98] transition-transform disabled:opacity-60">
                 {sending ? 'Saving...' : 'Pledge it'}
               </button>
-              <p className="text-xs text-ink-muted text-center">Only the host sees your name and amount. No account needed. iCamagu never holds money.</p>
+              <p className="text-xs text-ink-muted text-center">Only the host sees your name and amount. No account needed. i-Camagu never holds money.</p>
             </form>
           )}
         </section>
@@ -204,7 +204,7 @@ function PublicPlanView({ token }) {
         <div className="mt-8 rounded-[22px] bg-ink p-5 text-center">
           <p className="font-display text-lg font-semibold text-cream">Planning a ceremony of your own?</p>
           <p className="text-xs text-cream/75 mt-1">Checklist, budget, bulk buying and family pledges in one place. Free to join.</p>
-          <a href="/" className="inline-block mt-4 bg-terracotta text-white text-sm font-bold px-5 py-3 rounded-pill">Start on iCamagu</a>
+          <a href="/" className="inline-block mt-4 bg-terracotta text-white text-sm font-bold px-5 py-3 rounded-pill">Start on i-Camagu</a>
         </div>
       </div>
     </div>

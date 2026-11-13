@@ -84,6 +84,7 @@ export async function findClanMatches(userId) {
       id: true, firstName: true, lastName: true, profileImage: true,
       paternalIziduko: true, maternalIziduko: true,
       paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true,
+      latitude: true, longitude: true,
     },
   });
 
@@ -103,10 +104,28 @@ export async function findClanMatches(userId) {
     if (matchedLines.length === 0) continue;
 
     const sameSurname = user.lastName?.trim().toLowerCase() === other.lastName?.trim().toLowerCase();
-    matches.push({ ...other, matchedLines, sameSurname });
+    // Clan members who live near each other (e.g. AmaCirha in Gqeberha) see
+    // each other first. Only a yes/no leaves the server, never a location.
+    const { latitude, longitude, ...publicFields } = other;
+    const nearYou = isNear(user, { latitude, longitude });
+    matches.push({ ...publicFields, matchedLines, sameSurname, nearYou });
   }
 
+  // Near you first, then the closest bloodline (more shared clan lines).
+  matches.sort((a, b) => Number(b.nearYou) - Number(a.nearYou) || b.matchedLines.length - a.matchedLines.length);
   return matches;
+}
+
+export const NEAR_YOU_KM = 60;
+
+// Straight-line distance between two people's saved locations.
+export function isNear(a, b, km = NEAR_YOU_KM) {
+  if ([a?.latitude, a?.longitude, b?.latitude, b?.longitude].some((v) => typeof v !== 'number')) return false;
+  const rad = (d) => (d * Math.PI) / 180;
+  const dLat = rad(b.latitude - a.latitude);
+  const dLon = rad(b.longitude - a.longitude);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.latitude)) * Math.cos(rad(b.latitude)) * Math.sin(dLon / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.sqrt(h)) <= km;
 }
 
 export async function registerClanAlias(aliasForm, canonicalClanName) {

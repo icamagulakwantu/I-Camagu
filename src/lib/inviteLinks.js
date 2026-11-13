@@ -13,7 +13,7 @@ export function stokvelInviteUrl(stokvelId) {
 }
 
 export function stokvelInviteMessage(stokvelName, stokvelId) {
-  return `Join our stokvel "${stokvelName}" on iCamagu. Open this link, register if you are new, and you will be added automatically:\n${stokvelInviteUrl(stokvelId)}`
+  return `Join our stokvel "${stokvelName}" on i-Camagu. Open this link, register if you are new, and you will be added automatically:\n${stokvelInviteUrl(stokvelId)}`
 }
 
 export function clanInviteUrl(inviteCode) {
@@ -25,7 +25,7 @@ export function clanInviteUrl(inviteCode) {
 export function clanInviteMessage(clanName, groupName, inviteCode) {
   return [
     `Molweni ${clanName}!`,
-    `Our family group "${groupName}" is now also on iCamagu, so our news, ceremonies and contributions are kept safe in one place.`,
+    `Our family group "${groupName}" is now also on i-Camagu, so our news, ceremonies and contributions are kept safe in one place.`,
     'Tap the link below. If you are new, register first and you will be added to the group automatically:',
     clanInviteUrl(inviteCode),
   ].join('\n\n')

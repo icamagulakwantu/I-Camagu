@@ -17,7 +17,7 @@ const NONEXISTENT_SKU_NAMES = [
   // name — never lingers if something re-creates it.
   'Bernini Ruby',
   // The founder confirmed Peach Schnapps (Relic) is the only peach
-  // schnapps iCamagu actually carries — the unbranded "Generic" row was
+  // schnapps i-Camagu actually carries — the unbranded "Generic" row was
   // never a real product, and "Peach Schnapps (Butlers)" is dropped too
   // rather than kept alongside Relic as a second real option.
   'Peach Schnapps Generic',
@@ -31,7 +31,7 @@ const NONEXISTENT_SKU_NAMES = [
   // photographed and wired.
   'Strawberry Liqueur Generic',
   // Founder confirmed this unbranded placeholder isn't a real product
-  // iCamagu carries — same class as the other Generic removals above.
+  // i-Camagu carries — same class as the other Generic removals above.
   'Sambuca Generic White',
   // Founder sent real photos for every other remaining missing-photo
   // alcohol/mixer item in one final round and explicitly asked that

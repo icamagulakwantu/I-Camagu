@@ -86,7 +86,7 @@ function RegisterForm({ onRegistered }) {
     <div className="px-4 mt-4">
       <div className="bg-white border-2 border-terracotta/25 rounded-soft p-5">
         <h2 className="font-display font-bold text-lg text-ink mb-1">Sell to group orders</h2>
-        <p className="text-xs text-ink-muted mb-4">Register your business to see group orders from iCamagu members and send your best price on them. The best offer is confirmed once a group reaches its minimum.</p>
+        <p className="text-xs text-ink-muted mb-4">Register your business to see group orders from i-Camagu members and send your best price on them. The best offer is confirmed once a group reaches its minimum.</p>
         <form onSubmit={submit} className="space-y-3">
           <input
             type="text" placeholder="Business name" value={name}
@@ -174,7 +174,7 @@ function OrderRequests({ requests, onSent, verified }) {
           <span className="min-w-0">
             <span className="block text-sm font-extrabold">Waiting for verification</span>
             <span className="mt-1 block text-[13px] leading-relaxed text-[#c9bfb2]">
-              iCamagu checks every merchant before they can quote, because members pay merchants directly. You can see group orders now and send offers once you are verified. We will notify you.
+              i-Camagu checks every merchant before they can quote, because members pay merchants directly. You can see group orders now and send offers once you are verified. We will notify you.
             </span>
           </span>
         </div>
@@ -473,7 +473,7 @@ function SupplierDashboard({ onBack }) {
                                   </button>
                                 ) : (
                                   <span className="text-xs text-ink-muted flex-shrink-0 text-right">
-                                    Paid online — iCamagu will refund this directly
+                                    Paid online — i-Camagu will refund this directly
                                   </span>
                                 )}
                               </div>

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // SEC-02: these tests fail if sign-in ever again tells a stranger whether an
-// email has an iCamagu account.
+// email has an i-Camagu account.
 const prisma = { user: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn() } };
 const send = vi.fn();
 const createOtp = vi.fn();
@@ -92,7 +92,7 @@ describe('password registration verification', () => {
     expect(createOtp).toHaveBeenCalledWith('user-2');
     expect(tokenService.generateTokenPair).not.toHaveBeenCalled();
     await vi.waitFor(() => expect(send).toHaveBeenCalledWith(expect.objectContaining({
-      to: 'new@example.com', subject: 'Verify your iCamagu email',
+      to: 'new@example.com', subject: 'Verify your i-Camagu email',
     })));
   });
 });

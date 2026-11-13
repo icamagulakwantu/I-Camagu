@@ -1,5 +1,6 @@
 import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
+import { rateLimit } from '../middleware/rateLimiter.js';
 import {
   getMyClanMatches,
   connectWithMatch,
@@ -18,6 +19,10 @@ const router = express.Router();
 router.get('/match', requireAuth, matchIsidukoName);
 // Search bar on "Find your clan": clans by clan name or praise name
 router.get('/clans', requireAuth, searchClanDirectory);
+// The same clan directory for visitors on the public landing page, so anyone
+// can find their clan and its praises before joining. It returns clan names
+// and praise names only: never members or anything about a person.
+router.get('/public/clans', rateLimit({ windowMs: 60 * 1000, max: 60 }), searchClanDirectory);
 router.post('/submissions', requireAuth, submitIsidukoReview);
 router.get('/matches', requireAuth, getMyClanMatches);
 router.post('/connect', requireAuth, connectWithMatch);

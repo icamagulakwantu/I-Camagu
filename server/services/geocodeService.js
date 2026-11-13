@@ -2,7 +2,7 @@
 // API key is needed. Their usage policy asks for a real User-Agent and at most
 // one request a second, so requests are queued and results cached.
 const GEOCODER_BASE_URL = String(process.env.GEOCODER_BASE_URL || 'https://nominatim.openstreetmap.org').replace(/\/+$/, '');
-const USER_AGENT = process.env.GEOCODER_USER_AGENT || 'iCamagu/1.0 (iCamagu address lookup)';
+const USER_AGENT = process.env.GEOCODER_USER_AGENT || 'i-Camagu/1.0 (i-Camagu address lookup)';
 const CACHE_LIMIT = 500;
 const MIN_GAP_MS = 1100;
 

@@ -210,7 +210,7 @@ export async function donateToShrineFund(req, res) {
 
     res.status(201).json({
       donation,
-      message: "Thank you — we've recorded your pledge. Someone from iCamagu will follow up with you directly to complete the transfer.",
+      message: "Thank you — we've recorded your pledge. Someone from i-Camagu will follow up with you directly to complete the transfer.",
     });
   } catch (error) {
     console.error('Donate to shrine fund error:', error.message);

@@ -2,7 +2,7 @@
 //
 // retailPriceZAR drives every savings figure in the app — the per-product
 // comparison in the Store and the basket total. If an unchecked number
-// reaches those screens, iCamagu tells a family it saved them money it
+// reaches those screens, i-Camagu tells a family it saved them money it
 // cannot prove. So the price only leaves the server when somebody actually
 // verified it against a named shop.
 //

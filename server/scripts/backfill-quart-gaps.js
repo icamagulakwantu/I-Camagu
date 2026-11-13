@@ -11,7 +11,7 @@
 // Fish's 660ml bottle a "quart" (its own product listing: "Flying Fish
 // Premium Flavoured Beer Quarts 3x660ml"), and Stella Artois's big bottle is
 // 620ml (Pick n Pay/Takealot NRB listing). casePriceZAR is left null — no
-// real iCamagu-negotiated case cost exists yet, same rule as every other new
+// real i-Camagu-negotiated case cost exists yet, same rule as every other new
 // catalogue addition; the verified per-bottle retail price is set via
 // backfillVerifiedRetailPrices in backfill-bulk-units.js instead.
 //

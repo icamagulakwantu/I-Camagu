@@ -140,7 +140,7 @@ function LostPage({ onNavigate }) {
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-terracotta/10">
           <Icon name="compass" size={28} color="#c45c26" />
         </div>
-        <p className="eyebrow text-terracotta">You’re still in iCamagu</p>
+        <p className="eyebrow text-terracotta">You’re still in i-Camagu</p>
         <h1 className="mt-2 font-display text-2xl font-bold text-ink">Let’s get you back on track</h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">
           This page may have moved or the link may be incomplete. Choose where you’d like to go next.
@@ -488,7 +488,7 @@ function MainApp() {
 function AuthenticatedApp() {
   const { accessToken, user, checkingSession } = useAuth()
   const [onboardingComplete, setOnboardingComplete] = useState(false)
-  // Invites remain in their existing localStorage keys while the visitor learns about iCamagu.
+  // Invites remain in their existing localStorage keys while the visitor learns about i-Camagu.
   // The Landing is always first for signed-out visitors, including stokvel, clan and pool invites.
   const [showAuth, setShowAuth] = useState(false)
 
@@ -496,7 +496,7 @@ function AuthenticatedApp() {
     return (
       <div className="icamagu-bg flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <img src="/images/brand/icon-128.png" alt="iCamagu" className="w-16 h-16 mx-auto mb-4 rounded-2xl animate-pulse" />
+          <img src="/images/brand/icon-128.png" alt="i-Camagu" className="w-16 h-16 mx-auto mb-4 rounded-2xl animate-pulse" />
           <p className="text-brand-black/50 font-bold text-sm">Loading...</p>
         </div>
       </div>
@@ -571,7 +571,7 @@ export default function App() {
       <OfflineBanner />
       <Suspense fallback={
         <div className="icamagu-bg flex min-h-screen items-center justify-center" role="status" aria-live="polite">
-          <p className="text-brand-black/60 font-bold text-sm">Loading iCamagu…</p>
+          <p className="text-brand-black/60 font-bold text-sm">Loading i-Camagu…</p>
         </div>
       }>
       <Routes>

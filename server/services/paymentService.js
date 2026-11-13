@@ -1,17 +1,17 @@
 // server/services/paymentService.js
-// iCamagu — Online payment orchestration for PoolPayment (SmartMatch bulk
+// i-Camagu — Online payment orchestration for PoolPayment (SmartMatch bulk
 // order payments). Sits above the PSP adapter (PayFastAdapter today) the
 // same way matchmakerService sits above the pool-matching logic: callers
 // (paymentController, the webhook route) deal in PoolPayment rows and never
 // touch PayFast's field names directly.
 //
 // 2026 NO-CUSTODY RELEASE GATE: online checkout is deliberately disabled.
-// A configured PayFast merchant account would collect money into iCamagu's
+// A configured PayFast merchant account would collect money into i-Camagu's
 // account rather than directly into the supplier's account. Environment vars
 // must never be enough to activate a real-money path. Re-enable only in a
 // reviewed future change after the founder's 2027+ legal, banking, provider,
 // settlement and compliance gates have all been met. Manual/direct payment
-// recording remains available and does not move money through iCamagu.
+// recording remains available and does not move money through i-Camagu.
 // Culture before capital. 🌾
 
 import prisma from '../config/db.js';
@@ -54,11 +54,11 @@ export function isOnlinePaymentConfigured() {
 }
 
 // Alcohol sales carry real liquor-licensing exposure that manual EFT never
-// did: a member paying a tavern/liquor supplier directly means iCamagu
+// did: a member paying a tavern/liquor supplier directly means i-Camagu
 // never touches the money, so it's clearly just a matching platform, not a
-// party to the sale. PayFast collecting into iCamagu's OWN account instead
-// puts iCamagu in the payment chain for the alcohol itself — which a
-// regulator could read as iCamagu conducting the sale without holding its
+// party to the sale. PayFast collecting into i-Camagu's OWN account instead
+// puts i-Camagu in the payment chain for the alcohol itself — which a
+// regulator could read as i-Camagu conducting the sale without holding its
 // own liquor license, and could just as easily jeopardize the supplier's
 // license too (most have conditions about who the licensee may transact
 // through). So: never offered for TAVERN pools, full stop, until that's
@@ -74,7 +74,7 @@ export async function initiatePoolPayment(userId, paymentId, baseUrl) {
   // Enforce the no-custody policy server-side before reading or changing any
   // payment row. Hiding the frontend button is not a security boundary.
   if (!isOnlinePaymentConfigured()) {
-    const err = new Error('Online checkout is disabled under iCamagu’s current no-custody policy. Pay the supplier or intended recipient directly and record the reference here.');
+    const err = new Error('Online checkout is disabled under i-Camagu’s current no-custody policy. Pay the supplier or intended recipient directly and record the reference here.');
     err.status = 403;
     throw err;
   }
@@ -110,7 +110,7 @@ export async function initiatePoolPayment(userId, paymentId, baseUrl) {
     returnUrl: `${baseUrl}/store/orders?payment=success`,
     cancelUrl: `${baseUrl}/store/orders?payment=cancelled`,
     notifyUrl: `${baseUrl}/api/webhooks/payfast`,
-    itemName: `iCamagu bulk order — ${payment.pool.partner?.name || payment.pool.category}`,
+    itemName: `i-Camagu bulk order — ${payment.pool.partner?.name || payment.pool.category}`,
     buyerEmail: payment.user.email,
   });
 
@@ -185,7 +185,7 @@ export async function handlePayFastWebhook(rawBody) {
 }
 
 // Admin-only bookkeeping for the manual step described at the top of this
-// file: a PSP-collected payment sits in iCamagu's own account until someone
+// file: a PSP-collected payment sits in i-Camagu's own account until someone
 // actually wires it to the supplier. Without this, that money has no
 // tracked owner — an admin would have no way to tell what's already been
 // forwarded from what's still sitting there.
@@ -244,7 +244,7 @@ export async function markPayoutForwarded(paymentId, { reference, note }) {
 // The refund-side mirror of the payout tracking above. A member's refund
 // request on a MANUAL_EFT payment is the supplier's to process directly
 // (see supplierService.processRefund) — they hold that money. A refund
-// request on a PAYFAST payment is different: iCamagu holds that money, so
+// request on a PAYFAST payment is different: i-Camagu holds that money, so
 // the supplier has nothing to refund and nothing to click. Without this,
 // a PSP refund request had no valid path to actually being resolved.
 export async function listPendingSupplierRefunds() {

@@ -25,7 +25,7 @@ const REFRESH_COOKIE_OPTIONS = {
 // SEC-02: sign-in must not tell a stranger whether an email has an account.
 // Every "send me a code" request gets this same reply, whether or not a code
 // was actually sent.
-export const OTP_SENT_MESSAGE = 'If an iCamagu account uses this email, we have sent it a 6-digit login code.';
+export const OTP_SENT_MESSAGE = 'If an i-Camagu account uses this email, we have sent it a 6-digit login code.';
 
 function serializeUser(user) {
   return {
@@ -47,7 +47,7 @@ function serializeUser(user) {
 }
 
 const otpEmail = (code) =>
-  `<p>Your iCamagu verification code is:</p><h2>${code}</h2><p>Expires in 10 minutes. Never share this code with anyone.</p>`;
+  `<p>Your i-Camagu verification code is:</p><h2>${code}</h2><p>Expires in 10 minutes. Never share this code with anyone.</p>`;
 
 const cleanEmail = (value) => (typeof value === 'string' ? value.trim() : '');
 
@@ -95,7 +95,7 @@ export async function checkEmail(req, res) {
 export async function registerWithPassword(req, res) {
   // Iziduko is collected as a post-signup follow-up now (same step the
   // Google sign-in path already uses), not upfront during registration —
-  // asking for clan names before someone understands why iCamagu wants
+  // asking for clan names before someone understands why i-Camagu wants
   // them just adds friction to account creation. Still accepted here if a
   // caller does send it (kept optional, not removed) so nothing breaks for
   // an existing client sending the old shape.
@@ -110,7 +110,7 @@ export async function registerWithPassword(req, res) {
   // owner. Fail closed instead of creating an account whose verification code
   // the real member cannot receive. Google sign-in remains available.
   if (String(FROM_ADDRESS).toLowerCase().includes('onboarding@resend.dev')) {
-    return res.status(503).json({ error: 'Password registration is temporarily unavailable until iCamagu email delivery is configured. Please use verified Google sign-in for now.' });
+    return res.status(503).json({ error: 'Password registration is temporarily unavailable until i-Camagu email delivery is configured. Please use verified Google sign-in for now.' });
   }
 
   // Admin identities must be established through the verified Google sign-in
@@ -131,7 +131,7 @@ export async function registerWithPassword(req, res) {
       // code is sent to the owner of that address; entering it follows the
       // normal OTP login path and never changes the existing password.
       const code = await createOtp(existing.id);
-      sendQuietly({ from: FROM_ADDRESS, to: existing.email, subject: 'Your iCamagu login code', html: otpEmail(code) }, 'Registration existing-account code');
+      sendQuietly({ from: FROM_ADDRESS, to: existing.email, subject: 'Your i-Camagu login code', html: otpEmail(code) }, 'Registration existing-account code');
       await waitUntilFloor(startedAt);
       return res.status(201).json({ needsEmailVerification: true, message: 'If you can use this email, check your inbox for a code to continue.' });
     }
@@ -147,8 +147,8 @@ export async function registerWithPassword(req, res) {
     sendQuietly({
       from: FROM_ADDRESS,
       to: user.email,
-      subject: 'Verify your iCamagu email',
-      html: `<p>Welcome to iCamagu.</p><p>Enter this 6-digit code to verify your email and finish creating your account:</p><h2>${code}</h2><p>The code expires in 10 minutes. If you did not create this account, ignore this email.</p>`,
+      subject: 'Verify your i-Camagu email',
+      html: `<p>Welcome to i-Camagu.</p><p>Enter this 6-digit code to verify your email and finish creating your account:</p><h2>${code}</h2><p>The code expires in 10 minutes. If you did not create this account, ignore this email.</p>`,
     }, 'Registration verification');
     // Do not issue a session until the person proves they control the email.
     await waitUntilFloor(startedAt);
@@ -230,7 +230,7 @@ export async function googleAuth(req, res) {
         } else {
           if (existing.passwordHash || (existing.googleId && existing.googleId !== googleData.googleId)) {
             return res.status(409).json({
-              error: 'An iCamagu account already uses this email. Sign in with its existing sign-in method.',
+              error: 'An i-Camagu account already uses this email. Sign in with its existing sign-in method.',
               code: 'ACCOUNT_EXISTS',
             });
           }
@@ -273,7 +273,7 @@ export async function register(req, res) {
     await syncUserClanGroups(user);
 
     const code = await createOtp(user.id);
-    sendQuietly({ from: FROM_ADDRESS, to: email, subject: 'Your iCamagu login code', html: otpEmail(code) }, 'Register code');
+    sendQuietly({ from: FROM_ADDRESS, to: email, subject: 'Your i-Camagu login code', html: otpEmail(code) }, 'Register code');
     res.json({ message: OTP_SENT_MESSAGE });
   } catch (error) {
     console.error('Register error:', error.message);
@@ -290,7 +290,7 @@ export async function login(req, res) {
     const user = await prisma.user.findUnique({ where: { email } });
     if (user) {
       const code = await createOtp(user.id);
-      sendQuietly({ from: FROM_ADDRESS, to: email, subject: 'Your iCamagu login code', html: otpEmail(code) }, 'Login code');
+      sendQuietly({ from: FROM_ADDRESS, to: email, subject: 'Your i-Camagu login code', html: otpEmail(code) }, 'Login code');
     }
     await waitUntilFloor(startedAt);
     res.json({ message: OTP_SENT_MESSAGE });
@@ -429,8 +429,8 @@ export async function requestPasswordReset(req, res) {
     sendQuietly({
       from: FROM_ADDRESS,
       to: email,
-      subject: 'Reset your iCamagu password',
-      html: `<p>Someone requested a password reset for your iCamagu account.</p>
+      subject: 'Reset your i-Camagu password',
+      html: `<p>Someone requested a password reset for your i-Camagu account.</p>
              <p><a href="${resetUrl}">Click here to reset your password</a> — this link expires in 30 minutes.</p>
              <p>If you didn't request this, you can safely ignore this email.</p>`,
     }, 'Password reset');

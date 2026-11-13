@@ -101,7 +101,7 @@ export async function getMyClanMatches(req, res) {
 
       const connection = statusMap[other.id] || { status: 'none', connectionId: null };
       return { ...other, tier, label, connectionStatus: connection.status, connectionId: connection.connectionId };
-    }).sort((a, b) => a.tier - b.tier);
+    }).sort((a, b) => a.tier - b.tier || Number(b.nearYou) - Number(a.nearYou));
 
     res.json({ profileComplete: true, matches: ranked });
   } catch (error) {

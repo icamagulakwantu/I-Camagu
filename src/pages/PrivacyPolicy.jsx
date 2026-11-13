@@ -18,8 +18,8 @@ function PrivacyPolicy({ onBack }) {
 
       <Section title="Who this policy covers">
         <p>
-          This policy explains how iCamagu ("we", "us", the "Platform") collects, uses, stores,
-          and protects your personal information when you use the app. iCamagu is the
+          This policy explains how i-Camagu ("we", "us", the "Platform") collects, uses, stores,
+          and protects your personal information when you use the app. i-Camagu is the
           Responsible Party for this processing under POPIA. If you need to reach us about
           your data, email <a href="mailto:info@i-camagu.co.za" className="text-sage-600 underline">info@i-camagu.co.za</a>.
         </p>
@@ -29,7 +29,7 @@ function PrivacyPolicy({ onBack }) {
         <p><strong className="text-ink">Account information</strong> — name, email, phone number, address, age, and your Iziduko (clan names). Used to run your account, match you with family and clan connections, and personalise ceremony planning.</p>
         <p><strong className="text-ink">Location</strong> — only if you choose to share it, to help place you within Umgidi Hierarchy structures and clan matching. You can decline or remove this at any time.</p>
         <p><strong className="text-ink">Address suggestions</strong> — when you type an address or request a location lookup, the address text or coordinates are sent from our server to the configured geocoding provider to return suggestions. We do not include your name, email or account identifier in those lookup requests.</p>
-        <p><strong className="text-ink">How you found us</strong> — if you open iCamagu from a pamphlet or campaign link that carries a short campaign code, that code is saved on your account when you sign up, so we can see which outreach is working. It identifies the campaign, not you, and is never shown to other members.</p>
+        <p><strong className="text-ink">How you found us</strong> — if you open i-Camagu from a pamphlet or campaign link that carries a short campaign code, that code is saved on your account when you sign up, so we can see which outreach is working. It identifies the campaign, not you, and is never shown to other members.</p>
         <p><strong className="text-ink">Financial and stokvel records</strong> — contributions, payouts, and pool orders, so stokvel officials can reconcile real money against the app and so you have a record of your own participation.</p>
         <p><strong className="text-ink">ID number and ID document photo</strong> — collected only if you choose to verify your identity. This unlocks trust-sensitive features such as stokvel official roles, and lays the groundwork for an eventual biometric verification step. We treat this as sensitive information (see below).</p>
         <p><strong className="text-ink">Profile photo</strong> — optional, shown to other members and, if you verify your identity, used as a face reference alongside your ID document.</p>
@@ -41,7 +41,7 @@ function PrivacyPolicy({ onBack }) {
           differently from the rest of your profile:
         </p>
         <ul className="list-disc pl-5 space-y-1">
-          <li>Your ID number is encrypted before it is stored. iCamagu staff cannot read it directly from the database — only the last 4 digits are kept in plain text, so you and reviewers can reference "the ID ending in 1234."</li>
+          <li>Your ID number is encrypted before it is stored. i-Camagu staff cannot read it directly from the database — only the last 4 digits are kept in plain text, so you and reviewers can reference "the ID ending in 1234."</li>
           <li>Only an admin actively reviewing your submission can decrypt and view your full ID number and document photo, and only for as long as your review is pending.</li>
           <li>We do not currently perform automated facial recognition or biometric matching. If we introduce that in future, it will be through a dedicated, vetted identity-verification provider — never something we build or fake ourselves — and we will update this policy and ask for your consent again before switching it on.</li>
           <li>You choose when to submit this information. It is never required to create an account or use most of the app — only for the specific features that need verified trust (e.g. holding a stokvel official role).</li>
@@ -66,7 +66,7 @@ function PrivacyPolicy({ onBack }) {
         <ul className="list-disc pl-5 space-y-1">
           <li>Our hosting and database providers (Render and Supabase), who store data on our behalf under their own security commitments.</li>
           <li>Our email provider (Resend), to send account and notification emails.</li>
-          <li>Other iCamagu members, but only the profile details you choose to make visible (e.g. your name, Iziduko, and profile photo in Iziduko Network) — never your ID number, financial history, or contact details unless you share them yourself.</li>
+          <li>Other i-Camagu members, but only the profile details you choose to make visible (e.g. your name, Iziduko, and profile photo in Iziduko Network) — never your ID number, financial history, or contact details unless you share them yourself.</li>
           <li>Stokvel officials of a stokvel you belong to, limited to the contribution and payout records needed to run that stokvel.</li>
         </ul>
         <p>
@@ -108,7 +108,7 @@ function PrivacyPolicy({ onBack }) {
 
       <Section title="Children">
         <p>
-          iCamagu is not intended for children. If you believe a child has created an account,
+          i-Camagu is not intended for children. If you believe a child has created an account,
           please contact us so we can remove it.
         </p>
       </Section>

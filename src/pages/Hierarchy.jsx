@@ -309,10 +309,10 @@ function Hierarchy({ onBack, initialCeremonyId }) {
           {storeMatchCount > 0 && (
             <div className="bg-sage-50 border border-sage-200 rounded-soft px-4 py-3 mb-3">
               <p className="text-xs font-black text-sage-700 mb-1">
-                {storeMatchCount} item{storeMatchCount > 1 ? 's' : ''} matched to live iCamagu store prices
+                {storeMatchCount} item{storeMatchCount > 1 ? 's' : ''} matched to live i-Camagu store prices
               </p>
               <p className="text-xs text-sage-600 leading-relaxed">
-                These are the prices currently listed in iCamagu. Supplier availability, current quotes and any bulk discount can change; compare like-for-like offers before ordering.
+                These are the prices currently listed in i-Camagu. Supplier availability, current quotes and any bulk discount can change; compare like-for-like offers before ordering.
               </p>
             </div>
           )}
@@ -344,7 +344,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
                           <label className="text-xs text-ink font-semibold flex-1 capitalize">{key}</label>
                           {isStore && (
                             <span className="text-xs font-bold bg-sage-100 text-sage-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide flex-shrink-0">
-                              iCamagu price
+                              i-Camagu price
                             </span>
                           )}
                         </div>

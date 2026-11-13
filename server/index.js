@@ -106,7 +106,7 @@ app.get('/api/health', async (req, res) => {
   }
   try {
     await prisma.$queryRaw`SELECT 1`;
-    res.json({ status: 'ok', message: 'iCamagu server running, database connected' });
+    res.json({ status: 'ok', message: 'i-Camagu server running, database connected' });
   } catch (error) {
     console.error('Database health check failed:', error.message);
     res.status(500).json({ status: 'error', message: 'Server running, but database connection failed' });
@@ -187,7 +187,7 @@ app.use((err, req, res, next) => {
 // circuit breaker ("too many authentication failures"), which can take down
 // ordinary request traffic too. Fix DATABASE_URL at the source instead.
 app.listen(PORT, () => {
-  console.log(`iCamagu server listening on port ${PORT}`);
+  console.log(`i-Camagu server listening on port ${PORT}`);
 });
 
 try {

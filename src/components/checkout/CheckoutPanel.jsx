@@ -226,7 +226,7 @@ export default function CheckoutPanel({
           ))}
           <li className="text-xs leading-snug flex gap-1.5">
             <Icon name="shieldCheck" size={12} color="#9bb89b" className="mt-0.5 shrink-0" />
-            <span>iCamagu never holds your money. You pay the merchant once their offer is confirmed.</span>
+            <span>i-Camagu never holds your money. You pay the merchant once their offer is confirmed.</span>
           </li>
         </ul>
         <button

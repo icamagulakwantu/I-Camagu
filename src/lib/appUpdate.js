@@ -1,6 +1,6 @@
 // Make a shipped fix actually reach the phone.
 //
-// iCamagu is a PWA, so a service worker precaches index.html and the hashed
+// i-Camagu is a PWA, so a service worker precaches index.html and the hashed
 // JS bundle. With skipWaiting + clientsClaim a new worker installs and takes
 // control straight away — but the page that is already open goes on running
 // the OLD bundle, because nothing reloads it. The new code only appears the

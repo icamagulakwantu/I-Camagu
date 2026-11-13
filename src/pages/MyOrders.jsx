@@ -213,7 +213,7 @@ function MyOrders({ onBack }) {
                             <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Stokvel-funded settlement confirmed; no separate member payment is needed.</p>
                           ) : (
                             <p className="text-xs font-bold text-sage-600">
-                              Payment provider confirmed this payment to iCamagu. This does not by itself confirm supplier settlement; do not pay again while iCamagu reconciles it.
+                              Payment provider confirmed this payment to i-Camagu. This does not by itself confirm supplier settlement; do not pay again while i-Camagu reconciles it.
                             </p>
                           )
                         ) : payment.provider === 'STOKVEL_FUNDS' ? (
@@ -231,7 +231,7 @@ function MyOrders({ onBack }) {
                         ) : (
                           <div>
                             {/* Alcohol never gets the online option — that money would
-                                land in iCamagu's own account instead of the licensed
+                                land in i-Camagu's own account instead of the licensed
                                 supplier's, which is real liquor-licensing exposure a
                                 direct member-to-supplier EFT never had. The server
                                 enforces this too (paymentService.initiatePoolPayment),
@@ -250,7 +250,7 @@ function MyOrders({ onBack }) {
                             )}
                             {payment.provider !== 'MANUAL_EFT' ? (
                               <p className="text-xs text-terracotta font-bold mb-2">
-                                This payment is recorded with {payment.provider}. Do not make a second EFT transfer while it is being reconciled. If the status remains pending, contact the iCamagu admin through the app.
+                                This payment is recorded with {payment.provider}. Do not make a second EFT transfer while it is being reconciled. If the status remains pending, contact the i-Camagu admin through the app.
                               </p>
                             ) : (
                               <>
@@ -264,7 +264,7 @@ function MyOrders({ onBack }) {
                                   </div>
                                 ) : (
                                   <p className="text-xs text-terracotta font-bold mb-2">
-                                    Supplier bank details are not on file. Do not transfer money yet; ask the supplier or iCamagu admin for verified details. If you have already paid the supplier directly, you can still enter your reference below.
+                                    Supplier bank details are not on file. Do not transfer money yet; ask the supplier or i-Camagu admin for verified details. If you have already paid the supplier directly, you can still enter your reference below.
                                   </p>
                                 )}
                                 <p className="text-xs text-brand-black/50 mb-2">

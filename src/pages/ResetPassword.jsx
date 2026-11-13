@@ -59,7 +59,7 @@ function ResetPassword({ token }) {
         </div>
         <p className="font-display font-bold text-lg text-ink mb-1">Password reset</p>
         <p className="text-sm text-ink-muted mb-6">You can now sign in with your new password.</p>
-        <a href="/" className="bg-sage-500 text-white font-bold px-6 py-3 rounded-pill">Go to iCamagu</a>
+        <a href="/" className="bg-sage-500 text-white font-bold px-6 py-3 rounded-pill">Go to i-Camagu</a>
       </div>
     )
   }

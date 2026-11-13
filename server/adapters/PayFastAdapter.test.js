@@ -28,7 +28,7 @@ describe('createPaymentSession', () => {
       returnUrl: 'https://i-camagu-1.onrender.com/orders?payment=success',
       cancelUrl: 'https://i-camagu-1.onrender.com/orders?payment=cancelled',
       notifyUrl: 'https://i-camagu-1.onrender.com/api/webhooks/payfast',
-      itemName: 'iCamagu bulk order',
+      itemName: 'i-Camagu bulk order',
       buyerEmail: 'member@example.com',
     });
 
@@ -45,9 +45,9 @@ describe('createPaymentSession', () => {
     const adapter = new PayFastAdapter(CREDS);
     const { redirectUrl } = adapter.createPaymentSession(
       { id: 'pay_1', amountZAR: '10.00' },
-      { returnUrl: 'https://x.test/ok', cancelUrl: 'https://x.test/no', notifyUrl: 'https://x.test/hook', itemName: 'iCamagu bulk order' }
+      { returnUrl: 'https://x.test/ok', cancelUrl: 'https://x.test/no', notifyUrl: 'https://x.test/hook', itemName: 'i-Camagu bulk order' }
     );
-    expect(redirectUrl).toContain('item_name=iCamagu+bulk+order');
+    expect(redirectUrl).toContain('item_name=i-Camagu+bulk+order');
     expect(redirectUrl).not.toContain('%20');
   });
 

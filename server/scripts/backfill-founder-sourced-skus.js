@@ -3,7 +3,7 @@
 // product photo arrives for something we don't carry, add it to the
 // catalogue automatically rather than asking each time — as long as it's a
 // real, identifiable product in line with the rest of the alcohol range.
-// casePriceZAR stays null — no real iCamagu case cost exists yet, same
+// casePriceZAR stays null — no real i-Camagu case cost exists yet, same
 // discipline as every other catalogue addition; catalogued but not yet
 // orderable until a real bulk price is set.
 //
@@ -14,7 +14,7 @@ import { upsertSkuByNameAndBottleFormat } from '../utils/upsertSku.js';
 
 const NEW_SKUS = [
   // Amstel's actual SA pack range: 750ml returnable quart and 500ml can.
-  // Prices stay null until iCamagu has a verified supplier quote.
+  // Prices stay null until i-Camagu has a verified supplier quote.
   { name: 'Amstel Lager', category: 'BEER', bottleFormat: 'Quart (750ml)', unitsPerCase: 12 },
   { name: 'Amstel Lager', category: 'BEER', bottleFormat: 'Can (500ml)', unitsPerCase: 24 },
   { name: 'Southern Comfort', category: 'LIQUEUR', bottleFormat: '750ml Bottle', unitsPerCase: 12 },

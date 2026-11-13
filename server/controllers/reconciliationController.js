@@ -1,5 +1,5 @@
 // server/controllers/reconciliationController.js
-// iCamagu — Reconciliation Controller
+// i-Camagu — Reconciliation Controller
 // Manual EFT entry, webhook simulation, official review queue.
 // Culture before capital.
 

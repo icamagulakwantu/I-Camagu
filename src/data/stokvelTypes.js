@@ -30,7 +30,7 @@ export const STOKVEL_TYPES = [
     id: 'EXISTING_STOKVEL_UPGRADE',
     label: 'Bring an existing stokvel',
     short: 'Community stokvel',
-    purpose: 'An existing stokvel that now keeps its records on iCamagu.',
+    purpose: 'An existing stokvel that now keeps its records on i-Camagu.',
   },
 ]
 

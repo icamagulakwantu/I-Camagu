@@ -183,24 +183,24 @@ function Login() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/30 to-[#1f3320]" />
           <div className="relative">
           <div className="flex items-center gap-2.5 mb-5">
-            <img src="/images/brand/icon-128.png" alt="iCamagu" className="w-10 h-10 rounded-[11px] ring-1 ring-cream/30" />
-            <span className="font-display font-bold text-2xl text-cream">iCamagu</span>
+            <img src="/images/brand/icon-128.png" alt="i-Camagu" className="w-10 h-10 rounded-[11px] ring-1 ring-cream/30" />
+            <span className="font-display font-bold text-2xl text-cream">i-Camagu</span>
           </div>
           <h1 className="font-display font-semibold text-[1.75rem] leading-tight text-cream text-balance">
             {step === 'email' && 'Siyavuya. Let\u2019s plan the celebration.'}
-            {step === 'register' && 'Joyina iCamagu'}
+            {step === 'register' && 'Joyina i-Camagu'}
             {step === 'password-login' && 'Wamkelekile'}
             {step === 'forgot-password' && 'Reset your password'}
             {step === 'otp-verify' && 'Check your inbox'}
           </h1>
-          {step === 'register' && <p className="text-cream/80 text-sm mt-1">Join iCamagu</p>}
+          {step === 'register' && <p className="text-cream/80 text-sm mt-1">Join i-Camagu</p>}
           {step === 'password-login' && <p className="text-cream/80 text-sm mt-1">Welcome back</p>}
           <p className="text-cream/85 text-sm mt-2 leading-snug break-words">
             {step === 'email' && 'Your son\u2019s umgidi, your wedding, your stokvel and the feast, with the whole family in one place.'}
             {step === 'register' && `Create your account for ${email}.`}
             {step === 'password-login' && email}
             {step === 'forgot-password' && `We'll send a reset link to ${email}`}
-            {step === 'otp-verify' && `If an iCamagu account uses ${email}, we've sent it a 6-digit code.`}
+            {step === 'otp-verify' && `If an i-Camagu account uses ${email}, we've sent it a 6-digit code.`}
           </p>
           {step === 'email' && (
             <div className="mt-4 rounded-2xl border border-cream/15 bg-white/10 backdrop-blur-sm px-3.5 py-3">
@@ -372,7 +372,7 @@ function Login() {
               </button>
               <div className="flex items-center gap-3 pt-1">
                 <div className="flex-1 h-px bg-cream-dark" />
-                <span className="text-xs text-ink-muted">New to iCamagu?</span>
+                <span className="text-xs text-ink-muted">New to i-Camagu?</span>
                 <div className="flex-1 h-px bg-cream-dark" />
               </div>
               <button

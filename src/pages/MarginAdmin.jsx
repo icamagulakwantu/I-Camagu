@@ -112,7 +112,7 @@ export default function MarginAdmin({ onBack }) {
         <button type="button" onClick={onBack} className="text-sm text-ink-muted mb-4">← Back</button>
         <p className="font-display font-bold text-xl text-ink">Admin only</p>
         <p className="text-sm text-ink-muted mt-2">
-          Cost prices are only visible to an iCamagu admin account.
+          Cost prices are only visible to an i-Camagu admin account.
         </p>
       </div>
     )
