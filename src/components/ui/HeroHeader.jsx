@@ -7,9 +7,9 @@ import Icon from '../Icon.jsx'
 // same celebration as the landing page.
 export default function HeroHeader({ image, eyebrow, title, accent, subtitle, onBack, backLabel = 'Back', children = null, className = '' }) {
   return (
-    <header className={`relative overflow-hidden bg-[#1c1612] px-5 pb-20 pt-6 text-cream ${className}`}>
+    <header className={`relative overflow-hidden bg-[#1f3320] px-5 pb-20 pt-6 text-cream ${className}`}>
       {image && <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/50 to-[#1c1612]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/50 to-[#1f3320]" />
       <div className="relative">
         {onBack && (
           <button

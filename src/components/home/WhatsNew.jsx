@@ -2,9 +2,9 @@ import Icon from '../Icon.jsx'
 
 const STYLE = {
   PLEDGE_RECEIVED: { icon: 'gift', color: '#2f6b5a' },
-  CONTRIBUTION_CONFIRMED: { icon: 'check', color: '#3a2f27' },
-  ORDER_MATCHED: { icon: 'package', color: '#3a2f27' },
-  ORDER_FULFILLED: { icon: 'package', color: '#3a2f27' },
+  CONTRIBUTION_CONFIRMED: { icon: 'check', color: '#4a7a4a' },
+  ORDER_MATCHED: { icon: 'package', color: '#4a7a4a' },
+  ORDER_FULFILLED: { icon: 'package', color: '#4a7a4a' },
   POOL_CHANGED: { icon: 'cart', color: '#c1922f' },
   QUOTE_STATUS: { icon: 'cocktail', color: '#c1922f' },
   GROUP_EXPENSE_RECORDED: { icon: 'coins', color: '#c1922f' },

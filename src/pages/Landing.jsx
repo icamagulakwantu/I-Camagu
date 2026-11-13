@@ -52,19 +52,19 @@ const FLOW = [
   },
   {
     icon: 'heartHandshake',
-    color: '#a3471a',
+    color: '#2e4a2e',
     title: 'Family pledges in one place',
     body: 'Share one link. Relatives at home and abroad pledge what they will bring or give, and you can see what is covered and what is still needed.',
   },
   {
     icon: 'cart',
-    color: '#1c1612',
+    color: '#2e4a2e',
     title: 'Buy together for better prices',
     body: 'Families and stokvels pool their orders for drinks, meat, livestock and groceries, and unlock bulk discounts no single household gets.',
   },
   {
     icon: 'coins',
-    color: '#a3471a',
+    color: '#2e4a2e',
     title: 'Stokvels that run properly',
     body: 'Group savings with simple systems: a ledger every member can see, approvals, and every contribution, payout and loan interest recorded.',
   },
@@ -79,22 +79,19 @@ const FUND_POINTS = [
 
 function CelebrationCard({ item }) {
   return (
-    <article className="relative w-[78%] max-w-[300px] flex-shrink-0 snap-start overflow-hidden rounded-[26px] bg-[#1c1612] shadow-[0_24px_48px_-24px_rgba(28,22,18,0.7)]">
-      <div className="relative h-56">
+    <article className="relative w-[78%] max-w-[300px] flex-shrink-0 snap-start overflow-hidden rounded-[26px] bg-white shadow-[0_24px_48px_-28px_rgba(163,71,26,0.55)]">
+      <div className="relative h-52">
         <img src={item.image} alt="" className="h-full w-full object-cover" loading="lazy" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1c1612] via-[#1c1612]/30 to-transparent" />
-        <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-terracotta-dark">
+        <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-terracotta-dark">
           {item.tag}
         </span>
-        <div className="absolute inset-x-4 bottom-3">
-          <h3 className="font-display text-[1.7rem] font-semibold leading-none text-cream">{item.name}</h3>
-        </div>
       </div>
-      <div className="px-4 pb-4 pt-2">
-        <p className="text-[14px] leading-snug text-cream/90">{item.line}</p>
+      <div className="px-4 pb-4 pt-3.5">
+        <h3 className="font-display text-[1.6rem] font-semibold leading-none text-ink">{item.name}</h3>
+        <p className="mt-2 text-[14px] leading-snug text-ink-muted">{item.line}</p>
         <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={`What ${item.name} needs`}>
           {item.needs.map((n) => (
-            <li key={n} className="rounded-full border border-ochre-light/35 px-2.5 py-1 text-[11px] font-bold text-ochre-light">{n}</li>
+            <li key={n} className="rounded-full bg-[#fbe9d7] px-2.5 py-1 text-[11px] font-bold text-terracotta-dark">{n}</li>
           ))}
         </ul>
       </div>
@@ -127,21 +124,21 @@ export default function Landing({ onJoin, onSignIn }) {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-cream text-ink">
-      {/* —— Hero: clean type on a warm dark ground; the photos live in the cards below —— */}
-      <header className="relative overflow-hidden bg-[#1c1612]">
-        <div aria-hidden="true" className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-terracotta-dark/50 blur-2xl" />
-        <div aria-hidden="true" className="absolute -left-20 top-1/2 h-60 w-60 rounded-full bg-ochre/20 blur-2xl" />
+      {/* —— Hero: light and warm, like a celebration morning; the photos live in the cards below —— */}
+      <header className="relative overflow-hidden bg-gradient-to-b from-[#fff6ec] via-[#fbe9d7] to-[#f6dcc3]">
+        <div aria-hidden="true" className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-terracotta/25 blur-3xl" />
+        <div aria-hidden="true" className="absolute -left-20 top-1/2 h-60 w-60 rounded-full bg-ochre-light/30 blur-3xl" />
 
         <div className="relative z-10 mx-auto flex max-w-lg flex-col px-5 pb-32 pt-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <img src="/icons/source/gateway-mark-1024.png" alt="" width="40" height="40" className="h-10 w-10" />
-              <p className="font-display text-xl font-semibold tracking-tight text-cream">iCamagu</p>
+              <p className="font-display text-xl font-semibold tracking-tight text-ink">iCamagu</p>
             </div>
             <button
               type="button"
               onClick={onSignIn}
-              className="pressable rounded-full border border-cream/40 bg-black/20 px-4 py-2 text-sm font-bold text-cream backdrop-blur-sm"
+              className="pressable rounded-full border border-ink/15 bg-white/70 px-4 py-2 text-sm font-bold text-ink"
             >
               Sign in
             </button>
@@ -149,18 +146,18 @@ export default function Landing({ onJoin, onSignIn }) {
 
           <div className="mt-12">
             {inviteType && (
-              <div className="mb-6 rounded-2xl border border-ochre-light/40 bg-white/[0.06] px-4 py-3 text-sm leading-relaxed text-cream">
+              <div className="mb-6 rounded-2xl border border-terracotta/25 bg-white/80 px-4 py-3 text-sm leading-relaxed text-ink">
                 {inviteType === 'stokvel' && 'You have been invited to join a stokvel on iCamagu. Join free to continue with your invitation.'}
                 {inviteType === 'clan' && 'You have been invited to a family clan group on iCamagu. Join free to continue with your invitation.'}
                 {inviteType === 'pool' && 'You have been invited to a SmartMatch group order on iCamagu. Join free to continue with your invitation.'}
               </div>
             )}
-            <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Siyavuya · We celebrate</p>
-            <h1 className="mt-3 font-display text-[2.6rem] font-semibold leading-[1.02] text-cream text-balance">
+            <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-terracotta-dark">Siyavuya · We celebrate</p>
+            <h1 className="mt-3 font-display text-[2.6rem] font-semibold leading-[1.02] text-ink text-balance">
               Celebrate like a nation.{' '}
-              <span className="italic text-ochre-light">Plan like a family.</span>
+              <span className="italic text-terracotta">Plan like a family.</span>
             </h1>
-            <p className="mt-4 max-w-md text-[16px] leading-relaxed text-cream/90">
+            <p className="mt-4 max-w-md text-[16px] leading-relaxed text-ink-light">
               Your son&rsquo;s umgidi. Your wedding. Every ceremony that makes us amaXhosa, planned with
               structure, funded together and celebrated with family at home and across the world.
             </p>
@@ -173,7 +170,7 @@ export default function Landing({ onJoin, onSignIn }) {
                 Start planning, free →
               </button>
             </div>
-            <p className="mt-3 text-xs text-cream/70">Free to join · Works on slow data · Install from your browser</p>
+            <p className="mt-3 text-xs text-ink-muted">Free to join · Works on slow data · Install from your browser</p>
           </div>
         </div>
       </header>
@@ -240,7 +237,7 @@ export default function Landing({ onJoin, onSignIn }) {
 
       {/* —— Ubuhlanti: the Shrine Fund —— */}
       <section aria-labelledby="fund-heading" className="mx-auto max-w-lg px-5 pt-14">
-        <div className="relative overflow-hidden rounded-[30px] bg-[#1c1612] text-cream shadow-[0_28px_56px_-28px_rgba(28,22,18,0.9)]">
+        <div className="relative overflow-hidden rounded-[30px] bg-[#1f3320] text-cream shadow-[0_28px_56px_-28px_rgba(28,22,18,0.9)]">
           <div aria-hidden="true" className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-ochre-light/15" />
           <div aria-hidden="true" className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-terracotta-dark/35" />
           <div className="relative px-6 pb-7 pt-8">
@@ -288,7 +285,7 @@ export default function Landing({ onJoin, onSignIn }) {
         </div>
         <div className="flex gap-3.5 rounded-[22px] border border-ink/[0.06] bg-white px-5 py-4 shadow-soft">
           <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-sage/10" aria-hidden>
-            <Icon name="lock" size={18} color="#1c1612" />
+            <Icon name="lock" size={18} color="#2e4a2e" />
           </span>
           <div>
             <p className="text-[15px] font-bold text-ink">

@@ -92,7 +92,7 @@ function IzidukoChat({ userId, onBack, onViewProfile }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-cream">
-      <div className="bg-[#1c1612] text-cream px-5 pt-8 pb-4 rounded-b-[1.5rem] flex-shrink-0">
+      <div className="bg-[#1f3320] text-cream px-5 pt-8 pb-4 rounded-b-[1.5rem] flex-shrink-0">
         <button onClick={onBack} className="text-sm text-white/70 mb-3 block">← Back</button>
         {otherUser && (
           <button onClick={() => onViewProfile?.(otherUser.id)} className="flex items-center gap-3 text-left">

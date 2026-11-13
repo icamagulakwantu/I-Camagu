@@ -82,9 +82,9 @@ function Templates({ onBack }) {
     const { tasks, shopping } = countsOf(activeTemplate)
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
         <img src={ceremonyImage(activeTemplate.ceremonyType)} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />
         <div className="relative">
           <button type="button" onClick={() => setActiveTemplate(null)} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm">← All templates</button>
           <div className="flex items-center gap-3">
@@ -145,9 +145,9 @@ function Templates({ onBack }) {
   // ----- All templates -----
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+      <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
         <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />
         <div className="relative">
         <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm">← Back</button>
         <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">My Templates</h1>

@@ -214,9 +214,9 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+      <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
         <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />
         <div className="relative">
         <div className="relative flex items-center gap-4">
           <button
@@ -418,7 +418,7 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
                 className="w-full border-2 border-dashed border-ink/30 rounded-soft py-3 text-sm font-bold text-ink-muted flex items-center justify-center gap-2"
               >
                 {idDocumentUrl ? (
-                  <><Icon name="check" size={14} color="#3a2f27" /> ID photo attached</>
+                  <><Icon name="check" size={14} color="#4a7a4a" /> ID photo attached</>
                 ) : (
                   <><Icon name="camera" size={14} /> Attach a photo of your ID</>
                 )}

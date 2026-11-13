@@ -186,7 +186,7 @@ function MyOrders({ onBack }) {
                   <div key={li.id} className="flex justify-between items-center py-1">
                     <p className="text-sm text-brand-black/70">{li.quantity} {li.unitType.toLowerCase()}(s) — {li.itemDescription}</p>
                     {li.confirmedAt ? (
-                      <span className="text-xs text-brand-blue font-bold flex items-center gap-1"><Icon name="check" size={12} color="#3a2f27" /> Confirmed</span>
+                      <span className="text-xs text-brand-blue font-bold flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Confirmed</span>
                     ) : (
                       <button onClick={() => confirmLine(li.id)} className="text-xs bg-brand-blue text-brand-cream font-bold px-3 py-1 rounded-pill">
                         Confirm this is correct
@@ -208,9 +208,9 @@ function MyOrders({ onBack }) {
                       <>
                         {payment.status === 'CLEARED' ? (
                           payment.provider === 'MANUAL_EFT' ? (
-                            <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#3a2f27" /> Payment confirmed by supplier</p>
+                            <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Payment confirmed by supplier</p>
                           ) : payment.provider === 'STOKVEL_FUNDS' ? (
-                            <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#3a2f27" /> Stokvel-funded settlement confirmed; no separate member payment is needed.</p>
+                            <p className="text-xs font-bold text-sage-600 flex items-center gap-1"><Icon name="check" size={12} color="#4a7a4a" /> Stokvel-funded settlement confirmed; no separate member payment is needed.</p>
                           ) : (
                             <p className="text-xs font-bold text-sage-600">
                               Payment provider confirmed this payment to iCamagu. This does not by itself confirm supplier settlement; do not pay again while iCamagu reconciles it.

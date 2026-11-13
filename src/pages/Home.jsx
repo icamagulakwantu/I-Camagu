@@ -317,7 +317,7 @@ function CeremonyRail({ ceremonies, loading, onSelectCeremony, onNavigate }) {
 function ClanPanel({ user, clanCeremonies, onNavigate }) {
   const clan = user?.paternalIziduko
   return (
-    <section aria-label="Your clan" className="relative mx-4 mt-10 overflow-hidden rounded-[28px] bg-[#1c1612] text-cream">
+    <section aria-label="Your clan" className="relative mx-4 mt-10 overflow-hidden rounded-[28px] bg-[#1f3320] text-cream">
       <div className="px-5 pb-5 pt-5">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
@@ -380,7 +380,7 @@ function MoneyTiles({ stokvels, totalSaved, pools, basketCount, onNavigate }) {
   const tiles = [
     {
       id: 'stokvels',
-      bg: 'bg-[#1c1612]', disc: 'bg-[#e0a94e] text-[#1c1612]', icon: 'coins',
+      bg: 'bg-[#2e4a2e]', disc: 'bg-[#b9d3b0] text-[#1f3320]', icon: 'coins',
       title: 'Stokvels',
       detail: stokvels.length ? `${plural(stokvels.length, 'stokvel')} · ${rand(totalSaved)} saved` : 'Start one, or join with an invite link',
       action: stokvels.length ? 'Open' : 'Start',
@@ -472,7 +472,7 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
   }
   if (!hasPinSet && !pinDismissed) {
     needs.push({
-      id: 'pin', icon: 'key', tile: 'bg-[#1c1612] text-ochre-light', title: 'Set your security PIN', detail: 'Needed to approve payouts and confirm contributions',
+      id: 'pin', icon: 'key', tile: 'bg-[#1f3320] text-ochre-light', title: 'Set your security PIN', detail: 'Needed to approve payouts and confirm contributions',
       onOpen: () => onNavigate('pin'),
       onDismiss: () => {
         try { if (pinDismissKey) localStorage.setItem(pinDismissKey, '1') } catch { /* storage unavailable */ }
@@ -531,7 +531,7 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
 
       {/* Culture: a card with a folder tab standing up from its top edge. */}
       <section aria-label="Did you know" className="mx-4 mt-14">
-        <span className="relative z-10 ml-5 inline-flex items-center gap-2 rounded-t-[14px] bg-[#1c1612] px-4 pb-2 pt-2 text-xs font-extrabold uppercase tracking-[0.16em] text-ochre-light">
+        <span className="relative z-10 ml-5 inline-flex items-center gap-2 rounded-t-[14px] bg-[#1f3320] px-4 pb-2 pt-2 text-xs font-extrabold uppercase tracking-[0.16em] text-ochre-light">
           <Icon name="landmark" size={13} /> Inkcubeko
         </span>
         <div className="relative overflow-hidden rounded-[24px] rounded-tl-[8px] bg-[#fffdf9] p-5 shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">

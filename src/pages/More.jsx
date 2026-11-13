@@ -31,7 +31,7 @@ const TILE_GROUPS = [
     title: 'Usapho & Inkcubeko',
     english: 'Family & culture',
     line: 'Your clan, your history, your people.',
-    color: '#1c1612',
+    color: '#2e4a2e',
     items: [
       { id: 'iziduko', icon: 'link', label: 'Find clan members', desc: 'Siblings and clan by iziduko', keywords: 'clanmatch family' },
       { id: 'clangroups', icon: 'users', label: 'Clan groups', desc: 'Talk and plan with your clan' },
@@ -183,9 +183,9 @@ export default function More({ onNavigate }) {
   return (
     <div className="mx-auto min-h-screen max-w-md bg-cream pb-28">
       {/* Hero: who you are, on a ceremony photo. The search rises out of it. */}
-      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-16 pt-7 text-cream">
+      <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-16 pt-7 text-cream">
         <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 to-[#1c1612]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 to-[#1f3320]" />
         <div className="relative">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Konke okunye · Everything else</p>
           <h1 className="mt-1 font-display text-[2rem] font-semibold leading-tight">Your whole iCamagu</h1>
@@ -282,7 +282,7 @@ export default function More({ onNavigate }) {
           <button
             type="button"
             onClick={() => handleNav(FUND_ITEM.id)}
-            className="pressable relative mb-8 block w-full overflow-hidden rounded-[26px] bg-[#1c1612] p-5 text-left text-cream shadow-[0_22px_44px_-24px_rgba(28,22,18,0.85)]"
+            className="pressable relative mb-8 block w-full overflow-hidden rounded-[26px] bg-[#1f3320] p-5 text-left text-cream shadow-[0_22px_44px_-24px_rgba(28,22,18,0.85)]"
           >
             <span aria-hidden="true" className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-ochre-light/15" />
             <span aria-hidden="true" className="absolute -bottom-14 right-10 h-28 w-28 rounded-full bg-terracotta-dark/40" />

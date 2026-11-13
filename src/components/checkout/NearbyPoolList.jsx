@@ -21,7 +21,7 @@ export default function NearbyPoolList({ pools, loading, chosenIds, onToggle, ar
   if (!pools.length) {
     return (
       <div className="rounded-soft border border-dashed border-sage-500/50 bg-sage-50 p-3 flex gap-2.5">
-        <Icon name="sprout" size={18} color="#3a2f27" className="shrink-0 mt-0.5" />
+        <Icon name="sprout" size={18} color="#4a7a4a" className="shrink-0 mt-0.5" />
         <p className="text-xs text-ink leading-relaxed">
           <span className="font-bold">No open pools near {areaLabel || 'this address'} yet.</span> You'll start the first one, and anyone nearby who shops for the same things joins you automatically. Tap Invite afterwards to bring family and neighbours in.
         </p>

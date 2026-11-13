@@ -81,7 +81,7 @@ export default function PinSetup({ onBack }) {
       ) : hasPinSet && !changing ? (
         <div className="bg-white border-2 border-terracotta/25 rounded-soft p-5">
           <p className="text-sm font-bold text-sage-600 mb-1 flex items-center gap-1.5">
-            <Icon name="lock" size={15} color="#3a2f27" /> PIN is active
+            <Icon name="lock" size={15} color="#4a7a4a" /> PIN is active
           </p>
           <p className="text-xs text-ink-muted mb-4">Your account has a security PIN set.</p>
           <button
@@ -117,7 +117,7 @@ export default function PinSetup({ onBack }) {
           </div>
           {confirmPin.length > 0 && (
             <p className={`text-xs font-bold text-center flex items-center justify-center gap-1 ${confirmPin === pin ? 'text-sage-600' : 'text-terracotta'}`}>
-              {confirmPin === pin ? <><Icon name="check" size={11} color="#3a2f27" /> PINs match</> : 'PINs do not match yet'}
+              {confirmPin === pin ? <><Icon name="check" size={11} color="#4a7a4a" /> PINs match</> : 'PINs do not match yet'}
             </p>
           )}
           {error && <p role="alert" aria-live="assertive" className="text-terracotta text-sm">{error}</p>}

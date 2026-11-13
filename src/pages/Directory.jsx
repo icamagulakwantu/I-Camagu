@@ -220,7 +220,7 @@ function Directory({ onBack }) {
             onClick={() => handleTabSwitch('practitioners')}
             className={`flex-1 py-2.5 rounded-pill text-sm font-bold transition-colors ${
               tab === 'practitioners' 
-                ? 'bg-[#1c1612] text-cream' 
+                ? 'bg-[#1f3320] text-cream' 
                 : 'text-ink-muted'
             }`}
           >
@@ -230,7 +230,7 @@ function Directory({ onBack }) {
             onClick={() => handleTabSwitch('vendors')}
             className={`flex-1 py-2.5 rounded-pill text-sm font-bold transition-colors ${
               tab === 'vendors' 
-                ? 'bg-[#1c1612] text-cream' 
+                ? 'bg-[#1f3320] text-cream' 
                 : 'text-ink-muted'
             }`}
           >
@@ -287,7 +287,7 @@ function Directory({ onBack }) {
               {uploadingDoc ? (
                 'Uploading document...'
               ) : idDocUrl ? (
-                <><Icon name="check" size={13} color="#3a2f27" /> ID/FICA document attached</>
+                <><Icon name="check" size={13} color="#4a7a4a" /> ID/FICA document attached</>
               ) : (
                 <><Icon name="file" size={13} /> Upload ID/FICA document (optional, speeds up verification)</>
               )}

@@ -14,8 +14,10 @@ import { notifyBasketChanged } from '../lib/basketEvents.js'
 // the department rail rising out of it, and product cards whose price tab and
 // add button break out of the photo.
 
-// Department tiles whose picture is a photograph rather than a packshot.
-const PHOTO_TILES = new Set(['meat', 'livestock', 'nonconsumables'])
+// Department tiles whose picture is a full photograph rather than a
+// product on a white background. Packshots (bottles, the chicken, the
+// sheep) sit on white and are shown whole, never cropped.
+const PHOTO_TILES = new Set(['nonconsumables'])
 
 const DEPARTMENT_ICON = {
   alcohol: 'beer',
@@ -91,7 +93,7 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
           <span className="absolute left-2 top-2 rounded-full bg-sage-600 px-2 py-0.5 text-xs font-extrabold text-white">Save {price(savings)}</span>
         )}
         {/* Price only: the unit ("per case") is in the line under the name. */}
-        <span className="absolute -bottom-3 left-2 max-w-[calc(100%-4.5rem)] truncate rounded-[12px] bg-[#1c1612] px-2.5 py-1 text-[13px] font-extrabold tabular-nums text-cream shadow-[0_8px_16px_-8px_rgba(0,0,0,0.6)]">
+        <span className="absolute -bottom-3 left-2 max-w-[calc(100%-4.5rem)] truncate rounded-[12px] bg-[#1f3320] px-2.5 py-1 text-[13px] font-extrabold tabular-nums text-cream shadow-[0_8px_16px_-8px_rgba(0,0,0,0.6)]">
           {casePrice != null ? price(casePrice) : 'Price soon'}
         </span>
         {casePrice != null && (
@@ -260,7 +262,7 @@ function Store({ onGoToBasket, basketCount }) {
   return (
     <div className="mx-auto min-h-screen max-w-md pb-48">
       {/* ---------- Header with search ---------- */}
-      <header className="relative overflow-hidden rounded-b-[32px] bg-[#1c1612] px-5 pb-[84px] pt-6 text-cream">
+      <header className="relative overflow-hidden rounded-b-[32px] bg-[#1f3320] px-5 pb-[84px] pt-6 text-cream">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ochre-light">
@@ -316,9 +318,9 @@ function Store({ onGoToBasket, basketCount }) {
                   aria-pressed={active}
                   className={`pressable flex w-[112px] flex-col overflow-hidden rounded-[20px] text-left shadow-[0_16px_30px_-20px_rgba(43,30,18,0.65)] ring-2 ${active ? 'bg-ochre-light text-[#1c1612] ring-ochre-light' : 'bg-[#fffdf9] text-ink ring-transparent'}`}
                 >
-                  {/* One real product per tile, standing on its lower edge;
-                      photographs (animals, meat, blankets) fill the tile. */}
-                  <span className={`relative block h-[78px] ${active ? 'bg-[#f3d9a4]' : 'bg-[#f3ece1]'}`}>
+                  {/* One product per tile, whole, on a white panel so packshot
+                      backgrounds blend in; only the blanket photo fills the tile. */}
+                  <span className="relative block h-[78px] bg-white">
                     {d.image ? (
                       <img
                         src={d.image}
@@ -326,7 +328,7 @@ function Store({ onGoToBasket, basketCount }) {
                         loading="lazy"
                         className={PHOTO_TILES.has(d.id)
                           ? 'absolute inset-0 h-full w-full object-cover'
-                          : 'absolute inset-x-0 bottom-0 mx-auto h-[70px] w-[90px] object-contain object-bottom mix-blend-multiply'}
+                          : 'absolute inset-0 h-full w-full object-contain p-2'}
                       />
                     ) : (
                       <span className="flex h-full items-center justify-center text-terracotta-dark"><Icon name={DEPARTMENT_ICON[d.id] || 'package'} size={24} /></span>
@@ -349,7 +351,7 @@ function Store({ onGoToBasket, basketCount }) {
           {HOW_IT_WORKS.map((s) => (
             <li key={s.n} className="border-r border-ink/[0.08] px-2.5 py-2.5 last:border-r-0">
               <span className="flex items-center gap-1.5">
-                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#1c1612] text-xs font-extrabold text-cream">{s.n}</span>
+                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#1f3320] text-xs font-extrabold text-cream">{s.n}</span>
                 <span className="truncate text-xs font-extrabold text-ink">{s.title}</span>
               </span>
               <span className="mt-1 block text-xs leading-snug text-ink-muted">{s.desc}</span>
@@ -388,7 +390,7 @@ function Store({ onGoToBasket, basketCount }) {
                   type="button"
                   onClick={() => pickAisle(a.id)}
                   aria-pressed={activeAisle === a.id}
-                  className={`pressable min-h-9 flex-shrink-0 rounded-full px-3.5 text-[13px] font-bold ${activeAisle === a.id ? 'bg-[#1c1612] text-cream' : 'border border-ink/10 bg-[#fffdf9] text-ink-muted'}`}
+                  className={`pressable min-h-9 flex-shrink-0 rounded-full px-3.5 text-[13px] font-bold ${activeAisle === a.id ? 'bg-[#1f3320] text-cream' : 'border border-ink/10 bg-[#fffdf9] text-ink-muted'}`}
                 >
                   {a.name}
                 </button>

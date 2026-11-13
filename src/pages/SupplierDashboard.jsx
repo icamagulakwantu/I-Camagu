@@ -169,7 +169,7 @@ function OrderRequests({ requests, onSent, verified }) {
   return (
     <div className="mb-6">
       {!verified && (
-        <div role="status" className="mb-4 flex gap-3 rounded-[18px] bg-[#1c1612] p-4 text-cream">
+        <div role="status" className="mb-4 flex gap-3 rounded-[18px] bg-[#1f3320] p-4 text-cream">
           <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-ochre-light text-[#1c1612]"><Icon name="shieldCheck" size={18} /></span>
           <span className="min-w-0">
             <span className="block text-sm font-extrabold">Waiting for verification</span>
@@ -349,9 +349,9 @@ function SupplierDashboard({ onBack }) {
 
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+      <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
         <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />
         <div className="relative">
         <button onClick={onBack} className="cursor-pointer mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm">← Back</button>
         <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">Merchant Dashboard</h1>
@@ -457,7 +457,7 @@ function SupplierDashboard({ onBack }) {
                                   {confirmingId === p.id ? '...' : 'Confirm received'}
                                 </button>
                               ) : (
-                                <span className="text-xs font-bold text-sage-600 flex-shrink-0 flex items-center gap-1"><Icon name="check" size={11} color="#3a2f27" /> Cleared</span>
+                                <span className="text-xs font-bold text-sage-600 flex-shrink-0 flex items-center gap-1"><Icon name="check" size={11} color="#4a7a4a" /> Cleared</span>
                               )}
                             </div>
                             {p.refundRequestedAt && p.status !== 'REFUNDED' && (

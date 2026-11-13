@@ -30,14 +30,14 @@ const FEATURES = [
   },
   {
     icon: 'coins',
-    accent: '#3a2f27',
+    accent: '#4a7a4a',
     label: 'Stokvels',
     headline: 'Siza ndawonye · Save and pay out fairly',
     path: '/stokvels',
   },
   {
     icon: 'link',
-    accent: '#2a221c',
+    accent: '#3d623d',
     label: 'Iziduko Network',
     headline: 'Find relatives through your clan names',
     path: '/me/iziduko',
@@ -192,9 +192,9 @@ function Onboarding({ onDone }) {
 
       {step === 'welcome' && (
         <div className="w-full max-w-sm animate-slide-up">
-          <div className="relative overflow-hidden rounded-t-[28px] bg-[#1c1612] px-6 pb-6 pt-6">
+          <div className="relative overflow-hidden rounded-t-[28px] bg-[#1f3320] px-6 pb-6 pt-6">
             <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/30 to-[#1c1612]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/30 to-[#1f3320]" />
             <div className="relative">
               <div className="flex items-center gap-2.5 mb-4">
                 <img src="/icons/source/gateway-mark-1024.png" alt="iCamagu" className="w-8 h-8" />
@@ -260,7 +260,7 @@ function Onboarding({ onDone }) {
               {localPreview || user?.profileImage ? (
                 <img src={localPreview || user.profileImage} alt="" className={`w-full h-full object-cover ${uploading ? 'opacity-60' : ''}`} />
               ) : (
-                <Icon name="camera" size={24} color="#3a2f27" />
+                <Icon name="camera" size={24} color="#4a7a4a" />
               )}
             </button>
             <p className="text-xs text-ink-muted">JPG or PNG, up to 1.5MB</p>

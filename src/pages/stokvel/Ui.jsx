@@ -10,7 +10,7 @@ export function SubEmpty({ icon, title, description, actionLabel, onAction }) {
   return (
     <div className="bg-white border-2 border-dashed border-terracotta/20 rounded-soft px-5 py-7 text-center">
       <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sage-50">
-        <Icon name={icon} size={22} color="#3a2f27" />
+        <Icon name={icon} size={22} color="#4a7a4a" />
       </span>
       <p className="font-display font-bold text-base text-ink mt-3">{title}</p>
       {description && <p className="text-xs text-ink-muted mt-1 max-w-[260px] mx-auto leading-relaxed">{description}</p>}

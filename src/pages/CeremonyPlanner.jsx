@@ -249,9 +249,9 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
 
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
         <img src={ceremonyImage(activePlan?.ceremonyType)} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />
         <div className="relative">
           <div className="relative">
             <button type="button" onClick={goBack} className={cn('mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm text-left', pressable)}>
@@ -327,9 +327,9 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
   // ----- My ceremonies -----
   return (
     <div className="min-h-screen pb-24 bg-cream">
-      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+      <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
         <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />
         <div className="relative">
         <div className="relative">
           <button type="button" onClick={onBack} className={cn('mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm text-left', pressable)}>

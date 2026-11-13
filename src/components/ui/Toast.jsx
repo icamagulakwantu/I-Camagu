@@ -54,7 +54,7 @@ function ToastItem({ toast, onDismiss }) {
   };
 
   const iconColors = {
-    success: '#3a2f27',
+    success: '#4a7a4a',
     error: '#c45c26',
     info: '#c1922f',
   };

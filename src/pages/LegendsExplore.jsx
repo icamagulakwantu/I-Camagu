@@ -78,12 +78,12 @@ function LegendsExplore({ onBack }) {
       <>
       <div className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-2">
         <button onClick={() => setActiveCategory('')}
-          className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold ${!activeCategory ? 'bg-[#1c1612] text-cream' : 'border border-ink/10 bg-white text-ink'}`}>
+          className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold ${!activeCategory ? 'bg-[#1f3320] text-cream' : 'border border-ink/10 bg-white text-ink'}`}>
           All
         </button>
         {categories.map((cat) => (
           <button key={cat} onClick={() => setActiveCategory(cat)}
-            className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold ${activeCategory === cat ? 'bg-[#1c1612] text-cream' : 'border border-ink/10 bg-white text-ink'}`}>
+            className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold ${activeCategory === cat ? 'bg-[#1f3320] text-cream' : 'border border-ink/10 bg-white text-ink'}`}>
             {cat}
           </button>
         ))}

@@ -119,9 +119,9 @@ export default function Ekoyini({ onBack }) {
   return (
     <div className="min-h-screen pb-24 bg-cream">
       {/* Header */}
-      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+      <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
         <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />
         <div className="relative">
         <div className="relative">
           <div className="flex justify-between items-start">
@@ -153,7 +153,7 @@ export default function Ekoyini({ onBack }) {
             )}
           >
             <div className="w-12 h-12 rounded-full bg-sage-50 flex items-center justify-center flex-shrink-0">
-              <Icon name={pkg.icon} size={22} color="#3a2f27" />
+              <Icon name={pkg.icon} size={22} color="#4a7a4a" />
             </div>
             <div className="flex-1">
               <div className="flex justify-between items-center">

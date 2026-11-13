@@ -327,7 +327,7 @@ export default function Ukugida({ onBack }) {
                   'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
                   entry.direction === 'RECEIVED' ? 'bg-sage-50' : 'bg-cream-dark'
                 )}>
-                  <Icon name={entry.direction === 'RECEIVED' ? 'arrowDown' : 'arrowUp'} size={18} color={entry.direction === 'RECEIVED' ? '#3a2f27' : '#8a8278'} />
+                  <Icon name={entry.direction === 'RECEIVED' ? 'arrowDown' : 'arrowUp'} size={18} color={entry.direction === 'RECEIVED' ? '#4a7a4a' : '#8a8278'} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">

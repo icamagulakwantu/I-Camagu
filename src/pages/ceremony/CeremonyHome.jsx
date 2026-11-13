@@ -151,7 +151,7 @@ export default function CeremonyHome({
       <div className="mt-6 space-y-5 px-4">
         {/* ---------- Next step ---------- */}
         {next ? (
-          <section aria-label="Next step" className="overflow-hidden rounded-[26px] bg-[#1c1612] text-cream">
+          <section aria-label="Next step" className="overflow-hidden rounded-[26px] bg-[#1f3320] text-cream">
             <div className="p-5">
               <ol className="mb-4 flex items-center gap-1.5" aria-label="Setting up">
                 {steps.map((s) => (
@@ -190,7 +190,7 @@ export default function CeremonyHome({
 
         {/* ---------- The money picture, with a tab on its top edge ---------- */}
         <section aria-label="The money picture" className="pt-4">
-          <span className="relative z-10 ml-5 inline-flex items-center gap-2 rounded-t-[14px] bg-[#1c1612] px-4 pb-2 pt-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#d9e4d2]">
+          <span className="relative z-10 ml-5 inline-flex items-center gap-2 rounded-t-[14px] bg-[#2e4a2e] px-4 pb-2 pt-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#d9e4d2]">
             <Icon name="coins" size={13} /> The money picture
           </span>
           <div className="rounded-[24px] rounded-tl-[8px] bg-[#fffdf9] p-5 shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
@@ -266,7 +266,7 @@ export default function CeremonyHome({
           <div className="overflow-hidden rounded-[22px] bg-[#fffdf9] shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
             <Row icon="cart" tile="bg-[#f3e6cf] text-[#a3471a]" title="Buy in bulk" detail="Livestock, drinks and groceries at group prices" onClick={() => onNavigate?.('store')} />
             <Row icon="beer" tile="bg-sage-100 text-sage-700" title="Brew umqombothi" detail={ceremony.guestCount != null ? `How much to brew for ${ceremony.guestCount} guests` : 'Steps and quantities'} onClick={() => onNavigate?.('umqombothi')} />
-            {plan.ceremonyId && <Row icon="cocktail" tile="bg-[#1c1612] text-ochre-light" title="Ekoyini mobile bar" detail="Book a bar for the day" onClick={() => onBookEkoyini?.(plan.ceremonyId, title)} />}
+            {plan.ceremonyId && <Row icon="cocktail" tile="bg-[#1f3320] text-ochre-light" title="Ekoyini mobile bar" detail="Book a bar for the day" onClick={() => onBookEkoyini?.(plan.ceremonyId, title)} />}
             <Row icon="heartHandshake" tile="bg-[#f6e2d6] text-terracotta-dark" title="Healers, ingcibi & vendors" detail="Trusted traditional help" onClick={() => onNavigate?.('directory')} />
             <Row icon="clock" tile="bg-cream-dark text-ink" title="The day, step by step" detail="What happens, and in what order" onClick={() => onViewTimeline?.(type)} />
           </div>

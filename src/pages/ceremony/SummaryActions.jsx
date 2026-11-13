@@ -73,7 +73,7 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
           <span className="text-xs font-semibold leading-tight text-ink"><Bi {...BUTTONS.template} /></span>
         </button>
         <button type="button" onClick={() => onViewTimeline?.(plan.ceremonyType)} className={cn(ACTION_BUTTON, pressable)}>
-          <Icon name="clock" color="#3a2f27" />
+          <Icon name="clock" color="#4a7a4a" />
           <span className="text-xs font-semibold leading-tight text-ink"><Bi {...BUTTONS.timeline} /></span>
         </button>
         {plan.ceremonyId && (

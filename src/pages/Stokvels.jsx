@@ -661,9 +661,9 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
 
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-8 pt-6 text-cream">
+        <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
         <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/55 to-[#1c1612]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />
         <div className="relative">
           <button
             type="button"
@@ -1272,9 +1272,9 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
   return (
     <div className="mx-auto min-h-screen max-w-md bg-cream pb-28">
       {/* Hero: why we save together. The balance card rises out of it. */}
-      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-20 pt-6 text-cream">
+      <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-20 pt-6 text-cream">
         <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/40 via-[#1c1612]/50 to-[#1c1612]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/50 to-[#1f3320]" />
         <div className="relative">
           <button
             type="button"

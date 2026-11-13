@@ -28,7 +28,7 @@ const PHASES = [
   },
   {
     icon: 'coins',
-    accent: '#1c1612',
+    accent: '#2e4a2e',
     phase: 'Phase 3 — Primary Industries & Legacy',
     headline: 'Mining, property, and large-scale community investment.',
     body: "Once the foundation is solid, the fund moves into primary industries — mining, agriculture, fisheries, property, and livestock economies of scale across the Eastern Cape's arable land and coastline. No single family or stokvel could build this alone. Together, we can.",
@@ -102,9 +102,9 @@ function ShrineFund({ onBack }) {
   return (
     <div className="relative isolate mx-auto min-h-screen max-w-md bg-cream pb-28">
       {/* Hero: the homestead at dusk, and what this fund is for. */}
-      <header className="relative overflow-hidden bg-[#1c1612] px-5 pb-24 pt-6 text-cream">
+      <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-24 pt-6 text-cream">
         <img src={CEREMONY_IMAGE.ULWALUKO} alt="" className="absolute inset-0 h-full w-full object-cover opacity-55" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/50 via-[#1c1612]/40 to-[#1c1612]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/50 via-[#1f3320]/40 to-[#1f3320]" />
         <div className="relative">
           <button type="button" onClick={onBack} className="pressable mb-8 flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm">
             <Icon name="arrowLeft" size={14} color="#fffdf9" /> Back
@@ -165,7 +165,7 @@ function ShrineFund({ onBack }) {
               <p className="text-xs leading-relaxed text-ink-muted">
                 We don&rsquo;t yet have a live payment gateway. Submitting records your pledge, and someone from iCamagu will personally follow up to complete the transfer.
               </p>
-              <button type="submit" disabled={submitting} className={`w-full rounded-full bg-[#1c1612] py-3.5 font-bold text-white ${pressable}`}>
+              <button type="submit" disabled={submitting} className={`w-full rounded-full bg-[#1f3320] py-3.5 font-bold text-white ${pressable}`}>
                 {submitting ? 'Submitting...' : 'Pledge this donation'}
               </button>
             </form>
@@ -228,7 +228,7 @@ function ShrineFund({ onBack }) {
           <p className="mt-3 text-sm leading-relaxed text-ink">
             Committee members are selected on merit and willingness to serve, not through elections that can be manipulated. Projects put to the community must pass two tests: they must have majority support, and they must be demonstrably profitable or carry a clear, measurable impact milestone that benefits the broader community.
           </p>
-          <div className="relative mt-5 rounded-[20px] bg-[#1c1612] p-4 pt-5 text-cream">
+          <div className="relative mt-5 rounded-[20px] bg-[#1f3320] p-4 pt-5 text-cream">
             <div className="flex items-end gap-3">
               <p className="font-display text-[2.2rem] font-semibold leading-none text-ochre-light">60<span className="text-cream/50">/</span>40</p>
               <p className="pb-1 text-[12px] font-extrabold uppercase tracking-[0.14em] text-cream/80">Ownership model</p>
@@ -275,8 +275,8 @@ function ShrineFund({ onBack }) {
           <div className="grid grid-cols-2 gap-x-2.5 gap-y-5 pt-3">
             {PILLARS.map((pl) => (
               <div key={pl.label} className="relative rounded-[20px] bg-cream px-3.5 pb-3.5 pt-8">
-                <span aria-hidden="true" className="absolute -top-4 left-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-white" style={{ boxShadow: '0 0 0 4px #1c1612' }}>
-                  <Icon name={pl.icon} size={19} color="#1c1612" />
+                <span aria-hidden="true" className="absolute -top-4 left-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-white" style={{ boxShadow: '0 0 0 4px #2e4a2e' }}>
+                  <Icon name={pl.icon} size={19} color="#2e4a2e" />
                 </span>
                 <p className="text-[14px] font-bold leading-tight text-ink">{pl.label}</p>
                 <p className="mt-1 text-[12px] leading-snug text-ink-muted">{pl.desc}</p>

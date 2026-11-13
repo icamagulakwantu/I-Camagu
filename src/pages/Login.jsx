@@ -178,9 +178,9 @@ function Login() {
     <div className="min-h-screen icamagu-bg flex flex-col items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm animate-slide-up">
 
-        <div className="relative overflow-hidden rounded-t-[28px] bg-[#1c1612] px-6 pb-6 pt-6">
+        <div className="relative overflow-hidden rounded-t-[28px] bg-[#1f3320] px-6 pb-6 pt-6">
           <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/30 to-[#1c1612]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/30 to-[#1f3320]" />
           <div className="relative">
           <div className="flex items-center gap-2.5 mb-5">
             <img

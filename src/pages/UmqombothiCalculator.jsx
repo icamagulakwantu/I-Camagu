@@ -31,11 +31,11 @@ function UmqombothiCalculator({ onBack, guestCount = null, ceremonyTitle = '' })
 
   return (
     <div className="mx-auto min-h-screen max-w-md bg-cream pb-28">
-      <div className="relative overflow-hidden rounded-b-[32px] bg-[#1c1612] px-5 pb-16 pt-6 text-cream">
+      <div className="relative overflow-hidden rounded-b-[32px] bg-[#2e4a2e] px-5 pb-16 pt-6 text-cream">
         <button type="button" onClick={onBack} className="pressable mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-cream/80">
           <Icon name="arrowLeft" size={16} /> {ceremonyTitle ? `Back to ${ceremonyTitle}` : 'Back'}
         </button>
-        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#e0a94e]">Umqombothi</p>
+        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#b9d3b0]">Umqombothi</p>
         <h1 className="mt-1 font-display text-[2rem] font-semibold leading-tight">How much to brew</h1>
         <p className="mt-1 text-sm text-cream/80">{fromCeremony ? `Worked out for ${ceremonyTitle || 'your ceremony'}.` : 'By number of guests, or by litres.'}</p>
       </div>
@@ -51,7 +51,7 @@ function UmqombothiCalculator({ onBack, guestCount = null, ceremonyTitle = '' })
                 role="tab"
                 aria-selected={mode === tab.id}
                 onClick={() => setMode(tab.id)}
-                className={`pressable min-h-11 rounded-full text-sm font-extrabold ${mode === tab.id ? 'bg-[#1c1612] text-cream' : 'text-ink-muted'}`}
+                className={`pressable min-h-11 rounded-full text-sm font-extrabold ${mode === tab.id ? 'bg-[#2e4a2e] text-cream' : 'text-ink-muted'}`}
               >
                 {tab.label}
               </button>
@@ -86,21 +86,21 @@ function UmqombothiCalculator({ onBack, guestCount = null, ceremonyTitle = '' })
             <div className="mt-4">
               <div className="grid grid-cols-4 gap-2">
                 {LITRE_PRESETS.map((value) => (
-                  <button key={value} type="button" onClick={() => setManualLitres(value)} className={`pressable min-h-11 rounded-full text-sm font-extrabold ${manualLitres === value ? 'bg-[#1c1612] text-cream' : 'bg-cream-dark text-ink-muted'}`}>
+                  <button key={value} type="button" onClick={() => setManualLitres(value)} className={`pressable min-h-11 rounded-full text-sm font-extrabold ${manualLitres === value ? 'bg-[#2e4a2e] text-cream' : 'bg-cream-dark text-ink-muted'}`}>
                     {value} L
                   </button>
                 ))}
               </div>
               <label className="mt-4 block">
                 <span className="sr-only">Litres</span>
-                <input type="range" min="10" max="400" step="5" value={manualLitres} onChange={(e) => setManualLitres(parseInt(e.target.value, 10))} className="w-full accent-[#1c1612]" />
+                <input type="range" min="10" max="400" step="5" value={manualLitres} onChange={(e) => setManualLitres(parseInt(e.target.value, 10))} className="w-full accent-[#2e4a2e]" />
               </label>
             </div>
           )}
         </section>
 
         {/* Result */}
-        <section aria-live="polite" className="overflow-hidden rounded-[24px] bg-[#1c1612] text-cream">
+        <section aria-live="polite" className="overflow-hidden rounded-[24px] bg-[#1f3320] text-cream">
           <div className="p-5">
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ochre-light">You need to brew</p>
             <p className="mt-1 font-display text-[2.6rem] font-semibold leading-none tabular-nums">{litres} L</p>
@@ -122,7 +122,7 @@ function UmqombothiCalculator({ onBack, guestCount = null, ceremonyTitle = '' })
           <ol className="mt-3 space-y-2.5">
             {STEPS.map((step, i) => (
               <li key={step.title} className="flex gap-3 rounded-[18px] bg-[#fffdf9] p-4 shadow-soft">
-                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#1c1612] font-display text-sm font-semibold text-cream">{i + 1}</span>
+                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#2e4a2e] font-display text-sm font-semibold text-cream">{i + 1}</span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
                     <p className="text-[15px] font-extrabold text-ink">{step.title}</p>
