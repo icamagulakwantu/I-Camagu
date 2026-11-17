@@ -1247,3 +1247,21 @@ model LegendEntry {
   reviewedAt          DateTime?
   createdAt            DateTime  @default(now())
 }
+
+// Something a family member thinks the host forgot, sent from the shared
+// plan link (no account needed). It waits for the host, who accepts it onto
+// the checklist or dismisses it; nobody but the host can change the plan.
+// No database foreign key, matching the table created in ensure-schema.js.
+model PlanSuggestion {
+  id          String    @id @default(cuid())
+  planId      String
+  label       String
+  phase       String?
+  note        String?
+  suggestedBy String?
+  status      String    @default("PENDING")
+  createdAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+
+  @@index([planId, status])
+}

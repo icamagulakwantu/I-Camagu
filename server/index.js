@@ -21,6 +21,7 @@ import { backfillHennessyProductImages } from './scripts/backfill-hennessy-produ
 import { backfillRequestedProductImages } from './scripts/backfill-requested-product-images.js';
 import { backfillUploadedProductImages } from './scripts/backfill-uploaded-product-images.js';
 import { cleanUpCatalogueNov2026 } from './scripts/catalogue-cleanup-nov-2026.js';
+import { fixUlwalukoDietWording } from './scripts/ulwaluko-diet-wording-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -234,6 +235,13 @@ if (startup.schemaReady) {
     await cleanUpCatalogueNov2026();
   } catch (err) {
     console.error('Catalogue clean-up (Nov 2026) failed:', err?.message);
+  }
+  // Founder's 17 Nov 2026 ulwaluko correction: no salt and nothing watery for
+  // the first seven days, uMojiso after day 7. Idempotent.
+  try {
+    await fixUlwalukoDietWording();
+  } catch (err) {
+    console.error('Ulwaluko diet wording failed:', err?.message);
   }
 }
 

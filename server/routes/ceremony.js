@@ -30,6 +30,7 @@ import {
   toggleCeremonyChecklistItem,
 } from '../controllers/ceremonyController.js';
 
+import { listPlanSuggestions, acceptSuggestion, dismissSuggestion } from '../controllers/planSuggestionController.js';
 const router = express.Router();
 
 // ─── EXISTING ROUTES (keep all) ────────────────────────────────────────────
@@ -37,6 +38,11 @@ router.get('/types', requireAuth, getCeremonyTypes);
 router.get('/my', requireAuth, getMyCeremonies);
 router.get('/timeline/:ceremonyType', getCeremonyTimeline);
 router.post('/plans/:planId/share-link', requireAuth, generateShareLink);
+// Family suggestions from the shared link: only the plan's host can see,
+// accept or dismiss them.
+router.get('/plans/:planId/suggestions', requireAuth, listPlanSuggestions);
+router.post('/plans/suggestions/:id/accept', requireAuth, acceptSuggestion);
+router.post('/plans/suggestions/:id/dismiss', requireAuth, dismissSuggestion);
 router.post('/', requireAuth, createCeremony);
 router.post('/templates/save', requireAuth, saveAsTemplate);
 router.get('/templates/my', requireAuth, getMyTemplates);

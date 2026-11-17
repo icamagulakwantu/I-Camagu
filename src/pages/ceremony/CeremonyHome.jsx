@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Icon from '../../components/Icon.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
 import { UNFORESEEN_PHASE } from '../../../shared/ceremonyCosts.js'
@@ -11,6 +11,8 @@ import { sharePlan, wasShared } from './share.js'
 import { typeName } from './ceremonyMeta.js'
 import { planTitle } from './ceremonyForm.js'
 import { rand } from './format.js'
+import { request } from './api.js'
+import { phaseLabel } from '../../../shared/ceremonyList.js'
 
 // The ceremony page. Everything about one ceremony lives here: when it is,
 // the next thing to do, one picture of the money, the plan and the people,
@@ -24,6 +26,62 @@ const capitalise = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 const longDate = (iso) => new Date(iso).toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
 
 const VISIBILITY = { PRIVATE: 'Only you', CLAN_ONLY: 'Your clan', PUBLIC: 'Everyone in the community feed' }
+
+// What family have suggested through the shared link. Nothing reaches the
+// plan until the host taps Add; Dismiss removes it. The link itself never
+// gives anyone access to the host's account.
+function FamilySuggestions({ planId, accessToken, onAccepted }) {
+  const { showToast } = useToast()
+  const [items, setItems] = useState([])
+  const [busy, setBusy] = useState(null)
+
+  useEffect(() => {
+    if (!planId) return
+    request(`/api/ceremonies/plans/${planId}/suggestions`, accessToken)
+      .then((data) => setItems(Array.isArray(data) ? data : []))
+      .catch(() => setItems([]))
+  }, [planId, accessToken])
+
+  const act = async (item, action) => {
+    setBusy(item.id)
+    try {
+      await request(`/api/ceremonies/plans/suggestions/${item.id}/${action}`, accessToken, { method: 'POST' })
+      setItems((prev) => prev.filter((i) => i.id !== item.id))
+      if (action === 'accept') {
+        showToast(`Added "${item.label}" to the plan`, 'success')
+        onAccepted?.()
+      }
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  if (items.length === 0) return null
+  return (
+    <section aria-label="Family suggestions" className="rounded-[24px] bg-[#fffdf9] p-5 shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
+      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Iingcebiso · From the family</p>
+      <h2 className="mt-1 font-display text-[1.3rem] font-semibold leading-tight text-ink">{items.length} suggestion{items.length === 1 ? '' : 's'} for you</h2>
+      <p className="mt-1 text-[13px] text-ink-muted">Sent from the link you shared. Add what belongs in the plan.</p>
+      <ul className="mt-3 space-y-2">
+        {items.map((item) => (
+          <li key={item.id} className="rounded-[18px] border border-ink/[0.06] bg-white p-3.5">
+            <p className="text-[15px] font-bold text-ink">{item.label}</p>
+            <p className="mt-0.5 text-xs text-ink-muted">
+              {[item.suggestedBy || 'Someone in the family', item.phase ? phaseLabel(item.phase) : null].filter(Boolean).join(' · ')}
+            </p>
+            {item.note && <p className="mt-1 text-[13px] text-ink">{item.note}</p>}
+            <div className="mt-3 flex gap-2">
+              <button type="button" disabled={busy === item.id} onClick={() => act(item, 'accept')} className="pressable h-10 flex-1 rounded-full bg-terracotta text-sm font-bold text-white disabled:opacity-60">Add to plan</button>
+              <button type="button" disabled={busy === item.id} onClick={() => act(item, 'dismiss')} className="pressable h-10 rounded-full bg-cream-dark px-4 text-sm font-bold text-ink disabled:opacity-60">Dismiss</button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
 
 function Eyebrow({ children, tone = 'text-terracotta-dark' }) {
   return <p className={`text-xs font-extrabold uppercase tracking-[0.16em] ${tone}`}>{children}</p>
@@ -63,7 +121,7 @@ function Row({ icon, tile, title, detail, onClick }) {
 
 export default function CeremonyHome({
   plan, pledges, accessToken, onBack, onEditStep, onOpenPledges, onViewTimeline, onViewBudget,
-  onBookEkoyini, onOpenHierarchy, onNavigate, onDeleted,
+  onBookEkoyini, onOpenHierarchy, onNavigate, onDeleted, onPlanChanged,
 }) {
   const { showToast } = useToast()
   const [, setSharedTick] = useState(0)
@@ -187,6 +245,8 @@ export default function CeremonyHome({
             </span>
           </section>
         )}
+
+        <FamilySuggestions planId={plan.id} accessToken={accessToken} onAccepted={onPlanChanged} />
 
         {/* ---------- The money picture, with a tab on its top edge ---------- */}
         <section aria-label="The money picture" className="pt-4">

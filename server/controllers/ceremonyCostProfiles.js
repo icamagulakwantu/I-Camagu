@@ -160,8 +160,11 @@ const ULWALUKO_DEFAULT_ITEMS = [
   { phase: 'DAILY_ESSENTIALS', label: '25L water container' },
   { phase: 'DAILY_ESSENTIALS', label: 'Matches, lamp/candles' },
   { phase: 'DAILY_ESSENTIALS', label: 'A book' },
-  { phase: 'DIET_EARLY_STAGE', label: 'No-salt food, steamed bread, spinach/cabbage' },
-  { phase: 'DIET_EARLY_STAGE', label: 'Green apples and low-water-content fruit' },
+  // The first seven days: no salt and nothing watery, so the body stays dry
+  // and the wound can dry and heal. Founder-confirmed, 17 Nov 2026.
+  { phase: 'DIET_EARLY_STAGE', label: 'Days 1-7: food with no salt and little water, so the wound dries and heals' },
+  { phase: 'DIET_EARLY_STAGE', label: 'Days 1-7: green apples and other low-water fruit' },
+  { phase: 'UMOJISO', label: 'After day 7: uMojiso, when he may eat salt and some watery food again (if he has cared for himself well)' },
   { phase: 'UMOJISO', label: 'Sybok for uMojiso (sheep or goat if no sybok is available)' },
   { phase: 'UMOJISO', label: 'Minimum 4 bottles of brandy, 2 cases of beer (1 bottle for peers)' },
   { phase: 'EXIT_PREPARATION', label: 'Fresh white blanket with black stripes' },
@@ -352,8 +355,8 @@ const ULWALUKO_COST_PROFILE = {
     { label: 'A book', category: 'supplies', unit: 'book', unitCost: 0, quantity: 1, isInputField: true, inputType: 'text', suggestedAmount: 'Bring a journal or religious text' },
   ],
   'DIET_EARLY_STAGE': [
-    { label: 'No-salt food, steamed bread, spinach/cabbage', category: 'food', unit: 'weekly_groceries', unitCost: 450.00, quantity: 3, isInputField: true, inputType: 'number', suggestedAmount: 'R450/week x 3 weeks' },
-    { label: 'Green apples and low-water-content fruit', category: 'food', unit: 'kg', unitCost: COST_RATES.food.green_apples_kg, quantity: 5, isInputField: true, inputType: 'number', suggestedAmount: '5 kg apples', skuName: 'Green Apples (per kg)' },
+    { label: 'Days 1-7: food with no salt and little water, so the wound dries and heals', category: 'food', unit: 'weekly_groceries', unitCost: 450.00, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'R450 for the first week' },
+    { label: 'Days 1-7: green apples and other low-water fruit', category: 'food', unit: 'kg', unitCost: COST_RATES.food.green_apples_kg, quantity: 5, isInputField: true, inputType: 'number', suggestedAmount: '5 kg apples', skuName: 'Green Apples (per kg)' },
   ],
   'UMOJISO': [
     { label: 'Sybok for uMojiso (sheep or goat if no sybok is available)', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.sybok, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Sybok ~R2,700', skuName: 'Sybok' },

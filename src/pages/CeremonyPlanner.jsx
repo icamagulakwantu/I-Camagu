@@ -65,6 +65,21 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
     setShowPledges(false)
   }
 
+  // Reload the open plan after something outside the wizard changed it, such
+  // as accepting a family suggestion onto the checklist.
+  const refreshActivePlan = () => {
+    if (!activePlan?.id) return
+    request('/api/ceremonies/plans/my', accessToken)
+      .then((data) => {
+        const fresh = Array.isArray(data) ? data.find((plan) => plan.id === activePlan.id) : null
+        if (!fresh) return
+        const withList = { ...fresh, checklistItems: fresh.ceremony?.checklistItems?.length ? fresh.ceremony.checklistItems : (fresh.checklistItems || []) }
+        setPlans((prev) => prev.map((plan) => (plan.id === withList.id ? withList : plan)))
+        openPlan(withList)
+      })
+      .catch(() => {})
+  }
+
   const fetchPlans = () => {
     request('/api/ceremonies/plans/my', accessToken)
       .then((data) => {
@@ -231,6 +246,7 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         onOpenHierarchy={(ceremonyId) => onOpenTool?.('hierarchy', ceremonyId)}
         onNavigate={(tool) => onOpenTool?.(tool, activePlan.ceremonyId, { title: planTitle(activePlan), guestCount: activePlan.ceremony?.guestCount ?? null })}
         onDeleted={handleDeleted}
+        onPlanChanged={refreshActivePlan}
       />
     )
   }

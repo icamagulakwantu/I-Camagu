@@ -376,4 +376,20 @@ export async function ensureCeremonyBudgetColumns() {
   `);
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "IsidukoSubmission_status_createdAt_idx" ON "IsidukoSubmission" ("status", "createdAt");');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "IsidukoSubmission_normalisedText_idx" ON "IsidukoSubmission" ("normalisedText");');
+
+  // Family suggestions sent from a shared plan link (see PlanSuggestion).
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "PlanSuggestion" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "planId" TEXT NOT NULL,
+      "label" TEXT NOT NULL,
+      "phase" TEXT,
+      "note" TEXT,
+      "suggestedBy" TEXT,
+      "status" TEXT NOT NULL DEFAULT 'PENDING',
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "resolvedAt" TIMESTAMP(3)
+    );
+  `);
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "PlanSuggestion_planId_status_idx" ON "PlanSuggestion" ("planId", "status");');
 }

@@ -7,7 +7,7 @@ const MAX_ITEM = 120;
 const MAX_RELATIONSHIP = 40;
 const MAX_AMOUNT_ZAR = 1_000_000;
 
-async function findSharedPlan(token, select) {
+export async function findSharedPlan(token, select) {
   if (!token || !isShareTokenValid(token)) return null;
   return prisma.preparationPlan.findUnique({ where: { shareToken: token }, select });
 }

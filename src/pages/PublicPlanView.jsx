@@ -1,8 +1,94 @@
 import { useState, useEffect } from 'react'
 import Icon from '../components/Icon.jsx'
+import { phaseLabel } from '../../shared/ceremonyList.js'
 
 const inputClass = 'w-full h-12 rounded-2xl border-2 border-cream-dark bg-white px-4 text-base text-ink focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20'
 const EMPTY = { pledgerName: '', relationship: '', pledgedItem: '', pledgedAmountZAR: '' }
+const EMPTY_SUGGESTION = { label: '', phase: '', suggestedBy: '', note: '' }
+
+// "Did we forget something?": family suggest what the host may have missed.
+// It goes to the host to accept or dismiss; it never changes the plan itself.
+function SuggestForm({ token, phases }) {
+  const [form, setForm] = useState(EMPTY_SUGGESTION)
+  const [waiting, setWaiting] = useState([])
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
+  const [sent, setSent] = useState('')
+
+  useEffect(() => {
+    fetch(`/api/public/plan/${token}/suggestions`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setWaiting(Array.isArray(data) ? data : []))
+      .catch(() => setWaiting([]))
+  }, [token])
+
+  const submit = async (e) => {
+    e.preventDefault()
+    setError('')
+    if (form.label.trim().length < 2) return setError('Please say what should be added')
+    setSending(true)
+    try {
+      const res = await fetch(`/api/public/plan/${token}/suggestions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || 'Could not send your suggestion')
+      setWaiting((prev) => [...prev, { id: data.id, label: data.label }])
+      setSent(form.label.trim())
+      setForm(EMPTY_SUGGESTION)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <section id="suggest" className="mt-6 card-paper p-5">
+      {sent ? (
+        <div className="py-2 text-center">
+          <p className="font-display text-xl font-semibold text-ink">Enkosi! Your suggestion is with the host.</p>
+          <p className="mt-1 text-sm text-ink-muted">They will see &ldquo;{sent}&rdquo; and can add it to the plan.</p>
+          <button type="button" onClick={() => setSent('')} className="mt-4 text-sm font-bold text-terracotta-dark underline">Suggest something else</button>
+        </div>
+      ) : (
+        <form onSubmit={submit} className="space-y-3">
+          <div>
+            <p className="eyebrow text-terracotta-dark">Icebiso · Suggest</p>
+            <h2 className="font-display text-xl font-semibold text-ink">Did we forget something?</h2>
+            <p className="mt-1 text-sm text-ink-muted">Add anything the family may have missed. The host sees it and adds it to the plan.</p>
+          </div>
+          <input className={inputClass} placeholder="What should be added (e.g. imphepho, a second blanket)" value={form.label} onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))} maxLength={120} />
+          {phases.length > 0 && (
+            <select className={inputClass} value={form.phase} onChange={(e) => setForm((f) => ({ ...f, phase: e.target.value }))} aria-label="Which part of the ceremony">
+              <option value="">Which part? (optional)</option>
+              {phases.map((ph) => <option key={ph} value={ph}>{phaseLabel(ph)}</option>)}
+            </select>
+          )}
+          <input className={inputClass} placeholder="Why, or any detail (optional)" value={form.note} onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))} maxLength={300} />
+          <input className={inputClass} placeholder="Your name (optional, e.g. Malume Sipho)" value={form.suggestedBy} onChange={(e) => setForm((f) => ({ ...f, suggestedBy: e.target.value }))} maxLength={60} />
+          {error && <p role="alert" className="text-sm font-bold text-terracotta">{error}</p>}
+          <button type="submit" disabled={sending} className="h-14 w-full rounded-pill bg-terracotta text-base font-bold text-white transition-transform active:scale-[0.98] disabled:opacity-60">
+            {sending ? 'Sending...' : 'Send to the host'}
+          </button>
+          <p className="text-center text-xs text-ink-muted">No account needed. Only the host can change the plan.</p>
+        </form>
+      )}
+      {waiting.length > 0 && (
+        <div className="mt-4 border-t border-ink/[0.06] pt-3">
+          <p className="mb-2 text-xs font-black uppercase text-ink-muted">Already suggested, waiting for the host</p>
+          <div className="flex flex-wrap gap-2">
+            {waiting.map((w) => (
+              <span key={w.id} className="rounded-pill bg-cream-dark px-3 py-1.5 text-xs font-bold text-ink">{w.label}</span>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
 
 // Public copy of a ceremony shared by the host. Family see what is still
 // needed and can pledge what they will bring with no account. The
@@ -98,7 +184,7 @@ function PublicPlanView({ token }) {
         <p className="eyebrow text-ochre-light">Uyamenywa · You're invited to help</p>
         <h1 className="font-display font-semibold text-[1.9rem] leading-tight mt-2 text-balance">{plan.title}</h1>
         <p className="text-sm text-cream/85 mt-2 leading-relaxed">
-          The family is preparing this ceremony on i-Camagu. See what is still needed and pledge what you'll bring.
+          The family is preparing this ceremony on i-Camagu. See what is still needed, pledge what you'll bring, and tell us anything we forgot.
         </p>
         <div className="mt-5 grid grid-cols-2 gap-2">
           <div className="rounded-2xl bg-cream/10 p-3 ring-1 ring-cream/20">
@@ -168,6 +254,8 @@ function PublicPlanView({ token }) {
           )}
         </section>
 
+        <SuggestForm token={token} phases={phases} />
+
         {/* Who has already pledged (anonymous) */}
         {pledges.length > 0 && (
           <section className="mt-6">
@@ -186,7 +274,7 @@ function PublicPlanView({ token }) {
         {/* Full checklist */}
         {phases.map((phase) => (
           <section key={phase} className="mt-6">
-            <p className="text-xs font-black uppercase text-ink-muted mb-2">{phase.replace(/_/g, ' ')}</p>
+            <p className="text-xs font-black uppercase text-ink-muted mb-2">{phaseLabel(phase)}</p>
             <div className="space-y-1.5">
               {items.filter((i) => i.phase === phase).map((item) => (
                 <div key={item.id} className="flex items-center gap-3 bg-white border border-terracotta/15 rounded-2xl p-3">
