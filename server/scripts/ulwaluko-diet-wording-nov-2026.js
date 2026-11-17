@@ -1,7 +1,7 @@
 // Corrects the ulwaluko diet lines in existing plans, as the founder
 // described them on 17 Nov 2026: for the first seven days the initiate eats
 // no salt and nothing watery (green apples and other low-water fruit), so the
-// wound dries and heals; uMojiso comes after day 7. The old line wrongly
+// wound dries and heals; uMojiso comes after day 7 (named only, no detail). The old line wrongly
 // suggested spinach and cabbage, which are watery.
 //
 // Idempotent and narrow: only rows that still hold the exact old wording are
@@ -11,8 +11,11 @@ import prisma from '../config/db.js';
 const RELABEL = [
   ['No-salt food, steamed bread, spinach/cabbage', 'Days 1-7: food with no salt and little water, so the wound dries and heals'],
   ['Green apples and low-water-content fruit', 'Days 1-7: green apples and other low-water fruit'],
+  // Ulwaluko is sacred: the founder asked for uMojiso to be named only,
+  // without detail (18 Nov 2026). Shortens the line this script first added.
+  ['After day 7: uMojiso, when he may eat salt and some watery food again (if he has cared for himself well)', 'After day 7: uMojiso'],
 ];
-export const UMOJISO_LINE = 'After day 7: uMojiso, when he may eat salt and some watery food again (if he has cared for himself well)';
+export const UMOJISO_LINE = 'After day 7: uMojiso';
 const NEW_FIRST_LINE = RELABEL[0][1];
 
 export async function fixUlwalukoDietWording() {

@@ -164,7 +164,7 @@ const ULWALUKO_DEFAULT_ITEMS = [
   // and the wound can dry and heal. Founder-confirmed, 17 Nov 2026.
   { phase: 'DIET_EARLY_STAGE', label: 'Days 1-7: food with no salt and little water, so the wound dries and heals' },
   { phase: 'DIET_EARLY_STAGE', label: 'Days 1-7: green apples and other low-water fruit' },
-  { phase: 'UMOJISO', label: 'After day 7: uMojiso, when he may eat salt and some watery food again (if he has cared for himself well)' },
+  { phase: 'UMOJISO', label: 'After day 7: uMojiso' },
   { phase: 'UMOJISO', label: 'Sybok for uMojiso (sheep or goat if no sybok is available)' },
   { phase: 'UMOJISO', label: 'Minimum 4 bottles of brandy, 2 cases of beer (1 bottle for peers)' },
   { phase: 'EXIT_PREPARATION', label: 'Fresh white blanket with black stripes' },
