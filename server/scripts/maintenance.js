@@ -35,6 +35,7 @@ import { backfillLaunchPricing } from './backfill-launch-pricing.js';
 import { fixPackSizes, applyOctober2026Prices } from './fix-pack-sizes-oct-2026.js';
 import { cleanUpCatalogueNov2026 } from './catalogue-cleanup-nov-2026.js';
 import { fixUlwalukoDietWording } from './ulwaluko-diet-wording-nov-2026.js';
+import { loadClanPraises } from './load-clan-praises.js';
 
 export const MAINTENANCE_TASKS = [
   ['Beer quart format fix', fixBeerQuartFormats],
@@ -73,6 +74,7 @@ export const MAINTENANCE_TASKS = [
   // pack images, and this retires or removes them again.
   ['November 2026 catalogue clean-up', cleanUpCatalogueNov2026],
   ['Ulwaluko diet wording (Nov 2026)', fixUlwalukoDietWording],
+  ['Clan praise names', loadClanPraises],
 ];
 
 // Returns the labels of the tasks that failed.

@@ -1,0 +1,7635 @@
+{
+ "about": "Xhosa clan names (iziduko) and their praise names (izinqulo), gathered on 18 Nov 2026 from community sources and cleaned by hand: abongisocial.wordpress.com (Iziduko nezinqulo zamaXhosa jikelele, 2010), izithakazelo.blog (two lists), iziduko.wordpress.com and knowmyroots.blogspot.com. These sources copy from each other in places, so agreement is not proof. Praises differ between families and regions; the app labels them as community sourced and invites corrections. \"sources\" counts how many of the lists name that praise for that clan.",
+ "clans": [
+  {
+   "clan": "AmaBamba",
+   "praises": [
+    [
+     "Krila",
+     1
+    ],
+    [
+     "Thangani",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaBangula",
+   "praises": [
+    [
+     "Bamb’ intambo ezo kwedini ingathi lendawo iyehla",
+     1
+    ],
+    [
+     "Bhabha",
+     1
+    ],
+    [
+     "Bhaxane lwempontshane",
+     1
+    ],
+    [
+     "Cakeni",
+     1
+    ],
+    [
+     "Dumba",
+     1
+    ],
+    [
+     "Mhotho",
+     1
+    ],
+    [
+     "Ngub’ Ingaxuthw’ Inikw’ Abathandwayo",
+     1
+    ],
+    [
+     "Sximba ka Sxolothi",
+     1
+    ],
+    [
+     "UNINA WAM",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaBhanqo",
+   "praises": [
+    [
+     "Bobese",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaBhayi",
+   "praises": [
+    [
+     "Msuthu",
+     5
+    ],
+    [
+     "Khetshe",
+     4
+    ],
+    [
+     "Mkhumbeni",
+     4
+    ],
+    [
+     "Camsholo",
+     2
+    ],
+    [
+     "Gwaca",
+     2
+    ],
+    [
+     "Mevamhlophe",
+     2
+    ],
+    [
+     "Vundle",
+     2
+    ],
+    [
+     "Inyok’emnyama ecandiziziba",
+     1
+    ],
+    [
+     "Khayisa",
+     1
+    ],
+    [
+     "Khetsha",
+     1
+    ],
+    [
+     "Mkentane",
+     1
+    ],
+    [
+     "Mthokrakra ongatyiwa nazibhokhwe",
+     1
+    ],
+    [
+     "Ncilashe",
+     1
+    ],
+    [
+     "Nkonjane ebhabh’ emafini",
+     1
+    ],
+    [
+     "Nomtshoni",
+     1
+    ],
+    [
+     "Nyokemnyama ecand’iziziba",
+     1
+    ],
+    [
+     "Zawukana",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaBhejula",
+   "praises": [
+    [
+     "Diya",
+     1
+    ],
+    [
+     "Mageza",
+     1
+    ],
+    [
+     "Ngungu",
+     1
+    ],
+    [
+     "Qhwesha",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaBhele",
+   "praises": [
+    [
+     "Dongo",
+     3
+    ],
+    [
+     "Langa",
+     3
+    ],
+    [
+     "Amatya egoduka khon’ukuze angathinjwa lithambo lasemzin",
+     1
+    ],
+    [
+     "Amayekethe",
+     1
+    ],
+    [
+     "Amyengane",
+     1
+    ],
+    [
+     "Bhedlana lase Lenge",
+     1
+    ],
+    [
+     "Bhunta uGatsheni/Gatyeni uzalwa nguNdlovu kaMasoka",
+     1
+    ],
+    [
+     "Dlambulo",
+     1
+    ],
+    [
+     "Donga noSiphahla-phahla bangenela kumaZulu babangabakwaNtuli",
+     1
+    ],
+    [
+     "Ezity’owenyamakazi yon’ihlal’emahlathini",
+     1
+    ],
+    [
+     "Iintw’ezimpundu zinga zingongiwa",
+     1
+    ],
+    [
+     "Iintw’ezingawutyiyo umbilini wempahla",
+     1
+    ],
+    [
+     "Iinyath’ezasind’abazingeli sebezosele",
+     1
+    ],
+    [
+     "Ingab’asilobhele elo",
+     1
+    ],
+    [
+     "Inyathi eyasinda abazingeli sebeyosele izinto ezingawudliyo umbilini wenkomo",
+     1
+    ],
+    [
+     "Khuboni",
+     1
+    ],
+    [
+     "KwaNoqambulo",
+     1
+    ],
+    [
+     "Lasala ibhele lihleli",
+     1
+    ],
+    [
+     "Lavuthwa ilitye",
+     1
+    ],
+    [
+     "Mabandla",
+     1
+    ],
+    [
+     "Mabandla waya kwaRharhabe",
+     1
+    ],
+    [
+     "Mabandla wehlela kwaGcaleka",
+     1
+    ],
+    [
+     "Madiba-ndlela. Iinto ezidiba de zidibe nendlela",
+     1
+    ],
+    [
+     "Mafu",
+     1
+    ],
+    [
+     "Mafuza afulele njengelifu",
+     1
+    ],
+    [
+     "Maliwa weza kwaGcaleka",
+     1
+    ],
+    [
+     "Masombuka",
+     1
+    ],
+    [
+     "Mbutho",
+     1
+    ],
+    [
+     "Mnomana",
+     1
+    ],
+    [
+     "Mphemba abantu Bephemba ngamabele kanti abafokazana baphemba ngamaphepha",
+     1
+    ],
+    [
+     "Mthan’ ontyingantyingana omi phezu kwentaba",
+     1
+    ],
+    [
+     "Ncwana",
+     1
+    ],
+    [
+     "Ndabezitha",
+     1
+    ],
+    [
+     "Ndamane",
+     1
+    ],
+    [
+     "Nditsh’abaty’isikhwebu sakwamkhwekazi",
+     1
+    ],
+    [
+     "Ngoba ibhele laphekwa nelitye lenyengane",
+     1
+    ],
+    [
+     "Nkilane",
+     1
+    ],
+    [
+     "NoMbikazi ngob’umnt’ogxathu akalahlwa",
+     1
+    ],
+    [
+     "NoNtanda kuphakanyiswa",
+     1
+    ],
+    [
+     "Nosepha ayigijimi iyakhokhoba ukubhek’ eluqala",
+     1
+    ],
+    [
+     "Ntshangase",
+     1
+    ],
+    [
+     "Qunta",
+     1
+    ],
+    [
+     "Silo sase Lenge ngwane yezixhobo zothukela",
+     1
+    ],
+    [
+     "Thebul’ukunatha nje ngabendl’enkulu Umakhunga",
+     1
+    ],
+    [
+     "Ulanga lokulunga",
+     1
+    ],
+    [
+     "Umbutho",
+     1
+    ],
+    [
+     "Undlwana zinamaphela phez’ukwentab kalenge",
+     1
+    ],
+    [
+     "Unontanda Usengel’abantwana xa likhithika",
+     1
+    ],
+    [
+     "Vaphi",
+     1
+    ],
+    [
+     "Zidla owenyamakazi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaBhisha",
+   "praises": [
+    [
+     "AmaNtambo",
+     1
+    ],
+    [
+     "Bathi Nonyawana zincinane kanti zinkulu oku kwe Bhlayi letolofiya",
+     1
+    ],
+    [
+     "Gaba",
+     1
+    ],
+    [
+     "Gantsa",
+     1
+    ],
+    [
+     "Gogoba",
+     1
+    ],
+    [
+     "Mvundl’olubhelu",
+     1
+    ],
+    [
+     "Xho’ndlovu",
+     1
+    ],
+    [
+     "Zotsho",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaBhovu",
+   "praises": [
+    [
+     "Dumela oMvaw’bhekwa ubhekwa abawatiyo ooGxumisa",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaBhukhwana",
+   "praises": [
+    [
+     "Into ezingaphathwa mntu ngoba zizinkosi ngokwazo",
+     3
+    ],
+    [
+     "Mbara",
+     3
+    ],
+    [
+     "Mtshobo",
+     3
+    ],
+    [
+     "Phaphulengonyama",
+     3
+    ],
+    [
+     "Mpofu",
+     1
+    ],
+    [
+     "Phaphulesilo",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaBhuku",
+   "praises": [
+    [
+     "Iingonyama ezigqumela ngaphakathi ngokuthanda isizwe sama Xesibe",
+     1
+    ],
+    [
+     "Mbhamla",
+     1
+    ],
+    [
+     "Mfazi obele lide oncancisela ngaphesheya komfula",
+     1
+    ],
+    [
+     "Nkamangane",
+     1
+    ],
+    [
+     "Sinqasha",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaCethe",
+   "praises": [
+    [
+     "Chizama",
+     4
+    ],
+    [
+     "Bhurhuma",
+     2
+    ],
+    [
+     "Mbambozinomongo",
+     2
+    ],
+    [
+     "Mlanjana",
+     2
+    ],
+    [
+     "Ncenceza",
+     2
+    ],
+    [
+     "Hani",
+     1
+    ],
+    [
+     "Malahl’aluthuthu ayatshisa wawanyathela ungafa",
+     1
+    ],
+    [
+     "Mlowa",
+     1
+    ],
+    [
+     "Ngcok",
+     1
+    ],
+    [
+     "Njoloza",
+     1
+    ],
+    [
+     "Yint’ety’inyama ekrwada",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaCetshe",
+   "praises": [
+    [
+     "Jaba",
+     1
+    ],
+    [
+     "Mlamb’okhwel’iintaba",
+     1
+    ],
+    [
+     "Mlamb’owelwa ziinkonjane",
+     1
+    ],
+    [
+     "Rhuba",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaChiya",
+   "praises": [
+    [
+     "Chiya wohlanga",
+     1
+    ],
+    [
+     "Cwangu cwangu",
+     1
+    ],
+    [
+     "Galweni",
+     1
+    ],
+    [
+     "Magangadz’ udonga kuvuleke indlela",
+     1
+    ],
+    [
+     "Sodladla",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaCirha",
+   "praises": [
+    [
+     "Ncibane",
+     5
+    ],
+    [
+     "Nojaholo",
+     4
+    ],
+    [
+     "MGcaleka",
+     3
+    ],
+    [
+     "Mhlantla",
+     3
+    ],
+    [
+     "Ntswentswe",
+     3
+    ],
+    [
+     "Qhanqolo",
+     3
+    ],
+    [
+     "Sihlobo SikaPhalo",
+     3
+    ],
+    [
+     "Hlomla lidala lineempondo",
+     2
+    ],
+    [
+     "Khawuta",
+     2
+    ],
+    [
+     "Mhlathendlovu",
+     2
+    ],
+    [
+     "Nyembezana",
+     2
+    ],
+    [
+     "Dlakalashe",
+     1
+    ],
+    [
+     "Ghabha ka ntsikana",
+     1
+    ],
+    [
+     "Hloml’iphuthi lidala linempondo",
+     1
+    ],
+    [
+     "Hloml’phuthu lidala lineempondo",
+     1
+    ],
+    [
+     "Mayinga nyevulwa inyashe ngonyawo zambath’iindela",
+     1
+    ],
+    [
+     "Mfuyo",
+     1
+    ],
+    [
+     "Nkosiyamntu",
+     1
+    ],
+    [
+     "Noni",
+     1
+    ],
+    [
+     "Ntlokwenyani",
+     1
+    ],
+    [
+     "Ntswayibane",
+     1
+    ],
+    [
+     "Zona zaphosa ub’khosi ngexa yePhuta",
+     1
+    ],
+    [
+     "Zona zibeleke ingasi yobukhosi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaCwerha",
+   "praises": [
+    [
+     "Mahlahlana",
+     1
+    ],
+    [
+     "Vambane",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaDala",
+   "praises": [
+    [
+     "Jali",
+     1
+    ],
+    [
+     "Mganu",
+     1
+    ],
+    [
+     "Ntshintshise",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaDebeza",
+   "praises": [
+    [
+     "Jebe",
+     5
+    ],
+    [
+     "Mbeka Ntshiyini Bathi uqumbile",
+     5
+    ],
+    [
+     "Nongoqo",
+     5
+    ],
+    [
+     "Nonyanya",
+     5
+    ],
+    [
+     "Khonkcoshe Mbokodo engava mkwetsho",
+     4
+    ],
+    [
+     "Longw’elingacholwa nangabafazi",
+     1
+    ],
+    [
+     "Mbeka",
+     1
+    ],
+    [
+     "Mgod’ongeva mkhwitsho",
+     1
+    ],
+    [
+     "Nomanjiya",
+     1
+    ],
+    [
+     "Ntshiyini Bathi uqumbile",
+     1
+    ],
+    [
+     "Qumbu & Mthatha",
+     1
+    ],
+    [
+     "Qumbu naseMthatha",
+     1
+    ],
+    [
+     "Shleka nanja",
+     1
+    ],
+    [
+     "UbuKumkani bamaMpondomise bulapha",
+     1
+    ],
+    [
+     "Xwebisa",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaDeyi",
+   "praises": [
+    [
+     "Babalo",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaDikela",
+   "praises": [
+    [
+     "Noni",
+     2
+    ],
+    [
+     "Bhlangwe",
+     1
+    ],
+    [
+     "Mfuyo",
+     1
+    ],
+    [
+     "Mqwathi",
+     1
+    ],
+    [
+     "Yongose",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaDlamini",
+   "praises": [
+    [
+     "Jama kaSjadu",
+     3
+    ],
+    [
+     "Bhanise",
+     2
+    ],
+    [
+     "Bhengu",
+     2
+    ],
+    [
+     "Khatsini",
+     2
+    ],
+    [
+     "Mabetshe",
+     2
+    ],
+    [
+     "Mtikitiki",
+     2
+    ],
+    [
+     "Ngxib’inoboya",
+     2
+    ],
+    [
+     "Nomana ndab’azithethwa intsuku ngentsuku",
+     2
+    ],
+    [
+     "Zizi",
+     2
+    ],
+    [
+     "Fakade",
+     1
+    ],
+    [
+     "Jama kaSijadu",
+     1
+    ],
+    [
+     "Nonyathi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaDlomo",
+   "praises": [
+    [
+     "Madiba",
+     2
+    ],
+    [
+     "Ngqolomsila",
+     2
+    ],
+    [
+     "Yem-Yem",
+     2
+    ],
+    [
+     "MThembu",
+     1
+    ],
+    [
+     "Malangana",
+     1
+    ],
+    [
+     "Mtshikilana",
+     1
+    ],
+    [
+     "Ncikoza",
+     1
+    ],
+    [
+     "Qhumpase",
+     1
+    ],
+    [
+     "Sophitsho",
+     1
+    ],
+    [
+     "Sopitsho",
+     1
+    ],
+    [
+     "Tande",
+     1
+    ],
+    [
+     "Tubhana",
+     1
+    ],
+    [
+     "Vela bambhentsele",
+     1
+    ],
+    [
+     "Vela bembhentsele",
+     1
+    ],
+    [
+     "Zondwa",
+     1
+    ],
+    [
+     "Zondwa zintshaba ezingasoze zimenzele nto",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaDontsa",
+   "praises": [
+    [
+     "Bath’ uDontsa akananyongo kant’ abay’bon’ uba igqunywe ngesbhadlalala so mhlehlo",
+     4
+    ],
+    [
+     "Mntungwa uNdukuMkhonto",
+     4
+    ],
+    [
+     "NoDlabathi",
+     4
+    ],
+    [
+     "NoDlidlu",
+     4
+    ],
+    [
+     "Shembe",
+     4
+    ],
+    [
+     "Swahla",
+     4
+    ]
+   ]
+  },
+  {
+   "clan": "AmaDuma",
+   "praises": [
+    [
+     "Nxuba",
+     4
+    ]
+   ]
+  },
+  {
+   "clan": "AmaDzana",
+   "praises": [
+    [
+     "OoDzana oKhatsini omncwabe omfupi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaDzanibe",
+   "praises": [
+    [
+     "Abakhibexonya-bengalaluki",
+     1
+    ],
+    [
+     "Gaba kaThsayisa",
+     1
+    ],
+    [
+     "Mahlambahlaletyeni",
+     1
+    ],
+    [
+     "Mntu wasemanzini",
+     1
+    ],
+    [
+     "Ndzabedvolo",
+     1
+    ],
+    [
+     "Ndzathsane",
+     1
+    ],
+    [
+     "Ningayiqabi mpobovana nizawudlula nabadluli bendlela",
+     1
+    ],
+    [
+     "Nqolo",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaFakathe",
+   "praises": [
+    [
+     "Buya",
+     1
+    ],
+    [
+     "Gwili",
+     1
+    ],
+    [
+     "Mhlanga",
+     1
+    ],
+    [
+     "Nodaba",
+     1
+    ],
+    [
+     "Nomali",
+     1
+    ],
+    [
+     "Nxi",
+     1
+    ],
+    [
+     "Phandliwe",
+     1
+    ],
+    [
+     "Xuba",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaFaku",
+   "praises": [
+    [
+     "Hlamba ngobubend’amanz’ekhona",
+     4
+    ],
+    [
+     "Ndayeni",
+     4
+    ],
+    [
+     "Nyawuza",
+     4
+    ],
+    [
+     "Thahla",
+     4
+    ],
+    [
+     "Dakhile",
+     1
+    ],
+    [
+     "Ngqungqushe",
+     1
+    ],
+    [
+     "Ziqelekazi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGaba",
+   "praises": [
+    [
+     "Cihoshe",
+     5
+    ],
+    [
+     "Mbokodw’emnyama kahili",
+     5
+    ],
+    [
+     "Mjobi",
+     5
+    ],
+    [
+     "Mngqosini",
+     5
+    ],
+    [
+     "Msuthu",
+     5
+    ],
+    [
+     "Ndoko",
+     5
+    ],
+    [
+     "Nozinga",
+     5
+    ],
+    [
+     "Thikoloshe",
+     5
+    ],
+    [
+     "Thithiba",
+     5
+    ],
+    [
+     "Mnt’womlambo",
+     4
+    ],
+    [
+     "Mgweba",
+     1
+    ],
+    [
+     "Mntwan ‘omlambo",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGadluma",
+   "praises": [
+    [
+     "Cekwana",
+     1
+    ],
+    [
+     "Gando",
+     1
+    ],
+    [
+     "Izinto ezadla igusha zabelungu zathi ziziduli zethafa",
+     1
+    ],
+    [
+     "Mbomb’emfene",
+     1
+    ],
+    [
+     "Ndulini",
+     1
+    ],
+    [
+     "Tshutsha",
+     1
+    ],
+    [
+     "Tyhopho",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGambu",
+   "praises": [
+    [
+     "Memela",
+     3
+    ],
+    [
+     "Msuthu Nontuli",
+     3
+    ],
+    [
+     "Ngwekazi",
+     3
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGamede",
+   "praises": [
+    [
+     "Bhambolunye tingaba mbini tifute ekhaya kulonyoko",
+     1
+    ],
+    [
+     "Gamedze",
+     1
+    ],
+    [
+     "Gele",
+     1
+    ],
+    [
+     "Maqaqasi",
+     1
+    ],
+    [
+     "Mbew’enkulu engahlungulwa",
+     1
+    ],
+    [
+     "Mntimande",
+     1
+    ],
+    [
+     "Mphubani",
+     1
+    ],
+    [
+     "Mzamani",
+     1
+    ],
+    [
+     "Ngonyama",
+     1
+    ],
+    [
+     "Nogele",
+     1
+    ],
+    [
+     "Nomasi",
+     1
+    ],
+    [
+     "Phosibe",
+     1
+    ],
+    [
+     "Silwa kaMasikani",
+     1
+    ],
+    [
+     "Skhutyana",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGatyeni",
+   "praises": [
+    [
+     "Cubungu",
+     3
+    ],
+    [
+     "Indoda uyivumi nepokoto",
+     3
+    ],
+    [
+     "Mamali",
+     3
+    ],
+    [
+     "Ndondela",
+     3
+    ],
+    [
+     "Nkomo zibomvu",
+     3
+    ],
+    [
+     "Nywabe",
+     3
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGcina",
+   "praises": [
+    [
+     "Nokwindla",
+     4
+    ],
+    [
+     "Thyopho",
+     4
+    ],
+    [
+     "Bahamba bepheth’isali",
+     3
+    ],
+    [
+     "Helushe",
+     3
+    ],
+    [
+     "Magwebulikhula",
+     3
+    ],
+    [
+     "Malambedlile",
+     3
+    ],
+    [
+     "Xhamela Ncancashe",
+     3
+    ],
+    [
+     "Bathi iigusha ziziduli zentaba",
+     2
+    ],
+    [
+     "Ihashe bakulifuman’emlungwini",
+     2
+    ],
+    [
+     "Izinto zabantu abazibi koko bayazigcini",
+     2
+    ],
+    [
+     "Xhamela",
+     2
+    ],
+    [
+     "Bathi iigusha ziziduli zethafa",
+     1
+    ],
+    [
+     "Butsolo beentonga",
+     1
+    ],
+    [
+     "Dlelanga",
+     1
+    ],
+    [
+     "Gabul’ ikhula",
+     1
+    ],
+    [
+     "Gadluma",
+     1
+    ],
+    [
+     "Hamba epheth’isali ihashe ulifumana emfengwini",
+     1
+    ],
+    [
+     "Ibhokhwe ngumnqabaza wehlathi",
+     1
+    ],
+    [
+     "Izinto zabantu abazibi koko bayazigcina",
+     1
+    ],
+    [
+     "Malambayendle elambel’inyama yenyamakazi",
+     1
+    ],
+    [
+     "Malamb’ayendle aty’ igusha athi ziz’ duli zethafa",
+     1
+    ],
+    [
+     "Mbon’obomvu wase mbo",
+     1
+    ],
+    [
+     "Ncancashe",
+     1
+    ],
+    [
+     "Nogawul’ikhula",
+     1
+    ],
+    [
+     "Ntlonipho",
+     1
+    ],
+    [
+     "Nxego",
+     1
+    ],
+    [
+     "Thyopho ka Phato owathyaphakela eXonxa",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGcuma",
+   "praises": [
+    [
+     "Dzabela",
+     1
+    ],
+    [
+     "Jola",
+     1
+    ],
+    [
+     "Malandelwa yintomb’ ithi ndizeke",
+     1
+    ],
+    [
+     "Mayaba",
+     1
+    ],
+    [
+     "Nonga yintombi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGebe",
+   "praises": [
+    [
+     "Mkhasela Mduduma nje ngezulu",
+     1
+    ],
+    [
+     "Ngaleka",
+     1
+    ],
+    [
+     "Ngobe",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGiqwa",
+   "praises": [
+    [
+     "Jikijwa",
+     2
+    ],
+    [
+     "Nkosana",
+     2
+    ],
+    [
+     "Thotywayo",
+     2
+    ],
+    [
+     "Bambani",
+     1
+    ],
+    [
+     "Bhaxa",
+     1
+    ],
+    [
+     "Jingqi",
+     1
+    ],
+    [
+     "Magele",
+     1
+    ],
+    [
+     "Mdeyama",
+     1
+    ],
+    [
+     "Meqo",
+     1
+    ],
+    [
+     "Mvaba",
+     1
+    ],
+    [
+     "Mvamba",
+     1
+    ],
+    [
+     "Ncudwana",
+     1
+    ],
+    [
+     "Nonesi",
+     1
+    ],
+    [
+     "Ntiya",
+     1
+    ],
+    [
+     "Ntshinga ay’khwazwa ikhwazwa ngabayazo",
+     1
+    ],
+    [
+     "Ntshinga ka Khwaza",
+     1
+    ],
+    [
+     "Qhirama",
+     1
+    ],
+    [
+     "Qobo",
+     1
+    ],
+    [
+     "Tshobo",
+     1
+    ],
+    [
+     "Wohla",
+     1
+    ],
+    [
+     "Xhe",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGodlwana",
+   "praises": [
+    [
+     "Catala ka Qoyi",
+     3
+    ],
+    [
+     "Gcodi",
+     3
+    ],
+    [
+     "Lusalu",
+     3
+    ],
+    [
+     "Mbumbulu inye zingabambini ziyadubulana",
+     3
+    ],
+    [
+     "Thole lempunzi",
+     2
+    ],
+    [
+     "Nompunzi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGoqolo",
+   "praises": [
+    [
+     "Ganeka",
+     1
+    ],
+    [
+     "Mjoli",
+     1
+    ],
+    [
+     "Ntshintshi",
+     1
+    ],
+    [
+     "Sheya",
+     1
+    ],
+    [
+     "Thanana",
+     1
+    ],
+    [
+     "Tyebelangaphakathi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGqwarhu",
+   "praises": [
+    [
+     "Khawu",
+     3
+    ],
+    [
+     "Mhlophe",
+     3
+    ],
+    [
+     "Mtabasa ka Dingana",
+     3
+    ],
+    [
+     "Jalamba",
+     2
+    ],
+    [
+     "Ntenge",
+     2
+    ],
+    [
+     "Cebisa",
+     1
+    ],
+    [
+     "Deyi",
+     1
+    ],
+    [
+     "Ngoszi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGqwashu",
+   "praises": [
+    [
+     "Gxiya",
+     1
+    ],
+    [
+     "Lawu",
+     1
+    ],
+    [
+     "Manzini",
+     1
+    ],
+    [
+     "Mvambo",
+     1
+    ],
+    [
+     "Ndotshayisa",
+     1
+    ],
+    [
+     "Siyaphi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGubevu",
+   "praises": [
+    [
+     "Maduna",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaGxarha",
+   "praises": [
+    [
+     "Cwerha",
+     3
+    ],
+    [
+     "Mahlahla",
+     3
+    ],
+    [
+     "Mlawu",
+     3
+    ],
+    [
+     "Potwana",
+     3
+    ],
+    [
+     "Vambane",
+     3
+    ],
+    [
+     "Jalamba",
+     1
+    ],
+    [
+     "Siyoyo",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaHlanga",
+   "praises": [
+    [
+     "Dlangamakhandlela",
+     1
+    ],
+    [
+     "Maleku",
+     1
+    ],
+    [
+     "Maphuza",
+     1
+    ],
+    [
+     "Mfaz’obelenye phesheya komlanjana",
+     1
+    ],
+    [
+     "Mgweleta",
+     1
+    ],
+    [
+     "Mndlovu",
+     1
+    ],
+    [
+     "Mntada",
+     1
+    ],
+    [
+     "Mqiya",
+     1
+    ],
+    [
+     "Nobetha",
+     1
+    ],
+    [
+     "Nxeko",
+     1
+    ],
+    [
+     "Xhinela",
+     1
+    ],
+    [
+     "Yokhwe",
+     1
+    ],
+    [
+     "Zilenzi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaHlubi",
+   "praises": [
+    [
+     "Amade anjenge nyamazane",
+     1
+    ],
+    [
+     "Bhungane",
+     1
+    ],
+    [
+     "Bhungane kaNsele",
+     1
+    ],
+    [
+     "Mafuz’ afulele njengefu lemvula! Mashwabada",
+     1
+    ],
+    [
+     "Mafuz’ afulele njengelifu lemvula",
+     1
+    ],
+    [
+     "Makhulukhulu",
+     1
+    ],
+    [
+     "Mashiya amahle",
+     1
+    ],
+    [
+     "Mthimkhulu",
+     1
+    ],
+    [
+     "Mzekelo ooRhadebe",
+     1
+    ],
+    [
+     "Ndlubu ezamila ebubini bamadoda",
+     1
+    ],
+    [
+     "Ndlubu ezamila emthondweni",
+     1
+    ],
+    [
+     "UNkulunkulu uziqu zintathu",
+     1
+    ],
+    [
+     "Umkhulu Nkulunkulu kodwa awunganga Bhungane",
+     1
+    ],
+    [
+     "Washwabadel’ inkomo kanye nempondotayo!",
+     1
+    ],
+    [
+     "Zikode!Bhungane wenza ngakuningi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaJali",
+   "praises": [
+    [
+     "Gwatshu",
+     1
+    ],
+    [
+     "Jonas",
+     1
+    ],
+    [
+     "Juda",
+     1
+    ],
+    [
+     "Mabhala",
+     1
+    ],
+    [
+     "Mpemvu",
+     1
+    ],
+    [
+     "Mpevu Shelwame",
+     1
+    ],
+    [
+     "Mvetshane",
+     1
+    ],
+    [
+     "Nomaziphela ebuhlanti kuphela umgquba wodwa",
+     1
+    ],
+    [
+     "Ntlotshane",
+     1
+    ],
+    [
+     "Tshira",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaJama",
+   "praises": [
+    [
+     "Dlamini",
+     1
+    ],
+    [
+     "Fakade",
+     1
+    ],
+    [
+     "Ngxilinoboya",
+     1
+    ],
+    [
+     "Njokweni",
+     1
+    ],
+    [
+     "Sijadu",
+     1
+    ],
+    [
+     "Zizi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaJili",
+   "praises": [
+    [
+     "Masengwa",
+     1
+    ],
+    [
+     "Maseng’ inkomo noba ilele ngenxayokuthsandza intusi",
+     1
+    ],
+    [
+     "Mkhont’ obomvu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaJola",
+   "praises": [
+    [
+     "MphaNkomo",
+     5
+    ],
+    [
+     "Hakaha",
+     4
+    ],
+    [
+     "Hoshode",
+     4
+    ],
+    [
+     "Jolinkomo",
+     4
+    ],
+    [
+     "Njuza",
+     4
+    ],
+    [
+     "Nomakhala",
+     4
+    ],
+    [
+     "Qengeba",
+     4
+    ],
+    [
+     "SingaMampondomse ngohlanga",
+     4
+    ],
+    [
+     "Sithandwa mhla kukubi",
+     4
+    ],
+    [
+     "Sthukuthezi",
+     4
+    ],
+    [
+     "Mfaz’ obele ‘nye omabele made",
+     3
+    ],
+    [
+     "Ncancisa naphesheya komlambo",
+     3
+    ],
+    [
+     "Ngwanya",
+     3
+    ],
+    [
+     "Ndleb’endlovu",
+     2
+    ],
+    [
+     "Bholokodlela kuphila kuzenzela",
+     1
+    ],
+    [
+     "Bhukhana",
+     1
+    ],
+    [
+     "Chirwa",
+     1
+    ],
+    [
+     "Gcuma",
+     1
+    ],
+    [
+     "Hobo",
+     1
+    ],
+    [
+     "Ithole lomthwakazi",
+     1
+    ],
+    [
+     "Lembethe",
+     1
+    ],
+    [
+     "Marholisa",
+     1
+    ],
+    [
+     "Mbarha",
+     1
+    ],
+    [
+     "Mfaz’obelelide",
+     1
+    ],
+    [
+     "Mfaz’omabele made oncancisa naphesha komlambo",
+     1
+    ],
+    [
+     "Mgema",
+     1
+    ],
+    [
+     "Mpumlo engqongqosholo njengengulube",
+     1
+    ],
+    [
+     "Mqeke",
+     1
+    ],
+    [
+     "Mthwakazi",
+     1
+    ],
+    [
+     "Mzi Welanga",
+     1
+    ],
+    [
+     "Mzi welanga. Somarhwarhwa",
+     1
+    ],
+    [
+     "Ncancisa naphesheya komlambo. Yeyesa",
+     1
+    ],
+    [
+     "Ndzabela",
+     1
+    ],
+    [
+     "Ngubo ayinxitywa",
+     1
+    ],
+    [
+     "Phahla",
+     1
+    ],
+    [
+     "Phahlo",
+     1
+    ],
+    [
+     "Sabe",
+     1
+    ],
+    [
+     "Somadolo",
+     1
+    ],
+    [
+     "Thayithayi kade bemthibela",
+     1
+    ],
+    [
+     "Thole lenkwakha",
+     1
+    ],
+    [
+     "Thole lomthwakazi",
+     1
+    ],
+    [
+     "Vambane",
+     1
+    ],
+    [
+     "Zanemvula",
+     1
+    ],
+    [
+     "Zwelibanzi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaJuta",
+   "praises": [
+    [
+     "Mencwa",
+     1
+    ],
+    [
+     "Sjekula",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaJwarha",
+   "praises": [
+    [
+     "Bantw’abahle noba bapheth’ izikhali",
+     4
+    ],
+    [
+     "Jotela",
+     4
+    ],
+    [
+     "Khatiti",
+     4
+    ],
+    [
+     "Mayarha",
+     4
+    ],
+    [
+     "Mbelu",
+     4
+    ],
+    [
+     "Mnangwe",
+     4
+    ],
+    [
+     "Mtika",
+     4
+    ],
+    [
+     "Ndabase",
+     4
+    ],
+    [
+     "Mabujwe’bhidlika njengodaka",
+     1
+    ],
+    [
+     "Mnguyane",
+     1
+    ],
+    [
+     "Mtimka",
+     1
+    ],
+    [
+     "Ntame’nemida njengeye nkunzi",
+     1
+    ],
+    [
+     "Soga",
+     1
+    ],
+    [
+     "Tiyo",
+     1
+    ],
+    [
+     "Vongwe",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaKhambule",
+   "praises": [
+    [
+     "Khambule Mncube Mayela omalandelwa yintombi ithsi bhuti nditeke",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaKheswa",
+   "praises": [
+    [
+     "Macocobela",
+     1
+    ],
+    [
+     "Mbanguba",
+     1
+    ],
+    [
+     "Mchumane",
+     1
+    ],
+    [
+     "Mpafane",
+     1
+    ],
+    [
+     "Mpangazitha",
+     1
+    ],
+    [
+     "NoZulu",
+     1
+    ],
+    [
+     "Thukela",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaKhiwa",
+   "praises": [
+    [
+     "Khonjwayo",
+     3
+    ],
+    [
+     "Qwebeda",
+     3
+    ],
+    [
+     "Hlaka",
+     1
+    ],
+    [
+     "Makalanyana",
+     1
+    ],
+    [
+     "Ndzondela",
+     1
+    ],
+    [
+     "Ngcekula",
+     1
+    ],
+    [
+     "Ngetu",
+     1
+    ],
+    [
+     "Phoswa",
+     1
+    ],
+    [
+     "Sikhehlana",
+     1
+    ],
+    [
+     "Silwanyana",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaKhonjwayo",
+   "praises": [
+    [
+     "Dumile",
+     3
+    ],
+    [
+     "Zwelidumile",
+     3
+    ],
+    [
+     "Inkosi eyayiphethe ngexesha lakudala ihlonitshiwe",
+     2
+    ],
+    [
+     "NoNtsikinyani ekunene",
+     2
+    ],
+    [
+     "AmaNdanya akhokelwa nguNkosi uVelile Mkono",
+     1
+    ],
+    [
+     "Indlu kaTshizi ikhokelwa nguSiqukwana",
+     1
+    ],
+    [
+     "Inkosi eyayiphethe ngexesha lakudala ihlonitshiwe nguNgcekula",
+     1
+    ],
+    [
+     "Iwele lokuqala",
+     1
+    ],
+    [
+     "Khiwa ezele uNdanya ekunene",
+     1
+    ],
+    [
+     "Ngcekula",
+     1
+    ],
+    [
+     "Zele uNdzondela",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaKhumalo",
+   "praises": [
+    [
+     "Mntungwa",
+     2
+    ],
+    [
+     "Mzilikazi kaMashobane",
+     2
+    ],
+    [
+     "Abamkhule ngezinyawo ezimfushanyana",
+     1
+    ],
+    [
+     "Abathi bedl’umuntu",
+     1
+    ],
+    [
+     "Bebe bemyenga ngendaba. Abadl’izimf’ezimbili",
+     1
+    ],
+    [
+     "Ikhambi laphuma lilinye. Lobengula kaMzilikazi",
+     1
+    ],
+    [
+     "Kanti isiyetheswe",
+     1
+    ],
+    [
+     "Kwadliwa ilanga lishona Bantungw’abancwaba! Zindlovu ezibantu",
+     1
+    ],
+    [
+     "KwelaseNgome. UNkone evele ngobus’ emdibini",
+     1
+    ],
+    [
+     "Mbulase",
+     1
+    ],
+    [
+     "Mbulaz’omnyama",
+     1
+    ],
+    [
+     "Nangezimfushanyana",
+     1
+    ],
+    [
+     "Nezimaqhukulwana. Inyang’ abathe beth’ ifil’uZulu",
+     1
+    ],
+    [
+     "Ngoba zavul’iNgome zahamba. UNtshwintshwintshwi kaNoyanda noNdaba. Ndabezitha!",
+     1
+    ],
+    [
+     "Nina bakwaNtokela! Inkubele abayihlabe ngamanxeba",
+     1
+    ],
+    [
+     "Okhatshwe ngezind’izinyawo",
+     1
+    ],
+    [
+     "Oty’umntu emthuthuzela ngeendaba",
+     1
+    ],
+    [
+     "Shobana noGasa kaZikode",
+     1
+    ],
+    [
+     "UMkhatshwa wawoZimangele",
+     1
+    ],
+    [
+     "UMzilikazi kaMashobana",
+     1
+    ],
+    [
+     "Zikode kaMkhatshwa. Mabaso owabas’entabeni",
+     1
+    ],
+    [
+     "Zindlovu ezimacocombela. Nina bakwaMawela",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaKhwemte",
+   "praises": [
+    [
+     "Dabane",
+     1
+    ],
+    [
+     "Fulashe",
+     1
+    ],
+    [
+     "Gqabaza",
+     1
+    ],
+    [
+     "Mekhi",
+     1
+    ],
+    [
+     "Ncibane",
+     1
+    ],
+    [
+     "Ngququ",
+     1
+    ],
+    [
+     "Nojaholo",
+     1
+    ],
+    [
+     "Ntlokwenyathi",
+     1
+    ],
+    [
+     "Ntswentswe",
+     1
+    ],
+    [
+     "Qhanqolo",
+     1
+    ],
+    [
+     "Sgadi",
+     1
+    ],
+    [
+     "Venge",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaKhwetshube",
+   "praises": [
+    [
+     "Bhongxa",
+     1
+    ],
+    [
+     "Bipha",
+     1
+    ],
+    [
+     "Detshe",
+     1
+    ],
+    [
+     "KaXhanga",
+     1
+    ],
+    [
+     "Mabude",
+     1
+    ],
+    [
+     "Mhlang’olal ‘intake Kaz’ utshile nje zolala phi! Ndlu kaYokazi",
+     1
+    ],
+    [
+     "Ndelemane",
+     1
+    ],
+    [
+     "Ngcawukana",
+     1
+    ],
+    [
+     "Njenjani",
+     1
+    ],
+    [
+     "Thamse",
+     1
+    ],
+    [
+     "Xhanga",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaKrila",
+   "praises": [
+    [
+     "Bhukuxa umthondo uwujongise emntwini",
+     1
+    ],
+    [
+     "Bhurhu",
+     1
+    ],
+    [
+     "Bodlinja",
+     1
+    ],
+    [
+     "Gcaleka",
+     1
+    ],
+    [
+     "Gobingca",
+     1
+    ],
+    [
+     "Mayisithe",
+     1
+    ],
+    [
+     "Mbamba",
+     1
+    ],
+    [
+     "Mbombo",
+     1
+    ],
+    [
+     "Nkomo zibomvu namathol’azo",
+     1
+    ],
+    [
+     "Nomazele",
+     1
+    ],
+    [
+     "Nqele",
+     1
+    ],
+    [
+     "Rhaso",
+     1
+    ],
+    [
+     "Thangana",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaKwayi",
+   "praises": [
+    [
+     "Ngconde",
+     4
+    ],
+    [
+     "Ngcond’oneentshaba",
+     4
+    ],
+    [
+     "Togu",
+     4
+    ],
+    [
+     "Ubulawi",
+     4
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMadiba",
+   "praises": [
+    [
+     "Bhomoyi",
+     1
+    ],
+    [
+     "Dlomo",
+     1
+    ],
+    [
+     "MThembu",
+     1
+    ],
+    [
+     "Malangana",
+     1
+    ],
+    [
+     "Mtshikilana",
+     1
+    ],
+    [
+     "Ncikoza",
+     1
+    ],
+    [
+     "Ngqolomsila",
+     1
+    ],
+    [
+     "Ntande",
+     1
+    ],
+    [
+     "Qhumpase",
+     1
+    ],
+    [
+     "Sophitsho",
+     1
+    ],
+    [
+     "Tande",
+     1
+    ],
+    [
+     "Tubhana",
+     1
+    ],
+    [
+     "Vela bambhentsele",
+     1
+    ],
+    [
+     "Yem-Yem",
+     1
+    ],
+    [
+     "Zondwa",
+     1
+    ],
+    [
+     "Zondwa zintshaba ezingasoze zimenzele nto",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMaduna",
+   "praises": [
+    [
+     "Gubevu",
+     4
+    ],
+    [
+     "Nokhala",
+     4
+    ],
+    [
+     "Msuthu",
+     2
+    ],
+    [
+     "Tiba",
+     2
+    ],
+    [
+     "Iinkomo ezingqukuva azibuyi emzini xa bekulotyolwe ngazo",
+     1
+    ],
+    [
+     "Imamba kandidini ngoba ngimesabile",
+     1
+    ],
+    [
+     "Isilo esinamadevu emlonyeni",
+     1
+    ],
+    [
+     "Jiyana",
+     1
+    ],
+    [
+     "Jiyane",
+     1
+    ],
+    [
+     "Maduna omuhle ngekhala lakhe",
+     1
+    ],
+    [
+     "Malobola gesegadana",
+     1
+    ],
+    [
+     "Mandl’amakhulu",
+     1
+    ],
+    [
+     "Matoetoe",
+     1
+    ],
+    [
+     "Mlamb’unqolintaba",
+     1
+    ],
+    [
+     "Mpungushe",
+     1
+    ],
+    [
+     "Mvelase",
+     1
+    ],
+    [
+     "Ngaculende emabalabala njenge ngwe",
+     1
+    ],
+    [
+     "Ngub’engcuka",
+     1
+    ],
+    [
+     "Nokhala owawela ngempalazo eyaphalazwa ngamadoda",
+     1
+    ],
+    [
+     "Novikothek’ukuthetha",
+     1
+    ],
+    [
+     "Salathiso",
+     1
+    ],
+    [
+     "Sivunguvung’ esawis’ indoda emahlangeni",
+     1
+    ],
+    [
+     "Sjekula salakulandela",
+     1
+    ],
+    [
+     "Umnt’abesi gejebe nkomo sekhona",
+     1
+    ],
+    [
+     "Umnt’owaw’edakeni kwathi nqa abantu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMambi",
+   "praises": [
+    [
+     "Bhulingwe kuvele imamba",
+     3
+    ],
+    [
+     "Mntshontsho uSabela uyabizwa emazibukweni",
+     3
+    ],
+    [
+     "Ntabazikude zikuMganu",
+     3
+    ],
+    [
+     "Nxontsa ka Xesibe",
+     3
+    ],
+    [
+     "Mntshontsho",
+     1
+    ],
+    [
+     "Sabela uyabizwa emazibukweni",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaManci",
+   "praises": [
+    [
+     "Mbali",
+     5
+    ],
+    [
+     "Tshitshis’intaba",
+     5
+    ],
+    [
+     "Wabane",
+     5
+    ],
+    [
+     "Zinde Zinde Zinemiqala",
+     5
+    ],
+    [
+     "Mdludla ka Bekiso",
+     4
+    ],
+    [
+     "Mdludla",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMaya",
+   "praises": [
+    [
+     "Bhomoyi",
+     4
+    ],
+    [
+     "Magwa",
+     4
+    ],
+    [
+     "Ngqolomsila",
+     4
+    ],
+    [
+     "Maya oyem yem osophitsho",
+     3
+    ],
+    [
+     "Sophitsho",
+     1
+    ],
+    [
+     "Yem Yem oSophitsho",
+     1
+    ],
+    [
+     "Yem-yem",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMbanjwa",
+   "praises": [
+    [
+     "Gebane",
+     1
+    ],
+    [
+     "Gubulundu",
+     1
+    ],
+    [
+     "Mantiyantiyane",
+     1
+    ],
+    [
+     "Mhlabeka",
+     1
+    ],
+    [
+     "Mpethwane",
+     1
+    ],
+    [
+     "Nongoma",
+     1
+    ],
+    [
+     "Ntimela",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMbatha",
+   "praises": [
+    [
+     "Mthiya amaBhaca asuka kwaShandu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMbongwe",
+   "praises": [
+    [
+     "Khoza",
+     1
+    ],
+    [
+     "Madas’elangeni",
+     1
+    ],
+    [
+     "Mathobela",
+     1
+    ],
+    [
+     "Mbuyisa",
+     1
+    ],
+    [
+     "Mvemnyama",
+     1
+    ],
+    [
+     "Ndawonde",
+     1
+    ],
+    [
+     "Ndimande ka qaqaqa",
+     1
+    ],
+    [
+     "Nkob’aziphekwa ngamavila ziphekwa zizikhuthali",
+     1
+    ],
+    [
+     "Nqalela",
+     1
+    ],
+    [
+     "Sandamela",
+     1
+    ],
+    [
+     "Sigudu sebhokhwe",
+     1
+    ],
+    [
+     "Sondisa",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMbotho",
+   "praises": [
+    [
+     "Fulela mfaz’ olivila kuyanetha",
+     1
+    ],
+    [
+     "Juleka",
+     1
+    ],
+    [
+     "Juqu",
+     1
+    ],
+    [
+     "Malala nentombi ivuke ithi ndizeke",
+     1
+    ],
+    [
+     "Matala Nkosi",
+     1
+    ],
+    [
+     "Mazama",
+     1
+    ],
+    [
+     "Mlibati",
+     1
+    ],
+    [
+     "Mtshikilana",
+     1
+    ],
+    [
+     "Myalo",
+     1
+    ],
+    [
+     "NgqizaZibutha kandaka-ndaka",
+     1
+    ],
+    [
+     "Ntsindane",
+     1
+    ],
+    [
+     "Nyawo zibomvu nokuba zinentsente",
+     1
+    ],
+    [
+     "Sibasa Manzini kuvith’umlilo",
+     1
+    ],
+    [
+     "Sibasa manzini kuvuth’ umlilo",
+     1
+    ],
+    [
+     "Sigwamba sentswangu",
+     1
+    ],
+    [
+     "Thoyane",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMdlane",
+   "praises": [
+    [
+     "Tutuse",
+     3
+    ],
+    [
+     "Mdimba",
+     2
+    ],
+    [
+     "MThembu",
+     1
+    ],
+    [
+     "Mbomboyi",
+     1
+    ],
+    [
+     "Mtikrakra",
+     1
+    ],
+    [
+     "Ngubengcuka",
+     1
+    ],
+    [
+     "Nomdimba",
+     1
+    ],
+    [
+     "Ntlokwan’ibanzana",
+     1
+    ],
+    [
+     "Qandashe",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMdlangathi",
+   "praises": [
+    [
+     "Juta",
+     5
+    ],
+    [
+     "Mome mome sirhama somntwana",
+     5
+    ],
+    [
+     "Bhalangile ka toto",
+     1
+    ],
+    [
+     "Mbembe ka mahlalela",
+     1
+    ],
+    [
+     "Mencwa",
+     1
+    ],
+    [
+     "Mfaz’othakathayo ubonwa ngeempund’uxweba xa kbanda",
+     1
+    ],
+    [
+     "Mkhobela",
+     1
+    ],
+    [
+     "Mth’ugawlwe ngabangangaye ngamapilinya",
+     1
+    ],
+    [
+     "Ndakthum’ebhisdolophu walibala kusel’iti enempukane",
+     1
+    ],
+    [
+     "Ngwenduna",
+     1
+    ],
+    [
+     "Nkunz’emnyana bakhuz’ukuhlaba ngoba zonk’izizwe ziyzwil’ukulila",
+     1
+    ],
+    [
+     "Nobhedu",
+     1
+    ],
+    [
+     "Ntaba ayikhonjwa ikhonjwa Ngamadlangathi odwa",
+     1
+    ],
+    [
+     "Ntlangwane",
+     1
+    ],
+    [
+     "Ntshozina",
+     1
+    ],
+    [
+     "Nyame’enja eyafel’emfuleni yeza ngokunuka elalini",
+     1
+    ],
+    [
+     "Nyonyoza ka Nyinywa",
+     1
+    ],
+    [
+     "U juba lalal’emthini ngokuzbonakalisa",
+     1
+    ],
+    [
+     "U-hagu hagu ndibolek’umbombo ndiqebul’amafusi ndakuph’iingqweqwe mhla ndafula",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMfene",
+   "praises": [
+    [
+     "Hlathi",
+     4
+    ],
+    [
+     "Lisa",
+     4
+    ],
+    [
+     "Buswayo",
+     3
+    ],
+    [
+     "Canzi",
+     3
+    ],
+    [
+     "Jambase",
+     3
+    ],
+    [
+     "Sanzanza",
+     3
+    ],
+    [
+     "Msuthu",
+     2
+    ],
+    [
+     "Hlal’ endle",
+     1
+    ],
+    [
+     "Ingathi silele noxa sihleli",
+     1
+    ],
+    [
+     "Isilwanyana esakhe sasibi",
+     1
+    ],
+    [
+     "Isilwanyana esakhe sasibi ingathi sihleli noxa silele",
+     1
+    ],
+    [
+     "Jambasi",
+     1
+    ],
+    [
+     "Ojambasi",
+     1
+    ],
+    [
+     "Olisa",
+     1
+    ],
+    [
+     "Tyibilika emaweni ngomva",
+     1
+    ],
+    [
+     "Tyibilik’ emaweni ngomva",
+     1
+    ],
+    [
+     "Uyibeka Elityeni Ityiwe Zimbovane",
+     1
+    ],
+    [
+     "Uzango’mva Eliweni",
+     1
+    ],
+    [
+     "Zangomva eliweni",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMhaga",
+   "praises": [
+    [
+     "Amawel’ukuzana",
+     3
+    ],
+    [
+     "NoSabe",
+     3
+    ],
+    [
+     "Qwetha noGqubushe",
+     3
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMiya",
+   "praises": [
+    [
+     "Gcwanini",
+     5
+    ],
+    [
+     "Salakulandelwa",
+     4
+    ],
+    [
+     "Sibewu",
+     4
+    ],
+    [
+     "Sijekula",
+     4
+    ],
+    [
+     "Maguqa agalele njenge ngonyama",
+     1
+    ],
+    [
+     "Makaluza",
+     1
+    ],
+    [
+     "Malebomvu",
+     1
+    ],
+    [
+     "Mancoba",
+     1
+    ],
+    [
+     "Mandeluhlwini",
+     1
+    ],
+    [
+     "Mja",
+     1
+    ],
+    [
+     "Munja",
+     1
+    ],
+    [
+     "Saliwa",
+     1
+    ],
+    [
+     "Vezi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMjoli",
+   "praises": [
+    [
+     "Qubulashe",
+     5
+    ],
+    [
+     "Wushe",
+     5
+    ],
+    [
+     "Nonina",
+     3
+    ],
+    [
+     "Babalo",
+     1
+    ],
+    [
+     "Bharhuzi",
+     1
+    ],
+    [
+     "Bhedle",
+     1
+    ],
+    [
+     "Buso bumnyama ngathi sisonka sojiwe",
+     1
+    ],
+    [
+     "Danisa",
+     1
+    ],
+    [
+     "Deyi",
+     1
+    ],
+    [
+     "Dlilanga",
+     1
+    ],
+    [
+     "Fusani",
+     1
+    ],
+    [
+     "Hlathi",
+     1
+    ],
+    [
+     "Indlu kaSondzaba",
+     1
+    ],
+    [
+     "Izotshw’elihle",
+     1
+    ],
+    [
+     "Khusi",
+     1
+    ],
+    [
+     "Malandelwa zintombi zithi ndizeke",
+     1
+    ],
+    [
+     "Maqholo",
+     1
+    ],
+    [
+     "Mpulana",
+     1
+    ],
+    [
+     "Mshwawu",
+     1
+    ],
+    [
+     "Mswanzeli",
+     1
+    ],
+    [
+     "Mthi owathi ukuwa wabekisa amasebe eThukela",
+     1
+    ],
+    [
+     "Mzimvubu",
+     1
+    ],
+    [
+     "Ngilana",
+     1
+    ],
+    [
+     "Nokholwa wokwakhe",
+     1
+    ],
+    [
+     "Noma-ndzondzo",
+     1
+    ],
+    [
+     "Ntundzela",
+     1
+    ],
+    [
+     "Nyawo",
+     1
+    ],
+    [
+     "Shishi",
+     1
+    ],
+    [
+     "Uphika-nelanga",
+     1
+    ],
+    [
+     "Vebi",
+     1
+    ],
+    [
+     "Wabane",
+     1
+    ],
+    [
+     "Zulu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMkhwane",
+   "praises": [
+    [
+     "Cikilili",
+     1
+    ],
+    [
+     "Mlalase",
+     1
+    ],
+    [
+     "Mqingwana",
+     1
+    ],
+    [
+     "Mwelase",
+     1
+    ],
+    [
+     "Ngwekazi",
+     1
+    ],
+    [
+     "Ntukela",
+     1
+    ],
+    [
+     "Sigasa",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMlambo",
+   "praises": [
+    [
+     "Dladla",
+     1
+    ],
+    [
+     "Lubisi",
+     1
+    ],
+    [
+     "Mbinga",
+     1
+    ],
+    [
+     "Mlambo ongawelwayo owelwa zinkonjane zodwa pho nazo ukuba zinempiko",
+     1
+    ],
+    [
+     "Onoxhaka",
+     1
+    ],
+    [
+     "Senene",
+     1
+    ],
+    [
+     "Siszalo sika Gxiva",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMnganga",
+   "praises": [
+    [
+     "Bhodl’inja",
+     1
+    ],
+    [
+     "Krila",
+     1
+    ],
+    [
+     "Mbamba",
+     1
+    ],
+    [
+     "Mgquba",
+     1
+    ],
+    [
+     "Ngcondozimhlophe",
+     1
+    ],
+    [
+     "Thangane",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMngwevu",
+   "praises": [
+    [
+     "Bhodlinyama",
+     1
+    ],
+    [
+     "Fak’inyama emlanjeni iphume ivuthiwe",
+     1
+    ],
+    [
+     "Mhlatyana",
+     1
+    ],
+    [
+     "Nxuba",
+     1
+    ],
+    [
+     "Rhudulu",
+     1
+    ],
+    [
+     "Skhomo",
+     1
+    ],
+    [
+     "Snuka",
+     1
+    ],
+    [
+     "Tshangisa",
+     1
+    ],
+    [
+     "Zulu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNkabane",
+   "praises": [
+    [
+     "Majeke",
+     2
+    ],
+    [
+     "Mayeye",
+     2
+    ],
+    [
+     "Mabandla ka Rhanjana",
+     1
+    ],
+    [
+     "Mbuswana",
+     1
+    ],
+    [
+     "Mfaz’obele linye",
+     1
+    ],
+    [
+     "Mthondwana",
+     1
+    ],
+    [
+     "Mthwembotyi",
+     1
+    ],
+    [
+     "Nduntsha",
+     1
+    ],
+    [
+     "Nkomo zakwa Ntleki",
+     1
+    ],
+    [
+     "Nkomo zika Marhama",
+     1
+    ],
+    [
+     "Noqazo",
+     1
+    ],
+    [
+     "Nyawo zipinki noba zinentsente",
+     1
+    ],
+    [
+     "Nywabelemntwini",
+     1
+    ],
+    [
+     "Zika Khamanzana",
+     1
+    ],
+    [
+     "Zika Ngxalenye",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMpangela",
+   "praises": [
+    [
+     "Dlomo",
+     3
+    ],
+    [
+     "Gwadzi elisilika bubuhle",
+     3
+    ],
+    [
+     "Magwala",
+     3
+    ],
+    [
+     "Mvinjwa",
+     3
+    ],
+    [
+     "Ndlazi",
+     3
+    ],
+    [
+     "Rhoshana",
+     3
+    ],
+    [
+     "Sibetho",
+     3
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMpehle",
+   "praises": [
+    [
+     "Cabashe",
+     2
+    ],
+    [
+     "Dikana",
+     1
+    ],
+    [
+     "Dikane",
+     1
+    ],
+    [
+     "Goc’ iNyonga",
+     1
+    ],
+    [
+     "Masila",
+     1
+    ],
+    [
+     "Nkomo z’bomvu",
+     1
+    ],
+    [
+     "Nohushe",
+     1
+    ],
+    [
+     "Notyedo",
+     1
+    ],
+    [
+     "Vengwa",
+     1
+    ],
+    [
+     "Vete",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMpemvu",
+   "praises": [
+    [
+     "Bumela",
+     3
+    ],
+    [
+     "Jali",
+     3
+    ],
+    [
+     "Juda",
+     3
+    ],
+    [
+     "Ngciva",
+     3
+    ],
+    [
+     "Ntlotshane",
+     3
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMpinga",
+   "praises": [
+    [
+     "Mawawa",
+     4
+    ],
+    [
+     "Hlahla lamsik’ umntu es*ndeni",
+     3
+    ],
+    [
+     "Kheth ‘omthandayo",
+     3
+    ],
+    [
+     "Mbetshane",
+     3
+    ],
+    [
+     "Mzukulu kaSityulu",
+     3
+    ],
+    [
+     "Ngceza",
+     3
+    ],
+    [
+     "Nyaw’ zinoshukela",
+     3
+    ],
+    [
+     "Sintila",
+     3
+    ],
+    [
+     "Mbolokoqoshe",
+     2
+    ],
+    [
+     "Senzwa",
+     2
+    ],
+    [
+     "Bholokoqoshe",
+     1
+    ],
+    [
+     "Ingaphuma iimpondo ifanele isiko",
+     1
+    ],
+    [
+     "Ingaxhonywa exhantini seyiyeyezinja",
+     1
+    ],
+    [
+     "Into yomntwana",
+     1
+    ],
+    [
+     "Kanye ingaphuma izinza ifanele abafana",
+     1
+    ],
+    [
+     "Mpinga ngamaMpondomise uMpinga uzalwa nguNtose",
+     1
+    ],
+    [
+     "Nto*mntwana",
+     1
+    ],
+    [
+     "Ntoyomntwana ingaphuma uboya ilingene abadala",
+     1
+    ],
+    [
+     "Sineka",
+     1
+    ],
+    [
+     "Wawuzile",
+     1
+    ],
+    [
+     "Yazi binobaya ifanelwe ngabafana",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMpovane",
+   "praises": [
+    [
+     "Gubudza Nyamana",
+     1
+    ],
+    [
+     "Matalankosi",
+     1
+    ],
+    [
+     "Nomlakalakane",
+     1
+    ],
+    [
+     "Siwela",
+     1
+    ],
+    [
+     "Songiwe",
+     1
+    ],
+    [
+     "Vitsheka",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMtakwenda",
+   "praises": [
+    [
+     "Kwangeshe",
+     4
+    ],
+    [
+     "Leta",
+     4
+    ],
+    [
+     "Libele",
+     4
+    ],
+    [
+     "Mboyi",
+     4
+    ],
+    [
+     "Mentuko",
+     4
+    ],
+    [
+     "Ngcwadi",
+     4
+    ],
+    [
+     "Solizembe",
+     4
+    ],
+    [
+     "Tyebelendle",
+     4
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMthunzi",
+   "praises": [
+    [
+     "Homposhe",
+     3
+    ],
+    [
+     "Ntibane",
+     3
+    ],
+    [
+     "Nyukwana",
+     3
+    ],
+    [
+     "Pepepe",
+     3
+    ],
+    [
+     "Qabel’eliweni",
+     3
+    ],
+    [
+     "Thambo lihlab’elimzondayo",
+     3
+    ],
+    [
+     "Njifile",
+     2
+    ],
+    [
+     "Mthwakazi",
+     1
+    ],
+    [
+     "Njile",
+     1
+    ],
+    [
+     "Nkayi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMvulane",
+   "praises": [
+    [
+     "Msuthu",
+     4
+    ],
+    [
+     "Ncilashe",
+     4
+    ],
+    [
+     "Gwadela",
+     1
+    ],
+    [
+     "KaMaxambele",
+     1
+    ],
+    [
+     "KaMvimbi",
+     1
+    ],
+    [
+     "Marhula",
+     1
+    ],
+    [
+     "Nja ziyaf’lathena ngathi azifunani kanti zenzimikhuba",
+     1
+    ],
+    [
+     "Nyok”emnyam’ecandiziziba",
+     1
+    ],
+    [
+     "Papashe",
+     1
+    ],
+    [
+     "Phezu koMbhashe",
+     1
+    ],
+    [
+     "Sizila",
+     1
+    ],
+    [
+     "Umsuthu",
+     1
+    ],
+    [
+     "Vumba lempongo liyanuka",
+     1
+    ],
+    [
+     "Zalwa nguSmamane",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaMweli",
+   "praises": [
+    [
+     "Jili",
+     3
+    ],
+    [
+     "Msingawuthi",
+     3
+    ],
+    [
+     "Ngqambela",
+     3
+    ],
+    [
+     "Sibakhulu",
+     3
+    ],
+    [
+     "Ntlangwini’s enebathat yaseMakhuzeni",
+     2
+    ],
+    [
+     "Gqagqangana",
+     1
+    ],
+    [
+     "Masengwa",
+     1
+    ],
+    [
+     "Mchemane",
+     1
+    ],
+    [
+     "Mkhont’ obomvu",
+     1
+    ],
+    [
+     "Ntlangwini’s enebatha yaseMakhuzeni",
+     1
+    ],
+    [
+     "Thukela",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNala",
+   "praises": [
+    [
+     "Mpembe",
+     2
+    ],
+    [
+     "Ndokose",
+     2
+    ],
+    [
+     "Nojakadelana",
+     2
+    ],
+    [
+     "Bona abaphembela umlilo emanzini uvuthe",
+     1
+    ],
+    [
+     "Inkomo enhle yaphiwa amaNala nobuhle bayo",
+     1
+    ],
+    [
+     "Jiba isihlobo sikaDzangwe",
+     1
+    ],
+    [
+     "Makhanya ehlungwini kuhlwile",
+     1
+    ],
+    [
+     "Mpondo zihlanjiwe",
+     1
+    ],
+    [
+     "Ngquma",
+     1
+    ],
+    [
+     "Nokhay’ehlungwini",
+     1
+    ],
+    [
+     "Nomgquma",
+     1
+    ],
+    [
+     "Sbheku-bhekuza",
+     1
+    ],
+    [
+     "Sibhekuza baboNzima",
+     1
+    ],
+    [
+     "Zila zimkhonto zimangqangqase",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNcobeni",
+   "praises": [
+    [
+     "Dlekedle",
+     1
+    ],
+    [
+     "Gema",
+     1
+    ],
+    [
+     "Mthunzi",
+     1
+    ],
+    [
+     "Sibakhulu",
+     1
+    ],
+    [
+     "Thabethe",
+     1
+    ],
+    [
+     "Tiba",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNdaba",
+   "praises": [
+    [
+     "Bhadela",
+     3
+    ],
+    [
+     "Mntungwa",
+     3
+    ],
+    [
+     "Nomangcangca",
+     3
+    ],
+    [
+     "Nonunu",
+     3
+    ],
+    [
+     "Tshibase",
+     3
+    ],
+    [
+     "Nogubela",
+     2
+    ],
+    [
+     "Bharuza",
+     1
+    ],
+    [
+     "Choboka nje ngomkhuma woThukela",
+     1
+    ],
+    [
+     "Dzujana",
+     1
+    ],
+    [
+     "Khand’iyeza etyeni",
+     1
+    ],
+    [
+     "Magutywa",
+     1
+    ],
+    [
+     "Manyuza",
+     1
+    ],
+    [
+     "Mgubo odliwa ngabahambi bendlela",
+     1
+    ],
+    [
+     "Mntungwa ombulazi owadl’umntu emyenga ngeendaba",
+     1
+    ],
+    [
+     "Mvelase",
+     1
+    ],
+    [
+     "Ngabaphakela umyeni esithebeni kuba besonga amazimba",
+     1
+    ],
+    [
+     "Njujane",
+     1
+    ],
+    [
+     "Nkuluka",
+     1
+    ],
+    [
+     "Nogubel’egoduka",
+     1
+    ],
+    [
+     "Nompundwana zincinane yanga zingongiwa linunu entle engadli mntu",
+     1
+    ],
+    [
+     "Nothuli",
+     1
+    ],
+    [
+     "Ntombezintle nabayeni bazo",
+     1
+    ],
+    [
+     "Nyawo zimhlophe noxa zinodaka",
+     1
+    ],
+    [
+     "Nzipho zimnyama kukuqhwaya",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNdala",
+   "praises": [
+    [
+     "Mncotshe",
+     4
+    ],
+    [
+     "Msunu Sdumbu",
+     4
+    ],
+    [
+     "Ndala ka Momamana",
+     4
+    ],
+    [
+     "Ndithinina",
+     4
+    ],
+    [
+     "Ngxunga Smukumuku",
+     4
+    ],
+    [
+     "Thole",
+     4
+    ],
+    [
+     "Ntombi ubentseleni inkomo zimkaje",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNdlangisa",
+   "praises": [
+    [
+     "Buzini",
+     1
+    ],
+    [
+     "Duma",
+     1
+    ],
+    [
+     "Gqagqane",
+     1
+    ],
+    [
+     "Khweleta",
+     1
+    ],
+    [
+     "Luwelwa ziNkonjane zona ma phiko made",
+     1
+    ],
+    [
+     "Lwandl aluwelwa",
+     1
+    ],
+    [
+     "Lwandle",
+     1
+    ],
+    [
+     "Mcaca",
+     1
+    ],
+    [
+     "Mfingo",
+     1
+    ],
+    [
+     "Mpundeshe",
+     1
+    ],
+    [
+     "Mzimshe",
+     1
+    ],
+    [
+     "Nkonjane",
+     1
+    ],
+    [
+     "Thole",
+     1
+    ],
+    [
+     "Thombeni",
+     1
+    ],
+    [
+     "Welane",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNdlela",
+   "praises": [
+    [
+     "AmaNala amnandi njengebele likabelenyane",
+     1
+    ],
+    [
+     "Bakhama indoba yanyela emphandeni",
+     1
+    ],
+    [
+     "Bhekuza enkundleni kwadadeboyise umNtambose",
+     1
+    ],
+    [
+     "Isilila gazi njengoba abanye belila iinyembezi",
+     1
+    ],
+    [
+     "Matyeni",
+     1
+    ],
+    [
+     "Nala",
+     1
+    ],
+    [
+     "Nodabekhula",
+     1
+    ],
+    [
+     "Nodada",
+     1
+    ],
+    [
+     "Nongobe",
+     1
+    ],
+    [
+     "Sibhekuza",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNdlovu",
+   "praises": [
+    [
+     "Mntungwa Gengesi Malunga Mancoba",
+     4
+    ],
+    [
+     "Zidlekhaya ngokuswela umalusi",
+     4
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNduli",
+   "praises": [
+    [
+     "Bhoma",
+     1
+    ],
+    [
+     "Mayoni",
+     1
+    ],
+    [
+     "Nkcala",
+     1
+    ],
+    [
+     "Phutha",
+     1
+    ],
+    [
+     "Umkhont’uyimesi",
+     1
+    ],
+    [
+     "Umquli kodwa akakwaz’uhlanganisa",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNdungwane",
+   "praises": [
+    [
+     "Bhejula",
+     1
+    ],
+    [
+     "Buhle bendoda ziinkomo",
+     1
+    ],
+    [
+     "Bukhali bentonga",
+     1
+    ],
+    [
+     "Diya",
+     1
+    ],
+    [
+     "Dlomo",
+     1
+    ],
+    [
+     "Isagweba esavala iindonga kukubi",
+     1
+    ],
+    [
+     "Mngxongo",
+     1
+    ],
+    [
+     "Msimelelo",
+     1
+    ],
+    [
+     "Ngibiselwano",
+     1
+    ],
+    [
+     "Ngqolomsila",
+     1
+    ],
+    [
+     "Sandla senkosi",
+     1
+    ],
+    [
+     "Sophitsho",
+     1
+    ],
+    [
+     "Soze",
+     1
+    ],
+    [
+     "Themba lamagwala",
+     1
+    ],
+    [
+     "U Bhejula uDiya uMaqath’ alukhuni",
+     1
+    ],
+    [
+     "UKrali",
+     1
+    ],
+    [
+     "Velabambentsele",
+     1
+    ],
+    [
+     "Velabembhentsele uHala",
+     1
+    ],
+    [
+     "Yem yem",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNdzaba",
+   "praises": [
+    [
+     "Bhili",
+     3
+    ],
+    [
+     "Mancoba",
+     3
+    ],
+    [
+     "Msuthu",
+     3
+    ],
+    [
+     "Mwelase",
+     3
+    ],
+    [
+     "Gase",
+     2
+    ],
+    [
+     "Into ezehla ezintabeni/ezinkahlambeni zishubele ngenqatha lehashe",
+     2
+    ],
+    [
+     "Gasa",
+     1
+    ],
+    [
+     "Into ezehla ezintabeni/ezinkahlambeni zishubele ngenqatha lehashe… amaHlubi",
+     1
+    ],
+    [
+     "Nkonyeni",
+     1
+    ],
+    [
+     "Rhanza",
+     1
+    ],
+    [
+     "Sishuba",
+     1
+    ],
+    [
+     "Vangane",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNgcitshane",
+   "praises": [
+    [
+     "Mal’iyavuza",
+     1
+    ],
+    [
+     "Mev’amhlophe",
+     1
+    ],
+    [
+     "Nkwenkwezana",
+     1
+    ],
+    [
+     "Sigcongoma",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNgcwangule",
+   "praises": [
+    [
+     "Mntu awagwazumntu emasendeni",
+     1
+    ],
+    [
+     "Nqashiya",
+     1
+    ],
+    [
+     "Ntombi zithi ndizeke Bhuti noba awunankomo",
+     1
+    ],
+    [
+     "Ntombi ziyamlilela zithi Bhuti usishiyela ntoni sikhuthanda nje",
+     1
+    ],
+    [
+     "Phelwani",
+     1
+    ],
+    [
+     "Sikhuni somga nesomthole",
+     1
+    ],
+    [
+     "Tita",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNguse",
+   "praises": [
+    [
+     "Fola Fakade Mabembe khabekhulu Fol’odlilaxa Nguse Ngubezizwe unyawunyawu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNgwane",
+   "praises": [
+    [
+     "Hlongwane",
+     1
+    ],
+    [
+     "Masenga sileke",
+     1
+    ],
+    [
+     "Masobuza",
+     1
+    ],
+    [
+     "Masumpa",
+     1
+    ],
+    [
+     "Nduku Zinobulongwe",
+     1
+    ],
+    [
+     "Ngwane kaNgodi",
+     1
+    ],
+    [
+     "Nina besizwe sikaMatiwane",
+     1
+    ],
+    [
+     "Sozisela kaMasumpa noTshali",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNgxabane",
+   "praises": [
+    [
+     "Qengeba",
+     1
+    ],
+    [
+     "Sibhabha nomhlehlo",
+     1
+    ],
+    [
+     "Thole lomthwakazi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNgxabani",
+   "praises": [
+    [
+     "Bebal’ iinkomo nje thina sibal’iinkwenkwezi",
+     1
+    ],
+    [
+     "Bhabha nomhlehlo",
+     1
+    ],
+    [
+     "Bodi kaNcokazi",
+     1
+    ],
+    [
+     "Mdatshi",
+     1
+    ],
+    [
+     "Meyiwa",
+     1
+    ],
+    [
+     "Nontwenja yinkongolo",
+     1
+    ],
+    [
+     "Rhibela",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNgxongo",
+   "praises": [
+    [
+     "Ntsundu",
+     3
+    ],
+    [
+     "Sophitsho",
+     2
+    ],
+    [
+     "Bhomoyi zondwa zintshaba",
+     1
+    ],
+    [
+     "Dlomo",
+     1
+    ],
+    [
+     "Madiba",
+     1
+    ],
+    [
+     "Ngqolomsila",
+     1
+    ],
+    [
+     "Qhayiya",
+     1
+    ],
+    [
+     "Velebem’bhentsele",
+     1
+    ],
+    [
+     "Yem-yem",
+     1
+    ],
+    [
+     "Zondwa zintshaba zingazubenza nto",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNjilo",
+   "praises": [
+    [
+     "Balisa",
+     1
+    ],
+    [
+     "Bhekiso",
+     1
+    ],
+    [
+     "Debule",
+     1
+    ],
+    [
+     "INdlovu esikwa ihambha",
+     1
+    ],
+    [
+     "IS’khonde esikrakrayo",
+     1
+    ],
+    [
+     "Kubhej’umsobomvu",
+     1
+    ],
+    [
+     "Mabandla kamaqolo",
+     1
+    ],
+    [
+     "Manci",
+     1
+    ],
+    [
+     "Maqolo engqelezintabeni",
+     1
+    ],
+    [
+     "Mbali",
+     1
+    ],
+    [
+     "Mdludla ka Bekiso",
+     1
+    ],
+    [
+     "Mdludla odludl’amthambek’ebhek’othukela",
+     1
+    ],
+    [
+     "Mkhonde",
+     1
+    ],
+    [
+     "Msokweni",
+     1
+    ],
+    [
+     "Ndlov’edli goduka",
+     1
+    ],
+    [
+     "Qolo",
+     1
+    ],
+    [
+     "Silwa nenkunzi mbini",
+     1
+    ],
+    [
+     "Tshitshis’intaba",
+     1
+    ],
+    [
+     "Tyani",
+     1
+    ],
+    [
+     "Vela bethetha",
+     1
+    ],
+    [
+     "Wabane",
+     1
+    ],
+    [
+     "Zinde Zinde",
+     1
+    ],
+    [
+     "Zinemiqala engenamqala sisilima",
+     1
+    ],
+    [
+     "Zotsho",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNkomo",
+   "praises": [
+    [
+     "Khumalo",
+     5
+    ],
+    [
+     "Mntungwa",
+     4
+    ],
+    [
+     "Mtntungwa",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNkwali",
+   "praises": [
+    [
+     "Bhukula",
+     5
+    ],
+    [
+     "Mkhwanazi",
+     4
+    ],
+    [
+     "Nkwali ye Nkosi",
+     4
+    ],
+    [
+     "Bukula",
+     1
+    ],
+    [
+     "Lo ufungwayo ngabo. uBukula ngulo wamisela uNtsele kubukhulu bamaHlubi",
+     1
+    ],
+    [
+     "Mfengu/Hlubi",
+     1
+    ],
+    [
+     "Mkhwanase",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNozulu",
+   "praises": [
+    [
+     "Kheswa",
+     3
+    ],
+    [
+     "Macocobela",
+     3
+    ],
+    [
+     "Mchumane",
+     3
+    ],
+    [
+     "Mpafane",
+     3
+    ],
+    [
+     "Mpangazitha",
+     3
+    ],
+    [
+     "Thukela",
+     3
+    ],
+    [
+     "Mbanguba",
+     2
+    ],
+    [
+     "Deyi",
+     1
+    ],
+    [
+     "Dosini",
+     1
+    ],
+    [
+     "Macocobela yena onempundu ezincinci ezifuna uncanyiswa",
+     1
+    ],
+    [
+     "Makhonz’ egoduka",
+     1
+    ],
+    [
+     "Mathibane",
+     1
+    ],
+    [
+     "Mfazi uncancisa usana ngebele elinye",
+     1
+    ],
+    [
+     "Mvelase",
+     1
+    ],
+    [
+     "Mzimkhulu",
+     1
+    ],
+    [
+     "Ndokoma",
+     1
+    ],
+    [
+     "Ngoza",
+     1
+    ],
+    [
+     "Qhudeni",
+     1
+    ],
+    [
+     "Sonyangashe",
+     1
+    ],
+    [
+     "Thukela umlambo ongawelwayo uwelwa ziinkonjane zodwa",
+     1
+    ],
+    [
+     "Zona zidlisela ngamaphiko",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNqarhwane",
+   "praises": [
+    [
+     "Hintsabe",
+     3
+    ],
+    [
+     "Hlabilawu",
+     3
+    ],
+    [
+     "Maqhula",
+     3
+    ],
+    [
+     "Zduli",
+     3
+    ],
+    [
+     "Ziduli",
+     2
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNqolo",
+   "praises": [
+    [
+     "Abantu abangayekhathsi imbola ngoba bahleli bebahle",
+     1
+    ],
+    [
+     "Bakhi bexonya bangaleluki",
+     1
+    ],
+    [
+     "OaGaba kathsayithsi omahlambahlaletsheni ngenxa yokuswel’itawuli",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNtambo",
+   "praises": [
+    [
+     "Butsolo Benyoka",
+     1
+    ],
+    [
+     "Novege",
+     1
+    ],
+    [
+     "Sisu Sincinane",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNtande",
+   "praises": [
+    [
+     "Dlomo",
+     1
+    ],
+    [
+     "Ngqolomsila",
+     1
+    ],
+    [
+     "Sopitsho",
+     1
+    ],
+    [
+     "Zondwa ziintshaba",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNtlane",
+   "praises": [
+    [
+     "Amawele ukwezana ancanciswa apha nangaphesheya",
+     1
+    ],
+    [
+     "Bhal’esendeni ngonqaba kwephepha",
+     1
+    ],
+    [
+     "Dingi",
+     1
+    ],
+    [
+     "Gcuta",
+     1
+    ],
+    [
+     "Gxididi",
+     1
+    ],
+    [
+     "Mfusana",
+     1
+    ],
+    [
+     "Mkhondwana",
+     1
+    ],
+    [
+     "Mpilo",
+     1
+    ],
+    [
+     "Mthwa kaSihula",
+     1
+    ],
+    [
+     "Ndendela",
+     1
+    ],
+    [
+     "Nqabane",
+     1
+    ],
+    [
+     "Ntlanga",
+     1
+    ],
+    [
+     "Sinje",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNtshilibe",
+   "praises": [
+    [
+     "Ama andina tata ndizeke ndingowakho",
+     1
+    ],
+    [
+     "Bhanqo",
+     1
+    ],
+    [
+     "Bobese",
+     1
+    ],
+    [
+     "Gawul’abathakathi",
+     1
+    ],
+    [
+     "Langa",
+     1
+    ],
+    [
+     "Mdumane",
+     1
+    ],
+    [
+     "Mgcaleka",
+     1
+    ],
+    [
+     "Ndize",
+     1
+    ],
+    [
+     "Nqambodada",
+     1
+    ],
+    [
+     "Ntshontshololo",
+     1
+    ],
+    [
+     "Nyokony’elinyam’enyameni",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNtshiza",
+   "praises": [
+    [
+     "Gubha",
+     1
+    ],
+    [
+     "Mbamba",
+     1
+    ],
+    [
+     "Nakazana",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNxasana",
+   "praises": [
+    [
+     "Dunjane",
+     2
+    ],
+    [
+     "Totoba",
+     2
+    ],
+    [
+     "Adinamama andinatata",
+     1
+    ],
+    [
+     "Bhili",
+     1
+    ],
+    [
+     "Gastyeketye umbona obomvu othandwa ngabantwana",
+     1
+    ],
+    [
+     "Gazo",
+     1
+    ],
+    [
+     "Gqunu kaNomphakatshane",
+     1
+    ],
+    [
+     "Lunguza",
+     1
+    ],
+    [
+     "Magazo",
+     1
+    ],
+    [
+     "Malilelwa zintombi zithi “Bhuti ndizeke andina mama andina tata",
+     1
+    ],
+    [
+     "Malilelwaziintombi zithi ndizeke",
+     1
+    ],
+    [
+     "Malunguz’ udonga andulukuwela",
+     1
+    ],
+    [
+     "Mkhiwa",
+     1
+    ],
+    [
+     "NguSikonza",
+     1
+    ],
+    [
+     "NoMbhekela",
+     1
+    ],
+    [
+     "Skhonza",
+     1
+    ],
+    [
+     "Thaba",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNxotwe",
+   "praises": [
+    [
+     "Gabazi",
+     1
+    ],
+    [
+     "Mfuza afulele okwelifu lemvula",
+     1
+    ],
+    [
+     "Qamkazi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNxuba",
+   "praises": [
+    [
+     "Mduma",
+     4
+    ],
+    [
+     "Rhudulu",
+     4
+    ],
+    [
+     "Mngcengane",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNyase",
+   "praises": [
+    [
+     "Bhobhoza kaMgqiwane",
+     1
+    ],
+    [
+     "Fenjana kafebana ogangathela abanye bedl’ubomi",
+     1
+    ],
+    [
+     "Fenjana kafebana ogangathel’abanye bedl’ubomi",
+     1
+    ],
+    [
+     "Icala lenkomo emdaka",
+     1
+    ],
+    [
+     "Mduma",
+     1
+    ],
+    [
+     "Mfaz’obelelinye oncancis’okungaphetsheya",
+     1
+    ],
+    [
+     "Ndzabela",
+     1
+    ],
+    [
+     "Ngathintwayo ungamthinti lo mntwana uzakukuxaka",
+     1
+    ],
+    [
+     "Noshukumis’imivalo",
+     1
+    ],
+    [
+     "Nothintwa ongathintwayo ungamthinti lo mntwana uzakukuxaka",
+     1
+    ],
+    [
+     "Ntsebeza",
+     1
+    ],
+    [
+     "Nzabela",
+     1
+    ],
+    [
+     "Petsheya kweThina",
+     1
+    ],
+    [
+     "Phetsheya koMzimvubu",
+     1
+    ],
+    [
+     "Phetsheya kwe Thina",
+     1
+    ],
+    [
+     "Phetsheya kweTsitsa",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNyawuza",
+   "praises": [
+    [
+     "Faku",
+     5
+    ],
+    [
+     "Dakhile",
+     2
+    ],
+    [
+     "Ndayeni",
+     2
+    ],
+    [
+     "Thahla",
+     2
+    ],
+    [
+     "Faku ofakayo",
+     1
+    ],
+    [
+     "Hlamba ngobubende amanzi ekhona",
+     1
+    ],
+    [
+     "Hlamba ngobubend’amanz’ekhona",
+     1
+    ],
+    [
+     "Ngathi uyifakile kanti uyikade eboyeni",
+     1
+    ],
+    [
+     "Ngqungqushe",
+     1
+    ],
+    [
+     "NoNdamase",
+     1
+    ],
+    [
+     "Yindlana",
+     1
+    ],
+    [
+     "Ziqele",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaNzotho",
+   "praises": [
+    [
+     "Maphongo",
+     1
+    ],
+    [
+     "Nyelezi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaQadi",
+   "praises": [
+    [
+     "Ngqwili Nondlobe",
+     4
+    ],
+    [
+     "Ngcwina",
+     3
+    ],
+    [
+     "Dosini",
+     1
+    ],
+    [
+     "Mqadi",
+     1
+    ],
+    [
+     "Ngqwili",
+     1
+    ],
+    [
+     "Ngwenya",
+     1
+    ],
+    [
+     "Nondlobe",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaQhinebe",
+   "praises": [
+    [
+     "Gqugqugqu",
+     5
+    ],
+    [
+     "Mlunjwa",
+     5
+    ],
+    [
+     "Duka namahlathi",
+     4
+    ],
+    [
+     "Haha",
+     4
+    ],
+    [
+     "Mkhomanzi",
+     4
+    ],
+    [
+     "Zithonga-zithathu",
+     3
+    ],
+    [
+     "Zithonga-zthathu",
+     3
+    ],
+    [
+     "Phalela",
+     2
+    ],
+    [
+     "Phazima",
+     2
+    ],
+    [
+     "Konjanémnyama idlalémafini",
+     1
+    ],
+    [
+     "Konjanémnyama idlalémani",
+     1
+    ],
+    [
+     "Njemnyama",
+     1
+    ],
+    [
+     "Nkonjan’ émnyama edlalémafini",
+     1
+    ],
+    [
+     "Nondela",
+     1
+    ],
+    [
+     "Umth’ omde owavelela eHoyita!",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaQhudeni",
+   "praises": [
+    [
+     "Dla amathibane az ‘indlala iwile",
+     1
+    ],
+    [
+     "Goza",
+     1
+    ],
+    [
+     "Kheswa ka Nozulu",
+     1
+    ],
+    [
+     "Makhonz’ egoduka",
+     1
+    ],
+    [
+     "Mfaz’ omnyam’ uncancis’ isana ngebel’ elinye",
+     1
+    ],
+    [
+     "Mkhubukeni",
+     1
+    ],
+    [
+     "Mlamb’ ongawelwayo uwelwa ziinkonjane zodwa zona zidlisela ngokubhabha",
+     1
+    ],
+    [
+     "Mpafana",
+     1
+    ],
+    [
+     "Mpafane",
+     1
+    ],
+    [
+     "Mthembu obhuzuzu",
+     1
+    ],
+    [
+     "Mvelase",
+     1
+    ],
+    [
+     "Napa Sidziya",
+     1
+    ],
+    [
+     "Ngoza",
+     1
+    ],
+    [
+     "Phesheya kweThukela",
+     1
+    ],
+    [
+     "Thukela",
+     1
+    ],
+    [
+     "UMthembu",
+     1
+    ],
+    [
+     "UYISE WAM",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaQithi",
+   "praises": [
+    [
+     "Ndinga",
+     5
+    ],
+    [
+     "Zondwa",
+     5
+    ],
+    [
+     "Ngqolomsila",
+     3
+    ],
+    [
+     "Nkomo ayizali izala ngokuzaliswa",
+     3
+    ],
+    [
+     "Sopitsho",
+     3
+    ],
+    [
+     "Velabembhentsele",
+     3
+    ],
+    [
+     "Yem-yem",
+     3
+    ],
+    [
+     "MThembu",
+     1
+    ],
+    [
+     "Nomsobodwana",
+     1
+    ],
+    [
+     "Rhadu",
+     1
+    ],
+    [
+     "Sopitsho uNgqolomsila uYemyem uVela bembhentsele",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaQocwa",
+   "praises": [
+    [
+     "Jojo",
+     5
+    ],
+    [
+     "Tiyeka",
+     5
+    ],
+    [
+     "Butsolo Beentonga Mbizana",
+     4
+    ],
+    [
+     "Mabombo",
+     4
+    ],
+    [
+     "Zikhali Mazembe",
+     3
+    ],
+    [
+     "Butsolo beentonga",
+     2
+    ],
+    [
+     "Zikhali",
+     2
+    ],
+    [
+     "Deyi",
+     1
+    ],
+    [
+     "Mazembe",
+     1
+    ],
+    [
+     "Mbizana",
+     1
+    ],
+    [
+     "Ngcolosi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaQoma",
+   "praises": [
+    [
+     "Nwaba ndikwenze",
+     3
+    ],
+    [
+     "Nyoyela",
+     3
+    ],
+    [
+     "Qomukuyitya",
+     3
+    ],
+    [
+     "Sisiqobo eso",
+     3
+    ],
+    [
+     "Singqu",
+     2
+    ],
+    [
+     "Mvand’inyama",
+     1
+    ],
+    [
+     "Nyohela",
+     1
+    ],
+    [
+     "Sigqo",
+     1
+    ],
+    [
+     "Siqo",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaQwambi",
+   "praises": [
+    [
+     "Holomi",
+     4
+    ],
+    [
+     "Gcaleka",
+     1
+    ],
+    [
+     "Khawuta",
+     1
+    ],
+    [
+     "Tete",
+     1
+    ],
+    [
+     "Tshanabe",
+     1
+    ],
+    [
+     "Tshazibane",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaQwathi",
+   "praises": [
+    [
+     "Gqaz’indlel’ebhek’ebuNguni",
+     4
+    ],
+    [
+     "Iinkomo zikaXesibe",
+     4
+    ],
+    [
+     "ZikaJojo",
+     4
+    ],
+    [
+     "ZikaMtshutshumbe",
+     4
+    ],
+    [
+     "AmaBangula",
+     1
+    ],
+    [
+     "AmaDabisa",
+     1
+    ],
+    [
+     "AmaDumba",
+     1
+    ],
+    [
+     "AmaKhombayo",
+     1
+    ],
+    [
+     "AmaMvala",
+     1
+    ],
+    [
+     "AmaNtondo",
+     1
+    ],
+    [
+     "AmaNzolo",
+     1
+    ],
+    [
+     "AmaTshaba",
+     1
+    ],
+    [
+     "AmaVumbe",
+     1
+    ],
+    [
+     "Bhabha",
+     1
+    ],
+    [
+     "Bhlangwe",
+     1
+    ],
+    [
+     "Bhose",
+     1
+    ],
+    [
+     "Cakeni",
+     1
+    ],
+    [
+     "Dikela",
+     1
+    ],
+    [
+     "ImiNcayi",
+     1
+    ],
+    [
+     "Khebesi",
+     1
+    ],
+    [
+     "Mhotho",
+     1
+    ],
+    [
+     "Mkhondweni",
+     1
+    ],
+    [
+     "Noni",
+     1
+    ],
+    [
+     "Noqaz’ indlela. Iinkomo zikaXesibe",
+     1
+    ],
+    [
+     "Sdindi",
+     1
+    ],
+    [
+     "S’ximba",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaRhadebe",
+   "praises": [
+    [
+     "Bhungane",
+     3
+    ],
+    [
+     "Mafuz’ afulele njengelifu lemvula",
+     2
+    ],
+    [
+     "Makhulukhulu",
+     2
+    ],
+    [
+     "Mashwabada owashwabadel’ inkomo nempondo zayo",
+     2
+    ],
+    [
+     "Mbucwa",
+     2
+    ],
+    [
+     "Mthimkhulu",
+     2
+    ],
+    [
+     "Ndlebentle’zombini",
+     2
+    ],
+    [
+     "Zikode",
+     2
+    ],
+    [
+     "Dzangwe",
+     1
+    ],
+    [
+     "Langalibalele",
+     1
+    ],
+    [
+     "Mafuza fulele okwelifu lemvula",
+     1
+    ],
+    [
+     "Mashwa badelinkomo ngempondo zayo",
+     1
+    ],
+    [
+     "Matshisa",
+     1
+    ],
+    [
+     "Mthikhulu",
+     1
+    ],
+    [
+     "Ndlebe zintle zombini",
+     1
+    ],
+    [
+     "Ngelengele",
+     1
+    ],
+    [
+     "Nzipho zimnyama ngoqhwayana",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaRharha",
+   "praises": [
+    [
+     "Mfaz’obele’linye phesheya komlanjana",
+     1
+    ],
+    [
+     "Ndulwini",
+     1
+    ],
+    [
+     "Nokhwel’thole",
+     1
+    ],
+    [
+     "Rharh’orhalayo ongarhaleli nto yamntu",
+     1
+    ],
+    [
+     "Tshwentshwe",
+     1
+    ],
+    [
+     "Vuyani",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaRhoyi",
+   "praises": [
+    [
+     "Dedeza",
+     1
+    ],
+    [
+     "Masoka",
+     1
+    ],
+    [
+     "Mhlambiso",
+     1
+    ],
+    [
+     "Mzimkhulu",
+     1
+    ],
+    [
+     "Ndima",
+     1
+    ],
+    [
+     "Ndzube",
+     1
+    ],
+    [
+     "Ntanzi",
+     1
+    ],
+    [
+     "Nzimande",
+     1
+    ],
+    [
+     "Sakhele",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaSango",
+   "praises": [
+    [
+     "Nzitha",
+     2
+    ],
+    [
+     "Khwakhwayi",
+     1
+    ],
+    [
+     "Khwayikhwayi",
+     1
+    ],
+    [
+     "Mahlamb’ ehlala",
+     1
+    ],
+    [
+     "Mgabhisa",
+     1
+    ],
+    [
+     "Ngxongxo",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaShweme",
+   "praises": [
+    [
+     "Limakhwe",
+     3
+    ],
+    [
+     "Gqagqane",
+     2
+    ],
+    [
+     "Zilamkhonto",
+     2
+    ],
+    [
+     "Hlathi",
+     1
+    ],
+    [
+     "Jambase",
+     1
+    ],
+    [
+     "Malilelwa Zintombi zisithi bhuti ndizeke",
+     1
+    ],
+    [
+     "Malilelwa zintombi",
+     1
+    ],
+    [
+     "Mfene",
+     1
+    ],
+    [
+     "Mkhonto",
+     1
+    ],
+    [
+     "Ngangamsholo Ngcebetsha",
+     1
+    ],
+    [
+     "Nogqagqa",
+     1
+    ],
+    [
+     "Nolundi",
+     1
+    ],
+    [
+     "Zila",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaSithathu",
+   "praises": [
+    [
+     "Ndebe",
+     4
+    ],
+    [
+     "Chisana",
+     3
+    ],
+    [
+     "Hasa",
+     3
+    ],
+    [
+     "Khopoyi",
+     3
+    ],
+    [
+     "Lawu",
+     3
+    ],
+    [
+     "AmaLawu",
+     1
+    ],
+    [
+     "Hase",
+     1
+    ],
+    [
+     "Khophoyi",
+     1
+    ],
+    [
+     "Nkomo ezibomvu ezimnyama ziyatyiwa",
+     1
+    ],
+    [
+     "Qoboyi",
+     1
+    ],
+    [
+     "S’dwashu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaSkhomo",
+   "praises": [
+    [
+     "Rhudulu",
+     2
+    ],
+    [
+     "Tshangisa",
+     2
+    ],
+    [
+     "Bodlinyama",
+     1
+    ],
+    [
+     "Gaduka",
+     1
+    ],
+    [
+     "Hlakanakwena!",
+     1
+    ],
+    [
+     "Intonga yokugqugqisa amankazana phezu komlanjana. Njuza",
+     1
+    ],
+    [
+     "Jola",
+     1
+    ],
+    [
+     "Manz’amnyama",
+     1
+    ],
+    [
+     "Mduma",
+     1
+    ],
+    [
+     "Mhaga",
+     1
+    ],
+    [
+     "Mhlanyana",
+     1
+    ],
+    [
+     "Mhlatyana",
+     1
+    ],
+    [
+     "Mngwevu",
+     1
+    ],
+    [
+     "Nabela Mntwini",
+     1
+    ],
+    [
+     "Ncuku",
+     1
+    ],
+    [
+     "Ngcengane",
+     1
+    ],
+    [
+     "Njanye",
+     1
+    ],
+    [
+     "Nonkasa",
+     1
+    ],
+    [
+     "Nxub’ongafiyo ofa ngokuvuthelwa",
+     1
+    ],
+    [
+     "Oshode",
+     1
+    ],
+    [
+     "Qengebe",
+     1
+    ],
+    [
+     "Ufak’inyama emlanjeni iphum’ivuthiwe",
+     1
+    ],
+    [
+     "Umntu womlambo",
+     1
+    ],
+    [
+     "Washota",
+     1
+    ],
+    [
+     "Zitha",
+     1
+    ],
+    [
+     "Zulu khaya labangcwele",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaSkhosana",
+   "praises": [
+    [
+     "Mntungwa",
+     2
+    ],
+    [
+     "Msikamhlanga",
+     2
+    ],
+    [
+     "Novaphi",
+     2
+    ],
+    [
+     "Ntuthu uyeaqhuma zonke izizwe zabikelana zathi ngabakwaSkhosana. Dunga",
+     2
+    ],
+    [
+     "Ntuthwana",
+     2
+    ],
+    [
+     "Ntuthu uyeaqhuma zonke izizwe zabikelana zathi ngabakwaSkhosana. Dung",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaSonani",
+   "praises": [
+    [
+     "Bhovula zime nkqo",
+     1
+    ],
+    [
+     "Imvula lubabalo kuzo",
+     1
+    ],
+    [
+     "Into’ezawela umlambo nge peni",
+     1
+    ],
+    [
+     "Mabuya",
+     1
+    ],
+    [
+     "Mazanenkungu",
+     1
+    ],
+    [
+     "Mfazi omabele made owancancisa amawele ngaphesheya komfula wase leng",
+     1
+    ],
+    [
+     "Mhlab’ohlul’ abafokazana",
+     1
+    ],
+    [
+     "Ntshantsha ka- mpisi",
+     1
+    ],
+    [
+     "Ntshiza",
+     1
+    ],
+    [
+     "Phokela",
+     1
+    ],
+    [
+     "Sndindindi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaSukwini",
+   "praises": [
+    [
+     "Chwama",
+     2
+    ],
+    [
+     "Dibashe",
+     2
+    ],
+    [
+     "Imvaba yiketile",
+     2
+    ],
+    [
+     "Ithole loMthwakazi",
+     2
+    ],
+    [
+     "Lawu’ndini",
+     2
+    ],
+    [
+     "Nja-bomvu",
+     2
+    ],
+    [
+     "Nnqayi linqindi",
+     2
+    ],
+    [
+     "Sandlala-ngca",
+     2
+    ],
+    [
+     "Tiki ayivumi napokotho",
+     2
+    ],
+    [
+     "Lawu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaThangana",
+   "praises": [
+    [
+     "Bodlinja",
+     4
+    ],
+    [
+     "Gobingca",
+     4
+    ],
+    [
+     "Krila",
+     4
+    ],
+    [
+     "M’bamba",
+     4
+    ],
+    [
+     "Rhaso",
+     4
+    ],
+    [
+     "Mtengwana",
+     3
+    ]
+   ]
+  },
+  {
+   "clan": "AmaThiyane",
+   "praises": [
+    [
+     "Buhlungu Benyoka",
+     1
+    ],
+    [
+     "Mahlangabeza owahlangabeza iNkosi isiza ngobuso ezweni",
+     1
+    ],
+    [
+     "Mpundwana zincinci zingazingongiwa",
+     1
+    ],
+    [
+     "Ngele-ngele",
+     1
+    ],
+    [
+     "Nomphumela",
+     1
+    ],
+    [
+     "Nonkosi",
+     1
+    ],
+    [
+     "Zengele",
+     1
+    ],
+    [
+     "Zulu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaThole",
+   "praises": [
+    [
+     "Buzini",
+     5
+    ],
+    [
+     "Gqagqane",
+     5
+    ],
+    [
+     "Lwandle",
+     5
+    ],
+    [
+     "Mzimshe",
+     5
+    ],
+    [
+     "Ndlangisa",
+     5
+    ]
+   ]
+  },
+  {
+   "clan": "AmaThwane",
+   "praises": [
+    [
+     "Fulela wanetha",
+     3
+    ],
+    [
+     "Mfazi olivila",
+     3
+    ],
+    [
+     "Mpemvu",
+     3
+    ],
+    [
+     "Sabelo",
+     3
+    ],
+    [
+     "Wuwu",
+     3
+    ]
+   ]
+  },
+  {
+   "clan": "AmaTiyana",
+   "praises": [
+    [
+     "Mbambalalana",
+     1
+    ],
+    [
+     "Mlambokhwelintaba",
+     1
+    ],
+    [
+     "Mpheke",
+     1
+    ],
+    [
+     "Nhanhi",
+     1
+    ],
+    [
+     "Nongqwangile",
+     1
+    ],
+    [
+     "Sigquma-Nkungwini kutsho kothuk’izindlwana",
+     1
+    ],
+    [
+     "Tshulasi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaTolo",
+   "praises": [
+    [
+     "Dlangamandla",
+     5
+    ],
+    [
+     "Mchenge",
+     5
+    ],
+    [
+     "Zulu",
+     5
+    ],
+    [
+     "MaBhanekazi",
+     4
+    ],
+    [
+     "Vumba lempongo liyanuka",
+     4
+    ],
+    [
+     "Mfingo",
+     3
+    ],
+    [
+     "Amajubantlantsi",
+     2
+    ],
+    [
+     "Bona babasa amadaka eenkomo zabo",
+     2
+    ],
+    [
+     "Izinto ezifuye inkomo zafuya negusha nehashe",
+     2
+    ],
+    [
+     "Mabele-made",
+     2
+    ],
+    [
+     "Masali",
+     2
+    ],
+    [
+     "Ngwenyankomo",
+     2
+    ],
+    [
+     "AmaTolo akwaNongwandla",
+     1
+    ],
+    [
+     "Bhanekazi",
+     1
+    ],
+    [
+     "Hawi! Hawu! Hawu! Xa zibon’umnt’ozayo",
+     1
+    ],
+    [
+     "Hawu! Hawu! Hawu! Xa zibon’ umnt’ ozayo",
+     1
+    ],
+    [
+     "Kanti zenz’umntwana",
+     1
+    ],
+    [
+     "Kuba zithezwe yinkosazana",
+     1
+    ],
+    [
+     "Kuba zithi",
+     1
+    ],
+    [
+     "Mchenge Mabhanekazi",
+     1
+    ],
+    [
+     "Nkomo zikaGaxaza",
+     1
+    ],
+    [
+     "Nkomo zikaGaxaza! Oonkuni azothiwa",
+     1
+    ],
+    [
+     "Nongwadla",
+     1
+    ],
+    [
+     "Nongwandla",
+     1
+    ],
+    [
+     "Nozinja Ziyakhonkotha kuba zithi",
+     1
+    ],
+    [
+     "Nozinja ziyafulathelana",
+     1
+    ],
+    [
+     "Nozinja ziyakhonkotha",
+     1
+    ],
+    [
+     "Nozinja ziyaqhingana kanti zenz’ umntwana",
+     1
+    ],
+    [
+     "Oonkuni azothiwa kuba zithezwe yinkosazana",
+     1
+    ],
+    [
+     "Umlamb’ awuwelwa",
+     1
+    ],
+    [
+     "Umlamb’ awuwelwa uwelwa ziinkonjane kuphela zona zimaphiko made",
+     1
+    ],
+    [
+     "Uwelwa ziinkonjane kuphela",
+     1
+    ],
+    [
+     "Zona zimaphiko made",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaTshabalala",
+   "praises": [
+    [
+     "Idonga likaMavuso",
+     1
+    ],
+    [
+     "Mbanzeni",
+     1
+    ],
+    [
+     "Mkhabela",
+     1
+    ],
+    [
+     "Mshengu",
+     1
+    ],
+    [
+     "Mzwati",
+     1
+    ],
+    [
+     "Shasha",
+     1
+    ],
+    [
+     "Sobhuza",
+     1
+    ],
+    [
+     "Zikode",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaTshangisa",
+   "praises": [
+    [
+     "Mngwevu",
+     4
+    ],
+    [
+     "Mhlatyana",
+     3
+    ],
+    [
+     "Nxuba",
+     3
+    ],
+    [
+     "Rhudulu",
+     3
+    ],
+    [
+     "Skhomo",
+     3
+    ],
+    [
+     "Zulu",
+     3
+    ],
+    [
+     "NoZulu",
+     1
+    ],
+    [
+     "Skhoma",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaTshatshu",
+   "praises": [
+    [
+     "Tubane",
+     2
+    ],
+    [
+     "Gungubele",
+     1
+    ],
+    [
+     "Hoza",
+     1
+    ],
+    [
+     "Inkomo ezibomvu zikaMphasala",
+     1
+    ],
+    [
+     "Mahose",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaTshawe",
+   "praises": [
+    [
+     "Mdange",
+     2
+    ],
+    [
+     "Ngconde",
+     2
+    ],
+    [
+     "Nkosi Yamntu",
+     2
+    ],
+    [
+     "Tshiwo",
+     2
+    ],
+    [
+     "Khawuta",
+     1
+    ],
+    [
+     "Ngcqangu",
+     1
+    ],
+    [
+     "Ngcwangu",
+     1
+    ],
+    [
+     "Phalo",
+     1
+    ],
+    [
+     "Skhomo",
+     1
+    ],
+    [
+     "Togu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaTshezi",
+   "praises": [
+    [
+     "Jalamba",
+     2
+    ],
+    [
+     "Tenza",
+     2
+    ],
+    [
+     "Cetshane",
+     1
+    ],
+    [
+     "Fakade",
+     1
+    ],
+    [
+     "INkonjane emnyama ebhab’ emafini",
+     1
+    ],
+    [
+     "INyoka emnyama ecanda isiziba",
+     1
+    ],
+    [
+     "Iinto ezinomkhitha kodwa zimithond’wemide",
+     1
+    ],
+    [
+     "Iinzwana zakwaBomvana",
+     1
+    ],
+    [
+     "Inkosi ezingazange zibutheng’ubokhosi. Zinto ezityafileyo ingathi zidla umcuku",
+     1
+    ],
+    [
+     "Malala nentombi ivuke ithi bhuti ndizeke noba kungeshumi leesheleni",
+     1
+    ],
+    [
+     "Mkhabela",
+     1
+    ],
+    [
+     "Mkhonto",
+     1
+    ],
+    [
+     "Mkhonto ‘bomvu",
+     1
+    ],
+    [
+     "Mqala ongange nyhugu",
+     1
+    ],
+    [
+     "Mqalungangenduku",
+     1
+    ],
+    [
+     "Mqal’ ongangenduku",
+     1
+    ],
+    [
+     "Ndela",
+     1
+    ],
+    [
+     "Neneza",
+     1
+    ],
+    [
+     "Njilo-Njilo",
+     1
+    ],
+    [
+     "Njilo-njilo kuya ngaselwandle",
+     1
+    ],
+    [
+     "Saliwa",
+     1
+    ],
+    [
+     "Skhabela",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaTshonyane",
+   "praises": [
+    [
+     "Chungwa",
+     3
+    ],
+    [
+     "Dikiza",
+     3
+    ],
+    [
+     "Gqunukhwebe",
+     3
+    ],
+    [
+     "Hani",
+     3
+    ],
+    [
+     "Aphuma kubelungu abatyekezwa yinqanawe",
+     2
+    ],
+    [
+     "Khwane",
+     2
+    ],
+    [
+     "Mthuzimele",
+     2
+    ],
+    [
+     "Nkomo z’bomvu",
+     2
+    ],
+    [
+     "Sawu",
+     2
+    ],
+    [
+     "Simke",
+     2
+    ],
+    [
+     "Saba Tota",
+     1
+    ],
+    [
+     "Sawa",
+     1
+    ],
+    [
+     "Sido",
+     1
+    ],
+    [
+     "Simnke",
+     1
+    ],
+    [
+     "Tota",
+     1
+    ],
+    [
+     "Zulu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaTyani",
+   "praises": [
+    [
+     "Gabela",
+     1
+    ],
+    [
+     "Manci",
+     1
+    ],
+    [
+     "Mbengo",
+     1
+    ],
+    [
+     "Mbulu",
+     1
+    ],
+    [
+     "Mduma",
+     1
+    ],
+    [
+     "Mdumo",
+     1
+    ],
+    [
+     "Nontshatsha",
+     1
+    ],
+    [
+     "Noqobo",
+     1
+    ],
+    [
+     "Zotsho",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaWushe",
+   "praises": [
+    [
+     "Godongwana kaMjoli ka Bekwa kaWushe ka Lufulwenja kaMageba",
+     1
+    ],
+    [
+     "Maphungel’ esosini amakomitshi ekhona",
+     1
+    ],
+    [
+     "Masindza ngonwalu itizwana tisindza ngobulongwe",
+     1
+    ],
+    [
+     "Mbedu",
+     1
+    ],
+    [
+     "Mjoli",
+     1
+    ],
+    [
+     "Mthsi owathsi ukuwa wabhekisa amasebe eThukela",
+     1
+    ],
+    [
+     "Nonkasa",
+     1
+    ],
+    [
+     "Phathwa",
+     1
+    ],
+    [
+     "Qubulashe",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaXaba",
+   "praises": [
+    [
+     "Apho kungavalwa ngamivalo kuvalwa ngamakhand’amadoda",
+     1
+    ],
+    [
+     "Linda",
+     1
+    ],
+    [
+     "Mlotywa",
+     1
+    ],
+    [
+     "Mwelase",
+     1
+    ],
+    [
+     "Nomjoli",
+     1
+    ],
+    [
+     "Nonkosi",
+     1
+    ],
+    [
+     "Nonxa asikhathali",
+     1
+    ],
+    [
+     "Shwabada",
+     1
+    ],
+    [
+     "Washwabadel’inkomo neempondo zazo",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaXesibe",
+   "praises": [
+    [
+     "Tshomela ka Matsho",
+     5
+    ],
+    [
+     "Mbathane",
+     4
+    ],
+    [
+     "Nondzaba",
+     4
+    ],
+    [
+     "Gcuma",
+     2
+    ],
+    [
+     "Khandanyawana",
+     2
+    ],
+    [
+     "Rhadu",
+     2
+    ],
+    [
+     "Bhelesi",
+     1
+    ],
+    [
+     "Bhimbi",
+     1
+    ],
+    [
+     "Bhuku",
+     1
+    ],
+    [
+     "Cwerha",
+     1
+    ],
+    [
+     "Fikeni",
+     1
+    ],
+    [
+     "Hayi abantu besizwe samaXesibe kaXesibe wakuloMpondo noMpondomise",
+     1
+    ],
+    [
+     "Ibhaca",
+     1
+    ],
+    [
+     "Iintombi ezinamadhusu amhlophe ngathi zihlamba ngobisi",
+     1
+    ],
+    [
+     "Makhandanyawana",
+     1
+    ],
+    [
+     "Makhuma",
+     1
+    ],
+    [
+     "Malandelwa yintombi ithi ndizeke noba kungesipha samazimba",
+     1
+    ],
+    [
+     "Mantsaka",
+     1
+    ],
+    [
+     "Matshaya",
+     1
+    ],
+    [
+     "Matshaya ngenqaw’ende abanye betshaya ngezimfutshane",
+     1
+    ],
+    [
+     "Matshin’ayibheke",
+     1
+    ],
+    [
+     "Mayaba",
+     1
+    ],
+    [
+     "Mayitshin’eyibheka njengomntwana",
+     1
+    ],
+    [
+     "Mbathana",
+     1
+    ],
+    [
+     "Mganu. Nondzaba",
+     1
+    ],
+    [
+     "Mjoli",
+     1
+    ],
+    [
+     "Mlatshenyi",
+     1
+    ],
+    [
+     "Mnune",
+     1
+    ],
+    [
+     "Mnune Mkhuma",
+     1
+    ],
+    [
+     "Ngqatyana",
+     1
+    ],
+    [
+     "Nhlumayo",
+     1
+    ],
+    [
+     "Nondize",
+     1
+    ],
+    [
+     "Nune",
+     1
+    ],
+    [
+     "Nxanda kaXesibe",
+     1
+    ],
+    [
+     "Nxele",
+     1
+    ],
+    [
+     "Nxontsa",
+     1
+    ],
+    [
+     "Snama",
+     1
+    ],
+    [
+     "Somadoda",
+     1
+    ],
+    [
+     "Wulawula mathole endlovu",
+     1
+    ],
+    [
+     "Xesibeland",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaXoko",
+   "praises": [
+    [
+     "Mawawa",
+     1
+    ],
+    [
+     "Mpinga",
+     1
+    ],
+    [
+     "Ntomtwana",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaXolo",
+   "praises": [
+    [
+     "Dunywa",
+     1
+    ],
+    [
+     "Manci",
+     1
+    ],
+    [
+     "Ntshuntshe",
+     1
+    ],
+    [
+     "Nzimakhwe",
+     1
+    ],
+    [
+     "Thuse",
+     1
+    ],
+    [
+     "Zotsho",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaYirha",
+   "praises": [
+    [
+     "Ithambo lenyoka lihlaba elimzondayo",
+     4
+    ],
+    [
+     "Mzondi Sampu Ziyeka",
+     4
+    ],
+    [
+     "Hlab’ elimzondayo",
+     1
+    ],
+    [
+     "Mzondi",
+     1
+    ],
+    [
+     "Sambu",
+     1
+    ],
+    [
+     "Thambo lenyoka",
+     1
+    ],
+    [
+     "Ziyeka",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaZangwa",
+   "praises": [
+    [
+     "Khwalo",
+     5
+    ],
+    [
+     "Ncuthu",
+     4
+    ],
+    [
+     "Mlanjana",
+     3
+    ],
+    [
+     "Nkuma",
+     3
+    ],
+    [
+     "Sohobese",
+     3
+    ],
+    [
+     "Mzangwa",
+     2
+    ],
+    [
+     "Gcaleka",
+     1
+    ],
+    [
+     "Mpondozephela",
+     1
+    ],
+    [
+     "Nkume",
+     1
+    ],
+    [
+     "Nqene",
+     1
+    ],
+    [
+     "Sobohose",
+     1
+    ],
+    [
+     "Sohebese",
+     1
+    ],
+    [
+     "Songobese",
+     1
+    ],
+    [
+     "Ungqoqwana",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaZima",
+   "praises": [
+    [
+     "Bhomoyi",
+     2
+    ],
+    [
+     "Ceduma",
+     2
+    ],
+    [
+     "Sopitsho",
+     2
+    ],
+    [
+     "Vela bembhentsele",
+     2
+    ],
+    [
+     "Ntande ezalwa nguNdlunkulu",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaZoko",
+   "praises": [
+    [
+     "Bekwa",
+     1
+    ],
+    [
+     "Bhokomela",
+     1
+    ],
+    [
+     "Chatha",
+     1
+    ],
+    [
+     "Diya malandelwa yintombi ithi ngizeke noma awunkomo",
+     1
+    ],
+    [
+     "Dlokovana",
+     1
+    ],
+    [
+     "Gojana",
+     1
+    ],
+    [
+     "Kitana",
+     1
+    ],
+    [
+     "Mafumbatha",
+     1
+    ],
+    [
+     "Makhawini",
+     1
+    ],
+    [
+     "Maniza",
+     1
+    ],
+    [
+     "Matana",
+     1
+    ],
+    [
+     "Mathathesuka njeNyamazane",
+     1
+    ],
+    [
+     "Mazwana",
+     1
+    ],
+    [
+     "Mbhantso",
+     1
+    ],
+    [
+     "Mkhosana",
+     1
+    ],
+    [
+     "Mntomhle njenjomi",
+     1
+    ],
+    [
+     "Nduluka",
+     1
+    ],
+    [
+     "Ngqambashe",
+     1
+    ],
+    [
+     "Nyumbana",
+     1
+    ],
+    [
+     "Tseku",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaZongozi",
+   "praises": [
+    [
+     "Senzela ooPhondo liyagexeza",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaZothso",
+   "praises": [
+    [
+     "Khethela",
+     1
+    ],
+    [
+     "Maphango",
+     1
+    ],
+    [
+     "Myelesi",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaZulu",
+   "praises": [
+    [
+     "Tshaka",
+     3
+    ],
+    [
+     "Mahlahlula emaduneni",
+     2
+    ],
+    [
+     "Ntombhela",
+     2
+    ],
+    [
+     "Khalimeshe",
+     1
+    ],
+    [
+     "Lemba",
+     1
+    ],
+    [
+     "Lombeki",
+     1
+    ],
+    [
+     "Mbilingati",
+     1
+    ],
+    [
+     "Mhlehluwile",
+     1
+    ],
+    [
+     "Mpundzima",
+     1
+    ],
+    [
+     "Mpungose",
+     1
+    ],
+    [
+     "Mtungwa",
+     1
+    ],
+    [
+     "Nato ufute kulo nyoko",
+     1
+    ],
+    [
+     "Ndabakazi",
+     1
+    ],
+    [
+     "Ndlovana",
+     1
+    ],
+    [
+     "Ngwana",
+     1
+    ],
+    [
+     "Nofisa ongafi",
+     1
+    ],
+    [
+     "Nombuso ooVebi ooWabane. Mafula ngesibumbu ngexa yokuswela ingobozi",
+     1
+    ],
+    [
+     "Notibunwana etincane ngokwuswela tona",
+     1
+    ],
+    [
+     "Ntombela",
+     1
+    ],
+    [
+     "Ofa ngamaloyo. Mageba Ndabezitha",
+     1
+    ],
+    [
+     "Phungula",
+     1
+    ],
+    [
+     "Sakhephi",
+     1
+    ],
+    [
+     "Seme",
+     1
+    ],
+    [
+     "Sikamade",
+     1
+    ],
+    [
+     "Thole leSilo ngoba yiSilo ngokwaso",
+     1
+    ]
+   ]
+  },
+  {
+   "clan": "AmaZwane",
+   "praises": [
+    [
+     "CebeKhulu",
+     1
+    ],
+    [
+     "Intshontsho lika Ntsele",
+     1
+    ],
+    [
+     "Mangethe",
+     1
+    ],
+    [
+     "Philela",
+     1
+    ],
+    [
+     "Zikode",
+     1
+    ]
+   ]
+  }
+ ]
+}

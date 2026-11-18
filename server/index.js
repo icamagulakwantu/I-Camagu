@@ -22,6 +22,7 @@ import { backfillRequestedProductImages } from './scripts/backfill-requested-pro
 import { backfillUploadedProductImages } from './scripts/backfill-uploaded-product-images.js';
 import { cleanUpCatalogueNov2026 } from './scripts/catalogue-cleanup-nov-2026.js';
 import { fixUlwalukoDietWording } from './scripts/ulwaluko-diet-wording-nov-2026.js';
+import { loadClanPraises } from './scripts/load-clan-praises.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -242,6 +243,12 @@ if (startup.schemaReady) {
     await fixUlwalukoDietWording();
   } catch (err) {
     console.error('Ulwaluko diet wording failed:', err?.message);
+  }
+  // Clan praise names (izinqulo) for the clan search. Idempotent.
+  try {
+    await loadClanPraises();
+  } catch (err) {
+    console.error('Clan praises failed:', err?.message);
   }
 }
 

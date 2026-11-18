@@ -37,7 +37,19 @@ export async function buildClanIndex({ forceRefresh = false } = {}) {
     include: { aliases: true },
     orderBy: { clanName: 'asc' },
   });
+  // Praise names, best attested first. Kept separate from names: they help
+  // people find a clan in search, but never confirm a clan on their own.
+  let praiseRows = [];
+  try {
+    praiseRows = await prisma.clanPraise.findMany({ orderBy: [{ sourceCount: 'desc' }, { praise: 'asc' }] });
+  } catch { /* table not created yet: search still works on names */ }
+  const praisesByClan = new Map();
+  for (const row of praiseRows) {
+    if (!praisesByClan.has(row.clanGroupId)) praisesByClan.set(row.clanGroupId, []);
+    praisesByClan.get(row.clanGroupId).push(row.praise);
+  }
   clanIndexCache = groups.map((group) => ({
+    praises: praisesByClan.get(group.id) || [],
     id: group.id,
     head: group.clanName,
     display: group.clanName,
@@ -131,6 +143,7 @@ export async function matchClan(query) {
 }
 
 function praiseNamesFor(clan) {
+  if (clan.praises?.length) return clan.praises;
   return [...new Set(
     clan.names
       .filter((name) => name.kind === 'alias')
@@ -166,10 +179,15 @@ export async function searchClans(query, { limit = 40 } = {}) {
       continue;
     }
     let best = null;
-    for (const name of clan.names) {
+    const searchable = [...clan.names, ...(clan.praises || []).map((label) => ({ label, kind: 'praise' }))];
+    for (const name of searchable) {
       const candidate = normaliseIsiduko(name.label);
+      // A praise only counts from three letters, so short text matches names first.
+      if (name.kind === 'praise' && q.length < 3) continue;
       const rank = candidate === q ? 0 : candidate.startsWith(q) ? 1 : candidate.includes(q) ? 2 : -1;
-      if (rank >= 0 && (!best || rank < best.rank)) best = { rank, name };
+      // The clan's own name outranks a praise that matches equally well.
+      const score = rank < 0 ? -1 : rank * 2 + (name.kind === 'praise' ? 1 : 0);
+      if (score >= 0 && (!best || score < best.rank)) best = { rank: score, name };
     }
     if (best) found.push({ rank: best.rank, result: toSearchResult(clan, best.name) });
   }

@@ -392,4 +392,16 @@ export async function ensureCeremonyBudgetColumns() {
     );
   `);
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "PlanSuggestion_planId_status_idx" ON "PlanSuggestion" ("planId", "status");');
+
+  // Clan praise names (see ClanPraise).
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "ClanPraise" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "clanGroupId" TEXT NOT NULL,
+      "praise" TEXT NOT NULL,
+      "sourceCount" INTEGER NOT NULL DEFAULT 1
+    );
+  `);
+  await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "ClanPraise_clanGroupId_praise_key" ON "ClanPraise" ("clanGroupId", "praise");');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "ClanPraise_clanGroupId_idx" ON "ClanPraise" ("clanGroupId");');
 }

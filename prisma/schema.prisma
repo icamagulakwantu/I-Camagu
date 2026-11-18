@@ -1265,3 +1265,18 @@ model PlanSuggestion {
 
   @@index([planId, status])
 }
+
+// Praise names (izinqulo) for a clan, loaded from server/data/clanPraises.json
+// (community sources). A praise can belong to more than one clan, so it is
+// kept apart from ClanAlias, whose forms are unique. Praises make a clan
+// findable in search; they never decide someone's clan on their own.
+// No database foreign key, matching the table created in ensure-schema.js.
+model ClanPraise {
+  id          String @id @default(cuid())
+  clanGroupId String
+  praise      String
+  sourceCount Int    @default(1)
+
+  @@unique([clanGroupId, praise])
+  @@index([clanGroupId])
+}

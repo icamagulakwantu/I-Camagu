@@ -34,7 +34,7 @@ function ClanTile({ clan, isMine, open, onToggle, onPickClan }) {
             <span className="font-display font-bold text-lg text-ink truncate">{clan.head}</span>
             {isMine && <span className="text-xs font-black uppercase tracking-wide text-white bg-sage-500 px-2 py-0.5 rounded-pill flex-shrink-0">Your clan</span>}
           </span>
-          {clan.matchedAs === 'alias' && (
+          {(clan.matchedAs === 'alias' || clan.matchedAs === 'praise') && (
             <span className="block text-xs font-bold text-terracotta">Found by praise name: {clan.matchedName}</span>
           )}
           <span className={`block text-xs text-ink-muted mt-0.5 ${open ? '' : 'line-clamp-2'}`}>
@@ -198,6 +198,9 @@ export default function ClanSearch({ onPickClan }) {
                   {limit >= 100 ? 'Type a name to narrow the list' : state.status === 'loading' ? 'Loading...' : 'Show more clans'}
                 </button>
               )}
+              <p className="mt-3 text-center text-xs text-ink-muted">
+                Praise names are gathered from community sources and can differ between families. Ask your elders, and tell us what to correct.
+              </p>
             </>
           )}
         </div>

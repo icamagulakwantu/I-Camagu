@@ -174,6 +174,9 @@ function ClanFinder({ onJoin }) {
           </div>
         ))}
         {state.results.length > 0 && (
+          <p className="text-xs text-cream/65">Praise names come from community sources and can differ between families.</p>
+        )}
+        {state.results.length > 0 && (
           <button
             type="button"
             onClick={onJoin}
