@@ -57,7 +57,11 @@ No complete, authoritative list exists online. The best published source is
 Makuliwe, *Iziduko zabantu abathetha IsiXhosa* (cited by Wikipedia), which is
 not online. Community lists were collected, cleaned by hand and loaded:
 
-- 166 clans with 1,700 praise names, in `server/data/clanPraises.json`.
+- 165 clans with 1,692 praise names, in `server/data/clanPraises.json`.
+- One Xhosa banner: the lists group clans by division (amaGcaleka, abaThembu,
+  amaMpondo, amaMpondomise, amaMfengu, amaBhaca, amaHlubi and others). These
+  divisions recognise themselves as Xhosa, so division labels and notes were
+  removed and every clan is listed under the Xhosa nation.
 - Sources: abongisocial.wordpress.com (2010, with 577 comments of
   corrections), two lists on izithakazelo.blog, iziduko.wordpress.com and
   knowmyroots.blogspot.com. They copy each other in places, so agreement

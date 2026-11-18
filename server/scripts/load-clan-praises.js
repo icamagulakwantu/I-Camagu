@@ -1,8 +1,9 @@
 // Loads clan praise names (izinqulo) from server/data/clanPraises.json into
-// ClanPraise, creating any clan that is not yet in the directory. Idempotent:
-// existing praises are kept (a higher source count is updated), nothing is
-// deleted, and a clan is matched to an existing one by its normalised name,
-// so "AmaCirha" and "Cirha" stay one clan.
+// ClanPraise, creating any clan that is not yet in the directory. The file is
+// the source of truth for the clans it lists: praises removed from it are
+// removed here too (e.g. division labels taken out because every clan sits
+// under the one Xhosa banner). Idempotent. A clan is matched to an existing
+// one by its normalised name, so "AmaCirha" and "Cirha" stay one clan.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -20,6 +21,7 @@ export async function loadClanPraises(clans = readClanPraises()) {
   const byKey = new Map(existing.map((g) => [normaliseIsiduko(g.clanName), g]));
   let createdClans = 0;
   let addedPraises = 0;
+  let removedPraises = 0;
   for (const { clan, praises } of clans) {
     const key = normaliseIsiduko(clan);
     if (!key) continue;
@@ -30,6 +32,9 @@ export async function loadClanPraises(clans = readClanPraises()) {
       createdClans += 1;
     }
     const have = new Map((await prisma.clanPraise.findMany({ where: { clanGroupId: group.id } })).map((p) => [p.praise, p]));
+    const wanted = new Set(praises.map(([praise]) => praise));
+    const stale = [...have.values()].filter((row) => !wanted.has(row.praise)).map((row) => row.id);
+    if (stale.length) removedPraises += (await prisma.clanPraise.deleteMany({ where: { id: { in: stale } } })).count;
     for (const [praise, sourceCount] of praises) {
       const row = have.get(praise);
       if (!row) {
@@ -40,11 +45,11 @@ export async function loadClanPraises(clans = readClanPraises()) {
       }
     }
   }
-  if (createdClans || addedPraises) {
+  if (createdClans || addedPraises || removedPraises) {
     clearClanIndexCache();
-    console.log(`Clan praises: ${createdClans} clan(s) added, ${addedPraises} praise name(s) added.`);
+    console.log(`Clan praises: ${createdClans} clan(s) added, ${addedPraises} praise name(s) added, ${removedPraises} removed.`);
   }
-  return { createdClans, addedPraises };
+  return { createdClans, addedPraises, removedPraises };
 }
 
 const isMain = process.argv[1] && import.meta.url === `file://${process.argv[1]}`;

@@ -1,5 +1,5 @@
 {
- "about": "Xhosa clan names (iziduko) and their praise names (izinqulo), gathered on 18 Nov 2026 from community sources and cleaned by hand: abongisocial.wordpress.com (Iziduko nezinqulo zamaXhosa jikelele, 2010), izithakazelo.blog (two lists), iziduko.wordpress.com and knowmyroots.blogspot.com. These sources copy from each other in places, so agreement is not proof. Praises differ between families and regions; the app labels them as community sourced and invites corrections. \"sources\" counts how many of the lists name that praise for that clan.",
+ "about": "Clan names (iziduko) of the Xhosa nation and their praise names (izinqulo), gathered on 18 Nov 2026 from community sources and cleaned by hand: abongisocial.wordpress.com (Iziduko nezinqulo zamaXhosa jikelele, 2010), izithakazelo.blog (two lists), iziduko.wordpress.com and knowmyroots.blogspot.com. These sources copy from each other in places, so agreement is not proof. Praises differ between families and regions; the app labels them as community sourced and invites corrections. \"sources\" counts how many of the lists name that praise for that clan. Every clan here sits under the one Xhosa banner: divisions such as amaGcaleka, amaRharhabe, abaThembu, amaMpondo, amaMpondomise, amaMfengu, amaBhaca and amaHlubi recognise themselves as Xhosa, so no division labels are kept.",
  "clans": [
   {
    "clan": "AmaBamba",
@@ -442,10 +442,6 @@
    "clan": "AmaBhuku",
    "praises": [
     [
-     "Iingonyama ezigqumela ngaphakathi ngokuthanda isizwe sama Xesibe",
-     1
-    ],
-    [
      "Mbhamla",
      1
     ],
@@ -738,10 +734,6 @@
     ],
     [
      "Shleka nanja",
-     1
-    ],
-    [
-     "UbuKumkani bamaMpondomise bulapha",
      1
     ],
     [
@@ -1908,10 +1900,6 @@
      4
     ],
     [
-     "SingaMampondomse ngohlanga",
-     4
-    ],
-    [
      "Sithandwa mhla kukubi",
      4
     ],
@@ -2843,15 +2831,6 @@
    ]
   },
   {
-   "clan": "AmaMbatha",
-   "praises": [
-    [
-     "Mthiya amaBhaca asuka kwaShandu",
-     1
-    ]
-   ]
-  },
-  {
    "clan": "AmaMbongwe",
    "praises": [
     [
@@ -3614,6 +3593,10 @@
     [
      "Sibetho",
      3
+    ],
+    [
+     "Oogudlilwandle bade balifanela",
+     1
     ]
    ]
   },
@@ -3748,10 +3731,6 @@
     ],
     [
      "Kanye ingaphuma izinza ifanele abafana",
-     1
-    ],
-    [
-     "Mpinga ngamaMpondomise uMpinga uzalwa nguNtose",
      1
     ],
     [
@@ -4462,6 +4441,10 @@
      3
     ],
     [
+     "Into ezehla ezintabeni/ezinkahlambeni zishubele ngenqatha lehashe",
+     3
+    ],
+    [
      "Mancoba",
      3
     ],
@@ -4478,15 +4461,7 @@
      2
     ],
     [
-     "Into ezehla ezintabeni/ezinkahlambeni zishubele ngenqatha lehashe",
-     2
-    ],
-    [
      "Gasa",
-     1
-    ],
-    [
-     "Into ezehla ezintabeni/ezinkahlambeni zishubele ngenqatha lehashe… amaHlubi",
      1
     ],
     [
@@ -4837,14 +4812,6 @@
     ],
     [
      "Bukula",
-     1
-    ],
-    [
-     "Lo ufungwayo ngabo. uBukula ngulo wamisela uNtsele kubukhulu bamaHlubi",
-     1
-    ],
-    [
-     "Mfengu/Hlubi",
      1
     ],
     [
@@ -7105,10 +7072,6 @@
     ],
     [
      "Fikeni",
-     1
-    ],
-    [
-     "Hayi abantu besizwe samaXesibe kaXesibe wakuloMpondo noMpondomise",
      1
     ],
     [
