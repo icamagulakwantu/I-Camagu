@@ -285,8 +285,6 @@ export default function More({ onNavigate }) {
             onClick={() => handleNav(FUND_ITEM.id)}
             className="pressable relative mb-8 block w-full overflow-hidden rounded-[26px] bg-[#1f3320] p-5 text-left text-cream shadow-[0_22px_44px_-24px_rgba(28,22,18,0.85)]"
           >
-            <span aria-hidden="true" className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-ochre-light/15" />
-            <span aria-hidden="true" className="absolute -bottom-14 right-10 h-28 w-28 rounded-full bg-terracotta-dark/40" />
             <span className="relative flex items-start gap-3.5">
               <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-ochre-light">
                 <Icon name="flame" size={22} color="#1c1612" />
@@ -300,11 +298,11 @@ export default function More({ onNavigate }) {
           </button>
 
           {TILE_GROUPS.map((group) => (
-            <section key={group.title} className="mb-8 rounded-[28px] p-3 pb-3.5" style={{ backgroundColor: group.color }}>
-              <div className="px-2 pb-4 pt-2 text-cream">
-                <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-cream/70">{group.english}</p>
+            <section key={group.title} className="mb-8 rounded-[28px] bg-[#efe6d8] p-3 pb-3.5">
+              <div className="px-2 pb-4 pt-2 text-ink">
+                <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-terracotta-dark">{group.english}</p>
                 <h2 className="mt-0.5 font-display text-[1.45rem] font-semibold leading-tight">{group.title}</h2>
-                <p className="mt-0.5 text-[13px] text-cream/80">{group.line}</p>
+                <p className="mt-0.5 text-[13px] text-ink-muted">{group.line}</p>
               </div>
               <div className="grid grid-cols-2 gap-x-2.5 gap-y-5 pt-3">
                 {group.items.map((item, i) => (
@@ -312,12 +310,12 @@ export default function More({ onNavigate }) {
                     key={item.id}
                     type="button"
                     onClick={() => handleNav(item.id)}
-                    className={`pressable relative rounded-[20px] bg-cream px-3.5 pb-3.5 pt-8 text-left shadow-[0_12px_24px_-16px_rgba(0,0,0,0.6)] ${group.items.length % 2 === 1 && i === group.items.length - 1 ? 'col-span-2' : ''}`}
+                    className={`pressable relative rounded-[20px] bg-white px-3.5 pb-3.5 pt-8 text-left shadow-[0_12px_24px_-18px_rgba(43,30,18,0.45)] ${group.items.length % 2 === 1 && i === group.items.length - 1 ? 'col-span-2' : ''}`}
                   >
                     <span
                       aria-hidden="true"
                       className="absolute -top-4 left-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-white"
-                      style={{ boxShadow: `0 0 0 4px ${group.color}` }}
+                      style={{ boxShadow: '0 0 0 4px #efe6d8' }}
                     >
                       <Icon name={item.icon} size={20} color={group.color} />
                     </span>

@@ -1345,7 +1345,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
         <EmptyState
           icon="users"
           title="No stokvels yet"
-          description="Start your group\u2019s stokvel or join one with a code. Every contribution, payout and loan is recorded, and every member can see the books."
+          description="Start your group’s stokvel or join one with a code. Every contribution, payout and loan is recorded, and every member can see the books."
         />
       ) : (
         <>

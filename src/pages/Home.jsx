@@ -381,7 +381,7 @@ function MoneyTiles({ stokvels, totalSaved, pools, basketCount, onNavigate }) {
   const tiles = [
     {
       id: 'stokvels',
-      bg: 'bg-[#2e4a2e]', disc: 'bg-[#b9d3b0] text-[#1f3320]', icon: 'coins',
+      bg: 'bg-[#2e4a2e] text-cream', sub: 'text-cream/85', disc: 'bg-[#b9d3b0] text-[#1f3320]', icon: 'coins',
       title: 'Stokvels',
       detail: stokvels.length ? `${plural(stokvels.length, 'stokvel')} · ${rand(totalSaved)} saved` : 'Start one, or join with an invite link',
       action: stokvels.length ? 'Open' : 'Start',
@@ -389,7 +389,7 @@ function MoneyTiles({ stokvels, totalSaved, pools, basketCount, onNavigate }) {
     },
     {
       id: 'store',
-      bg: 'bg-[#a3471a]', disc: 'bg-[#fffdf9] text-[#a3471a]', icon: 'cart',
+      bg: 'bg-[#fffdf9] text-ink shadow-soft', sub: 'text-ink-muted', disc: 'bg-[#a3471a] text-white', icon: 'cart',
       title: 'Bulk Buy',
       detail: basketCount > 0
         ? `${plural(basketCount, 'item')} in your basket`
@@ -404,13 +404,13 @@ function MoneyTiles({ stokvels, totalSaved, pools, basketCount, onNavigate }) {
       <SectionTitle eyebrow="Yonga · Thenga kunye" title="Save and buy together" />
       <div className="grid grid-cols-2 gap-3 px-5 pt-3">
         {tiles.map((tile) => (
-          <button key={tile.id} type="button" onClick={tile.onOpen} className={`pressable relative flex min-h-[132px] flex-col justify-end rounded-[22px] ${tile.bg} px-4 pb-3.5 pt-8 text-left text-cream`}>
+          <button key={tile.id} type="button" onClick={tile.onOpen} className={`pressable relative flex min-h-[132px] flex-col justify-end rounded-[22px] ${tile.bg} px-4 pb-3.5 pt-8 text-left`}>
             {/* The icon disc sits half outside the tile's top edge. */}
             <span className={`absolute -top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full ${tile.disc} ring-4 ring-cream`}>
               <Icon name={tile.icon} size={19} />
             </span>
             <span className="font-display text-[1.2rem] font-semibold leading-tight">{tile.title}</span>
-            <span className="mt-1 text-[13px] leading-snug text-cream/85">{tile.detail}</span>
+            <span className={`mt-1 text-[13px] leading-snug ${tile.sub}`}>{tile.detail}</span>
             <span className="mt-2 text-sm font-extrabold">{tile.action} →</span>
           </button>
         ))}
@@ -547,12 +547,11 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
       <button
         type="button"
         onClick={() => onNavigate('shrinefund')}
-        className="pressable relative mx-4 mt-8 block w-[calc(100%-2rem)] overflow-hidden rounded-[24px] bg-terracotta-dark p-5 text-left text-cream"
+        className="pressable relative mx-4 mt-8 block w-[calc(100%-2rem)] overflow-hidden rounded-[24px] bg-[#fffdf9] p-5 text-left text-ink shadow-soft"
       >
-        <span aria-hidden="true" className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-ochre-light/20" />
-        <span className="relative block text-[11px] font-extrabold uppercase tracking-[0.18em] text-ochre-light">Ubuhlanti · Shrine Fund</span>
+        <span className="relative block text-[11px] font-extrabold uppercase tracking-[0.18em] text-terracotta-dark">Ubuhlanti · Shrine Fund</span>
         <span className="relative mt-1 block font-display text-[1.3rem] font-semibold leading-tight">Together we build greatness.</span>
-        <span className="relative mt-1 block text-[13px] text-cream/85">Our own seed capital, owned by the community. Pledge from R1 →</span>
+        <span className="relative mt-1 block text-[13px] text-ink-muted">Our own seed capital, owned by the community. Pledge from R1 →</span>
       </button>
 
       <p className="mt-10 text-center font-display text-sm italic text-ink-muted">Umntu ngumntu ngabantu</p>
