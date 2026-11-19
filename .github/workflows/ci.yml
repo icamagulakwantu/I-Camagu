@@ -227,7 +227,7 @@ jobs:
           printf '%s' "$html" | grep -q '<div id="root"></div>'
           printf '%s' "$html" | grep -q 'manifest.webmanifest'
           manifest="$(curl --fail --silent --show-error --max-time 15 "$APP_ORIGIN/manifest.webmanifest")"
-          printf '%s' "$manifest" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const m=JSON.parse(s);process.exit(m.name==='iCamagu' && m.start_url==='/' ? 0 : 1)}catch{process.exit(1)}})"
+          printf '%s' "$manifest" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const m=JSON.parse(s);process.exit(m.name==='i-Camagu' && m.start_url==='/' ? 0 : 1)}catch{process.exit(1)}})"
           for asset in /icons/android-chrome-192.png /icons/android-chrome-512.png /icons/maskable-512.png /icons/apple-touch-icon.png; do
             curl --fail --silent --show-error --max-time 15 -o /dev/null "$APP_ORIGIN$asset"
           done
