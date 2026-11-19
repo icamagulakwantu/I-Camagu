@@ -15,13 +15,14 @@ const NO_CUSTODY_LIVE = false
 // The celebrations people come to i-Camagu to plan, in the words they use.
 const CELEBRATIONS = [
   {
-    key: 'umgidi',
+    // Ulwaluko and umgidi are planned as one: from the mountain to the homecoming.
+    key: 'ulwaluko-umgidi',
     icon: 'drum',
     image: CEREMONY_IMAGE.UMGIDI,
-    name: 'Umgidi',
-    tag: 'His homecoming',
-    line: 'Your son comes home a man. Welcome him with the whole clan.',
-    needs: ['Sheep & cattle', 'Umqombothi', 'Drinks', 'New clothes'],
+    name: 'Ulwaluko & Umgidi',
+    tag: 'His journey to manhood',
+    line: 'From the mountain to the homecoming: one plan, with a guide for his mother.',
+    needs: ['Verified ingcibi', 'Building the ibhoma', 'Umgidi feast', 'Ubukrwala'],
   },
   {
     key: 'wedding',
@@ -29,49 +30,25 @@ const CELEBRATIONS = [
     image: CEREMONY_IMAGE.WEDDING,
     name: 'Umtshato',
     tag: 'Your wedding',
-    line: 'From lobola talks to the day two families become one.',
+    line: 'From ukucela and lobola to umdudo, the day two families become one.',
     needs: ['Lobola', 'Umdudo', 'Catering', 'Guest list'],
   },
-  {
-    key: 'ulwaluko',
-    icon: 'footprints',
-    image: CEREMONY_IMAGE.ULWALUKO,
-    name: 'Ulwaluko',
-    tag: 'Guidance for mothers',
-    line: 'Step-by-step guidance for a mother preparing her son, from a verified ingcibi to his return.',
-    needs: ['Verified ingcibi', 'Before the mountain', 'Mountain phase', 'His return'],
-  },
 ]
 
-const MORE_CEREMONIES = ['Intambo Enkulu', 'Inkobe zikaMama', 'Ukubuyisa', 'Umsebenzi weGqirha', 'Ukukhapha']
+const MORE_CEREMONIES = ['Imbeleko', 'Intonjane', 'Intambo Enkulu', 'Inkobe zikaMama', 'Ukubuyisa', 'Umsebenzi weGqirha', 'Ukukhapha']
 
-// What each part of the app is for, said plainly.
-const FLOW = [
-  {
-    icon: 'clipboard',
-    color: '#a3471a',
-    title: 'A clear plan for every ceremony',
-    body: 'Each ceremony comes with its steps, roles, timeline and budget, so it is done properly, with dignity, and the same way every time.',
-  },
-  {
-    icon: 'heartHandshake',
-    color: '#2e4a2e',
-    title: 'Family pledges in one place',
-    body: 'Share one link. Relatives at home and abroad pledge what they will bring or give, and you can see what is covered and what is still needed.',
-  },
-  {
-    icon: 'cart',
-    color: '#2e4a2e',
-    title: 'Buy together for better prices',
-    body: 'Families and stokvels pool their orders for drinks, meat, livestock and groceries, and unlock bulk discounts no single household gets.',
-  },
-  {
-    icon: 'coins',
-    color: '#2e4a2e',
-    title: 'Stokvels that run properly',
-    body: 'Group savings with simple systems: a ledger every member can see, approvals, and every contribution, payout and loan interest recorded.',
-  },
+// The i-Camagu journey: every pillar, in the order a family lives it, ending
+// in what is kept forever.
+const JOURNEY = [
+  { icon: 'users', color: '#2e4a2e', step: 'Isiduko', title: 'Find your clan', body: 'Your iziduko and izinqulo, the people who share your bloodline, and your clan where you live.' },
+  { icon: 'clipboard', color: '#a3471a', step: 'Isicwangciso', title: 'Plan the ceremony', body: 'Every step with a date to aim for, the budget and the roles, from ulwaluko and umgidi to a wedding.' },
+  { icon: 'heartHandshake', color: '#2e4a2e', step: 'Isithembiso', title: 'The family pledges', body: 'One link to the family group. Relatives at home and abroad pledge, and suggest what you forgot.' },
+  { icon: 'coins', color: '#a3471a', step: 'Umgalelo', title: 'Save together', body: 'Your stokvel with a constitution, minutes and books every member can see.' },
+  { icon: 'cart', color: '#2e4a2e', step: 'Thenga kunye', title: 'Buy together', body: 'Drinks, meat, livestock and groceries at bulk prices, ordered with families near you.' },
+  { icon: 'drum', color: '#a3471a', step: 'Umhla', title: 'The day itself', body: 'Everything ticked, everyone in their place, the umqombothi brewed to the guest count.' },
+  { icon: 'image', color: '#1f3320', step: 'Inkumbulo', title: 'Remembered forever', body: 'The ukugida book of who brought what, and the family archive of photos and records. Never lost.' },
 ]
+
 
 // What the Shrine Fund stands for, from the Ubuhlanti page itself.
 const FUND_POINTS = [
@@ -91,7 +68,7 @@ function CelebrationCard({ item }) {
         <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-terracotta-dark">
           {item.tag}
         </span>
-        <h3 className="absolute bottom-3 left-4 font-display text-[1.7rem] font-semibold leading-none text-cream">{item.name}</h3>
+        <h3 className="absolute bottom-3 left-4 right-16 font-display text-[1.5rem] font-semibold leading-[1.05] text-cream">{item.name}</h3>
       </div>
       <span
         aria-hidden="true"
@@ -270,6 +247,9 @@ export default function Landing({ onJoin, onSignIn }) {
               >
                 <Icon name="search" size={17} color="#2e4a2e" /> Find your clan
               </a>
+              <a href="#journey" className="pressable flex min-h-[44px] items-center justify-center gap-1.5 text-[15px] font-bold text-terracotta-dark sm:min-h-[52px]">
+                See the whole journey <Icon name="arrowDown" size={16} color="#a3471a" />
+              </a>
             </div>
             <p className="mt-3 text-xs text-ink-muted">Free to join · Works on slow data · Install from your browser</p>
           </div>
@@ -319,25 +299,26 @@ export default function Landing({ onJoin, onSignIn }) {
         </div>
       </section>
 
-      {/* —— How the day comes together —— */}
-      <section aria-labelledby="flow-heading" className="mx-auto max-w-lg px-5 pt-12">
-        <p className="eyebrow text-terracotta-dark">Kunye · Together</p>
-        <h2 id="flow-heading" className="mt-1 font-display text-[1.9rem] font-semibold leading-tight text-ink text-balance">
-          The whole family, one plan, one big day.
+      {/* —— The journey: every pillar, one path —— */}
+      <section id="journey" aria-labelledby="journey-heading" className="mx-auto max-w-lg scroll-mt-6 px-5 pt-12">
+        <p className="eyebrow text-terracotta-dark">Uhambo · The journey</p>
+        <h2 id="journey-heading" className="mt-1 font-display text-[1.9rem] font-semibold leading-tight text-ink text-balance">
+          From your clan to the day, and kept forever.
         </h2>
-        <ol className="mt-7 space-y-5">
-          {FLOW.map((f, i) => (
-            <li key={f.title} className="relative ml-5 rounded-[22px] border border-ink/[0.06] bg-white py-4 pl-11 pr-4 shadow-soft">
+        <ol className="relative mt-7 space-y-4 pl-7">
+          <span aria-hidden="true" className="absolute bottom-8 left-[26px] top-6 w-[3px] rounded-full bg-gradient-to-b from-[#2e4a2e] via-terracotta to-[#1f3320]" />
+          {JOURNEY.map((j, i) => (
+            <li key={j.title} className="relative rounded-[22px] border border-ink/[0.06] bg-white py-4 pl-11 pr-4 shadow-soft">
               <span
                 aria-hidden="true"
                 className="absolute -left-5 top-4 flex h-11 w-11 items-center justify-center rounded-2xl text-white shadow-[0_10px_20px_-10px_rgba(28,22,18,0.6)] ring-4 ring-cream"
-                style={{ backgroundColor: f.color }}
+                style={{ backgroundColor: j.color }}
               >
-                <Icon name={f.icon} size={20} color="#ffffff" />
+                <Icon name={j.icon} size={20} color="#ffffff" />
               </span>
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.16em]" style={{ color: f.color }}>Step {i + 1}</p>
-              <h3 className="mt-0.5 text-[16px] font-bold text-ink">{f.title}</h3>
-              <p className="mt-1 text-[14px] leading-snug text-ink-muted">{f.body}</p>
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.16em]" style={{ color: j.color }}>{i + 1} · {j.step}</p>
+              <h3 className="mt-0.5 text-[16px] font-bold text-ink">{j.title}</h3>
+              <p className="mt-1 text-[14px] leading-snug text-ink-muted">{j.body}</p>
             </li>
           ))}
         </ol>

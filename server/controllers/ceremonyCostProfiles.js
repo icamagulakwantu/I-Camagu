@@ -95,7 +95,7 @@ const COST_RATES = {
     plastic_spoon_pack_50: 45.00,
     blanket_white_striped: 425.00,  // Aranda 10 Sep 2026 (STALE — recheck required): Ingcawe Xhosa white/black R425 (Blankets of Africa poly R349)
     blanket_plain: 189.00,  // Makro 10 Sep 2026 (STALE — recheck required): Aranda 150x200 rewool grey R189 (Aranda Boxer grey/white R229)
-    grass_mat_ikhukho: 150.00,
+    grass_mat_ikhukho: 150.00,  // Checked 20 Nov 2026: R150 (clarebaccessories.com, 180x85cm); weavers sell small R80, big R150 (allAfrica, Jan 2026)
     tarpaulin_sail: 375.00,  // Leroy Merlin 10 Sep 2026 (STALE — recheck required): 70gr 5x8m with eyelets R375 (140gr R679)
     poles_bundle: 450.00,  // Corrected from founder's own knowledge of what a pole bundle for ibhoma actually costs (not a shop listing)
     firewood_bundle: 95.00,
@@ -110,7 +110,7 @@ const COST_RATES = {
     knife_butcher: 150.00,
     cable_ties_pack: 35.00,
     cardboard_bedding: 80.00,
-    imphepho_bundle: 45.00,
+    imphepho_bundle: 45.00,  // Checked 20 Nov 2026: R30 hand-wrapped (jungleroots.co.za) to R50 a bundle (bobshop.co.za); also sold by local curio shops such as Shwabz KwaSintu, KwaDwesi
     ikoto_bentonite_kg: 65.00,
     amaphondo_beads_strand: 85.00,
     iintambo_cord_set: 120.00,
