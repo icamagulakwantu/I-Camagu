@@ -63,7 +63,14 @@ function FeastCalculator({ onBack, onOpenStore, guestCount = null, ceremonyTitle
                     <p className="text-[15px] font-extrabold text-ink">{line.label}</p>
                     <p className="text-xs text-ink-muted">{line.qty} × {line.unit}</p>
                   </div>
-                  <span className="text-sm font-extrabold tabular-nums text-ink">{rand(line.qty * line.price)}</span>
+                  <span className="flex flex-shrink-0 items-center gap-3">
+                    <span className="text-sm font-extrabold tabular-nums text-ink">{rand(line.qty * line.price)}</span>
+                    {onOpenStore && (
+                      <button type="button" onClick={() => onOpenStore(line.search)} aria-label={`Find ${line.label} in Bulk Buy`} className="pressable flex h-9 w-9 items-center justify-center rounded-full bg-[#a3471a]/10">
+                        <Icon name="cart" size={15} color="#a3471a" />
+                      </button>
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -71,8 +78,8 @@ function FeastCalculator({ onBack, onOpenStore, guestCount = null, ceremonyTitle
         ))}
 
         {feast.guests > 0 && onOpenStore && (
-          <button type="button" onClick={onOpenStore} className="pressable flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#a3471a] text-[15px] font-extrabold text-cream">
-            <Icon name="cart" size={18} color="#fffdf9" /> Buy it together in Bulk Buy
+          <button type="button" onClick={() => onOpenStore('')} className="pressable flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#a3471a] text-[15px] font-extrabold text-cream">
+            <Icon name="cart" size={18} color="#fffdf9" /> Open Bulk Buy
           </button>
         )}
 

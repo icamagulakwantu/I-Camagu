@@ -195,6 +195,10 @@ function MainApp() {
   const [returnToCeremonyId, setReturnToCeremonyId] = useState(null)
   // What the tool needs to know about that ceremony (its title and guests).
   const [toolCeremony, setToolCeremony] = useState(null)
+  // A search to open Bulk Buy with (from the feast calculator); cleared once
+  // the shopper leaves the store so it never comes back on its own.
+  const [storeSearch, setStoreSearch] = useState('')
+  useEffect(() => { if (screen !== 'store' && screen !== 'isidlo') setStoreSearch('') }, [screen])
 
   // Keep the browser address in sync with screen navigation so refresh, share
   // and the browser back button return to a meaningful place in the app.
@@ -358,7 +362,7 @@ function MainApp() {
           />
         )
       case 'store':
-        return <Store onGoToBasket={() => setScreen('basket')} basketCount={basketCount} />
+        return <Store onGoToBasket={() => setScreen('basket')} basketCount={basketCount} initialSearch={storeSearch} />
       case 'basket':
         return <Basket onBack={() => setScreen('store')} onBasketChanged={setBasketCount} onGoToOrders={() => setScreen('myorders')} />
       case 'ceremony':
@@ -438,7 +442,7 @@ function MainApp() {
       case 'umqombothi':
         return <UmqombothiCalculator onBack={backFromTool} guestCount={toolCeremony?.guestCount ?? null} ceremonyTitle={toolCeremony?.title || ''} />
       case 'isidlo':
-        return <FeastCalculator onBack={backFromTool} onOpenStore={() => setScreen('store')} guestCount={toolCeremony?.guestCount ?? null} ceremonyTitle={toolCeremony?.title || ''} />
+        return <FeastCalculator onBack={backFromTool} onOpenStore={(term = '') => { setStoreSearch(term); setScreen('store') }} guestCount={toolCeremony?.guestCount ?? null} ceremonyTitle={toolCeremony?.title || ''} />
       case 'pin':
         return <PinSetup onBack={goMore} />
       case 'stokvels':

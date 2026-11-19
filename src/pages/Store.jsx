@@ -125,7 +125,7 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
   )
 }
 
-function Store({ onGoToBasket, basketCount }) {
+function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
   const { accessToken } = useAuth()
   const { location, feed } = useCommunity()
   const { showToast } = useToast()
@@ -137,7 +137,7 @@ function Store({ onGoToBasket, basketCount }) {
   const [catalogueError, setCatalogueError] = useState(false)
   const [catalogueRetry, setCatalogueRetry] = useState(0)
   const [addingId, setAddingId] = useState(null)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState(initialSearch)
   const [offerSku, setOfferSku] = useState(null)
   const [failedImageIds, setFailedImageIds] = useState(() => new Set())
 

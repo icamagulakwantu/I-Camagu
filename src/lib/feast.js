@@ -44,16 +44,16 @@ export function feastFor(guests, beasts = 0) {
   const people = count(guests)
   const animals = animalsFor(people, beasts)
   const lines = [
-    { key: 'beast', label: 'Beast (inkomo)', qty: animals.beasts, unit: 'beast', price: PRICES.beast, group: 'Inyama · Meat' },
-    { key: 'sheep', label: 'Sheep (igusha)', qty: animals.sheep, unit: 'sheep', price: PRICES.sheep, group: 'Inyama · Meat' },
-    { key: 'maize', label: 'Maize meal for pap', qty: units(people, 0.003), unit: '50 kg bag', price: PRICES.maize50, group: 'Ipapa nerayisi · Pap and rice' },
-    { key: 'rice', label: 'Rice', qty: units(people, 0.007), unit: '10 kg bag', price: PRICES.rice10, group: 'Ipapa nerayisi · Pap and rice' },
-    { key: 'cabbage', label: 'Cabbage', qty: units(people, 1 / 18), unit: 'head', price: PRICES.cabbage, group: 'Imifuno · Vegetables' },
-    { key: 'spinach', label: 'Spinach', qty: units(people, 1 / 15), unit: 'bundle', price: PRICES.spinach, group: 'Imifuno · Vegetables' },
-    { key: 'potatoes', label: 'Potatoes', qty: units(people, 0.01), unit: '10 kg bag', price: PRICES.potatoes10, group: 'Imifuno · Vegetables' },
-    { key: 'oil', label: 'Cooking oil', qty: units(people, 0.003), unit: '5 L', price: PRICES.oil5, group: 'Ekhitshini · Kitchen' },
-    { key: 'sugar', label: 'Sugar for tea', qty: units(people, 0.002), unit: '10 kg bag', price: PRICES.sugar10, group: 'Ekhitshini · Kitchen' },
-    { key: 'plates', label: 'Plates and spoons', qty: units(people, 0.02), unit: 'pack of 50', price: PRICES.plates50, group: 'Ekhitshini · Kitchen' },
+    { key: 'beast', search: 'Inkomo', label: 'Beast (inkomo)', qty: animals.beasts, unit: 'beast', price: PRICES.beast, group: 'Inyama · Meat' },
+    { key: 'sheep', search: 'Sheep', label: 'Sheep (igusha)', qty: animals.sheep, unit: 'sheep', price: PRICES.sheep, group: 'Inyama · Meat' },
+    { key: 'maize', search: 'Maize Meal', label: 'Maize meal for pap', qty: units(people, 0.003), unit: '50 kg bag', price: PRICES.maize50, group: 'Ipapa nerayisi · Pap and rice' },
+    { key: 'rice', search: 'Rice', label: 'Rice', qty: units(people, 0.007), unit: '10 kg bag', price: PRICES.rice10, group: 'Ipapa nerayisi · Pap and rice' },
+    { key: 'cabbage', search: 'Cabbage', label: 'Cabbage', qty: units(people, 1 / 18), unit: 'head', price: PRICES.cabbage, group: 'Imifuno · Vegetables' },
+    { key: 'spinach', search: 'Spinach', label: 'Spinach', qty: units(people, 1 / 15), unit: 'bundle', price: PRICES.spinach, group: 'Imifuno · Vegetables' },
+    { key: 'potatoes', search: 'Potatoes', label: 'Potatoes', qty: units(people, 0.01), unit: '10 kg bag', price: PRICES.potatoes10, group: 'Imifuno · Vegetables' },
+    { key: 'oil', search: 'Cooking Oil', label: 'Cooking oil', qty: units(people, 0.003), unit: '5 L', price: PRICES.oil5, group: 'Ekhitshini · Kitchen' },
+    { key: 'sugar', search: 'Sugar', label: 'Sugar for tea', qty: units(people, 0.002), unit: '10 kg bag', price: PRICES.sugar10, group: 'Ekhitshini · Kitchen' },
+    { key: 'plates', search: 'Plate', label: 'Plates and spoons', qty: units(people, 0.02), unit: 'pack of 50', price: PRICES.plates50, group: 'Ekhitshini · Kitchen' },
   ].filter((line) => line.qty > 0)
   const total = Math.round(lines.reduce((sum, line) => sum + line.qty * line.price, 0))
   return { guests: people, meatKg: animals.meatKg, lines, total, perGuest: people ? Math.round(total / people) : 0 }
