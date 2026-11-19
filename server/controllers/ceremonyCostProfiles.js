@@ -151,6 +151,7 @@ const COST_RATES = {
 export const ULWALUKO_REGISTRATION_ITEMS = [
   { phase: 'REGISTRATION', label: 'Register with the initiation committee or traditional leader before the season' },
   { phase: 'REGISTRATION', label: "Collect the CoGTA initiation forms from the ward councillor's office" },
+  { phase: 'REGISTRATION', label: 'Medical examination at least three months before, and a second one 14 days before (Customary Initiation Act)' },
   { phase: 'REGISTRATION', label: 'Written consent from his parent or guardian' },
   { phase: 'REGISTRATION', label: 'Ingcibi and ikhankatha are registered (verified on i-Camagu)' },
 ];

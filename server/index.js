@@ -26,6 +26,7 @@ import { loadClanPraises } from './scripts/load-clan-praises.js';
 import { updateUlwalukoPlans } from './scripts/ulwaluko-umgidi-nov-2026.js';
 import { updateWeddingAndMourningPlans } from './scripts/wedding-mourning-nov-2026.js';
 import { updateDirectoryListings } from './scripts/directory-listings-nov-2026.js';
+import { addUlwalukoRegistrationSteps } from './scripts/ulwaluko-registration-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -270,6 +271,12 @@ if (startup.schemaReady) {
     await updateDirectoryListings();
   } catch (err) {
     console.error('Directory listing update failed:', err?.message);
+  }
+  // CoGTA forms and the two medical examinations for upcoming ulwaluko plans. Runs once.
+  try {
+    await addUlwalukoRegistrationSteps();
+  } catch (err) {
+    console.error('Ulwaluko registration update failed:', err?.message);
   }
 }
 
