@@ -40,13 +40,13 @@ const MORE_CEREMONIES = ['Imbeleko', 'Intonjane', 'Intambo Enkulu', 'Inkobe zika
 // The i-Camagu journey: every pillar, in the order a family lives it, ending
 // in what is kept forever.
 const JOURNEY = [
-  { icon: 'users', color: '#2e4a2e', step: 'Isiduko', title: 'Find your clan', body: 'Your iziduko and izinqulo, the people who share your bloodline, and your clan where you live.' },
-  { icon: 'clipboard', color: '#a3471a', step: 'Isicwangciso', title: 'Plan the ceremony', body: 'Every step with a date to aim for, the budget and the roles, from ulwaluko and umgidi to a wedding.' },
-  { icon: 'heartHandshake', color: '#2e4a2e', step: 'Isithembiso', title: 'The family pledges', body: 'One link to the family group. Relatives at home and abroad pledge, and suggest what you forgot.' },
-  { icon: 'coins', color: '#a3471a', step: 'Umgalelo', title: 'Save together', body: 'Your stokvel with a constitution, minutes and books every member can see.' },
-  { icon: 'cart', color: '#2e4a2e', step: 'Thenga kunye', title: 'Buy together', body: 'Drinks, meat, livestock and groceries at bulk prices, ordered with families near you.' },
-  { icon: 'drum', color: '#a3471a', step: 'Umhla', title: 'The day itself', body: 'Everything ticked, everyone in their place, the umqombothi brewed to the guest count.' },
-  { icon: 'image', color: '#1f3320', step: 'Inkumbulo', title: 'Remembered forever', body: 'The ukugida book of who brought what, and the family archive of photos and records. Never lost.' },
+  { icon: 'users', step: 'Isiduko', title: 'Find your clan', body: 'Your iziduko and izinqulo, the people who share your bloodline, and your clan where you live.' },
+  { icon: 'clipboard', step: 'Isicwangciso', title: 'Plan the ceremony', body: 'Every step with a date to aim for, the budget and the roles, from ulwaluko and umgidi to a wedding.' },
+  { icon: 'heartHandshake', step: 'Isithembiso', title: 'The family pledges', body: 'One link to the family group. Relatives at home and abroad pledge, and suggest what you forgot.' },
+  { icon: 'coins', step: 'Umgalelo', title: 'Save together', body: 'Your stokvel with a constitution, minutes and books every member can see.' },
+  { icon: 'cart', step: 'Thenga kunye', title: 'Buy together', body: 'Drinks, meat, livestock and groceries at bulk prices, ordered with families near you.' },
+  { icon: 'drum', step: 'Umhla', title: 'The day itself', body: 'Everything ticked, everyone in their place, the umqombothi brewed to the guest count.' },
+  { icon: 'image', step: 'Inkumbulo', title: 'Remembered forever', body: 'The ukugida book of who brought what, and the family archive of photos and records. Never lost.' },
 ]
 
 
@@ -61,10 +61,10 @@ const FUND_POINTS = [
 // ceremony's icon sits on the seam between photo and text.
 function CelebrationCard({ item }) {
   return (
-    <article className="relative w-[78%] max-w-[300px] flex-shrink-0 snap-start overflow-hidden rounded-[26px] bg-[#1c1612] shadow-[0_24px_48px_-24px_rgba(28,22,18,0.7)]">
+    <article className="relative w-[78%] max-w-[300px] flex-shrink-0 snap-start overflow-hidden rounded-[26px] bg-[#1f3320] shadow-[0_24px_48px_-24px_rgba(28,22,18,0.7)]">
       <div className="relative h-52">
         <img src={item.image} alt="" className="h-full w-full object-cover" loading="lazy" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1c1612] via-[#1c1612]/25 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1f3320] via-[#1f3320]/25 to-transparent" />
         <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-terracotta-dark">
           {item.tag}
         </span>
@@ -72,9 +72,9 @@ function CelebrationCard({ item }) {
       </div>
       <span
         aria-hidden="true"
-        className="absolute right-4 top-[11.5rem] flex h-11 w-11 items-center justify-center rounded-full bg-ochre-light ring-4 ring-[#1c1612]"
+        className="absolute right-4 top-[11.5rem] flex h-11 w-11 items-center justify-center rounded-full bg-ochre-light ring-4 ring-[#1f3320]"
       >
-        <Icon name={item.icon} size={19} color="#1c1612" />
+        <Icon name={item.icon} size={19} color="#1f3320" />
       </span>
       <div className="px-4 pb-4 pt-3">
         <span aria-hidden="true" className="block h-px w-10 bg-ochre-light/70" />
@@ -200,9 +200,7 @@ export default function Landing({ onJoin, onSignIn }) {
   return (
     <div className="min-h-screen overflow-x-hidden bg-cream text-ink">
       {/* —— Hero: light and warm, like a celebration morning; the photos live in the cards below —— */}
-      <header className="relative overflow-hidden bg-gradient-to-b from-[#fff6ec] via-[#fbe9d7] to-[#f6dcc3]">
-        <div aria-hidden="true" className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-terracotta/25 blur-3xl" />
-        <div aria-hidden="true" className="absolute -left-20 top-1/2 h-60 w-60 rounded-full bg-ochre-light/30 blur-3xl" />
+      <header className="relative overflow-hidden bg-gradient-to-b from-[#fbf3e8] to-cream">
 
         <div className="relative z-10 mx-auto flex max-w-lg flex-col px-5 pb-32 pt-6">
           <div className="flex items-center justify-between">
@@ -272,7 +270,6 @@ export default function Landing({ onJoin, onSignIn }) {
       {/* —— Clan: the foundation. A traditional social network under one kingdom —— */}
       <section id="clan" aria-labelledby="clan-heading" className="mx-auto max-w-lg scroll-mt-6 px-5 pt-10">
         <div className="relative overflow-hidden rounded-[30px] bg-[#2e4a2e] px-6 pb-7 pt-8 text-cream shadow-[0_28px_56px_-28px_rgba(31,51,32,0.9)]">
-          <div aria-hidden="true" className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-ochre-light/15" />
           <p className="relative text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Isiduko sakho · Your clan</p>
           <h2 id="clan-heading" className="relative mt-2 font-display text-[2.1rem] font-semibold leading-[1.05] text-balance">
             Your clan is your <span className="italic text-ochre-light">first family.</span>
@@ -306,17 +303,16 @@ export default function Landing({ onJoin, onSignIn }) {
           From your clan to the day, and kept forever.
         </h2>
         <ol className="relative mt-7 space-y-4 pl-7">
-          <span aria-hidden="true" className="absolute bottom-8 left-[26px] top-6 w-[3px] rounded-full bg-gradient-to-b from-[#2e4a2e] via-terracotta to-[#1f3320]" />
+          <span aria-hidden="true" className="absolute bottom-8 left-[26px] top-6 w-[3px] rounded-full bg-[#2e4a2e]/20" />
           {JOURNEY.map((j, i) => (
             <li key={j.title} className="relative rounded-[22px] border border-ink/[0.06] bg-white py-4 pl-11 pr-4 shadow-soft">
               <span
                 aria-hidden="true"
-                className="absolute -left-5 top-4 flex h-11 w-11 items-center justify-center rounded-2xl text-white shadow-[0_10px_20px_-10px_rgba(28,22,18,0.6)] ring-4 ring-cream"
-                style={{ backgroundColor: j.color }}
+                className="absolute -left-5 top-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#2e4a2e] text-white shadow-[0_10px_20px_-10px_rgba(28,22,18,0.6)] ring-4 ring-cream"
               >
                 <Icon name={j.icon} size={20} color="#ffffff" />
               </span>
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.16em]" style={{ color: j.color }}>{i + 1} · {j.step}</p>
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">{i + 1} · {j.step}</p>
               <h3 className="mt-0.5 text-[16px] font-bold text-ink">{j.title}</h3>
               <p className="mt-1 text-[14px] leading-snug text-ink-muted">{j.body}</p>
             </li>
@@ -326,14 +322,12 @@ export default function Landing({ onJoin, onSignIn }) {
 
       {/* —— Pride —— */}
       <section aria-labelledby="pride-heading" className="mx-auto max-w-lg px-5 pt-14">
-        <div className="relative overflow-hidden rounded-[30px] bg-terracotta-dark px-6 pb-7 pt-8 text-cream shadow-[0_28px_56px_-28px_rgba(163,71,26,0.9)]">
-          <div aria-hidden="true" className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-ochre-light/20" />
-          <div aria-hidden="true" className="absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-black/15" />
-          <p className="relative text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Siyazingca</p>
+        <div className="relative overflow-hidden rounded-[30px] border border-ink/[0.06] bg-white px-6 pb-7 pt-8 text-ink shadow-soft">
+          <p className="relative text-[12px] font-extrabold uppercase tracking-[0.2em] text-terracotta-dark">Siyazingca</p>
           <h2 id="pride-heading" className="relative mt-2 font-display text-[2.1rem] font-semibold leading-[1.05] text-balance">
             We are proud of who we are.
           </h2>
-          <p className="relative mt-3 text-[15px] leading-relaxed text-cream/90">
+          <p className="relative mt-3 text-[15px] leading-relaxed text-ink-light">
             Learn the rites from the elders who know them, the kings and heroes who carried our name, and the
             reasons behind every ceremony. Then pass it on to the young ones.
           </p>
@@ -349,33 +343,31 @@ export default function Landing({ onJoin, onSignIn }) {
 
       {/* —— Ubuhlanti: the Shrine Fund —— */}
       <section aria-labelledby="fund-heading" className="mx-auto max-w-lg px-5 pt-14">
-        <div className="relative overflow-hidden rounded-[30px] bg-[#1f3320] text-cream shadow-[0_28px_56px_-28px_rgba(28,22,18,0.9)]">
-          <div aria-hidden="true" className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-ochre-light/15" />
-          <div aria-hidden="true" className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-terracotta-dark/35" />
+        <div className="relative overflow-hidden rounded-[30px] bg-[#efe6d8] text-ink">
           <div className="relative px-6 pb-7 pt-8">
-            <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Ubuhlanti bakwaXhosa · The Shrine Fund</p>
+            <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-terracotta-dark">Ubuhlanti bakwaXhosa · The Shrine Fund</p>
             <h2 id="fund-heading" className="mt-2 font-display text-[2.1rem] font-semibold leading-[1.04] text-balance">
               Together we can build greatness.
             </h2>
-            <p className="mt-3 text-[15px] leading-relaxed text-cream/90">
+            <p className="mt-3 text-[15px] leading-relaxed text-ink-light">
               Every rand we spend on our ceremonies can help build our own wealth. The Shrine Fund is our
               nation&rsquo;s seed capital: open to all, public in its books, and invested in businesses we own,
               so our money stays in our communities for longer.
             </p>
             <ul className="mt-6 space-y-2">
               {FUND_POINTS.map((p) => (
-                <li key={p.title} className="flex items-start gap-3 rounded-[18px] border border-cream/10 bg-white/[0.06] p-3.5">
-                  <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-ochre-light/20">
-                    <Icon name={p.icon} size={17} color="#e0a94e" />
+                <li key={p.title} className="flex items-start gap-3 rounded-[18px] bg-white p-3.5">
+                  <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#2e4a2e]/10">
+                    <Icon name={p.icon} size={17} color="#2e4a2e" />
                   </span>
                   <span>
-                    <span className="block text-[14px] font-bold leading-tight text-cream">{p.title}</span>
-                    <span className="mt-0.5 block text-[13px] leading-snug text-cream/75">{p.body}</span>
+                    <span className="block text-[14px] font-bold leading-tight text-ink">{p.title}</span>
+                    <span className="mt-0.5 block text-[13px] leading-snug text-ink-muted">{p.body}</span>
                   </span>
                 </li>
               ))}
             </ul>
-            <p className="mt-5 font-display text-lg italic text-ochre-light">Sakha isizwe. We are building a nation.</p>
+            <p className="mt-5 font-display text-lg italic text-[#2e4a2e]">Sakha isizwe. We are building a nation.</p>
           </div>
         </div>
       </section>
@@ -384,8 +376,8 @@ export default function Landing({ onJoin, onSignIn }) {
       <section aria-labelledby="trust-heading" className="mx-auto max-w-lg space-y-3 px-5 pt-10">
         <h2 id="trust-heading" className="sr-only">Trust</h2>
         <div className="flex gap-3.5 rounded-[22px] border border-ink/[0.06] bg-white px-5 py-4 shadow-soft">
-          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-terracotta-dark/10" aria-hidden>
-            <Icon name="shieldCheck" size={19} color="#a3471a" />
+          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#2e4a2e]/10" aria-hidden>
+            <Icon name="shieldCheck" size={19} color="#2e4a2e" />
           </span>
           <div>
             <p className="text-[15px] font-bold text-ink">Only verified ingcibi</p>
@@ -414,8 +406,7 @@ export default function Landing({ onJoin, onSignIn }) {
 
       {/* —— Final call —— */}
       <section className="mx-auto max-w-lg px-5 pb-14 pt-10">
-        <div className="relative overflow-hidden rounded-[30px] bg-terracotta-dark px-6 pb-7 pt-9 text-center text-cream">
-          <div aria-hidden="true" className="absolute -right-14 -top-14 h-44 w-44 rounded-full bg-ochre-light/20" />
+        <div className="relative overflow-hidden rounded-[30px] bg-[#1f3320] px-6 pb-7 pt-9 text-center text-cream">
           <div className="relative">
             <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Masiqale</p>
             <p className="mt-2 font-display text-[1.9rem] font-semibold leading-tight text-balance">
@@ -424,7 +415,7 @@ export default function Landing({ onJoin, onSignIn }) {
             <button
               type="button"
               onClick={onJoin}
-              className="pressable mt-6 min-h-[52px] w-full rounded-full bg-cream px-6 text-[16px] font-bold text-terracotta-dark"
+              className="pressable mt-6 min-h-[52px] w-full rounded-full bg-terracotta px-6 text-[16px] font-bold text-white"
             >
               Start planning, free →
             </button>
