@@ -6,7 +6,7 @@ import PoolOfferCard from '../components/PoolOfferCard.jsx'
 import DidYouKnow from '../components/DidYouKnow.jsx'
 import Icon from '../components/Icon.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
-import { daysUntil, describeCountdown, nextCeremony } from '../lib/countdown.js'
+import { daysUntil, describeCountdown, focusDate, nextCeremony } from '../lib/countdown.js'
 import { ceremonyImage } from '../data/ceremonyImages.js'
 import { labelForCeremonyType } from '../data/ceremonyLabels.js'
 
@@ -80,7 +80,8 @@ function SectionTitle({ eyebrow, title, actionLabel, onAction }) {
 // ---------- Hero ----------
 
 function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, onOpenType }) {
-  const days = daysUntil(lead?.eventDate)
+  const focus = focusDate(lead)
+  const days = daysUntil(focus.date)
   const { done, total } = checklistCounts(lead)
   const remaining = Math.max(total - done, 0)
   const progress = total ? Math.round((done / total) * 100) : 0
@@ -130,7 +131,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
         {lead ? (
           <>
             <h1 className="mt-2 font-display text-[2.3rem] font-semibold leading-[1.02] tracking-tight text-balance">
-              {lead.title}{' '}
+              {focus.isHomecoming ? 'Umgidi' : lead.title}{' '}
               {days != null
                 ? <>is <em className="font-medium text-ochre-light">{describeCountdown(days)}.</em></>
                 : <em className="font-medium text-ochre-light">needs a date.</em>}
@@ -142,7 +143,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
             >
               <span className="min-w-0 flex-1">
                 <span className="block text-sm text-cream/85">
-                  {lead.eventDate ? shortDate(lead.eventDate, true) : 'No date yet'}
+                  {focus.date ? shortDate(focus.date, true) : 'No date yet'}
                   {total > 0 && ` · ${remaining === 0 ? 'everything is ready' : `${plural(remaining, 'thing')} still to do`}`}
                 </span>
                 {step && (
@@ -461,7 +462,7 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
   const lead = nextCeremony(ceremonies)
   // Soonest first, so the rail reads like a calendar.
   const orderedCeremonies = [...ceremonies].sort((a, b) => {
-    const da = daysUntil(a.eventDate); const db = daysUntil(b.eventDate)
+    const da = daysUntil(focusDate(a).date); const db = daysUntil(focusDate(b).date)
     return (da ?? Infinity) - (db ?? Infinity)
   })
 

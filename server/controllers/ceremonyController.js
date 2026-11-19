@@ -85,7 +85,7 @@ export const getMyCeremonies = async (req, res) => {
 // POST / - create a ceremony
 export const createCeremony = async (req, res) => {
       try {
-              const { title, type, eventDate, notes, budgetZAR, visibility } = req.body;
+              const { title, type, eventDate, homecomingDate, notes, budgetZAR, visibility } = req.body;
                   const hostId = req.user.id;
 
                       if (DRAFT_CEREMONY_TYPE_NAMES.includes(type)) {
@@ -113,6 +113,7 @@ export const createCeremony = async (req, res) => {
                                                 title,
                                                         type,
                                                                 eventDate: eventDate ? new Date(eventDate) : null,
+                                                                homecomingDate: homecomingDate ? new Date(homecomingDate) : null,
                                                                         notes: notes || '',
                                                                                 hostId,
                                                                                         status: 'PLANNING',
@@ -511,7 +512,7 @@ export const getPublicPlan = async (req, res) => {
 // POST /auto - create ceremony with auto‑generated checklist & cost items
 export const createAutoCeremony = async (req, res) => {
       try {
-              const { title, type, eventDate, notes, budgetZAR, guestCount, visibility, createPlan = false } = req.body;
+              const { title, type, eventDate, homecomingDate, notes, budgetZAR, guestCount, visibility, createPlan = false } = req.body;
                   const hostId = req.user.id;
 
                       if (DRAFT_CEREMONY_TYPE_NAMES.includes(type)) {
@@ -548,6 +549,7 @@ export const createAutoCeremony = async (req, res) => {
                                                                       title,
                                                                                 type,
                                                                                           eventDate: eventDate ? new Date(eventDate) : null,
+                                                                homecomingDate: homecomingDate ? new Date(homecomingDate) : null,
                                                                                                     notes: notes || '',
                                                                                                               hostId,
                                                                                                                         status: 'PLANNING',
@@ -654,7 +656,7 @@ export const getCeremonyById = async (req, res) => {
 export const updateCeremony = async (req, res) => {
       try {
               const { id } = req.params;
-                  const { title, eventDate, status, notes, budgetZAR, guestCount, visibility } = req.body;
+                  const { title, eventDate, homecomingDate, status, notes, budgetZAR, guestCount, visibility } = req.body;
 
                       let parsedBudget;
                       if (budgetZAR === undefined) {
@@ -678,6 +680,7 @@ export const updateCeremony = async (req, res) => {
                                                   data: {
                                                               title: title || undefined,
                                                                       eventDate: eventDate ? new Date(eventDate) : undefined,
+                                                                      homecomingDate: homecomingDate === null || homecomingDate === '' ? null : homecomingDate ? new Date(homecomingDate) : undefined,
                                                                               status: status || undefined,
                                                                                       notes: notes !== undefined ? notes : undefined,
                                                                               visibility: visibility !== undefined && ['PRIVATE', 'CLAN_ONLY', 'PUBLIC'].includes(visibility) ? visibility : undefined,

@@ -25,11 +25,23 @@ export function describeCountdown(days) {
   return `in ${Math.round(days / 365.25)} years`
 }
 
+// The date that matters now. For ulwaluko the plan runs from going to the
+// mountain (eventDate) to umgidi at home (homecomingDate): once he has gone
+// up, the countdown moves to umgidi.
+export function focusDate(ceremony, now = new Date()) {
+  if (!ceremony) return { date: null, isHomecoming: false }
+  const start = daysUntil(ceremony.eventDate, now)
+  if (ceremony.homecomingDate && ceremony.eventDate && start == null && daysUntil(ceremony.homecomingDate, now) != null) {
+    return { date: ceremony.homecomingDate, isHomecoming: true }
+  }
+  return { date: ceremony.eventDate || null, isHomecoming: false }
+}
+
 // The ceremony to feature: the soonest one still ahead, otherwise the first
 // one without a date, otherwise the first in the list.
 export function nextCeremony(ceremonies = [], now = new Date()) {
   const upcoming = ceremonies
-    .map((ceremony) => ({ ceremony, days: daysUntil(ceremony?.eventDate, now) }))
+    .map((ceremony) => ({ ceremony, days: daysUntil(focusDate(ceremony, now).date, now) }))
     .filter((entry) => entry.days != null)
     .sort((a, b) => a.days - b.days)
   if (upcoming.length) return upcoming[0].ceremony

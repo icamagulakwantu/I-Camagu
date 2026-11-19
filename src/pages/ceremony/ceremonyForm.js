@@ -4,7 +4,7 @@ export const FORM_STEP_IDS = ['what', 'when', 'who', 'money']
 
 export const STEP_COMPONENTS = { what: TypeStep, when: WhenStep, who: GuestsStep, money: MoneyStep }
 
-export const EMPTY_FORM = { type: '', title: '', eventDate: '', guestCount: '', budget: '' }
+export const EMPTY_FORM = { type: '', title: '', eventDate: '', homecomingDate: '', guestCount: '', budget: '' }
 
 export const planTitle = (plan) => plan.ceremony?.title || plan.title
 
@@ -14,6 +14,7 @@ export function formFromPlan(plan) {
     type: plan.ceremonyType || ceremony.type || '',
     title: planTitle(plan) || '',
     eventDate: ceremony.eventDate ? new Date(ceremony.eventDate).toISOString().slice(0, 10) : '',
+    homecomingDate: ceremony.homecomingDate ? new Date(ceremony.homecomingDate).toISOString().slice(0, 10) : '',
     guestCount: ceremony.guestCount != null ? String(ceremony.guestCount) : '',
     budget: ceremony.budgetZAR != null && ceremony.budgetZAR !== '' ? String(parseFloat(ceremony.budgetZAR)) : '',
   }
@@ -24,6 +25,8 @@ export function formToPayload(form) {
   return {
     title: form.title.trim(),
     eventDate: form.eventDate || undefined,
+    // Ulwaluko only: the umgidi date. Empty clears it; other ceremonies leave it alone.
+    homecomingDate: form.type === 'ULWALUKO' ? (form.homecomingDate || null) : undefined,
     budgetZAR: form.budget === '' ? null : parseFloat(form.budget),
     guestCount: form.guestCount === '' ? null : parseInt(form.guestCount, 10),
   }

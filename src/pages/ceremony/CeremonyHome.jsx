@@ -3,7 +3,7 @@ import Icon from '../../components/Icon.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
 import { UNFORESEEN_PHASE } from '../../../shared/ceremonyCosts.js'
 import { buildListRows, countProgress, summariseRows } from '../../../shared/ceremonyList.js'
-import { daysUntil, describeCountdown } from '../../lib/countdown.js'
+import { daysUntil, describeCountdown, focusDate } from '../../lib/countdown.js'
 import { ceremonyImage } from '../../data/ceremonyImages.js'
 import { CEREMONY_META as STORY } from '../../data/ceremonyTypes.js'
 import SummaryActions from './SummaryActions.jsx'
@@ -136,7 +136,8 @@ export default function CeremonyHome({
   const summary = summariseRows({ budgetZAR, rows, unforeseenItems: checklistItems.filter((i) => i.phase === UNFORESEEN_PHASE) })
   const { done, total } = countProgress(rows)
   const percent = total ? Math.round((done / total) * 100) : 0
-  const days = daysUntil(ceremony.eventDate)
+  const focus = focusDate(ceremony)
+  const days = daysUntil(focus.date)
   const pledgedMoney = pledges.reduce((sum, p) => sum + (p.pledgedAmountZAR != null ? parseFloat(p.pledgedAmountZAR) : 0), 0)
   const shared = wasShared(plan)
 
@@ -184,8 +185,9 @@ export default function CeremonyHome({
           <h1 className="mt-2 font-display text-[2.5rem] font-semibold leading-[1] tracking-tight text-balance break-words">{title}</h1>
           <div className="mt-3.5 flex flex-wrap gap-2">
             <Chip icon="calendar">{ceremony.eventDate ? longDate(ceremony.eventDate) : 'No date yet'}</Chip>
+            {ceremony.homecomingDate && <Chip icon="home">Umgidi {longDate(ceremony.homecomingDate)}</Chip>}
             {ceremony.guestCount != null && <Chip icon="users">{ceremony.guestCount} guests</Chip>}
-            {days != null && <Chip strong>{capitalise(describeCountdown(days))}</Chip>}
+            {days != null && <Chip strong>{focus.isHomecoming ? `Umgidi ${describeCountdown(days)}` : capitalise(describeCountdown(days))}</Chip>}
           </div>
         </div>
       </section>
@@ -355,7 +357,7 @@ export default function CeremonyHome({
             {[
               // The kind is fixed once a ceremony exists, so it has no Change button.
               { id: 'what', label: 'Kind of ceremony', value: typeName(type), fixed: true },
-              { id: 'when', label: 'Name and date', value: `${title}${ceremony.eventDate ? ` · ${longDate(ceremony.eventDate)}` : ''}` },
+              { id: 'when', label: 'Name and date', value: `${title}${ceremony.eventDate ? ` · ${longDate(ceremony.eventDate)}` : ''}${ceremony.homecomingDate ? ` · Umgidi ${longDate(ceremony.homecomingDate)}` : ''}` },
               { id: 'who', label: 'Guests', value: ceremony.guestCount != null ? `${ceremony.guestCount} people` : 'Not set yet' },
               { id: 'money', label: 'Budget', value: budgetZAR != null ? rand(budgetZAR) : 'Not set yet' },
             ].map((item) => (

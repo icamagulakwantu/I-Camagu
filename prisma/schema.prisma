@@ -1164,6 +1164,8 @@ model Ceremony {
   type      CeremonyType
   title     String
   eventDate DateTime?
+  // Ulwaluko: the umgidi (homecoming) date; eventDate is going to the mountain.
+  homecomingDate DateTime?
   status    String       @default("PLANNING")
   visibility String      @default("PRIVATE")
   notes     String?

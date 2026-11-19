@@ -54,7 +54,16 @@ export function TypeStep({ form, setForm, ceremonyTypes, locked }) {
   )
 }
 
+const GOING_IN = { xh: 'Usuku lokungena', en: 'Going to the mountain' }
+const HOMECOMING = { xh: 'Umgidi', en: 'Umgidi (homecoming) date' }
+const addDays = (isoDate, days) => {
+  const d = new Date(`${isoDate}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() + days)
+  return d.toISOString().slice(0, 10)
+}
+
 export function WhenStep({ form, setForm }) {
+  const isUlwaluko = form.type === 'ULWALUKO'
   return (
     <div className="space-y-5">
       <Field label={LABELS.ceremonyName}>
@@ -66,14 +75,29 @@ export function WhenStep({ form, setForm }) {
           onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
         />
       </Field>
-      <Field label={LABELS.date}>
+      <Field label={isUlwaluko ? GOING_IN : LABELS.date}>
         <input
           type="date"
           className={inputClass}
           value={form.eventDate}
-          onChange={(e) => setForm((f) => ({ ...f, eventDate: e.target.value }))}
+          onChange={(e) => {
+            const eventDate = e.target.value
+            // Ulwaluko and umgidi are one plan: suggest umgidi four weeks later.
+            setForm((f) => ({ ...f, eventDate, homecomingDate: isUlwaluko && !f.homecomingDate && eventDate ? addDays(eventDate, 28) : f.homecomingDate }))
+          }}
         />
       </Field>
+      {isUlwaluko && (
+        <Field label={HOMECOMING} hint="Usually three to five weeks after going in, in the school holidays. Change it to suit the family.">
+          <input
+            type="date"
+            className={inputClass}
+            value={form.homecomingDate || ''}
+            min={form.eventDate || undefined}
+            onChange={(e) => setForm((f) => ({ ...f, homecomingDate: e.target.value }))}
+          />
+        </Field>
+      )}
     </div>
   )
 }
