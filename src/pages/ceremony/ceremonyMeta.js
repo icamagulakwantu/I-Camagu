@@ -13,6 +13,8 @@ export const CEREMONY_META = {
   INKOBE_ZIKA_MAMA: { name: 'Inkobe zikaMama', desc: 'Ceremony planning', titleExample: 'Inkobe zikaNoluthando' },
   UKUBUYISA: { name: 'Ukubuyisa', desc: 'Ceremony planning', titleExample: 'Ukubuyisa kukaNomsa' },
   UMSEBENZI_WEGQIRHA: { name: 'Umsebenzi weGqirha', desc: 'Ceremony planning', titleExample: 'Umsebenzi kaZanele' },
+  IMBELEKO: { name: 'Imbeleko', desc: 'Welcoming a child', titleExample: 'Imbeleko kaLuthando' },
+  INTONJANE: { name: 'Intonjane', desc: 'Coming of age', titleExample: 'Intonjane kaAyanda' },
   WEDDING: { name: 'Wedding', desc: 'Marriage celebration', titleExample: "Sindiswa's Wedding" },
   GENERAL_EVENT: { name: 'General Event', desc: 'Custom event', titleExample: 'Family gathering, July 2026' },
 }

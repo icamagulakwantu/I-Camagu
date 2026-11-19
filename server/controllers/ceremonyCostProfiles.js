@@ -1,3 +1,4 @@
+import { DRAFT_CEREMONY_TYPES, LIVE_FROM_DRAFTS } from '../data/ceremonyDrafts.js';
 // ============================================================================
 // COST ESTIMATION CONSTANTS — Market rates (ZAR)
 //
@@ -673,6 +674,36 @@ export const CEREMONY_COST_PROFILES = {
   UMSEBENZI_WEGQIRHA: UMSEBENZI_WEGQIRHA_COST_PROFILE,
 };
 
+// Reviewed draft ceremonies (Imbeleko, Intonjane) become live plans: their
+// items become checklist steps, and items with a quantity and price key
+// become cost lines. Without a known price the line says "Price to confirm".
+const RATE_LOOKUP = Object.assign({}, ...Object.values(COST_RATES));
+const RATE_CATEGORY = Object.fromEntries(Object.entries(COST_RATES).flatMap(([category, rates]) => Object.keys(rates).map((key) => [key, category])));
+function liveFromDraft(type) {
+  const draft = DRAFT_CEREMONY_TYPES[type];
+  const items = [];
+  const profile = {};
+  for (const { phase, items: phaseItems } of draft.phases) {
+    for (const item of phaseItems) {
+      items.push({ phase, label: item.label });
+      if (item.unit === 'task') continue;
+      (profile[phase] ||= []).push({
+        label: item.label,
+        category: (item.rateKey && RATE_CATEGORY[item.rateKey]) || 'supplies',
+        unit: item.unit,
+        unitCost: item.rateKey && RATE_LOOKUP[item.rateKey] != null ? RATE_LOOKUP[item.rateKey] : 0,
+        quantity: item.quantity,
+        isInputField: true,
+        inputType: 'number',
+        suggestedAmount: item.rateKey && RATE_LOOKUP[item.rateKey] != null ? null : 'Price to confirm',
+      });
+    }
+  }
+  return { items, profile };
+}
+const LIVE_DRAFTS = Object.fromEntries(LIVE_FROM_DRAFTS.map((type) => [type, liveFromDraft(type)]));
+for (const [type, { profile }] of Object.entries(LIVE_DRAFTS)) CEREMONY_COST_PROFILES[type] = profile;
+
 // Map ceremony types to their default checklist arrays
 // Exported so existing ulwaluko plans can be brought up to date.
 export const ULWALUKO_WITH_UMGIDI_ITEMS = [...ULWALUKO_DEFAULT_ITEMS, ...UMGIDI_DEFAULT_ITEMS, ...UBUKRWALA_ITEMS];
@@ -680,6 +711,7 @@ export const ULWALUKO_CLOSURE_RENAME = ['Courtesy: 1-2 bottles of brandy and bee
 export { UMGIDI_DEFAULT_ITEMS, UMGIDI_COST_PROFILE };
 
 const DEFAULT_ITEMS_MAP = {
+  ...Object.fromEntries(Object.entries(LIVE_DRAFTS).map(([type, { items }]) => [type, items])),
   ULWALUKO: ULWALUKO_WITH_UMGIDI_ITEMS,
   WEDDING: WEDDING_DEFAULT_ITEMS,
   UMGIDI: UMGIDI_DEFAULT_ITEMS,

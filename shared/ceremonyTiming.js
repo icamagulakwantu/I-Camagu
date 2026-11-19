@@ -37,6 +37,11 @@ export const PHASE_TIMING = {
   WEDDING_FINAL: { days: -7 },
   WEDDING_DAY: { days: 0 },
   AFTER_WEDDING: { days: 1 },
+  // Imbeleko and Intonjane (Intonjane's date is when the separation begins)
+  ANIMAL_AND_OFFERING: { days: -7 },
+  FOOD_AND_DRINK: { days: -3 },
+  PREPARATION: { days: -7 },
+  CELEBRATION: { days: 21 },
   // Mourning, after the funeral
   MOURNING: { days: 7 },
   MOURNING_END: { days: 365 },

@@ -1,60 +1,65 @@
-// Founder-reviewed draft catalogue. These entries are intentionally not
-// exposed as live planner templates until the checklist, animal rules and
+// Founder-reviewed draft catalogue. Entries marked REVIEWED_LIVE are live
+// planner templates; the others are intentionally not exposed until the checklist, animal rules and
 // quantities have been reviewed. A null rateKey always means Price to confirm;
 // a rateKey only points at COST_RATES and is not proof that the rate is current.
 export const DRAFT_CEREMONY_TYPES = Object.freeze({
   IMBELEKO: {
     name: 'Imbeleko',
     english: 'Introducing a child to the family and ancestors',
-    status: 'DRAFT_FOR_FOUNDER_REVIEW',
-    basis: 'A rite introducing a child to family and ancestors; animal, timing and hide details vary by family.',
+    status: 'REVIEWED_LIVE',
+    basis: 'Reviewed 20 Nov 2026 against the research review: the child is introduced to the family and ancestors, an elder calls the child by name while a goat is offered, and a strip of the hide is made for the child. Sources differ on the goat (colour, sex) and on timing (days after birth to later childhood), so those stay the family’s decision.',
     phases: [
       { phase: 'PLANNING', items: [
         { label: 'Agree the date with the child’s father’s family and inform the mother’s family', quantity: 1, unit: 'task', rateKey: null },
-        { label: 'Choose the elder who will lead the family’s address', quantity: 1, unit: 'task', rateKey: null, founderToConfirm: 'Who leads' },
-        { label: 'Record the child’s names and both family iziduko for the elder', quantity: 1, unit: 'task', rateKey: null },
+        { label: 'Choose the elder who will speak to the ancestors for the child', quantity: 1, unit: 'task', rateKey: null },
+        { label: 'Write down the child’s names and both families’ iziduko for the elder', quantity: 1, unit: 'task', rateKey: null },
       ]},
       { phase: 'ANIMAL_AND_OFFERING', items: [
-        { label: 'Goat for the ceremony', quantity: 1, unit: 'animal', rateKey: 'goat_standard', founderToConfirm: 'Confirm animal, sex/colour and whether sheep is used' },
+        { label: 'Goat for the imbeleko (its kind and colour as the family decides)', quantity: 1, unit: 'animal', rateKey: 'goat_standard' },
         { label: 'Imphepho', quantity: 2, unit: 'bundle', rateKey: 'imphepho_bundle' },
-        { label: 'Hide strip for the child', quantity: 1, unit: 'piece', rateKey: null, founderToConfirm: 'Confirm animal hide and preparation' },
+        { label: 'A strip of the hide made for the child', quantity: 1, unit: 'piece', rateKey: null },
       ]},
       { phase: 'FOOD_AND_DRINK', items: [
-        { label: 'Umqombothi', quantity: 6, unit: 'bhekile', rateKey: 'umqombothi_bhekile', founderToConfirm: 'Adjust to guest numbers' },
+        { label: 'Umqombothi', quantity: 6, unit: 'bhekile', rateKey: 'umqombothi_bhekile' },
         { label: 'Maize meal for pap', quantity: 1, unit: '50kg bag', rateKey: 'maize_meal_50kg' },
         { label: 'Vegetables and cooking oil', quantity: 1, unit: 'kit', rateKey: null },
-        { label: 'Courtesy brandy for elders', quantity: 2, unit: 'bottle', rateKey: 'brandy_750ml' },
+        { label: 'Courtesy brandy for the elders', quantity: 2, unit: 'bottle', rateKey: 'brandy_750ml' },
         { label: 'Plates and spoons', quantity: 2, unit: 'pack of 50', rateKey: 'plastic_plate_pack_50' },
       ]},
       { phase: 'CEREMONY_DAY', items: [
-        { label: 'Elder introduces the child by name and clan praises', quantity: 1, unit: 'task', rateKey: null },
-        { label: 'Slaughter the animal according to the family’s practice', quantity: 1, unit: 'task', rateKey: null, founderToConfirm: 'Timing and person responsible' },
-        { label: 'Place the hide strip on the child', quantity: 1, unit: 'task', rateKey: null },
-        { label: 'Share the meat according to the family’s practice', quantity: 1, unit: 'task', rateKey: null, founderToConfirm: 'Order of sharing' },
+        { label: 'The elder calls the child by name to the ancestors, with the clan praises', quantity: 1, unit: 'task', rateKey: null },
+        { label: 'The goat is offered as the family does it', quantity: 1, unit: 'task', rateKey: null },
+        { label: 'The hide strip is placed on the child', quantity: 1, unit: 'task', rateKey: null },
+        { label: 'The meat is shared as the family does it', quantity: 1, unit: 'task', rateKey: null },
       ]},
-      { phase: 'CLOSING', items: [{ label: 'Record attendance and gifts (Ukugida)', quantity: 1, unit: 'task', rateKey: null }]},
+      { phase: 'CLOSING', items: [
+        { label: 'Keep the goat skin for the child', quantity: 1, unit: 'task', rateKey: null },
+        { label: 'Record who came and what they brought (ukugida)', quantity: 1, unit: 'task', rateKey: null },
+      ]},
     ],
     questions: ['What age range is used in your family?', 'Is the rite the same for a boy and a girl?', 'Is the animal always supplied by the father’s side?'],
   },
   INTONJANE: {
-    name: 'Intonjane', english: 'Young woman’s coming-of-age rite', status: 'DRAFT_FOR_FOUNDER_REVIEW',
-    basis: 'A sensitive rite led by senior women; private teachings must not be required in a public checklist.',
+    name: 'Intonjane', english: 'A young woman’s coming of age', status: 'REVIEWED_LIVE',
+    basis: 'Reviewed 20 Nov 2026 against the research review (incl. Matholeni 2020, KwaNtonjane): a rite between a girl’s first period and marriage, led by senior women, with a time of separation (three to six weeks in the sources) behind a curtain, the inkciyo beaded covering, new clothes on the return from the river, and ritual meat. Private teachings stay with the women and are never listed.',
     phases: [
       { phase: 'PLANNING_WOMEN_ELDERS', items: [
-        { label: 'Senior women set the dates and lead planning', quantity: 1, unit: 'task', rateKey: null, founderToConfirm: 'Senior women to confirm' },
-        { label: 'Agree the place and length of the separation', quantity: 1, unit: 'task', rateKey: null, founderToConfirm: 'Confirm length and place' },
+        { label: 'She tells her mother, and the senior women lead from here', quantity: 1, unit: 'task', rateKey: null },
+        { label: 'Senior women set the dates, the place and the length of the separation', quantity: 1, unit: 'task', rateKey: null },
       ]},
       { phase: 'PREPARATION', items: [
-        { label: 'Umqombothi for the gathering', quantity: 10, unit: 'bhekile', rateKey: 'umqombothi_bhekile', founderToConfirm: 'Confirm quantity' },
+        { label: 'A private space for the separation, with a curtain', quantity: 1, unit: 'task', rateKey: null },
+        { label: 'Inkciyo (beaded covering) and beads for the young woman', quantity: 1, unit: 'set', rateKey: null },
+        { label: 'New clothes for her return from the river', quantity: 1, unit: 'set', rateKey: null },
+        { label: 'Animal for the ceremony', quantity: 1, unit: 'animal', rateKey: 'goat_standard' },
+        { label: 'Umqombothi for the gathering', quantity: 10, unit: 'bhekile', rateKey: 'umqombothi_bhekile' },
         { label: 'Maize meal', quantity: 1, unit: '50kg bag', rateKey: 'maize_meal_50kg' },
-        { label: 'Animal for the ceremony', quantity: 1, unit: 'animal', rateKey: 'goat_standard', founderToConfirm: 'Confirm animal and quantity' },
-        { label: 'Beads and clothing for the young woman', quantity: 1, unit: 'set', rateKey: null, founderToConfirm: 'Senior women to list' },
       ]},
       { phase: 'CELEBRATION', items: [
-        { label: 'Singers and dancers (ukuxhentsa)', quantity: 4, unit: 'person', rateKey: 'singer_per_session', founderToConfirm: 'Confirm whether family members are paid' },
+        { label: 'Singing and dancing (ukuxhentsa) to welcome her back', quantity: 1, unit: 'task', rateKey: null },
         { label: 'Guests’ food, plates and spoons', quantity: 1, unit: 'kit', rateKey: null },
       ]},
-      { phase: 'CLOSING', items: [{ label: 'Record contributions (Ukugida)', quantity: 1, unit: 'task', rateKey: null }]},
+      { phase: 'CLOSING', items: [{ label: 'Record who came and what they brought (ukugida)', quantity: 1, unit: 'task', rateKey: null }]},
     ],
     questions: ['Which steps are public and which remain with women?', 'How long is the separation in your family?', 'What do the beads and clothing signify?'],
   },
@@ -175,4 +180,6 @@ export const DRAFT_CEREMONY_TYPES = Object.freeze({
   },
 });
 
-export const DRAFT_CEREMONY_TYPE_NAMES = Object.freeze(Object.keys(DRAFT_CEREMONY_TYPES));
+// Reviewed entries are live; the rest stay hidden until reviewed.
+export const LIVE_FROM_DRAFTS = Object.freeze(Object.keys(DRAFT_CEREMONY_TYPES).filter((type) => DRAFT_CEREMONY_TYPES[type].status === 'REVIEWED_LIVE'));
+export const DRAFT_CEREMONY_TYPE_NAMES = Object.freeze(Object.keys(DRAFT_CEREMONY_TYPES).filter((type) => DRAFT_CEREMONY_TYPES[type].status !== 'REVIEWED_LIVE'));

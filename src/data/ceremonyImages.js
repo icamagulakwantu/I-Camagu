@@ -11,6 +11,9 @@ export const CEREMONY_IMAGE = {
   UMSEBENZI_WEGQIRHA: '/images/ceremonies/umsebenzi.jpg',
   // Founder-supplied wedding photo (Simphiwe Nama Photography).
   WEDDING: '/images/ceremonies/wedding-celebration.jpg',
+  // No photograph of their own yet: the homestead and family table.
+  IMBELEKO: '/images/ceremonies/umsebenzi.jpg',
+  INTONJANE: '/images/ceremonies/inkobe-zika-mama.jpg',
 }
 
 // Ceremony types without their own photo share the homestead feast table.

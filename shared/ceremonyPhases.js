@@ -32,6 +32,12 @@ export const PHASE_LABELS = {
   AFTER_WEDDING: 'After the wedding',
   MOURNING: 'Ukuzila · Mourning',
   MOURNING_END: 'Ukukhulula izila · End of mourning',
+  ANIMAL_AND_OFFERING: 'The goat and the offering',
+  FOOD_AND_DRINK: 'Food and drink',
+  CEREMONY_DAY: 'On the day',
+  PLANNING_WOMEN_ELDERS: 'The senior women lead',
+  PREPARATION: 'Preparing',
+  CELEBRATION: 'Welcoming her back',
   FAMILY_SUGGESTIONS: 'Suggested by the family',
 };
 

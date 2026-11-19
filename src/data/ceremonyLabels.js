@@ -11,6 +11,8 @@ export const CEREMONY_LABEL = {
   INKOBE_ZIKA_MAMA: 'Inkobe zikaMama',
   UKUBUYISA: 'Ukubuyisa',
   UMSEBENZI_WEGQIRHA: 'Umsebenzi weGqirha',
+  IMBELEKO: 'Imbeleko',
+  INTONJANE: 'Intonjane',
   WEDDING: 'Wedding',
   GENERAL_EVENT: 'General Event',
 }

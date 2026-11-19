@@ -12,6 +12,8 @@ const CEREMONY_ICONS = {
   UKUBUYISA: 'houseHeart',
   UMSEBENZI_WEGQIRHA: 'sprout',
   WEDDING: 'heartHandshake',
+  IMBELEKO: 'sprout',
+  INTONJANE: 'heart',
   GENERAL_EVENT: 'calendarRange',
 }
 
