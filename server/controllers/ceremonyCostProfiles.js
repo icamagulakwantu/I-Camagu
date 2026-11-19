@@ -143,13 +143,32 @@ const COST_RATES = {
 // CHECKLIST ARRAYS — Strictly isiXhosa, no Zulu contamination
 // ============================================================================
 
+// Ulwaluko and umgidi are planned as one: the plan runs from umgeno (going
+// in) through ubukhwetha (seclusion) and umphumo (coming out) to umgidi at
+// home and ubukrwala (the new man). Stage names follow the scholarly
+// isiXhosa terms (see docs/research/2026-11-ulwaluko-and-iziduko.md).
+export const ULWALUKO_REGISTRATION_ITEMS = [
+  { phase: 'REGISTRATION', label: 'Register with the initiation committee or traditional leader before the season' },
+  { phase: 'REGISTRATION', label: 'Written consent from his parent or guardian' },
+  { phase: 'REGISTRATION', label: 'Ingcibi and ikhankatha are registered (verified on i-Camagu)' },
+];
+export const IBHOMA_TOOL_ITEMS = [
+  { phase: 'IBHOMA_CONSTRUCTION', label: 'Ipeki and shovel: clear the bushes and grass and make a patch' },
+  { phase: 'IBHOMA_CONSTRUCTION', label: 'Saw and hammer (with nails)' },
+];
+export const UBUKRWALA_ITEMS = [
+  { phase: 'UBUKRWALA', label: 'Amakrwala clothes: hat, jacket, shirt, trousers and shoes (often brown, beige or khaki)' },
+];
+
 const ULWALUKO_DEFAULT_ITEMS = [
+  ...ULWALUKO_REGISTRATION_ITEMS,
   { phase: 'TRANSPORT_ARRIVAL', label: 'Arrange transport to the mountain' },
   { phase: 'TRANSPORT_ARRIVAL', label: 'Confirm elders/men accompanying' },
   { phase: 'PHYSICAL_PREPARATION', label: 'Head, facial, and pubic hair fully removed' },
   { phase: 'SPIRITUAL_ITEMS', label: 'Ikoto (bentonite clay)' },
   { phase: 'SPIRITUAL_ITEMS', label: 'Imphepho' },
   { phase: 'SPIRITUAL_ITEMS', label: 'Arrange uqiniswa komntwana (traditional healer)' },
+  ...IBHOMA_TOOL_ITEMS,
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Ingubo (blanket)' },
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Sail/tarpaulin to cover ibhoma' },
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Poles for structure' },
@@ -169,7 +188,7 @@ const ULWALUKO_DEFAULT_ITEMS = [
   { phase: 'UMOJISO', label: 'Minimum 4 bottles of brandy, 2 cases of beer (1 bottle for peers)' },
   { phase: 'EXIT_PREPARATION', label: 'Fresh white blanket with black stripes' },
   { phase: 'EXIT_PREPARATION', label: 'Correct type of butter (confirm with family)' },
-  { phase: 'IBHOMA_CLOSURE', label: 'Courtesy: 1-2 bottles of brandy and beers for closure team' },
+  { phase: 'IBHOMA_CLOSURE', label: 'Courtesy: the family pays the young men who burn the ibhoma with a bottle and beers' },
   { phase: 'RETURN_HOME', label: 'Arrange transport home' },
 ];
 
@@ -341,6 +360,9 @@ const ULWALUKO_COST_PROFILE = {
     { label: 'Arrange uqiniswa komntwana (traditional healer)', category: 'services', unit: 'session', unitCost: COST_RATES.services.igqirha_session, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'R1,500 - R3,500' },
   ],
   'IBHOMA_CONSTRUCTION': [
+    // No checked shop prices for these tools yet, so no price is invented.
+    { label: 'Ipeki and shovel: clear the bushes and grass and make a patch', category: 'supplies', unit: 'set', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Borrow from family or buy' },
+    { label: 'Saw and hammer (with nails)', category: 'supplies', unit: 'set', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Borrow from family or buy' },
     { label: 'Ingubo (blanket)', category: 'supplies', unit: 'blanket', unitCost: COST_RATES.supplies.blanket_plain, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 blankets', skuName: 'Plain Grey Blanket' },
     { label: 'Sail/tarpaulin to cover ibhoma', category: 'supplies', unit: 'sheet', unitCost: COST_RATES.supplies.tarpaulin_sail, quantity: 1, isInputField: true, inputType: 'number', skuName: 'Tarpaulin Sail' },
     { label: 'Poles for structure', category: 'supplies', unit: 'bundle', unitCost: COST_RATES.supplies.poles_bundle, quantity: 1, isInputField: true, inputType: 'number', skuName: 'Ibhoma Pole Bundle' },
@@ -367,7 +389,7 @@ const ULWALUKO_COST_PROFILE = {
     { label: 'Correct type of butter (confirm with family)', category: 'food', unit: 'tub', unitCost: COST_RATES.food.butter_500g, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 x 500g tubs', skuName: 'Butter 500g' },
   ],
   'IBHOMA_CLOSURE': [
-    { label: 'Courtesy: 1-2 bottles of brandy and beers for closure team', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 12 beers' },
+    { label: 'Courtesy: the family pays the young men who burn the ibhoma with a bottle and beers', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 12 beers' },
   ],
   'RETURN_HOME': [
     { label: 'Arrange transport home', category: 'transport', unit: 'trip', unitCost: COST_RATES.transport.bakkie_hire_day, quantity: 1, isInputField: true, inputType: 'number' },
@@ -605,7 +627,8 @@ const UMSEBENZI_WEGQIRHA_COST_PROFILE = {
 // ============================================================================
 
 export const CEREMONY_COST_PROFILES = {
-  ULWALUKO: ULWALUKO_COST_PROFILE,
+  // One plan from the mountain to umgidi at home.
+  ULWALUKO: { ...ULWALUKO_COST_PROFILE, ...UMGIDI_COST_PROFILE },
   UMGIDI: UMGIDI_COST_PROFILE,
   IMIGIDI: UMGIDI_COST_PROFILE,
   INTAMBO_ENKULU: INTAMBO_ENKULU_COST_PROFILE,
@@ -617,8 +640,13 @@ export const CEREMONY_COST_PROFILES = {
 };
 
 // Map ceremony types to their default checklist arrays
+// Exported so existing ulwaluko plans can be brought up to date.
+export const ULWALUKO_WITH_UMGIDI_ITEMS = [...ULWALUKO_DEFAULT_ITEMS, ...UMGIDI_DEFAULT_ITEMS, ...UBUKRWALA_ITEMS];
+export const ULWALUKO_CLOSURE_RENAME = ['Courtesy: 1-2 bottles of brandy and beers for closure team', 'Courtesy: the family pays the young men who burn the ibhoma with a bottle and beers'];
+export { UMGIDI_DEFAULT_ITEMS, UMGIDI_COST_PROFILE };
+
 const DEFAULT_ITEMS_MAP = {
-  ULWALUKO: ULWALUKO_DEFAULT_ITEMS,
+  ULWALUKO: ULWALUKO_WITH_UMGIDI_ITEMS,
   UMGIDI: UMGIDI_DEFAULT_ITEMS,
   IMIGIDI: UMGIDI_DEFAULT_ITEMS,
   INTAMBO_ENKULU: INTAMBO_ENKULU_DEFAULT_ITEMS,

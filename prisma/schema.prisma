@@ -1280,3 +1280,10 @@ model ClanPraise {
   @@unique([clanGroupId, praise])
   @@index([clanGroupId])
 }
+
+// One-off data fixes that must run once only (e.g. adding new checklist items
+// to existing plans, which must not come back after a family removes them).
+model DataFix {
+  name      String   @id
+  appliedAt DateTime @default(now())
+}

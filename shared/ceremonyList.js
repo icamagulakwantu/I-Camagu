@@ -7,6 +7,7 @@
 // The money rules do not change: a SUGGESTED price is only a hint and is never
 // deducted. Only the ACTUAL price a host types in comes off the budget.
 import { hasActual, suggestedTotal, suggestedUnitCost, summariseCosts, UNFORESEEN_PHASE } from './ceremonyCosts.js';
+import { PHASE_LABELS } from './ceremonyPhases.js';
 
 const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
 
@@ -89,6 +90,7 @@ export function groupRowsByPhase(rows) {
 
 export function phaseLabel(phase) {
   if (!phase || phase === 'CUSTOM') return 'Added by you';
+  if (PHASE_LABELS[phase]) return PHASE_LABELS[phase];
   const text = String(phase).replace(/_/g, ' ').toLowerCase();
   return text.charAt(0).toUpperCase() + text.slice(1);
 }

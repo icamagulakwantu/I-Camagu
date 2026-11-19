@@ -404,4 +404,12 @@ export async function ensureCeremonyBudgetColumns() {
   `);
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "ClanPraise_clanGroupId_praise_key" ON "ClanPraise" ("clanGroupId", "praise");');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "ClanPraise_clanGroupId_idx" ON "ClanPraise" ("clanGroupId");');
+
+  // Record of one-off data fixes (see DataFix).
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "DataFix" (
+      "name" TEXT NOT NULL PRIMARY KEY,
+      "appliedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 }

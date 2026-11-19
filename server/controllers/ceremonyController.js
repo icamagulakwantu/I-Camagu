@@ -2,6 +2,7 @@ import prisma from '../config/db.js';
 import crypto from 'crypto';
 import { CeremonyType } from '@prisma/client';
 import { CEREMONY_COST_PROFILES, getDefaultItemsForType } from './ceremonyCostProfiles.js';
+import { ULWALUKO_STAGES } from '../../shared/ceremonyPhases.js';
 import { DRAFT_CEREMONY_TYPE_NAMES } from '../data/ceremonyDrafts.js';
 import { createShareToken, isShareTokenValid } from '../utils/shareToken.js';
 
@@ -42,15 +43,8 @@ export const getCeremonyTimeline = async (req, res) => {
             }));
 
             if (normalized === 'ULWALUKO') {
-                  const before = ['TRANSPORT_ARRIVAL', 'PHYSICAL_PREPARATION', 'SPIRITUAL_ITEMS', 'IBHOMA_CONSTRUCTION', 'DAILY_ESSENTIALS', 'DIET_EARLY_STAGE'];
-                  const mountain = ['UMOJISO'];
-                  const after = ['EXIT_PREPARATION', 'IBHOMA_CLOSURE', 'RETURN_HOME'];
-                  const groups = [
-                        ['BEFORE_MOUNTAIN', 'Before the mountain', before],
-                        ['MOUNTAIN', 'Mountain phase', mountain],
-                        ['AFTER_MOUNTAIN', 'After the mountain', after],
-                  ];
-                  phases = groups.map(([key, label, keys]) => ({
+                  // Ulwaluko and umgidi as one plan, by the isiXhosa stages.
+                  phases = ULWALUKO_STAGES.map(([key, label, keys]) => ({
                         key,
                         label,
                         checklist: keys.flatMap(phase => phaseMap[phase] || []),

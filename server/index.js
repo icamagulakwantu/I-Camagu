@@ -23,6 +23,7 @@ import { backfillUploadedProductImages } from './scripts/backfill-uploaded-produ
 import { cleanUpCatalogueNov2026 } from './scripts/catalogue-cleanup-nov-2026.js';
 import { fixUlwalukoDietWording } from './scripts/ulwaluko-diet-wording-nov-2026.js';
 import { loadClanPraises } from './scripts/load-clan-praises.js';
+import { updateUlwalukoPlans } from './scripts/ulwaluko-umgidi-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -249,6 +250,12 @@ if (startup.schemaReady) {
     await loadClanPraises();
   } catch (err) {
     console.error('Clan praises failed:', err?.message);
+  }
+  // Founder's 19 Nov 2026 ulwaluko changes for existing plans. Runs once.
+  try {
+    await updateUlwalukoPlans();
+  } catch (err) {
+    console.error('Ulwaluko plan update failed:', err?.message);
   }
 }
 
