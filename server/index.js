@@ -25,6 +25,7 @@ import { fixUlwalukoDietWording } from './scripts/ulwaluko-diet-wording-nov-2026
 import { loadClanPraises } from './scripts/load-clan-praises.js';
 import { updateUlwalukoPlans } from './scripts/ulwaluko-umgidi-nov-2026.js';
 import { updateWeddingAndMourningPlans } from './scripts/wedding-mourning-nov-2026.js';
+import { updateDirectoryListings } from './scripts/directory-listings-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -263,6 +264,12 @@ if (startup.schemaReady) {
     await updateWeddingAndMourningPlans();
   } catch (err) {
     console.error('Wedding and mourning plan update failed:', err?.message);
+  }
+  // Remove the sample practitioners and add the first local businesses. Runs once.
+  try {
+    await updateDirectoryListings();
+  } catch (err) {
+    console.error('Directory listing update failed:', err?.message);
   }
 }
 

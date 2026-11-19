@@ -150,6 +150,7 @@ const COST_RATES = {
 // isiXhosa terms (see docs/research/2026-11-ulwaluko-and-iziduko.md).
 export const ULWALUKO_REGISTRATION_ITEMS = [
   { phase: 'REGISTRATION', label: 'Register with the initiation committee or traditional leader before the season' },
+  { phase: 'REGISTRATION', label: "Collect the CoGTA initiation forms from the ward councillor's office" },
   { phase: 'REGISTRATION', label: 'Written consent from his parent or guardian' },
   { phase: 'REGISTRATION', label: 'Ingcibi and ikhankatha are registered (verified on i-Camagu)' },
 ];

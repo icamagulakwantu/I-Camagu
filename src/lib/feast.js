@@ -5,9 +5,9 @@
 // Sources and reasoning:
 // - Meat on the bone: 320 g a person, Food & Home's South African catering
 //   guide (bone-in beef joints). foodandhome.co.za/how-to/calculate-catering-quantities-per-person
-// - A sheep gives about 20 kg of meat on the bone, and a Nguni beast about
-//   180 kg. Both are estimates; a butcher or the person slaughtering will know
-//   the animal in front of them.
+// - A sheep gives about 18 kg of meat and a beast about 200 kg: the
+//   founder's figures from slaughtering for ceremonies. The person
+//   slaughtering will know the animal in front of them.
 // - Maize meal, cabbage, spinach, potatoes, oil, sugar and plates use the same
 //   per-guest fractions the ceremony planner already scales its catering lines
 //   by (server/controllers/ceremonyCostProfiles.js).
@@ -16,8 +16,8 @@
 // Prices mirror COST_RATES on the server and are estimates.
 
 export const MEAT_KG_PER_GUEST = 0.32
-export const SHEEP_MEAT_KG = 20
-export const BEAST_MEAT_KG = 180
+export const SHEEP_MEAT_KG = 18
+export const BEAST_MEAT_KG = 200
 
 const PRICES = {
   sheep: 2700, beast: 18000, maize50: 520, rice10: 195, cabbage: 22,

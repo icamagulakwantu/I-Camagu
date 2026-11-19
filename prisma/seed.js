@@ -420,12 +420,9 @@ const samplePartners = [
   { name: "Coke's Tavern", type: 'TAVERN', area: 'Motherwell', moq: 40 },
 ];
 
-const practitionerSeeds = [
-  { name: 'Bhut\' Sizwe Ingcibi Services', role: 'INGCIBI', area: 'Gugulethu', contactInfo: '021 555 0101' },
-  { name: 'Mama Noku Ikhankatha Care', role: 'IKHANKATHA', area: 'Khayelitsha', contactInfo: '021 555 0102' },
-  { name: 'Tata Zola Traditional Guidance', role: 'CULTURAL_ADVISOR', area: 'Motherwell', contactInfo: '041 555 0103' },
-  { name: 'Nkosi Ingcibi Practice', role: 'INGCIBI', area: 'Mdantsane', contactInfo: '043 555 0104' },
-];
+// No sample practitioners: a family must never mistake a made-up name for a
+// real ingcibi. Real ones list themselves and are verified.
+const practitionerSeeds = [];
 
 const vendorSeeds = [
   { name: 'Makro Liquor', category: 'LIQUOR_SUPPLIER', area: 'South Africa', description: 'Major liquor retail/wholesale source for catalogue and partner sourcing.' },

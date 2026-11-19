@@ -10,7 +10,32 @@ import { isAdminEmail } from '../lib/admin.js'
 import CommunityVerification from '../components/CommunityVerification.jsx'
 
 const PRACTITIONER_ROLES = ['INGCIBI', 'IKHANKATHA', 'CULTURAL_ADVISOR']
-const VENDOR_CATEGORIES = ['ATTIRE', 'CATERING', 'EQUIPMENT_HIRE', 'COOKWARE', 'LIVESTOCK_FARM', 'LIQUOR_SUPPLIER', 'IKRWALA_CLOTHING', 'FORMALWEAR']
+const CATEGORY_NAMES = {
+  TRADITIONAL_GOODS: 'Traditional goods', ATTIRE: 'Attire', CATERING: 'Catering',
+  EQUIPMENT_HIRE: 'Tents & hire', COOKWARE: 'Pots & cookware', LIVESTOCK_FARM: 'Livestock',
+  LIQUOR_SUPPLIER: 'Drinks', IKRWALA_CLOTHING: 'Ikrwala clothing', FORMALWEAR: 'Formalwear',
+}
+const categoryName = (c) => CATEGORY_NAMES[c] || c.replace(/_/g, ' ').toLowerCase()
+
+// Each part of a vendor's contact line ("067 947 9022 · site.co.za") as a
+// link: a phone opens WhatsApp, a web address opens the site.
+function ContactLinks({ text }) {
+  const parts = text.split(/\s*[·|,]\s*/).filter(Boolean)
+  return (
+    <p className="mt-2 flex flex-wrap gap-2 text-xs">
+      {parts.map((part) => {
+        const isPhone = /^[+\d][\d\s-]{6,}$/.test(part)
+        const isWeb = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(part)
+        const href = isPhone ? `https://wa.me/${part.replace(/\D/g, '').replace(/^0/, '27')}` : isWeb ? (part.startsWith('http') ? part : `https://${part}`) : null
+        return href
+          ? <a key={part} href={href} target="_blank" rel="noopener noreferrer" className={`rounded-pill px-3 py-1.5 font-bold ${isPhone ? 'bg-[#25D366] text-white' : 'bg-cream-dark text-ink'}`}>{isPhone ? `WhatsApp ${part}` : part.replace(/^https?:\/\//, '')}</a>
+          : <span key={part} className="py-1.5 text-ink">{part}</span>
+      })}
+    </p>
+  )
+}
+
+const VENDOR_CATEGORIES = ['TRADITIONAL_GOODS', 'ATTIRE', 'CATERING', 'EQUIPMENT_HIRE', 'COOKWARE', 'LIVESTOCK_FARM', 'LIQUOR_SUPPLIER', 'IKRWALA_CLOTHING', 'FORMALWEAR']
 
 function Directory({ onBack }) {
   const { accessToken, user } = useAuth()
@@ -325,7 +350,7 @@ function Directory({ onBack }) {
               className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm focus:outline-none focus:border-sage-500"
             >
               {VENDOR_CATEGORIES.map(c => (
-                <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>
+                <option key={c} value={c}>{categoryName(c)}</option>
               ))}
             </select>
             <input 
@@ -362,7 +387,14 @@ function Directory({ onBack }) {
             <Skeleton className="h-20 w-full rounded-soft" />
           </div>
         ) : tab === 'practitioners' ? (
-          practitioners.length === 0 ? (
+          <>
+          <section className="mb-4 rounded-[20px] bg-[#1f3320] p-4 text-cream">
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-ochre-light">Ingcibi ebhalisiweyo · A registered ingcibi</p>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-cream/85">
+              The law asks that the ingcibi and ikhankatha be registered. Ask to see their registration, and check with your ward councillor's office or the initiation forum in your municipality. In Nelson Mandela Bay that is the Municipality's Initiation Forum; the CoGTA forms are at ward councillor offices.
+            </p>
+          </section>
+          {practitioners.length === 0 ? (
             <EmptyState emoji="🧑‍⚕️" title="No practitioners listed yet" description="Be the first to list one using the button above." />
           ) : (
             <div className="space-y-3">
@@ -419,7 +451,8 @@ function Directory({ onBack }) {
                 </div>
               ))}
             </div>
-          )
+          )}
+          </>
         ) : (
           vendors.length === 0 ? (
             <EmptyState emoji="📦" title="No vendors listed yet" description="Be the first to list one using the button above." />
@@ -429,16 +462,12 @@ function Directory({ onBack }) {
                 <div key={v.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 shadow-sm">
                   <p className="font-bold text-sm text-ink">{v.name}</p>
                   <p className="text-xs text-ink-muted font-medium mt-0.5">
-                    {v.category.replace(/_/g, ' ')} • {v.area}
+                    {categoryName(v.category)} • {v.area}
                   </p>
                   {v.description && (
                     <p className="text-xs text-ink-muted mt-2 border-t border-terracotta/10 pt-2">{v.description}</p>
                   )}
-                  {v.contactInfo && (
-                    <p className="text-xs text-ink mt-2">
-                      <span className="font-semibold">Contact:</span> {v.contactInfo}
-                    </p>
-                  )}
+                  {v.contactInfo && <ContactLinks text={v.contactInfo} />}
                   <CommunityVerification
                     targetType="VENDOR"
                     targetId={v.id}

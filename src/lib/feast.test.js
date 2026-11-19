@@ -6,7 +6,7 @@ describe('feast calculator', () => {
     expect(animalsFor(200)).toEqual({ meatKg: 64, beasts: 0, sheep: 4 })
   })
   it('a beast covers most of a large feast, sheep the rest', () => {
-    expect(animalsFor(700, 1)).toEqual({ meatKg: 224, beasts: 1, sheep: 3 })
+    expect(animalsFor(700, 1)).toEqual({ meatKg: 224, beasts: 1, sheep: 2 })
     expect(animalsFor(300, 1).sheep).toBe(0)
   })
   it('returns nothing for no guests', () => {
