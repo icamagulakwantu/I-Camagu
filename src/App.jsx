@@ -50,6 +50,7 @@ const ShrineFund = lazy(() => import('./pages/ShrineFund.jsx'))
 const LegendsExplore = lazy(() => import('./pages/LegendsExplore.jsx'))
 const Directory = lazy(() => import('./pages/Directory.jsx'))
 const UmqombothiCalculator = lazy(() => import('./pages/UmqombothiCalculator.jsx'))
+const FeastCalculator = lazy(() => import('./pages/FeastCalculator.jsx'))
 const Profile = lazy(() => import('./pages/Profile.jsx'))
 const PinSetup = lazy(() => import('./pages/PinSetup.jsx'))
 const PublicPlanView = lazy(() => import('./pages/PublicPlanView.jsx'))
@@ -70,7 +71,7 @@ const MORE_SCREENS = [
   'izidukoprofile', 'izidukochat', 'clangroups', 'supplier', 'portal', 'ekoyini',
   'ekoyiniadmin', 'identityadmin', 'marginadmin', 'demandadmin',
   'privacy', 'hierarchy', 'myorders', 'expenditure', 'shrinefund',
-  'legends', 'directory', 'umqombothi', 'pin', 'profile',
+  'legends', 'directory', 'umqombothi', 'isidlo', 'pin', 'profile',
   'notifications', 'account', 'help', 'activity',
 ]
 
@@ -106,6 +107,7 @@ const SCREEN_PATHS = {
   ukugida: '/ceremonies/ukugida',
   ukusoka: '/ceremonies/ukusoka',
   umqombothi: '/me/umqombothi',
+  isidlo: '/me/feast',
   expenditure: '/me/expenditure',
   shrinefund: '/me/ubuhlanti',
   pin: '/me/pin',
@@ -435,6 +437,8 @@ function MainApp() {
         return <Directory onBack={backFromTool} />
       case 'umqombothi':
         return <UmqombothiCalculator onBack={backFromTool} guestCount={toolCeremony?.guestCount ?? null} ceremonyTitle={toolCeremony?.title || ''} />
+      case 'isidlo':
+        return <FeastCalculator onBack={backFromTool} onOpenStore={() => setScreen('store')} guestCount={toolCeremony?.guestCount ?? null} ceremonyTitle={toolCeremony?.title || ''} />
       case 'pin':
         return <PinSetup onBack={goMore} />
       case 'stokvels':
