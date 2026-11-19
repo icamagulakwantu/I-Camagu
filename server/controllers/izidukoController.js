@@ -10,6 +10,7 @@ import {
 } from '../services/izidukoService.js';
 import { createNotification } from '../services/notificationDbService.js';
 import prisma from '../config/db.js';
+import { cleanLineage } from '../../shared/lineage.js';
 import { matchClan, searchClans, submitIsidukoForReview } from '../services/clanMatchService.js';
 
 export async function matchIsidukoName(req, res) {
@@ -79,7 +80,11 @@ export async function getMyClanMatches(req, res) {
       const matchedCount = other.matchedLines.length;
       let tier = 5;
       let label = 'Potential ancestral connection';
-      if (other.sameSurname && matchedCount >= 4) {
+      const shared = other.sharedAncestors || [];
+      if (shared.length) {
+        tier = 1;
+        label = `You share an ancestor: ${shared[0].name}`;
+      } else if (other.sameSurname && matchedCount >= 4) {
         tier = 1;
         label = 'Strong ancestral connection — shared four Isiduko lines & surname';
       } else if (other.sameSurname && matchedCount >= 2) {
@@ -187,5 +192,34 @@ export async function viewConnectionProfile(req, res) {
   } catch (error) {
     console.error('View connection profile error:', error.message);
     res.status(error.status || 500).json({ error: error.status ? error.message : 'Could not fetch profile' });
+  }
+}
+
+// GET /api/iziduko/lineage: my own umnombo.
+export async function getMyLineage(req, res) {
+  try {
+    const row = await prisma.lineage.findUnique({ where: { userId: req.userId } });
+    res.json({ ancestors: row?.ancestors || [], shareForMatching: !!row?.shareForMatching });
+  } catch (error) {
+    console.error('Get lineage error:', error.message);
+    res.status(500).json({ error: 'Could not load your line' });
+  }
+}
+
+// PUT /api/iziduko/lineage: save my umnombo and whether clan matches may
+// see the ancestors we share.
+export async function saveMyLineage(req, res) {
+  try {
+    const ancestors = cleanLineage(req.body?.ancestors);
+    const shareForMatching = req.body?.shareForMatching === true;
+    const row = await prisma.lineage.upsert({
+      where: { userId: req.userId },
+      update: { ancestors, shareForMatching },
+      create: { userId: req.userId, ancestors, shareForMatching },
+    });
+    res.json({ ancestors: row.ancestors, shareForMatching: row.shareForMatching });
+  } catch (error) {
+    console.error('Save lineage error:', error.message);
+    res.status(500).json({ error: 'Could not save your line' });
   }
 }

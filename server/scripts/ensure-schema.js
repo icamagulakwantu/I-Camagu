@@ -407,6 +407,16 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "ClanPraise_clanGroupId_praise_key" ON "ClanPraise" ("clanGroupId", "praise");');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "ClanPraise_clanGroupId_idx" ON "ClanPraise" ("clanGroupId");');
 
+  // A member's umnombo, their line of ancestors (see Lineage).
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "Lineage" (
+      "userId" TEXT NOT NULL PRIMARY KEY,
+      "ancestors" JSONB NOT NULL DEFAULT '[]',
+      "shareForMatching" BOOLEAN NOT NULL DEFAULT false,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
   // Record of one-off data fixes (see DataFix).
   await prisma.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "DataFix" (

@@ -11,7 +11,7 @@ import {
   viewConnectionProfile,
 } from '../controllers/izidukoController.js';
 import { listRites, addRite, updateRite, deleteRite } from '../controllers/ancestralRitesController.js';
-import { matchIsidukoName, searchClanDirectory, submitIsidukoReview } from '../controllers/izidukoController.js';
+import { matchIsidukoName, searchClanDirectory, submitIsidukoReview, getMyLineage, saveMyLineage } from '../controllers/izidukoController.js';
 import clanGroupRoutes from './clanGroups.js';
 
 const router = express.Router();
@@ -25,6 +25,8 @@ router.get('/clans', requireAuth, searchClanDirectory);
 router.get('/public/clans', rateLimit({ windowMs: 60 * 1000, max: 60 }), searchClanDirectory);
 router.post('/submissions', requireAuth, submitIsidukoReview);
 router.get('/matches', requireAuth, getMyClanMatches);
+router.get('/lineage', requireAuth, getMyLineage);
+router.put('/lineage', requireAuth, saveMyLineage);
 router.post('/connect', requireAuth, connectWithMatch);
 router.get('/requests', requireAuth, listConnectionRequests);
 router.patch('/requests/:id', requireAuth, respondToConnectionRequest);

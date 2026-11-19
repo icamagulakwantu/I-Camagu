@@ -5,6 +5,8 @@ import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
 import ClanSearch from '../components/ClanSearch.jsx'
+import LineageCard from '../components/LineageCard.jsx'
+import { generationName } from '../../shared/lineage.js'
 import HeroHeader from '../components/ui/HeroHeader.jsx'
 import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
@@ -154,6 +156,8 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
         {/* Anyone can search clans, even before their own profile is complete */}
         <ClanSearch onPickClan={onGoToClanLines} />
 
+        <LineageCard accessToken={accessToken} showToast={showToast} onSaved={loadAll} />
+
         <div className="flex bg-white border-2 border-terracotta/25 rounded-pill p-1 mb-4">
           {TABS.map((t) => (
             <button
@@ -227,6 +231,11 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
                         <div className="absolute bottom-0 left-0 right-0 p-4">
                           <p className="font-display font-bold text-2xl text-white leading-tight">{m.firstName} {m.lastName}</p>
                           <p className="text-xs text-white/80 mt-1">{m.label}</p>
+                          {m.sharedAncestors?.length > 0 && (
+                            <p className="mt-2 rounded-[12px] bg-ochre-light/95 px-3 py-2 text-xs font-bold leading-snug text-ink">
+                              You both name {m.sharedAncestors[0].name}: {generationName(m.sharedAncestors[0].myGeneration).split(' · ')[0].toLowerCase()} for you, {generationName(m.sharedAncestors[0].theirGeneration).split(' · ')[0].toLowerCase()} for them.
+                            </p>
+                          )}
                           {m.nearYou && (
                             <span className="mt-2 inline-flex items-center gap-1 rounded-pill bg-ochre-light px-2.5 py-1 text-xs font-extrabold text-ink">
                               <Icon name="mapPin" size={12} /> Lives near you

@@ -1,3 +1,4 @@
+import { sharedAncestors } from '../../shared/lineage.js';
 import prisma from '../config/db.js';
 import { matchClan, clearClanIndexCache } from './clanMatchService.js';
 
@@ -88,6 +89,15 @@ export async function findClanMatches(userId) {
     },
   });
 
+  // Umnombo: when both people share their line, name the ancestors they
+  // have in common. Only shared names leave the server, never a whole line.
+  const lineages = await prisma.lineage.findMany({
+    where: { shareForMatching: true, userId: { in: [userId, ...allUsers.map((u) => u.id)] } },
+    select: { userId: true, ancestors: true },
+  });
+  const lineageOf = new Map(lineages.map((l) => [l.userId, l.ancestors]));
+  const myLine = lineageOf.get(userId);
+
   const matches = [];
   for (const other of allUsers) {
     const otherFields = [
@@ -108,7 +118,9 @@ export async function findClanMatches(userId) {
     // each other first. Only a yes/no leaves the server, never a location.
     const { latitude, longitude, ...publicFields } = other;
     const nearYou = isNear(user, { latitude, longitude });
-    matches.push({ ...publicFields, matchedLines, sameSurname, nearYou });
+    const theirLine = lineageOf.get(other.id);
+    const commonAncestors = myLine && theirLine ? sharedAncestors(myLine, theirLine) : [];
+    matches.push({ ...publicFields, matchedLines, sameSurname, nearYou, sharedAncestors: commonAncestors });
   }
 
   // Near you first, then the closest bloodline (more shared clan lines).
