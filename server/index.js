@@ -24,6 +24,7 @@ import { cleanUpCatalogueNov2026 } from './scripts/catalogue-cleanup-nov-2026.js
 import { fixUlwalukoDietWording } from './scripts/ulwaluko-diet-wording-nov-2026.js';
 import { loadClanPraises } from './scripts/load-clan-praises.js';
 import { updateUlwalukoPlans } from './scripts/ulwaluko-umgidi-nov-2026.js';
+import { updateWeddingAndMourningPlans } from './scripts/wedding-mourning-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -256,6 +257,12 @@ if (startup.schemaReady) {
     await updateUlwalukoPlans();
   } catch (err) {
     console.error('Ulwaluko plan update failed:', err?.message);
+  }
+  // Full wedding plan and mourning steps for existing plans. Runs once.
+  try {
+    await updateWeddingAndMourningPlans();
+  } catch (err) {
+    console.error('Wedding and mourning plan update failed:', err?.message);
   }
 }
 

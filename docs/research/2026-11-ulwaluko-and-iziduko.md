@@ -92,3 +92,55 @@ in-app way for members to correct a praise.
 - izithakazelo, Iziduko zamaXhosa. https://izithakazelo.blog/iziduko-zamaxhosa/
 - iziduko.wordpress.com. https://iziduko.wordpress.com/
 - Know my roots, Xhosa clan names. https://knowmyroots.blogspot.com/2019/11/xhosa-clan-names_19.html
+
+# Update, 20 Nov 2026: planning like a wedding planner
+
+## What was built
+- **Due dates for every ceremony** (`shared/ceremonyTiming.js`): each stage
+  has an aim date counted from the ceremony date, or for ulwaluko's umgidi
+  stages from the umgidi date. Ulwaluko registration three months before the
+  season follows the Customary Initiation Act 2 of 2021; the other dates are
+  planning aims ("buy the tools before he goes up"), shown as "aim for". The
+  ceremony page has a "Coming up" card, like a wedding planner's this-week list.
+- **A guide for the initiate's mother** on the ulwaluko page, from research
+  with Xhosa mothers: mothers prepare their sons emotionally, spiritually and
+  with money, women prepare food and umqombothi, and mothers carry umgidi,
+  while choosing the ingcibi and what happens at the ibhoma belong to the men;
+  mothers often find strength in prayer and each other.
+- **Umtshato (wedding)**: from 4 generic steps to a full plan. Xhosa steps:
+  ukucela, senior men (uncles, older brothers) as negotiators, lobola in
+  cattle or cash as the families agree, at least two days of celebration,
+  utsiki (goat meat and amasi for umakoti), umdudo (the dance of acceptance),
+  ukuyalwa (elder women advise umakoti). Planning steps: budget, guest list,
+  venue, catering, attire, photographer, transport, MC and programme.
+- **Mourning** for ukukhapha: ukuzila (the elders set its length) and
+  ukukhulula izila (a goat, and the mourning clothes are burned).
+- Existing wedding and funeral plans get the new steps once (DataFix).
+
+## Competitors
+- No app called "Siko" was found in the app stores or on the web.
+- UMCIMBI (umcimbi.co.za) is the nearest: a marketplace for vendor quotes
+  (catering, décor, photography, transport) across South African ceremonies.
+  It does not plan the ceremony itself. i-Camagu's edge: the full plan per
+  ceremony with due dates, family pledges, stokvels, bulk buying and clans.
+
+## Still open
+- Imbeleko and Intonjane drafts await review (timing varies by family in the
+  sources: imbeleko from days after birth to later childhood).
+- "Izibizo" was not confirmed for Xhosa weddings in the sources, so it was
+  removed from the landing page.
+
+## Sources (update)
+- Makupula (2026), Psychosocial experiences, challenges, and coping strategies of Xhosa women during ulwaluko. https://journals.sagepub.com/doi/10.1177/00812463251414022
+- Constructing masculinity through ulwaluko: a scoping literature review (2025). https://www.tandfonline.com/doi/full/10.1080/23311983.2025.2457828
+- Some views of Xhosa women regarding the initiation of their sons. https://www.researchgate.net/publication/267705644_Some_views_of_Xhosa_women_regarding_the_initiation_of_their_sons
+- The extent of women involvement in the Ulwaluko rituals (AmaZizi-Dlamini). https://www.academia.edu/103994023/The_extent_of_women_involvement_in_the_Ulwaluko_rituals_among_the_AmaZizi_Dlamini_ethnic_group_of_KwaZangashe_Eastern_Cape
+- The Conversation, Why women should have more of a say in male rites of passage. https://theconversation.com/why-women-should-have-more-of-a-say-in-male-rites-of-passage-98015
+- Mail & Guardian, Inside 'Mgidi Moms'. https://mg.co.za/friday/2026-04-02-inside-mgidi-moms-where-tradition-love-and-celebration-meet/
+- Xhosa Marriage Practices, BeingAfrican. https://beingafrican.org/culture-panel/xhosa-marriage-practices/
+- Xhosa wedding traditions. https://weddings.traditionscustoms.com/xhosa-wedding
+- Clipkulture, Xhosa traditional wedding ceremony and lobola. https://clipkulture.com/xhosa-traditional-wedding-ceremony-and-lobola-payment/
+- Holding on and letting go: grief and two Xhosa rituals (UEL). https://www.uel.ac.uk/sites/default/files/holding-on-and-letting-go-the-resolution-of-grief-in-relation-to-two-xhosa-rituals-in-south-africa.pdf
+- Death and Funerals in Xhosa Culture, BeingAfrican. https://beingafrican.org/culture-panel/death-and-funerals-in-xhosa-culture/
+- The Rites of Passage of AmaXhosa Revisited. https://www.academia.edu/61194038/The_Rites_of_Passage_of_AmaXhosa_Revisited
+- UMCIMBI. https://www.umcimbi.co.za/

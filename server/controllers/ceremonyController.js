@@ -2,7 +2,7 @@ import prisma from '../config/db.js';
 import crypto from 'crypto';
 import { CeremonyType } from '@prisma/client';
 import { CEREMONY_COST_PROFILES, getDefaultItemsForType } from './ceremonyCostProfiles.js';
-import { ULWALUKO_STAGES } from '../../shared/ceremonyPhases.js';
+import { ULWALUKO_STAGES, PHASE_LABELS } from '../../shared/ceremonyPhases.js';
 import { DRAFT_CEREMONY_TYPE_NAMES } from '../data/ceremonyDrafts.js';
 import { createShareToken, isShareTokenValid } from '../utils/shareToken.js';
 
@@ -38,7 +38,7 @@ export const getCeremonyTimeline = async (req, res) => {
 
             let phases = Object.entries(phaseMap).map(([key, checklist]) => ({
                   key,
-                  label: key.replace(/_/g, ' '),
+                  label: PHASE_LABELS[key] || key.replace(/_/g, ' '),
                   checklist,
             }));
 

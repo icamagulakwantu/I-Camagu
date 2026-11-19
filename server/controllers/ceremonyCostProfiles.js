@@ -192,6 +192,40 @@ const ULWALUKO_DEFAULT_ITEMS = [
   { phase: 'RETURN_HOME', label: 'Arrange transport home' },
 ];
 
+// Umtshato (wedding), from asking to umakoti's welcome. The Xhosa steps
+// follow the research review (ukucela, lobola with senior men as
+// negotiators, at least two days of celebration, utsiki, umdudo, ukuyalwa);
+// the planning steps around them are those of any good wedding plan.
+export const WEDDING_DEFAULT_ITEMS = [
+  { phase: 'UKUCELA', label: 'Ukucela: the groom’s family sends word to ask for the bride' },
+  { phase: 'UKUCELA', label: 'Choose the negotiators: senior men of the family, such as uncles and older brothers' },
+  { phase: 'UKUCELA', label: 'Lobola letter to the bride’s family' },
+  { phase: 'LOBOLA', label: 'Lobola negotiations: agree the cattle, or their cash value, with her family' },
+  { phase: 'LOBOLA', label: 'Food and drinks for both families on negotiation day' },
+  { phase: 'LOBOLA', label: 'Record what was agreed and what has been paid' },
+  { phase: 'WEDDING_PLANNING', label: 'Budget: lobola, the celebration and gifts' },
+  { phase: 'WEDDING_PLANNING', label: 'Guest list: both families, the clan, neighbours and community' },
+  { phase: 'WEDDING_PLANNING', label: 'Homestead or venue, tent and chairs' },
+  { phase: 'WEDDING_SUPPLIERS', label: 'Catering for at least two days of celebration' },
+  { phase: 'WEDDING_SUPPLIERS', label: 'Livestock for slaughter, and umqombothi' },
+  { phase: 'WEDDING_SUPPLIERS', label: 'Umakoti’s traditional dress, and the groom’s attire' },
+  { phase: 'WEDDING_SUPPLIERS', label: 'Photographer, transport and the bar' },
+  { phase: 'WEDDING_FINAL', label: 'Share the plan with family for pledges' },
+  { phase: 'WEDDING_FINAL', label: 'MC and programme for both days' },
+  { phase: 'WEDDING_DAY', label: 'Utsiki: the groom’s family prepares goat meat and amasi for umakoti' },
+  { phase: 'WEDDING_DAY', label: 'Umdudo: the dance that shows the families accept the bride' },
+  { phase: 'WEDDING_DAY', label: 'Umakoti and the groom show themselves to the community' },
+  { phase: 'AFTER_WEDDING', label: 'Ukuyalwa: elder women advise umakoti in her new home' },
+];
+
+// Mourning after the funeral, from the research review: the elders set how
+// long the family mourns (ukuzila), and its end is marked with a goat while
+// the mourning clothes are burned (ukukhulula izila).
+export const MOURNING_ITEMS = [
+  { phase: 'MOURNING', label: 'Elders set how long the family mourns (ukuzila)' },
+  { phase: 'MOURNING_END', label: 'Ukukhulula izila at the end of mourning: a goat, and the mourning clothes are burned' },
+];
+
 const UMGIDI_DEFAULT_ITEMS = [
   { phase: 'ARRIVAL_INGQONGQO', label: 'Arrange Ingqongqo (women beating zinc, chanting)' },
   { phase: 'ARRIVAL_INGQONGQO', label: 'Courtesy: bottle of gin and brandy for the women' },
@@ -647,10 +681,11 @@ export { UMGIDI_DEFAULT_ITEMS, UMGIDI_COST_PROFILE };
 
 const DEFAULT_ITEMS_MAP = {
   ULWALUKO: ULWALUKO_WITH_UMGIDI_ITEMS,
+  WEDDING: WEDDING_DEFAULT_ITEMS,
   UMGIDI: UMGIDI_DEFAULT_ITEMS,
   IMIGIDI: UMGIDI_DEFAULT_ITEMS,
   INTAMBO_ENKULU: INTAMBO_ENKULU_DEFAULT_ITEMS,
-  UKUKHAPHA: UKUKHAPHA_DEFAULT_ITEMS,
+  UKUKHAPHA: [...UKUKHAPHA_DEFAULT_ITEMS, ...MOURNING_ITEMS],
   INKOBE: INKOBE_DEFAULT_ITEMS,
   INKOBE_ZIKA_MAMA: INKOBE_DEFAULT_ITEMS,
   UKUBUYISA: UKUBUYISA_DEFAULT_ITEMS,

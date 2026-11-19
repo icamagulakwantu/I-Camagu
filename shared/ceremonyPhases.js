@@ -23,6 +23,15 @@ export const PHASE_LABELS = {
   VIP_EKOYINI: 'Umgidi · The bar',
   CLOSURE: 'Umgidi · Closing',
   UBUKRWALA: 'Ubukrwala · The new man',
+  UKUCELA: 'Ukucela · Asking for her',
+  LOBOLA: 'Ilobola · The negotiations',
+  WEDDING_PLANNING: 'Planning',
+  WEDDING_SUPPLIERS: 'Food, dress and suppliers',
+  WEDDING_FINAL: 'The final week',
+  WEDDING_DAY: 'The wedding',
+  AFTER_WEDDING: 'After the wedding',
+  MOURNING: 'Ukuzila · Mourning',
+  MOURNING_END: 'Ukukhulula izila · End of mourning',
   FAMILY_SUGGESTIONS: 'Suggested by the family',
 };
 

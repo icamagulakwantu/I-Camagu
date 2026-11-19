@@ -30,7 +30,7 @@ const CELEBRATIONS = [
     name: 'Umtshato',
     tag: 'Your wedding',
     line: 'From lobola talks to the day two families become one.',
-    needs: ['Lobola', 'Izibizo gifts', 'Catering', 'Guest list'],
+    needs: ['Lobola', 'Umdudo', 'Catering', 'Guest list'],
   },
   {
     key: 'ulwaluko',

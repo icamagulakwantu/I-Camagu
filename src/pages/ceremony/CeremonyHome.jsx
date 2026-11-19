@@ -7,6 +7,8 @@ import { daysUntil, describeCountdown, focusDate } from '../../lib/countdown.js'
 import { ceremonyImage } from '../../data/ceremonyImages.js'
 import { CEREMONY_META as STORY } from '../../data/ceremonyTypes.js'
 import SummaryActions from './SummaryActions.jsx'
+import ComingUp from './ComingUp.jsx'
+import MothersGuide from './MothersGuide.jsx'
 import { sharePlan, wasShared } from './share.js'
 import { typeName } from './ceremonyMeta.js'
 import { planTitle } from './ceremonyForm.js'
@@ -249,6 +251,10 @@ export default function CeremonyHome({
         )}
 
         <FamilySuggestions planId={plan.id} accessToken={accessToken} onAccepted={onPlanChanged} />
+
+        <ComingUp rows={rows} ceremony={{ ...ceremony, type }} onOpenList={() => onEditStep('list')} />
+
+        {type === 'ULWALUKO' && <MothersGuide onOpenUmqombothi={() => onNavigate?.('umqombothi')} />}
 
         {/* ---------- The money picture, with a tab on its top edge ---------- */}
         <section aria-label="The money picture" className="pt-4">
