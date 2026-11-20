@@ -43,6 +43,10 @@ try {
       check('ulwaluko has registration, medical, ibhoma tools', /CoGTA/.test(labels) && /Medical examination/.test(labels) && /Ipeki and shovel/.test(labels));
     }
   }
+  const plain = await api(token, '/api/ceremonies', { method: 'POST', body: JSON.stringify({ title: 'Smoke plain', type: 'WEDDING', eventDate: '2027-03-01' }) });
+  check('create ceremony (plain route)', plain.status < 300, `${plain.status} ${plain.body?.error || ''}`);
+  const notMine = await api(token, `/api/ceremonies/${plain.body?.id}`, { method: 'PUT', body: JSON.stringify({ savingStokvelId: 'not-my-stokvel' }) });
+  check('cannot link a stokvel you do not belong to', notMine.status === 403, `${notMine.status}`);
   const plans = await api(token, '/api/ceremonies/plans/my');
   check('my plans lists them', plans.status === 200 && plans.body?.length >= 6, `${plans.body?.length}`);
 

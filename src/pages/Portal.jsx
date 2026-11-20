@@ -11,7 +11,7 @@ import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 
-export default function Portal({ onBack }) {
+export default function Portal({ onBack, ceremonyTitle = '' }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   
@@ -34,14 +34,21 @@ export default function Portal({ onBack }) {
       })
       if (!res.ok) throw new Error('Failed to load portals')
       const data = await res.json()
-      setPortals(Array.isArray(data) ? data : [])
+      const list = Array.isArray(data) ? data : []
+      setPortals(list)
+      // Opened from a ceremony: go straight to its album, or suggest one.
+      if (ceremonyTitle) {
+        const match = list.find((p) => p.title?.trim().toLowerCase() === ceremonyTitle.trim().toLowerCase())
+        if (match) setActivePortal(match)
+        else setNewTitle((t) => t || ceremonyTitle)
+      }
     } catch (err) {
       showToast(err.message, 'error')
       setPortals([])
     } finally {
       setLoading(false)
     }
-  }, [accessToken, showToast])
+  }, [accessToken, showToast, ceremonyTitle])
 
   useEffect(() => {
     fetchPortals()

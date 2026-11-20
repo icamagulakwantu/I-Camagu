@@ -407,6 +407,9 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "ClanPraise_clanGroupId_praise_key" ON "ClanPraise" ("clanGroupId", "praise");');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "ClanPraise_clanGroupId_idx" ON "ClanPraise" ("clanGroupId");');
 
+  // The stokvel a host links to a ceremony (see Ceremony.savingStokvelId).
+  await prisma.$executeRawUnsafe('ALTER TABLE "Ceremony" ADD COLUMN IF NOT EXISTS "savingStokvelId" TEXT;');
+
   // A member's umnombo, their line of ancestors (see Lineage).
   await prisma.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "Lineage" (

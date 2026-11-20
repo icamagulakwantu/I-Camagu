@@ -329,7 +329,9 @@ function MainApp() {
   const openToolFromCeremony = (tool, ceremonyId, ceremony = null) => {
     if (tool === 'hierarchy') setHierarchyCeremonyId(ceremonyId || null)
     setScreen(tool)
-    if (tool !== 'store') {
+    // The tab pages (Bulk Buy, Stokvels, Isiduko) stand on their own; tools
+    // like ukugida, photos and umqombothi return to the ceremony.
+    if (!['store', 'stokvels', 'iziduko'].includes(tool)) {
       setReturnToCeremonyId(ceremonyId || null)
       setToolCeremony(ceremony)
     }
@@ -411,7 +413,7 @@ function MainApp() {
       case 'family':
         return <FamilyContributions onBack={goMore} />
       case 'ukugida':
-        return <Ukugida onBack={goMore} />
+        return <Ukugida onBack={backFromTool} ceremonyTitle={toolCeremony?.title || ''} />
       case 'ukusoka':
         return <Ukusoka onBack={goMore} />
       case 'iziduko':
@@ -440,7 +442,7 @@ function MainApp() {
       case 'supplier':
         return <SupplierDashboard onBack={goMore} />
       case 'portal':
-        return <Portal onBack={goMore} />
+        return <Portal onBack={backFromTool} ceremonyTitle={toolCeremony?.title || ''} />
       case 'ekoyini':
         return <Ekoyini onBack={goMore} />
       case 'ekoyiniadmin':

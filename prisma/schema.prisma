@@ -1166,6 +1166,9 @@ model Ceremony {
   eventDate DateTime?
   // Ulwaluko: the umgidi (homecoming) date; eventDate is going to the mountain.
   homecomingDate DateTime?
+  // The host's own stokvel that is saving for this ceremony: a pointer only,
+  // it gives no one access to the stokvel.
+  savingStokvelId String?
   status    String       @default("PLANNING")
   visibility String      @default("PRIVATE")
   notes     String?

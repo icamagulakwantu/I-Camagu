@@ -7,6 +7,7 @@ import { daysUntil, describeCountdown, focusDate } from '../../lib/countdown.js'
 import { ceremonyImage } from '../../data/ceremonyImages.js'
 import { CEREMONY_META as STORY } from '../../data/ceremonyTypes.js'
 import SummaryActions from './SummaryActions.jsx'
+import ConnectedCard from './ConnectedCard.jsx'
 import { planDocumentHtml, printHtml } from '../../lib/printDoc.js'
 import ComingUp from './ComingUp.jsx'
 import MothersGuide from './MothersGuide.jsx'
@@ -328,12 +329,13 @@ export default function CeremonyHome({
           </button>
         </section>
 
+        <ConnectedCard ceremony={ceremony} title={title} accessToken={accessToken} onNavigate={onNavigate} onChanged={onPlanChanged} showToast={showToast} />
+
         {/* ---------- Everything for this ceremony ---------- */}
         <section aria-label={`For this ${typeName(type)}`} className="pt-3">
           <Eyebrow>For this {typeName(type).toLowerCase()}</Eyebrow>
           <h2 className="mb-3 mt-0.5 font-display text-[1.45rem] font-semibold leading-tight tracking-tight text-ink">Prepare, buy and book</h2>
           <div className="overflow-hidden rounded-[22px] bg-[#fffdf9] shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
-            <Row icon="cart" tile="bg-[#f3e6cf] text-[#a3471a]" title="Buy in bulk" detail="Livestock, drinks and groceries at group prices" onClick={() => onNavigate?.('store')} />
             <Row icon="drumstick" tile="bg-[#f6e2d6] text-terracotta-dark" title="Feast calculator" detail={ceremony.guestCount != null ? `Meat, samp and vegetables for ${ceremony.guestCount} guests` : 'Meat, samp and vegetables, and the cost'} onClick={() => onNavigate?.('isidlo')} />
             <Row icon="beer" tile="bg-sage-100 text-sage-700" title="Brew umqombothi" detail={ceremony.guestCount != null ? `How much to brew for ${ceremony.guestCount} guests` : 'Steps and quantities'} onClick={() => onNavigate?.('umqombothi')} />
             {plan.ceremonyId && <Row icon="cocktail" tile="bg-[#1f3320] text-ochre-light" title="Ekoyini mobile bar" detail="Book a bar for the day" onClick={() => onBookEkoyini?.(plan.ceremonyId, title)} />}

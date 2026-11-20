@@ -23,13 +23,17 @@ const makeEmptyForm = () => ({
   items: [emptyItem()],
 })
 
-export default function Ukugida({ onBack }) {
+export default function Ukugida({ onBack, ceremonyTitle = '' }) {
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState(makeEmptyForm)
+  // Opened from a ceremony: new gifts are recorded against it, and the
+  // list shows that ceremony's gifts first ("Show all" for the rest).
+  const withCeremony = () => ({ ...makeEmptyForm(), ceremonyLabel: ceremonyTitle })
+  const [form, setForm] = useState(withCeremony)
+  const [onlyThis, setOnlyThis] = useState(Boolean(ceremonyTitle))
   const [catalogue, setCatalogue] = useState([])
   const [suggestFor, setSuggestFor] = useState(null)
 
@@ -93,7 +97,7 @@ export default function Ukugida({ onBack }) {
       if (!res.ok) throw new Error(data.error || 'Failed to save')
       fetchEntries()
       setShowForm(false)
-      setForm(makeEmptyForm())
+      setForm(withCeremony())
       setSuggestFor(null)
       showToast(validItems.length > 1 ? `${validItems.length} items recorded` : 'Entry recorded', 'success')
     } catch (err) {
@@ -116,6 +120,7 @@ export default function Ukugida({ onBack }) {
     }
   }
 
+  const shown = onlyThis ? entries.filter((e) => (e.ceremonyLabel || '').trim().toLowerCase() === ceremonyTitle.trim().toLowerCase()) : entries
   const balance = entries.reduce((acc, e) => {
     const val = e.quantity || 0
     return e.direction === 'RECEIVED' ? acc + val : acc - val
@@ -312,14 +317,21 @@ export default function Ukugida({ onBack }) {
 
       {/* Entries List */}
       <div className="px-4 mt-6">
-        <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider mb-3">History</h3>
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">{onlyThis ? ceremonyTitle : 'History'}</h3>
+          {ceremonyTitle && (
+            <button type="button" onClick={() => setOnlyThis((v) => !v)} className="text-xs font-bold text-[#1f3320]">
+              {onlyThis ? 'Show all' : `Only ${ceremonyTitle}`}
+            </button>
+          )}
+        </div>
 
         {loading ? (
           <div className="space-y-2">
             <Skeleton className="h-20 w-full rounded-soft" />
             <Skeleton className="h-20 w-full rounded-soft" />
           </div>
-        ) : entries.length === 0 ? (
+        ) : shown.length === 0 ? (
           <EmptyState
             emoji="🎁"
             title="No entries yet"
@@ -330,7 +342,7 @@ export default function Ukugida({ onBack }) {
           />
         ) : (
           <div className="space-y-2">
-            {entries.map((entry) => (
+            {shown.map((entry) => (
               <div
                 key={entry.id}
                 className={cn(

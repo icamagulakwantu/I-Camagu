@@ -656,7 +656,7 @@ export const getCeremonyById = async (req, res) => {
 export const updateCeremony = async (req, res) => {
       try {
               const { id } = req.params;
-                  const { title, eventDate, homecomingDate, status, notes, budgetZAR, guestCount, visibility } = req.body;
+                  const { title, eventDate, homecomingDate, status, notes, budgetZAR, guestCount, visibility, savingStokvelId } = req.body;
 
                       let parsedBudget;
                       if (budgetZAR === undefined) {
@@ -675,6 +675,16 @@ export const updateCeremony = async (req, res) => {
                           if (!ceremony) return res.status(404).json({ error: 'Ceremony not found' });
                               if (ceremony.hostId !== req.user.id) return res.status(403).json({ error: 'Not your ceremony' });
 
+                      // Linking a stokvel that saves for this ceremony: only one the
+                      // host belongs to. null clears the link.
+                      let parsedStokvelId;
+                      if (savingStokvelId === null || savingStokvelId === '') parsedStokvelId = null;
+                      else if (typeof savingStokvelId === 'string') {
+                        const member = await prisma.stokvelMember.findFirst({ where: { stokvelId: savingStokvelId, userId: req.user.id } });
+                        if (!member) return res.status(403).json({ error: 'You can only link a stokvel you belong to' });
+                        parsedStokvelId = savingStokvelId;
+                      }
+
                                   const updated = await prisma.ceremony.update({
                                             where: { id },
                                                   data: {
@@ -685,6 +695,7 @@ export const updateCeremony = async (req, res) => {
                                                                                       notes: notes !== undefined ? notes : undefined,
                                                                               visibility: visibility !== undefined && ['PRIVATE', 'CLAN_ONLY', 'PUBLIC'].includes(visibility) ? visibility : undefined,
                                                                                               budgetZAR: parsedBudget,
+                                                                                              savingStokvelId: parsedStokvelId,
                                                                                               guestCount: guestCount !== undefined ? (guestCount === '' || guestCount === null ? null : parseInt(guestCount, 10)) : undefined,
                                                   },
                                   });

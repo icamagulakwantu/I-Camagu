@@ -468,7 +468,9 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
   }, [accessToken, showToast])
 
   const pools = feed.pools || []
-  const totalSaved = stokvels.reduce((sum, s) => sum + (Number(s.totalBalance) || 0), 0)
+  // What you have saved: your own balance in each stokvel (the list is your
+  // memberships; there is no totalBalance on them, so this always read R0).
+  const totalSaved = stokvels.reduce((sum, s) => sum + (Number(s.myBalance) || 0), 0)
   const lead = nextCeremony(ceremonies)
   // Soonest first, so the rail reads like a calendar.
   const orderedCeremonies = [...ceremonies].sort((a, b) => {
