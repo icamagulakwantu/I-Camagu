@@ -16,7 +16,7 @@ workbox: {
         name: 'i-Camagu',
         short_name: 'i-Camagu',
         description: 'Ceremony planning, stokvel savings, and bulk purchasing for Xhosa communities',
-        theme_color: '#c45c26',
+        theme_color: '#1f3320',
         background_color: '#f5f3ee',
         display: 'standalone',
         start_url: '/',

@@ -15,11 +15,11 @@ function FeastCalculator({ onBack, onOpenStore, guestCount = null, ceremonyTitle
 
   return (
     <div className="mx-auto min-h-screen max-w-md bg-cream pb-28">
-      <div className="relative overflow-hidden rounded-b-[32px] bg-[#a3471a] px-5 pb-16 pt-6 text-cream">
+      <div className="relative overflow-hidden rounded-b-[32px] bg-[#2e4a2e] px-5 pb-16 pt-6 text-cream">
         <button type="button" onClick={onBack} className="pressable mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-cream/80">
           <Icon name="arrowLeft" size={16} /> {ceremonyTitle ? `Back to ${ceremonyTitle}` : 'Back'}
         </button>
-        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#f3d9b8]">Isidlo · The feast</p>
+        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#b9d3b0]">Isidlo · The feast</p>
         <h1 className="mt-1 font-display text-[2rem] font-semibold leading-tight">How much food to buy</h1>
         <p className="mt-1 text-sm text-cream/85">{fromCeremony ? `Worked out for ${ceremonyTitle || 'your ceremony'}.` : 'Meat, pap, vegetables and plates for your guests.'}</p>
       </div>

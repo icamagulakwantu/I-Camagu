@@ -107,7 +107,7 @@ function UmqombothiCalculator({ onBack, guestCount = null, ceremonyTitle = '' })
             <p className="mt-2 text-sm text-[#c9bfb2]">{containers.label ? `In ${containers.label}, with room for the igwebu to rise.` : 'Add the number of guests to see how much.'}</p>
             <div className="mt-4 grid grid-cols-3 gap-2">
               {[{ label: 'Maize meal' }, { label: 'Umbona' }, { label: 'Amazimba' }].map((grain) => (
-                <div key={grain.label} className="rounded-[16px] bg-[#2a211a] px-2 py-3 text-center">
+                <div key={grain.label} className="rounded-[16px] bg-white/[0.08] px-2 py-3 text-center">
                   <p className="text-lg font-extrabold tabular-nums text-ochre-light">{kg} kg</p>
                   <p className="mt-0.5 text-xs font-bold text-[#c9bfb2]">{grain.label}</p>
                 </div>

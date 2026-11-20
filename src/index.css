@@ -101,12 +101,12 @@
 
 @layer utilities {
   .icamagu-bg {
-    background-color: #f0e4d3;
+    /* Calm cream with only a breath of warmth: the colour belongs to the
+       cards and buttons, not the page behind them. */
+    background-color: #f5f0e7;
     background-image:
-      radial-gradient(ellipse 950px 750px at 0% -10%, rgba(196, 92, 38, 0.45), transparent 58%),
-      radial-gradient(ellipse 800px 650px at 105% 5%, rgba(217, 164, 65, 0.45), transparent 55%),
-      radial-gradient(ellipse 750px 600px at 15% 115%, rgba(163, 71, 26, 0.24), transparent 60%),
-      radial-gradient(ellipse 700px 600px at 100% 110%, rgba(74, 122, 74, 0.18), transparent 55%);
+      radial-gradient(ellipse 900px 600px at 0% -10%, rgba(224, 169, 78, 0.10), transparent 60%),
+      radial-gradient(ellipse 700px 600px at 100% 110%, rgba(46, 74, 46, 0.05), transparent 60%);
     background-attachment: fixed;
   }
 

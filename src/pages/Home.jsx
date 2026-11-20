@@ -110,7 +110,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
           >
             <Icon name="bell" size={19} color="#fffdf9" />
             {unreadNotifications > 0 && (
-              <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-ochre-light ring-2 ring-[#2a211a]" />
+              <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-ochre-light ring-2 ring-[#1f3320]" />
             )}
           </button>
           <button
@@ -255,7 +255,12 @@ function NeedsYou({ items, loading }) {
 // ---------- Your ceremonies: details rise out of each photo ----------
 
 function CeremonyCard({ ceremony, onOpen }) {
-  const days = daysUntil(ceremony.eventDate)
+  // Ulwaluko counts down to umgidi once he has gone in.
+  const focus = focusDate(ceremony)
+  const days = daysUntil(focus.date)
+  const badge = days != null
+    ? `${focus.isHomecoming ? 'Umgidi ' : ''}${focus.isHomecoming ? describeCountdown(days) : capitalise(describeCountdown(days))}`
+    : ceremony.eventDate ? 'Date passed' : 'No date yet'
   const { done, total } = checklistCounts(ceremony)
   const progress = total ? Math.round((done / total) * 100) : 0
   const soon = days != null && days <= 14
@@ -266,7 +271,7 @@ function CeremonyCard({ ceremony, onOpen }) {
         <span className="relative block h-[132px] overflow-hidden rounded-[22px] bg-cream-dark">
           <img src={ceremonyImage(ceremony.type)} alt="" loading="lazy" className="h-full w-full object-cover" />
           <span className={`absolute left-0 top-3 rounded-r-full py-1 pl-3 pr-3 text-xs font-extrabold ${soon ? 'bg-terracotta-dark text-white' : 'bg-ink/80 text-cream'}`}>
-            {days != null ? capitalise(describeCountdown(days)) : 'No date yet'}
+            {badge}
           </span>
         </span>
         <span className="relative mx-2.5 -mt-8 block rounded-[18px] bg-[#fffdf9] px-3.5 pb-3 pt-3 shadow-[0_16px_30px_-20px_rgba(43,30,18,0.6)]">
@@ -339,7 +344,7 @@ function ClanPanel({ user, clanCeremonies, onNavigate }) {
               const date = ceremony.eventDate ? new Date(ceremony.eventDate) : null
               const days = daysUntil(ceremony.eventDate)
               return (
-                <li key={ceremony.id} className="relative flex items-center gap-3 rounded-[18px] bg-[#2a211a] py-3 pl-12 pr-4">
+                <li key={ceremony.id} className="relative flex items-center gap-3 rounded-[18px] bg-white/[0.08] py-3 pl-12 pr-4">
                   {/* The date tile steps out past the row's left edge. */}
                   <span className="absolute -left-3 top-1/2 flex h-[52px] w-[48px] -translate-y-1/2 flex-col items-center justify-center rounded-[14px] bg-terracotta-dark leading-none shadow-[0_10px_20px_-10px_rgba(0,0,0,0.7)]">
                     {date ? (
