@@ -1,4 +1,5 @@
 import express from 'express';
+import * as collab from '../controllers/templateCollabController.js';
 import { requireAuth } from '../middleware/auth.js';
 import { getCeremonyTimeline } from '../controllers/ceremonyController.js';
 import { getPlanBudget } from '../controllers/budgetController.js';
@@ -47,6 +48,21 @@ router.post('/', requireAuth, createCeremony);
 router.post('/templates/save', requireAuth, saveAsTemplate);
 router.get('/templates/my', requireAuth, getMyTemplates);
 router.post('/templates/use', requireAuth, useTemplate);
+// Template collaboration: invite link, edit requests, proposals and merge.
+router.get('/templates/shared', requireAuth, collab.listShared);
+router.get('/templates/invite/:token', requireAuth, collab.viewInvite);
+router.post('/templates/invite/:token/request', requireAuth, collab.requestAccess);
+router.post('/templates/:id/invite', requireAuth, collab.createInvite);
+router.delete('/templates/:id/invite', requireAuth, collab.revokeInvite);
+router.get('/templates/:id/people', requireAuth, collab.listPeople);
+router.post('/templates/:id/people/:memberId', requireAuth, collab.decideRequest);
+router.delete('/templates/:id/people/:memberId', requireAuth, collab.removePerson);
+router.get('/templates/:id/workspace', requireAuth, collab.getWorkspace);
+router.put('/templates/:id/proposal', requireAuth, collab.saveProposal);
+router.delete('/templates/:id/proposal', requireAuth, collab.withdrawProposal);
+router.get('/templates/:id/proposals/:proposalId', requireAuth, collab.getProposal);
+router.post('/templates/:id/proposals/:proposalId/merge', requireAuth, collab.mergeProposal);
+router.post('/templates/:id/proposals/:proposalId/decline', requireAuth, collab.declineProposal);
 router.post('/plans', requireAuth, createPreparationPlan);
 router.get('/plans/:planId/budget', requireAuth, getPlanBudget);
 router.get('/plans/my', requireAuth, getMyPlans);

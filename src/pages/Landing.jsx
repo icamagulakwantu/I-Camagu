@@ -182,6 +182,7 @@ export default function Landing({ onJoin, onSignIn }) {
       if (localStorage.getItem('icamagu_join_stokvel_id')) setInviteType('stokvel')
       else if (localStorage.getItem('icamagu_join_clan_code')) setInviteType('clan')
       else if (localStorage.getItem('icamagu_join_pool_id')) setInviteType('pool')
+      else if (localStorage.getItem('icamagu_template_invite')) setInviteType('template')
     } catch { /* storage unavailable */ }
   }, [])
 
@@ -219,6 +220,7 @@ export default function Landing({ onJoin, onSignIn }) {
               <div className="mb-6 rounded-2xl border border-terracotta/25 bg-white/80 px-4 py-3 text-sm leading-relaxed text-ink">
                 {inviteType === 'stokvel' && 'You have been invited to join a stokvel on i-Camagu. Join free to continue with your invitation.'}
                 {inviteType === 'clan' && 'You have been invited to a family clan group on i-Camagu. Join free to continue with your invitation.'}
+                {inviteType === 'template' && 'You have been invited to help plan a ceremony on i-Camagu. Join free or sign in, then ask to edit the plan.'}
                 {inviteType === 'pool' && 'You have been invited to a SmartMatch group order on i-Camagu. Join free to continue with your invitation.'}
               </div>
             )}

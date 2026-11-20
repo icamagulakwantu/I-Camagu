@@ -7,6 +7,7 @@
 
 export const PENDING_STOKVEL_KEY = 'icamagu_join_stokvel_id'
 export const PENDING_CLAN_KEY = 'icamagu_join_clan_code'
+export const PENDING_TEMPLATE_KEY = 'icamagu_template_invite'
 
 export function stokvelInviteUrl(stokvelId) {
   return `${window.location.origin}/join/stokvel/${encodeURIComponent(stokvelId)}`
@@ -33,4 +34,17 @@ export function clanInviteMessage(clanName, groupName, inviteCode) {
 
 export function whatsappShareUrl(message) {
   return `https://wa.me/?text=${encodeURIComponent(message)}`
+}
+
+export function templateInviteUrl(token) {
+  return `${window.location.origin}/t/${encodeURIComponent(token)}`
+}
+
+// Sent with a template link: says what the person can and cannot see.
+export function templateInviteMessage(title, token) {
+  return [
+    `Molo! I am planning with the i-Camagu template "${title}" and would value your help.`,
+    'Open the link, register if you are new, and ask to edit. Your changes come to me to approve before they are added. You only see this template, nothing else of mine.',
+    templateInviteUrl(token),
+  ].join('\n\n')
 }

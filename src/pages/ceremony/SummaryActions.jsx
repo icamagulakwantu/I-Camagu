@@ -15,7 +15,7 @@ const ACTION_BUTTON = 'group flex min-w-0 flex-col items-center justify-center g
 // Summary (onShare) so the journey map ticks "Share" as soon as it is sent.
 // variant="manage" shows only Save as template and Delete: the ceremony page
 // already offers sharing, the timeline and the bar elsewhere.
-export default function SummaryActions({ plan, accessToken, onShare, onViewTimeline, onBookEkoyini, onDeleted, variant = 'full' }) {
+export default function SummaryActions({ plan, accessToken, onShare, onViewTimeline, onBookEkoyini, onDeleted, onDownloadPdf, variant = 'full' }) {
   const { showToast } = useToast()
   const [templateOpen, setTemplateOpen] = useState(false)
   const [templateTitle, setTemplateTitle] = useState('')
@@ -59,6 +59,13 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
 
   return (
     <div className="space-y-3">
+      {manage && onDownloadPdf && (
+        <button type="button" onClick={onDownloadPdf} className={cn('flex w-full items-center gap-3 rounded-[18px] bg-[#fffdf9] px-4 py-3.5 text-left shadow-soft', pressable)}>
+          <Icon name="file" size={18} color="#2e4a2e" />
+          <span className="flex-1 text-sm font-extrabold text-ink">Download as PDF</span>
+          <span className="text-xs text-ink-muted">Print or keep a copy</span>
+        </button>
+      )}
       {manage && (
         <button type="button" onClick={openTemplate} className={cn('flex w-full items-center gap-3 rounded-[18px] bg-[#fffdf9] px-4 py-3.5 text-left shadow-soft', pressable)}>
           <Icon name="template" size={18} color="#a3471a" />

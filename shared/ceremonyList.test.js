@@ -74,9 +74,12 @@ describe('summariseRows', () => {
 });
 
 describe('groupRowsByPhase and countProgress', () => {
-  it('groups rows in the order phases first appear', () => {
+  it('orders stages by when they are due, what the host added last', () => {
     const rows = buildListRows({ costItems: [transportCost], checklistItems: [otherTask] });
-    expect(groupRowsByPhase(rows).map((g) => g.phase)).toEqual(['TRANSPORT_ARRIVAL', 'SPIRITUAL_ITEMS']);
+    // Spiritual items are due two weeks before, transport one week before.
+    expect(groupRowsByPhase(rows).map((g) => g.phase)).toEqual(['SPIRITUAL_ITEMS', 'TRANSPORT_ARRIVAL']);
+    const mixed = [{ phase: 'CUSTOM' }, { phase: 'UMOJISO' }, { phase: 'REGISTRATION' }, { phase: 'CLOSURE' }];
+    expect(groupRowsByPhase(mixed).map((g) => g.phase)).toEqual(['REGISTRATION', 'UMOJISO', 'CLOSURE', 'CUSTOM']);
   });
 
   it('does not count notes in progress', () => {

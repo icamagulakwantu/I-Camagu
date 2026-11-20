@@ -7,6 +7,7 @@ import { daysUntil, describeCountdown, focusDate } from '../../lib/countdown.js'
 import { ceremonyImage } from '../../data/ceremonyImages.js'
 import { CEREMONY_META as STORY } from '../../data/ceremonyTypes.js'
 import SummaryActions from './SummaryActions.jsx'
+import { planDocumentHtml, printHtml } from '../../lib/printDoc.js'
 import ComingUp from './ComingUp.jsx'
 import MothersGuide from './MothersGuide.jsx'
 import { sharePlan, wasShared } from './share.js'
@@ -384,7 +385,7 @@ export default function CeremonyHome({
             </div>
           </dl>
           <div className="mt-4">
-            <SummaryActions variant="manage" plan={plan} accessToken={accessToken} onShare={share} onDeleted={onDeleted} />
+            <SummaryActions variant="manage" plan={plan} accessToken={accessToken} onShare={share} onDeleted={onDeleted} onDownloadPdf={() => printHtml(planDocumentHtml({ title, typeName: typeName(type), ceremony, rows, summary }))} />
           </div>
         </section>
       </div>

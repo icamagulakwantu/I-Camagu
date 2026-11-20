@@ -8,6 +8,7 @@
 // deducted. Only the ACTUAL price a host types in comes off the budget.
 import { hasActual, suggestedTotal, suggestedUnitCost, summariseCosts, UNFORESEEN_PHASE } from './ceremonyCosts.js';
 import { PHASE_LABELS } from './ceremonyPhases.js';
+import { timingFor } from './ceremonyTiming.js';
 
 const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
 
@@ -74,6 +75,18 @@ export function buildListRows({ costItems = [], checklistItems = [] }) {
   return rows;
 }
 
+// Where a stage falls in the ceremony, for ordering: days from the start,
+// umgidi stages counted from the homecoming (about four weeks after going
+// in), and what the host added themselves at the end.
+const HOMECOMING_OFFSET_DAYS = 28;
+export function phaseOrder(phase) {
+  if (!phase || phase === 'CUSTOM' || phase === UNFORESEEN_PHASE) return Number.MAX_SAFE_INTEGER;
+  const { days = 0, anchor } = timingFor(phase);
+  return anchor === 'homecoming' ? HOMECOMING_OFFSET_DAYS + days : days;
+}
+
+// Rows grouped by stage, stages in the order they happen. Stages at the same
+// time keep the order they first appear in.
 export function groupRowsByPhase(rows) {
   const groups = [];
   const byPhase = new Map();
@@ -85,7 +98,10 @@ export function groupRowsByPhase(rows) {
     }
     byPhase.get(row.phase).rows.push(row);
   }
-  return groups;
+  return groups
+    .map((group, index) => ({ group, index, order: phaseOrder(group.phase) }))
+    .sort((a, b) => a.order - b.order || a.index - b.index)
+    .map(({ group }) => group);
 }
 
 export function phaseLabel(phase) {

@@ -1,3 +1,5 @@
+import { esc, printHtml } from './printDoc.js'
+
 // The ukugida book as something a family can keep outside the app: a
 // spreadsheet (CSV, opens in Excel or Google Sheets) and a printable page
 // (print it, or "Save as PDF" from the print screen).
@@ -36,7 +38,6 @@ export function ukugidaCsv(entries) {
   return lines.join('\r\n') + '\r\n'
 }
 
-const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
 
 export function ukugidaBookHtml(entries, ownerName = '') {
   const rows = ROWS(entries).map((r) => `<tr><td>${esc(r.date)}</td><td>${esc(r.direction)}</td><td>${esc(r.person)}</td><td>${esc(r.item)}</td><td>${esc(r.quantity)} ${esc(r.unit)}</td><td>${esc(r.ceremony)}</td></tr>`).join('')
@@ -59,16 +60,6 @@ export function downloadUkugidaCsv(entries) {
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
-// Prints from a hidden frame, so it also works in the installed app where
-// pop-up windows are blocked.
 export function printUkugidaBook(entries, ownerName) {
-  const frame = document.createElement('iframe')
-  frame.setAttribute('aria-hidden', 'true')
-  frame.style.cssText = 'position:fixed;width:0;height:0;border:0;right:0;bottom:0'
-  document.body.appendChild(frame)
-  const doc = frame.contentWindow.document
-  doc.open(); doc.write(ukugidaBookHtml(entries, ownerName)); doc.close()
-  frame.contentWindow.focus()
-  frame.contentWindow.print()
-  setTimeout(() => frame.remove(), 60000)
+  printHtml(ukugidaBookHtml(entries, ownerName))
 }

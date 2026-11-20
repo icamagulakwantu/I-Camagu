@@ -417,6 +417,47 @@ export async function ensureCeremonyBudgetColumns() {
     );
   `);
 
+  // Template collaboration (see TemplateInvite, TemplateMember, TemplateProposal).
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "TemplateInvite" (
+      "token" TEXT NOT NULL PRIMARY KEY,
+      "templateId" TEXT NOT NULL,
+      "ownerId" TEXT NOT NULL,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "revokedAt" TIMESTAMP(3)
+    );
+  `);
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "TemplateInvite_templateId_idx" ON "TemplateInvite" ("templateId");');
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "TemplateMember" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "templateId" TEXT NOT NULL,
+      "userId" TEXT NOT NULL,
+      "status" TEXT NOT NULL DEFAULT 'REQUESTED',
+      "message" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "decidedAt" TIMESTAMP(3)
+    );
+  `);
+  await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "TemplateMember_templateId_userId_key" ON "TemplateMember" ("templateId", "userId");');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "TemplateMember_userId_idx" ON "TemplateMember" ("userId");');
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "TemplateProposal" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "templateId" TEXT NOT NULL,
+      "authorId" TEXT NOT NULL,
+      "status" TEXT NOT NULL DEFAULT 'OPEN',
+      "note" TEXT,
+      "baseItems" JSONB NOT NULL DEFAULT '[]',
+      "items" JSONB NOT NULL DEFAULT '[]',
+      "mergedCount" INTEGER NOT NULL DEFAULT 0,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "decidedAt" TIMESTAMP(3)
+    );
+  `);
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "TemplateProposal_templateId_status_idx" ON "TemplateProposal" ("templateId", "status");');
+
   // Record of one-off data fixes (see DataFix).
   await prisma.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "DataFix" (

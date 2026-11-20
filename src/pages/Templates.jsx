@@ -6,6 +6,15 @@ import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import CeremonyIcon from '../components/CeremonyIcon.jsx'
 import { CEREMONY_IMAGE, ceremonyImage } from '../data/ceremonyImages.js'
+import TemplateInvite from './templates/TemplateInvite.jsx'
+import TemplateEditor from './templates/TemplateEditor.jsx'
+import ProposalReview from './templates/ProposalReview.jsx'
+import TemplateShareCard from './templates/TemplateShareCard.jsx'
+import { PENDING_TEMPLATE_KEY } from '../lib/inviteLinks.js'
+import { printHtml, templateDocumentHtml, templateRowsToItems } from '../lib/printDoc.js'
+
+const pendingInvite = () => { try { return localStorage.getItem(PENDING_TEMPLATE_KEY) } catch { return null } }
+const forgetInvite = () => { try { localStorage.removeItem(PENDING_TEMPLATE_KEY) } catch { /* storage blocked */ } }
 
 const typeLabel = (type) => (type || '').replace(/_/g, ' ')
 
@@ -34,6 +43,9 @@ function Templates({ onBack }) {
   const [newTitle, setNewTitle] = useState('')
   const [eventDate, setEventDate] = useState('')
   const [creating, setCreating] = useState(false)
+  // Collaboration views: an invite link, the editor, or the owner's review.
+  const [view, setView] = useState(() => (pendingInvite() ? { kind: 'invite', token: pendingInvite() } : null))
+  const [shared, setShared] = useState([])
 
   const fetchTemplates = useCallback(() => {
     setLoading(true)
@@ -46,6 +58,12 @@ function Templates({ onBack }) {
   }, [accessToken])
 
   useEffect(() => { fetchTemplates() }, [fetchTemplates])
+  useEffect(() => {
+    fetch('/api/ceremonies/templates/shared', { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setShared(Array.isArray(data) ? data : []))
+      .catch(() => setShared([]))
+  }, [accessToken, view])
 
   const openTemplate = (t) => {
     setActiveTemplate(t)
@@ -76,6 +94,10 @@ function Templates({ onBack }) {
       setCreating(false)
     }
   }
+
+  if (view?.kind === 'invite') return <TemplateInvite token={view.token} onActed={forgetInvite} onBack={() => { forgetInvite(); setView(null) }} onOpenEditor={(id) => { forgetInvite(); const own = templates.find((t) => t.id === id); if (own) { setView(null); openTemplate(own) } else setView({ kind: 'edit', id }) }} />
+  if (view?.kind === 'edit') return <TemplateEditor templateId={view.id} onBack={() => setView(null)} />
+  if (view?.kind === 'review') return <ProposalReview templateId={view.id} proposalId={view.pid} onBack={() => setView(null)} onDone={() => { setView(null); fetchTemplates() }} />
 
   // ----- One template: preview + create -----
   if (activeTemplate) {
@@ -110,6 +132,12 @@ function Templates({ onBack }) {
               <p className="text-xs text-ink-muted">Things to buy and pay</p>
             </div>
           </div>
+
+          <button type="button" onClick={() => printHtml(templateDocumentHtml({ title: activeTemplate.title, typeName: typeLabel(activeTemplate.ceremonyType).toLowerCase(), items: templateRowsToItems(activeTemplate.checklistItems) }))} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-full border-2 border-[#1f3320]/20 bg-white text-sm font-extrabold text-[#1f3320]">
+            Download as PDF
+          </button>
+
+          <TemplateShareCard template={activeTemplate} onReview={(pid) => setView({ kind: 'review', id: activeTemplate.id, pid })} />
 
           <form onSubmit={createFromTemplate} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
             <p className="text-sm font-bold text-ink">Start a new ceremony from this template</p>
@@ -188,6 +216,8 @@ function Templates({ onBack }) {
                     <span className="mt-2 flex flex-wrap gap-1.5">
                       <CountPill value={tasks} label="to do" tone="bg-sage-50 text-sage-600" />
                       <CountPill value={shopping} label="to buy" tone="bg-ochre/10 text-ochre" />
+                      {t.pendingRequests > 0 && <CountPill value={t.pendingRequests} label={t.pendingRequests === 1 ? 'request' : 'requests'} tone="bg-terracotta text-white" />}
+                      {t.openProposals > 0 && <CountPill value={t.openProposals} label="to review" tone="bg-[#1f3320] text-cream" />}
                     </span>
                   </span>
                   <span className="text-terracotta text-xl" aria-hidden="true">›</span>
@@ -195,6 +225,30 @@ function Templates({ onBack }) {
               )
             })}
           </div>
+        )}
+
+        {shared.length > 0 && (
+          <section aria-label="Shared with me" className="mt-8">
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Owabelene nam · Shared with me</p>
+            <div className="mt-2 grid grid-cols-1 gap-3">
+              {shared.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  disabled={t.role !== 'editor'}
+                  onClick={() => setView({ kind: 'edit', id: t.id })}
+                  className="flex w-full items-center gap-3 rounded-2xl bg-white p-4 text-left shadow-soft disabled:opacity-80"
+                >
+                  <CeremonyIcon type={t.ceremonyType} size={44} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block break-words text-base font-bold text-ink">{t.title}</span>
+                    <span className="block text-xs text-ink-muted">{t.ownerName}&rsquo;s template · {t.role === 'editor' ? (t.myProposalStatus === 'OPEN' ? 'your changes are waiting for approval' : 'you can suggest changes') : 'waiting for approval to edit'}</span>
+                  </span>
+                  {t.role === 'editor' && <span className="text-xl text-terracotta" aria-hidden="true">›</span>}
+                </button>
+              ))}
+            </div>
+          </section>
         )}
       </div>
     </div>

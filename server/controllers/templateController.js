@@ -11,7 +11,7 @@ import prisma from '../config/db.js';
 const TASK = 'task';
 const COST = 'cost';
 
-function readMeta(item) {
+export function readMeta(item) {
   if (!item.notes) return { templateKind: TASK };
   try {
     const parsed = JSON.parse(item.notes);
@@ -206,7 +206,14 @@ export async function getMyTemplates(req, res) {
       include: { checklistItems: true },
       orderBy: { createdAt: 'desc' },
     });
-    res.json(templates.map(withCounts));
+    // What is waiting for the owner: edit requests and proposed changes.
+    const ids = templates.map((t) => t.id);
+    const [requests, proposals] = ids.length ? await Promise.all([
+      prisma.templateMember.groupBy({ by: ['templateId'], where: { templateId: { in: ids }, status: 'REQUESTED' }, _count: true }),
+      prisma.templateProposal.groupBy({ by: ['templateId'], where: { templateId: { in: ids }, status: 'OPEN' }, _count: true }),
+    ]).catch(() => [[], []]) : [[], []];
+    const countFor = (rows, id) => rows.find((r) => r.templateId === id)?._count || 0;
+    res.json(templates.map((t) => ({ ...withCounts(t), pendingRequests: countFor(requests, t.id), openProposals: countFor(proposals, t.id) })));
   } catch (error) {
     console.error('Get templates error:', error.message);
     res.status(500).json({ error: 'Could not fetch templates' });

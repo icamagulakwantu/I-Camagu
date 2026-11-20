@@ -11,7 +11,7 @@ import BottomNav from './components/BottomNav.jsx'
 import Icon from './components/Icon.jsx'
 import PendingStokvelJoin from './components/PendingStokvelJoin.jsx'
 import PendingClanJoin from './components/PendingClanJoin.jsx'
-import { PENDING_STOKVEL_KEY, PENDING_CLAN_KEY } from './lib/inviteLinks.js'
+import { PENDING_STOKVEL_KEY, PENDING_CLAN_KEY, PENDING_TEMPLATE_KEY } from './lib/inviteLinks.js'
 
 // Home is the first screen, so it is loaded straight away.
 import Home from './pages/Home.jsx'
@@ -204,6 +204,15 @@ function MainApp() {
   // A search to open Bulk Buy with (from the feast calculator); cleared once
   // the shopper leaves the store so it never comes back on its own.
   const [storeSearch, setStoreSearch] = useState('')
+  // A template invite link opened before signing in: once inside, open
+  // Templates, which shows the invitation. The link stays remembered until
+  // the person acts on it (see Templates), so a reload never loses it.
+  useEffect(() => {
+    if (!accessToken) return
+    let token = null
+    try { token = localStorage.getItem(PENDING_TEMPLATE_KEY) } catch { /* storage blocked */ }
+    if (token) setScreen('templates')
+  }, [accessToken]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (screen !== 'store' && screen !== 'isidlo') setStoreSearch('') }, [screen])
 
   // Keep the browser address in sync with screen navigation so refresh, share
@@ -571,6 +580,17 @@ function StokvelJoinRoute() {
   return null
 }
 
+// A template invite link: remembered through sign-in, then opened in Templates.
+function TemplateInviteRoute() {
+  const { token } = useParams()
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (token) { try { localStorage.setItem(PENDING_TEMPLATE_KEY, token) } catch { /* storage blocked */ } }
+    navigate('/', { replace: true })
+  }, [token, navigate])
+  return null
+}
+
 // A clan group invite link, usually tapped from a family WhatsApp group.
 // Works the same way as the stokvel link above.
 function ClanJoinRoute() {
@@ -598,6 +618,7 @@ export default function App() {
         <Route path="/pool/:id" element={<PoolJoinRoute />} />
         <Route path="/join/stokvel/:id" element={<StokvelJoinRoute />} />
         <Route path="/join/clan/:code" element={<ClanJoinRoute />} />
+        <Route path="/t/:token" element={<TemplateInviteRoute />} />
         <Route path="/ubuhlanti" element={<PublicUbuhlanti />} />
         <Route path="/ubuhlanti/" element={<PublicUbuhlanti />} />
         <Route
