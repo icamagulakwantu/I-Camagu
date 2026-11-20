@@ -1,14 +1,14 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import prisma from '../config/db.js';
-import { FIX_NAME, LOCAL_VENDORS, SAMPLE_PRACTITIONERS, updateDirectoryListings } from './directory-listings-nov-2026.js';
+import { FIX_NAME, FIX_NAME_2, LOCAL_VENDORS, MORE_VENDORS, SAMPLE_PRACTITIONERS, updateDirectoryListings, addMoreDirectoryListings } from './directory-listings-nov-2026.js';
 
 const integrationDescribe = process.env.RUN_POSTGRES_INTEGRATION === 'true' ? describe : describe.skip;
 
 integrationDescribe('directory clean-up and local listings (real database)', () => {
   let real;
   beforeAll(async () => {
-    await prisma.dataFix.deleteMany({ where: { name: FIX_NAME } });
-    await prisma.vendor.deleteMany({ where: { name: { in: LOCAL_VENDORS.map((v) => v.name) } } });
+    await prisma.dataFix.deleteMany({ where: { name: { in: [FIX_NAME, FIX_NAME_2] } } });
+    await prisma.vendor.deleteMany({ where: { name: { in: [...LOCAL_VENDORS, ...MORE_VENDORS].map((v) => v.name) } } });
     await prisma.practitioner.deleteMany({ where: { name: { in: [...SAMPLE_PRACTITIONERS.map((p) => p.name), 'A real ingcibi'] } } });
     for (const sample of SAMPLE_PRACTITIONERS) await prisma.practitioner.create({ data: { ...sample, role: 'INGCIBI', area: 'Somewhere' } });
     // Same name as a sample but a real number: must be kept.
@@ -27,5 +27,11 @@ integrationDescribe('directory clean-up and local listings (real database)', () 
     const shwabz = await prisma.vendor.findFirst({ where: { name: 'Shwabz KwaSintu' } });
     expect(shwabz).toMatchObject({ category: 'TRADITIONAL_GOODS', area: 'KwaDwesi, Gqeberha' });
     expect(await updateDirectoryListings()).toMatchObject({ skipped: true });
+  });
+
+  it('adds the second batch once', async () => {
+    expect(await addMoreDirectoryListings()).toMatchObject({ added: 2, skipped: false });
+    expect(await prisma.vendor.findFirst({ where: { name: 'Siya Meals' } })).toMatchObject({ category: 'CATERING' });
+    expect(await addMoreDirectoryListings()).toMatchObject({ skipped: true });
   });
 });

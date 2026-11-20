@@ -114,12 +114,12 @@ const COST_RATES = {
     ikoto_bentonite_kg: 65.00,
     amaphondo_beads_strand: 85.00,
     iintambo_cord_set: 120.00,
-    ifutha_white_clay_pack: 65.00,
+    ifutha_white_clay_pack: 130.00,  // Checked 20 Nov 2026: 5 kg bag for abakhwetha R130 from a Gqeberha seller (Facebook); small packs from R29.95 (imithiyesintu.co.za)
     intlabathi_ritual_ash: 0.00,
     isidlo_snuff_tin: 35.00,
-    isidanga_bead_necklace: 250.00,
+    isidanga_bead_necklace: 450.00,  // Checked 20 Nov 2026: R450 (clarebaccessories.com), R550+ (hombacrafts.com), R670 (Wild Coast Trading Co.)
     ingca_ritual_grass: 30.00,
-    umqombothi_brewing_sorghum_malt_kg: 55.00,
+    umqombothi_brewing_sorghum_malt_kg: 20.00,  // Checked 20 Nov 2026: Umoja Mtombo sorghum malt 1 kg R19.99 (Checkers, 2025); King Korn malt R12.95 (Makro, Aug 2026)
     umqombothi_brewing_maize_kg: 25.00,
     imbula_red_ochre_pack: 45.00,
     grass_broom: 45.00,
@@ -135,8 +135,8 @@ const COST_RATES = {
     igqirha_graduation: 3500.00,
     drummer_per_session: 800.00,
     singer_per_session: 600.00,
-    iingcibi_surgeon_fee: 2500.00,
-    ikhankatha_guardian_fee: 2000.00,
+    iingcibi_surgeon_fee: 1500.00,  // Gazetted: CoGTA fee determination under the Customary Initiation Act (March 2026), Eastern Cape R1,500 per male initiate. The initiate pays the initiation school R3,500; parents pay no extra fee
+    ikhankatha_guardian_fee: 2000.00,  // No gazetted figure for the ikhankatha; estimate, families agree it with him
   },
 };
 

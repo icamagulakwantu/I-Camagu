@@ -25,7 +25,7 @@ import { fixUlwalukoDietWording } from './scripts/ulwaluko-diet-wording-nov-2026
 import { loadClanPraises } from './scripts/load-clan-praises.js';
 import { updateUlwalukoPlans } from './scripts/ulwaluko-umgidi-nov-2026.js';
 import { updateWeddingAndMourningPlans } from './scripts/wedding-mourning-nov-2026.js';
-import { updateDirectoryListings } from './scripts/directory-listings-nov-2026.js';
+import { updateDirectoryListings, addMoreDirectoryListings } from './scripts/directory-listings-nov-2026.js';
 import { addUlwalukoRegistrationSteps } from './scripts/ulwaluko-registration-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -269,6 +269,7 @@ if (startup.schemaReady) {
   // Remove the sample practitioners and add the first local businesses. Runs once.
   try {
     await updateDirectoryListings();
+    await addMoreDirectoryListings();
   } catch (err) {
     console.error('Directory listing update failed:', err?.message);
   }
