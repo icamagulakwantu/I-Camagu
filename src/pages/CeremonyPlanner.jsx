@@ -36,7 +36,7 @@ const planProgress = (plan) => countProgress(buildListRows({
 // A guided plan: What, When, Who is coming, Money, Shopping list, then a
 // summary where any section can be tapped to edit. Props are unchanged from
 // the old planner so App.jsx needs no edit.
-export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, onViewBudget, onBookEkoyini, onOpenTool, selectedCeremonyId }) {
+export default function CeremonyPlanner({ onBack, defaultType, autoStartType = null, onAutoStartDone, onViewTimeline, onViewBudget, onBookEkoyini, onOpenTool, selectedCeremonyId }) {
   const { accessToken } = useAuth()
   const { setActiveCeremony } = useCommunity()
   const { showToast } = useToast()
@@ -92,6 +92,19 @@ export default function CeremonyPlanner({ onBack, defaultType, onViewTimeline, o
         setPlans(nextPlans)
         const selected = selectedCeremonyId && nextPlans.find((plan) => plan.ceremonyId === selectedCeremonyId)
         if (selected) openPlan(selected)
+        else if (autoStartType) {
+          // From a quick-start button: open the family's current plan of
+          // that type, or start a new one with the type already chosen.
+          const current = nextPlans.find((plan) => (plan.ceremony?.type || plan.type) === autoStartType && (plan.ceremony?.status || plan.status) !== 'COMPLETED')
+          if (current) openPlan(current)
+          else {
+            setForm({ ...EMPTY_FORM, type: autoStartType })
+            setStepId('when')
+            setCreating(true)
+            setReturnToSummary(false)
+          }
+          onAutoStartDone?.()
+        }
       })
       .catch(() => {})
       .finally(() => setLoading(false))

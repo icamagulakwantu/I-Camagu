@@ -29,9 +29,10 @@ function nextStep(ceremony) {
 
 // One-tap starts for the ceremonies families plan most.
 const QUICK_START = [
-  { type: 'UMGIDI', label: 'Umgidi' },
+  // Ulwaluko and umgidi are planned as one, as on the landing page.
+  { type: 'ULWALUKO', label: 'Ulwaluko & Umgidi' },
   { type: 'WEDDING', label: 'Wedding' },
-  { type: 'ULWALUKO', label: 'Ulwaluko' },
+  { type: 'IMBELEKO', label: 'Imbeleko' },
 ]
 
 function checklistCounts(ceremony) {

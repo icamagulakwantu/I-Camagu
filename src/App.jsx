@@ -184,6 +184,8 @@ function MainApp() {
   // Ceremony planning state
   const [selectedCeremonyId, setSelectedCeremonyId] = useState(null)
   const [ceremonyHubType, setCeremonyHubType] = useState(null)
+  // One-shot: a quick-start button asked for this type; cleared once used.
+  const [autoStartType, setAutoStartType] = useState(null)
   const [timelineType, setTimelineType] = useState(null)
   const [budgetPlanId, setBudgetPlanId] = useState(null)
   const [budgetPlanTitle, setBudgetPlanTitle] = useState('')
@@ -263,6 +265,7 @@ function MainApp() {
     setCeremonyHubType(type)
     setSelectedCeremonyId(null)
     setScreen('ceremony')
+    setAutoStartType(type)
   }
 
   const openTimeline = (type) => {
@@ -375,6 +378,8 @@ function MainApp() {
           <CeremonyPlanner
             onBack={() => setScreen('ceremonyhub')}
             defaultType={ceremonyHubType}
+            autoStartType={autoStartType}
+            onAutoStartDone={() => setAutoStartType(null)}
             onViewTimeline={openTimeline}
             onViewBudget={openBudget}
             onBookEkoyini={openEkoyiniBooking}
