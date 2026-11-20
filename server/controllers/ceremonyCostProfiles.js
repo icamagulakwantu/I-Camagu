@@ -59,7 +59,7 @@ const COST_RATES = {
     // Sybok — a goat/sheep cross, and the animal customarily used for
     // uMojiso at entabeni during ulwaluko. It is its own beast, not a
     // substitute for a sheep or a goat, so it gets its own rate.
-    sybok: 2700.00,  // Founder's platform ceiling: sheep/goat/sybok all capped at R2,700
+    sybok: 2500.00,  // Founder's photo, 20 Nov 2026: sybok sold off a trailer in Gqeberha at R2,500 (platform ceiling R2,700)
     fowl: 150.00,
   },
   food: {
