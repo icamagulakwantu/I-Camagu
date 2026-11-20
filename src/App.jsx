@@ -11,7 +11,7 @@ import BottomNav from './components/BottomNav.jsx'
 import Icon from './components/Icon.jsx'
 import PendingStokvelJoin from './components/PendingStokvelJoin.jsx'
 import PendingClanJoin from './components/PendingClanJoin.jsx'
-import { PENDING_STOKVEL_KEY, PENDING_CLAN_KEY, PENDING_TEMPLATE_KEY } from './lib/inviteLinks.js'
+import { PENDING_STOKVEL_KEY, PENDING_CLAN_KEY, PENDING_TEMPLATE_KEY, PENDING_PLAN_KEY } from './lib/inviteLinks.js'
 
 // Home is the first screen, so it is loaded straight away.
 import Home from './pages/Home.jsx'
@@ -51,6 +51,7 @@ const LegendsExplore = lazy(() => import('./pages/LegendsExplore.jsx'))
 const Directory = lazy(() => import('./pages/Directory.jsx'))
 const UmqombothiCalculator = lazy(() => import('./pages/UmqombothiCalculator.jsx'))
 const FeastCalculator = lazy(() => import('./pages/FeastCalculator.jsx'))
+const SharedPlans = lazy(() => import('./pages/SharedPlans.jsx'))
 const Profile = lazy(() => import('./pages/Profile.jsx'))
 const PinSetup = lazy(() => import('./pages/PinSetup.jsx'))
 const PublicPlanView = lazy(() => import('./pages/PublicPlanView.jsx'))
@@ -71,7 +72,7 @@ const MORE_SCREENS = [
   'izidukoprofile', 'izidukochat', 'clangroups', 'supplier', 'portal', 'ekoyini',
   'ekoyiniadmin', 'identityadmin', 'marginadmin', 'demandadmin',
   'privacy', 'hierarchy', 'myorders', 'expenditure', 'shrinefund',
-  'legends', 'directory', 'umqombothi', 'isidlo', 'pin', 'profile',
+  'legends', 'directory', 'umqombothi', 'isidlo', 'sharedplans', 'pin', 'profile',
   'notifications', 'account', 'help', 'activity',
 ]
 
@@ -112,6 +113,7 @@ const SCREEN_PATHS = {
   ukusoka: '/ceremonies/ukusoka',
   umqombothi: '/me/umqombothi',
   isidlo: '/me/feast',
+  sharedplans: '/ceremonies/shared',
   expenditure: '/me/expenditure',
   shrinefund: '/me/ubuhlanti',
   pin: '/me/pin',
@@ -216,6 +218,9 @@ function MainApp() {
     let token = null
     try { token = localStorage.getItem(PENDING_TEMPLATE_KEY) } catch { /* storage blocked */ }
     if (token) setScreen('templates')
+    let planToken = null
+    try { planToken = localStorage.getItem(PENDING_PLAN_KEY) } catch { /* storage blocked */ }
+    if (planToken) setScreen('sharedplans')
   }, [accessToken]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (screen !== 'store' && screen !== 'isidlo') setStoreSearch('') }, [screen])
 
@@ -467,6 +472,8 @@ function MainApp() {
         return <Directory onBack={backFromTool} />
       case 'umqombothi':
         return <UmqombothiCalculator onBack={backFromTool} guestCount={toolCeremony?.guestCount ?? null} ceremonyTitle={toolCeremony?.title || ''} />
+      case 'sharedplans':
+        return <SharedPlans onBack={goMore} />
       case 'isidlo':
         return <FeastCalculator onBack={backFromTool} onOpenStore={(term = '') => { setStoreSearch(term); setScreen('store') }} guestCount={toolCeremony?.guestCount ?? null} ceremonyTitle={toolCeremony?.title || ''} />
       case 'pin':
@@ -599,6 +606,18 @@ function TemplateInviteRoute() {
   return null
 }
 
+// A live ceremony plan invite link: remembered through sign-in, then opened
+// in "Plans shared with me".
+function PlanInviteRoute() {
+  const { token } = useParams()
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (token) { try { localStorage.setItem(PENDING_PLAN_KEY, token) } catch { /* storage blocked */ } }
+    navigate('/', { replace: true })
+  }, [token, navigate])
+  return null
+}
+
 // A clan group invite link, usually tapped from a family WhatsApp group.
 // Works the same way as the stokvel link above.
 function ClanJoinRoute() {
@@ -627,6 +646,7 @@ export default function App() {
         <Route path="/join/stokvel/:id" element={<StokvelJoinRoute />} />
         <Route path="/join/clan/:code" element={<ClanJoinRoute />} />
         <Route path="/t/:token" element={<TemplateInviteRoute />} />
+        <Route path="/p/:token" element={<PlanInviteRoute />} />
         <Route path="/ubuhlanti" element={<PublicUbuhlanti />} />
         <Route path="/ubuhlanti/" element={<PublicUbuhlanti />} />
         <Route

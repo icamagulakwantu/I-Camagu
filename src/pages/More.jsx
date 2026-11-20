@@ -30,6 +30,7 @@ const TILE_GROUPS = [
     color: '#a3471a',
     items: [
       { id: 'templates', icon: 'template', label: 'Ceremony templates', desc: 'Ready-made plans to start from' },
+      { id: 'sharedplans', icon: 'heartHandshake', label: 'Plans shared with me', desc: 'Help family plan their ceremony', keywords: 'shared plan help edit family invite' },
       { id: 'hierarchy', icon: 'users', label: 'Who brings what', desc: 'Give each group its items' },
       // Family pledges for a ceremony live on the ceremony page. This is the
       // separate record of gifts exchanged between families over the years.

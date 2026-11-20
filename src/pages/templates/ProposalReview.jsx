@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../components/ui/Toast.jsx'
 import { request } from '../ceremony/api.js'
 import { FIELD_NAMES, describeValue, groupByPhase } from './templateItems.js'
+import { TEMPLATE_API } from './collabApi.js'
 
 const TAG = {
   add: { text: 'Added', cls: 'bg-[#2e4a2e]/10 text-[#2e4a2e]' },
@@ -23,14 +24,14 @@ function ItemList({ items }) {
 
 // The owner's review: their original stays as it is; the editor's version
 // sits beside it; each change can be taken or left before merging.
-export default function ProposalReview({ templateId, proposalId, onBack, onDone }) {
+export default function ProposalReview({ templateId, proposalId, onBack, onDone, api = TEMPLATE_API }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   const [data, setData] = useState(null)
   const [tab, setTab] = useState('changes')
   const [accept, setAccept] = useState(new Set())
   const [busy, setBusy] = useState(false)
-  const base = `/api/ceremonies/templates/${templateId}/proposals/${proposalId}`
+  const base = `${api.base(templateId)}/proposals/${proposalId}`
 
   useEffect(() => {
     request(base, accessToken).then((d) => { setData(d); setAccept(new Set(d.changes.map((c) => c.id))) }).catch((err) => showToast(err.message, 'error'))
@@ -41,7 +42,7 @@ export default function ProposalReview({ templateId, proposalId, onBack, onDone 
     setBusy(true)
     try {
       const r = await request(`${base}/merge`, accessToken, { method: 'POST', body: JSON.stringify({ accept: [...accept] }) })
-      showToast(`${r.applied} change${r.applied === 1 ? '' : 's'} merged into your template${r.skipped.length ? `; ${r.skipped.length} no longer applied` : ''}`, 'success')
+      showToast(`${r.applied} change${r.applied === 1 ? '' : 's'} merged into your ${api.noun}${r.skipped.length ? `; ${r.skipped.length} no longer applied` : ''}`, 'success')
       onDone?.()
     } catch (err) { showToast(err.message, 'error') } finally { setBusy(false) }
   }
@@ -49,7 +50,7 @@ export default function ProposalReview({ templateId, proposalId, onBack, onDone 
     setBusy(true)
     try {
       await request(`${base}/decline`, accessToken, { method: 'POST' })
-      showToast('Declined. Your template is unchanged.', 'info')
+      showToast(`Declined. Your ${api.noun} is unchanged.`, 'info')
       onDone?.()
     } catch (err) { showToast(err.message, 'error') } finally { setBusy(false) }
   }
@@ -60,11 +61,11 @@ export default function ProposalReview({ templateId, proposalId, onBack, onDone 
   return (
     <div className="min-h-screen bg-cream pb-40">
       <header className="bg-[#1f3320] px-5 pb-7 pt-6 text-cream">
-        <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold">← Template</button>
+        <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold">← Back</button>
         <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/60">Iinguqu · Suggested changes</p>
         <h1 className="mt-1 font-display text-[1.7rem] font-semibold leading-tight">From {data.authorName}</h1>
         {data.note && <p className="mt-2 rounded-[14px] bg-white/10 px-3 py-2 text-sm italic text-cream/90">&ldquo;{data.note}&rdquo;</p>}
-        <p className="mt-2 text-sm text-cream/75">Your template stays as it is until you merge.</p>
+        <p className="mt-2 text-sm text-cream/75">Your {api.noun} stays as it is until you merge.</p>
       </header>
 
       <div className="px-4 pt-4">

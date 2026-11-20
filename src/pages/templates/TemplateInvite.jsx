@@ -4,10 +4,11 @@ import Icon from '../../components/Icon.jsx'
 import CeremonyIcon from '../../components/CeremonyIcon.jsx'
 import { request } from '../ceremony/api.js'
 import { groupByPhase } from './templateItems.js'
+import { TEMPLATE_API } from './collabApi.js'
 
 // What a template invite link shows a signed-in member: the template, and
 // a way to ask the owner for permission to suggest edits.
-export default function TemplateInvite({ token, onBack, onOpenEditor, onActed }) {
+export default function TemplateInvite({ token, onBack, onOpenEditor, onActed, api = TEMPLATE_API }) {
   const { accessToken } = useAuth()
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
@@ -15,7 +16,7 @@ export default function TemplateInvite({ token, onBack, onOpenEditor, onActed })
   const [sending, setSending] = useState(false)
 
   useEffect(() => {
-    request(`/api/ceremonies/templates/invite/${encodeURIComponent(token)}`, accessToken)
+    request(api.invite(token), accessToken)
       .then(setData)
       .catch((err) => setError(err.message))
   }, [token, accessToken])
@@ -23,7 +24,7 @@ export default function TemplateInvite({ token, onBack, onOpenEditor, onActed })
   const ask = async () => {
     setSending(true)
     try {
-      const r = await request(`/api/ceremonies/templates/invite/${encodeURIComponent(token)}/request`, accessToken, { method: 'POST', body: JSON.stringify({ message }) })
+      const r = await request(`${api.invite(token)}/request`, accessToken, { method: 'POST', body: JSON.stringify({ message }) })
       setData((d) => ({ ...d, role: r.role }))
       onActed?.()
     } catch (err) {
@@ -37,9 +38,9 @@ export default function TemplateInvite({ token, onBack, onOpenEditor, onActed })
   return (
     <div className="min-h-screen bg-cream pb-28">
       <header className="bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
-        <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold">← Templates</button>
+        <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold">← Back</button>
         <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/60">Isimemo · An invitation</p>
-        <h1 className="mt-1 font-display text-[1.9rem] font-semibold leading-tight">{t ? t.title : 'A ceremony template'}</h1>
+        <h1 className="mt-1 font-display text-[1.9rem] font-semibold leading-tight">{t ? t.title : `A ceremony ${api.noun}`}</h1>
         {data && <p className="mt-1 text-sm text-cream/80">{data.ownerName} asked for your help with this plan.</p>}
       </header>
 
@@ -65,7 +66,7 @@ export default function TemplateInvite({ token, onBack, onOpenEditor, onActed })
             </section>
 
             <p className="flex items-start gap-2 px-1 text-xs leading-relaxed text-ink-muted">
-              <Icon name="lock" size={14} color="#6b6258" /> You see only this template. Never {data.ownerName}&rsquo;s ceremonies, money, pledges or ukugida.
+              <Icon name="lock" size={14} color="#6b6258" /> You see only this {api.noun}&rsquo;s steps and shopping list. Never {data.ownerName}&rsquo;s money, pledges, ukugida or anything else.
             </p>
 
             {data.role === 'none' && (
@@ -78,10 +79,10 @@ export default function TemplateInvite({ token, onBack, onOpenEditor, onActed })
             )}
             {data.role === 'requested' && <p className="rounded-[20px] bg-white p-4 text-[14px] text-ink shadow-soft">Your request is with <strong>{data.ownerName}</strong>. You will get a notification when they answer.</p>}
             {data.role === 'declined' && <p className="rounded-[20px] bg-white p-4 text-[14px] text-ink shadow-soft">{data.ownerName} declined this request.</p>}
-            {data.role === 'owner' && <p className="rounded-[20px] bg-white p-4 text-[14px] text-ink shadow-soft">This is your own template.</p>}
+            {data.role === 'owner' && <p className="rounded-[20px] bg-white p-4 text-[14px] text-ink shadow-soft">This is your own {api.noun}.</p>}
             {(data.role === 'editor' || data.role === 'owner') && (
               <button type="button" onClick={() => onOpenEditor(t.id)} className="min-h-12 w-full rounded-full bg-[#1f3320] text-[15px] font-extrabold text-cream">
-                {data.role === 'owner' ? 'Open the template' : 'Suggest changes'}
+                {data.role === 'owner' ? `Open the ${api.noun}` : 'Suggest changes'}
               </button>
             )}
           </>

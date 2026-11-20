@@ -182,7 +182,7 @@ export default function Landing({ onJoin, onSignIn }) {
       if (localStorage.getItem('icamagu_join_stokvel_id')) setInviteType('stokvel')
       else if (localStorage.getItem('icamagu_join_clan_code')) setInviteType('clan')
       else if (localStorage.getItem('icamagu_join_pool_id')) setInviteType('pool')
-      else if (localStorage.getItem('icamagu_template_invite')) setInviteType('template')
+      else if (localStorage.getItem('icamagu_template_invite') || localStorage.getItem('icamagu_plan_invite')) setInviteType('template')
     } catch { /* storage unavailable */ }
   }, [])
 

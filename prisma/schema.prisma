@@ -1284,6 +1284,7 @@ model PlanSuggestion {
 // merges the changes they accept. Access is to that one template only:
 // never the owner's ceremonies, pledges, ukugida or anything else.
 model TemplateInvite {
+  scope      String    @default("TEMPLATE") // TEMPLATE | CEREMONY
   token      String    @id
   templateId String
   ownerId    String
@@ -1294,6 +1295,7 @@ model TemplateInvite {
 }
 
 model TemplateMember {
+  scope      String    @default("TEMPLATE") // TEMPLATE | CEREMONY
   id         String    @id @default(cuid())
   templateId String
   userId     String
@@ -1307,6 +1309,7 @@ model TemplateMember {
 }
 
 model TemplateProposal {
+  scope      String    @default("TEMPLATE") // TEMPLATE | CEREMONY
   id          String    @id @default(cuid())
   templateId  String
   authorId    String

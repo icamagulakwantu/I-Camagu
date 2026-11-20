@@ -8,6 +8,9 @@ import { ceremonyImage } from '../../data/ceremonyImages.js'
 import { CEREMONY_META as STORY } from '../../data/ceremonyTypes.js'
 import SummaryActions from './SummaryActions.jsx'
 import ConnectedCard from './ConnectedCard.jsx'
+import TemplateShareCard from '../templates/TemplateShareCard.jsx'
+import ProposalReview from '../templates/ProposalReview.jsx'
+import { PLAN_API } from '../templates/collabApi.js'
 import { planDocumentHtml, printHtml } from '../../lib/printDoc.js'
 import ComingUp from './ComingUp.jsx'
 import MothersGuide from './MothersGuide.jsx'
@@ -129,6 +132,8 @@ export default function CeremonyHome({
 }) {
   const { showToast } = useToast()
   const [, setSharedTick] = useState(0)
+  // A suggestion from someone helping plan, open for review.
+  const [reviewing, setReviewing] = useState(null)
   const ceremony = plan.ceremony || {}
   const type = plan.ceremonyType || ceremony.type
   const title = planTitle(plan)
@@ -170,6 +175,10 @@ export default function CeremonyHome({
   const spentWidth = Math.min(100, (summary.spent / scale) * 100)
   const toComeWidth = Math.min(100 - spentWidth, (Math.max(expected - summary.spent, 0) / scale) * 100)
   const overBy = budgetZAR != null && expected > budgetZAR ? expected - budgetZAR : 0
+
+  if (reviewing) {
+    return <ProposalReview api={PLAN_API} templateId={ceremony.id} proposalId={reviewing} onBack={() => setReviewing(null)} onDone={() => { setReviewing(null); onPlanChanged?.() }} />
+  }
 
   return (
     <div className="mx-auto max-w-md pb-32">
@@ -330,6 +339,9 @@ export default function CeremonyHome({
         </section>
 
         <ConnectedCard ceremony={ceremony} title={title} accessToken={accessToken} onNavigate={onNavigate} onChanged={onPlanChanged} showToast={showToast} />
+
+        {/* Family help plan: their suggestions wait for the host's approval. */}
+        {ceremony.id && <TemplateShareCard api={PLAN_API} template={{ id: ceremony.id, title }} onReview={setReviewing} />}
 
         {/* ---------- Everything for this ceremony ---------- */}
         <section aria-label={`For this ${typeName(type)}`} className="pt-3">

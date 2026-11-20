@@ -1,4 +1,5 @@
 import express from 'express';
+import { collab as planCollab } from '../controllers/ceremonyCollabController.js';
 import { rsvp, attendance } from '../controllers/attendanceController.js';
 import * as collab from '../controllers/templateCollabController.js';
 import { requireAuth } from '../middleware/auth.js';
@@ -80,6 +81,21 @@ router.delete('/:ceremonyId', requireAuth, deleteCeremony);
 router.post('/auto', requireAuth, createAutoCeremony);
 
 // Get a single ceremony with all its items
+// Live plans edited together with approval (scope CEREMONY).
+router.get('/collab/shared', requireAuth, planCollab.listShared);
+router.get('/collab/invite/:token', requireAuth, planCollab.viewInvite);
+router.post('/collab/invite/:token/request', requireAuth, planCollab.requestAccess);
+router.post('/:id/collab/invite', requireAuth, planCollab.createInvite);
+router.delete('/:id/collab/invite', requireAuth, planCollab.revokeInvite);
+router.get('/:id/collab/people', requireAuth, planCollab.listPeople);
+router.post('/:id/collab/people/:memberId', requireAuth, planCollab.decideRequest);
+router.delete('/:id/collab/people/:memberId', requireAuth, planCollab.removePerson);
+router.get('/:id/collab/workspace', requireAuth, planCollab.getWorkspace);
+router.put('/:id/collab/proposal', requireAuth, planCollab.saveProposal);
+router.delete('/:id/collab/proposal', requireAuth, planCollab.withdrawProposal);
+router.get('/:id/collab/proposals/:proposalId', requireAuth, planCollab.getProposal);
+router.post('/:id/collab/proposals/:proposalId/merge', requireAuth, planCollab.mergeProposal);
+router.post('/:id/collab/proposals/:proposalId/decline', requireAuth, planCollab.declineProposal);
 router.post('/:id/rsvp', requireAuth, rsvp);
 router.get('/:id/attendance', requireAuth, attendance);
 router.get('/:id', requireAuth, getCeremonyById);

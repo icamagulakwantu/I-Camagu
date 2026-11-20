@@ -5,13 +5,14 @@ import Icon from '../../components/Icon.jsx'
 import { request } from '../ceremony/api.js'
 import { groupByPhase } from './templateItems.js'
 import { diffItems } from '../../../shared/templateDiff.js'
+import { TEMPLATE_API } from './collabApi.js'
 
 let nextNew = 0
 const newKey = () => `new-${Date.now().toString(36)}-${(nextNew += 1)}`
 
 // An approved editor's view: they change their own copy, and "Send to the
 // owner" saves it as a proposal. The template itself never changes here.
-export default function TemplateEditor({ templateId, onBack }) {
+export default function TemplateEditor({ templateId, onBack, api = TEMPLATE_API }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
   const [ws, setWs] = useState(null)
@@ -21,7 +22,7 @@ export default function TemplateEditor({ templateId, onBack }) {
   const [saving, setSaving] = useState(false)
   const [adding, setAdding] = useState({ kind: 'task', phase: '', label: '' })
 
-  const load = () => request(`/api/ceremonies/templates/${templateId}/workspace`, accessToken)
+  const load = () => request(`${api.base(templateId)}/workspace`, accessToken)
     .then((data) => {
       setWs(data)
       setItems(data.myProposal?.items || data.items)
@@ -47,7 +48,7 @@ export default function TemplateEditor({ templateId, onBack }) {
   const send = async () => {
     setSaving(true)
     try {
-      const r = await request(`/api/ceremonies/templates/${templateId}/proposal`, accessToken, { method: 'PUT', body: JSON.stringify({ items, note }) })
+      const r = await request(`${api.base(templateId)}/proposal`, accessToken, { method: 'PUT', body: JSON.stringify({ items, note }) })
       showToast(r.changeCount ? `${r.changeCount} change${r.changeCount === 1 ? '' : 's'} sent for approval` : 'Saved. No changes yet.', 'success')
       load()
     } catch (err) {
@@ -57,7 +58,7 @@ export default function TemplateEditor({ templateId, onBack }) {
     }
   }
   const withdraw = async () => {
-    await request(`/api/ceremonies/templates/${templateId}/proposal`, accessToken, { method: 'DELETE' }).catch(() => {})
+    await request(`${api.base(templateId)}/proposal`, accessToken, { method: 'DELETE' }).catch(() => {})
     showToast('Your suggestion was withdrawn', 'info')
     load()
   }
@@ -68,7 +69,7 @@ export default function TemplateEditor({ templateId, onBack }) {
   return (
     <div className="min-h-screen bg-cream pb-48">
       <header className="bg-[#1f3320] px-5 pb-7 pt-6 text-cream">
-        <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold">← Templates</button>
+        <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold">← Back</button>
         <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/60">Iziphakamiso · Your suggestions</p>
         <h1 className="mt-1 font-display text-[1.8rem] font-semibold leading-tight">{ws.template.title}</h1>
         <p className="mt-1 text-sm text-cream/80">Change your copy, then send it. The owner sees their original beside yours and chooses what to keep.</p>

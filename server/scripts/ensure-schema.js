@@ -480,6 +480,10 @@ export async function ensureCeremonyBudgetColumns() {
     );
   `);
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "TemplateProposal_templateId_status_idx" ON "TemplateProposal" ("templateId", "status");');
+  // The same tables serve live ceremony plans (scope CEREMONY).
+  for (const table of ['TemplateInvite', 'TemplateMember', 'TemplateProposal']) {
+    await prisma.$executeRawUnsafe(`ALTER TABLE "${table}" ADD COLUMN IF NOT EXISTS "scope" TEXT NOT NULL DEFAULT 'TEMPLATE';`);
+  }
 
   // Record of one-off data fixes (see DataFix).
   await prisma.$executeRawUnsafe(`

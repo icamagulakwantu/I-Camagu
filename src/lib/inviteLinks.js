@@ -8,6 +8,7 @@
 export const PENDING_STOKVEL_KEY = 'icamagu_join_stokvel_id'
 export const PENDING_CLAN_KEY = 'icamagu_join_clan_code'
 export const PENDING_TEMPLATE_KEY = 'icamagu_template_invite'
+export const PENDING_PLAN_KEY = 'icamagu_plan_invite'
 
 export function stokvelInviteUrl(stokvelId) {
   return `${window.location.origin}/join/stokvel/${encodeURIComponent(stokvelId)}`
@@ -46,5 +47,18 @@ export function templateInviteMessage(title, token) {
     `Molo! I am planning with the i-Camagu template "${title}" and would value your help.`,
     'Open the link, register if you are new, and ask to edit. Your changes come to me to approve before they are added. You only see this template, nothing else of mine.',
     templateInviteUrl(token),
+  ].join('\n\n')
+}
+
+export function planInviteUrl(token) {
+  return `${window.location.origin}/p/${encodeURIComponent(token)}`
+}
+
+// Sent with a live ceremony plan link.
+export function planInviteMessage(title, token) {
+  return [
+    `Molo! Help me plan "${title}" on i-Camagu.`,
+    'Open the link, register if you are new, and ask to edit. Your suggestions come to me to approve before they change the plan. You only see the steps and shopping list, never the money or gifts.',
+    planInviteUrl(token),
   ].join('\n\n')
 }
