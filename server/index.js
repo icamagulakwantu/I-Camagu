@@ -28,6 +28,7 @@ import { updateWeddingAndMourningPlans } from './scripts/wedding-mourning-nov-20
 import { updateDirectoryListings, addMoreDirectoryListings } from './scripts/directory-listings-nov-2026.js';
 import { addUlwalukoRegistrationSteps } from './scripts/ulwaluko-registration-nov-2026.js';
 import { switchPapToSamp } from './scripts/samp-nov-2026.js';
+import { applyGrocerySpecials } from './scripts/grocery-specials-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -285,6 +286,12 @@ if (startup.schemaReady) {
     await switchPapToSamp();
   } catch (err) {
     console.error('Samp update failed:', err?.message);
+  }
+  // Grocery bulk prices at retail specials, and new staples. Runs once.
+  try {
+    await applyGrocerySpecials();
+  } catch (err) {
+    console.error('Grocery specials update failed:', err?.message);
   }
 }
 

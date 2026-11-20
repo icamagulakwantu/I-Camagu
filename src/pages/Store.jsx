@@ -49,9 +49,9 @@ const PLACEHOLDER_TONE = {
 // How SmartMatch works, in three short steps: many small orders from
 // families and stokvels become one big order at volume prices.
 const HOW_IT_WORKS = [
-  { n: 1, title: 'Add what you need', desc: 'Drinks, meat, groceries or livestock' },
-  { n: 2, title: 'SmartMatch joins it', desc: 'With families and stokvels near you, into one big order' },
-  { n: 3, title: 'Pay less, share out', desc: 'Bought at volume, divided, delivered or collected nearby' },
+  { n: 1, title: 'Add it', desc: 'Drinks, meat, groceries or livestock' },
+  { n: 2, title: 'Matched', desc: 'SmartMatch joins it with families and stokvels near you' },
+  { n: 3, title: 'Pay less', desc: 'Bought at volume, divided, delivered or collected nearby' },
 ]
 
 // Product prices keep their cents, written the South African way: R2 700,00.
@@ -114,6 +114,7 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
         {showDepartment && <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#6f655a]">{dept.short}</p>}
         <h3 className="line-clamp-2 font-display text-[15px] font-semibold leading-snug text-ink">{sku.name}</h3>
         <p className="mt-0.5 line-clamp-2 text-xs leading-snug text-ink-muted">{pack}</p>
+        {casePrice != null && <p className="mt-0.5 text-[11px] font-semibold leading-snug text-[#2e4a2e]">Bulk price · unlocks at the group's bulk tier</p>}
         {savings !== null && retail && <p className="mt-0.5 text-xs tabular-nums text-ink-muted line-through">{price(retail)} retail</p>}
         {flock && <p className="mt-0.5 text-xs text-ink-muted">Pooled into a {flock}</p>}
         {casePrice != null && (
@@ -360,6 +361,12 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
           ))}
         </ol>
       )}
+
+      {/* Founder's rule: listed prices are special-level bulk prices, unlocked
+          by the group order's bulk tier, never single-purchase prices. */}
+      <p className="mx-4 mt-3 rounded-[14px] bg-[#2e4a2e]/[0.07] px-3.5 py-2.5 text-[12px] leading-relaxed text-ink">
+        <span className="font-extrabold text-[#1f3320]">Bulk prices, not single prices.</span> Prices here are SmartMatch bulk prices, set at the shops' special prices. They unlock only when your group order reaches its bulk tier, and are not prices for buying one on its own. You only pay once the group reaches its minimum and the supplier confirms the price.
+      </p>
 
       {/* ---------- Group orders filling near you ---------- */}
       {!isSearching && nearbyPools.length > 0 && (
