@@ -115,13 +115,17 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
           </button>
           <button
             type="button"
-            onClick={() => onNavigate('profile')}
-            aria-label="Your profile"
-            className="pressable flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-cream/40 bg-[#2e4a2e] text-sm font-extrabold"
+            onClick={() => onNavigate('more')}
+            aria-label="Your profile and more"
+            className="pressable relative flex h-11 w-11 items-center justify-center rounded-full border-2 border-cream/40 bg-[#2e4a2e] text-sm font-extrabold"
           >
             {user?.profileImage
-              ? <img src={user.profileImage} alt="" className="h-full w-full object-cover" />
+              ? <img src={user.profileImage} alt="" className="h-full w-full rounded-full object-cover" />
               : initials(user)}
+            {/* Everything else (ukugida, templates, directory, settings) lives here. */}
+            <span aria-hidden="true" className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-cream ring-2 ring-[#1f3320]">
+              <Icon name="menu" size={11} color="#1f3320" />
+            </span>
           </button>
         </div>
       </header>

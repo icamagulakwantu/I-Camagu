@@ -6,7 +6,6 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import Icon from '../components/Icon.jsx'
-import MoneySwitch from '../components/MoneySwitch.jsx'
 import { DEPARTMENTS, departmentOf, aisleOf, sectionOf } from '../data/storeTaxonomy.js'
 import { unitOf, collectiveNoun } from '../data/bulkUnits.js'
 import { notifyBasketChanged } from '../lib/basketEvents.js'
@@ -126,7 +125,7 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
   )
 }
 
-function Store({ onGoToBasket, basketCount, initialSearch = '', onSwitchMoney }) {
+function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
   const { accessToken } = useAuth()
   const { location, feed } = useCommunity()
   const { showToast } = useToast()
@@ -264,7 +263,6 @@ function Store({ onGoToBasket, basketCount, initialSearch = '', onSwitchMoney })
     <div className="mx-auto min-h-screen max-w-md pb-48">
       {/* ---------- Header with search ---------- */}
       <header className="relative overflow-hidden rounded-b-[32px] bg-[#1f3320] px-5 pb-[84px] pt-6 text-cream">
-        {onSwitchMoney && <MoneySwitch active="store" onSwitch={onSwitchMoney} />}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-cream/60">

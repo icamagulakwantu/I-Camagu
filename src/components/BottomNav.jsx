@@ -2,13 +2,15 @@ import Icon from './Icon.jsx'
 
 function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals = 0, unreadNotifications = 0 }) {
   // The vehicle (docs/VISION.md): isiduko is the root, ceremonies the
-  // engine, imali (saving and buying together) the gears and tyres.
+  // engine, stokvels the gears and Bulk Buy the tyres (and what keeps the
+  // platform going). Everything else ("More") opens from the profile
+  // picture at the top of Home.
   const tabs = [
     { id: 'home', label: 'Home', english: 'Home', icon: 'home', badge: unreadNotifications },
     { id: 'iziduko', label: 'Isiduko', english: 'Your clan', icon: 'users' },
     { id: 'ceremonyhub', label: 'Imisebenzi', english: 'Ceremonies', icon: 'calendar' },
-    { id: 'imali', label: 'Imali', english: 'Save and buy', icon: 'coins', badge: pendingApprovals + basketCount },
-    { id: 'more', label: 'More', english: 'More', icon: 'menu' },
+    { id: 'stokvels', label: 'Stokvels', english: 'Stokvels', icon: 'coins', badge: pendingApprovals },
+    { id: 'store', label: 'Bulk Buy', english: 'Bulk Buy', icon: 'cart', badge: basketCount },
   ]
 
   return (
