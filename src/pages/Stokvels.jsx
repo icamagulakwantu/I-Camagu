@@ -4,6 +4,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton, StokvelCardSkeleton, StokvelDetailSkeleton } from '../components/ui/Skeleton.jsx'
 import Icon from '../components/Icon.jsx'
+import MoneySwitch from '../components/MoneySwitch.jsx'
 import MeetingMinutes from './stokvel/MeetingMinutes.jsx'
 import LeaveStokvelButton from './stokvel/LeaveStokvelButton.jsx'
 import FinesPenalties from './stokvel/FinesPenalties.jsx'
@@ -58,7 +59,7 @@ const inputStyle = "w-full border border-ink/30 rounded-soft px-3 py-2 text-sm f
 // cards to the list view only, below the page header, so the header always
 // sits at the top like every other tab and the extras never leak into the
 // create, join or detail views.
-function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
+function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
 
@@ -1276,13 +1277,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
         <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/50 to-[#1f3320]" />
         <div className="relative">
-          <button
-            type="button"
-            onClick={() => onBack?.()}
-            className={`mb-6 flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm ${pressable}`}
-          >
-            <Icon name="arrowLeft" size={14} color="#fffdf9" /> Back
-          </button>
+          <MoneySwitch active="stokvels" onSwitch={(id) => onNavigate?.(id)} />
           <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-cream/60">Yonga kunye · Save together</p>
           <h1 className="mt-2 font-display text-[2.3rem] font-semibold leading-[1.04] text-balance">
             Stokvels that <span className="italic text-ochre-light">run properly.</span>

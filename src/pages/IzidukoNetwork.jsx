@@ -26,7 +26,7 @@ function Avatar({ src, size = 'w-12 h-12' }) {
   )
 }
 
-function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
+function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage, onOpenGroups }) {
   const { accessToken } = useAuth()
   const { showToast } = useToast()
 
@@ -157,6 +157,17 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
         <ClanSearch onPickClan={onGoToClanLines} />
 
         <LineageCard accessToken={accessToken} showToast={showToast} onSaved={loadAll} />
+
+        {onOpenGroups && (
+          <button type="button" onClick={onOpenGroups} className="pressable mb-4 flex w-full items-center gap-3 rounded-[20px] bg-white p-4 text-left shadow-soft">
+            <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#2e4a2e]/10"><Icon name="users" size={18} color="#2e4a2e" /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-bold text-ink">Clan groups</span>
+              <span className="block text-[13px] text-ink-muted">Your clan where you live: talk, plan and share news</span>
+            </span>
+            <Icon name="arrowRight" size={16} color="#6b645a" />
+          </button>
+        )}
 
         <div className="flex bg-white border-2 border-terracotta/25 rounded-pill p-1 mb-4">
           {TABS.map((t) => (

@@ -79,6 +79,10 @@ const MORE_SCREENS = [
 // Ceremony tools opened from More (templates, ukugida, ...) light up More,
 // because that is where their Back button returns.
 const CEREMONY_SCREENS = ['ceremony', 'timeline', 'budget', 'ekoyinibooking']
+// Imali: saving (stokvels) and buying together (Bulk Buy) under one tab.
+const MONEY_SCREENS = ['stokvels', 'store', 'basket', 'myorders']
+// Isiduko: the clan network, clan groups and messages.
+const CLAN_SCREENS = ['iziduko', 'izidukoprofile', 'izidukochat', 'clangroups']
 
 const SCREEN_PATHS = {
   home: '/',
@@ -204,6 +208,8 @@ function MainApp() {
   // A search to open Bulk Buy with (from the feast calculator); cleared once
   // the shopper leaves the store so it never comes back on its own.
   const [storeSearch, setStoreSearch] = useState('')
+  const [lastMoneyScreen, setLastMoneyScreen] = useState('stokvels')
+  useEffect(() => { if (screen === 'stokvels' || screen === 'store') setLastMoneyScreen(screen) }, [screen])
   // A template invite link opened before signing in: once inside, open
   // Templates, which shows the invitation. The link stays remembered until
   // the person acts on it (see Templates), so a reload never loses it.
@@ -379,7 +385,7 @@ function MainApp() {
           />
         )
       case 'store':
-        return <Store onGoToBasket={() => setScreen('basket')} basketCount={basketCount} initialSearch={storeSearch} />
+        return <Store onGoToBasket={() => setScreen('basket')} basketCount={basketCount} initialSearch={storeSearch} onSwitchMoney={setScreen} />
       case 'basket':
         return <Basket onBack={() => setScreen('store')} onBasketChanged={setBasketCount} onGoToOrders={() => setScreen('myorders')} />
       case 'ceremony':
@@ -413,7 +419,8 @@ function MainApp() {
       case 'iziduko':
         return (
           <IzidukoNetwork
-            onBack={goMore}
+            onBack={goHome}
+            onOpenGroups={() => openClanGroup(null)}
             onGoToClanLines={() => { setProfileInitialTab('clan'); setScreen('profile') }}
             onViewProfile={openIzidukoProfile}
             onMessage={openIzidukoChat}
@@ -426,7 +433,7 @@ function MainApp() {
       case 'clangroups':
         return (
           <ClanGroups
-            onBack={goMore}
+            onBack={() => setScreen('iziduko')}
             onGoToClanLines={() => { setProfileInitialTab('clan'); setScreen('profile') }}
             initialGroupId={clanGroupId}
             onConsumeInitialGroup={() => setClanGroupId(null)}
@@ -488,10 +495,13 @@ function MainApp() {
   const activeTab =
     screen === 'home' ? 'home'
     : screen === 'ceremonyhub' || CEREMONY_SCREENS.includes(screen) || returnToCeremonyId ? 'ceremonyhub'
-    : screen === 'store' || screen === 'basket' || screen === 'myorders' ? 'store'
-    : screen === 'stokvels' ? 'stokvels'
+    : MONEY_SCREENS.includes(screen) ? 'imali'
+    : CLAN_SCREENS.includes(screen) ? 'iziduko'
     : MORE_SCREENS.includes(screen) ? 'more'
     : 'home'
+
+  // Tapping a tab: Imali returns to whichever side (save or buy) was used last.
+  const onTab = (tab) => setScreen(tab === 'imali' ? lastMoneyScreen : tab)
 
   return (
     <div className="icamagu-bg min-h-screen">
@@ -502,7 +512,7 @@ function MainApp() {
       {renderScreen()}
       <BottomNav
         activeScreen={activeTab}
-        onNavigate={setScreen}
+        onNavigate={onTab}
         basketCount={basketCount}
         pendingApprovals={pendingApprovals}
         unreadNotifications={unreadNotifications}

@@ -1,13 +1,14 @@
 import Icon from './Icon.jsx'
 
 function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals = 0, unreadNotifications = 0 }) {
-  // Same order as the "Your path" map on Home: save, buy in bulk, ceremony.
+  // The vehicle (docs/VISION.md): isiduko is the root, ceremonies the
+  // engine, imali (saving and buying together) the gears and tyres.
   const tabs = [
-    { id: 'home', label: 'Home', icon: 'home', badge: unreadNotifications },
-    { id: 'stokvels', label: 'Stokvels', icon: 'coins', badge: pendingApprovals },
-    { id: 'store', label: 'Bulk Buy', icon: 'cart', badge: basketCount },
-    { id: 'ceremonyhub', label: 'Ceremonies', icon: 'calendar' },
-    { id: 'more', label: 'More', icon: 'menu' },
+    { id: 'home', label: 'Home', english: 'Home', icon: 'home', badge: unreadNotifications },
+    { id: 'iziduko', label: 'Isiduko', english: 'Your clan', icon: 'users' },
+    { id: 'ceremonyhub', label: 'Imisebenzi', english: 'Ceremonies', icon: 'calendar' },
+    { id: 'imali', label: 'Imali', english: 'Save and buy', icon: 'coins', badge: pendingApprovals + basketCount },
+    { id: 'more', label: 'More', english: 'More', icon: 'menu' },
   ]
 
   return (
@@ -22,7 +23,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
                   <button
                     type="button"
                     onClick={() => onNavigate(tab.id)}
-                    aria-label={tab.badge > 0 ? `${tab.label}, ${tab.badge} new` : tab.label}
+                    aria-label={`${tab.label}${tab.english !== tab.label ? ` (${tab.english})` : ''}${tab.badge > 0 ? `, ${tab.badge} new` : ''}`}
                     aria-current={active ? 'page' : undefined}
                     className="pressable flex min-h-[58px] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-[18px] px-0.5"
                   >
