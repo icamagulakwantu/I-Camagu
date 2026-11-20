@@ -243,7 +243,7 @@ export default function FamilyContributions({ onBack }) {
           <EmptyState
             emoji="📋"
             title="No ceremony plans yet"
-            description="Create a plan in Ceremony Preparation first to start tracking family pledges."
+            description="Create a plan in Ceremonies first to start tracking family pledges."
             className="border-2 border-terracotta/25"
           />
         ) : (

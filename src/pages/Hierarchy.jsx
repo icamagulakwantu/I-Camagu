@@ -230,7 +230,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
 
       <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 space-y-2">
         {ceremonies.length === 0 ? (
-          <p className="text-xs text-brand-black/50">You don't have any ceremonies yet — create one in Ceremony Preparation first.</p>
+          <p className="text-xs text-brand-black/50">You don't have any ceremonies yet — create one in Ceremonies first.</p>
         ) : (
           <select value={ceremonyId} onChange={(e) => setCeremonyId(e.target.value)}
             className="w-full border border-brand-black/30 rounded-soft px-3 py-2 text-sm" required>
