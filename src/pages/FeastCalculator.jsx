@@ -46,7 +46,7 @@ function FeastCalculator({ onBack, onOpenStore, guestCount = null, ceremonyTitle
         </section>
 
         <section aria-live="polite" className="rounded-[24px] bg-[#1f3320] p-5 text-cream">
-          <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ochre-light">Estimated food cost</p>
+          <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-cream/60">Estimated food cost</p>
           <p className="mt-1 font-display text-[2.6rem] font-semibold leading-none tabular-nums">{rand(feast.total)}</p>
           <p className="mt-2 text-sm text-cream/75">
             {feast.guests ? `About ${rand(feast.perGuest)} a guest, for about ${feast.meatKg} kg of meat on the bone.` : 'Add the number of guests to see the list.'}
@@ -55,7 +55,7 @@ function FeastCalculator({ onBack, onOpenStore, guestCount = null, ceremonyTitle
 
         {groups.map((group) => (
           <section key={group} aria-label={group}>
-            <p className="px-1 text-xs font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">{group}</p>
+            <p className="px-1 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">{group}</p>
             <ul className="mt-2 overflow-hidden rounded-[20px] bg-[#fffdf9] shadow-soft">
               {feast.lines.filter((line) => line.group === group).map((line) => (
                 <li key={line.key} className="flex items-center justify-between gap-3 border-b border-ink/5 px-4 py-3 last:border-0">

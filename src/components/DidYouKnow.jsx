@@ -74,13 +74,13 @@ export default function DidYouKnow() {
   const handleNext = () => setCurrentIndex((prev) => (prev + 1) % legends.length)
   const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + legends.length) % legends.length)
 
-  const navBtn = 'w-11 h-11 rounded-full bg-terracotta/10 text-terracotta text-xl font-black flex items-center justify-center active:scale-95 transition-transform'
+  const navBtn = 'w-11 h-11 rounded-full bg-[#2e4a2e]/10 text-[#1f3320] text-xl font-black flex items-center justify-center active:scale-95 transition-transform'
 
   return (
     <div className="relative select-none text-left">
       <div className="flex justify-between items-start gap-3 mb-3">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-ochre">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#6f655a]">
             Did you know? · {currentIndex + 1} of {legends.length}
           </p>
           <p className="font-display font-bold text-2xl text-brand-black leading-tight mt-0.5">Xhosa Greatness</p>

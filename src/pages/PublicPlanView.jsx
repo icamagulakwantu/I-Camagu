@@ -56,7 +56,7 @@ function SuggestForm({ token, phases }) {
       ) : (
         <form onSubmit={submit} className="space-y-3">
           <div>
-            <p className="eyebrow text-terracotta-dark">Icebiso · Suggest</p>
+            <p className="eyebrow text-[#6f655a]">Icebiso · Suggest</p>
             <h2 className="font-display text-xl font-semibold text-ink">Did we forget something?</h2>
             <p className="mt-1 text-sm text-ink-muted">Add anything the family may have missed. The host sees it and adds it to the plan.</p>
           </div>
@@ -205,7 +205,7 @@ function PublicPlanView({ token }) {
         {/* Still needed: one tap fills the pledge form */}
         {stillNeeded.length > 0 && (
           <section className="mt-6">
-            <p className="eyebrow text-terracotta">Okusafuneka · Still needed</p>
+            <p className="eyebrow text-[#6f655a]">Okusafuneka · Still needed</p>
             <h2 className="font-display text-xl font-semibold text-ink">Tap what you can bring</h2>
             <div className="mt-3 flex flex-wrap gap-2">
               {stillNeeded.map((item) => (

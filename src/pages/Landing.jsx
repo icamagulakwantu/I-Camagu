@@ -65,7 +65,7 @@ function CelebrationCard({ item }) {
       <div className="relative h-52">
         <img src={item.image} alt="" className="h-full w-full object-cover" loading="lazy" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1f3320] via-[#1f3320]/25 to-transparent" />
-        <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-terracotta-dark">
+        <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#6f655a]">
           {item.tag}
         </span>
         <h3 className="absolute bottom-3 left-4 right-16 font-display text-[1.5rem] font-semibold leading-[1.05] text-cream">{item.name}</h3>
@@ -81,7 +81,7 @@ function CelebrationCard({ item }) {
         <p className="mt-3 text-[14px] leading-snug text-cream/90">{item.line}</p>
         <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={`What ${item.name} needs`}>
           {item.needs.map((n) => (
-            <li key={n} className="rounded-full border border-ochre-light/35 px-2.5 py-1 text-[11px] font-bold text-ochre-light">{n}</li>
+            <li key={n} className="rounded-full border border-cream/25 px-2.5 py-1 text-[11px] font-bold text-cream/80">{n}</li>
           ))}
         </ul>
       </div>
@@ -157,7 +157,7 @@ function ClanFinder({ onJoin }) {
           <button
             type="button"
             onClick={onJoin}
-            className="pressable mt-2 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-ochre-light text-[15px] font-extrabold text-[#1f3320]"
+            className="pressable mt-2 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-cream text-[15px] font-extrabold text-[#1f3320]"
           >
             Join and find your clan family <Icon name="arrowRight" size={16} color="#1f3320" />
           </button>
@@ -224,10 +224,10 @@ export default function Landing({ onJoin, onSignIn }) {
                 {inviteType === 'pool' && 'You have been invited to a SmartMatch group order on i-Camagu. Join free to continue with your invitation.'}
               </div>
             )}
-            <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-terracotta-dark">Siyavuya · We celebrate</p>
+            <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-[#6f655a]">Siyavuya · We celebrate</p>
             <h1 className="mt-3 font-display text-[2.6rem] font-semibold leading-[1.02] text-ink text-balance">
               Celebrate like a nation.{' '}
-              <span className="italic text-terracotta">Plan like a family.</span>
+              <span className="italic text-[#2e4a2e]">Plan like a family.</span>
             </h1>
             <p className="mt-4 max-w-md text-[16px] leading-relaxed text-ink-light">
               Your son&rsquo;s umgidi. Your wedding. Every ceremony that makes us amaXhosa, planned with
@@ -247,8 +247,8 @@ export default function Landing({ onJoin, onSignIn }) {
               >
                 <Icon name="search" size={17} color="#2e4a2e" /> Find your clan
               </a>
-              <a href="#journey" className="pressable flex min-h-[44px] items-center justify-center gap-1.5 text-[15px] font-bold text-terracotta-dark sm:min-h-[52px]">
-                See the whole journey <Icon name="arrowDown" size={16} color="#a3471a" />
+              <a href="#journey" className="pressable flex min-h-[44px] items-center justify-center gap-1.5 text-[15px] font-bold text-[#2e4a2e] sm:min-h-[52px]">
+                See the whole journey <Icon name="arrowDown" size={16} color="#2e4a2e" />
               </a>
             </div>
             <p className="mt-3 text-xs text-ink-muted">Free to join · Works on slow data · Install from your browser</p>
@@ -272,7 +272,7 @@ export default function Landing({ onJoin, onSignIn }) {
       {/* —— Clan: the foundation. A traditional social network under one kingdom —— */}
       <section id="clan" aria-labelledby="clan-heading" className="mx-auto max-w-lg scroll-mt-6 px-5 pt-10">
         <div className="relative overflow-hidden rounded-[30px] bg-[#2e4a2e] px-6 pb-7 pt-8 text-cream shadow-[0_28px_56px_-28px_rgba(31,51,32,0.9)]">
-          <p className="relative text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Isiduko sakho · Your clan</p>
+          <p className="relative text-[12px] font-extrabold uppercase tracking-[0.2em] text-cream/60">Isiduko sakho · Your clan</p>
           <h2 id="clan-heading" className="relative mt-2 font-display text-[2.1rem] font-semibold leading-[1.05] text-balance">
             Your clan is your <span className="italic text-ochre-light">first family.</span>
           </h2>
@@ -300,7 +300,7 @@ export default function Landing({ onJoin, onSignIn }) {
 
       {/* —— The journey: every pillar, one path —— */}
       <section id="journey" aria-labelledby="journey-heading" className="mx-auto max-w-lg scroll-mt-6 px-5 pt-12">
-        <p className="eyebrow text-terracotta-dark">Uhambo · The journey</p>
+        <p className="eyebrow text-[#6f655a]">Uhambo · The journey</p>
         <h2 id="journey-heading" className="mt-1 font-display text-[1.9rem] font-semibold leading-tight text-ink text-balance">
           From your clan to the day, and kept forever.
         </h2>
@@ -314,7 +314,7 @@ export default function Landing({ onJoin, onSignIn }) {
               >
                 <Icon name={j.icon} size={20} color="#ffffff" />
               </span>
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">{i + 1} · {j.step}</p>
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">{i + 1} · {j.step}</p>
               <h3 className="mt-0.5 text-[16px] font-bold text-ink">{j.title}</h3>
               <p className="mt-1 text-[14px] leading-snug text-ink-muted">{j.body}</p>
             </li>
@@ -325,7 +325,7 @@ export default function Landing({ onJoin, onSignIn }) {
       {/* —— Pride —— */}
       <section aria-labelledby="pride-heading" className="mx-auto max-w-lg px-5 pt-14">
         <div className="relative overflow-hidden rounded-[30px] border border-ink/[0.06] bg-white px-6 pb-7 pt-8 text-ink shadow-soft">
-          <p className="relative text-[12px] font-extrabold uppercase tracking-[0.2em] text-terracotta-dark">Siyazingca</p>
+          <p className="relative text-[12px] font-extrabold uppercase tracking-[0.2em] text-[#6f655a]">Siyazingca</p>
           <h2 id="pride-heading" className="relative mt-2 font-display text-[2.1rem] font-semibold leading-[1.05] text-balance">
             We are proud of who we are.
           </h2>
@@ -334,7 +334,7 @@ export default function Landing({ onJoin, onSignIn }) {
             reasons behind every ceremony. Then pass it on to the young ones.
           </p>
           <div className="relative mt-6 rounded-[22px] bg-cream p-4 text-ink">
-            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Did you know</p>
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Did you know</p>
             <p className="mt-1 text-[14px] leading-snug">
               Laduma Ngxokolo first made his MaXhosa knitwear for <span className="font-bold">amakrwala</span>,
               young men home from ulwaluko. Today the world wears it.
@@ -347,7 +347,7 @@ export default function Landing({ onJoin, onSignIn }) {
       <section aria-labelledby="fund-heading" className="mx-auto max-w-lg px-5 pt-14">
         <div className="relative overflow-hidden rounded-[30px] bg-[#efe6d8] text-ink">
           <div className="relative px-6 pb-7 pt-8">
-            <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-terracotta-dark">Ubuhlanti bakwaXhosa · The Shrine Fund</p>
+            <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-[#6f655a]">Ubuhlanti bakwaXhosa · The Shrine Fund</p>
             <h2 id="fund-heading" className="mt-2 font-display text-[2.1rem] font-semibold leading-[1.04] text-balance">
               Together we can build greatness.
             </h2>
@@ -410,7 +410,7 @@ export default function Landing({ onJoin, onSignIn }) {
       <section className="mx-auto max-w-lg px-5 pb-14 pt-10">
         <div className="relative overflow-hidden rounded-[30px] bg-[#1f3320] px-6 pb-7 pt-9 text-center text-cream">
           <div className="relative">
-            <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Masiqale</p>
+            <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-cream/60">Masiqale</p>
             <p className="mt-2 font-display text-[1.9rem] font-semibold leading-tight text-balance">
               What are we celebrating next?
             </p>

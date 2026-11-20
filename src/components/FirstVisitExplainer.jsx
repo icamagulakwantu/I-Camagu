@@ -15,7 +15,7 @@ const SHORTCUTS = [
 export default function FirstVisitExplainer({ onNavigate }) {
   return (
     <section className="mb-5" aria-label="Get started">
-      <p className="eyebrow text-terracotta mb-2 px-1">Qala apha · Start here</p>
+      <p className="eyebrow text-[#6f655a] mb-2 px-1">Qala apha · Start here</p>
       <div className="grid grid-cols-2 gap-2.5">
         {SHORTCUTS.map((s) => (
           <button

@@ -90,7 +90,7 @@ function Notifications({ onBack, onNavigate }) {
       </button>
       <div className="flex justify-between items-end mb-5">
         <div>
-          <p className="eyebrow text-terracotta">Izaziso</p>
+          <p className="eyebrow text-[#6f655a]">Izaziso</p>
           <h2 className="font-display font-bold text-2xl text-ink">Notifications</h2>
         </div>
         {unread.length > 0 && (

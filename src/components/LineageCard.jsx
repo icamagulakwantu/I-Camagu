@@ -57,7 +57,7 @@ export default function LineageCard({ accessToken, onSaved, showToast }) {
           <Icon name="users" size={18} color="#e0a94e" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[11px] font-extrabold uppercase tracking-[0.16em] text-ochre-light">Umnombo wakho · Your line</span>
+          <span className="block text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/60">Umnombo wakho · Your line</span>
           <span className="mt-0.5 block text-[15px] font-bold leading-snug">
             {savedCount ? `${savedCount} generation${savedCount === 1 ? '' : 's'} recorded` : 'Name your fathers, back as far as you know'}
           </span>
@@ -73,7 +73,7 @@ export default function LineageCard({ accessToken, onSaved, showToast }) {
           <ol className="space-y-2">
             {rows.map((row, i) => (
               <li key={i} className="rounded-[16px] bg-white/[0.06] p-3">
-                <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-ochre-light">{generationName(i + 1)}</p>
+                <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-cream/60">{generationName(i + 1)}</p>
                 <input
                   value={row.name}
                   maxLength={MAX_NAME}
@@ -105,7 +105,7 @@ export default function LineageCard({ accessToken, onSaved, showToast }) {
               Clan matches see only the ancestors we share, never my whole line.
             </span>
           </label>
-          <button type="button" onClick={save} disabled={saving} className="pressable min-h-12 w-full rounded-full bg-ochre-light text-[15px] font-extrabold text-[#1f3320] disabled:opacity-60">
+          <button type="button" onClick={save} disabled={saving} className="pressable min-h-12 w-full rounded-full bg-cream text-[15px] font-extrabold text-[#1f3320] disabled:opacity-60">
             {saving ? 'Saving…' : 'Save my line'}
           </button>
         </div>

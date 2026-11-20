@@ -26,13 +26,13 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
                     aria-current={active ? 'page' : undefined}
                     className="pressable flex min-h-[58px] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-[18px] px-0.5"
                   >
-                    <span className={`relative flex h-8 w-12 items-center justify-center rounded-full transition-colors duration-200 ${active ? 'bg-terracotta shadow-[0_6px_16px_-6px_rgba(196,92,38,0.9)]' : ''}`}>
+                    <span className={`relative flex h-8 w-12 items-center justify-center rounded-full transition-colors duration-200 ${active ? 'bg-[#2e4a2e] shadow-[0_6px_16px_-6px_rgba(31,51,32,0.8)]' : ''}`}>
                       <Icon name={tab.icon} size={19} color={active ? '#fff' : '#6b645a'} strokeWidth={active ? 2 : 1.7} />
                       {tab.badge > 0 && (
                         <span className="absolute -top-1.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-pill bg-brand-ochre text-brand-black text-xs font-black flex items-center justify-center ring-2 ring-[#fffdf9]">{tab.badge > 99 ? '99+' : tab.badge}</span>
                       )}
                     </span>
-                    <span className={`max-w-full truncate text-[11px] sm:text-xs leading-tight text-center tracking-wide ${active ? 'font-bold text-terracotta-dark' : 'font-medium text-ink-muted'}`}>
+                    <span className={`max-w-full truncate text-[11px] sm:text-xs leading-tight text-center tracking-wide ${active ? 'font-bold text-[#1f3320]' : 'font-medium text-ink-muted'}`}>
                       {tab.label}
                     </span>
                   </button>

@@ -296,7 +296,7 @@ export default function Ukugida({ onBack }) {
         </button>
         {entries.length > 0 && (
           <div className="mb-4 rounded-[20px] bg-[#fffdf9] p-4 shadow-soft">
-            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Gcina ikopi · Keep a copy</p>
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Gcina ikopi · Keep a copy</p>
             <p className="mt-1 text-[13px] leading-snug text-ink-muted">Your book stays on i-Camagu. Keep your own copy too: print it, save it as a PDF, or open it in Excel.</p>
             <div className="mt-3 grid grid-cols-2 gap-2">
               <button type="button" onClick={() => printUkugidaBook(entries, user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '')} className={`flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-[#1f3320] text-sm font-bold text-cream ${pressable}`}>

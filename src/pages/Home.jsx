@@ -58,7 +58,7 @@ function initials(user) {
   return `${user?.firstName?.[0] || ''}${user?.lastName?.[0] || ''}`.toUpperCase() || 'Me'
 }
 
-function Eyebrow({ children, tone = 'text-terracotta-dark' }) {
+function Eyebrow({ children, tone = 'text-[#6f655a]' }) {
   return <p className={`text-xs font-extrabold uppercase tracking-[0.16em] ${tone}`}>{children}</p>
 }
 
@@ -70,7 +70,7 @@ function SectionTitle({ eyebrow, title, actionLabel, onAction }) {
         <h2 className="mt-0.5 font-display text-[1.45rem] font-semibold leading-tight tracking-tight text-ink">{title}</h2>
       </div>
       {actionLabel && (
-        <button type="button" onClick={onAction} className="pressable flex-shrink-0 pb-1 text-sm font-extrabold text-terracotta-dark">
+        <button type="button" onClick={onAction} className="pressable flex-shrink-0 pb-1 text-sm font-extrabold text-[#2e4a2e]">
           {actionLabel}
         </button>
       )}
@@ -117,7 +117,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
             type="button"
             onClick={() => onNavigate('profile')}
             aria-label="Your profile"
-            className="pressable flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-ochre-light bg-terracotta-dark text-sm font-extrabold"
+            className="pressable flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-cream/40 bg-[#2e4a2e] text-sm font-extrabold"
           >
             {user?.profileImage
               ? <img src={user.profileImage} alt="" className="h-full w-full object-cover" />
@@ -128,7 +128,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
 
       {/* Bottom padding leaves room for the Needs-you deck that overlaps the hero. */}
       <div className="absolute inset-x-0 bottom-0 px-5 pb-[84px]">
-        <Eyebrow tone="text-ochre-light">Molo, {user?.firstName || 'mhlobo'} · {today}</Eyebrow>
+        <Eyebrow tone="text-cream/60">Molo, {user?.firstName || 'mhlobo'} · {today}</Eyebrow>
         {lead ? (
           <>
             <h1 className="mt-2 font-display text-[2.3rem] font-semibold leading-[1.02] tracking-tight text-balance">
@@ -149,7 +149,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
                 </span>
                 {step && (
                   <span className="mt-1 block truncate text-sm font-bold text-cream">
-                    <span className="text-ochre-light">Next:</span> {step.label}
+                    <span className="text-cream/60">Next:</span> {step.label}
                   </span>
                 )}
                 <span className="mt-2 block h-1 overflow-hidden rounded-full bg-cream/25">
@@ -281,7 +281,7 @@ function CeremonyCard({ ceremony, onOpen }) {
           <span className="mt-0.5 block truncate font-display text-[1.15rem] font-semibold leading-tight text-ink">{ceremony.title}</span>
           <span className="mt-2 flex items-center gap-2">
             <span className="h-1 flex-1 overflow-hidden rounded-full bg-cream-dark">
-              <span className="block h-full rounded-full bg-terracotta-dark" style={{ width: `${Math.max(progress, 3)}%` }} />
+              <span className="block h-full rounded-full bg-[#2e4a2e]" style={{ width: `${Math.max(progress, 3)}%` }} />
             </span>
             <span className="text-xs font-bold tabular-nums text-ink-muted">{total ? `${done}/${total}` : '—'}</span>
           </span>
@@ -309,7 +309,7 @@ function CeremonyRail({ ceremonies, loading, onSelectCeremony, onNavigate }) {
               onClick={() => onNavigate('ceremonyhub')}
               className="pressable flex h-[200px] w-full flex-col items-center justify-center gap-2 rounded-[22px] border-2 border-dashed border-ink/15 text-center"
             >
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-terracotta-dark text-2xl font-light leading-none text-white">+</span>
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2e4a2e] text-2xl font-light leading-none text-white">+</span>
               <span className="px-3 text-sm font-extrabold text-ink">Plan a ceremony</span>
             </button>
           </li>
@@ -328,12 +328,12 @@ function ClanPanel({ user, clanCeremonies, onNavigate }) {
       <div className="px-5 pb-5 pt-5">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
-            <Eyebrow tone="text-ochre-light">Abantu bakho{clan ? ` · ${clan}` : ''}</Eyebrow>
+            <Eyebrow tone="text-cream/60">Abantu bakho{clan ? ` · ${clan}` : ''}</Eyebrow>
             <h2 className="mt-0.5 font-display text-[1.35rem] font-semibold leading-tight">
               {clanCeremonies.length ? 'Coming up in your clan' : 'Your clan'}
             </h2>
           </div>
-          <button type="button" onClick={() => onNavigate('clangroups')} className="pressable flex-shrink-0 pb-0.5 text-sm font-extrabold text-ochre-light">
+          <button type="button" onClick={() => onNavigate('clangroups')} className="pressable flex-shrink-0 pb-0.5 text-sm font-extrabold text-cream/80 underline-offset-4 hover:underline">
             Groups
           </button>
         </div>
@@ -346,13 +346,13 @@ function ClanPanel({ user, clanCeremonies, onNavigate }) {
               return (
                 <li key={ceremony.id} className="relative flex items-center gap-3 rounded-[18px] bg-white/[0.08] py-3 pl-12 pr-4">
                   {/* The date tile steps out past the row's left edge. */}
-                  <span className="absolute -left-3 top-1/2 flex h-[52px] w-[48px] -translate-y-1/2 flex-col items-center justify-center rounded-[14px] bg-terracotta-dark leading-none shadow-[0_10px_20px_-10px_rgba(0,0,0,0.7)]">
+                  <span className="absolute -left-3 top-1/2 flex h-[52px] w-[48px] -translate-y-1/2 flex-col items-center justify-center rounded-[14px] bg-cream text-[#1f3320] leading-none shadow-[0_10px_20px_-10px_rgba(0,0,0,0.7)]">
                     {date ? (
                       <>
                         <span className="font-display text-xl font-semibold">{date.getDate()}</span>
                         <span className="mt-0.5 text-xs font-extrabold uppercase tracking-wider">{date.toLocaleDateString('en-ZA', { month: 'short' })}</span>
                       </>
-                    ) : <Icon name="calendar" size={18} color="#fffdf9" />}
+                    ) : <Icon name="calendar" size={18} color="#1f3320" />}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-display text-[1.05rem] font-semibold">{ceremony.title}</span>
@@ -369,7 +369,7 @@ function ClanPanel({ user, clanCeremonies, onNavigate }) {
         )}
 
         <div className="mt-4 grid grid-cols-2 gap-2.5">
-          <button type="button" onClick={() => onNavigate('iziduko')} className="pressable flex h-11 items-center justify-center gap-2 rounded-full bg-ochre-light text-sm font-extrabold text-[#1c1612]">
+          <button type="button" onClick={() => onNavigate('iziduko')} className="pressable flex h-11 items-center justify-center gap-2 rounded-full bg-cream text-sm font-extrabold text-[#1f3320]">
             <Icon name="link" size={15} /> Find your clan
           </button>
           <button type="button" onClick={() => onNavigate('legends')} className="pressable flex h-11 items-center justify-center gap-2 rounded-full border border-cream/30 text-sm font-bold text-cream">
@@ -395,7 +395,7 @@ function MoneyTiles({ stokvels, totalSaved, pools, basketCount, onNavigate }) {
     },
     {
       id: 'store',
-      bg: 'bg-[#fffdf9] text-ink shadow-soft', sub: 'text-ink-muted', disc: 'bg-[#a3471a] text-white', icon: 'cart',
+      bg: 'bg-[#fffdf9] text-ink shadow-soft', sub: 'text-ink-muted', disc: 'bg-[#1f3320] text-cream', icon: 'cart',
       title: 'Bulk Buy',
       detail: basketCount > 0
         ? `${plural(basketCount, 'item')} in your basket`
@@ -538,7 +538,7 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
 
       {/* Culture: a card with a folder tab standing up from its top edge. */}
       <section aria-label="Did you know" className="mx-4 mt-14">
-        <span className="relative z-10 ml-5 inline-flex items-center gap-2 rounded-t-[14px] bg-[#1f3320] px-4 pb-2 pt-2 text-xs font-extrabold uppercase tracking-[0.16em] text-ochre-light">
+        <span className="relative z-10 ml-5 inline-flex items-center gap-2 rounded-t-[14px] bg-[#1f3320] px-4 pb-2 pt-2 text-xs font-extrabold uppercase tracking-[0.16em] text-cream/60">
           <Icon name="landmark" size={13} /> Inkcubeko
         </span>
         <div className="relative overflow-hidden rounded-[24px] rounded-tl-[8px] bg-[#fffdf9] p-5 shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
@@ -555,7 +555,7 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
         onClick={() => onNavigate('shrinefund')}
         className="pressable relative mx-4 mt-8 block w-[calc(100%-2rem)] overflow-hidden rounded-[24px] bg-[#fffdf9] p-5 text-left text-ink shadow-soft"
       >
-        <span className="relative block text-[11px] font-extrabold uppercase tracking-[0.18em] text-terracotta-dark">Ubuhlanti · Shrine Fund</span>
+        <span className="relative block text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#6f655a]">Ubuhlanti · Shrine Fund</span>
         <span className="relative mt-1 block font-display text-[1.3rem] font-semibold leading-tight">Together we build greatness.</span>
         <span className="relative mt-1 block text-[13px] text-ink-muted">Our own seed capital, owned by the community. Pledge from R1 →</span>
       </button>

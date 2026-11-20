@@ -20,7 +20,7 @@ export default function WhatsNew({ items, onOpenItem, onSeeAll }) {
     <section className="mb-8" aria-label="What's new">
       <div className="flex items-end justify-between gap-3 mb-3">
         <div>
-          <p className="eyebrow text-terracotta">Okutsha · What's new</p>
+          <p className="eyebrow text-[#6f655a]">Okutsha · What's new</p>
           <h2 className="font-display text-[1.4rem] font-semibold leading-tight text-ink">
             {items.length === 1 ? '1 new update' : `${items.length} new updates`}
           </h2>

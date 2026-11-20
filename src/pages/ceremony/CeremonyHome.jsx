@@ -64,7 +64,7 @@ function FamilySuggestions({ planId, accessToken, onAccepted }) {
   if (items.length === 0) return null
   return (
     <section aria-label="Family suggestions" className="rounded-[24px] bg-[#fffdf9] p-5 shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
-      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Iingcebiso · From the family</p>
+      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Iingcebiso · From the family</p>
       <h2 className="mt-1 font-display text-[1.3rem] font-semibold leading-tight text-ink">{items.length} suggestion{items.length === 1 ? '' : 's'} for you</h2>
       <p className="mt-1 text-[13px] text-ink-muted">Sent from the link you shared. Add what belongs in the plan.</p>
       <ul className="mt-3 space-y-2">
@@ -86,13 +86,13 @@ function FamilySuggestions({ planId, accessToken, onAccepted }) {
   )
 }
 
-function Eyebrow({ children, tone = 'text-terracotta-dark' }) {
+function Eyebrow({ children, tone = 'text-[#6f655a]' }) {
   return <p className={`text-xs font-extrabold uppercase tracking-[0.16em] ${tone}`}>{children}</p>
 }
 
 function Chip({ icon, children, strong = false }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-bold ${strong ? 'bg-ochre-light text-[#1c1612]' : 'border border-cream/25 bg-cream/15 text-cream backdrop-blur-sm'}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-bold ${strong ? 'bg-cream text-[#1f3320]' : 'border border-cream/25 bg-cream/15 text-cream backdrop-blur-sm'}`}>
       {icon && <Icon name={icon} size={14} />}
       {children}
     </span>
@@ -184,7 +184,7 @@ export default function CeremonyHome({
           </div>
         </header>
         <div className="absolute inset-x-0 bottom-0 px-5 pb-[76px]">
-          <Eyebrow tone="text-ochre-light">{typeName(type)}{story.english ? ` · ${story.english}` : ''}</Eyebrow>
+          <Eyebrow tone="text-cream/60">{typeName(type)}{story.english ? ` · ${story.english}` : ''}</Eyebrow>
           <h1 className="mt-2 font-display text-[2.5rem] font-semibold leading-[1] tracking-tight text-balance break-words">{title}</h1>
           <div className="mt-3.5 flex flex-wrap gap-2">
             <Chip icon="calendar">{ceremony.eventDate ? longDate(ceremony.eventDate) : 'No date yet'}</Chip>
@@ -224,7 +224,7 @@ export default function CeremonyHome({
                   </li>
                 ))}
               </ol>
-              <Eyebrow tone="text-ochre-light">{next.eyebrow}</Eyebrow>
+              <Eyebrow tone="text-cream/60">{next.eyebrow}</Eyebrow>
               <h2 className="mt-1 font-display text-[1.5rem] font-semibold leading-tight">{next.title}</h2>
               <p className="mt-1.5 text-sm leading-relaxed text-[#c9bfb2]">{next.text}</p>
               {next.share ? (
@@ -348,9 +348,9 @@ export default function CeremonyHome({
             <img src={ceremonyImage(type)} alt="" className="absolute inset-0 h-full w-full object-cover object-bottom" />
             <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,15,11,0.45)_0%,rgba(20,15,11,0.9)_70%)]" />
             <div className="relative px-5 pb-5 pt-24">
-              <Eyebrow tone="text-ochre-light">Why we hold {typeName(type).toLowerCase()}</Eyebrow>
+              <Eyebrow tone="text-cream/60">Why we hold {typeName(type).toLowerCase()}</Eyebrow>
               <p className="mt-2 font-display text-[1.35rem] font-medium leading-snug">{story.desc}</p>
-              <button type="button" onClick={() => onViewTimeline?.(type)} className="pressable mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-ochre-light px-4 text-sm font-extrabold text-[#1c1612]">
+              <button type="button" onClick={() => onViewTimeline?.(type)} className="pressable mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-cream px-4 text-sm font-extrabold text-[#1f3320]">
                 See how the day unfolds <Icon name="arrowRight" size={15} />
               </button>
             </div>

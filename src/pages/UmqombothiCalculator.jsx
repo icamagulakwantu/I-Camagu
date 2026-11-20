@@ -102,7 +102,7 @@ function UmqombothiCalculator({ onBack, guestCount = null, ceremonyTitle = '' })
         {/* Result */}
         <section aria-live="polite" className="overflow-hidden rounded-[24px] bg-[#1f3320] text-cream">
           <div className="p-5">
-            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ochre-light">You need to brew</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-cream/60">You need to brew</p>
             <p className="mt-1 font-display text-[2.6rem] font-semibold leading-none tabular-nums">{litres} L</p>
             <p className="mt-2 text-sm text-[#c9bfb2]">{containers.label ? `In ${containers.label}, with room for the igwebu to rise.` : 'Add the number of guests to see how much.'}</p>
             <div className="mt-4 grid grid-cols-3 gap-2">
@@ -118,7 +118,7 @@ function UmqombothiCalculator({ onBack, guestCount = null, ceremonyTitle = '' })
 
         {/* Steps */}
         <section aria-label="Brewing steps" className="pt-2">
-          <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Brewing steps</p>
+          <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Brewing steps</p>
           <ol className="mt-3 space-y-2.5">
             {STEPS.map((step, i) => (
               <li key={step.title} className="flex gap-3 rounded-[18px] bg-[#fffdf9] p-4 shadow-soft">

@@ -46,7 +46,7 @@ export default function MothersGuide({ onOpenUmqombothi }) {
           <Icon name="heartHandshake" size={20} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-xs font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Kumama · For his mother</span>
+          <span className="block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Kumama · For his mother</span>
           <span className="mt-0.5 block font-display text-[1.2rem] font-semibold leading-tight text-ink">What is yours to carry</span>
         </span>
         <Icon name={open ? 'arrowUp' : 'arrowDown'} size={16} />

@@ -38,7 +38,7 @@ export default function TemplateInvite({ token, onBack, onOpenEditor, onActed })
     <div className="min-h-screen bg-cream pb-28">
       <header className="bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
         <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold">← Templates</button>
-        <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-ochre-light">Isimemo · An invitation</p>
+        <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/60">Isimemo · An invitation</p>
         <h1 className="mt-1 font-display text-[1.9rem] font-semibold leading-tight">{t ? t.title : 'A ceremony template'}</h1>
         {data && <p className="mt-1 text-sm text-cream/80">{data.ownerName} asked for your help with this plan.</p>}
       </header>
@@ -55,7 +55,7 @@ export default function TemplateInvite({ token, onBack, onOpenEditor, onActed })
               <div className="mt-3 max-h-72 space-y-3 overflow-y-auto pr-1">
                 {groupByPhase(t.items).map((g) => (
                   <div key={g.phase}>
-                    <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-terracotta-dark">{g.title}</p>
+                    <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#6f655a]">{g.title}</p>
                     <ul className="mt-1 space-y-0.5 text-[14px] text-ink">
                       {g.items.map((i) => <li key={i.key}>· {i.label}{i.kind === 'cost' && i.quantity ? ` (${i.quantity} ${i.unit})` : ''}</li>)}
                     </ul>

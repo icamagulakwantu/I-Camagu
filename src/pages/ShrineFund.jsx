@@ -109,7 +109,7 @@ function ShrineFund({ onBack }) {
           <button type="button" onClick={onBack} className="pressable mb-8 flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm">
             <Icon name="arrowLeft" size={14} color="#fffdf9" /> Back
           </button>
-          <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Ubuhlanti bakwaXhosa · Shrine Fund</p>
+          <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-cream/60">Ubuhlanti bakwaXhosa · Shrine Fund</p>
           <h1 className="mt-2 font-display text-[2.4rem] font-semibold leading-[1.02] text-balance">
             Together we build <span className="italic text-ochre-light">greatness.</span>
           </h1>
@@ -202,7 +202,7 @@ function ShrineFund({ onBack }) {
         {/* What this is */}
         <section className="relative overflow-hidden rounded-[28px] bg-terracotta-dark p-6 text-cream">
           <span aria-hidden="true" className="absolute -right-14 -top-14 h-44 w-44 rounded-full bg-ochre-light/20" />
-          <p className="relative text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Asiyo ntlawulo · Not a fee</p>
+          <p className="relative text-[12px] font-extrabold uppercase tracking-[0.2em] text-cream/60">Asiyo ntlawulo · Not a fee</p>
           <h2 className="relative mt-2 font-display text-[1.7rem] font-semibold leading-tight">The seed capital of our communities.</h2>
           <p className="relative mt-3 text-[14px] leading-relaxed text-cream/90">
             A long-term, community-owned investment fund dedicated to building economies that keep our rand circulating within our communities for longer before it leaves.

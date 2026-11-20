@@ -69,7 +69,7 @@ export default function TemplateEditor({ templateId, onBack }) {
     <div className="min-h-screen bg-cream pb-48">
       <header className="bg-[#1f3320] px-5 pb-7 pt-6 text-cream">
         <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold">← Templates</button>
-        <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-ochre-light">Iziphakamiso · Your suggestions</p>
+        <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/60">Iziphakamiso · Your suggestions</p>
         <h1 className="mt-1 font-display text-[1.8rem] font-semibold leading-tight">{ws.template.title}</h1>
         <p className="mt-1 text-sm text-cream/80">Change your copy, then send it. The owner sees their original beside yours and chooses what to keep.</p>
       </header>
@@ -84,7 +84,7 @@ export default function TemplateEditor({ templateId, onBack }) {
 
         {groupByPhase(items).map((g) => (
           <section key={g.phase} aria-label={g.title}>
-            <p className="px-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-terracotta-dark">{g.title}</p>
+            <p className="px-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#6f655a]">{g.title}</p>
             <ul className="mt-2 space-y-2">
               {g.items.map((i) => (
                 <li key={i.key} className={`rounded-[16px] bg-white p-3 shadow-soft ${i.key.startsWith('new-') ? 'ring-2 ring-[#2e4a2e]/30' : ''}`}>

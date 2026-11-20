@@ -188,7 +188,7 @@ export default function More({ onNavigate }) {
         <img src={CEREMONY_IMAGE.UMGIDI} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 to-[#1f3320]" />
         <div className="relative">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Konke okunye · Everything else</p>
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-cream/60">Konke okunye · Everything else</p>
           <h1 className="mt-1 font-display text-[2rem] font-semibold leading-tight">Your whole i-Camagu</h1>
           {user && (
             <button
@@ -290,7 +290,7 @@ export default function More({ onNavigate }) {
                 <Icon name="flame" size={22} color="#1c1612" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-[11px] font-extrabold uppercase tracking-[0.18em] text-ochre-light">Ubuhlanti · Shrine Fund</span>
+                <span className="block text-[11px] font-extrabold uppercase tracking-[0.18em] text-cream/60">Ubuhlanti · Shrine Fund</span>
                 <span className="mt-1 block font-display text-[1.35rem] font-semibold leading-tight">Together we build greatness.</span>
                 <span className="mt-1.5 block text-[13px] leading-snug text-cream/80">Our own seed capital, owned by the community. Pledge from R1.</span>
               </span>
@@ -300,7 +300,7 @@ export default function More({ onNavigate }) {
           {TILE_GROUPS.map((group) => (
             <section key={group.title} className="mb-8 rounded-[28px] bg-[#efe6d8] p-3 pb-3.5">
               <div className="px-2 pb-4 pt-2 text-ink">
-                <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-terracotta-dark">{group.english}</p>
+                <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#6f655a]">{group.english}</p>
                 <h2 className="mt-0.5 font-display text-[1.45rem] font-semibold leading-tight">{group.title}</h2>
                 <p className="mt-0.5 text-[13px] text-ink-muted">{group.line}</p>
               </div>

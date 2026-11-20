@@ -13,7 +13,7 @@ export default function ComingUp({ rows, ceremony, onOpenList }) {
   if (list.length === 0) return null
   return (
     <section aria-label="Coming up" className="rounded-[24px] bg-[#fffdf9] p-5 shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
-      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Okulandelayo · Coming up</p>
+      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Okulandelayo · Coming up</p>
       <h2 className="mt-1 font-display text-[1.3rem] font-semibold leading-tight text-ink">What to finish next</h2>
       <ul className="mt-3 space-y-2">
         {list.map(({ row, due, daysLeft }) => (

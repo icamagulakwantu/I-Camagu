@@ -20,7 +20,7 @@ export default function HeroHeader({ image, eyebrow, title, accent, subtitle, on
             <Icon name="arrowLeft" size={14} color="#fffdf9" /> {backLabel}
           </button>
         )}
-        {eyebrow && <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">{eyebrow}</p>}
+        {eyebrow && <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-cream/60">{eyebrow}</p>}
         <h1 className="mt-2 font-display text-[2.1rem] font-semibold leading-[1.05] text-balance">
           {title}{accent && <> <span className="italic text-ochre-light">{accent}</span></>}
         </h1>

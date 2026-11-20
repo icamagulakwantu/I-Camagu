@@ -1283,7 +1283,7 @@ function Stokvels({ onBack, topSlot = null, bottomSlot = null }) {
           >
             <Icon name="arrowLeft" size={14} color="#fffdf9" /> Back
           </button>
-          <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light">Yonga kunye · Save together</p>
+          <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-cream/60">Yonga kunye · Save together</p>
           <h1 className="mt-2 font-display text-[2.3rem] font-semibold leading-[1.04] text-balance">
             Stokvels that <span className="italic text-ochre-light">run properly.</span>
           </h1>

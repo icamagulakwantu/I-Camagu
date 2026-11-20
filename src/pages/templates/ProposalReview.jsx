@@ -13,7 +13,7 @@ const TAG = {
 function ItemList({ items }) {
   return groupByPhase(items).map((g) => (
     <div key={g.phase} className="mb-3">
-      <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-terracotta-dark">{g.title}</p>
+      <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#6f655a]">{g.title}</p>
       <ul className="mt-1 space-y-0.5 text-[14px] text-ink">
         {g.items.map((i) => <li key={i.key}>· {i.label}{i.kind === 'cost' && i.quantity ? ` (${i.quantity} ${i.unit}${i.unitCost ? `, R${i.unitCost}` : ''})` : ''}</li>)}
       </ul>
@@ -61,7 +61,7 @@ export default function ProposalReview({ templateId, proposalId, onBack, onDone 
     <div className="min-h-screen bg-cream pb-40">
       <header className="bg-[#1f3320] px-5 pb-7 pt-6 text-cream">
         <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold">← Template</button>
-        <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-ochre-light">Iinguqu · Suggested changes</p>
+        <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/60">Iinguqu · Suggested changes</p>
         <h1 className="mt-1 font-display text-[1.7rem] font-semibold leading-tight">From {data.authorName}</h1>
         {data.note && <p className="mt-2 rounded-[14px] bg-white/10 px-3 py-2 text-sm italic text-cream/90">&ldquo;{data.note}&rdquo;</p>}
         <p className="mt-2 text-sm text-cream/75">Your template stays as it is until you merge.</p>

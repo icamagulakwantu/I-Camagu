@@ -232,12 +232,12 @@ function IzidukoNetwork({ onBack, onGoToClanLines, onViewProfile, onMessage }) {
                           <p className="font-display font-bold text-2xl text-white leading-tight">{m.firstName} {m.lastName}</p>
                           <p className="text-xs text-white/80 mt-1">{m.label}</p>
                           {m.sharedAncestors?.length > 0 && (
-                            <p className="mt-2 rounded-[12px] bg-ochre-light/95 px-3 py-2 text-xs font-bold leading-snug text-ink">
+                            <p className="mt-2 rounded-[12px] bg-cream/95 px-3 py-2 text-xs font-bold leading-snug text-ink">
                               You both name {m.sharedAncestors[0].name}: {generationName(m.sharedAncestors[0].myGeneration).split(' · ')[0].toLowerCase()} for you, {generationName(m.sharedAncestors[0].theirGeneration).split(' · ')[0].toLowerCase()} for them.
                             </p>
                           )}
                           {m.nearYou && (
-                            <span className="mt-2 inline-flex items-center gap-1 rounded-pill bg-ochre-light px-2.5 py-1 text-xs font-extrabold text-ink">
+                            <span className="mt-2 inline-flex items-center gap-1 rounded-pill bg-cream px-2.5 py-1 text-xs font-extrabold text-ink">
                               <Icon name="mapPin" size={12} /> Lives near you
                             </span>
                           )}

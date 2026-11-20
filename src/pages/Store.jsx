@@ -110,7 +110,7 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col px-1 pt-5">
-        {showDepartment && <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-terracotta-dark">{dept.short}</p>}
+        {showDepartment && <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#6f655a]">{dept.short}</p>}
         <h3 className="line-clamp-2 font-display text-[15px] font-semibold leading-snug text-ink">{sku.name}</h3>
         <p className="mt-0.5 line-clamp-2 text-xs leading-snug text-ink-muted">{pack}</p>
         {savings !== null && retail && <p className="mt-0.5 text-xs tabular-nums text-ink-muted line-through">{price(retail)} retail</p>}
@@ -265,7 +265,7 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
       <header className="relative overflow-hidden rounded-b-[32px] bg-[#1f3320] px-5 pb-[84px] pt-6 text-cream">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ochre-light">
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-cream/60">
               Thengani kunye{location.label ? ` · Near ${location.label}` : ''}
             </p>
             <h1 className="mt-1 font-display text-[2.1rem] font-semibold leading-none tracking-tight">Bulk Buy</h1>
@@ -363,7 +363,7 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
       {/* ---------- Group orders filling near you ---------- */}
       {!isSearching && nearbyPools.length > 0 && (
         <section aria-label="Group orders near you" className="mt-6 px-4">
-          <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Filling near you</p>
+          <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Filling near you</p>
           <PoolOfferCard variant="feed" pool={nearbyPools[0]} />
         </section>
       )}
@@ -377,7 +377,7 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
         <div className="mt-7">
           <div className="flex items-end justify-between gap-3 px-5">
             <div className="min-w-0">
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">{activeDepartment.xhosa}</p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">{activeDepartment.xhosa}</p>
               <h2 className="mt-0.5 font-display text-[1.45rem] font-semibold leading-tight tracking-tight text-ink">{activeDepartment.name}</h2>
             </div>
             <span className="flex-shrink-0 pb-1 text-xs font-bold tabular-nums text-ink-muted">{skus.length} item{skus.length === 1 ? '' : 's'}</span>

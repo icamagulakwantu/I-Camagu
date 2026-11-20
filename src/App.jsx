@@ -142,7 +142,7 @@ function LostPage({ onNavigate }) {
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-terracotta/10">
           <Icon name="compass" size={28} color="#c45c26" />
         </div>
-        <p className="eyebrow text-terracotta">You’re still in i-Camagu</p>
+        <p className="eyebrow text-[#6f655a]">You’re still in i-Camagu</p>
         <h1 className="mt-2 font-display text-2xl font-bold text-ink">Let’s get you back on track</h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">
           This page may have moved or the link may be incomplete. Choose where you’d like to go next.

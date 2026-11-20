@@ -200,7 +200,7 @@ function Onboarding({ onDone }) {
                 <img src="/images/brand/icon-128.png" alt="i-Camagu" className="w-9 h-9 rounded-[10px] ring-1 ring-cream/30" />
                 <span className="font-display font-bold text-xl text-cream">i-Camagu</span>
               </div>
-              <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-ochre-light mb-1.5">Wamkelekile, {user?.firstName || 'mhlobo'}</p>
+              <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-cream/60 mb-1.5">Wamkelekile, {user?.firstName || 'mhlobo'}</p>
               <h1 className="font-display font-semibold text-[1.75rem] leading-tight text-cream text-balance">
                 Konke okufunwa ngumsebenzi wakho. <span className="italic text-ochre-light">Ndawonye.</span>
               </h1>

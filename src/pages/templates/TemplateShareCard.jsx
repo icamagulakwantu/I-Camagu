@@ -45,7 +45,7 @@ export default function TemplateShareCard({ template, onReview }) {
   return (
     <section className="space-y-3 rounded-[20px] bg-white p-4 shadow-soft">
       <div>
-        <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Yabelana · Plan it together</p>
+        <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Yabelana · Plan it together</p>
         <p className="mt-1 text-[13px] leading-snug text-ink-muted">Invite family or friends to suggest changes. They sign in, ask you first, and every change waits for your approval. They see only this template: never your ceremonies, money, pledges or ukugida.</p>
       </div>
 

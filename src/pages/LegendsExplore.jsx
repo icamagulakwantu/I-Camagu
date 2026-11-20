@@ -94,7 +94,7 @@ function LegendsExplore({ onBack }) {
           <div key={legend.id} className="relative overflow-hidden rounded-[22px] border border-ink/[0.06] bg-white p-4 pl-5 shadow-soft">
             <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1.5 bg-terracotta-dark" />
             <div className="flex items-center justify-between gap-2 mb-1">
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-terracotta-dark">{legend.category}</p>
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#6f655a]">{legend.category}</p>
               <span className="text-xs font-bold uppercase px-2 py-0.5 rounded-pill bg-cream-dark text-brand-black/60">
                 {STATUS_LABEL[legend.verificationStatus] || 'Pending community review'}
               </span>

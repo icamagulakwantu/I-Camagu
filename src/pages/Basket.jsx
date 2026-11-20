@@ -548,7 +548,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
               return (
                 <div key={g}>
                   <div className="flex items-center justify-between mb-2 px-1">
-                    <p className="eyebrow text-terracotta">{d.name}</p>
+                    <p className="eyebrow text-[#6f655a]">{d.name}</p>
                     <p className="text-xs font-bold text-ink-muted">R{groupSubtotal.toFixed(2)}</p>
                   </div>
                   <div className="space-y-3">

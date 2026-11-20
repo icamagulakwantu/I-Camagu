@@ -229,7 +229,7 @@ function Templates({ onBack }) {
 
         {shared.length > 0 && (
           <section aria-label="Shared with me" className="mt-8">
-            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Owabelene nam · Shared with me</p>
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Owabelene nam · Shared with me</p>
             <div className="mt-2 grid grid-cols-1 gap-3">
               {shared.map((t) => (
                 <button

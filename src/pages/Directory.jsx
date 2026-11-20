@@ -389,7 +389,7 @@ function Directory({ onBack }) {
         ) : tab === 'practitioners' ? (
           <>
           <section className="mb-4 rounded-[20px] bg-[#1f3320] p-4 text-cream">
-            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-ochre-light">Ingcibi ebhalisiweyo · A registered ingcibi</p>
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/60">Ingcibi ebhalisiweyo · A registered ingcibi</p>
             <p className="mt-1.5 text-[13px] leading-relaxed text-cream/85">
               The law asks that the ingcibi and ikhankatha be registered. Ask to see their registration, and check with your ward councillor's office or the initiation forum in your municipality. In Nelson Mandela Bay that is the Municipality's Initiation Forum; the CoGTA forms are at ward councillor offices.
             </p>
