@@ -22,4 +22,9 @@ describe('parsePublicPledge', () => {
     expect(parsePublicPledge({ pledgerName: 'A', pledgedItem: 'B', pledgedAmountZAR: 'abc' }).error).toBeTruthy();
     expect(parsePublicPledge({ pledgerName: 'A', pledgedItem: 'B', pledgedAmountZAR: 5_000_000 }).error).toBeTruthy();
   });
+
+  it('accepts a money-only pledge', () => {
+    expect(parsePublicPledge({ pledgerName: 'Sipho', pledgedAmountZAR: '500' }).value).toMatchObject({ pledgedItem: 'Imali · Money', pledgedAmountZAR: 500 });
+    expect(parsePublicPledge({ pledgerName: 'Sipho', pledgedAmountZAR: '0' }).error).toBe('Please say what you will bring');
+  });
 });

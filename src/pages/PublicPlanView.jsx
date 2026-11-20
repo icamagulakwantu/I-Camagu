@@ -129,7 +129,7 @@ function PublicPlanView({ token }) {
     e.preventDefault()
     setFormError('')
     if (!form.pledgerName.trim()) return setFormError('Please add your name')
-    if (!form.pledgedItem.trim()) return setFormError('Please say what you will bring')
+    if (!form.pledgedItem.trim() && !(Number(form.pledgedAmountZAR) > 0)) return setFormError('Say what you will bring, or the amount you will give')
     setSending(true)
     try {
       const res = await fetch(`/api/public/plan/${token}/pledges`, {
@@ -140,7 +140,7 @@ function PublicPlanView({ token }) {
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || 'Could not save your pledge')
       setPledges((prev) => [...prev, data])
-      setThanks(form.pledgedItem.trim())
+      setThanks(form.pledgedItem.trim() || `R${Number(form.pledgedAmountZAR).toLocaleString('en-ZA')}`)
       setForm(EMPTY)
     } catch (err) {
       setFormError(err.message)
@@ -240,11 +240,12 @@ function PublicPlanView({ token }) {
               <div>
                 <p className="eyebrow text-sage-700">Isithembiso · Pledge</p>
                 <h2 className="font-display text-xl font-semibold text-ink">What will you bring?</h2>
+                <p className="mt-0.5 text-xs text-ink-muted">An item, money, or both.</p>
               </div>
               <input className={inputClass} placeholder="Your name (e.g. Uncle Sipho)" value={form.pledgerName} onChange={(e) => setForm((f) => ({ ...f, pledgerName: e.target.value }))} maxLength={60} />
               <input className={inputClass} placeholder="How you're related (optional)" value={form.relationship} onChange={(e) => setForm((f) => ({ ...f, relationship: e.target.value }))} maxLength={40} />
               <input className={inputClass} placeholder="Item (e.g. a goat, 2 cases of beer)" value={form.pledgedItem} onChange={(e) => setForm((f) => ({ ...f, pledgedItem: e.target.value }))} maxLength={120} />
-              <input className={inputClass} type="number" inputMode="decimal" min="0" placeholder="Value in rand (optional)" value={form.pledgedAmountZAR} onChange={(e) => setForm((f) => ({ ...f, pledgedAmountZAR: e.target.value }))} />
+              <input className={inputClass} type="number" inputMode="decimal" min="0" placeholder="Amount in rand (or the value of your item)" value={form.pledgedAmountZAR} onChange={(e) => setForm((f) => ({ ...f, pledgedAmountZAR: e.target.value }))} />
               {formError && <p role="alert" className="text-sm font-bold text-terracotta">{formError}</p>}
               <button type="submit" disabled={sending} className="w-full h-14 rounded-pill bg-sage-600 text-white font-bold text-base active:scale-[0.98] transition-transform disabled:opacity-60">
                 {sending ? 'Saving...' : 'Pledge it'}

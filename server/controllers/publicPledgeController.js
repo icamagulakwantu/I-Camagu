@@ -16,13 +16,13 @@ const clean = (value, max) => String(value ?? '').replace(/\s+/g, ' ').trim().sl
 
 // Turns a family member's form into safe pledge fields, or an error message.
 // Exported so the rules can be unit tested without a database.
+export const MONEY_PLEDGE = 'Imali · Money';
+
 export function parsePublicPledge(body = {}) {
   const pledgerName = clean(body.pledgerName, MAX_NAME);
-  const pledgedItem = clean(body.pledgedItem, MAX_ITEM);
+  let pledgedItem = clean(body.pledgedItem, MAX_ITEM);
   const relationship = clean(body.relationship, MAX_RELATIONSHIP) || null;
   if (!pledgerName) return { error: 'Please add your name' };
-  if (!pledgedItem) return { error: 'Please say what you will bring' };
-
   let pledgedAmountZAR = null;
   if (body.pledgedAmountZAR !== undefined && body.pledgedAmountZAR !== null && body.pledgedAmountZAR !== '') {
     const amount = Number(body.pledgedAmountZAR);
@@ -31,6 +31,10 @@ export function parsePublicPledge(body = {}) {
     }
     pledgedAmountZAR = Math.round(amount * 100) / 100;
   }
+  // Many relatives give money rather than an item: "R500 towards it" is a
+  // whole pledge on its own.
+  if (!pledgedItem && pledgedAmountZAR > 0) pledgedItem = MONEY_PLEDGE;
+  if (!pledgedItem) return { error: 'Please say what you will bring' };
   return { value: { pledgerName, pledgedItem, relationship, pledgedAmountZAR } };
 }
 
