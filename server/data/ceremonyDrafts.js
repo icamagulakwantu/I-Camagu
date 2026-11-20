@@ -21,7 +21,7 @@ export const DRAFT_CEREMONY_TYPES = Object.freeze({
       ]},
       { phase: 'FOOD_AND_DRINK', items: [
         { label: 'Umqombothi', quantity: 6, unit: 'bhekile', rateKey: 'umqombothi_bhekile' },
-        { label: 'Maize meal for pap', quantity: 1, unit: '50kg bag', rateKey: 'maize_meal_50kg' },
+        { label: 'White samp', quantity: 2, unit: '10kg bag', rateKey: 'samp_10kg' },
         { label: 'Vegetables and cooking oil', quantity: 1, unit: 'kit', rateKey: null },
         { label: 'Courtesy brandy for the elders', quantity: 2, unit: 'bottle', rateKey: 'brandy_750ml' },
         { label: 'Plates and spoons', quantity: 2, unit: 'pack of 50', rateKey: 'plastic_plate_pack_50' },
@@ -53,7 +53,7 @@ export const DRAFT_CEREMONY_TYPES = Object.freeze({
         { label: 'New clothes for her return from the river', quantity: 1, unit: 'set', rateKey: null },
         { label: 'Animal for the ceremony', quantity: 1, unit: 'animal', rateKey: 'goat_standard' },
         { label: 'Umqombothi for the gathering', quantity: 10, unit: 'bhekile', rateKey: 'umqombothi_bhekile' },
-        { label: 'Maize meal', quantity: 1, unit: '50kg bag', rateKey: 'maize_meal_50kg' },
+        { label: 'White samp', quantity: 2, unit: '10kg bag', rateKey: 'samp_10kg' },
       ]},
       { phase: 'CELEBRATION', items: [
         { label: 'Singing and dancing (ukuxhentsa) to welcome her back', quantity: 1, unit: 'task', rateKey: null },
@@ -173,7 +173,7 @@ export const DRAFT_CEREMONY_TYPES = Object.freeze({
       { phase: 'FOOD_AND_DRINK', items: [
         { label: 'Umqombothi', quantity: 10, unit: 'bhekile', rateKey: 'umqombothi_bhekile', founderToConfirm: 'Follow the igqirha’s instructions' },
         { label: 'Animal for the gathering', quantity: 1, unit: 'animal', rateKey: 'goat_white', founderToConfirm: 'Confirm locally' },
-        { label: 'Maize meal', quantity: 1, unit: '50kg bag', rateKey: 'maize_meal_50kg' },
+        { label: 'White samp', quantity: 2, unit: '10kg bag', rateKey: 'samp_10kg' },
       ]},
     ],
     questions: ['Standalone ceremony or stage of Umsebenzi wegqirha in this community?', 'Who may attend?', 'Is the feast always a goat?'],

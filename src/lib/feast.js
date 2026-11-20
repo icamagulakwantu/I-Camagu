@@ -8,11 +8,13 @@
 // - A sheep gives about 18 kg of meat and a beast about 200 kg: the
 //   founder's figures from slaughtering for ceremonies. The person
 //   slaughtering will know the animal in front of them.
-// - Maize meal, cabbage, spinach, potatoes, oil, sugar and plates use the same
+// - White samp, the ceremony starch in the Eastern Cape: about 100 g dry a
+//   guest (it swells two to three times), in 10 kg bags at about R185.
+// - Cabbage, spinach, potatoes, oil, sugar and plates use the same
 //   per-guest fractions the ceremony planner already scales its catering lines
 //   by (server/controllers/ceremonyCostProfiles.js).
 // - Rice: about 70 g uncooked a person as a side dish, the common catering
-//   figure, since pap is the main starch.
+//   figure, since samp is the main starch.
 // Prices mirror COST_RATES on the server and are estimates.
 
 export const MEAT_KG_PER_GUEST = 0.32
@@ -20,7 +22,7 @@ export const SHEEP_MEAT_KG = 18
 export const BEAST_MEAT_KG = 200
 
 const PRICES = {
-  sheep: 2700, beast: 18000, maize50: 520, rice10: 195, cabbage: 22,
+  sheep: 2700, beast: 18000, samp10: 185, rice10: 195, cabbage: 22,
   spinach: 25, potatoes10: 113.99, oil5: 158.95, sugar10: 232.25, plates50: 140,
 }
 
@@ -46,8 +48,8 @@ export function feastFor(guests, beasts = 0) {
   const lines = [
     { key: 'beast', search: 'Inkomo', label: 'Beast (inkomo)', qty: animals.beasts, unit: 'beast', price: PRICES.beast, group: 'Inyama · Meat' },
     { key: 'sheep', search: 'Sheep', label: 'Sheep (igusha)', qty: animals.sheep, unit: 'sheep', price: PRICES.sheep, group: 'Inyama · Meat' },
-    { key: 'maize', search: 'Maize Meal', label: 'Maize meal for pap', qty: units(people, 0.003), unit: '50 kg bag', price: PRICES.maize50, group: 'Ipapa nerayisi · Pap and rice' },
-    { key: 'rice', search: 'Rice', label: 'Rice', qty: units(people, 0.007), unit: '10 kg bag', price: PRICES.rice10, group: 'Ipapa nerayisi · Pap and rice' },
+    { key: 'samp', search: 'Samp', label: 'White samp', qty: units(people, 0.01), unit: '10 kg bag', price: PRICES.samp10, group: 'Umngqusho nerayisi · Samp and rice' },
+    { key: 'rice', search: 'Rice', label: 'Rice', qty: units(people, 0.007), unit: '10 kg bag', price: PRICES.rice10, group: 'Umngqusho nerayisi · Samp and rice' },
     { key: 'cabbage', search: 'Cabbage', label: 'Cabbage', qty: units(people, 1 / 18), unit: 'head', price: PRICES.cabbage, group: 'Imifuno · Vegetables' },
     { key: 'spinach', search: 'Spinach', label: 'Spinach', qty: units(people, 1 / 15), unit: 'bundle', price: PRICES.spinach, group: 'Imifuno · Vegetables' },
     { key: 'potatoes', search: 'Potatoes', label: 'Potatoes', qty: units(people, 0.01), unit: '10 kg bag', price: PRICES.potatoes10, group: 'Imifuno · Vegetables' },

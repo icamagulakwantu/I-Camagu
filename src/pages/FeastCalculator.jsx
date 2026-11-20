@@ -21,7 +21,7 @@ function FeastCalculator({ onBack, onOpenStore, guestCount = null, ceremonyTitle
         </button>
         <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#b9d3b0]">Isidlo · The feast</p>
         <h1 className="mt-1 font-display text-[2rem] font-semibold leading-tight">How much food to buy</h1>
-        <p className="mt-1 text-sm text-cream/85">{fromCeremony ? `Worked out for ${ceremonyTitle || 'your ceremony'}.` : 'Meat, pap, vegetables and plates for your guests.'}</p>
+        <p className="mt-1 text-sm text-cream/85">{fromCeremony ? `Worked out for ${ceremonyTitle || 'your ceremony'}.` : 'Meat, samp, vegetables and plates for your guests.'}</p>
       </div>
 
       <div className="relative z-10 -mt-10 space-y-4 px-4">

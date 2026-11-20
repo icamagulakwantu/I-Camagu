@@ -65,6 +65,8 @@ const COST_RATES = {
   food: {
     maize_meal_50kg: 520.00,
     maize_meal_12_5kg: 145.00,
+    // In the Eastern Cape the ceremony starch is white samp, not pap.
+    samp_10kg: 185.00,  // Checked 20 Nov 2026: Iwisa No.1 Samp 5kg R94 at Shoprite (so ~R185 for 10kg)
     rice_10kg: 195.00,
     cooking_oil_5l: 158.95,  // Makro 10 Sep 2026 (STALE — recheck required): Great Value 5L R158.95 (SunStar R152.95, Econo R147.99 at Game)
     spinach_bundle: 25.00,
@@ -240,7 +242,7 @@ const UMGIDI_DEFAULT_ITEMS = [
   { phase: 'COOKING_EBUHLANTI', label: '9+ large enamel dishes, 6 cast iron pots' },
   { phase: 'COOKING_EBUHLANTI', label: '10+ bhekile for umqombothi' },
   { phase: 'COOKING_KITCHEN', label: 'Arrange women for kitchen station (general food)' },
-  { phase: 'COOKING_KITCHEN', label: 'Maize meal for pap' },
+  { phase: 'COOKING_KITCHEN', label: 'White samp' },
   { phase: 'COOKING_KITCHEN', label: 'Potatoes' },
   { phase: 'COOKING_KITCHEN', label: 'Cabbage' },
   { phase: 'COOKING_KITCHEN', label: 'Spinach' },
@@ -458,7 +460,9 @@ const UMGIDI_COST_PROFILE = {
     // item's bulk unit one guest needs" (e.g. 0.003 = a 50kg maize meal
     // bag covers ~333 guests). Ratios from general SA function-catering
     // guidance (~150-200g starch/veg per guest), apportioned across items.
-    { label: 'Maize meal for pap', category: 'food', unit: '50kg bag', unitCost: COST_RATES.food.maize_meal_50kg, quantity: 1, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.003, suggestedAmount: '~0.15kg/guest', skuName: 'Maize Meal 50kg' },
+    // White samp is the ceremony starch in the Eastern Cape (founder, 20 Nov
+    // 2026). ~100 g dry a guest: samp swells two to three times when cooked.
+    { label: 'White samp', category: 'food', unit: '10kg bag', unitCost: COST_RATES.food.samp_10kg, quantity: 2, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.01, suggestedAmount: '~100g dry a guest', skuName: 'Samp' },
     { label: 'Potatoes', category: 'food', unit: '10kg bag', unitCost: COST_RATES.food.potatoes_10kg, quantity: 1, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.01, suggestedAmount: '~0.1kg/guest', skuName: 'Potatoes 10kg' },
     { label: 'Cabbage', category: 'food', unit: 'head', unitCost: COST_RATES.food.cabbage_head, quantity: 6, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.056, suggestedAmount: '~1 head per 18 guests', skuName: 'Cabbage Head' },
     { label: 'Spinach', category: 'food', unit: 'bundle', unitCost: COST_RATES.food.spinach_bundle, quantity: 8, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.067, suggestedAmount: '~1 bundle per 15 guests', skuName: 'Spinach Bundle' },
@@ -731,3 +735,5 @@ export function getDefaultItemsForType(type) {
 }
 
 export default CEREMONY_COST_PROFILES;
+// The price list, for one-off data fixes that must use the same rates.
+export { COST_RATES as COST_RATES_FOR_SCRIPTS };

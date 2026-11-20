@@ -17,7 +17,7 @@ describe('feast calculator', () => {
   it('scales the shopping list and totals it', () => {
     const feast = feastFor(150)
     const qty = Object.fromEntries(feast.lines.map((l) => [l.key, l.qty]))
-    expect(qty).toMatchObject({ sheep: 3, maize: 1, rice: 2, cabbage: 9, spinach: 10, plates: 3 })
+    expect(qty).toMatchObject({ sheep: 3, samp: 2, rice: 2, cabbage: 9, spinach: 10, plates: 3 })
     expect(feast.lines.find((l) => l.key === 'beast')).toBeUndefined()
     expect(feast.total).toBeGreaterThan(8000)
     expect(feast.perGuest).toBe(Math.round(feast.total / 150))

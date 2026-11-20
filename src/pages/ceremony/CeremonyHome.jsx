@@ -334,7 +334,7 @@ export default function CeremonyHome({
           <h2 className="mb-3 mt-0.5 font-display text-[1.45rem] font-semibold leading-tight tracking-tight text-ink">Prepare, buy and book</h2>
           <div className="overflow-hidden rounded-[22px] bg-[#fffdf9] shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
             <Row icon="cart" tile="bg-[#f3e6cf] text-[#a3471a]" title="Buy in bulk" detail="Livestock, drinks and groceries at group prices" onClick={() => onNavigate?.('store')} />
-            <Row icon="drumstick" tile="bg-[#f6e2d6] text-terracotta-dark" title="Feast calculator" detail={ceremony.guestCount != null ? `Meat, pap and vegetables for ${ceremony.guestCount} guests` : 'Meat, pap and vegetables, and the cost'} onClick={() => onNavigate?.('isidlo')} />
+            <Row icon="drumstick" tile="bg-[#f6e2d6] text-terracotta-dark" title="Feast calculator" detail={ceremony.guestCount != null ? `Meat, samp and vegetables for ${ceremony.guestCount} guests` : 'Meat, samp and vegetables, and the cost'} onClick={() => onNavigate?.('isidlo')} />
             <Row icon="beer" tile="bg-sage-100 text-sage-700" title="Brew umqombothi" detail={ceremony.guestCount != null ? `How much to brew for ${ceremony.guestCount} guests` : 'Steps and quantities'} onClick={() => onNavigate?.('umqombothi')} />
             {plan.ceremonyId && <Row icon="cocktail" tile="bg-[#1f3320] text-ochre-light" title="Ekoyini mobile bar" detail="Book a bar for the day" onClick={() => onBookEkoyini?.(plan.ceremonyId, title)} />}
             <Row icon="heartHandshake" tile="bg-[#f6e2d6] text-terracotta-dark" title="Healers, ingcibi & vendors" detail="Trusted traditional help" onClick={() => onNavigate?.('directory')} />

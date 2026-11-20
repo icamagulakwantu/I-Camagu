@@ -27,6 +27,7 @@ import { updateUlwalukoPlans } from './scripts/ulwaluko-umgidi-nov-2026.js';
 import { updateWeddingAndMourningPlans } from './scripts/wedding-mourning-nov-2026.js';
 import { updateDirectoryListings, addMoreDirectoryListings } from './scripts/directory-listings-nov-2026.js';
 import { addUlwalukoRegistrationSteps } from './scripts/ulwaluko-registration-nov-2026.js';
+import { switchPapToSamp } from './scripts/samp-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -278,6 +279,12 @@ if (startup.schemaReady) {
     await addUlwalukoRegistrationSteps();
   } catch (err) {
     console.error('Ulwaluko registration update failed:', err?.message);
+  }
+  // White samp, not pap, in existing plans (unticked, unpaid lines only). Runs once.
+  try {
+    await switchPapToSamp();
+  } catch (err) {
+    console.error('Samp update failed:', err?.message);
   }
 }
 
