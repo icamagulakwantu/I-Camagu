@@ -200,12 +200,11 @@ function ShrineFund({ onBack }) {
         )}
 
         {/* What this is */}
-        <section className="relative overflow-hidden rounded-[28px] bg-terracotta-dark p-6 text-cream">
-          <span aria-hidden="true" className="absolute -right-14 -top-14 h-44 w-44 rounded-full bg-ochre-light/20" />
+        <section className="relative overflow-hidden rounded-[28px] bg-[#1f3320] p-6 text-cream">
           <p className="relative text-[12px] font-extrabold uppercase tracking-[0.2em] text-cream/60">Asiyo ntlawulo · Not a fee</p>
           <h2 className="relative mt-2 font-display text-[1.7rem] font-semibold leading-tight">The seed capital of our communities.</h2>
           <p className="relative mt-3 text-[14px] leading-relaxed text-cream/90">
-            A long-term, community-owned investment fund dedicated to building economies that keep our rand circulating within our communities for longer before it leaves.
+            A long-term investment fund owned by the people at large and designed to advance the Xhosa nation: building economies that keep our rand circulating in our communities for longer before it leaves.
           </p>
           <p className="relative mt-3 text-[14px] leading-relaxed text-cream/90">
             Ubuhlanti, the homestead kraal, comes from Xhosa tradition, but its gate is open to every family who lives, works and celebrates in our communities, whatever their own customs.
@@ -228,18 +227,16 @@ function ShrineFund({ onBack }) {
           <p className="mt-3 text-sm leading-relaxed text-ink">
             Committee members are selected on merit and willingness to serve, not through elections that can be manipulated. Projects put to the community must pass two tests: they must have majority support, and they must be demonstrably profitable or carry a clear, measurable impact milestone that benefits the broader community.
           </p>
-          <div className="relative mt-5 rounded-[20px] bg-[#1f3320] p-4 pt-5 text-cream">
-            <div className="flex items-end gap-3">
-              <p className="font-display text-[2.2rem] font-semibold leading-none text-ochre-light">60<span className="text-cream/50">/</span>40</p>
-              <p className="pb-1 text-[12px] font-extrabold uppercase tracking-[0.14em] text-cream/80">Ownership model</p>
+          <div className="relative mt-5 space-y-3 rounded-[20px] bg-[#1f3320] p-4 pt-5 text-cream">
+            <p className="text-[12px] font-extrabold uppercase tracking-[0.14em] text-cream/60">How the fund owns what it builds</p>
+            <div>
+              <p className="font-display text-[1.15rem] font-semibold">Owned by the Shrine</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-cream/85">Some assets the Shrine owns outright. The Shrine itself belongs to the people at large, and exists to advance the Xhosa nation.</p>
             </div>
-            <div className="mt-3 flex h-2.5 overflow-hidden rounded-full" aria-hidden="true">
-              <span className="w-[60%] bg-cream/80" />
-              <span className="w-[40%] bg-ochre-light" />
+            <div>
+              <p className="font-display text-[1.15rem] font-semibold">A share and a return</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-cream/85">In businesses it backs, the fund holds an agreed percentage and earns a return on its investment. Not every business is run by the community; the share is set deal by deal, and every deal is listed in the open books.</p>
             </div>
-            <p className="mt-3 text-[13px] leading-relaxed text-cream/85">
-              Every business the fund invests in is 60% privately owned and 40% community-owned, and the private owners must come from the communities the business serves. Profit stays local. Ownership stays local.
-            </p>
           </div>
         </section>
 

@@ -52,8 +52,8 @@ const JOURNEY = [
 
 // What the Shrine Fund stands for, from the Ubuhlanti page itself.
 const FUND_POINTS = [
-  { icon: 'sprout', title: 'Owned by us', body: 'A community-owned investment fund. Pledge from R1.' },
-  { icon: 'landmark', title: '60 / 40', body: 'Every business it backs is 40% community-owned, run by people from the community.' },
+  { icon: 'sprout', title: 'Owned by the people', body: 'The Shrine belongs to the Xhosa nation at large, to advance it. Pledge from R1.' },
+  { icon: 'landmark', title: 'A share and a return', body: 'Some things the Shrine owns outright. In businesses it backs, it holds an agreed share and earns a return.' },
   { icon: 'users', title: 'Decided by us', body: 'Projects need majority support and a clear return for the community.' },
 ]
 

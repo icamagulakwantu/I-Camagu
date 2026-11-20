@@ -31,6 +31,9 @@ and come together to build.
 1. **Isiduko.** How we identify each other and who we are: deeper than a
    name and surname, it is your root. It is why you cannot marry someone
    who shares your isiduko. Everything in the Xhosa nation is rooted in it.
+   Each clan has a male and a female form of the same name: AmaTshawe and
+   Mam-Tshawe, AmaCirha and MamCirha, AmaCwerha and MamCwerha, AmaZangwa and
+   MamZangwa. Same clan, man and woman.
 
 2. **Unwavering belief in our ancestors**, lived through ceremonies all our
    lives, yearly and monthly, through and through:
@@ -74,6 +77,21 @@ without the others. (Proposed mapping, for the founder to confirm.)
 | Tyres | **Bulk buying** | Where that power meets the road: buying together at scale. |
 | Logbook | **Ukugida and the family archive** | The record of the journey, never lost. |
 | Fuel | **The Shrine Fund** | Money we keep in our own communities, invested in what we own. |
+
+Stokvels and Bulk Buy each keep their own place in the bottom bar: Bulk
+Buy is also how the platform earns its keep and sustains itself.
+
+## The Shrine Fund (ubuhlanti)
+
+The Shrine is owned by the people at large and designed to advance the
+Xhosa nation. Some things it owns outright. In businesses it funds, it holds
+an agreed percentage and earns a return on its investment; not every
+business it funds is run by the community, and the share is set deal by
+deal, in open books.
+
+## Ceremony food
+
+In the Eastern Cape the ceremony starch is white samp, not pap.
 
 ## What this means for every change
 
