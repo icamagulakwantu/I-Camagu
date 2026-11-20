@@ -30,6 +30,7 @@ import { addUlwalukoRegistrationSteps } from './scripts/ulwaluko-registration-no
 import { switchPapToSamp } from './scripts/samp-nov-2026.js';
 import { applyGrocerySpecials } from './scripts/grocery-specials-nov-2026.js';
 import { addEkoyiniProducts } from './scripts/ekoyini-catalogue-nov-2026.js';
+import { correctQuartSizes } from './scripts/quart-sizes-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -299,6 +300,12 @@ if (startup.schemaReady) {
     await addEkoyiniProducts();
   } catch (err) {
     console.error('Ekoyini catalogue import failed:', err?.message);
+  }
+  // Quart sizes: 660ml where shops sell 660ml; no Brutal Fruit quart. Runs once.
+  try {
+    await correctQuartSizes();
+  } catch (err) {
+    console.error('Quart size correction failed:', err?.message);
   }
 }
 

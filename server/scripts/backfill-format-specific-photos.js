@@ -45,7 +45,7 @@ const FORMAT_SPECIFIC_IMAGES = [
   // Savanna Dry's big returnable bottle (fix-savanna-dry-format.js corrected
   // it from a wrong 750ml to the real 500ml) gets its own photo, distinct
   // from the Dumpy bottle shot that's the default for the name.
-  { name: 'Savanna Dry', bottleFormat: 'Quart (500ml)', slug: 'savanna-dry-quart' },
+  { name: 'Savanna Dry', bottleFormat: 'NRB (500ml)', slug: 'savanna-dry-quart' },
   { name: 'Savanna Dry', bottleFormat: 'Can (500ml)', slug: 'savanna-dry-can' },
   // Lion Lager's bottle shot (backfill-brand-images.js, matched by name)
   // already covers the Quart; this gives the Can its own real can photo.

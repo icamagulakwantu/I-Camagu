@@ -32,8 +32,8 @@ export async function fixBeerQuartFormats() {
   const fixes = [
     { name: 'Heineken', from: 'Quart (500ml)', to: 'Quart (650ml)' },
     { name: 'Heineken', from: 'Quart (620ml)', to: 'Quart (650ml)' },
-    { name: 'Windhoek Lager', from: 'Quart (500ml)', to: 'Quart (750ml)' },
-    { name: 'Windhoek Draught', from: 'Quart (440ml)', to: 'Quart (750ml)' },
+    { name: 'Windhoek Lager', from: 'Quart (500ml)', to: 'Quart (660ml)' },
+    { name: 'Windhoek Draught', from: 'Quart (440ml)', to: 'Quart (660ml)' },
     // Real can/bottle photos show these were wrong: Corona's can is 410ml,
     // not 500ml (its Dumpy row is correctly 355ml already, per its own
     // sharply legible label, and is left alone). Sol's only bottle photo
