@@ -160,7 +160,11 @@ function LostPage({ onNavigate }) {
 
 function screenForPath(pathname) {
   if (pathname === '/' || pathname === '') return 'home';
-  if (/^\/ceremonies\/[^/]+$/.test(pathname) && !['/ceremonies/plan', '/ceremonies/timeline'].includes(pathname)) return 'ceremony';
+  // Named screens first: /ceremonies/ukugida, /ceremonies/templates and the
+  // other tools are not ceremony ids.
+  const named = Object.entries(SCREEN_PATHS).find(([, path]) => path === pathname)?.[0];
+  if (named) return named;
+  if (/^\/ceremonies\/[^/]+$/.test(pathname)) return 'ceremony';
   if (/^\/me\/iziduko\/[^/]+$/.test(pathname)) return 'izidukoprofile';
   if (/^\/me\/messages\/[^/]+$/.test(pathname)) return 'izidukochat';
   if (/^\/me\/clan-groups\/[^/]+$/.test(pathname)) return 'clangroups';
@@ -212,7 +216,8 @@ function MainApp() {
   useEffect(() => {
     const path = location.pathname;
     const ceremonyMatch = path.match(/^\/ceremonies\/([^/]+)$/);
-    if (ceremonyMatch && !['plan', 'timeline'].includes(ceremonyMatch[1])) {
+    // A named tool (ukugida, templates, family, ...) is not a ceremony id.
+    if (ceremonyMatch && !Object.values(SCREEN_PATHS).includes(path)) {
       setSelectedCeremonyId(ceremonyMatch[1]);
       setScreenState('ceremony');
       return;

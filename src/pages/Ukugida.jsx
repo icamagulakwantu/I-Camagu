@@ -6,6 +6,7 @@ import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { cn } from '../lib/utils'
 import Icon from '../components/Icon.jsx'
+import { downloadUkugidaCsv, printUkugidaBook } from '../lib/ukugidaBook.js'
 import ScrollableLabel from '../components/ScrollableLabel.jsx'
 import HeroHeader from '../components/ui/HeroHeader.jsx'
 import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
@@ -23,7 +24,7 @@ const makeEmptyForm = () => ({
 })
 
 export default function Ukugida({ onBack }) {
-  const { accessToken } = useAuth()
+  const { accessToken, user } = useAuth()
   const { showToast } = useToast()
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
@@ -293,6 +294,20 @@ export default function Ukugida({ onBack }) {
         >
           Share on WhatsApp
         </button>
+        {entries.length > 0 && (
+          <div className="mb-4 rounded-[20px] bg-[#fffdf9] p-4 shadow-soft">
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-terracotta-dark">Gcina ikopi · Keep a copy</p>
+            <p className="mt-1 text-[13px] leading-snug text-ink-muted">Your book stays on i-Camagu. Keep your own copy too: print it, save it as a PDF, or open it in Excel.</p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => printUkugidaBook(entries, user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '')} className={`flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-[#1f3320] text-sm font-bold text-cream ${pressable}`}>
+                <Icon name="file" size={15} color="#fffdf9" /> Print or PDF
+              </button>
+              <button type="button" onClick={() => downloadUkugidaCsv(entries)} className={`flex min-h-11 items-center justify-center gap-1.5 rounded-full border-2 border-[#1f3320]/20 text-sm font-bold text-[#1f3320] ${pressable}`}>
+                <Icon name="arrowDown" size={15} color="#1f3320" /> Spreadsheet
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Entries List */}
