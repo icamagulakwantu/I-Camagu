@@ -1,4 +1,5 @@
 import express from 'express';
+import { rsvp, attendance } from '../controllers/attendanceController.js';
 import * as collab from '../controllers/templateCollabController.js';
 import { requireAuth } from '../middleware/auth.js';
 import { getCeremonyTimeline } from '../controllers/ceremonyController.js';
@@ -79,6 +80,8 @@ router.delete('/:ceremonyId', requireAuth, deleteCeremony);
 router.post('/auto', requireAuth, createAutoCeremony);
 
 // Get a single ceremony with all its items
+router.post('/:id/rsvp', requireAuth, rsvp);
+router.get('/:id/attendance', requireAuth, attendance);
 router.get('/:id', requireAuth, getCeremonyById);
 
 // Update ceremony metadata

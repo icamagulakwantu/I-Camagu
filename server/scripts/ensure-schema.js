@@ -407,6 +407,21 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "ClanPraise_clanGroupId_praise_key" ON "ClanPraise" ("clanGroupId", "praise");');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "ClanPraise_clanGroupId_idx" ON "ClanPraise" ("clanGroupId");');
 
+  // Ceremony RSVPs (see CeremonyAttendance).
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "CeremonyAttendance" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "ceremonyId" TEXT NOT NULL,
+      "userId" TEXT NOT NULL,
+      "coming" BOOLEAN NOT NULL DEFAULT true,
+      "guests" INTEGER NOT NULL DEFAULT 1,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "CeremonyAttendance_ceremonyId_userId_key" ON "CeremonyAttendance" ("ceremonyId", "userId");');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "CeremonyAttendance_ceremonyId_idx" ON "CeremonyAttendance" ("ceremonyId");');
+
   // Burial societies and grocery stokvels (StokvelType). ADD VALUE must run
   // outside a transaction, which $executeRawUnsafe on its own does.
   await prisma.$executeRawUnsafe(`ALTER TYPE "StokvelType" ADD VALUE IF NOT EXISTS 'BURIAL_SOCIETY';`);

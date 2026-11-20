@@ -32,6 +32,8 @@ export default function ConnectedCard({ ceremony, title, accessToken, onNavigate
   const [gifts, setGifts] = useState([])
   const [albums, setAlbums] = useState([])
   const [busy, setBusy] = useState(false)
+  const [guests, setGuests] = useState(null)
+  const [showGuests, setShowGuests] = useState(false)
 
   useEffect(() => {
     // /api/stokvels/my lists memberships, each with its stokvel inside.
@@ -39,8 +41,9 @@ export default function ConnectedCard({ ceremony, title, accessToken, onNavigate
       .then((d) => setStokvels(Array.isArray(d) ? d.map((m) => ({ id: m.stokvel?.id || m.stokvelId, name: m.stokvel?.name || 'Stokvel', balance: Number(m.stokvel?.groupLedger?.totalBalance) || 0 })) : []))
       .catch(() => setStokvels([]))
     request('/api/reciprocity/my', accessToken).then((d) => setGifts(Array.isArray(d) ? d.filter((g) => same(g.ceremonyLabel, title)) : [])).catch(() => {})
+    request(`/api/ceremonies/${ceremony.id}/attendance`, accessToken).then(setGuests).catch(() => {})
     request('/api/portals/my', accessToken).then((d) => setAlbums(Array.isArray(d) ? d.filter((p) => same(p.title, title)) : [])).catch(() => {})
-  }, [accessToken, title])
+  }, [accessToken, title, ceremony.id])
 
   const update = async (data, done) => {
     setBusy(true)
@@ -88,6 +91,25 @@ export default function ConnectedCard({ ceremony, title, accessToken, onNavigate
           <Line icon="users" title="Your clan can see it" detail="It shows on your clan members' Home, so they can come and help" action="Clan" onClick={() => onNavigate?.('iziduko')} />
         ) : (
           <Line icon="users" title="Tell your clan" detail="Let clan members see this ceremony on their Home" action={busy ? '…' : 'Share'} onClick={() => update({ visibility: 'CLAN_ONLY' }, 'Your clan can see this ceremony')} />
+        )}
+        {clanCanSee && (
+          <Line
+            icon="check"
+            title="Who is coming"
+            detail={guests?.coming?.length
+              ? `${guests.coming.length} confirmed · ${guests.people} ${guests.people === 1 ? 'person' : 'people'}`
+              : 'Clan members confirm on their Home; they show here'}
+            action={guests?.coming?.length ? (showGuests ? 'Hide' : 'See') : null}
+            onClick={guests?.coming?.length ? () => setShowGuests((v) => !v) : null}
+          >
+            {showGuests && (
+              <ul className="mt-2 space-y-1">
+                {guests.coming.map((g, i) => (
+                  <li key={i} className="text-[13px] text-ink">{g.name}{g.clan ? <span className="text-ink-muted"> · {g.clan}</span> : null}{g.guests > 1 ? <span className="text-ink-muted"> · {g.guests} people</span> : null}</li>
+                ))}
+              </ul>
+            )}
+          </Line>
         )}
         <Line icon="send" title="Ukugida book" detail={gifts.length ? `${gifts.length} gift${gifts.length === 1 ? '' : 's'} recorded, ${received} received` : 'Record what guests bring, so you can return it'} action={gifts.length ? 'Open' : 'Start'} onClick={() => onNavigate?.('ukugida')} />
         <Line icon="image" title="Photos of the day" detail={albums.length ? `${photos} photo${photos === 1 ? '' : 's'} and videos kept` : 'Keep the photos and videos in the family archive'} action={albums.length ? 'Open' : 'Start'} onClick={() => onNavigate?.('portal')} />

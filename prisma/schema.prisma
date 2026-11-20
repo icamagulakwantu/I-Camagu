@@ -1322,6 +1322,21 @@ model TemplateProposal {
   @@index([templateId, status])
 }
 
+// Who is coming to a ceremony: a clan member (or anyone the ceremony is
+// visible to) confirms. Only the host sees the list.
+model CeremonyAttendance {
+  id         String   @id @default(cuid())
+  ceremonyId String
+  userId     String
+  coming     Boolean  @default(true)
+  guests     Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([ceremonyId, userId])
+  @@index([ceremonyId])
+}
+
 // A member's umnombo: their line of ancestors, father first
 // ([{ generation, name, place? }], see shared/lineage.js). Private unless
 // shareForMatching is on; then clan matches see only the ancestors they

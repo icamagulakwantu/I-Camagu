@@ -360,6 +360,7 @@ function ClanPanel({ user, clanCeremonies, onNavigate }) {
                       Hosted by {ceremony.host?.firstName || 'a clan member'}{days != null ? ` · ${describeCountdown(days)}` : ' · date to be confirmed'}
                     </span>
                   </span>
+                  {!ceremony.isMine && <ClanRsvp ceremony={ceremony} />}
                 </li>
               )
             })}
@@ -378,6 +379,50 @@ function ClanPanel({ user, clanCeremonies, onNavigate }) {
         </div>
       </div>
     </section>
+  )
+}
+
+// "I'm coming": a clan member confirms, with how many people. The host
+// sees the confirmed list on the ceremony.
+function ClanRsvp({ ceremony }) {
+  const { accessToken } = useAuth()
+  const [answer, setAnswer] = useState(ceremony.myRsvp)
+  const [asking, setAsking] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const send = async (coming, guests = 1) => {
+    setBusy(true)
+    try {
+      const res = await fetch(`/api/ceremonies/${ceremony.id}/rsvp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ coming, guests }),
+      })
+      if (res.ok) setAnswer(await res.json())
+    } finally {
+      setBusy(false)
+      setAsking(false)
+    }
+  }
+  if (asking) {
+    return (
+      <span className="flex flex-shrink-0 items-center gap-1" role="group" aria-label="How many of you are coming?">
+        {[1, 2, 3, 4].map((n) => (
+          <button key={n} type="button" disabled={busy} onClick={() => send(true, n)} aria-label={`${n} ${n === 1 ? 'person' : 'people'}`} className="pressable h-8 w-8 rounded-full bg-cream text-[13px] font-extrabold text-[#1f3320]">{n}{n === 4 ? '+' : ''}</button>
+        ))}
+      </span>
+    )
+  }
+  if (answer?.coming) {
+    return (
+      <button type="button" disabled={busy} onClick={() => send(false)} aria-label="Coming. Tap if you can no longer come" className="pressable flex-shrink-0 rounded-full bg-cream/15 px-3 py-1.5 text-[12px] font-extrabold text-cream">
+        Coming ✓{answer.guests > 1 ? ` · ${answer.guests}` : ''}
+      </button>
+    )
+  }
+  return (
+    <button type="button" disabled={busy} onClick={() => setAsking(true)} className="pressable flex-shrink-0 rounded-full bg-cream px-3 py-1.5 text-[12px] font-extrabold text-[#1f3320]">
+      I'm coming
+    </button>
   )
 }
 

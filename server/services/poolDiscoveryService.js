@@ -321,6 +321,18 @@ export async function joinPoolWithItem(userId, input) {
   }
 }
 
+// Whether a member may see (and RSVP to) a ceremony: their own, a public
+// one, or a clan one when they share the host's clan group or a clan line.
+export function ceremonyVisibleTo(user, ceremony) {
+  if (!user || !ceremony) return false;
+  if (ceremony.hostId === user.id || ceremony.visibility === 'PUBLIC') return true;
+  return ceremony.visibility === 'CLAN_ONLY'
+    && ((user.clanGroupId && ceremony.host?.clanGroupId === user.clanGroupId)
+      || clanScore(user, { baskets: [{ user: ceremony.host }] }).score > 0);
+}
+
+export const CEREMONY_HOST_SELECT = { id: true, firstName: true, lastName: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true, clanGroupId: true };
+
 export async function getCommunityFeed(userId) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error('User not found');
@@ -340,9 +352,11 @@ export async function getCommunityFeed(userId) {
       orderBy: { createdAt: 'desc' },
       take: 100,
     }),
+    // Upcoming by either date: an ulwaluko whose boy has gone in still shows
+    // until umgidi (homecomingDate).
     prisma.ceremony.findMany({
-      where: { eventDate: { gte: new Date() }, visibility: { in: ['PUBLIC', 'CLAN_ONLY'] } },
-      include: { host: { select: { id: true, firstName: true, lastName: true, paternalIziduko: true, maternalIziduko: true, paternalGrandmotherIziduko: true, maternalGrandmotherIziduko: true, clanGroupId: true } } },
+      where: { OR: [{ eventDate: { gte: new Date() } }, { homecomingDate: { gte: new Date() } }], visibility: { in: ['PUBLIC', 'CLAN_ONLY'] } },
+      include: { host: { select: CEREMONY_HOST_SELECT } },
       orderBy: { eventDate: 'asc' },
       take: 100,
     }),
@@ -387,19 +401,28 @@ export async function getCommunityFeed(userId) {
         - (b.deadline ? new Date(b.deadline).getTime() : Number.MAX_SAFE_INTEGER))
     .slice(0, 20);
 
-  const ceremonies = rawCeremonies.filter((ceremony) => {
-    if (ceremony.hostId === userId || ceremony.visibility === 'PUBLIC') return true;
-    return ceremony.visibility === 'CLAN_ONLY'
-      && ((user.clanGroupId && ceremony.host.clanGroupId === user.clanGroupId)
-        || clanScore(user, { baskets: [{ user: ceremony.host }] }).score > 0);
-  }).map((ceremony) => ({
-    id: ceremony.id,
-    title: ceremony.title,
-    type: ceremony.type,
-    eventDate: ceremony.eventDate,
-    visibility: ceremony.visibility,
-    host: { id: ceremony.host.id, firstName: ceremony.host.firstName },
-  })).slice(0, 20);
+  const visible = rawCeremonies.filter((ceremony) => ceremonyVisibleTo(user, ceremony)).slice(0, 20);
+  // My own answer for each, so Home can show "I'm coming" or "Coming".
+  const mine = visible.length
+    ? await prisma.ceremonyAttendance.findMany({ where: { userId, ceremonyId: { in: visible.map((c) => c.id) } } }).catch(() => [])
+    : [];
+  const myAnswer = new Map(mine.map((a) => [a.ceremonyId, a]));
+  const now = Date.now();
+  const ceremonies = visible.map((ceremony) => {
+    // The date that matters next: umgidi once the boy has gone in.
+    const homecoming = ceremony.homecomingDate && new Date(ceremony.eventDate).getTime() < now;
+    const answer = myAnswer.get(ceremony.id);
+    return {
+      id: ceremony.id,
+      title: homecoming ? `Umgidi · ${ceremony.title}` : ceremony.title,
+      type: ceremony.type,
+      eventDate: homecoming ? ceremony.homecomingDate : ceremony.eventDate,
+      visibility: ceremony.visibility,
+      isMine: ceremony.hostId === userId,
+      myRsvp: answer ? { coming: answer.coming, guests: answer.guests } : null,
+      host: { id: ceremony.host.id, firstName: ceremony.host.firstName },
+    };
+  }).sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
 
   return { pools, upcomingClanCeremonies: ceremonies, featuredLegends: legends };
 }
