@@ -9,6 +9,28 @@ export function normaliseIsiduko(value) {
     .replace(/[^a-z0-9]/g, '');
 }
 
+// Female forms of a clan name: a woman of AmaCirha is MamCirha, of
+// AmaTshawe Mam-Tshawe. Same clan, male and female. Only "Mam" (with or
+// without a hyphen or space) or "Ma-" / "Ma " is read as the female prefix,
+// so a clan name that simply starts with "Ma" (Madiba) is never cut.
+// Returns the possible clan roots, or [] when the text is not a female form.
+// "MaMadiba" could be Ma + Madiba or Mam + adiba, so both are tried.
+export function femaleRoots(value) {
+  const text = String(value || '').trim();
+  const mam = text.match(/^mam[-\s]?(.{2,})$/i);
+  if (mam) return /^m[aeiou]/i.test(text.slice(2)) ? [mam[1], text.slice(2)] : [mam[1]];
+  const ma = text.match(/^ma[-\s](.{2,})$/i);
+  return ma ? [ma[1]] : [];
+}
+
+// The female form shown beside a clan: Mam before most roots (MamCirha,
+// MamTshawe), Ma before a root that starts with M (MaMadiba).
+export function femaleForm(head) {
+  const root = String(head || '').replace(/^(?:Abakwa|Akwa|Ama|Aba|Abe|Oo)(?=[A-Z])/, '');
+  if (!root) return null;
+  return /^M/.test(root) ? `Ma${root}` : `Mam${root}`;
+}
+
 function consonantSkeleton(value) {
   return normaliseIsiduko(value).replace(/[aeiou]/g, '');
 }
@@ -69,6 +91,16 @@ export function clearClanIndexCache() {
 }
 
 export async function matchClan(query) {
+  const asTyped = await matchClanAsTyped(query);
+  if (asTyped.autoSelect || asTyped.results.some((r) => !r.fuzzy)) return asTyped;
+  for (const root of femaleRoots(query)) {
+    const asFemale = await matchClanAsTyped(root);
+    if (asFemale.autoSelect || asFemale.results.some((r) => !r.fuzzy)) return { ...asFemale, query: asTyped.query };
+  }
+  return asTyped;
+}
+
+async function matchClanAsTyped(query) {
   const rawQuery = String(query || '').trim();
   if (rawQuery.length > 120) {
     return {
@@ -156,6 +188,7 @@ function toSearchResult(clan, matched) {
   return {
     id: clan.id,
     head: clan.head,
+    female: femaleForm(clan.head),
     praises: praiseNamesFor(clan),
     matchedName: matched.label,
     matchedAs: matched.kind,
@@ -169,6 +202,8 @@ function toSearchResult(clan, matched) {
 export async function searchClans(query, { limit = 40 } = {}) {
   const rawQuery = String(query || '').trim().slice(0, 120);
   const q = normaliseIsiduko(rawQuery);
+  // "MamCirha" also searches "Cirha" (see femaleRoots).
+  const queries = [q, ...femaleRoots(rawQuery).map(normaliseIsiduko)].filter(Boolean);
   const safeLimit = Math.min(Math.max(Number.parseInt(limit, 10) || 40, 1), 100);
   const index = await buildClanIndex();
 
@@ -182,12 +217,14 @@ export async function searchClans(query, { limit = 40 } = {}) {
     const searchable = [...clan.names, ...(clan.praises || []).map((label) => ({ label, kind: 'praise' }))];
     for (const name of searchable) {
       const candidate = normaliseIsiduko(name.label);
-      // A praise only counts from three letters, so short text matches names first.
-      if (name.kind === 'praise' && q.length < 3) continue;
-      const rank = candidate === q ? 0 : candidate.startsWith(q) ? 1 : candidate.includes(q) ? 2 : -1;
-      // The clan's own name outranks a praise that matches equally well.
-      const score = rank < 0 ? -1 : rank * 2 + (name.kind === 'praise' ? 1 : 0);
-      if (score >= 0 && (!best || score < best.rank)) best = { rank: score, name };
+      for (const text of queries) {
+        // A praise only counts from three letters, so short text matches names first.
+        if (name.kind === 'praise' && text.length < 3) continue;
+        const rank = candidate === text ? 0 : candidate.startsWith(text) ? 1 : candidate.includes(text) ? 2 : -1;
+        // The clan's own name outranks a praise that matches equally well.
+        const score = rank < 0 ? -1 : rank * 2 + (name.kind === 'praise' ? 1 : 0);
+        if (score >= 0 && (!best || score < best.rank)) best = { rank: score, name };
+      }
     }
     if (best) found.push({ rank: best.rank, result: toSearchResult(clan, best.name) });
   }

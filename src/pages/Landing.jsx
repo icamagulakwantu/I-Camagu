@@ -124,7 +124,7 @@ function ClanFinder({ onJoin }) {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Type your clan name, e.g. Cirha, Zangwa, Jola"
+          placeholder="Type your clan, e.g. Cirha, MamTshawe, Jola"
           className="h-14 w-full rounded-[18px] border-0 bg-cream pl-11 pr-4 text-[15px] text-ink shadow-[0_14px_30px_-18px_rgba(0,0,0,0.6)] focus:outline-none focus:ring-2 focus:ring-ochre-light"
         />
       </label>
@@ -145,7 +145,7 @@ function ClanFinder({ onJoin }) {
               {clan.head.replace(/^Ama/, '').charAt(0)}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block font-display text-lg font-semibold leading-tight text-cream">{clan.head}</span>
+              <span className="block font-display text-lg font-semibold leading-tight text-cream">{clan.head}{clan.female && <span className="ml-1.5 font-sans text-xs font-semibold text-cream/60">· {clan.female}</span>}</span>
               {clan.praises?.length > 0 && <span className="mt-0.5 block text-[13px] leading-snug text-cream/80">{clan.praises.join(' · ')}</span>}
             </span>
           </div>

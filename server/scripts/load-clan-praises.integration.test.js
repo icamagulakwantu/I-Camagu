@@ -53,4 +53,11 @@ integrationDescribe('clan praise names (real database)', () => {
     expect(res.autoSelect).toBe(false);
     expect(res.results.some((r) => r.matchedAs === 'praise')).toBe(false);
   });
+
+  it('finds a clan by its female form', async () => {
+    clearClanIndexCache();
+    const result = await searchClans('MamCirha');
+    expect(result.results[0]).toMatchObject({ head: 'AmaCirha', female: 'MamCirha' });
+    expect((await matchClan('Mam-Cirha')).results[0]?.head).toBe('AmaCirha');
+  });
 });

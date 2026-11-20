@@ -31,7 +31,7 @@ function ClanTile({ clan, isMine, open, onToggle, onPickClan }) {
         </span>
         <span className="flex-1 min-w-0">
           <span className="flex items-center gap-2">
-            <span className="font-display font-bold text-lg text-ink truncate">{clan.head}</span>
+            <span className="font-display font-bold text-lg text-ink truncate">{clan.head}{clan.female && <span className="ml-1.5 font-sans text-xs font-semibold text-ink-muted">· {clan.female}</span>}</span>
             {isMine && <span className="text-xs font-black uppercase tracking-wide text-white bg-sage-500 px-2 py-0.5 rounded-pill flex-shrink-0">Your clan</span>}
           </span>
           {(clan.matchedAs === 'alias' || clan.matchedAs === 'praise') && (
