@@ -46,11 +46,12 @@ const PLACEHOLDER_TONE = {
   other: 'from-[#ebe5dc] to-[#dcd3c6] text-ink',
 }
 
-// How bulk buying works, in three short steps.
+// How SmartMatch works, in three short steps: many small orders from
+// families and stokvels become one big order at volume prices.
 const HOW_IT_WORKS = [
-  { n: 1, title: 'Add items', desc: 'Drinks, meat, groceries or livestock' },
-  { n: 2, title: 'Join a group', desc: 'Pooled with orders near you' },
-  { n: 3, title: 'Pay less', desc: 'Bulk price, confirmed by the supplier' },
+  { n: 1, title: 'Add what you need', desc: 'Drinks, meat, groceries or livestock' },
+  { n: 2, title: 'SmartMatch joins it', desc: 'With families and stokvels near you, into one big order' },
+  { n: 3, title: 'Pay less, share out', desc: 'Bought at volume, divided, delivered or collected nearby' },
 ]
 
 // Product prices keep their cents, written the South African way: R2 700,00.
@@ -266,7 +267,7 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-cream/60">
-              Thengani kunye{location.label ? ` · Near ${location.label}` : ''}
+              SmartMatch · Thengani kunye{location.label ? ` · Near ${location.label}` : ''}
             </p>
             <h1 className="mt-1 font-display text-[2.1rem] font-semibold leading-none tracking-tight">Bulk Buy</h1>
             <p className="mt-2 text-sm text-[#c9bfb2]">

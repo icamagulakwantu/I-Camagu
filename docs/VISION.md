@@ -74,7 +74,7 @@ without the others. (Proposed mapping, for the founder to confirm.)
 | Engine | **Ceremonies** | Belief in the ancestors is what drives us, all our lives. |
 | Steering wheel | **Learning our ways** | The rites, their meaning, our history and heroes keep us on our road. |
 | Gears | **Stokvels** | Saving together turns small amounts into power. |
-| Tyres | **Bulk buying** | Where that power meets the road: buying together at scale. |
+| Tyres | **Bulk buying (SmartMatch)** | Where that power meets the road: buying together at scale. |
 | Logbook | **Ukugida and the family archive** | The record of the journey, never lost. |
 | Fuel | **The Shrine Fund** | Money we keep in our own communities, invested in what we own. |
 
@@ -83,6 +83,18 @@ is also how the platform earns its keep and sustains itself. Ukugida is a
 feature inside a ceremony, not a ceremony or a section of its own: it lives
 on each ceremony's page (and in More). The clan is the first card on Home
 and the first tile in More.
+
+## The two matches: the core of the engine
+
+- **ClanMatch** finds your people through isiduko and umnombo.
+- **SmartMatch** finds your buying partners. It takes what families and
+  stokvels buy, groups the same things across many orders (someone wants 3
+  cases of Hennessy, someone 1, someone 2, forty people in Gqeberha), places
+  it as one big order at the volume price that retailers, wholesalers and
+  distributors give for pallets, then divides it and delivers it or has it
+  collected at a central place. Stokvels already buy in bulk on their own;
+  i-Camagu pulls many stokvels together into one far bigger order. This is
+  also how the platform earns: the negotiated volume discount.
 
 ## The Shrine Fund (ubuhlanti)
 

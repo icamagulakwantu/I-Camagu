@@ -44,7 +44,7 @@ const JOURNEY = [
   { icon: 'clipboard', step: 'Isicwangciso', title: 'Plan the ceremony', body: 'Every step with a date to aim for, the budget and the roles, from ulwaluko and umgidi to a wedding.' },
   { icon: 'heartHandshake', step: 'Isithembiso', title: 'The family pledges', body: 'One link to the family group. Relatives at home and abroad pledge, and suggest what you forgot.' },
   { icon: 'coins', step: 'Umgalelo', title: 'Save together', body: 'Your stokvel with a constitution, minutes and books every member can see.' },
-  { icon: 'cart', step: 'Thenga kunye', title: 'Buy together', body: 'Drinks, meat, livestock and groceries at bulk prices, ordered with families near you.' },
+  { icon: 'cart', step: 'Thenga kunye', title: 'Buy together with SmartMatch', body: 'SmartMatch puts orders from families and stokvels near you into one big order at bulk prices, then divides it and delivers or you collect nearby.' },
   { icon: 'drum', step: 'Umhla', title: 'The day itself', body: 'Everything ticked, everyone in their place, the umqombothi brewed to the guest count.' },
   { icon: 'image', step: 'Inkumbulo', title: 'Remembered forever', body: 'The ukugida book of who brought what, and the family archive of photos and records. Never lost.' },
 ]
