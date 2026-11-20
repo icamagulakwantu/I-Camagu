@@ -196,11 +196,12 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
     <div className="px-4 mt-4 space-y-4">
       <MoneyCard summary={summary} budgetZAR={budgetZAR} onEditBudget={onEditBudget} />
 
-      <p className="text-sm font-bold text-ink">{done} / {total} <span className="font-normal text-ink-muted">done</span></p>
-
-      <button type="button" onClick={() => setShowAdd((v) => !v)} className={cn('w-full h-14 rounded-pill bg-white border-2 border-terracotta text-terracotta', pressable)}>
-        <Bi {...(showAdd ? BUTTONS.cancel : { xh: 'Ongeza into', en: 'Add something to the list' })} />
-      </button>
+      <div className="flex items-center justify-between px-1">
+        <p className="text-sm font-bold text-ink">{done} of {total} <span className="font-normal text-ink-muted">done</span></p>
+        <button type="button" onClick={() => setShowAdd((v) => !v)} className={cn('flex h-9 items-center gap-1 rounded-full px-3 text-sm font-bold text-[#1f3320]', pressable)}>
+          {showAdd ? 'Cancel' : '+ Add to the list'}
+        </button>
+      </div>
 
       {showAdd && (
         <form onSubmit={addItem} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
@@ -226,18 +227,18 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
       )}
 
       {groupRowsByPhase(rows).map((group) => (
-        <div key={group.phase} className="card-paper p-4">
-          <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider mb-1">{phaseLabel(group.phase)}</h3>
-          <div className="divide-y divide-cream-dark/50">
+        <div key={group.phase} className="rounded-[20px] bg-[#fffdf9] px-4 pb-1.5 pt-3.5 shadow-[0_10px_24px_-20px_rgba(43,30,18,0.5)]">
+          <h3 className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#6f655a]">{phaseLabel(group.phase)}</h3>
+          <div className="mt-1 divide-y divide-ink/[0.06]">
             {group.rows.map((row) => <ListRow key={row.key} row={row} busy={busyKey === row.key} {...rowProps} />)}
           </div>
         </div>
       ))}
 
       {unforeseenRows.length > 0 && (
-        <div className="card-paper p-4">
-          <h3 className="text-xs font-extrabold text-terracotta uppercase tracking-wider mb-1">Unexpected expenses</h3>
-          <div className="divide-y divide-cream-dark/50">
+        <div className="rounded-[20px] bg-[#fffdf9] px-4 pb-1.5 pt-3.5 shadow-[0_10px_24px_-20px_rgba(43,30,18,0.5)]">
+          <h3 className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-terracotta-dark">Unexpected expenses</h3>
+          <div className="mt-1 divide-y divide-ink/[0.06]">
             {unforeseenRows.map((row) => <ListRow key={row.key} row={row} showTick={false} busy={busyKey === row.key} {...rowProps} />)}
           </div>
         </div>

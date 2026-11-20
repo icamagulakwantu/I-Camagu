@@ -1,61 +1,80 @@
+import { useState } from 'react'
 import Icon from '../../components/Icon.jsx'
 import { cn } from '../../lib/utils'
-import Bi from './Bi.jsx'
-import { BUTTONS, LABELS } from './wizardText.js'
 import { rand } from './format.js'
-import { pressable, smallInputClass } from './styles.js'
+import { pressable } from './styles.js'
 
-// One line of the shopping list. A guide price is only a hint; the box
-// "I paid" is the one number that comes off the budget.
+// One line of the plan: a round tick, the item, a quiet guide price, and
+// what was paid. The paid box stays out of the way until it is needed: tap
+// "+ Paid" to enter an amount; once saved it shows as a small chip.
 export default function ListRow({ row, showTick = true, busy, onToggle, onSavePrice, onBuy }) {
+  const [editing, setEditing] = useState(false)
   if (row.kind === 'note') {
-    return <p className="py-3 text-sm font-bold text-terracotta">{row.label}</p>
+    return <p className="py-2.5 text-[13px] font-semibold text-terracotta-dark">{row.label}</p>
   }
-  const guide = row.suggested != null ? `${rand(row.suggested)} (${row.quantity} x ${rand(row.unitPrice)})` : null
+  const guide = row.suggested != null
+    ? `Guide ${rand(row.suggested)}${row.quantity > 1 ? ` · ${row.quantity} × ${rand(row.unitPrice)}` : ''}`
+    : null
+  const save = (value) => { setEditing(false); onSavePrice(row, value) }
+
   return (
-    <div className="py-3">
-      <div className="flex items-start gap-3">
-        {showTick && (
-          <button
-            type="button"
-            aria-label={row.done ? 'Mark as not done' : 'Mark as done'}
-            aria-pressed={row.done}
-            disabled={busy}
-            onClick={() => onToggle(row)}
-            className={cn('w-10 h-10 rounded-xl border-2 flex items-center justify-center flex-shrink-0', row.done ? 'bg-sage-500 border-sage-500' : 'border-cream-dark bg-white', pressable)}
-          >
-            {row.done && <Icon name="check" size={18} color="#fff" strokeWidth={2.5} />}
-          </button>
+    <div className="flex items-center gap-3 py-2.5">
+      {showTick && (
+        <button
+          type="button"
+          aria-label={row.done ? `Mark ${row.label} as not done` : `Mark ${row.label} as done`}
+          aria-pressed={row.done}
+          disabled={busy}
+          onClick={() => onToggle(row)}
+          className={cn('-m-2 flex h-11 w-11 flex-shrink-0 items-center justify-center', pressable)}
+        >
+          <span className={cn('flex h-6 w-6 items-center justify-center rounded-full border-[1.5px]', row.done ? 'border-[#2e4a2e] bg-[#2e4a2e]' : 'border-ink/25 bg-white')}>
+            {row.done && <Icon name="check" size={13} color="#fff" strokeWidth={3} />}
+          </span>
+        </button>
+      )}
+
+      <div className="min-w-0 flex-1">
+        <p className={cn('text-[15px] leading-snug break-words', row.done ? 'text-ink-muted line-through' : 'text-ink')}>{row.label}</p>
+        {guide && !editing && <p className="mt-0.5 text-[12px] text-ink-muted">{guide}</p>}
+        {editing && (
+          <label className="mt-1.5 flex items-center gap-1.5">
+            <span className="text-[12px] font-semibold text-ink-muted">Paid R</span>
+            <input
+              autoFocus
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="0.01"
+              placeholder={row.suggested != null ? String(Math.round(row.suggested)) : '0'}
+              defaultValue={row.actual ?? ''}
+              disabled={busy}
+              onBlur={(e) => save(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); if (e.key === 'Escape') setEditing(false) }}
+              className="h-9 w-28 rounded-[10px] border border-ink/15 bg-white px-2.5 text-right text-[15px] text-ink focus:border-[#2e4a2e] focus:outline-none"
+            />
+          </label>
         )}
-        <div className="flex-1 min-w-0">
-          <p className={cn('text-base font-medium break-words', row.done ? 'text-ink-muted line-through' : 'text-ink')}>{row.label}</p>
-          {guide && <p className="text-xs text-ink-muted mt-0.5">{LABELS.guide.xh} / {LABELS.guide.en}: {guide}</p>}
+      </div>
+
+      {!editing && (
+        <div className="flex flex-shrink-0 items-center gap-1.5">
+          {row.cost?.skuId && !row.done && (
+            <button type="button" onClick={() => onBuy(row.cost)} className={cn('h-8 rounded-full border border-[#2e4a2e]/30 px-3 text-[12px] font-bold text-[#1f3320]', pressable)}>
+              Buy
+            </button>
+          )}
+          {row.actual != null ? (
+            <button type="button" onClick={() => setEditing(true)} aria-label={`Paid ${rand(row.actual)}, change`} className={cn('h-8 rounded-full bg-[#2e4a2e]/10 px-3 text-[12px] font-bold text-[#1f3320]', pressable)}>
+              Paid {rand(row.actual)}
+            </button>
+          ) : (
+            <button type="button" onClick={() => setEditing(true)} aria-label={`Add what you paid for ${row.label}`} className={cn('h-8 rounded-full px-2.5 text-[12px] font-semibold text-ink-muted', pressable)}>
+              + Paid
+            </button>
+          )}
         </div>
-      </div>
-      <div className={cn('flex w-full min-w-0 flex-wrap items-center gap-2 mt-2', showTick && 'pl-[52px]')}>
-        {row.cost?.skuId && !row.done && (
-          <button type="button" onClick={() => onBuy(row.cost)} className={cn('h-11 px-4 rounded-pill bg-terracotta text-white text-sm', pressable)}>
-            <Bi {...BUTTONS.buy} enClassName="hidden" />
-          </button>
-        )}
-        <label className="ml-auto flex min-w-0 max-w-full items-center gap-1.5">
-          <span className="text-xs text-ink-muted text-right"><Bi {...LABELS.paid} /></span>
-          <span className="text-base font-bold text-ink-muted">R</span>
-          <input
-            key={`${row.key}-${row.actual ?? 'none'}`}
-            type="number"
-            inputMode="decimal"
-            min="0"
-            step="0.01"
-            placeholder="0"
-            defaultValue={row.actual ?? ''}
-            disabled={busy}
-            onBlur={(e) => onSavePrice(row, e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur() }}
-            className={cn(smallInputClass, 'w-20 max-w-[28vw] sm:w-24')}
-          />
-        </label>
-      </div>
+      )}
     </div>
   )
 }
