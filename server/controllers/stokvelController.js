@@ -14,7 +14,7 @@ export async function createStokvel(req, res) {
     return res.status(400).json({ error: 'Name and type are required' });
   }
 
-  const validTypes = ['ALCOHOL_BULK_POOL', 'UMGALELO_ROTATING', 'CEREMONY_SAVINGS', 'EXISTING_STOKVEL_UPGRADE', 'RECIPROCAL_GIFTING'];
+  const validTypes = ['ALCOHOL_BULK_POOL', 'UMGALELO_ROTATING', 'CEREMONY_SAVINGS', 'EXISTING_STOKVEL_UPGRADE', 'RECIPROCAL_GIFTING', 'BURIAL_SOCIETY', 'GROCERY_STOKVEL'];
   if (!validTypes.includes(type)) {
     return res.status(400).json({ error: `Type must be one of: ${validTypes.join(', ')}` });
   }
