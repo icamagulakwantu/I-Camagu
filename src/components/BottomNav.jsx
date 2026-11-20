@@ -1,16 +1,14 @@
 import Icon from './Icon.jsx'
 
 function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals = 0, unreadNotifications = 0 }) {
-  // The vehicle (docs/VISION.md): isiduko is the root, ceremonies the
-  // engine, stokvels the gears and Bulk Buy the tyres (and what keeps the
-  // platform going). Everything else ("More") opens from the profile
-  // picture at the top of Home.
+  // Founder's order (20 Nov 2026). Ukugida, templates and the other tools
+  // live inside a ceremony and in More; the clan is first on Home and More.
   const tabs = [
     { id: 'home', label: 'Home', english: 'Home', icon: 'home', badge: unreadNotifications },
-    { id: 'iziduko', label: 'Isiduko', english: 'Your clan', icon: 'users' },
-    { id: 'ceremonyhub', label: 'Imisebenzi', english: 'Ceremonies', icon: 'calendar' },
-    { id: 'stokvels', label: 'Stokvels', english: 'Stokvels', icon: 'coins', badge: pendingApprovals },
+    { id: 'ceremonyhub', label: 'Ceremonies', english: 'Ceremonies', icon: 'calendar' },
     { id: 'store', label: 'Bulk Buy', english: 'Bulk Buy', icon: 'cart', badge: basketCount },
+    { id: 'stokvels', label: 'Stokvels', english: 'Stokvels', icon: 'coins', badge: pendingApprovals },
+    { id: 'more', label: 'More', english: 'More', icon: 'menu' },
   ]
 
   return (

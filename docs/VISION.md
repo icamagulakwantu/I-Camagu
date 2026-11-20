@@ -78,8 +78,11 @@ without the others. (Proposed mapping, for the founder to confirm.)
 | Logbook | **Ukugida and the family archive** | The record of the journey, never lost. |
 | Fuel | **The Shrine Fund** | Money we keep in our own communities, invested in what we own. |
 
-Stokvels and Bulk Buy each keep their own place in the bottom bar: Bulk
-Buy is also how the platform earns its keep and sustains itself.
+The bottom bar is Home · Ceremonies · Bulk Buy · Stokvels · More. Bulk Buy
+is also how the platform earns its keep and sustains itself. Ukugida is a
+feature inside a ceremony, not a ceremony or a section of its own: it lives
+on each ceremony's page (and in More). The clan is the first card on Home
+and the first tile in More.
 
 ## The Shrine Fund (ubuhlanti)
 

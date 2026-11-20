@@ -419,7 +419,7 @@ function MainApp() {
       case 'iziduko':
         return (
           <IzidukoNetwork
-            onBack={goHome}
+            onBack={goMore}
             onOpenGroups={() => openClanGroup(null)}
             onGoToClanLines={() => { setProfileInitialTab('clan'); setScreen('profile') }}
             onViewProfile={openIzidukoProfile}
@@ -497,7 +497,7 @@ function MainApp() {
     : screen === 'ceremonyhub' || CEREMONY_SCREENS.includes(screen) || returnToCeremonyId ? 'ceremonyhub'
     : screen === 'stokvels' ? 'stokvels'
     : MONEY_SCREENS.includes(screen) ? 'store'
-    : CLAN_SCREENS.includes(screen) ? 'iziduko'
+    : CLAN_SCREENS.includes(screen) || MORE_SCREENS.includes(screen) ? 'more'
     : 'home'
 
   return (
