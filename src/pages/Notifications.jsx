@@ -17,7 +17,10 @@ const TYPE_STYLE = {
   ORDER_FULFILLED: { icon: 'package', color: '#4a7a4a' },
   PLEDGE_RECEIVED: { icon: 'gift', color: '#2f6b5a' },
 }
-const DEFAULT_STYLE = { icon: 'bell', color: '#c45c26' }
+// Anything else (news and messages from i-Camagu itself) carries the
+// one-colour i-Camagu mark instead of a generic bell.
+const DEFAULT_STYLE = { mark: true, color: '#1f3320' }
+const MARK = '/images/brand/mark-green-96.png'
 
 // "Just now", "5 min ago", "3 h ago", "Yesterday", then a short date.
 function timeAgo(value) {
@@ -41,7 +44,7 @@ function NotificationRow({ n, onTap }) {
       className={`w-full text-left rounded-2xl p-3.5 flex items-start gap-3 transition-transform active:scale-[0.99] ${n.isRead ? 'bg-white ring-1 ring-ink/[0.06]' : 'bg-sage-50 ring-1 ring-sage-300'}`}
     >
       <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: `${style.color}1a` }}>
-        <Icon name={style.icon} size={18} color={style.color} />
+        {style.mark ? <img src={MARK} alt="" width="26" height="26" className="h-[26px] w-[26px]" /> : <Icon name={style.icon} size={18} color={style.color} />}
       </span>
       <span className="flex-1 min-w-0">
         <span className={`block text-sm leading-snug break-words ${n.isRead ? 'text-ink' : 'text-ink font-semibold'}`}>{n.message}</span>
@@ -103,7 +106,7 @@ function Notifications({ onBack, onNavigate }) {
           {[0, 1, 2, 3].map((i) => <div key={i} className="h-[68px] rounded-2xl bg-white/70 animate-pulse" />)}
         </div>
       ) : notifications.length === 0 ? (
-        <EmptyState icon="bell" title="No notifications" description="You're all caught up. Pledges, offers and orders will show up here." />
+        <EmptyState image={MARK} title="No notifications" description="You're all caught up. Pledges, offers and orders will show up here." />
       ) : (
         <div className="space-y-5">
           {unread.length > 0 && (
