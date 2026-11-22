@@ -31,6 +31,7 @@ import { switchPapToSamp } from './scripts/samp-nov-2026.js';
 import { applyGrocerySpecials } from './scripts/grocery-specials-nov-2026.js';
 import { addEkoyiniProducts } from './scripts/ekoyini-catalogue-nov-2026.js';
 import { correctQuartSizes } from './scripts/quart-sizes-nov-2026.js';
+import { applyDrinksPhotosPrices } from './scripts/drinks-photos-prices-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -314,6 +315,12 @@ if (startup.schemaReady) {
     await correctQuartSizes();
   } catch (err) {
     console.error('Quart size correction failed:', err?.message);
+  }
+  // Founder's drinks photos, new drinks, water prices checked online. Runs once.
+  try {
+    await applyDrinksPhotosPrices();
+  } catch (err) {
+    console.error('Drinks photos and prices failed:', err?.message);
   }
 }
 
