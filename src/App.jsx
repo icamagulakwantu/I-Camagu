@@ -15,6 +15,7 @@ import { PENDING_STOKVEL_KEY, PENDING_CLAN_KEY, PENDING_TEMPLATE_KEY, PENDING_PL
 
 // Home is the first screen, so it is loaded straight away.
 import Home from './pages/Home.jsx'
+import { SCREEN_PATHS } from '../shared/screenPaths.js'
 
 // Load feature screens on demand so first-time and returning mobile visits do not
 // download every ceremony, admin, and community screen before the home screen.
@@ -85,49 +86,6 @@ const MONEY_SCREENS = ['store', 'basket', 'myorders']
 // Isiduko: the clan network, clan groups and messages.
 const CLAN_SCREENS = ['iziduko', 'izidukoprofile', 'izidukochat', 'clangroups']
 
-const SCREEN_PATHS = {
-  home: '/',
-  ceremonyhub: '/ceremonies',
-  ceremony: '/ceremonies/plan',
-  timeline: '/ceremonies/timeline',
-  store: '/smartmatch',
-  basket: '/basket',
-  stokvels: '/stokvels',
-  more: '/me',
-  profile: '/me/profile',
-  iziduko: '/me/iziduko',
-  clangroups: '/me/clan-groups',
-  legends: '/me/legends',
-  directory: '/me/directory',
-  myorders: '/smartmatch/orders',
-  notifications: '/me/notifications',
-  account: '/me/account',
-  help: '/me/help',
-  privacy: '/me/privacy',
-  activity: '/me/activity',
-  budget: '/ceremonies/budget',
-  templates: '/ceremonies/templates',
-  hierarchy: '/ceremonies/hierarchy',
-  family: '/ceremonies/family',
-  ukugida: '/ceremonies/ukugida',
-  ukusoka: '/ceremonies/ukusoka',
-  umqombothi: '/me/umqombothi',
-  isidlo: '/me/feast',
-  sharedplans: '/ceremonies/shared',
-  expenditure: '/me/expenditure',
-  shrinefund: '/me/ubuhlanti',
-  pin: '/me/pin',
-  ekoyini: '/services/ekoyini',
-  ekoyinibooking: '/services/ekoyini/booking',
-  supplier: '/supplier',
-  portal: '/me/portal',
-  identityadmin: '/admin/identity',
-  marginadmin: '/admin/margins',
-  demandadmin: '/admin/demand',
-  ekoyiniadmin: '/admin/ekoyini',
-  izidukoprofile: '/me/iziduko-profile',
-  izidukochat: '/me/messages',
-};
 
 function isKnownAppPath(pathname) {
   if (pathname === '/' || Object.values(SCREEN_PATHS).includes(pathname)) return true;
@@ -223,6 +181,7 @@ function MainApp() {
     if (planToken) setScreen('sharedplans')
   }, [accessToken]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (screen !== 'store' && screen !== 'isidlo') setStoreSearch('') }, [screen])
+
 
   // Keep the browser address in sync with screen navigation so refresh, share
   // and the browser back button return to a meaningful place in the app.
@@ -630,9 +589,26 @@ function ClanJoinRoute() {
   return null
 }
 
+// A tapped phone notification, with the app already open: go to its screen.
+// Lives at the top so it works on every page, signed in or not.
+function NotificationTapListener() {
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return undefined
+    const onMessage = (event) => {
+      const path = event.data?.type === 'icamagu:open' ? event.data.path : null
+      if (typeof path === 'string' && path.startsWith('/') && !path.startsWith('//')) navigate(path)
+    }
+    navigator.serviceWorker.addEventListener('message', onMessage)
+    return () => navigator.serviceWorker.removeEventListener('message', onMessage)
+  }, [navigate])
+  return null
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <NotificationTapListener />
       <OfflineBanner />
       <Suspense fallback={
         <div className="icamagu-bg flex min-h-screen items-center justify-center" role="status" aria-live="polite">

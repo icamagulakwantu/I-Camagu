@@ -11,6 +11,8 @@ workbox: {
   skipWaiting: true,
   clientsClaim: true,
   navigateFallbackDenylist: [/^\/api\//],
+  // Phone notifications: show pushes and open the right screen on tap.
+  importScripts: ['/push-sw.js'],
 },
       manifest: {
         name: 'i-Camagu',

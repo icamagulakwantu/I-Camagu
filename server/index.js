@@ -36,6 +36,8 @@ import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
 import reconciliationRoutes from './routes/reconciliation.js';
 import notificationRoutes from './routes/notification.js';
+import pushRoutes from './routes/push.js';
+import { startPushSender } from './services/pushService.js';
 import basketRoutes from './routes/basket.js';
 import ceremonyRoutes from './routes/ceremony.js';
 import reciprocityRoutes from './routes/reciprocity.js';
@@ -102,6 +104,7 @@ app.use(cors({
 app.use(express.json({ limit: '5mb' }));
 app.use(cookieParser());
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/push', pushRoutes);
 app.use('/api/activity', activityRoutes);
 
 // API routes
@@ -212,6 +215,11 @@ try {
   startup.schemaError = err;
   console.error(`Start-up database check FAILED — name=${err?.name} code=${err?.code} message=${err?.message}`);
   captureException(err);
+}
+
+if (startup.schemaReady && process.env.NODE_ENV !== 'test') {
+  // Phone notifications: send each new notification to the person's phones.
+  startPushSender();
 }
 
 if (startup.schemaReady) {

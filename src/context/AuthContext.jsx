@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react'
+import { turnOffPush } from '../lib/push.js'
 
 export const AuthContext = createContext(null)
 
@@ -117,6 +118,10 @@ export function AuthProvider({ children }) {
   }
 
   const logout = async () => {
+    // A shared phone must stop getting this person's notifications.
+    try {
+      await Promise.race([turnOffPush(accessToken), new Promise((resolve) => setTimeout(resolve, 2500))])
+    } catch { /* never block signing out */ }
     try {
       await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
     } catch (err) {

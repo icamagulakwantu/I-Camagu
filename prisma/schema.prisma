@@ -482,6 +482,11 @@ model Notification {
   linkScreen  String?  // which screen to navigate to on tap, e.g. "stokvels"
   isRead      Boolean  @default(false)
   createdAt   DateTime @default(now())
+  // When this was sent to the person's phones (null: not yet, or created
+  // before phone notifications existed and never will be).
+  pushedAt    DateTime?
+
+  @@index([pushedAt, createdAt])
 }
 
 // Ubuhlanti bakwa Xhosa — the sovereign Xhosa cultural wealth & development
@@ -1366,4 +1371,27 @@ model ClanPraise {
 model DataFix {
   name      String   @id
   appliedAt DateTime @default(now())
+}
+
+// A phone or browser that turned on phone notifications. The endpoint is
+// the push service address the browser gave us; p256dh and auth are the
+// browser's public keys used to encrypt each message to it.
+model PushSubscription {
+  id         String    @id @default(cuid())
+  userId     String
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+
+  @@index([userId])
+}
+
+// Small server-owned settings, such as the push keys generated on first run.
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @default(now())
 }

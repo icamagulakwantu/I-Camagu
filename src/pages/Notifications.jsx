@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import Icon from '../components/Icon.jsx'
+import PhoneNotificationsCard from '../components/PhoneNotificationsCard.jsx'
 
 // Icon + colour per notification type, so people can tell at a glance what
 // happened (like the coloured badges on Instagram/Facebook activity).
@@ -100,6 +101,8 @@ function Notifications({ onBack, onNavigate }) {
           <button type="button" onClick={markAllRead} className="text-xs text-sage-700 font-bold underline min-h-11">Mark all read</button>
         )}
       </div>
+
+      <PhoneNotificationsCard className="mb-5" />
 
       {notifications === null ? (
         <div className="space-y-2">

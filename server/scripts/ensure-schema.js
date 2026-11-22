@@ -422,6 +422,33 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "CeremonyAttendance_ceremonyId_userId_key" ON "CeremonyAttendance" ("ceremonyId", "userId");');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "CeremonyAttendance_ceremonyId_idx" ON "CeremonyAttendance" ("ceremonyId");');
 
+  // Phone notifications: one row per phone or browser that turned them on,
+  // a small key/value store for the server's own push keys, and when each
+  // notification was sent to phones (see services/pushService.js).
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "PushSubscription" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "endpoint" TEXT NOT NULL,
+      "p256dh" TEXT NOT NULL,
+      "auth" TEXT NOT NULL,
+      "userAgent" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "lastUsedAt" TIMESTAMP(3)
+    );
+  `);
+  await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "PushSubscription_endpoint_key" ON "PushSubscription" ("endpoint");');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "PushSubscription_userId_idx" ON "PushSubscription" ("userId");');
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "AppSetting" (
+      "key" TEXT NOT NULL PRIMARY KEY,
+      "value" TEXT NOT NULL,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  await prisma.$executeRawUnsafe('ALTER TABLE "Notification" ADD COLUMN IF NOT EXISTS "pushedAt" TIMESTAMP(3);');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "Notification_pushedAt_createdAt_idx" ON "Notification" ("pushedAt", "createdAt");');
+
   // Burial societies and grocery stokvels (StokvelType). ADD VALUE must run
   // outside a transaction, which $executeRawUnsafe on its own does.
   await prisma.$executeRawUnsafe(`ALTER TYPE "StokvelType" ADD VALUE IF NOT EXISTS 'BURIAL_SOCIETY';`);
