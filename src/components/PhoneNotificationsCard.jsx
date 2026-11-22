@@ -8,25 +8,48 @@ const MARK = '/images/brand/mark-green-96.png'
 // when the phone cannot do it yet (iPhone not added to the Home Screen, or
 // notifications blocked in settings). Hidden where the browser has no
 // notifications at all.
-export default function PhoneNotificationsCard({ className = '' }) {
-  const { accessToken } = useAuth()
+//
+// prompt: the one-time invitation on Home. Shown only while notifications
+// are off (or the iPhone needs the Home Screen step), until the person turns
+// them on or taps "Not now"; after that it never comes back on this phone.
+const promptKey = (userId) => `icamagu_push_prompt_done:${userId}`
+
+export function pushPromptDone(userId) {
+  try { return localStorage.getItem(promptKey(userId)) === '1' } catch { return true }
+}
+
+function markPromptDone(userId) {
+  try { localStorage.setItem(promptKey(userId), '1') } catch { /* storage blocked: it shows again, harmlessly */ }
+}
+
+export default function PhoneNotificationsCard({ className = '', prompt = false }) {
+  const { accessToken, user } = useAuth()
   const [status, setStatus] = useState(null)
+  const [hidden, setHidden] = useState(() => prompt && (!user?.id || pushPromptDone(user.id)))
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [justTurnedOn, setJustTurnedOn] = useState(false)
 
   useEffect(() => {
+    if (hidden) return undefined
     let live = true
     pushStatus().then((s) => { if (live) setStatus(s) }).catch(() => { if (live) setStatus('unsupported') })
     return () => { live = false }
-  }, [])
+  }, [hidden])
 
-  if (!status || status === 'unsupported') return null
+  if (hidden || !status || status === 'unsupported') return null
+  // On Home, only invite people who can still say yes.
+  if (prompt && status !== 'off' && status !== 'needs-install' && !justTurnedOn) return null
+
+  const dismiss = () => { markPromptDone(user?.id); setHidden(true) }
 
   const run = async (action) => {
     setBusy(true)
     setError('')
     try {
-      setStatus(await action(accessToken))
+      const next = await action(accessToken)
+      setStatus(next)
+      if (prompt && next === 'on') { markPromptDone(user?.id); setJustTurnedOn(true) }
     } catch (err) {
       setError(err?.message || 'Something went wrong. Please try again.')
     } finally {
@@ -58,17 +81,31 @@ export default function PhoneNotificationsCard({ className = '' }) {
           <p className="text-[15px] font-semibold leading-snug text-ink">{title}</p>
           <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">{text}</p>
           {error && <p className="mt-2 text-[13px] font-semibold text-terracotta-dark" role="alert">{error}</p>}
-          {status === 'off' && (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => run(turnOnPush)}
-              className="mt-3 h-10 rounded-full bg-[#1f3320] px-5 text-[13px] font-bold text-white disabled:opacity-60"
-            >
-              {busy ? 'Turning on…' : 'Turn on'}
+          {(status === 'off' || (prompt && status === 'needs-install')) && (
+            <div className="mt-3 flex items-center gap-2">
+              {status === 'off' && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => run(turnOnPush)}
+                  className="h-10 rounded-full bg-[#1f3320] px-5 text-[13px] font-bold text-white disabled:opacity-60"
+                >
+                  {busy ? 'Turning on…' : 'Turn on'}
+                </button>
+              )}
+              {prompt && (
+                <button type="button" onClick={dismiss} className="min-h-11 px-3 text-[13px] font-semibold text-ink-muted">
+                  {status === 'needs-install' ? 'Got it' : 'Not now'}
+                </button>
+              )}
+            </div>
+          )}
+          {prompt && status === 'on' && (
+            <button type="button" onClick={() => setHidden(true)} className="mt-2 min-h-11 text-[13px] font-semibold text-ink-muted">
+              Done
             </button>
           )}
-          {status === 'on' && (
+          {!prompt && status === 'on' && (
             <button
               type="button"
               disabled={busy}

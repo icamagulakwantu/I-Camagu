@@ -9,6 +9,7 @@ import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { daysUntil, describeCountdown, focusDate, nextCeremony } from '../lib/countdown.js'
 import { ceremonyImage } from '../data/ceremonyImages.js'
 import { labelForCeremonyType } from '../data/ceremonyLabels.js'
+import PhoneNotificationsCard from '../components/PhoneNotificationsCard.jsx'
 
 // Founder-supplied photo: women in umbhaco celebrating at an umgidi.
 const HERO_IMAGE = 'https://hercules-cdn.com/file_wxyYBh6l6xbEhksr09BuCEsR'
@@ -549,6 +550,9 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
       <Hero user={user} lead={lead} unreadNotifications={unreadNotifications} onNavigate={onNavigate} onSelectCeremony={onSelectCeremony} onOpenType={onOpenType} />
 
       <NeedsYou items={needs} loading={loading} />
+
+      {/* Once only: invite people to get notifications on their phone. */}
+      <PhoneNotificationsCard prompt className="mx-4 mt-6 shadow-soft" />
 
       {/* With no ceremony yet the hero already asks what you are planning, so
           the rail would only repeat it. */}
