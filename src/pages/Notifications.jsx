@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import Icon from '../components/Icon.jsx'
 import PhoneNotificationsCard from '../components/PhoneNotificationsCard.jsx'
+import { useT } from '../i18n/index.jsx'
 
 // Icon + colour per notification type, so people can tell at a glance what
 // happened (like the coloured badges on Instagram/Facebook activity).
@@ -24,19 +25,20 @@ const DEFAULT_STYLE = { mark: true, color: '#1f3320' }
 const MARK = '/images/brand/mark-green-96.png'
 
 // "Just now", "5 min ago", "3 h ago", "Yesterday", then a short date.
-function timeAgo(value) {
+function timeAgo(value, t = (s, v) => s.replace(/\{(\w+)\}/g, (m, k) => v?.[k] ?? m)) {
   const then = new Date(value)
   const mins = Math.floor((Date.now() - then.getTime()) / 60000)
   if (Number.isNaN(mins)) return ''
-  if (mins < 1) return 'Just now'
-  if (mins < 60) return `${mins} min ago`
+  if (mins < 1) return t('Just now')
+  if (mins < 60) return t('{n} min ago', { n: mins })
   const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours} h ago`
-  if (hours < 48) return 'Yesterday'
+  if (hours < 24) return t('{n} h ago', { n: hours })
+  if (hours < 48) return t('Yesterday')
   return then.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 }
 
 function NotificationRow({ n, onTap }) {
+  const t = useT()
   const style = TYPE_STYLE[n.type] || DEFAULT_STYLE
   return (
     <button
@@ -49,7 +51,7 @@ function NotificationRow({ n, onTap }) {
       </span>
       <span className="flex-1 min-w-0">
         <span className={`block text-sm leading-snug break-words ${n.isRead ? 'text-ink' : 'text-ink font-semibold'}`}>{n.message}</span>
-        <span className="block text-xs text-ink-muted mt-1">{timeAgo(n.createdAt)}</span>
+        <span className="block text-xs text-ink-muted mt-1">{timeAgo(n.createdAt, t)}</span>
       </span>
       {!n.isRead && <span className="w-2.5 h-2.5 rounded-full bg-terracotta mt-1.5 flex-shrink-0" aria-label="Unread" />}
     </button>
@@ -57,6 +59,7 @@ function NotificationRow({ n, onTap }) {
 }
 
 function Notifications({ onBack, onNavigate }) {
+  const t = useT()
   const { accessToken } = useAuth()
   const [notifications, setNotifications] = useState(null)
 
@@ -90,15 +93,15 @@ function Notifications({ onBack, onNavigate }) {
   return (
     <div className="min-h-screen pb-24 bg-cream px-4 pt-6 max-w-md mx-auto">
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm text-ink-muted mb-4 min-h-11">
-        <Icon name="arrowLeft" size={16} /> Back
+        <Icon name="arrowLeft" size={16} /> {t('Back')}
       </button>
       <div className="flex justify-between items-end mb-5">
         <div>
           <p className="eyebrow text-[#6f655a]">Izaziso</p>
-          <h2 className="font-display font-bold text-2xl text-ink">Notifications</h2>
+          <h2 className="font-display font-bold text-2xl text-ink">{t('Notifications')}</h2>
         </div>
         {unread.length > 0 && (
-          <button type="button" onClick={markAllRead} className="text-xs text-sage-700 font-bold underline min-h-11">Mark all read</button>
+          <button type="button" onClick={markAllRead} className="text-xs text-sage-700 font-bold underline min-h-11">{t('Mark all read')}</button>
         )}
       </div>
 
@@ -109,18 +112,18 @@ function Notifications({ onBack, onNavigate }) {
           {[0, 1, 2, 3].map((i) => <div key={i} className="h-[68px] rounded-2xl bg-white/70 animate-pulse" />)}
         </div>
       ) : notifications.length === 0 ? (
-        <EmptyState image={MARK} title="No notifications" description="You're all caught up. Pledges, offers and orders will show up here." />
+        <EmptyState image={MARK} title={t('No notifications')} description={t("You're all caught up. Pledges, offers and orders will show up here.")} />
       ) : (
         <div className="space-y-5">
           {unread.length > 0 && (
             <section>
-              <p className="text-xs font-black uppercase tracking-widest text-ink-muted mb-2">New · {unread.length}</p>
+              <p className="text-xs font-black uppercase tracking-widest text-ink-muted mb-2">{t('New · {n}', { n: unread.length })}</p>
               <div className="space-y-2">{unread.map((n) => <NotificationRow key={n.id} n={n} onTap={handleTap} />)}</div>
             </section>
           )}
           {earlier.length > 0 && (
             <section>
-              <p className="text-xs font-black uppercase tracking-widest text-ink-muted mb-2">Earlier</p>
+              <p className="text-xs font-black uppercase tracking-widest text-ink-muted mb-2">{t('Earlier')}</p>
               <div className="space-y-2">{earlier.map((n) => <NotificationRow key={n.id} n={n} onTap={handleTap} />)}</div>
             </section>
           )}

@@ -1,0 +1,182 @@
+# isiXhosa: lines to review
+
+Every isiXhosa line in the app, beside the English it replaces. These are a
+draft, written without a first-language speaker. Please correct anything that
+is wrong, stiff or not how people in the Eastern Cape actually speak, in the
+last column, and it will be changed in `src/i18n/xh.js`.
+
+Notes:
+- The bottom bar must stay short (six tabs share a phone's width): Ekhaya,
+  Imisitho, Thenga, Imigalelo, Iziduko, Okunye.
+- Stokvels are called **Imigalelo** and Bulk Buy **Thenga**: are those the
+  words members would use?
+- Screens not yet translated stay in English. `{n}`, `{title}` and `{tab}`
+  are filled in by the app: keep them as they are.
+
+| English | isiXhosa (draft) | Correction |
+|---|---|---|
+| Home | Ekhaya | |
+| Ceremonies | Imisitho | |
+| Bulk Buy | Thenga | |
+| Stokvels | Imigalelo | |
+| Iziduko | Iziduko | |
+| More | Okunye | |
+| Back | Emva | |
+| Next | Okulandelayo | |
+| Skip | Tsiba | |
+| Open | Vula | |
+| See all | Bona konke | |
+| Try again | Zama kwakhona | |
+| Not now | Hayi okwangoku | |
+| Got it | Ndiyaqonda | |
+| Done | Kulungile | |
+| Notifications | Izaziso | |
+| What are we | Sibhiyozela | |
+| celebrating? | ntoni? | |
+| Pick a ceremony and get its plan: steps, roles, timeline and budget. | Khetha umsitho ufumane isicwangciso sawo: amanyathelo, imisebenzi, ixesha nohlahlo lwemali. | |
+| Wedding | Umtshato | |
+| Other | Omnye | |
+| No date yet | Akukabikho mhla | |
+| needs a date. | ufuna umhla. | |
+| Next: | Okulandelayo: | |
+| everything is ready | yonke into ilungile | |
+| 1 thing still to do | kusasele into e-1 | |
+| {n} things still to do | kusasele izinto ezi-{n} | |
+| Your profile | Iprofayile yakho | |
+| Needs you | Kulindele wena | |
+| You are all caught up. Nothing is waiting for you. | Akukho nto ikulindileyo okwangoku. | |
+| Set your security PIN | Seta i-PIN yakho yokhuseleko | |
+| Needed to approve payouts and confirm contributions | Iyafuneka ukuvuma iintlawulo nokuqinisekisa iminikelo | |
+| Your stokvel needs your decision | Umgalelo wakho ulinde isigqibo sakho | |
+| 1 approval waiting | Isivumelwano esi-1 silindile | |
+| {n} approvals waiting | Izivumelwano ezi-{n} zilindile | |
+| 1 new notification | Isaziso esitsha esi-1 | |
+| {n} new notifications | Izaziso ezitsha ezi-{n} | |
+| Pledges, orders and messages | Izithembiso, ii-odolo nemiyalezo | |
+| Finish your order | Gqibezela i-odolo yakho | |
+| 1 item waiting in your basket | Into e-1 ilinde engobozini yakho | |
+| {n} items waiting in your basket | Izinto ezi-{n} zilinde engobozini yakho | |
+| Give {title} a date | Nika u-{title} umhla | |
+| Family can plan around it once it has one | Usapho lungacwangcisa ngokwawo xa sele unawo | |
+| Your ceremonies | Imisitho yakho | |
+| Plan a ceremony | Cwangcisa umsitho | |
+| Date passed | Umhla udlulile | |
+| Your clan | Isiduko sakho | |
+| Coming up in your clan | Okuzayo esidukweni sakho | |
+| When someone in your clan plans a ceremony, it appears here. | Xa umntu wesiduko sakho ecwangcisa umsitho, uya kuvela apha. | |
+| I'm coming | Ndiyeza | |
+| Coming ✓ | Ndiyeza ✓ | |
+| Save and buy together | Yonga uthenge kunye | |
+| Start one, or join with an invite link | Qalisa omnye, okanye ujoyine ngekhonkco lesimemo | |
+| Drinks, meat and groceries at bulk prices | Iziselo, inyama nokutya ngamaxabiso amaninzi | |
+| Start | Qala | |
+| Shop | Thenga | |
+| Basket | Ingobozi | |
+| Group orders near you could not load. | Ii-odolo zamaqela ezikufutshane azikwazanga ukulayisha. | |
+| Everything else still works. Try again in a moment. | Yonke enye into isasebenza. Zama kwakhona kamva kancinci. | |
+| Near you | Kufuphi nawe | |
+| Group orders filling now | Ii-odolo zamaqela ezizalisekayo ngoku | |
+| Explore the House of AmaXhosa → | Hlola iNdlu yamaXhosa → | |
+| Together we build greatness. | Kunye sakha ubukhulu. | |
+| Our own seed capital, owned by the community. Pledge from R1 → | Imali yethu yokuqalisa, yeyoluntu. Thembisa ukusuka ku-R1 → | |
+| Add i-Camagu to your phone | Faka i-Camagu efowunini yakho | |
+| Add to phone | Faka efowunini | |
+| Get notifications on this phone | Fumana izaziso kule fowuni | |
+| Know straight away when someone pledges, your stokvel needs your approval, or your order is ready. | Yazi kwangoko xa umntu ethembisa, umgalelo wakho ufuna imvume yakho, okanye i-odolo yakho ilungile. | |
+| Notifications are on for this phone | Izaziso zivuliwe kule fowuni | |
+| You will hear from i-Camagu even when the app is closed. | Uya kufumana iindaba ze-i-Camagu nokuba i-app ivaliwe. | |
+| Notifications are blocked | Izaziso zivaliwe | |
+| Turn on | Vula | |
+| Turning on… | Iyavula… | |
+| Turn off for this phone | Zivale kule fowuni | |
+| Turning off… | Iyavala… | |
+| Open it from your home screen like any app, and get notifications on your iPhone. | Yivule kwisikrini sakho sasekhaya njengayo nayiphi na i-app, ufumane nezaziso kwi-iPhone yakho. | |
+| Open it from your home screen like any app, even on a slow connection. | Yivule kwisikrini sakho sasekhaya njengayo nayiphi na i-app, nokuba i-intanethi icothayo. | |
+| Tap | Cofa | |
+| at the bottom of Safari | ezantsi kwi-Safari | |
+| Choose | Khetha | |
+| Open i-Camagu from your Home Screen | Vula i-Camagu kwisikrini sakho sasekhaya | |
+| On iPhone, first add i-Camagu to your Home Screen: tap Share, then "Add to Home Screen". Open it from there and turn notifications on. | Kwi-iPhone, qala ufake i-Camagu kwisikrini sasekhaya: cofa u-Share, emva koko u-"Add to Home Screen". Yivule apho uze uvule izaziso. | |
+| Open Settings, then Notifications, then i-Camagu, and allow notifications. Then come back here. | Vula u-Settings, emva koko u-Notifications, emva koko i-Camagu, uvumele izaziso. Uze ubuyele apha. | |
+| Allow notifications for i-Camagu in your browser or phone settings, then come back here. | Vumela izaziso ze-i-Camagu kwiisetingi zebhrawuza okanye zefowuni yakho, uze ubuyele apha. | |
+| Mark all read | Phawula zonke njengezifundiweyo | |
+| New · {n} | Ezintsha · {n} | |
+| Earlier | Ezidlulileyo | |
+| No notifications | Akukho zaziso | |
+| You're all caught up. Pledges, offers and orders will show up here. | Akukho nto intsha. Izithembiso, izithembiso zabathengisi nee-odolo ziya kuvela apha. | |
+| Just now | Ngoku nje | |
+| {n} min ago | imizuzu eyi-{n} eyadlulayo | |
+| {n} h ago | iiyure ezi-{n} ezadlulayo | |
+| Yesterday | Izolo | |
+| One place for your family’s life | Indawo enye yobomi bosapho lwakho | |
+| i-Camagu brings together your ceremonies, your clan, your saving and your buying. Each part helps the others, so nothing is planned alone. | i-Camagu idibanisa imisitho yakho, isiduko sakho, ukonga kwakho nokuthenga kwakho. Icandelo ngalinye linceda amanye, ngoko akukho nto icwangciswa wedwa. | |
+| Plan every ceremony, step by step | Cwangcisa umsitho ngamnye, inyathelo ngenyathelo | |
+| Imbeleko, ulwaluko and umgidi, umtshato and more: what to do and when, what to buy, and what it costs. Family can help plan, and nothing changes without your approval. Your ukugida book is kept with it. | Imbeleko, ulwaluko nomgidi, umtshato nokunye: into ekufuneka yenziwe nanini, into ekufuneka ithengwe, nexabiso layo. Usapho lunokunceda ukucwangcisa, kwaye akukho nto itshintshayo ngaphandle kwemvume yakho. Incwadi yakho yokugida igcinwa kunye nawo. | |
+| Your isiduko is your root | Isiduko sakho yingcambu yakho | |
+| Find your people through your clan names. Your clan can see your ceremony and say "I’m coming", so you know who to plan for. | Fumana abantu bakho ngeziduko zakho. Isiduko sakho singawubona umsitho wakho sithi "Ndiyeza", ukuze wazi ukuba ucwangcisela bani. | |
+| Save with your stokvel | Yonga nomgalelo wakho | |
+| Umgalelo, burial society, grocery or family saving: track who paid and pay out fairly. Link a stokvel to a ceremony and see what it is saving for. | Umgalelo, umbutho wokungcwaba, owokutya okanye ukonga kosapho: landela ukuba ngubani ohlawulileyo, uhlawule ngobulungisa. Qhagamshela umgalelo nomsitho, ubone ukuba wongela ntoni. | |
+| Buy together, pay less | Thengani kunye, nihlawule kancinci | |
+| SmartMatch joins what you need with what many other families and stokvels need, into one big order at the bulk price. You pay only once the group reaches its bulk tier. | I-SmartMatch idibanisa oko ukufunayo nokufunwa ziintsapho nemigalelo emininzi, ibe yi-odolo enkulu enye ngexabiso elikhulu. Uhlawula kuphela xa iqela lifike kwinqanaba lalo. | |
+| Show me | Ndibonise | |
+| Start with a ceremony | Qala ngomsitho | |
+| Open {tab} → | Vula {tab} → | |
+| Your whole i-Camagu | Yonke i-Camagu yakho | |
+| Search, e.g. umqombothi, clan, orders | Khangela, umz. umqombothi, isiduko, ii-odolo | |
+| Add your iziduko so your clan can find you | Faka iziduko zakho ukuze isiduko sakho sikufumane | |
+| Your clan, your history, your people. | Isiduko sakho, imbali yakho, abantu bakho. | |
+| Everything to run the day the way it should be run. | Yonke into yokuqhuba umsitho ngendlela efanelekileyo. | |
+| Orders, spending and the people who serve our ceremonies. | Ii-odolo, inkcitho nabantu abasebenzela imisitho yethu. | |
+| Your clan, its praises and your bloodline | Isiduko sakho, izibongo zaso nomnombo wakho | |
+| Clan groups | Amaqela esiduko | |
+| Talk and plan with your clan | Thetha ucwangcise nesiduko sakho | |
+| House of AmaXhosa | Indlu yamaXhosa | |
+| History, kings and legends | Imbali, ookumkani namagorha | |
+| Family archive | Uvimba wosapho | |
+| Photos and family records | Iifoto neerekhodi zosapho | |
+| Ceremony templates | Iitemplate zemisitho | |
+| Ready-made plans to start from | Izicwangciso esezilungile zokuqala | |
+| Plans shared with me | Izicwangciso endabelwe zona | |
+| Help family plan their ceremony | Nceda usapho lucwangcise umsitho walo | |
+| Who brings what | Ngubani ozisa ntoni | |
+| Give each group its items | Nika iqela ngalinye izinto zalo | |
+| Gifts guests bring, and what you return | Izipho eziziswa ziindwendwe, nezo uzibuyisayo | |
+| Feast calculator | Isibali-sidlo | |
+| Meat, samp and vegetables for your guests | Inyama, umngqusho nemifuno yeendwendwe zakho | |
+| Umqombothi brewing | Ukwenza umqombothi | |
+| Steps and quantities | Amanyathelo nobungakanani | |
+| Preparing with the ingcibi | Ukulungiselela nengcibi | |
+| Ancestral rites | Amasiko ezinyanya | |
+| Each step and its meaning | Inyathelo ngalinye nentsingiselo yalo | |
+| My orders | Ii-odolo zam | |
+| Track your bulk orders | Landela ii-odolo zakho | |
+| My spending | Inkcitho yam | |
+| Where the money went | Apho imali iye khona | |
+| Healers, ingcibi & vendors | Amagqirha, iingcibi nabathengisi | |
+| Trusted traditional help | Uncedo lwesintu oluthembekileyo | |
+| Ekoyini mobile bar | Ibhari ehambayo ye-Ekoyini | |
+| Book a bar for your event | Buka ibhari yomsitho wakho | |
+| Sell on i-Camagu | Thengisa ku-i-Camagu | |
+| Supply stokvels and families | Bonelela imigalelo neentsapho | |
+| Profile | Iprofayile | |
+| Name, area and iziduko | Igama, indawo neziduko | |
+| My activity | Okwenzileyo | |
+| Everything you have done lately | Konke okwenze kutsha nje | |
+| Security PIN | I-PIN yokhuseleko | |
+| Protects payouts and approvals | Ikhusela iintlawulo nezivumelwano | |
+| Account & privacy | I-akhawunti nobumfihlo | |
+| Password, data and deletion | Iphasiwedi, idatha nokucima | |
+| Take the tour | Hamba nathi | |
+| How i-Camagu fits together | Indlela i-Camagu edibana ngayo | |
+| Help | Uncedo | |
+| Answers and support | Iimpendulo nenkxaso | |
+| Privacy policy | Umgaqo-nkqubo wobumfihlo | |
+| How we look after your data | Indlela esikhusela ngayo idatha yakho | |
+| Our own seed capital, owned by the community. Pledge from R1. | Imali yethu yokuqalisa, yeyoluntu. Thembisa ukusuka ku-R1. | |
+| Log out of i-Camagu? | Uphuma ku-i-Camagu? | |
+| Your stokvels and plans stay safe. You can sign back in any time. | Imigalelo nezicwangciso zakho zihlala zikhuselekile. Ungangena kwakhona nanini na. | |
+| Log out | Phuma | |
+| Yes, log out | Ewe, phuma | |
+| Stay | Hlala | |
+| ClanMatch | ClanMatch | |
+| Language | Ulwimi | |

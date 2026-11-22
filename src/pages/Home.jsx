@@ -13,6 +13,7 @@ import PhoneNotificationsCard from '../components/PhoneNotificationsCard.jsx'
 import InstallAppCard from '../components/InstallAppCard.jsx'
 import WelcomeTour, { TOUR_REQUEST_KEY, tourDoneKey } from '../components/WelcomeTour.jsx'
 import { useInstallOffer } from '../lib/installApp.js'
+import { longDay, useLanguage, useT } from '../i18n/index.jsx'
 
 // Founder-supplied photo: women in umbhaco celebrating at an umgidi.
 const HERO_IMAGE = 'https://hercules-cdn.com/file_wxyYBh6l6xbEhksr09BuCEsR'
@@ -90,8 +91,10 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
   const { done, total } = checklistCounts(lead)
   const remaining = Math.max(total - done, 0)
   const progress = total ? Math.round((done / total) * 100) : 0
-  const today = new Date().toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long' })
   const step = nextStep(lead)
+  const t = useT()
+  const { lang } = useLanguage()
+  const today = longDay(lang)
   // Your own ceremony's photo when you have one; the umgidi photo otherwise.
   const photo = lead ? ceremonyImage(lead.type) : HERO_IMAGE
 
@@ -109,7 +112,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
           <button
             type="button"
             onClick={() => onNavigate('notifications')}
-            aria-label={unreadNotifications > 0 ? `Notifications, ${unreadNotifications} new` : 'Notifications'}
+            aria-label={unreadNotifications > 0 ? `${t('Notifications')}, ${unreadNotifications}` : t('Notifications')}
             className="pressable relative flex h-11 w-11 items-center justify-center rounded-full border border-cream/30 bg-black/30 backdrop-blur-sm"
           >
             <Icon name="bell" size={19} color="#fffdf9" />
@@ -120,7 +123,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
           <button
             type="button"
             onClick={() => onNavigate('profile')}
-            aria-label="Your profile"
+            aria-label={t('Your profile')}
             className="pressable relative flex h-11 w-11 items-center justify-center rounded-full border-2 border-cream/40 bg-[#2e4a2e] text-sm font-extrabold"
           >
             {user?.profileImage
@@ -139,7 +142,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
               {focus.isHomecoming ? 'Umgidi' : lead.title}{' '}
               {days != null
                 ? <>is <em className="font-medium text-ochre-light">{describeCountdown(days)}.</em></>
-                : <em className="font-medium text-ochre-light">needs a date.</em>}
+                : <em className="font-medium text-ochre-light">{t('needs a date.')}</em>}
             </h1>
             <button
               type="button"
@@ -148,12 +151,12 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
             >
               <span className="min-w-0 flex-1">
                 <span className="block text-sm text-cream/85">
-                  {focus.date ? shortDate(focus.date, true) : 'No date yet'}
-                  {total > 0 && ` · ${remaining === 0 ? 'everything is ready' : `${plural(remaining, 'thing')} still to do`}`}
+                  {focus.date ? shortDate(focus.date, true) : t('No date yet')}
+                  {total > 0 && ` · ${remaining === 0 ? t('everything is ready') : remaining === 1 ? t('1 thing still to do') : t('{n} things still to do', { n: remaining })}`}
                 </span>
                 {step && (
                   <span className="mt-1 block truncate text-sm font-bold text-cream">
-                    <span className="text-cream/60">Next:</span> {step.label}
+                    <span className="text-cream/60">{t('Next:')}</span> {step.label}
                   </span>
                 )}
                 <span className="mt-2 block h-1 overflow-hidden rounded-full bg-cream/25">
@@ -161,16 +164,16 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
                 </span>
               </span>
               <span className="flex h-11 flex-shrink-0 items-center gap-1.5 rounded-full bg-cream px-4 text-sm font-extrabold text-ink">
-                Open <Icon name="arrowRight" size={15} />
+                {t('Open')} <Icon name="arrowRight" size={15} />
               </span>
             </button>
           </>
         ) : (
           <>
             <h1 className="mt-2 font-display text-[2.3rem] font-semibold leading-[1.02] tracking-tight text-balance">
-              What are we <em className="font-medium text-ochre-light">celebrating?</em>
+              {t('What are we')} <em className="font-medium text-ochre-light">{t('celebrating?')}</em>
             </h1>
-            <p className="mt-2 text-sm text-cream/85">Pick a ceremony and get its plan: steps, roles, timeline and budget.</p>
+            <p className="mt-2 text-sm text-cream/85">{t('Pick a ceremony and get its plan: steps, roles, timeline and budget.')}</p>
             <div className="mt-4 flex flex-wrap gap-2">
               {QUICK_START.map((q) => (
                 <button
@@ -179,11 +182,11 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
                   onClick={() => (onOpenType ? onOpenType(q.type) : onNavigate('ceremonyhub'))}
                   className="pressable flex h-11 items-center rounded-full bg-cream px-4 text-sm font-extrabold text-ink"
                 >
-                  {q.label}
+                  {t(q.label)}
                 </button>
               ))}
               <button type="button" onClick={() => onNavigate('ceremonyhub')} className="pressable flex h-11 items-center gap-1.5 rounded-full border border-cream/40 px-4 text-sm font-extrabold text-cream">
-                Other <Icon name="arrowRight" size={15} />
+                {t('Other')} <Icon name="arrowRight" size={15} />
               </button>
             </div>
           </>
@@ -196,6 +199,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
 // ---------- Needs you: a layered deck rising out of the hero ----------
 
 function NeedsYou({ items, loading }) {
+  const t = useT()
   const shown = items.slice(0, 3)
   const extra = items.length - shown.length
 
@@ -207,7 +211,7 @@ function NeedsYou({ items, loading }) {
 
       <div className="relative overflow-hidden rounded-[24px] bg-[#fffdf9] shadow-[0_24px_48px_-28px_rgba(43,30,18,0.65)]">
         <div className="flex items-center justify-between gap-3 border-b border-ink/[0.06] px-4 py-3">
-          <Eyebrow>Needs you</Eyebrow>
+          <Eyebrow>{t('Needs you')}</Eyebrow>
           {!loading && items.length > 0 && (
             <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-extrabold text-cream">{items.length}</span>
           )}
@@ -223,7 +227,7 @@ function NeedsYou({ items, loading }) {
             <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[12px] bg-sage-100 text-sage-600">
               <Icon name="check" size={17} strokeWidth={2.4} />
             </span>
-            <p className="text-sm font-bold text-ink">You are all caught up. Nothing is waiting for you.</p>
+            <p className="text-sm font-bold text-ink">{t('You are all caught up. Nothing is waiting for you.')}</p>
           </div>
         ) : (
           <ul>
@@ -259,12 +263,13 @@ function NeedsYou({ items, loading }) {
 // ---------- Your ceremonies: details rise out of each photo ----------
 
 function CeremonyCard({ ceremony, onOpen }) {
+  const t = useT()
   // Ulwaluko counts down to umgidi once he has gone in.
   const focus = focusDate(ceremony)
   const days = daysUntil(focus.date)
   const badge = days != null
     ? `${focus.isHomecoming ? 'Umgidi ' : ''}${focus.isHomecoming ? describeCountdown(days) : capitalise(describeCountdown(days))}`
-    : ceremony.eventDate ? 'Date passed' : 'No date yet'
+    : ceremony.eventDate ? t('Date passed') : t('No date yet')
   const { done, total } = checklistCounts(ceremony)
   const progress = total ? Math.round((done / total) * 100) : 0
   const soon = days != null && days <= 14
@@ -296,9 +301,10 @@ function CeremonyCard({ ceremony, onOpen }) {
 }
 
 function CeremonyRail({ ceremonies, loading, onSelectCeremony, onNavigate }) {
+  const t = useT()
   return (
     <section aria-label="Your ceremonies" className="mt-12">
-      <SectionTitle eyebrow="Imisebenzi yakho" title="Your ceremonies" actionLabel={ceremonies.length ? 'See all' : null} onAction={() => onNavigate('ceremonyhub')} />
+      <SectionTitle eyebrow="Imisebenzi yakho" title={t('Your ceremonies')} actionLabel={ceremonies.length ? t('See all') : null} onAction={() => onNavigate('ceremonyhub')} />
       <ul className="flex snap-x gap-3 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {loading && [0, 1].map((i) => (
           <li key={i} className="w-[208px] flex-shrink-0"><Skeleton className="h-[200px] w-full rounded-[22px]" /></li>
@@ -314,7 +320,7 @@ function CeremonyRail({ ceremonies, loading, onSelectCeremony, onNavigate }) {
               className="pressable flex h-[200px] w-full flex-col items-center justify-center gap-2 rounded-[22px] border-2 border-dashed border-ink/15 text-center"
             >
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2e4a2e] text-2xl font-light leading-none text-white">+</span>
-              <span className="px-3 text-sm font-extrabold text-ink">Plan a ceremony</span>
+              <span className="px-3 text-sm font-extrabold text-ink">{t('Plan a ceremony')}</span>
             </button>
           </li>
         )}
@@ -326,6 +332,7 @@ function CeremonyRail({ ceremonies, loading, onSelectCeremony, onNavigate }) {
 // ---------- Clan: dark panel, date tiles step out of their rows ----------
 
 function ClanPanel({ user, clanCeremonies, onNavigate }) {
+  const t = useT()
   const clan = user?.paternalIziduko
   return (
     <section aria-label="Your clan" className="relative mx-4 mt-10 overflow-hidden rounded-[28px] bg-[#1f3320] text-cream">
@@ -334,7 +341,7 @@ function ClanPanel({ user, clanCeremonies, onNavigate }) {
           <div className="min-w-0">
             <Eyebrow tone="text-cream/60">Abantu bakho{clan ? ` · ${clan}` : ''}</Eyebrow>
             <h2 className="mt-0.5 font-display text-[1.35rem] font-semibold leading-tight">
-              {clanCeremonies.length ? 'Coming up in your clan' : 'Your clan'}
+              {clanCeremonies.length ? t('Coming up in your clan') : t('Your clan')}
             </h2>
           </div>
           <button type="button" onClick={() => onNavigate('clangroups')} className="pressable flex-shrink-0 pb-0.5 text-sm font-extrabold text-cream/80 underline-offset-4 hover:underline">
@@ -370,7 +377,7 @@ function ClanPanel({ user, clanCeremonies, onNavigate }) {
             })}
           </ul>
         ) : (
-          <p className="mt-2 text-sm leading-relaxed text-[#c9bfb2]">When someone in your clan plans a ceremony, it appears here.</p>
+          <p className="mt-2 text-sm leading-relaxed text-[#c9bfb2]">{t('When someone in your clan plans a ceremony, it appears here.')}</p>
         )}
 
         <div className="mt-4 grid grid-cols-2 gap-2.5">
@@ -393,6 +400,7 @@ function ClanRsvp({ ceremony }) {
   const [answer, setAnswer] = useState(ceremony.myRsvp)
   const [asking, setAsking] = useState(false)
   const [busy, setBusy] = useState(false)
+  const t = useT()
   const send = async (coming, guests = 1) => {
     setBusy(true)
     try {
@@ -419,13 +427,13 @@ function ClanRsvp({ ceremony }) {
   if (answer?.coming) {
     return (
       <button type="button" disabled={busy} onClick={() => send(false)} aria-label="Coming. Tap if you can no longer come" className="pressable flex-shrink-0 rounded-full bg-cream/15 px-3 py-1.5 text-[12px] font-extrabold text-cream">
-        Coming ✓{answer.guests > 1 ? ` · ${answer.guests}` : ''}
+        {t('Coming ✓')}{answer.guests > 1 ? ` · ${answer.guests}` : ''}
       </button>
     )
   }
   return (
     <button type="button" disabled={busy} onClick={() => setAsking(true)} className="pressable flex-shrink-0 rounded-full bg-cream px-3 py-1.5 text-[12px] font-extrabold text-[#1f3320]">
-      I'm coming
+      {t("I'm coming")}
     </button>
   )
 }
@@ -433,30 +441,31 @@ function ClanRsvp({ ceremony }) {
 // ---------- Save and buy together: icon discs break out of the tiles ----------
 
 function MoneyTiles({ stokvels, totalSaved, pools, basketCount, onNavigate }) {
+  const t = useT()
   const tiles = [
     {
       id: 'stokvels',
       bg: 'bg-[#2e4a2e] text-cream', sub: 'text-cream/85', disc: 'bg-[#b9d3b0] text-[#1f3320]', icon: 'coins',
-      title: 'Stokvels',
-      detail: stokvels.length ? `${plural(stokvels.length, 'stokvel')} · ${rand(totalSaved)} saved` : 'Start one, or join with an invite link',
-      action: stokvels.length ? 'Open' : 'Start',
+      title: t('Stokvels'),
+      detail: stokvels.length ? `${plural(stokvels.length, 'stokvel')} · ${rand(totalSaved)} saved` : t('Start one, or join with an invite link'),
+      action: stokvels.length ? t('Open') : t('Start'),
       onOpen: () => onNavigate('stokvels'),
     },
     {
       id: 'store',
       bg: 'bg-[#fffdf9] text-ink shadow-soft', sub: 'text-ink-muted', disc: 'bg-[#1f3320] text-cream', icon: 'cart',
-      title: 'Bulk Buy',
+      title: t('Bulk Buy'),
       detail: basketCount > 0
         ? `${plural(basketCount, 'item')} in your basket`
-        : pools.length ? `${plural(pools.length, 'group order')} near you` : 'Drinks, meat and groceries at bulk prices',
-      action: basketCount > 0 ? 'Basket' : 'Shop',
+        : pools.length ? `${plural(pools.length, 'group order')} near you` : t('Drinks, meat and groceries at bulk prices'),
+      action: basketCount > 0 ? t('Basket') : t('Shop'),
       onOpen: () => onNavigate(basketCount > 0 ? 'basket' : 'store'),
     },
   ]
 
   return (
     <section aria-label="Save and buy together" className="mt-12">
-      <SectionTitle eyebrow="Yonga · Thenga kunye" title="Save and buy together" />
+      <SectionTitle eyebrow="Yonga · Thenga kunye" title={t('Save and buy together')} />
       <div className="grid grid-cols-2 gap-3 px-5 pt-3">
         {tiles.map((tile) => (
           <button key={tile.id} type="button" onClick={tile.onOpen} className={`pressable relative flex min-h-[132px] flex-col justify-end rounded-[22px] ${tile.bg} px-4 pb-3.5 pt-8 text-left`}>
@@ -485,6 +494,7 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
   const [loading, setLoading] = useState(true)
   const [hasPinSet, setHasPinSet] = useState(true)
   const installOffer = useInstallOffer()
+  const t = useT()
   const [showTour, setShowTour] = useState(false)
 
   // The welcome tour: once, for a member with no ceremony or stokvel yet,
@@ -547,11 +557,11 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
   // One list of what is waiting for this person, across the whole app.
   const needs = []
   if (pendingApprovals > 0) {
-    needs.push({ id: 'approvals', icon: 'shieldCheck', tile: 'bg-sage-100 text-sage-700', title: `${plural(pendingApprovals, 'approval')} waiting`, detail: 'Your stokvel needs your decision', onOpen: () => onNavigate('stokvels') })
+    needs.push({ id: 'approvals', icon: 'shieldCheck', tile: 'bg-sage-100 text-sage-700', title: pendingApprovals === 1 ? t('1 approval waiting') : t('{n} approvals waiting', { n: pendingApprovals }), detail: t('Your stokvel needs your decision'), onOpen: () => onNavigate('stokvels') })
   }
   if (!hasPinSet && !pinDismissed) {
     needs.push({
-      id: 'pin', icon: 'key', tile: 'bg-[#1f3320] text-ochre-light', title: 'Set your security PIN', detail: 'Needed to approve payouts and confirm contributions',
+      id: 'pin', icon: 'key', tile: 'bg-[#1f3320] text-ochre-light', title: t('Set your security PIN'), detail: t('Needed to approve payouts and confirm contributions'),
       onOpen: () => onNavigate('pin'),
       onDismiss: () => {
         try { if (pinDismissKey) localStorage.setItem(pinDismissKey, '1') } catch { /* storage unavailable */ }
@@ -560,13 +570,13 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
     })
   }
   if (basketCount > 0) {
-    needs.push({ id: 'basket', icon: 'cart', tile: 'bg-[#f3e6cf] text-[#a3471a]', title: 'Finish your order', detail: `${plural(basketCount, 'item')} waiting in your basket`, onOpen: () => onNavigate('basket') })
+    needs.push({ id: 'basket', icon: 'cart', tile: 'bg-[#f3e6cf] text-[#a3471a]', title: t('Finish your order'), detail: basketCount === 1 ? t('1 item waiting in your basket') : t('{n} items waiting in your basket', { n: basketCount }), onOpen: () => onNavigate('basket') })
   }
   if (lead && !lead.eventDate) {
-    needs.push({ id: 'date', icon: 'calendar', tile: 'bg-[#f6e2d6] text-terracotta-dark', title: `Give ${lead.title} a date`, detail: 'Family can plan around it once it has one', onOpen: () => onSelectCeremony?.(lead.id) })
+    needs.push({ id: 'date', icon: 'calendar', tile: 'bg-[#f6e2d6] text-terracotta-dark', title: t('Give {title} a date', { title: lead.title }), detail: t('Family can plan around it once it has one'), onOpen: () => onSelectCeremony?.(lead.id) })
   }
   if (unreadNotifications > 0) {
-    needs.push({ id: 'notifications', icon: 'bell', tile: 'bg-cream-dark text-ink', title: `${plural(unreadNotifications, 'new notification')}`, detail: 'Pledges, orders and messages', onOpen: () => onNavigate('notifications') })
+    needs.push({ id: 'notifications', icon: 'bell', tile: 'bg-cream-dark text-ink', title: unreadNotifications === 1 ? t('1 new notification') : t('{n} new notifications', { n: unreadNotifications }), detail: t('Pledges, orders and messages'), onOpen: () => onNavigate('notifications') })
   }
 
   return (
@@ -596,18 +606,18 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
 
       {feedError && (
         <div role="status" className="mx-5 mt-6 rounded-[20px] bg-[#fffdf9] p-4 shadow-soft">
-          <p className="text-sm font-bold text-ink">Group orders near you could not load.</p>
-          <p className="mt-1 text-xs text-ink-muted">Everything else still works. Try again in a moment.</p>
-          <button type="button" onClick={() => refreshPools()} className="mt-3 min-h-11 rounded-full bg-terracotta-dark px-4 text-sm font-bold text-white">Try again</button>
+          <p className="text-sm font-bold text-ink">{t('Group orders near you could not load.')}</p>
+          <p className="mt-1 text-xs text-ink-muted">{t('Everything else still works. Try again in a moment.')}</p>
+          <button type="button" onClick={() => refreshPools()} className="mt-3 min-h-11 rounded-full bg-terracotta-dark px-4 text-sm font-bold text-white">{t('Try again')}</button>
         </div>
       )}
 
       {pools.length > 0 && (
         <section aria-label="Group orders near you" className="mt-10">
           <SectionTitle
-            eyebrow={location.label ? `Near ${location.label}` : 'Near you'}
-            title="Group orders filling now"
-            actionLabel="See all"
+            eyebrow={location.label ? `Near ${location.label}` : t('Near you')}
+            title={t('Group orders filling now')}
+            actionLabel={t('See all')}
             onAction={() => onNavigate('store')}
           />
           <div className="px-5">
@@ -624,7 +634,7 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
         <div className="relative overflow-hidden rounded-[24px] rounded-tl-[8px] bg-[#fffdf9] p-5 shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
           <DidYouKnow />
           <button type="button" onClick={() => onNavigate('legends')} className="pressable mt-3 text-sm font-extrabold text-terracotta-dark">
-            Explore the House of AmaXhosa →
+            {t('Explore the House of AmaXhosa →')}
           </button>
         </div>
       </section>
@@ -636,8 +646,8 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
         className="pressable relative mx-4 mt-8 block w-[calc(100%-2rem)] overflow-hidden rounded-[24px] bg-[#fffdf9] p-5 text-left text-ink shadow-soft"
       >
         <span className="relative block text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#6f655a]">Ubuhlanti · Shrine Fund</span>
-        <span className="relative mt-1 block font-display text-[1.3rem] font-semibold leading-tight">Together we build greatness.</span>
-        <span className="relative mt-1 block text-[13px] text-ink-muted">Our own seed capital, owned by the community. Pledge from R1 →</span>
+        <span className="relative mt-1 block font-display text-[1.3rem] font-semibold leading-tight">{t('Together we build greatness.')}</span>
+        <span className="relative mt-1 block text-[13px] text-ink-muted">{t('Our own seed capital, owned by the community. Pledge from R1 →')}</span>
       </button>
 
       <p className="mt-10 text-center font-display text-sm italic text-ink-muted">Umntu ngumntu ngabantu</p>

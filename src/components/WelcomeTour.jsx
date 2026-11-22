@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Icon from './Icon.jsx'
+import { useT } from '../i18n/index.jsx'
 
 // The first-visit tour: i-Camagu as one vehicle (docs/VISION.md). Your
 // ceremony, your clan, your saving and your buying, each step saying how it
@@ -51,6 +52,7 @@ const STEPS = [
 
 export default function WelcomeTour({ onClose, onNavigate }) {
   const [step, setStep] = useState(0)
+  const t = useT()
   const nextRef = useRef(null)
   const current = STEPS[step]
   const last = step === STEPS.length - 1
@@ -73,7 +75,7 @@ export default function WelcomeTour({ onClose, onNavigate }) {
               <span key={s.eyebrow} className={`h-1.5 rounded-full transition-all ${i === step ? 'w-6 bg-[#1f3320]' : i < step ? 'w-1.5 bg-[#1f3320]/50' : 'w-1.5 bg-ink/15'}`} />
             ))}
           </div>
-          <button type="button" onClick={onClose} className="min-h-11 px-2 text-[13px] font-semibold text-ink-muted">Skip</button>
+          <button type="button" onClick={onClose} className="min-h-11 px-2 text-[13px] font-semibold text-ink-muted">{t('Skip')}</button>
         </div>
 
         <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1f3320]/[0.07]">
@@ -82,28 +84,28 @@ export default function WelcomeTour({ onClose, onNavigate }) {
             : <Icon name={current.icon} size={26} color="#1f3320" />}
         </span>
         <p className="mt-4 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">{current.eyebrow}</p>
-        <h2 id="welcome-tour-title" className="mt-1 font-display text-[24px] font-bold leading-tight text-ink">{current.title}</h2>
-        <p className="mt-2 min-h-[110px] text-[15px] leading-relaxed text-ink-muted">{current.body}</p>
+        <h2 id="welcome-tour-title" className="mt-1 font-display text-[24px] font-bold leading-tight text-ink">{t(current.title)}</h2>
+        <p className="mt-2 min-h-[110px] text-[15px] leading-relaxed text-ink-muted">{t(current.body)}</p>
 
         {current.screen && (
           <button type="button" onClick={() => open(current.screen)} className="min-h-11 text-[13px] font-bold text-[#1f3320] underline underline-offset-4">
-            Open {current.tab} →
+            {t('Open {tab} →', { tab: t(current.tab) })}
           </button>
         )}
 
         <div className="mt-4 flex gap-2">
           {step > 0 && (
             <button type="button" onClick={() => setStep(step - 1)} className="h-12 flex-1 rounded-full border border-ink/15 text-[15px] font-bold text-ink">
-              Back
+              {t('Back')}
             </button>
           )}
           {last ? (
             <button ref={nextRef} type="button" onClick={() => open('ceremonyhub')} className="h-12 flex-[2] rounded-full bg-terracotta-dark text-[15px] font-bold text-white">
-              Start with a ceremony
+              {t('Start with a ceremony')}
             </button>
           ) : (
             <button ref={nextRef} type="button" onClick={() => setStep(step + 1)} className="h-12 flex-[2] rounded-full bg-[#1f3320] text-[15px] font-bold text-white">
-              {step === 0 ? 'Show me' : 'Next'}
+              {step === 0 ? t('Show me') : t('Next')}
             </button>
           )}
         </div>

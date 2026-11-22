@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
+import { useT } from '../i18n/index.jsx'
 
 // "Add i-Camagu to your phone": shown once on Home (see useInstallOffer).
 // Android/desktop: the phone's own install prompt. iPhone: the three steps
@@ -8,6 +9,7 @@ import Icon from './Icon.jsx'
 // Screen.
 export default function InstallAppCard({ offer, className = '' }) {
   const [busy, setBusy] = useState(false)
+  const t = useT()
   if (!offer?.show) return null
   const ios = offer.kind === 'ios'
 
@@ -21,23 +23,23 @@ export default function InstallAppCard({ offer, className = '' }) {
       <div className="flex items-start gap-3">
         <img src="/images/brand/icon-128.png?v=3" alt="" width="40" height="40" className="h-10 w-10 flex-shrink-0 rounded-[11px]" />
         <div className="min-w-0 flex-1">
-          <p className="text-[15px] font-semibold leading-snug text-ink">Add i-Camagu to your phone</p>
+          <p className="text-[15px] font-semibold leading-snug text-ink">{t('Add i-Camagu to your phone')}</p>
           <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
-            Open it from your home screen like any app{ios ? ', and get notifications on your iPhone.' : ', even on a slow connection.'}
+            {ios ? t('Open it from your home screen like any app, and get notifications on your iPhone.') : t('Open it from your home screen like any app, even on a slow connection.')}
           </p>
           {ios && (
             <ol className="mt-3 space-y-2 text-[13px] text-ink">
               <li className="flex items-center gap-2">
                 <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#1f3320]/[0.08] text-[12px] font-bold text-[#1f3320]">1</span>
-                <span>Tap <span className="inline-flex translate-y-[3px] items-center" aria-label="Share"><ShareGlyph /></span> <b>Share</b> at the bottom of Safari</span>
+                <span>{t('Tap')} <span className="inline-flex translate-y-[3px] items-center" aria-label="Share"><ShareGlyph /></span> <b>Share</b> {t('at the bottom of Safari')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#1f3320]/[0.08] text-[12px] font-bold text-[#1f3320]">2</span>
-                <span>Choose <b>Add to Home Screen</b></span>
+                <span>{t('Choose')} <b>Add to Home Screen</b></span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#1f3320]/[0.08] text-[12px] font-bold text-[#1f3320]">3</span>
-                <span>Open i-Camagu from your Home Screen</span>
+                <span>{t('Open i-Camagu from your Home Screen')}</span>
               </li>
             </ol>
           )}
@@ -49,11 +51,11 @@ export default function InstallAppCard({ offer, className = '' }) {
                 onClick={install}
                 className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#1f3320] px-5 text-[13px] font-bold text-white disabled:opacity-60"
               >
-                <Icon name="plus" size={15} color="#fff" /> Add to phone
+                <Icon name="plus" size={15} color="#fff" /> {t('Add to phone')}
               </button>
             )}
             <button type="button" onClick={offer.dismiss} className="min-h-11 px-3 text-[13px] font-semibold text-ink-muted">
-              {ios ? 'Got it' : 'Not now'}
+              {ios ? t('Got it') : t('Not now')}
             </button>
           </div>
         </div>

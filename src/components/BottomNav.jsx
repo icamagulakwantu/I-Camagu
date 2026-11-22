@@ -1,6 +1,8 @@
 import Icon from './Icon.jsx'
+import { useT } from '../i18n/index.jsx'
 
 function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals = 0, unreadNotifications = 0 }) {
+  const t = useT()
   // Founder's order (20 Nov 2026). Ukugida, templates and the other tools
   // live inside a ceremony and in More; the clan is first on Home and More.
   const tabs = [
@@ -24,7 +26,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
                   <button
                     type="button"
                     onClick={() => onNavigate(tab.id)}
-                    aria-label={`${tab.label}${tab.english !== tab.label ? ` (${tab.english})` : ''}${tab.badge > 0 ? `, ${tab.badge} new` : ''}`}
+                    aria-label={`${t(tab.label)}${tab.english !== t(tab.label) ? ` (${tab.english})` : ''}${tab.badge > 0 ? `, ${tab.badge} new` : ''}`}
                     aria-current={active ? 'page' : undefined}
                     className="pressable flex min-h-[58px] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-[18px] px-0"
                   >
@@ -35,7 +37,7 @@ function BottomNav({ activeScreen, onNavigate, basketCount = 0, pendingApprovals
                       )}
                     </span>
                     <span className={`max-w-full truncate text-[10.5px] sm:text-xs leading-tight text-center ${active ? 'font-bold text-[#1f3320]' : 'font-medium text-ink-muted'}`}>
-                      {tab.label}
+                      {t(tab.label)}
                     </span>
                   </button>
                 </li>

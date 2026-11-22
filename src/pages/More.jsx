@@ -5,6 +5,7 @@ import Icon from '../components/Icon.jsx'
 import AncestralRites from './AncestralRites.jsx'
 import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 import { TOUR_REQUEST_KEY } from '../components/WelcomeTour.jsx'
+import { LANGUAGES, useLanguage, useT } from '../i18n/index.jsx'
 
 // One colour per kind of thing, matching Home:
 // terracotta = ceremony, sage = family & culture, ochre = money & services.
@@ -112,6 +113,7 @@ function GroupHeading({ title, english, color = '#2b2620' }) {
 }
 
 function ItemRow({ item, onOpen }) {
+  const t = useT()
   return (
     <button
       type="button"
@@ -122,8 +124,8 @@ function ItemRow({ item, onOpen }) {
         <Icon name={item.icon} size={17} color={item.color || MUTED} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-semibold text-ink">{item.label}</span>
-        {item.desc && <span className="block truncate text-xs text-ink-muted">{item.desc}</span>}
+        <span className="block truncate text-sm font-semibold text-ink">{t(item.label)}</span>
+        {item.desc && <span className="block truncate text-xs text-ink-muted">{t(item.desc)}</span>}
       </span>
       <Icon name="arrowRight" size={14} color={MUTED} />
     </button>
@@ -137,6 +139,8 @@ export default function More({ onNavigate }) {
   const [query, setQuery] = useState('')
   const [recent, setRecent] = useState(readRecent)
   const [confirmLogout, setConfirmLogout] = useState(false)
+  const t = useT()
+  const { lang, setLang } = useLanguage()
 
   const isAdmin = Boolean(user?.isAdmin)
   const listGroups = useMemo(() => LIST_GROUPS.filter((g) => !g.adminOnly || isAdmin), [isAdmin])
@@ -198,7 +202,7 @@ export default function More({ onNavigate }) {
         <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 to-[#1f3320]" />
         <div className="relative">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-cream/60">Konke okunye · Everything else</p>
-          <h1 className="mt-1 font-display text-[2rem] font-semibold leading-tight">Your whole i-Camagu</h1>
+          <h1 className="mt-1 font-display text-[2rem] font-semibold leading-tight">{t('Your whole i-Camagu')}</h1>
           {user && (
             <button
               type="button"
@@ -211,9 +215,9 @@ export default function More({ onNavigate }) {
                   : <span className="font-display text-xl font-semibold text-cream">{initials || <Icon name="user" size={22} color="#fffdf9" />}</span>}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-display text-lg font-semibold text-cream">{fullName || 'Your profile'}</span>
+                <span className="block truncate font-display text-lg font-semibold text-cream">{fullName || t('Your profile')}</span>
                 <span className="mt-0.5 block truncate text-xs text-cream/80">
-                  {user.paternalIziduko ? `Clan · ${user.paternalIziduko}` : 'Add your iziduko so your clan can find you'}
+                  {user.paternalIziduko ? `Clan · ${user.paternalIziduko}` : t('Add your iziduko so your clan can find you')}
                 </span>
               </span>
               <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-cream/10">
@@ -234,7 +238,7 @@ export default function More({ onNavigate }) {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search, e.g. umqombothi, clan, orders"
+            placeholder={t('Search, e.g. umqombothi, clan, orders')}
             className="h-14 w-full rounded-[20px] border border-ink/[0.06] bg-white pl-11 pr-11 text-[15px] shadow-[0_16px_36px_-18px_rgba(28,22,18,0.45)] focus:border-terracotta focus:outline-none"
           />
           {query && (
@@ -281,7 +285,7 @@ export default function More({ onNavigate }) {
                     <span className="flex h-7 w-7 items-center justify-center rounded-full" style={{ backgroundColor: item.color || MUTED }}>
                       <Icon name={item.icon} size={14} color="#ffffff" />
                     </span>
-                    <span className="whitespace-nowrap text-xs font-bold text-ink">{item.label}</span>
+                    <span className="whitespace-nowrap text-xs font-bold text-ink">{t(item.label)}</span>
                   </button>
                 ))}
               </div>
@@ -300,8 +304,8 @@ export default function More({ onNavigate }) {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[11px] font-extrabold uppercase tracking-[0.18em] text-cream/60">Ubuhlanti · Shrine Fund</span>
-                <span className="mt-1 block font-display text-[1.35rem] font-semibold leading-tight">Together we build greatness.</span>
-                <span className="mt-1.5 block text-[13px] leading-snug text-cream/80">Our own seed capital, owned by the community. Pledge from R1.</span>
+                <span className="mt-1 block font-display text-[1.35rem] font-semibold leading-tight">{t('Together we build greatness.')}</span>
+                <span className="mt-1.5 block text-[13px] leading-snug text-cream/80">{t('Our own seed capital, owned by the community. Pledge from R1.')}</span>
               </span>
             </span>
           </button>
@@ -311,7 +315,7 @@ export default function More({ onNavigate }) {
               <div className="px-2 pb-4 pt-2 text-ink">
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#6f655a]">{group.english}</p>
                 <h2 className="mt-0.5 font-display text-[1.45rem] font-semibold leading-tight">{group.title}</h2>
-                <p className="mt-0.5 text-[13px] text-ink-muted">{group.line}</p>
+                <p className="mt-0.5 text-[13px] text-ink-muted">{t(group.line)}</p>
               </div>
               <div className="grid grid-cols-2 gap-x-2.5 gap-y-5 pt-3">
                 {group.items.map((item, i) => (
@@ -328,8 +332,8 @@ export default function More({ onNavigate }) {
                     >
                       <Icon name={item.icon} size={20} color={group.color} />
                     </span>
-                    <span className="block text-[14px] font-bold leading-tight text-ink">{item.label}</span>
-                    <span className="mt-1 line-clamp-2 block text-[12px] leading-snug text-ink-muted">{item.desc}</span>
+                    <span className="block text-[14px] font-bold leading-tight text-ink">{t(item.label)}</span>
+                    <span className="mt-1 line-clamp-2 block text-[12px] leading-snug text-ink-muted">{t(item.desc)}</span>
                   </button>
                 ))}
               </div>
@@ -347,17 +351,39 @@ export default function More({ onNavigate }) {
         </>
       )}
 
+      {/* Language: English or isiXhosa, remembered on this phone. */}
+      <section className="mb-7" aria-label="Language">
+        <GroupHeading title="Ulwimi" english="Language" />
+        <div className="card-paper flex gap-1.5 p-1.5" role="radiogroup" aria-label="Language">
+          {LANGUAGES.map((l) => (
+            <button
+              key={l.id}
+              type="button"
+              role="radio"
+              aria-checked={lang === l.id}
+              onClick={() => setLang(l.id)}
+              className={`pressable h-11 flex-1 rounded-[14px] text-sm font-bold ${lang === l.id ? 'bg-[#1f3320] text-white' : 'text-ink'}`}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
+        {lang === 'xh' && (
+          <p className="mt-2 px-1 text-xs leading-relaxed text-ink-muted">Isiqalo: amanye amaphepha asesesiNgesini. Siyaqhubeka nokuguqulela.</p>
+        )}
+      </section>
+
       {/* Asks first: a stray tap on Log out is easy on a phone. */}
       {confirmLogout ? (
         <div className="card-paper mb-8 p-4">
-          <p className="text-sm font-bold text-ink">Log out of i-Camagu?</p>
-          <p className="mt-0.5 text-xs text-ink-muted">Your stokvels and plans stay safe. You can sign back in any time.</p>
+          <p className="text-sm font-bold text-ink">{t('Log out of i-Camagu?')}</p>
+          <p className="mt-0.5 text-xs text-ink-muted">{t('Your stokvels and plans stay safe. You can sign back in any time.')}</p>
           <div className="mt-3 flex gap-2">
             <button type="button" onClick={handleLogout} className="pressable flex-1 rounded-pill bg-terracotta py-2.5 text-sm font-bold text-white">
-              Yes, log out
+              {t('Yes, log out')}
             </button>
             <button type="button" onClick={() => setConfirmLogout(false)} className="pressable flex-1 rounded-pill bg-cream-dark py-2.5 text-sm font-bold text-ink">
-              Stay
+              {t('Stay')}
             </button>
           </div>
         </div>

@@ -16,6 +16,7 @@ import { PENDING_STOKVEL_KEY, PENDING_CLAN_KEY, PENDING_TEMPLATE_KEY, PENDING_PL
 // Home is the first screen, so it is loaded straight away.
 import Home from './pages/Home.jsx'
 import { SCREEN_PATHS } from '../shared/screenPaths.js'
+import { LanguageProvider } from './i18n/index.jsx'
 
 // Load feature screens on demand so first-time and returning mobile visits do not
 // download every ceremony, admin, and community screen before the home screen.
@@ -610,6 +611,7 @@ function NotificationTapListener() {
 
 export default function App() {
   return (
+    <LanguageProvider>
     <BrowserRouter>
       <NotificationTapListener />
       <OfflineBanner />
@@ -643,5 +645,6 @@ export default function App() {
       </Routes>
       </Suspense>
     </BrowserRouter>
+    </LanguageProvider>
   )
 }

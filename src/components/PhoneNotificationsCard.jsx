@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { isIos, pushStatus, turnOffPush, turnOnPush } from '../lib/push.js'
+import { useT } from '../i18n/index.jsx'
 
 const MARK = '/images/brand/mark-green-96.png'
 
@@ -24,6 +25,7 @@ function markPromptDone(userId) {
 
 export default function PhoneNotificationsCard({ className = '', prompt = false }) {
   const { accessToken, user } = useAuth()
+  const t = useT()
   const [status, setStatus] = useState(null)
   const [hidden, setHidden] = useState(() => prompt && (!user?.id || pushPromptDone(user.id)))
   const [busy, setBusy] = useState(false)
@@ -58,18 +60,18 @@ export default function PhoneNotificationsCard({ className = '', prompt = false 
     }
   }
 
-  let title = 'Get notifications on this phone'
-  let text = 'Know straight away when someone pledges, your stokvel needs your approval, or your order is ready.'
+  let title = t('Get notifications on this phone')
+  let text = t('Know straight away when someone pledges, your stokvel needs your approval, or your order is ready.')
   if (status === 'on') {
-    title = 'Notifications are on for this phone'
-    text = 'You will hear from i-Camagu even when the app is closed.'
+    title = t('Notifications are on for this phone')
+    text = t('You will hear from i-Camagu even when the app is closed.')
   } else if (status === 'needs-install') {
-    text = 'On iPhone, first add i-Camagu to your Home Screen: tap Share, then "Add to Home Screen". Open it from there and turn notifications on.'
+    text = t('On iPhone, first add i-Camagu to your Home Screen: tap Share, then "Add to Home Screen". Open it from there and turn notifications on.')
   } else if (status === 'blocked') {
-    title = 'Notifications are blocked'
+    title = t('Notifications are blocked')
     text = isIos()
-      ? 'Open Settings, then Notifications, then i-Camagu, and allow notifications. Then come back here.'
-      : 'Allow notifications for i-Camagu in your browser or phone settings, then come back here.'
+      ? t('Open Settings, then Notifications, then i-Camagu, and allow notifications. Then come back here.')
+      : t('Allow notifications for i-Camagu in your browser or phone settings, then come back here.')
   }
 
   return (
@@ -91,19 +93,19 @@ export default function PhoneNotificationsCard({ className = '', prompt = false 
                   onClick={() => run(turnOnPush)}
                   className="h-10 rounded-full bg-[#1f3320] px-5 text-[13px] font-bold text-white disabled:opacity-60"
                 >
-                  {busy ? 'Turning on…' : 'Turn on'}
+                  {busy ? t('Turning on…') : t('Turn on')}
                 </button>
               )}
               {prompt && (
                 <button type="button" onClick={dismiss} className="min-h-11 px-3 text-[13px] font-semibold text-ink-muted">
-                  {status === 'needs-install' ? 'Got it' : 'Not now'}
+                  {status === 'needs-install' ? t('Got it') : t('Not now')}
                 </button>
               )}
             </div>
           )}
           {prompt && status === 'on' && (
             <button type="button" onClick={() => setHidden(true)} className="mt-2 min-h-11 text-[13px] font-semibold text-ink-muted">
-              Done
+              {t('Done')}
             </button>
           )}
           {!prompt && status === 'on' && (
@@ -113,7 +115,7 @@ export default function PhoneNotificationsCard({ className = '', prompt = false 
               onClick={() => run(turnOffPush)}
               className="mt-2 min-h-11 text-[13px] font-semibold text-ink-muted underline disabled:opacity-60"
             >
-              {busy ? 'Turning off…' : 'Turn off for this phone'}
+              {busy ? t('Turning off…') : t('Turn off for this phone')}
             </button>
           )}
         </div>
