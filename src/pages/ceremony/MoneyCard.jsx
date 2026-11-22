@@ -1,7 +1,7 @@
 import { cn } from '../../lib/utils'
 import Bi from './Bi.jsx'
 import { LABELS, EXPLAIN_MONEY } from './wizardText.js'
-import { rand, randExact } from './format.js'
+import { rand } from './format.js'
 import { pressable } from './styles.js'
 import { useT } from '../../i18n/index.jsx'
 
@@ -18,7 +18,7 @@ export default function MoneyCard({ summary, budgetZAR, onEditBudget }) {
         <div>
           <div className="text-sm text-ink-muted"><Bi {...LABELS.spent} /></div>
           <p className="font-display font-bold text-3xl text-ink mt-1 tabular">
-            {randExact(summary.spent)}
+            {rand(summary.spent)}
             {hasBudget && <span className="text-sm font-normal text-ink-muted"> / {rand(budgetZAR)}</span>}
           </p>
         </div>
@@ -37,18 +37,18 @@ export default function MoneyCard({ summary, budgetZAR, onEditBudget }) {
         <div>
           <div className="text-xs text-ink-muted"><Bi {...(summary.overBudget ? LABELS.over : LABELS.left)} /></div>
           <p className={cn('font-black text-xl tabular mt-0.5', summary.overBudget ? 'text-terracotta' : 'text-sage-600')}>
-            {summary.remaining == null ? '-' : randExact(Math.abs(summary.remaining))}
+            {summary.remaining == null ? '-' : rand(Math.abs(summary.remaining))}
           </p>
         </div>
         <div>
           <div className="text-xs text-ink-muted"><Bi {...LABELS.stillToBuy} /></div>
-          <p className="font-black text-xl tabular text-ink mt-0.5">{randExact(summary.stillToPay)}</p>
+          <p className="font-black text-xl tabular text-ink mt-0.5">{rand(summary.stillToPay)}</p>
         </div>
       </div>
       <p className="text-xs text-ink-muted mt-3">
-        {t(LABELS.onList.en)}: <span className="font-bold text-ink">{randExact(summary.onList)}</span>
+        {t(LABELS.onList.en)}: <span className="font-bold text-ink">{rand(summary.onList)}</span>
         {' · '}
-        {t(LABELS.unexpected.en)}: <span className="font-bold text-ink">{randExact(summary.unforeseen)}</span>
+        {t(LABELS.unexpected.en)}: <span className="font-bold text-ink">{rand(summary.unforeseen)}</span>
       </p>
       <p className="text-xs text-ink-muted mt-1 leading-relaxed">
         {t(EXPLAIN_MONEY)}

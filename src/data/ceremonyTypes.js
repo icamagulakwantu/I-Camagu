@@ -9,7 +9,7 @@ export const CEREMONY_META = {
   UKUKHAPHA: { label: 'Ukukhapha', english: 'Accompanying the departed', desc: 'The rite that walks a loved one to the ancestors.', image: CEREMONY_IMAGE.UKUKHAPHA },
   INKOBE_ZIKA_MAMA: { label: 'Inkobe zikaMama', english: "Mother's harvest", desc: "A thanksgiving rite honouring a mother's provision.", image: CEREMONY_IMAGE.INKOBE_ZIKA_MAMA },
   UKUBUYISA: { label: 'Ukubuyisa', english: 'Bringing the spirit home', desc: 'A year on, the departed is called back to the homestead.', image: CEREMONY_IMAGE.UKUBUYISA },
-  UMSEBENZI_WEGQIRHA: { label: 'Umsebenzi weGqirha', english: "Healer's ritual", desc: "A ceremony marking a traditional healer's calling.", image: CEREMONY_IMAGE.UMSEBENZI_WEGQIRHA },
+  UMSEBENZI_WEGQIRHA: { label: 'Ukuphuthuma', english: "The igqirha's calling", desc: "The igqirha's work: ukuphuthuma, and the stages of the calling.", image: CEREMONY_IMAGE.UMSEBENZI_WEGQIRHA },
   IMBELEKO: { label: 'Imbeleko', english: 'Welcoming a child', desc: 'A child is introduced to the family and the ancestors by name.', image: CEREMONY_IMAGE.IMBELEKO },
   INTONJANE: { label: 'Intonjane', english: 'Coming of age', desc: 'A young woman’s rite into womanhood, led by the senior women.', image: CEREMONY_IMAGE.INTONJANE },
   WEDDING: { label: 'Wedding', english: 'Umtshato', desc: "Lobola talks, the handing over, and the two families' feast.", image: CEREMONY_IMAGE.WEDDING },

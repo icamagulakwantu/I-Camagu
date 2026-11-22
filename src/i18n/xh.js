@@ -411,6 +411,7 @@ const XH = {
   'Coming of age': 'Ukukhula',
   'Marriage celebration': 'Umbhiyozo womtshato',
   'Custom event': 'Umsebenzi wakho',
+  "The igqirha's calling": 'Ubizo lwegqirha',
   'General Event': 'Omnye umsebenzi',
 
   // The mother's guide: headings only. The guidance itself stays in English

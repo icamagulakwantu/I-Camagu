@@ -66,11 +66,14 @@ export default function ListRow({ row, showTick = true, busy, onToggle, onSavePr
               {t('Buy')}
             </button>
           )}
+          {/* "+ Paid" only where money is involved: a step such as written
+              consent is not a purchase, and a pay button on it makes the
+              list feel like a till slip. */}
           {row.actual != null ? (
             <button type="button" onClick={() => setEditing(true)} aria-label={t('Paid {amount}, change', { amount: rand(row.actual) })} className={cn('h-8 rounded-full bg-[#2e4a2e]/10 px-3 text-[12px] font-bold text-[#1f3320]', pressable)}>
               {t('Paid')} {rand(row.actual)}
             </button>
-          ) : (
+          ) : (row.suggested != null || row.cost) && (
             <button type="button" onClick={() => setEditing(true)} aria-label={t('Add what you paid for {item}', { item: row.label })} className={cn('h-8 rounded-full px-2.5 text-[12px] font-semibold text-ink-muted', pressable)}>
               {t('+ Paid')}
             </button>

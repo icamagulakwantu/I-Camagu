@@ -12,7 +12,7 @@ export const CEREMONY_META = {
   UKUKHAPHA: { name: 'Ukukhapha', desc: 'Ceremony planning', titleExample: 'Ukukhapha kukaVumile' },
   INKOBE_ZIKA_MAMA: { name: 'Inkobe zikaMama', desc: 'Ceremony planning', titleExample: 'Inkobe zikaNoluthando' },
   UKUBUYISA: { name: 'Ukubuyisa', desc: 'Ceremony planning', titleExample: 'Ukubuyisa kukaNomsa' },
-  UMSEBENZI_WEGQIRHA: { name: 'Umsebenzi weGqirha', desc: 'Ceremony planning', titleExample: 'Umsebenzi kaZanele' },
+  UMSEBENZI_WEGQIRHA: { name: 'Ukuphuthuma', desc: "The igqirha's calling", titleExample: 'Ukuphuthuma kukaZanele' },
   IMBELEKO: { name: 'Imbeleko', desc: 'Welcoming a child', titleExample: 'Imbeleko kaLuthando' },
   INTONJANE: { name: 'Intonjane', desc: 'Coming of age', titleExample: 'Intonjane kaAyanda' },
   WEDDING: { name: 'Wedding', desc: 'Marriage celebration', titleExample: "Sindiswa's Wedding" },

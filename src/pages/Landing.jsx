@@ -35,7 +35,7 @@ const CELEBRATIONS = [
   },
 ]
 
-const MORE_CEREMONIES = ['Imbeleko', 'Intonjane', 'Intambo Enkulu', 'Inkobe zikaMama', 'Ukubuyisa', 'Umsebenzi weGqirha', 'Ukukhapha']
+const MORE_CEREMONIES = ['Imbeleko', 'Intonjane', 'Intambo Enkulu', 'Inkobe zikaMama', 'Ukubuyisa', 'Ukuphuthuma', 'Ukukhapha']
 
 // The i-Camagu journey: every pillar, in the order a family lives it, ending
 // in what is kept forever.

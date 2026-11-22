@@ -104,7 +104,12 @@ const COST_RATES = {
     water_container_25l: 129.99,  // Mambo's 10 Sep 2026 (STALE — recheck required): 25L canister with tap R129.99 (25L polycan drum R55 at Foamy)
     matches_box: 15.00,
     candles_pack: 35.00,
-    lamp_paraffin: 120.00,
+    lamp_paraffin: 44.99,  // PriceCheck 22 Nov 2026: glass paraffin lamp, Superb Hyper
+    paraffin_5l: 119.99,  // PriceCheck 22 Nov 2026: Handyman's Paraffin 5L, Shoprite
+    solar_lantern: 165.00,  // PriceCheck 22 Nov 2026: LED solar lantern, takealot
+    wire_nails_1kg: 136.00,  // PriceCheck 22 Nov 2026: 75mm wire nails 1kg, takealot (R61-R187 elsewhere)
+    binding_wire_250g: 59.99,  // PriceCheck 22 Nov 2026: Starline 2mm binding wire, Shoprite/Checkers
+    rope_6mm_20m: 30.00,  // PriceCheck 22 Nov 2026: nylon rope 6mm x 20m
     dish_enamel: 45.00,
     cup_enamel: 25.00,
     spoon_metal: 15.00,
@@ -161,6 +166,25 @@ export const IBHOMA_TOOL_ITEMS = [
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Ipeki and shovel: clear the bushes and grass and make a patch' },
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Saw and hammer (with nails)' },
 ];
+// What else goes into building and lighting the ibhoma (founder, 22 Nov
+// 2026, checked against research on initiation huts): nails with beer
+// caps under them so the sail or plastic does not tear, binding wire and
+// rope, plastic where there is no sail, the paraffin lamp and its paraffin
+// (or a solar lantern), and buckets of water while the ibhoma is burnt.
+export const IBHOMA_EXTRA_ITEMS = [
+  { phase: 'IBHOMA_CONSTRUCTION', label: 'Nails (1kg wire nails) to fix the sail or plastic to the poles' },
+  { phase: 'IBHOMA_CONSTRUCTION', label: 'Beer bottle caps under the nails, so the sail or plastic does not tear' },
+  { phase: 'IBHOMA_CONSTRUCTION', label: 'Binding wire to tie the poles' },
+  { phase: 'IBHOMA_CONSTRUCTION', label: 'Rope to tie down the sail' },
+  { phase: 'IBHOMA_CONSTRUCTION', label: 'Black plastic sheeting, if there is no sail' },
+  { phase: 'DAILY_ESSENTIALS', label: 'Paraffin lamp' },
+  { phase: 'DAILY_ESSENTIALS', label: 'Paraffin (5L) for the lamp' },
+  { phase: 'DAILY_ESSENTIALS', label: 'Or a solar lantern: no flame near the sail' },
+  { phase: 'IBHOMA_CLOSURE', label: 'Buckets of water on hand while the ibhoma burns' },
+];
+// The old combined line, split so the lamp and its paraffin are their own rows.
+export const LAMP_RENAME = ['Matches, lamp/candles', 'Matches and candles'];
+
 export const UBUKRWALA_ITEMS = [
   { phase: 'UBUKRWALA', label: 'Amakrwala clothes: hat, jacket, shirt, trousers and shoes (often brown, beige or khaki)' },
 ];
@@ -179,10 +203,12 @@ const ULWALUKO_DEFAULT_ITEMS = [
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Poles for structure' },
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Cardboard for bedding base' },
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Axe, knife, wire/cable ties, firewood' },
+  ...IBHOMA_EXTRA_ITEMS.filter((i) => i.phase === 'IBHOMA_CONSTRUCTION'),
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Courtesy: a bottle of brandy and beers for the builders' },
   { phase: 'DAILY_ESSENTIALS', label: 'Dish, cup, spoon' },
   { phase: 'DAILY_ESSENTIALS', label: '25L water container' },
-  { phase: 'DAILY_ESSENTIALS', label: 'Matches, lamp/candles' },
+  { phase: 'DAILY_ESSENTIALS', label: 'Matches and candles' },
+  ...IBHOMA_EXTRA_ITEMS.filter((i) => i.phase === 'DAILY_ESSENTIALS'),
   { phase: 'DAILY_ESSENTIALS', label: 'A book' },
   // The first seven days: no salt and nothing watery, so the body stays dry
   // and the wound can dry and heal. Founder-confirmed, 17 Nov 2026.
@@ -194,6 +220,7 @@ const ULWALUKO_DEFAULT_ITEMS = [
   { phase: 'EXIT_PREPARATION', label: 'Fresh white blanket with black stripes' },
   { phase: 'EXIT_PREPARATION', label: 'Correct type of butter (confirm with family)' },
   { phase: 'IBHOMA_CLOSURE', label: 'Courtesy: the family pays the young men who burn the ibhoma with a bottle and beers' },
+  ...IBHOMA_EXTRA_ITEMS.filter((i) => i.phase === 'IBHOMA_CLOSURE'),
   { phase: 'RETURN_HOME', label: 'Arrange transport home' },
 ];
 
@@ -407,12 +434,20 @@ const ULWALUKO_COST_PROFILE = {
     { label: 'Poles for structure', category: 'supplies', unit: 'bundle', unitCost: COST_RATES.supplies.poles_bundle, quantity: 1, isInputField: true, inputType: 'number', skuName: 'Ibhoma Pole Bundle' },
     { label: 'Cardboard for bedding base', category: 'supplies', unit: 'bundle', unitCost: COST_RATES.supplies.cardboard_bedding, quantity: 2, isInputField: true, inputType: 'number' },
     { label: 'Axe, knife, wire/cable ties, firewood', category: 'supplies', unit: 'kit', unitCost: COST_RATES.supplies.axe + COST_RATES.supplies.knife_butcher + COST_RATES.supplies.cable_ties_pack + COST_RATES.supplies.firewood_bundle, quantity: 1, isInputField: true, inputType: 'number' },
+    { label: 'Nails (1kg wire nails) to fix the sail or plastic to the poles', category: 'supplies', unit: 'kg', unitCost: COST_RATES.supplies.wire_nails_1kg, quantity: 1, isInputField: true, inputType: 'number' },
+    { label: 'Beer bottle caps under the nails, so the sail or plastic does not tear', category: 'supplies', unit: 'handful', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Collect from family and friends' },
+    { label: 'Binding wire to tie the poles', category: 'supplies', unit: 'roll', unitCost: COST_RATES.supplies.binding_wire_250g, quantity: 1, isInputField: true, inputType: 'number' },
+    { label: 'Rope to tie down the sail', category: 'supplies', unit: 'roll', unitCost: COST_RATES.supplies.rope_6mm_20m, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '20m' },
+    { label: 'Black plastic sheeting, if there is no sail', category: 'supplies', unit: 'roll', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Price at your hardware store' },
     { label: 'Courtesy: a bottle of brandy and beers for the builders', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '1 brandy + 6 beers' },
   ],
   'DAILY_ESSENTIALS': [
     { label: 'Dish, cup, spoon', category: 'supplies', unit: 'set', unitCost: COST_RATES.supplies.dish_enamel + COST_RATES.supplies.cup_enamel + COST_RATES.supplies.spoon_metal, quantity: 1, isInputField: true, inputType: 'number' },
     { label: '25L water container', category: 'supplies', unit: 'container', unitCost: COST_RATES.supplies.water_container_25l, quantity: 2, isInputField: true, inputType: 'number', skuName: '25L Water Container' },
-    { label: 'Matches, lamp/candles', category: 'supplies', unit: 'kit', unitCost: COST_RATES.supplies.matches_box + COST_RATES.supplies.lamp_paraffin, quantity: 1, isInputField: true, inputType: 'number' },
+    { label: 'Matches and candles', category: 'supplies', unit: 'kit', unitCost: COST_RATES.supplies.matches_box + COST_RATES.supplies.candles_pack, quantity: 1, isInputField: true, inputType: 'number' },
+    { label: 'Paraffin lamp', category: 'supplies', unit: 'lamp', unitCost: COST_RATES.supplies.lamp_paraffin, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Keep it well away from the sail' },
+    { label: 'Paraffin (5L) for the lamp', category: 'supplies', unit: 'bottle', unitCost: COST_RATES.supplies.paraffin_5l, quantity: 1, isInputField: true, inputType: 'number' },
+    { label: 'Or a solar lantern: no flame near the sail', category: 'supplies', unit: 'lantern', unitCost: COST_RATES.supplies.solar_lantern, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Optional' },
     { label: 'A book', category: 'supplies', unit: 'book', unitCost: 0, quantity: 1, isInputField: true, inputType: 'text', suggestedAmount: 'Bring a journal or religious text' },
   ],
   'DIET_EARLY_STAGE': [
@@ -429,6 +464,7 @@ const ULWALUKO_COST_PROFILE = {
   ],
   'IBHOMA_CLOSURE': [
     { label: 'Courtesy: the family pays the young men who burn the ibhoma with a bottle and beers', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 12 beers' },
+    { label: 'Buckets of water on hand while the ibhoma burns', category: 'supplies', unit: 'bucket', unitCost: 0, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: 'Use the 25L containers' },
   ],
   'RETURN_HOME': [
     { label: 'Arrange transport home', category: 'transport', unit: 'trip', unitCost: COST_RATES.transport.bakkie_hire_day, quantity: 1, isInputField: true, inputType: 'number' },

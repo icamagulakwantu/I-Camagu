@@ -128,7 +128,8 @@ In the Eastern Cape the ceremony starch is white samp, not pap.
   "stock fairs" (cattle auctions) of English settler farmers in the Eastern
   Cape in the early 1800s, which Black people, largely Xhosa, attended and
   carried into the savings clubs. How should i-Camagu tell it?
-- The ceremony welcoming an igqirha's calling at the sea, dam or bush: the
-  exact word (intlombe, or another).
+- The igqirha's work is **ukuphuthuma** (founder, 22 Nov 2026), with stages
+  as the person is introduced into the calling. Still to record: the stages,
+  in order, and what each needs.
 - The father's claiming of a child (asking the mother's ancestors and
   paying): its name, and whether it should be a ceremony in the app.
