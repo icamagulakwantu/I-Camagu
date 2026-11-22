@@ -191,3 +191,31 @@ export async function setSkuRetailPrice(req, res) {
     res.status(500).json({ error: 'Could not save shop price' });
   }
 }
+
+// Admin: what each weekly price check changed, newest first.
+export async function getPriceCheckRuns(req, res) {
+  try {
+    if (!(await requireAdmin(req, res))) return;
+    const runs = await prisma.priceCheckRun.findMany({ orderBy: { appliedAt: 'desc' }, take: 26 });
+    const oldest = await prisma.sku.findMany({
+      where: { retiredAt: null, casePriceZAR: { not: null } },
+      orderBy: [{ retailPriceCheckedAt: { sort: 'asc', nulls: 'first' } }, { name: 'asc' }],
+      take: 40,
+      select: { name: true, bottleFormat: true, retailPriceCheckedAt: true },
+    });
+    res.json({
+      runs: runs.map((r) => {
+        let details = {};
+        try { details = JSON.parse(r.details); } catch { /* keep empty */ }
+        return {
+          id: r.id, checkedOn: r.checkedOn, appliedAt: r.appliedAt, checked: r.checked, loweredCount: r.lowered,
+          lowered: details.lowered || [], higherFound: details.higherFound || [], unchanged: details.unchanged || [], missing: details.missing || [],
+        };
+      }),
+      nextUp: oldest,
+    });
+  } catch (err) {
+    console.error('Price check runs failed:', err?.message);
+    res.status(500).json({ error: 'Could not load price checks' });
+  }
+}

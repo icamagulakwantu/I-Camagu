@@ -3,7 +3,7 @@ import { requireAuth } from '../middleware/auth.js';
 import { getCatalogue, getCategories } from '../controllers/catalogueController.js';
 import { submitToPool, getMyOrderDocuments, confirmOrderLine, getMyPoolPayments, submitPoolPaymentReference, getMyPoolStatus, getPoolSummary, cancelParkedBasket, requestPoolPaymentRefund, suggestPoolsForItem, joinPoolWithChecklistItem, getPoolDemandSignal, getSmartMatchCommunityFeed, searchDeliveryAddress, reverseDeliveryAddress, getPoolsNearAddress } from '../controllers/poolController.js';
 import { getMyBasket, addItem, updateItem, removeItem } from '../controllers/basketController.js';
-import { getCatalogueMargins, setSkuCostPrice, setSkuRetailPrice } from '../controllers/marginController.js';
+import { getCatalogueMargins, getPriceCheckRuns, setSkuCostPrice, setSkuRetailPrice } from '../controllers/marginController.js';
 import { getOnlinePaymentStatus, initiatePoolPaymentOnline, getPendingSupplierPayouts, forwardSupplierPayout, getPendingSupplierRefunds, processSupplierRefund } from '../controllers/paymentController.js';
 
 const router = express.Router();
@@ -38,6 +38,7 @@ router.post('/pool-payments/:paymentId/pay-online', requireAuth, initiatePoolPay
 // Admin-only margin view. Cost price never appears on /catalogue — it leaves
 // the server only through these two routes, both of which check admin.
 router.get('/margins', requireAuth, getCatalogueMargins);
+router.get('/price-checks', requireAuth, getPriceCheckRuns);
 router.patch('/margins/:skuId/cost', requireAuth, setSkuCostPrice);
 router.patch('/margins/:skuId/retail', requireAuth, setSkuRetailPrice);
 

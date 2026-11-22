@@ -49,16 +49,29 @@ export async function applyCheck(json, fixName) {
   if (problems.length) throw new Error(`${fixName}: ${problems.join('; ')}`);
   const checkedAt = new Date(`${json.checkedOn}T12:00:00Z`);
   const result = { lowered: 0, unchanged: 0, higherFound: [], missing: [], skipped: false };
+  const detail = { lowered: [], higherFound: [], unchanged: [], missing: [] };
   for (const c of json.checks) {
     const sku = await prisma.sku.findFirst({ where: { name: c.name, bottleFormat: c.bottleFormat, retiredAt: null } });
-    if (!sku) { result.missing.push(`${c.name} (${c.bottleFormat})`); continue; }
+    if (!sku) {
+      result.missing.push(`${c.name} (${c.bottleFormat})`);
+      detail.missing.push({ name: c.name, bottleFormat: c.bottleFormat, source: c.source });
+      continue;
+    }
     const bulk = Number(c.bulk);
     const retail = c.retail == null ? null : Number(c.retail);
     const current = sku.casePriceZAR != null ? Number(sku.casePriceZAR) : null;
     const data = {};
-    if (current == null || bulk < current) { data.casePriceZAR = bulk; result.lowered += 1; } else {
+    const row = { name: c.name, bottleFormat: c.bottleFormat, from: current, found: bulk, retail, source: c.source };
+    if (current == null || bulk < current) {
+      data.casePriceZAR = bulk;
+      result.lowered += 1;
+      detail.lowered.push(row);
+    } else {
       result.unchanged += 1;
-      if (bulk > current) result.higherFound.push(`${c.name} (${c.bottleFormat}): R${current} listed, R${bulk} found`);
+      if (bulk > current) {
+        result.higherFound.push(`${c.name} (${c.bottleFormat}): R${current} listed, R${bulk} found`);
+        detail.higherFound.push(row);
+      } else detail.unchanged.push(row);
     }
     const nextBulk = data.casePriceZAR ?? current;
     if (retail != null && nextBulk != null && nextBulk <= retail) {
@@ -66,7 +79,10 @@ export async function applyCheck(json, fixName) {
     }
     if (Object.keys(data).length) await prisma.sku.update({ where: { id: sku.id }, data });
   }
-  await prisma.dataFix.create({ data: { name: fixName } });
+  await prisma.$transaction([
+    prisma.dataFix.create({ data: { name: fixName } }),
+    prisma.priceCheckRun.create({ data: { file: fixName, checkedOn: json.checkedOn, checked: json.checks.length, lowered: result.lowered, details: JSON.stringify(detail) } }),
+  ]);
   return result;
 }
 

@@ -447,6 +447,19 @@ export async function ensureCeremonyBudgetColumns() {
     );
   `);
   await prisma.$executeRawUnsafe('ALTER TABLE "Notification" ADD COLUMN IF NOT EXISTS "pushedAt" TIMESTAMP(3);');
+  // What each weekly price check changed (see scripts/apply-price-checks.js).
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "PriceCheckRun" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "file" TEXT NOT NULL,
+      "checkedOn" TEXT NOT NULL,
+      "appliedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "checked" INTEGER NOT NULL DEFAULT 0,
+      "lowered" INTEGER NOT NULL DEFAULT 0,
+      "details" TEXT NOT NULL
+    );
+  `);
+  await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "PriceCheckRun_file_key" ON "PriceCheckRun" ("file");');
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "Notification_pushedAt_createdAt_idx" ON "Notification" ("pushedAt", "createdAt");');
 
   // Burial societies and grocery stokvels (StokvelType). ADD VALUE must run

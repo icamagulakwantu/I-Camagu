@@ -38,6 +38,7 @@ export const SCREEN_PATHS = {
   portal: '/me/portal',
   identityadmin: '/admin/identity',
   marginadmin: '/admin/margins',
+  pricecheckadmin: '/admin/price-checks',
   demandadmin: '/admin/demand',
   ekoyiniadmin: '/admin/ekoyini',
   izidukoprofile: '/me/iziduko-profile',

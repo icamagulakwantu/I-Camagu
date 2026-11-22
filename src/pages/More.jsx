@@ -83,6 +83,7 @@ const LIST_GROUPS = [
       { id: 'ekoyiniadmin', icon: 'settings', label: 'Ekoyini admin' },
       { id: 'identityadmin', icon: 'key', label: 'Identity admin' },
       { id: 'marginadmin', icon: 'chart', label: 'Cost & margin' },
+      { id: 'pricecheckadmin', icon: 'activity', label: 'Weekly price checks' },
     ],
   },
 ]

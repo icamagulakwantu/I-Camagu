@@ -42,6 +42,7 @@ const Ekoyini = lazy(() => import('./pages/Ekoyini.jsx'))
 const EkoyiniAdmin = lazy(() => import('./pages/EkoyiniAdmin.jsx'))
 const IdentityAdmin = lazy(() => import('./pages/IdentityAdmin.jsx'))
 const MarginAdmin = lazy(() => import('./pages/MarginAdmin.jsx'))
+const PriceCheckAdmin = lazy(() => import('./pages/PriceCheckAdmin.jsx'))
 const DemandDashboard = lazy(() => import('./pages/DemandDashboard.jsx'))
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy.jsx'))
 const Hierarchy = lazy(() => import('./pages/Hierarchy.jsx'))
@@ -71,7 +72,7 @@ const MORE_SCREENS = [
   'more', 'ceremony', 'timeline', 'budget', 'ekoyinibooking',
   'templates', 'family', 'ukugida', 'ukusoka', 'iziduko',
   'izidukoprofile', 'izidukochat', 'clangroups', 'supplier', 'portal', 'ekoyini',
-  'ekoyiniadmin', 'identityadmin', 'marginadmin', 'demandadmin',
+  'ekoyiniadmin', 'identityadmin', 'marginadmin', 'pricecheckadmin', 'demandadmin',
   'privacy', 'hierarchy', 'myorders', 'expenditure', 'shrinefund',
   'legends', 'directory', 'umqombothi', 'isidlo', 'sharedplans', 'pin', 'profile',
   'notifications', 'account', 'help', 'activity',
@@ -415,6 +416,8 @@ function MainApp() {
         return <IdentityAdmin onBack={goMore} />
       case 'marginadmin':
         return <MarginAdmin onBack={goMore} />
+      case 'pricecheckadmin':
+        return <PriceCheckAdmin onBack={goMore} />
       case 'demandadmin':
         return <DemandDashboard onBack={goMore} />
       case 'hierarchy':

@@ -9,6 +9,7 @@ const names = ['Test Vodka PC', 'Test Gin PC'];
 integrationDescribe('weekly price check (real database)', () => {
   beforeAll(async () => {
     await prisma.dataFix.deleteMany({ where: { name: FIX } });
+    await prisma.priceCheckRun.deleteMany({ where: { file: FIX } });
     await prisma.sku.deleteMany({ where: { name: { in: names } } });
     for (const [name, casePriceZAR] of [['Test Vodka PC', 2000], ['Test Gin PC', 1500]]) {
       await prisma.sku.create({ data: { name, bottleFormat: '750ml Bottle', category: 'VODKA', productType: 'ALCOHOL', unitsPerCase: 12, casePriceZAR } });
@@ -17,6 +18,7 @@ integrationDescribe('weekly price check (real database)', () => {
   afterAll(async () => {
     await prisma.sku.deleteMany({ where: { name: { in: names } } });
     await prisma.dataFix.deleteMany({ where: { name: FIX } });
+    await prisma.priceCheckRun.deleteMany({ where: { file: FIX } });
     await prisma.$disconnect();
   });
 
@@ -34,6 +36,12 @@ integrationDescribe('weekly price check (real database)', () => {
     expect(Number(vodka.casePriceZAR)).toBe(1899);
     expect(vodka.retailPriceSource).toBe('VERIFIED');
     expect(Number((await prisma.sku.findFirst({ where: { name: 'Test Gin PC' } })).casePriceZAR)).toBe(1500);
+    const run = await prisma.priceCheckRun.findUnique({ where: { file: FIX } });
+    const details = JSON.parse(run.details);
+    expect(run).toMatchObject({ checkedOn: '2026-11-30', checked: 3, lowered: 1 });
+    expect(details.lowered[0]).toMatchObject({ name: 'Test Vodka PC', from: 2000, found: 1899 });
+    expect(details.higherFound[0]).toMatchObject({ name: 'Test Gin PC', from: 1500, found: 1600 });
+    expect(details.missing).toHaveLength(1);
     expect(await applyCheck(json, FIX)).toEqual({ skipped: true });
   });
 });

@@ -1395,3 +1395,16 @@ model AppSetting {
   value     String
   updatedAt DateTime @default(now())
 }
+
+// What one weekly price check changed (server/data/price-checks/*.json),
+// recorded when it was applied. details is JSON: lowered (old -> new, with
+// source), higherFound (not applied), missing, unchanged.
+model PriceCheckRun {
+  id        String   @id @default(cuid())
+  file      String   @unique
+  checkedOn String
+  appliedAt DateTime @default(now())
+  checked   Int      @default(0)
+  lowered   Int      @default(0)
+  details   String
+}
