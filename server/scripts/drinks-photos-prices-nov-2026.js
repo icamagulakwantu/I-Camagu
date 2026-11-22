@@ -29,7 +29,7 @@ export const PHOTOS = [
   ['Aquelle Sparkling Water', 'Bottle (500ml)', 'aquelle-sparkling-500ml'],
   ['Aquelle Still Water', 'Bottle (1.5L)', 'aquelle-still-1-5l'],
   ['Tsitsikamma Sparkling Water', 'Bottle (500ml)', 'tsitsikamma-sparkling-500ml'],
-  ['Tsitsikamma Sparkling Water', 'Bottle (1L)', 'tsitsikamma-sparkling-1l'],
+  ['Tsitsikamma Sparkling Water', 'Bottle (1.5L)', 'tsitsikamma-sparkling-1-5l'],
   ['Tsitsikamma Still Water', 'Bottle (500ml)', 'tsitsikamma-still-500ml'],
   ['Tsitsikamma Still Water', 'Bottle (1.5L)', 'tsitsikamma-still-1-5l'],
   ['Valpre Sparkling Water', 'Bottle (1L)', 'valpre-sparkling-1l'],
@@ -97,6 +97,20 @@ export async function applyDrinksPhotosPrices() {
   await prisma.dataFix.create({ data: { name: FIX_NAME } });
   console.log(`Drinks: ${photos} photos, ${lowered} prices lowered, ${added} added.`);
   return { photos, lowered, added, skipped: false };
+}
+
+// The founder confirmed (22 Nov 2026) the tall Tsitsikamma Sparkling photo is
+// the 1.5L, not the 1L. Where the first run already put it on the 1L, move
+// it. Runs once.
+export const PHOTO_FIX_NAME = 'tsitsikamma-sparkling-photo-2026-11-22';
+
+export async function fixTsitsikammaSparklingPhoto() {
+  if (await prisma.dataFix.findUnique({ where: { name: PHOTO_FIX_NAME } })) return { skipped: true };
+  const wrong = '/images/brands/drinks/tsitsikamma-sparkling-1l.webp';
+  const cleared = await prisma.sku.updateMany({ where: { name: 'Tsitsikamma Sparkling Water', bottleFormat: 'Bottle (1L)', imageUrl: wrong }, data: { imageUrl: null } });
+  const set = await prisma.sku.updateMany({ where: { name: 'Tsitsikamma Sparkling Water', bottleFormat: 'Bottle (1.5L)' }, data: { imageUrl: img('tsitsikamma-sparkling-1-5l') } });
+  await prisma.dataFix.create({ data: { name: PHOTO_FIX_NAME } });
+  return { cleared: cleared.count, set: set.count, skipped: false };
 }
 
 const isMain = process.argv[1] && import.meta.url === `file://${process.argv[1]}`;

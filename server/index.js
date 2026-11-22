@@ -31,7 +31,7 @@ import { switchPapToSamp } from './scripts/samp-nov-2026.js';
 import { applyGrocerySpecials } from './scripts/grocery-specials-nov-2026.js';
 import { addEkoyiniProducts } from './scripts/ekoyini-catalogue-nov-2026.js';
 import { correctQuartSizes } from './scripts/quart-sizes-nov-2026.js';
-import { applyDrinksPhotosPrices } from './scripts/drinks-photos-prices-nov-2026.js';
+import { applyDrinksPhotosPrices, fixTsitsikammaSparklingPhoto } from './scripts/drinks-photos-prices-nov-2026.js';
 import { applyPriceChecks } from './scripts/apply-price-checks.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
@@ -322,6 +322,11 @@ if (startup.schemaReady) {
     await applyDrinksPhotosPrices();
   } catch (err) {
     console.error('Drinks photos and prices failed:', err?.message);
+  }
+  try {
+    await fixTsitsikammaSparklingPhoto();
+  } catch (err) {
+    console.error('Tsitsikamma photo fix failed:', err?.message);
   }
   // Weekly price checks (server/data/price-checks/*.json), each applied once.
   try {
