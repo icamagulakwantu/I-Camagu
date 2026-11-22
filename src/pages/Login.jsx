@@ -183,7 +183,7 @@ function Login() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/30 to-[#1f3320]" />
           <div className="relative">
           <div className="flex items-center gap-2.5 mb-5">
-            <img src="/images/brand/icon-128.png" alt="i-Camagu" className="w-10 h-10 rounded-[11px] ring-1 ring-cream/30" />
+            <img src="/images/brand/icon-128.png?v=3" alt="i-Camagu" className="w-10 h-10 rounded-[11px] ring-1 ring-cream/30" />
             <span className="font-display font-bold text-2xl text-cream">i-Camagu</span>
           </div>
           <h1 className="font-display font-semibold text-[1.75rem] leading-tight text-cream text-balance">

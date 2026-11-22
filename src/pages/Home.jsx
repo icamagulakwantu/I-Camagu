@@ -98,7 +98,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
 
       <header className="relative flex items-center justify-between px-5 pt-5">
         <div className="flex items-center gap-2.5">
-          <img src="/images/brand/icon-128.png" alt="" width="34" height="34" className="h-[34px] w-[34px] rounded-[10px] ring-1 ring-cream/30" />
+          <img src="/images/brand/icon-128.png?v=3" alt="" width="34" height="34" className="h-[34px] w-[34px] rounded-[10px] ring-1 ring-cream/30" />
           <span className="font-display text-[1.4rem] font-semibold tracking-tight">i-Camagu</span>
         </div>
         <div className="flex items-center gap-2.5">
