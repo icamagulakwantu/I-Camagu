@@ -20,6 +20,7 @@ import {
   EMPTY_FORM, FORM_STEP_IDS, STEP_COMPONENTS, formFromPlan, formToPayload, planTitle, stepIsValid,
 } from './ceremony/ceremonyForm.js'
 import { CEREMONY_IMAGE, ceremonyImage } from '../data/ceremonyImages.js'
+import { useT } from '../i18n/index.jsx'
 
 const INVALID_MESSAGE = {
   what: 'Please choose the kind of ceremony',
@@ -37,6 +38,7 @@ const planProgress = (plan) => countProgress(buildListRows({
 // summary where any section can be tapped to edit. Props are unchanged from
 // the old planner so App.jsx needs no edit.
 export default function CeremonyPlanner({ onBack, defaultType, autoStartType = null, onAutoStartDone, onViewTimeline, onViewBudget, onBookEkoyini, onOpenTool, selectedCeremonyId }) {
+  const t = useT()
   const { accessToken } = useAuth()
   const { setActiveCeremony } = useCommunity()
   const { showToast } = useToast()
@@ -170,9 +172,9 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
       setActivePlan(newPlan)
       setCreating(false)
       setStepId('list')
-      showToast(`Plan created with ${newPlan.checklistItems.length} items`, 'success')
+      showToast(t('Plan created with {n} items', { n: newPlan.checklistItems.length }), 'success')
     } catch (err) {
-      showToast(err.message || 'Could not create plan', 'error')
+      showToast(err.message || t('Could not create plan'), 'error')
     } finally {
       setSaving(false)
     }
@@ -187,10 +189,10 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
         body: JSON.stringify(formToPayload(form)),
       })
       updateCeremonyInState(updated)
-      showToast('Saved', 'success')
+      showToast(t('Saved'), 'success')
       return true
     } catch (err) {
-      showToast(err.message || 'Could not save', 'error')
+      showToast(err.message || t('Could not save'), 'error')
       return false
     } finally {
       setSaving(false)
@@ -201,7 +203,7 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
   const isFormStep = FORM_STEP_IDS.includes(stepId)
 
   const goNext = async () => {
-    if (!stepIsValid(stepId, form)) { showToast(INVALID_MESSAGE[stepId], 'error'); return }
+    if (!stepIsValid(stepId, form)) { showToast(t(INVALID_MESSAGE[stepId]), 'error'); return }
     if (isFormStep && !activePlan) {
       if (stepId === 'money') { await createPlan(); return }
     } else if (isFormStep) {
@@ -286,7 +288,7 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
             <button type="button" onClick={goBack} className={cn('mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm text-left', pressable)}>
               <Bi {...(stepId === 'summary' ? { xh: 'Buyela kwimisebenzi yam', en: 'Back to my ceremonies' } : BUTTONS.back)} />
             </button>
-            <h1 className="font-display font-semibold text-[2rem] leading-[1.08] break-words">{activePlan ? planTitle(activePlan) : 'New ceremony'}</h1>
+            <h1 className="font-display font-semibold text-[2rem] leading-[1.08] break-words">{activePlan ? planTitle(activePlan) : t('New ceremony')}</h1>
             {/* The step counter belongs to the set-up wizard. On the summary it
                 read "Step 6 of 6" with a full bar while the ceremony itself
                 could still be 0% ready, so it is hidden there. */}
@@ -328,12 +330,12 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
         {creating && stepId === 'money' && (
           <div className="px-4 mt-4">
             <label className="block rounded-2xl border border-cream-dark bg-white p-4">
-              <span className="block font-bold text-ink">Who can see this ceremony?</span>
-              <span className="block mt-1 text-xs text-ink-muted">Private is the default. Clan-only shares it only with people who match your registered clan lines. Public can appear in the community feed.</span>
+              <span className="block font-bold text-ink">{t('Who can see this ceremony?')}</span>
+              <span className="block mt-1 text-xs text-ink-muted">{t('Private is the default. Clan-only shares it only with people who match your registered clan lines. Public can appear in the community feed.')}</span>
               <select value={visibility} onChange={(event) => setVisibility(event.target.value)} className="mt-3 w-full min-h-12 rounded-xl border border-cream-dark bg-white px-3 text-ink">
-                <option value="PRIVATE">Private — only me</option>
-                <option value="CLAN_ONLY">Clan-only — matching clan members</option>
-                <option value="PUBLIC">Public — community feed</option>
+                <option value="PRIVATE">{t('Private — only me')}</option>
+                <option value="CLAN_ONLY">{t('Clan-only — matching clan members')}</option>
+                <option value="PUBLIC">{t('Public — community feed')}</option>
               </select>
             </label>
           </div>
@@ -364,8 +366,8 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
           <button type="button" onClick={onBack} className={cn('mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm text-left', pressable)}>
             <Bi {...BUTTONS.back} />
           </button>
-          <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">Ceremony planning</h1>
-          <p className="text-white/80 text-sm mt-1">Structure for every ceremony: its steps, roles, timeline and budget, so it is done properly and with dignity.</p>
+          <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">{t('Ceremony planning')}</h1>
+          <p className="text-white/80 text-sm mt-1">{t('Structure for every ceremony: its steps, roles, timeline and budget, so it is done properly and with dignity.')}</p>
         </div>
       </div>
       </header>
@@ -383,7 +385,7 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
             <Skeleton className="h-20 w-full" />
           </div>
         ) : plans.length === 0 ? (
-          <EmptyState emoji="📋" title="No plans yet" description="Tap ‘Start a new ceremony’ above to plan your first one." />
+          <EmptyState emoji="📋" title={t('No plans yet')} description={t('Tap ‘Start a new ceremony’ above to plan your first one.')} />
         ) : (
           <div className="space-y-2">
             {plans.map((plan) => {

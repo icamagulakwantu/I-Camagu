@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Icon from '../../components/Icon.jsx'
 import { request } from './api.js'
 import { rand } from './format.js'
+import { useT } from '../../i18n/index.jsx'
 
 const same = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase()
 
@@ -28,6 +29,7 @@ function Line({ icon, title, detail, action, onClick, children }) {
 // stokvel saving for it, buying together, the clan, the ukugida book and
 // the photos, each one tap away from the ceremony.
 export default function ConnectedCard({ ceremony, title, accessToken, onNavigate, onChanged, showToast }) {
+  const t = useT()
   const [stokvels, setStokvels] = useState(null)
   const [gifts, setGifts] = useState([])
   const [albums, setAlbums] = useState([])
@@ -64,42 +66,42 @@ export default function ConnectedCard({ ceremony, title, accessToken, onNavigate
   const clanCanSee = ceremony.visibility === 'CLAN_ONLY' || ceremony.visibility === 'PUBLIC'
 
   return (
-    <section aria-label="Everything for this ceremony" className="pt-3">
+    <section aria-label={t('Everything for this ceremony')} className="pt-3">
       <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Konke kunye · Everything for it</p>
-      <h2 className="mb-3 mt-0.5 font-display text-[1.45rem] font-semibold leading-tight tracking-tight text-ink">Save, buy, gather, remember</h2>
+      <h2 className="mb-3 mt-0.5 font-display text-[1.45rem] font-semibold leading-tight tracking-tight text-ink">{t('Save, buy, gather, remember')}</h2>
       <div className="overflow-hidden rounded-[22px] bg-[#fffdf9] shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
         {linked ? (
-          <Line icon="coins" title={`Saving: ${linked.name}`} detail={`${rand(linked.balance)} saved together so far`} action="Open" onClick={() => onNavigate?.('stokvels')} />
+          <Line icon="coins" title={t('Saving: {name}', { name: linked.name })} detail={t('{amount} saved together so far', { amount: rand(linked.balance) })} action={t('Open')} onClick={() => onNavigate?.('stokvels')} />
         ) : (
-          <Line icon="coins" title="Saving for it" detail={stokvels?.length ? 'Choose the stokvel that is saving for this ceremony' : 'Start a stokvel with the family, or join one'} action={stokvels?.length ? null : 'Start'} onClick={stokvels?.length ? null : () => onNavigate?.('stokvels')}>
+          <Line icon="coins" title={t('Saving for it')} detail={stokvels?.length ? t('Choose the stokvel that is saving for this ceremony') : t('Start a stokvel with the family, or join one')} action={stokvels?.length ? null : t('Start')} onClick={stokvels?.length ? null : () => onNavigate?.('stokvels')}>
             {stokvels?.length > 0 && (
               <select
-                aria-label="Stokvel saving for this ceremony"
+                aria-label={t('Stokvel saving for this ceremony')}
                 disabled={busy}
                 defaultValue=""
-                onChange={(e) => e.target.value && update({ savingStokvelId: e.target.value }, 'Stokvel linked')}
+                onChange={(e) => e.target.value && update({ savingStokvelId: e.target.value }, t('Stokvel linked'))}
                 className="mt-2 h-10 w-full rounded-[10px] border border-ink/15 bg-white px-2 text-sm text-ink"
               >
-                <option value="">Choose a stokvel…</option>
+                <option value="">{t('Choose a stokvel…')}</option>
                 {stokvels.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
             )}
           </Line>
         )}
-        <Line icon="cart" title="Buy together" detail="Livestock, drinks and groceries at group prices" action="Shop" onClick={() => onNavigate?.('store')} />
+        <Line icon="cart" title={t('Buy together')} detail={t('Livestock, drinks and groceries at group prices')} action={t('Shop')} onClick={() => onNavigate?.('store')} />
         {clanCanSee ? (
-          <Line icon="users" title="Your clan can see it" detail="It shows on your clan members' Home, so they can come and help" action="Clan" onClick={() => onNavigate?.('iziduko')} />
+          <Line icon="users" title={t('Your clan can see it')} detail={t('It shows on your clan members\' Home, so they can come and help')} action={t('Clan')} onClick={() => onNavigate?.('iziduko')} />
         ) : (
-          <Line icon="users" title="Tell your clan" detail="Let clan members see this ceremony on their Home" action={busy ? '…' : 'Share'} onClick={() => update({ visibility: 'CLAN_ONLY' }, 'Your clan can see this ceremony')} />
+          <Line icon="users" title={t('Tell your clan')} detail={t('Let clan members see this ceremony on their Home')} action={busy ? '…' : t('Share')} onClick={() => update({ visibility: 'CLAN_ONLY' }, t('Your clan can see this ceremony'))} />
         )}
         {clanCanSee && (
           <Line
             icon="check"
-            title="Who is coming"
+            title={t('Who is coming')}
             detail={guests?.coming?.length
-              ? `${guests.coming.length} confirmed · ${guests.people} ${guests.people === 1 ? 'person' : 'people'}`
-              : 'Clan members confirm on their Home; they show here'}
-            action={guests?.coming?.length ? (showGuests ? 'Hide' : 'See') : null}
+              ? t('{n} confirmed · {people} people', { n: guests.coming.length, people: guests.people })
+              : t('Clan members confirm on their Home; they show here')}
+            action={guests?.coming?.length ? (showGuests ? t('Hide') : t('See')) : null}
             onClick={guests?.coming?.length ? () => setShowGuests((v) => !v) : null}
           >
             {showGuests && (
@@ -111,8 +113,8 @@ export default function ConnectedCard({ ceremony, title, accessToken, onNavigate
             )}
           </Line>
         )}
-        <Line icon="send" title="Ukugida book" detail={gifts.length ? `${gifts.length} gift${gifts.length === 1 ? '' : 's'} recorded, ${received} received` : 'Record what guests bring, so you can return it'} action={gifts.length ? 'Open' : 'Start'} onClick={() => onNavigate?.('ukugida')} />
-        <Line icon="image" title="Photos of the day" detail={albums.length ? `${photos} photo${photos === 1 ? '' : 's'} and videos kept` : 'Keep the photos and videos in the family archive'} action={albums.length ? 'Open' : 'Start'} onClick={() => onNavigate?.('portal')} />
+        <Line icon="send" title={t('Ukugida book')} detail={gifts.length ? t('{n} gifts recorded, {received} received', { n: gifts.length, received }) : t('Record what guests bring, so you can return it')} action={gifts.length ? t('Open') : t('Start')} onClick={() => onNavigate?.('ukugida')} />
+        <Line icon="image" title={t('Photos of the day')} detail={albums.length ? t('{n} photos and videos kept', { n: photos }) : t('Keep the photos and videos in the family archive')} action={albums.length ? t('Open') : t('Start')} onClick={() => onNavigate?.('portal')} />
       </div>
     </section>
   )

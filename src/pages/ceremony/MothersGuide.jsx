@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Icon from '../../components/Icon.jsx'
+import { useT } from '../../i18n/index.jsx'
 
 // A guide for the initiate's mother. Drawn from research with Xhosa mothers
 // (Makupula 2026; the 2025 scoping review on ulwaluko; studies of women's
@@ -38,16 +39,17 @@ const SECTIONS = [
 ]
 
 export default function MothersGuide({ onOpenUmqombothi }) {
+  const t = useT()
   const [open, setOpen] = useState(false)
   return (
-    <section aria-label="A guide for his mother" className="overflow-hidden rounded-[24px] bg-[#fffdf9] shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
+    <section aria-label={t('A guide for his mother')} className="overflow-hidden rounded-[24px] bg-[#fffdf9] shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
       <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="flex w-full items-center gap-3 p-5 text-left">
         <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-terracotta-dark text-white">
           <Icon name="heartHandshake" size={20} />
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Kumama · For his mother</span>
-          <span className="mt-0.5 block font-display text-[1.2rem] font-semibold leading-tight text-ink">What is yours to carry</span>
+          <span className="mt-0.5 block font-display text-[1.2rem] font-semibold leading-tight text-ink">{t('What is yours to carry')}</span>
         </span>
         <Icon name={open ? 'arrowUp' : 'arrowDown'} size={16} />
       </button>
@@ -58,7 +60,7 @@ export default function MothersGuide({ onOpenUmqombothi }) {
           </p>
           {SECTIONS.map((section) => (
             <div key={section.title} className="rounded-[18px] border border-ink/[0.06] bg-white p-3.5">
-              <p className="flex items-center gap-2 text-[14px] font-bold text-ink"><Icon name={section.icon} size={15} /> {section.title}</p>
+              <p className="flex items-center gap-2 text-[14px] font-bold text-ink"><Icon name={section.icon} size={15} /> {t(section.title)}</p>
               <ul className="mt-2 space-y-1.5">
                 {section.points.map((point) => (
                   <li key={point} className="flex gap-2 text-[13px] leading-snug text-ink">
@@ -70,7 +72,7 @@ export default function MothersGuide({ onOpenUmqombothi }) {
             </div>
           ))}
           {onOpenUmqombothi && (
-            <button type="button" onClick={onOpenUmqombothi} className="pressable text-sm font-extrabold text-terracotta-dark">Open the umqombothi calculator →</button>
+            <button type="button" onClick={onOpenUmqombothi} className="pressable text-sm font-extrabold text-terracotta-dark">{t('Open the umqombothi calculator →')}</button>
           )}
           <p className="text-xs italic text-ink-muted">Gathered from research with Xhosa mothers. Every family does things its own way.</p>
         </div>

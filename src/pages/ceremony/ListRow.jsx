@@ -3,17 +3,19 @@ import Icon from '../../components/Icon.jsx'
 import { cn } from '../../lib/utils'
 import { rand } from './format.js'
 import { pressable } from './styles.js'
+import { useT } from '../../i18n/index.jsx'
 
 // One line of the plan: a round tick, the item, a quiet guide price, and
 // what was paid. The paid box stays out of the way until it is needed: tap
 // "+ Paid" to enter an amount; once saved it shows as a small chip.
 export default function ListRow({ row, showTick = true, busy, onToggle, onSavePrice, onBuy }) {
+  const t = useT()
   const [editing, setEditing] = useState(false)
   if (row.kind === 'note') {
     return <p className="py-2.5 text-[13px] font-semibold text-terracotta-dark">{row.label}</p>
   }
   const guide = row.suggested != null
-    ? `Guide ${rand(row.suggested)}${row.quantity > 1 ? ` · ${row.quantity} × ${rand(row.unitPrice)}` : ''}`
+    ? `${t('Guide')} ${rand(row.suggested)}${row.quantity > 1 ? ` · ${row.quantity} × ${rand(row.unitPrice)}` : ''}`
     : null
   const save = (value) => { setEditing(false); onSavePrice(row, value) }
 
@@ -22,7 +24,7 @@ export default function ListRow({ row, showTick = true, busy, onToggle, onSavePr
       {showTick && (
         <button
           type="button"
-          aria-label={row.done ? `Mark ${row.label} as not done` : `Mark ${row.label} as done`}
+          aria-label={row.done ? t('Mark {item} as not done', { item: row.label }) : t('Mark {item} as done', { item: row.label })}
           aria-pressed={row.done}
           disabled={busy}
           onClick={() => onToggle(row)}
@@ -39,7 +41,7 @@ export default function ListRow({ row, showTick = true, busy, onToggle, onSavePr
         {guide && !editing && <p className="mt-0.5 text-[12px] text-ink-muted">{guide}</p>}
         {editing && (
           <label className="mt-1.5 flex items-center gap-1.5">
-            <span className="text-[12px] font-semibold text-ink-muted">Paid R</span>
+            <span className="text-[12px] font-semibold text-ink-muted">{t('Paid')} R</span>
             <input
               autoFocus
               type="number"
@@ -61,16 +63,16 @@ export default function ListRow({ row, showTick = true, busy, onToggle, onSavePr
         <div className="flex flex-shrink-0 items-center gap-1.5">
           {row.cost?.skuId && !row.done && (
             <button type="button" onClick={() => onBuy(row.cost)} className={cn('h-8 rounded-full border border-[#2e4a2e]/30 px-3 text-[12px] font-bold text-[#1f3320]', pressable)}>
-              Buy
+              {t('Buy')}
             </button>
           )}
           {row.actual != null ? (
-            <button type="button" onClick={() => setEditing(true)} aria-label={`Paid ${rand(row.actual)}, change`} className={cn('h-8 rounded-full bg-[#2e4a2e]/10 px-3 text-[12px] font-bold text-[#1f3320]', pressable)}>
-              Paid {rand(row.actual)}
+            <button type="button" onClick={() => setEditing(true)} aria-label={t('Paid {amount}, change', { amount: rand(row.actual) })} className={cn('h-8 rounded-full bg-[#2e4a2e]/10 px-3 text-[12px] font-bold text-[#1f3320]', pressable)}>
+              {t('Paid')} {rand(row.actual)}
             </button>
           ) : (
-            <button type="button" onClick={() => setEditing(true)} aria-label={`Add what you paid for ${row.label}`} className={cn('h-8 rounded-full px-2.5 text-[12px] font-semibold text-ink-muted', pressable)}>
-              + Paid
+            <button type="button" onClick={() => setEditing(true)} aria-label={t('Add what you paid for {item}', { item: row.label })} className={cn('h-8 rounded-full px-2.5 text-[12px] font-semibold text-ink-muted', pressable)}>
+              {t('+ Paid')}
             </button>
           )}
         </div>

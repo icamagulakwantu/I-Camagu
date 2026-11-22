@@ -10,12 +10,14 @@ import Bi from './Bi.jsx'
 import { BUTTONS } from './wizardText.js'
 import { inputClass, pressable } from './styles.js'
 import { CEREMONY_IMAGE } from '../../data/ceremonyImages.js'
+import { useT } from '../../i18n/index.jsx'
 
 const EMPTY_PLEDGE = { contributorName: '', pledgeItem: '', pledgeValue: '' }
 
 // Family contributions. The server returns pledgerName / pledgedItem /
 // pledgedAmountZAR / paidAmountZAR (see ContributionPledge in the schema).
 export default function Pledges({ plan, accessToken, pledges, setPledges, onBack }) {
+  const t = useT()
   const { showToast } = useToast()
   const [showForm, setShowForm] = useState(false)
   const [draft, setDraft] = useState(EMPTY_PLEDGE)
@@ -23,7 +25,7 @@ export default function Pledges({ plan, accessToken, pledges, setPledges, onBack
   const addPledge = async (e) => {
     e.preventDefault()
     if (!draft.contributorName || !draft.pledgeItem) {
-      showToast('Please fill in the name and the item', 'error')
+      showToast(t('Please fill in the name and the item'), 'error')
       return
     }
     try {
@@ -39,7 +41,7 @@ export default function Pledges({ plan, accessToken, pledges, setPledges, onBack
       setPledges((prev) => [...prev, data])
       setDraft(EMPTY_PLEDGE)
       setShowForm(false)
-      showToast('Pledge added', 'success')
+      showToast(t('Pledge added'), 'success')
     } catch (err) {
       showToast(err.message, 'error')
     }
@@ -49,7 +51,7 @@ export default function Pledges({ plan, accessToken, pledges, setPledges, onBack
     try {
       await request(`/api/ceremonies/plans/pledges/${pledgeId}`, accessToken, { method: 'DELETE' })
       setPledges((prev) => prev.filter((p) => p.id !== pledgeId))
-      showToast('Pledge removed', 'info')
+      showToast(t('Pledge removed'), 'info')
     } catch (err) {
       showToast(err.message, 'error')
     }
@@ -64,7 +66,7 @@ export default function Pledges({ plan, accessToken, pledges, setPledges, onBack
         <button type="button" onClick={onBack} className={cn('mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm', pressable)}>
           <Bi {...BUTTONS.back} className="text-left" />
         </button>
-        <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">Family pledges</h1>
+        <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">{t('Family pledges')}</h1>
         <p className="text-white/80 text-sm mt-1">{planTitle(plan)}</p>
       </div>
       </header>
@@ -76,9 +78,9 @@ export default function Pledges({ plan, accessToken, pledges, setPledges, onBack
 
         {showForm && (
           <form onSubmit={addPledge} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-3 space-y-3">
-            <input className={inputClass} placeholder="Name (e.g. Uncle Sipho)" value={draft.contributorName} onChange={(e) => setDraft((p) => ({ ...p, contributorName: e.target.value }))} required />
-            <input className={inputClass} placeholder="Item (e.g. Goat, Groceries)" value={draft.pledgeItem} onChange={(e) => setDraft((p) => ({ ...p, pledgeItem: e.target.value }))} required />
-            <input className={inputClass} type="number" inputMode="decimal" min="0" placeholder="Value in rand (optional, e.g. 500)" value={draft.pledgeValue} onChange={(e) => setDraft((p) => ({ ...p, pledgeValue: e.target.value }))} />
+            <input className={inputClass} placeholder={t('Name (e.g. Uncle Sipho)')} value={draft.contributorName} onChange={(e) => setDraft((p) => ({ ...p, contributorName: e.target.value }))} required />
+            <input className={inputClass} placeholder={t('Item (e.g. Goat, Groceries)')} value={draft.pledgeItem} onChange={(e) => setDraft((p) => ({ ...p, pledgeItem: e.target.value }))} required />
+            <input className={inputClass} type="number" inputMode="decimal" min="0" placeholder={t('Value in rand (optional, e.g. 500)')} value={draft.pledgeValue} onChange={(e) => setDraft((p) => ({ ...p, pledgeValue: e.target.value }))} />
             <button type="submit" className={cn('w-full h-14 rounded-pill bg-sage-500 text-white', pressable)}>
               <Bi {...BUTTONS.save} />
             </button>
@@ -88,9 +90,9 @@ export default function Pledges({ plan, accessToken, pledges, setPledges, onBack
         {pledges.length === 0 ? (
           <EmptyState
             emoji="👨‍👩‍👧‍👦"
-            title="No pledges yet"
-            description="Write down what each family member has promised to bring or pay for."
-            primaryLabel="Add first pledge"
+            title={t('No pledges yet')}
+            description={t('Write down what each family member has promised to bring or pay for.')}
+            primaryLabel={t('Add first pledge')}
             onPrimary={() => setShowForm(true)}
             className="border-2 border-terracotta/25"
           />
@@ -107,8 +109,8 @@ export default function Pledges({ plan, accessToken, pledges, setPledges, onBack
                     <p className="text-sm text-ink-muted break-words">{p.pledgedItem}{pledgedAmount != null && ` · ${rand(pledgedAmount)}`}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className={cn('text-xs font-bold px-2.5 py-1 rounded-pill', isPaid ? 'bg-sage-100 text-sage-700' : 'bg-sage-50 text-sage-700')}>{isPaid ? 'Received' : 'Pledged'}</span>
-                    <button type="button" aria-label="Delete pledge" onClick={() => deletePledge(p.id)} className={cn('w-10 h-10 flex items-center justify-center bg-rose-50 rounded-pill', pressable)}>
+                    <span className={cn('text-xs font-bold px-2.5 py-1 rounded-pill', isPaid ? 'bg-sage-100 text-sage-700' : 'bg-sage-50 text-sage-700')}>{isPaid ? t('Received') : t('Pledged')}</span>
+                    <button type="button" aria-label={t('Delete pledge')} onClick={() => deletePledge(p.id)} className={cn('w-10 h-10 flex items-center justify-center bg-rose-50 rounded-pill', pressable)}>
                       <Icon name="trash" size={16} color="#f43f5e" />
                     </button>
                   </div>

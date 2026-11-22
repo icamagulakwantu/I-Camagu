@@ -7,6 +7,7 @@ import { planTitle } from './ceremonyForm.js'
 import Bi from './Bi.jsx'
 import { BUTTONS } from './wizardText.js'
 import { inputClass, pressable } from './styles.js'
+import { useT } from '../../i18n/index.jsx'
 
 const ACTION_BUTTON = 'group flex min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border border-terracotta/15 bg-white px-2 py-3 text-center shadow-[0_8px_22px_-12px_rgba(43,38,32,0.28)] transition-all hover:border-sage-300 hover:bg-sage-50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 min-h-[76px] active:scale-[0.98]'
 
@@ -16,6 +17,7 @@ const ACTION_BUTTON = 'group flex min-w-0 flex-col items-center justify-center g
 // variant="manage" shows only Save as template and Delete: the ceremony page
 // already offers sharing, the timeline and the bar elsewhere.
 export default function SummaryActions({ plan, accessToken, onShare, onViewTimeline, onBookEkoyini, onDeleted, onDownloadPdf, variant = 'full' }) {
+  const t = useT()
   const { showToast } = useToast()
   const [templateOpen, setTemplateOpen] = useState(false)
   const [templateTitle, setTemplateTitle] = useState('')
@@ -31,12 +33,12 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
   const saveTemplate = async (e) => {
     e.preventDefault()
     const name = templateTitle.trim()
-    if (!name) { showToast('Please enter a template name', 'error'); return }
+    if (!name) { showToast(t('Please enter a template name'), 'error'); return }
     setSavingTemplate(true)
     try {
       await request('/api/ceremonies/templates/save', accessToken, { method: 'POST', body: JSON.stringify({ planId: plan.id, templateTitle: name }) })
       setTemplateOpen(false)
-      showToast('Saved as template', 'success')
+      showToast(t('Saved as template'), 'success')
     } catch (err) {
       showToast(err.message, 'error')
     } finally {
@@ -49,7 +51,7 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
       await request(`/api/ceremonies/${plan.ceremonyId}`, accessToken, { method: 'DELETE' })
       setConfirmDelete(false)
       onDeleted(plan.ceremonyId)
-      showToast('Ceremony deleted', 'info')
+      showToast(t('Ceremony deleted'), 'info')
     } catch (err) {
       showToast(err.message, 'error')
     }
@@ -62,15 +64,15 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
       {manage && onDownloadPdf && (
         <button type="button" onClick={onDownloadPdf} className={cn('flex w-full items-center gap-3 rounded-[18px] bg-[#fffdf9] px-4 py-3.5 text-left shadow-soft', pressable)}>
           <Icon name="file" size={18} color="#2e4a2e" />
-          <span className="flex-1 text-sm font-extrabold text-ink">Download as PDF</span>
-          <span className="text-xs text-ink-muted">Print or keep a copy</span>
+          <span className="flex-1 text-sm font-extrabold text-ink">{t('Download as PDF')}</span>
+          <span className="text-xs text-ink-muted">{t('Print or keep a copy')}</span>
         </button>
       )}
       {manage && (
         <button type="button" onClick={openTemplate} className={cn('flex w-full items-center gap-3 rounded-[18px] bg-[#fffdf9] px-4 py-3.5 text-left shadow-soft', pressable)}>
           <Icon name="template" size={18} color="#a3471a" />
-          <span className="flex-1 text-sm font-extrabold text-ink">Save as a template</span>
-          <span className="text-xs text-ink-muted">Reuse this plan</span>
+          <span className="flex-1 text-sm font-extrabold text-ink">{t('Save as a template')}</span>
+          <span className="text-xs text-ink-muted">{t('Reuse this plan')}</span>
         </button>
       )}
       {!manage && (
@@ -100,12 +102,12 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
         <button type="button" onClick={() => onShare(true)} className={cn('flex-1 h-14 bg-[#25D366] text-white font-bold rounded-pill', pressable)}>WhatsApp</button>
       </div>
       )}
-      {!manage && <p className="text-xs text-ink-muted text-center -mt-1">Family can pledge straight from the link. Sharing again replaces the old link.</p>}
+      {!manage && <p className="text-xs text-ink-muted text-center -mt-1">{t('Family can pledge straight from the link. Sharing again replaces the old link.')}</p>}
 
       {templateOpen && (
         <form onSubmit={saveTemplate} className="bg-white border-2 border-sage-500 rounded-soft p-4 space-y-3">
-          <p className="text-sm font-bold text-ink">Name this template</p>
-          <p className="text-xs text-ink-muted">You can reuse it to start future ceremonies faster.</p>
+          <p className="text-sm font-bold text-ink">{t('Name this template')}</p>
+          <p className="text-xs text-ink-muted">{t('You can reuse it to start future ceremonies faster.')}</p>
           <input className={inputClass} value={templateTitle} onChange={(e) => setTemplateTitle(e.target.value)} autoFocus />
           <div className="flex gap-2">
             <button type="submit" disabled={savingTemplate} className={cn('flex-1 h-14 bg-sage-600 text-white rounded-pill', pressable)}><Bi {...BUTTONS.save} /></button>
@@ -120,10 +122,10 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
 
       {confirmDelete && (
         <div className="bg-white border-2 border-terracotta rounded-soft p-4">
-          <p className="text-sm font-bold text-ink mb-1">Delete this ceremony for good?</p>
-          <p className="text-xs text-ink-muted mb-3">This removes the ceremony, the shopping list, the budget and the pledges. It cannot be undone.</p>
+          <p className="text-sm font-bold text-ink mb-1">{t('Delete this ceremony for good?')}</p>
+          <p className="text-xs text-ink-muted mb-3">{t('This removes the ceremony, the shopping list, the budget and the pledges. It cannot be undone.')}</p>
           <div className="flex gap-2">
-            <button type="button" onClick={deleteCeremony} className={cn('flex-1 h-14 bg-terracotta text-white font-bold rounded-pill', pressable)}>Yes, delete</button>
+            <button type="button" onClick={deleteCeremony} className={cn('flex-1 h-14 bg-terracotta text-white font-bold rounded-pill', pressable)}>{t('Yes, delete')}</button>
             <button type="button" onClick={() => setConfirmDelete(false)} className={cn('flex-1 h-14 border-2 border-terracotta/25 rounded-pill', pressable)}><Bi {...BUTTONS.cancel} /></button>
           </div>
         </div>

@@ -24,8 +24,8 @@ export const BUTTONS = {
   startNew: { xh: 'Qala umsebenzi omtsha', en: 'Start a new ceremony' },
   share: { xh: 'Yabelana', en: 'Share' },
   remove: { xh: 'Cima', en: 'Delete ceremony' },
-  template: { en: 'Save as template' },
-  timeline: { en: 'Timeline' },
+  template: { xh: 'Gcina njengetemplate', en: 'Save as template' },
+  timeline: { xh: 'Ixesha', en: 'Timeline' },
   bar: { en: 'Ekoyini Bar' },
 }
 
@@ -40,10 +40,10 @@ export const LABELS = {
   stillToBuy: { xh: 'Okusele ukuthengwa', en: 'Still to buy (guide price)' },
   paid: { xh: 'Ndihlawulile', en: 'I paid' },
   guide: { xh: 'Isikhokelo', en: 'Guide price' },
-  onList: { en: 'On your list' },
-  unexpected: { en: 'Unexpected' },
+  onList: { xh: 'Kuluhlu lwakho', en: 'On your list' },
+  unexpected: { xh: 'Okungalindelekanga', en: 'Unexpected' },
   tapToChange: { xh: 'Cofa ukuguqula', en: 'Tap to change' },
-  family: { en: 'Family pledges' },
+  family: { xh: 'Izithembiso zosapho', en: 'Family pledges' },
 }
 
 export const EXPLAIN_MONEY = 'Guide prices are only a help. Only what you really paid comes off your budget.'

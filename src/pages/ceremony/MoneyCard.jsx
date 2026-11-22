@@ -3,11 +3,13 @@ import Bi from './Bi.jsx'
 import { LABELS, EXPLAIN_MONEY } from './wizardText.js'
 import { rand, randExact } from './format.js'
 import { pressable } from './styles.js'
+import { useT } from '../../i18n/index.jsx'
 
 // The one place money is shown. It says plainly where every rand comes from:
 // what was paid for items on the list, what was paid for unexpected things,
 // and what is still to buy at guide price (which is never taken off).
 export default function MoneyCard({ summary, budgetZAR, onEditBudget }) {
+  const t = useT()
   const hasBudget = budgetZAR != null
   const percent = hasBudget && Number(budgetZAR) > 0 ? Math.min(100, Math.round((summary.spent / Number(budgetZAR)) * 100)) : 0
   return (
@@ -44,12 +46,12 @@ export default function MoneyCard({ summary, budgetZAR, onEditBudget }) {
         </div>
       </div>
       <p className="text-xs text-ink-muted mt-3">
-        {LABELS.onList.en}: <span className="font-bold text-ink">{randExact(summary.onList)}</span>
+        {t(LABELS.onList.en)}: <span className="font-bold text-ink">{randExact(summary.onList)}</span>
         {' · '}
-        {LABELS.unexpected.en}: <span className="font-bold text-ink">{randExact(summary.unforeseen)}</span>
+        {t(LABELS.unexpected.en)}: <span className="font-bold text-ink">{randExact(summary.unforeseen)}</span>
       </p>
       <p className="text-xs text-ink-muted mt-1 leading-relaxed">
-        {EXPLAIN_MONEY}
+        {t(EXPLAIN_MONEY)}
         {summary.projectedOverBudget && ' At these prices you may go over your budget.'}
       </p>
     </div>

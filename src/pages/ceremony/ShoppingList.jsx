@@ -13,6 +13,7 @@ import PoolOfferCard from '../../components/PoolOfferCard.jsx'
 import ListRow from './ListRow.jsx'
 import { BUTTONS } from './wizardText.js'
 import { inputClass, pressable } from './styles.js'
+import { useT } from '../../i18n/index.jsx'
 
 const PHASE_OPTIONS = [
   { value: 'CUSTOM', label: 'Something I am adding' },
@@ -44,6 +45,7 @@ const unforeseenRow = (task) => ({
 // checklist tasks apart, so a row that is both is written to both (the price
 // goes to each) and the old screens that read either one stay correct.
 export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legacyItems = [], onEditBudget, onItemsChanged }) {
+  const t = useT()
   const { showToast } = useToast()
   const [costItems, setCostItems] = useState([])
   const [checklistItems, setChecklistItems] = useState(legacyItems)
@@ -119,7 +121,7 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
   const savePrice = async (row, value) => {
     const parsed = value === '' ? null : parseFloat(value)
     if (parsed !== null && (Number.isNaN(parsed) || parsed < 0)) {
-      showToast('Please type an amount in rand', 'error')
+      showToast(t('Please type an amount in rand'), 'error')
       return
     }
     if (parsed === row.actual) return
@@ -141,7 +143,7 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
         nextTasks = replaceTask(checklistItems, task)
       }
       commit(nextCosts, nextTasks)
-      showToast(parsed === null ? 'Amount cleared' : 'Amount saved', 'success')
+      showToast(parsed === null ? t('Amount cleared') : t('Amount saved'), 'success')
     } catch (err) {
       showToast(err.message, 'error')
       load()
@@ -170,7 +172,7 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
       commit(costItems, [...checklistItems, data])
       setForm(EMPTY_ADD)
       setShowAdd(false)
-      showToast(unforeseen ? 'Added to your unexpected costs' : 'Added to your list', 'success')
+      showToast(unforeseen ? t('Added to your unexpected costs') : t('Added to your list'), 'success')
     } catch (err) {
       showToast(err.message, 'error')
     } finally {
@@ -197,22 +199,22 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
       <MoneyCard summary={summary} budgetZAR={budgetZAR} onEditBudget={onEditBudget} />
 
       <div className="flex items-center justify-between px-1">
-        <p className="text-sm font-bold text-ink">{done} of {total} <span className="font-normal text-ink-muted">done</span></p>
+        <p className="text-sm font-bold text-ink">{done} / {total} <span className="font-normal text-ink-muted">{t('done')}</span></p>
         <button type="button" onClick={() => setShowAdd((v) => !v)} className={cn('flex h-9 items-center gap-1 rounded-full px-3 text-sm font-bold text-[#1f3320]', pressable)}>
-          {showAdd ? 'Cancel' : '+ Add to the list'}
+          {showAdd ? t('Cancel') : t('+ Add to the list')}
         </button>
       </div>
 
       {showAdd && (
         <form onSubmit={addItem} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
           <select value={form.phase} onChange={(e) => setForm({ ...form, phase: e.target.value })} className={inputClass}>
-            {PHASE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            {PHASE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{t(o.label)}</option>)}
           </select>
-          <input className={inputClass} placeholder="e.g. Hired extra tent" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} required />
+          <input className={inputClass} placeholder={t('e.g. Hired extra tent')} value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} required />
           <input
             type="number" inputMode="decimal" step="0.01" min="0"
             className={inputClass}
-            placeholder="What did it cost? (R, optional)"
+            placeholder={t('What did it cost? (R, optional)')}
             value={form.actual}
             onChange={(e) => setForm({ ...form, actual: e.target.value })}
           />
@@ -223,12 +225,12 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
       )}
 
       {rows.length === 0 && unforeseenRows.length === 0 && (
-        <div className="card-paper p-4 text-sm text-ink-muted">Nothing on your list yet. Use the button above to add the first item.</div>
+        <div className="card-paper p-4 text-sm text-ink-muted">{t('Nothing on your list yet. Use the button above to add the first item.')}</div>
       )}
 
       {groupRowsByPhase(rows).map((group) => (
         <div key={group.phase} className="rounded-[20px] bg-[#fffdf9] px-4 pb-1.5 pt-3.5 shadow-[0_10px_24px_-20px_rgba(43,30,18,0.5)]">
-          <h3 className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#6f655a]">{phaseLabel(group.phase)}</h3>
+          <h3 className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#6f655a]">{t(phaseLabel(group.phase))}</h3>
           <div className="mt-1 divide-y divide-ink/[0.06]">
             {group.rows.map((row) => <ListRow key={row.key} row={row} busy={busyKey === row.key} {...rowProps} />)}
           </div>
@@ -237,7 +239,7 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
 
       {unforeseenRows.length > 0 && (
         <div className="rounded-[20px] bg-[#fffdf9] px-4 pb-1.5 pt-3.5 shadow-[0_10px_24px_-20px_rgba(43,30,18,0.5)]">
-          <h3 className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-terracotta-dark">Unexpected expenses</h3>
+          <h3 className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-terracotta-dark">{t('Unexpected expenses')}</h3>
           <div className="mt-1 divide-y divide-ink/[0.06]">
             {unforeseenRows.map((row) => <ListRow key={row.key} row={row} showTick={false} busy={busyKey === row.key} {...rowProps} />)}
           </div>
