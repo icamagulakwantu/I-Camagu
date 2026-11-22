@@ -20,7 +20,7 @@ describe('isiXhosa', () => {
     }
   })
   it('writes the date with isiXhosa day and month names', () => {
-    expect(longDay('xh', new Date(2026, 10, 22))).toBe('Cawe, 22 EyeNkanga')
+    expect(longDay('xh', new Date(2026, 10, 22))).toBe('Cawe, 22 EyeNkanga (Nov)')
   })
 })
 
@@ -33,6 +33,6 @@ describe('isiXhosa countdowns and dates', () => {
   })
   it('writes ceremony dates with isiXhosa month names', async () => {
     const { formatDate } = await import('./index.jsx')
-    expect(formatDate('xh', '2026-12-05T00:00:00Z', { year: true, utc: true })).toBe('Mgqibelo, 5 EyoMnga 2026')
+    expect(formatDate('xh', '2026-12-05T00:00:00Z', { year: true, utc: true })).toBe('Mgqibelo, 5 EyoMnga (Dec) 2026')
   })
 })

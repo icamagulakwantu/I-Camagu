@@ -17,7 +17,7 @@ const STEPS = [
     mark: true,
   },
   {
-    eyebrow: 'Imisitho · Ceremonies',
+    eyebrow: 'Imisebenzi · Ceremonies',
     title: 'Plan every ceremony, step by step',
     body: 'Imbeleko, ulwaluko and umgidi, umtshato and more: what to do and when, what to buy, and what it costs. Family can help plan, and nothing changes without your approval. Your ukugida book is kept with it.',
     icon: 'calendar',

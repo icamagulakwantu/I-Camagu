@@ -5,16 +5,12 @@ draft, written without a first-language speaker. Please correct anything that
 is wrong, stiff or not how people in the Eastern Cape actually speak, in the
 last column, and it will be changed in `src/i18n/xh.js`.
 
-## Questions first
+## Decided by the founder (22 Nov 2026)
 
-- **Umsitho or umsebenzi?** The bottom bar and the new screens say *umsitho /
-  imisitho* for a ceremony. The older set-up steps say *umsebenzi*
-  ("Ngowuphi umsebenzi?", "Qala umsebenzi omtsha"). Which should the whole
-  app use?
-- Stokvels are called **Imigalelo** and Bulk Buy **Thenga**: are those the
-  words members would use? The bottom bar must stay short.
-- Months use the traditional names (EyoMqungu ... EyoMnga). Would members
-  rather see Janyuwari, Febhuwari...?
+- A ceremony is **umsebenzi / imisebenzi** throughout (not umsitho).
+- Stokvels are **Imigalelo**, Bulk Buy is **Thenga**.
+- Months use the traditional names (EyoMqungu ... EyoMnga), with the English
+  month written small beside them (as text inside a sentence: in brackets).
 
 ## Not translated on purpose
 
@@ -31,7 +27,7 @@ them as they are.
 | English | isiXhosa (draft) | Correction |
 |---|---|---|
 | Home | Ekhaya | |
-| Ceremonies | Imisitho | |
+| Ceremonies | Imisebenzi | |
 | Bulk Buy | Thenga | |
 | Stokvels | Imigalelo | |
 | Iziduko | Iziduko | |
@@ -48,7 +44,7 @@ them as they are.
 | Notifications | Izaziso | |
 | What are we | Sibhiyozela | |
 | celebrating? | ntoni? | |
-| Pick a ceremony and get its plan: steps, roles, timeline and budget. | Khetha umsitho ufumane isicwangciso sawo: amanyathelo, imisebenzi, ixesha nohlahlo lwemali. | |
+| Pick a ceremony and get its plan: steps, roles, timeline and budget. | Khetha umsebenzi ufumane isicwangciso sawo: amanyathelo, imisebenzi, ixesha nohlahlo lwemali. | |
 | Wedding | Umtshato | |
 | Other | Omnye | |
 | No date yet | Akukabikho mhla | |
@@ -73,12 +69,12 @@ them as they are.
 | {n} items waiting in your basket | Izinto ezi-{n} zilinde engobozini yakho | |
 | Give {title} a date | Nika u-{title} umhla | |
 | Family can plan around it once it has one | Usapho lungacwangcisa ngokwawo xa sele unawo | |
-| Your ceremonies | Imisitho yakho | |
-| Plan a ceremony | Cwangcisa umsitho | |
+| Your ceremonies | Imisebenzi yakho | |
+| Plan a ceremony | Cwangcisa umsebenzi | |
 | Date passed | Umhla udlulile | |
 | Your clan | Isiduko sakho | |
 | Coming up in your clan | Okuzayo esidukweni sakho | |
-| When someone in your clan plans a ceremony, it appears here. | Xa umntu wesiduko sakho ecwangcisa umsitho, uya kuvela apha. | |
+| When someone in your clan plans a ceremony, it appears here. | Xa umntu wesiduko sakho ecwangcisa umsebenzi, uya kuvela apha. | |
 | I'm coming | Ndiyeza | |
 | Coming ✓ | Ndiyeza ✓ | |
 | Save and buy together | Yonga uthenge kunye | |
@@ -124,24 +120,24 @@ them as they are.
 | {n} h ago | iiyure ezi-{n} ezadlulayo | |
 | Yesterday | Izolo | |
 | One place for your family’s life | Indawo enye yobomi bosapho lwakho | |
-| i-Camagu brings together your ceremonies, your clan, your saving and your buying. Each part helps the others, so nothing is planned alone. | i-Camagu idibanisa imisitho yakho, isiduko sakho, ukonga kwakho nokuthenga kwakho. Icandelo ngalinye linceda amanye, ngoko akukho nto icwangciswa wedwa. | |
-| Plan every ceremony, step by step | Cwangcisa umsitho ngamnye, inyathelo ngenyathelo | |
+| i-Camagu brings together your ceremonies, your clan, your saving and your buying. Each part helps the others, so nothing is planned alone. | i-Camagu idibanisa imisebenzi yakho, isiduko sakho, ukonga kwakho nokuthenga kwakho. Icandelo ngalinye linceda amanye, ngoko akukho nto icwangciswa wedwa. | |
+| Plan every ceremony, step by step | Cwangcisa umsebenzi ngamnye, inyathelo ngenyathelo | |
 | Imbeleko, ulwaluko and umgidi, umtshato and more: what to do and when, what to buy, and what it costs. Family can help plan, and nothing changes without your approval. Your ukugida book is kept with it. | Imbeleko, ulwaluko nomgidi, umtshato nokunye: into ekufuneka yenziwe nanini, into ekufuneka ithengwe, nexabiso layo. Usapho lunokunceda ukucwangcisa, kwaye akukho nto itshintshayo ngaphandle kwemvume yakho. Incwadi yakho yokugida igcinwa kunye nawo. | |
 | Your isiduko is your root | Isiduko sakho yingcambu yakho | |
-| Find your people through your clan names. Your clan can see your ceremony and say "I’m coming", so you know who to plan for. | Fumana abantu bakho ngeziduko zakho. Isiduko sakho singawubona umsitho wakho sithi "Ndiyeza", ukuze wazi ukuba ucwangcisela bani. | |
+| Find your people through your clan names. Your clan can see your ceremony and say "I’m coming", so you know who to plan for. | Fumana abantu bakho ngeziduko zakho. Isiduko sakho singawubona umsebenzi wakho sithi "Ndiyeza", ukuze wazi ukuba ucwangcisela bani. | |
 | Save with your stokvel | Yonga nomgalelo wakho | |
-| Umgalelo, burial society, grocery or family saving: track who paid and pay out fairly. Link a stokvel to a ceremony and see what it is saving for. | Umgalelo, umbutho wokungcwaba, owokutya okanye ukonga kosapho: landela ukuba ngubani ohlawulileyo, uhlawule ngobulungisa. Qhagamshela umgalelo nomsitho, ubone ukuba wongela ntoni. | |
+| Umgalelo, burial society, grocery or family saving: track who paid and pay out fairly. Link a stokvel to a ceremony and see what it is saving for. | Umgalelo, umbutho wokungcwaba, owokutya okanye ukonga kosapho: landela ukuba ngubani ohlawulileyo, uhlawule ngobulungisa. Qhagamshela umgalelo nomsebenzi, ubone ukuba wongela ntoni. | |
 | Buy together, pay less | Thengani kunye, nihlawule kancinci | |
 | SmartMatch joins what you need with what many other families and stokvels need, into one big order at the bulk price. You pay only once the group reaches its bulk tier. | I-SmartMatch idibanisa oko ukufunayo nokufunwa ziintsapho nemigalelo emininzi, ibe yi-odolo enkulu enye ngexabiso elikhulu. Uhlawula kuphela xa iqela lifike kwinqanaba lalo. | |
 | Show me | Ndibonise | |
-| Start with a ceremony | Qala ngomsitho | |
+| Start with a ceremony | Qala ngomsebenzi | |
 | Open {tab} → | Vula {tab} → | |
 | Your whole i-Camagu | Yonke i-Camagu yakho | |
 | Search, e.g. umqombothi, clan, orders | Khangela, umz. umqombothi, isiduko, ii-odolo | |
 | Add your iziduko so your clan can find you | Faka iziduko zakho ukuze isiduko sakho sikufumane | |
 | Your clan, your history, your people. | Isiduko sakho, imbali yakho, abantu bakho. | |
-| Everything to run the day the way it should be run. | Yonke into yokuqhuba umsitho ngendlela efanelekileyo. | |
-| Orders, spending and the people who serve our ceremonies. | Ii-odolo, inkcitho nabantu abasebenzela imisitho yethu. | |
+| Everything to run the day the way it should be run. | Yonke into yokuqhuba umsebenzi ngendlela efanelekileyo. | |
+| Orders, spending and the people who serve our ceremonies. | Ii-odolo, inkcitho nabantu abasebenzela imisebenzi yethu. | |
 | Your clan, its praises and your bloodline | Isiduko sakho, izibongo zaso nomnombo wakho | |
 | Clan groups | Amaqela esiduko | |
 | Talk and plan with your clan | Thetha ucwangcise nesiduko sakho | |
@@ -149,10 +145,10 @@ them as they are.
 | History, kings and legends | Imbali, ookumkani namagorha | |
 | Family archive | Uvimba wosapho | |
 | Photos and family records | Iifoto neerekhodi zosapho | |
-| Ceremony templates | Iitemplate zemisitho | |
+| Ceremony templates | Iitemplate zemisebenzi | |
 | Ready-made plans to start from | Izicwangciso esezilungile zokuqala | |
 | Plans shared with me | Izicwangciso endabelwe zona | |
-| Help family plan their ceremony | Nceda usapho lucwangcise umsitho walo | |
+| Help family plan their ceremony | Nceda usapho lucwangcise umsebenzi walo | |
 | Who brings what | Ngubani ozisa ntoni | |
 | Give each group its items | Nika iqela ngalinye izinto zalo | |
 | Gifts guests bring, and what you return | Izipho eziziswa ziindwendwe, nezo uzibuyisayo | |
@@ -170,7 +166,7 @@ them as they are.
 | Healers, ingcibi & vendors | Amagqirha, iingcibi nabathengisi | |
 | Trusted traditional help | Uncedo lwesintu oluthembekileyo | |
 | Ekoyini mobile bar | Ibhari ehambayo ye-Ekoyini | |
-| Book a bar for your event | Buka ibhari yomsitho wakho | |
+| Book a bar for your event | Buka ibhari yomsebenzi wakho | |
 | Sell on i-Camagu | Thengisa ku-i-Camagu | |
 | Supply stokvels and families | Bonelela imigalelo neentsapho | |
 | Profile | Iprofayile | |
@@ -199,22 +195,22 @@ them as they are.
 | tomorrow | ngomso | |
 | Should already be done | Bekufanele sele kwenziwe | |
 | Overdue by a day | Kudlule usuku olu-1 | |
-| aim for {date} | jolisa ku-{date} | |
+| aim for | jolisa ku- | |
 | Plan created with {n} items | Isicwangciso senziwe sinezinto ezi-{n} | |
 | Could not create plan | Isicwangciso asikwazanga ukwenziwa | |
 | Saved | Kugciniwe | |
 | Could not save | Akukwazanga ukugcinwa | |
-| New ceremony | Umsitho omtsha | |
-| Who can see this ceremony? | Ngubani onokuwubona lo msitho? | |
+| New ceremony | Umsebenzi omtsha | |
+| Who can see this ceremony? | Ngubani onokuwubona lo msebenzi? | |
 | Private is the default. Clan-only shares it only with people who match your registered clan lines. Public can appear in the community feed. | Ngokwesiqhelo ngowakho wedwa. "Isiduko kuphela" wabelana nabantu abanesiduko esifana nesakho. "Wonke umntu" ungavela kwiindaba zoluntu. | |
 | Private — only me | Owam wedwa | |
 | Clan-only — matching clan members | Isiduko kuphela — amalungu esiduko sam | |
 | Public — community feed | Wonke umntu — iindaba zoluntu | |
-| Ceremony planning | Ukucwangcisa umsitho | |
-| Structure for every ceremony: its steps, roles, timeline and budget, so it is done properly and with dignity. | Ulwakhiwo lomsitho ngamnye: amanyathelo awo, imisebenzi, ixesha nemali, ukuze wenziwe kakuhle nangesidima. | |
+| Ceremony planning | Ukucwangcisa umsebenzi | |
+| Structure for every ceremony: its steps, roles, timeline and budget, so it is done properly and with dignity. | Ulwakhiwo lomsebenzi ngamnye: amanyathelo awo, imisebenzi, ixesha nemali, ukuze wenziwe kakuhle nangesidima. | |
 | No plans yet | Akukabikho zicwangciso | |
 | Tap ‘Start a new ceremony’ above to plan your first one. | Cofa u-‘Qala umsebenzi omtsha’ ngentla ukuze ucwangcise owokuqala. | |
-| Please choose the kind of ceremony | Nceda ukhethe uhlobo lomsitho | |
+| Please choose the kind of ceremony | Nceda ukhethe uhlobo lomsebenzi | |
 | Please add a name and a date | Nceda ufake igama nomhla | |
 | Please type a number of people, or leave it empty | Nceda ubhale inani labantu, okanye uyishiye ingenanto | |
 | Please type an amount in rand, or leave it empty | Nceda ubhale imali ngeerandi, okanye uyishiye ingenanto | |
@@ -229,7 +225,7 @@ them as they are.
 | Could not create the share link | Ikhonkco lokwabelana alikwazanga ukwenziwa | |
 | Date | Umhla | |
 | Next · Usuku | Okulandelayo · Usuku | |
-| Give the ceremony a date | Nika umsitho umhla | |
+| Give the ceremony a date | Nika umsebenzi umhla | |
 | Family plan travel and leave around it. Your checklist is already waiting. | Usapho lucwangcisa uhambo nekhefu ngokwawo. Uluhlu lwakho sele lulindile. | |
 | Add the date | Faka umhla | |
 | Budget | Imali | |
@@ -246,11 +242,11 @@ them as they are.
 | Collect the pledges | Qokelela izithembiso | |
 | As family promise goats, drinks or money, add them here so you know what is covered. | Njengoko usapho luthembisa iibhokhwe, iziselo okanye imali, zifake apha ukuze wazi ukuba yintoni esele igqityiwe. | |
 | Add a pledge | Faka isithembiso | |
-| Back to your ceremonies | Buyela kwimisitho yakho | |
+| Back to your ceremonies | Buyela kwimisebenzi yakho | |
 | Share with family | Yabelana nosapho | |
-| Ceremony details | Iinkcukacha zomsitho | |
+| Ceremony details | Iinkcukacha zomsebenzi | |
 | {n} guests | iindwendwe ezi-{n} | |
-| Ceremony sections | Amacandelo omsitho | |
+| Ceremony sections | Amacandelo omsebenzi | |
 | Plan | Isicwangciso | |
 | List | Uluhlu | |
 | People | Abantu | |
@@ -278,8 +274,8 @@ them as they are.
 | Pledged by family | Okuthenjiswe lusapho | |
 | Over budget by | Kudlule imali ngo | |
 | Left in budget | Imali eseleyo | |
-| At guide prices this ceremony will cost about {total}, {over} more than your budget. | Ngamaxabiso esikhokelo lo msitho uya kubiza malunga no-{total}, {over} ngaphezu kwemali yakho. | |
-| At guide prices this ceremony will cost about {total}. Only what you actually pay comes off your budget. | Ngamaxabiso esikhokelo lo msitho uya kubiza malunga no-{total}. Kuthatyathwa kuphela oko ukuhlawulayo ngokwenene. | |
+| At guide prices this ceremony will cost about {total}, {over} more than your budget. | Ngamaxabiso esikhokelo lo msebenzi uya kubiza malunga no-{total}, {over} ngaphezu kwemali yakho. | |
+| At guide prices this ceremony will cost about {total}. Only what you actually pay comes off your budget. | Ngamaxabiso esikhokelo lo msebenzi uya kubiza malunga no-{total}. Kuthatyathwa kuphela oko ukuhlawulayo ngokwenene. | |
 | Unexpected costs so far: {amount}. | Iindleko ezingalindelekanga ukuza kuthi ga ngoku: {amount}. | |
 | Plan and people | Isicwangciso nabantu | |
 | The list | Uluhlu | |
@@ -294,8 +290,8 @@ them as they are.
 | The day, step by step | Usuku, inyathelo ngenyathelo | |
 | What happens, and in what order | Okwenzekayo, nokuba kulandelelana njani | |
 | Details | Iinkcukacha | |
-| About this ceremony | Malunga nalo msitho | |
-| Kind of ceremony | Uhlobo lomsitho | |
+| About this ceremony | Malunga nalo msebenzi | |
+| Kind of ceremony | Uhlobo lomsebenzi | |
 | Name and date | Igama nomhla | |
 | Guests | Iindwendwe | |
 | {n} people | abantu abangama-{n} | |
@@ -335,14 +331,14 @@ them as they are.
 | Coming up | Okuzayo | |
 | What to finish next | Ekufuneka kugqitywe okulandelayo | |
 | See the whole plan → | Bona isicwangciso sonke → | |
-| Everything for this ceremony | Konke kwalo msitho | |
+| Everything for this ceremony | Konke kwalo msebenzi | |
 | Save, buy, gather, remember | Yonga, thenga, hlanganisa, khumbula | |
 | Saving: {name} | Ukonga: {name} | |
 | {amount} saved together so far | {amount} songiwe kunye ukuza kuthi ga ngoku | |
 | Saving for it | Ukongela wona | |
-| Choose the stokvel that is saving for this ceremony | Khetha umgalelo owongela lo msitho | |
+| Choose the stokvel that is saving for this ceremony | Khetha umgalelo owongela lo msebenzi | |
 | Start a stokvel with the family, or join one | Qalisa umgalelo nosapho, okanye ujoyine omnye | |
-| Stokvel saving for this ceremony | Umgalelo owongela lo msitho | |
+| Stokvel saving for this ceremony | Umgalelo owongela lo msebenzi | |
 | Stokvel linked | Umgalelo uqhagamshelwe | |
 | Choose a stokvel… | Khetha umgalelo… | |
 | Buy together | Thengani kunye | |
@@ -351,8 +347,8 @@ them as they are.
 | It shows on your clan members' Home, so they can come and help | Uvela ekhaya kumalungu esiduko sakho, ukuze beze bancede | |
 | Clan | Isiduko | |
 | Tell your clan | Yazisa isiduko sakho | |
-| Let clan members see this ceremony on their Home | Vumela amalungu esiduko awubone lo msitho ekhaya kwawo | |
-| Your clan can see this ceremony | Isiduko sakho singawubona lo msitho | |
+| Let clan members see this ceremony on their Home | Vumela amalungu esiduko awubone lo msebenzi ekhaya kwawo | |
+| Your clan can see this ceremony | Isiduko sakho singawubona lo msebenzi | |
 | Who is coming | Ngubani oza kuza | |
 | {n} confirmed · {people} people | abaqinisekisileyo ngama-{n} · abantu abangama-{people} | |
 | Clan members confirm on their Home; they show here | Amalungu esiduko aqinisekisa ekhaya kwawo; avela apha | |
@@ -366,16 +362,16 @@ them as they are.
 | Keep the photos and videos in the family archive | Gcina iifoto neevidiyo kuvimba wosapho | |
 | Please enter a template name | Nceda ufake igama letemplate | |
 | Saved as template | Igcinwe njengetemplate | |
-| Ceremony deleted | Umsitho ucinyiwe | |
+| Ceremony deleted | Umsebenzi ucinyiwe | |
 | Download as PDF | Khuphela njenge-PDF | |
 | Print or keep a copy | Shicilela okanye ugcine ikopi | |
 | Save as a template | Gcina njengetemplate | |
 | Reuse this plan | Sebenzisa esi sicwangciso kwakhona | |
 | Family can pledge straight from the link. Sharing again replaces the old link. | Usapho lungathembisa ngqo ngekhonkco. Ukwabelana kwakhona kuthatha indawo yekhonkco elidala. | |
 | Name this template | Nika le template igama | |
-| You can reuse it to start future ceremonies faster. | Ungayisebenzisa kwakhona ukuqala imisitho ezayo ngokukhawuleza. | |
-| Delete this ceremony for good? | Ucima lo msitho ngonaphakade? | |
-| This removes the ceremony, the shopping list, the budget and the pledges. It cannot be undone. | Oku kususa umsitho, uluhlu lokuthenga, imali nezithembiso. Akunakubuyiselwa. | |
+| You can reuse it to start future ceremonies faster. | Ungayisebenzisa kwakhona ukuqala imisebenzi ezayo ngokukhawuleza. | |
+| Delete this ceremony for good? | Ucima lo msebenzi ngonaphakade? | |
+| This removes the ceremony, the shopping list, the budget and the pledges. It cannot be undone. | Oku kususa umsebenzi, uluhlu lokuthenga, imali nezithembiso. Akunakubuyiselwa. | |
 | Yes, delete | Ewe, cima | |
 | Please fill in the name and the item | Nceda ugcwalise igama nento | |
 | Pledge added | Isithembiso sifakiwe | |
@@ -390,7 +386,7 @@ them as they are.
 | Received | Sifunyenwe | |
 | Pledged | Sithenjisiwe | |
 | Delete pledge | Cima isithembiso | |
-| The kind of ceremony cannot be changed once the plan is made. | Uhlobo lomsitho alunakutshintshwa xa isicwangciso sele senziwe. | |
+| The kind of ceremony cannot be changed once the plan is made. | Uhlobo lomsebenzi alunakutshintshwa xa isicwangciso sele senziwe. | |
 | e.g. | umz. | |
 | Name this plan | Nika esi sicwangciso igama | |
 | Usually three to five weeks after going in, in the school holidays. Change it to suit the family. | Ngokwesiqhelo kwiiveki ezintathu ukuya kwezintlanu emva kokungena, ngeholide zesikolo. Lutshintshe lufanele usapho. | |
@@ -402,8 +398,8 @@ them as they are.
 | Welcoming a child | Ukwamkela umntwana | |
 | Coming of age | Ukukhula | |
 | Marriage celebration | Umbhiyozo womtshato | |
-| Custom event | Umsitho wakho | |
-| General Event | Omnye umsitho | |
+| Custom event | Umsebenzi wakho | |
+| General Event | Omnye umsebenzi | |
 | A guide for his mother | Isikhokelo sikanina | |
 | What is yours to carry | Okwakho ukukuthwala | |
 | Before he goes | Ngaphambi kokuba ahambe | |

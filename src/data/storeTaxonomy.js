@@ -110,7 +110,7 @@ export const DEPARTMENTS = [
     id: 'nonconsumables',
     name: 'Ceremony & household',
     short: 'Ceremony & home',
-    xhosa: 'Izinto zomsitho',
+    xhosa: 'Izinto zomsebenzi',
     image: 'https://hercules-cdn.com/file_wWg6TY8EOXaauUnyTSlRBPwZ',
     aisles: [
       { id: 'ritual', name: 'Ceremony & household supplies', categories: ['RITUAL_SUPPLIES', 'ULWALUKO_SUPPLIES', 'NON_CONSUMABLE', 'NON_CONSUMABLES', 'HOUSEHOLD', 'CLEANING', 'HYGIENE', 'CLOTHING', 'TOOLS'] },

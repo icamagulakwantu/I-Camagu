@@ -71,20 +71,49 @@ export function useT() {
 const XH_DAYS = ['Cawe', 'Mvulo', 'Lwesibini', 'Lwesithathu', 'Lwesine', 'Lwesihlanu', 'Mgqibelo']
 const XH_MONTHS = ['EyoMqungu', 'EyoMdumba', 'EyoKwindla', 'UTshazimpuzi', 'UCanzibe', 'Isilimela', 'EyeKhala', 'EyeThupha', 'EyoMsintsi', 'EyeDwarha', 'EyeNkanga', 'EyoMnga']
 
-// A date in the member's language. Options: weekday, year, utc (ceremony
-// dates are stored at UTC midnight). English keeps the short en-ZA form.
-export function formatDate(lang, value, { weekday = true, year = false, utc = false } = {}) {
+const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+// The pieces of a date in isiXhosa: the traditional month name, with the
+// English month kept alongside it (founder's choice) so nobody has to guess.
+function xhParts(value, { weekday = true, year = false, utc = false } = {}) {
   const d = new Date(value)
-  if (lang === 'xh') {
-    const get = (f) => (utc ? d[`getUTC${f}`]() : d[`get${f}`]())
-    const parts = `${get('Date')} ${XH_MONTHS[get('Month')]}${year ? ` ${get('FullYear')}` : ''}`
-    return weekday ? `${XH_DAYS[get('Day')]}, ${parts}` : parts
+  const get = (f) => (utc ? d[`getUTC${f}`]() : d[`get${f}`]())
+  return {
+    lead: `${weekday ? `${XH_DAYS[get('Day')]}, ` : ''}${get('Date')} ${XH_MONTHS[get('Month')]}`,
+    en: EN_MONTHS[get('Month')],
+    tail: year ? ` ${get('FullYear')}` : '',
   }
-  return d.toLocaleDateString('en-ZA', { ...(weekday ? { weekday: 'short' } : {}), day: 'numeric', month: 'short', ...(year ? { year: 'numeric' } : {}), ...(utc ? { timeZone: 'UTC' } : {}) })
+}
+
+function enDate(value, { weekday = true, year = false, utc = false, long = false } = {}) {
+  const style = long ? 'long' : 'short'
+  return new Date(value).toLocaleDateString('en-ZA', { ...(weekday ? { weekday: style } : {}), day: 'numeric', month: style, ...(year ? { year: 'numeric' } : {}), ...(utc ? { timeZone: 'UTC' } : {}) })
+}
+
+// A date as plain text (inside a sentence): "Mgqibelo, 5 EyoMnga (Dec) 2026".
+export function formatDate(lang, value, opts = {}) {
+  if (lang !== 'xh') return enDate(value, opts)
+  const p = xhParts(value, opts)
+  return `${p.lead} (${p.en})${p.tail}`
+}
+
+// A date on its own on screen: the English month sits small and lowered
+// beneath the isiXhosa one, like a subscript.
+export function DateText({ value, ...opts }) {
+  const { lang } = useLanguage()
+  if (lang !== 'xh') return <>{enDate(value, opts)}</>
+  const p = xhParts(value, opts)
+  return (
+    <>
+      {p.lead}
+      <sub className="ml-0.5 align-sub text-[0.68em] font-medium normal-case tracking-normal opacity-75">{p.en}</sub>
+      {p.tail}
+    </>
+  )
 }
 
 // "Sunday, 22 November" or "Cawe, 22 EyeNkanga".
 export function longDay(lang, date = new Date()) {
-  if (lang === 'xh') return `${XH_DAYS[date.getDay()]}, ${date.getDate()} ${XH_MONTHS[date.getMonth()]}`
-  return date.toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long' })
+  if (lang === 'xh') return formatDate('xh', date)
+  return enDate(date, { long: true })
 }

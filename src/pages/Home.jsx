@@ -13,7 +13,7 @@ import PhoneNotificationsCard from '../components/PhoneNotificationsCard.jsx'
 import InstallAppCard from '../components/InstallAppCard.jsx'
 import WelcomeTour, { TOUR_REQUEST_KEY, tourDoneKey } from '../components/WelcomeTour.jsx'
 import { useInstallOffer } from '../lib/installApp.js'
-import { longDay, useLanguage, useT } from '../i18n/index.jsx'
+import { DateText, useT } from '../i18n/index.jsx'
 
 // Founder-supplied photo: women in umbhaco celebrating at an umgidi.
 const HERO_IMAGE = 'https://hercules-cdn.com/file_wxyYBh6l6xbEhksr09BuCEsR'
@@ -93,8 +93,6 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
   const progress = total ? Math.round((done / total) * 100) : 0
   const step = nextStep(lead)
   const t = useT()
-  const { lang } = useLanguage()
-  const today = longDay(lang)
   // Your own ceremony's photo when you have one; the umgidi photo otherwise.
   const photo = lead ? ceremonyImage(lead.type) : HERO_IMAGE
 
@@ -135,7 +133,7 @@ function Hero({ user, lead, unreadNotifications, onNavigate, onSelectCeremony, o
 
       {/* Bottom padding leaves room for the Needs-you deck that overlaps the hero. */}
       <div className="absolute inset-x-0 bottom-0 px-5 pb-[84px]">
-        <Eyebrow tone="text-cream/60">Molo, {user?.firstName || 'mhlobo'} · {today}</Eyebrow>
+        <Eyebrow tone="text-cream/60">Molo, {user?.firstName || 'mhlobo'} · <DateText value={new Date()} long /></Eyebrow>
         {lead ? (
           <>
             <h1 className="mt-2 font-display text-[2.3rem] font-semibold leading-[1.02] tracking-tight text-balance">

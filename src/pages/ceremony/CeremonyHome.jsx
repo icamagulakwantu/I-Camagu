@@ -20,7 +20,7 @@ import { planTitle } from './ceremonyForm.js'
 import { rand } from './format.js'
 import { request } from './api.js'
 import { phaseLabel } from '../../../shared/ceremonyList.js'
-import { formatDate, useLanguage, useT } from '../../i18n/index.jsx'
+import { DateText, formatDate, useLanguage, useT } from '../../i18n/index.jsx'
 
 // The ceremony page. Everything about one ceremony lives here: when it is,
 // the next thing to do, one picture of the money, the plan and the people,
@@ -201,8 +201,8 @@ export default function CeremonyHome({
           <Eyebrow tone="text-cream/60">{t(typeName(type))}{story.english && lang !== 'xh' ? ` · ${story.english}` : ''}</Eyebrow>
           <h1 className="mt-2 font-display text-[2.5rem] font-semibold leading-[1] tracking-tight text-balance break-words">{title}</h1>
           <div className="mt-3.5 flex flex-wrap gap-2">
-            <Chip icon="calendar">{ceremony.eventDate ? longDate(lang, ceremony.eventDate) : t('No date yet')}</Chip>
-            {ceremony.homecomingDate && <Chip icon="home">Umgidi {longDate(lang, ceremony.homecomingDate)}</Chip>}
+            <Chip icon="calendar">{ceremony.eventDate ? <DateText value={ceremony.eventDate} year utc /> : t('No date yet')}</Chip>
+            {ceremony.homecomingDate && <Chip icon="home">Umgidi <DateText value={ceremony.homecomingDate} year utc /></Chip>}
             {ceremony.guestCount != null && <Chip icon="users">{t('{n} guests', { n: ceremony.guestCount })}</Chip>}
             {days != null && <Chip strong>{focus.isHomecoming ? `Umgidi ${t(describeCountdown(days))}` : t(capitalise(describeCountdown(days)))}</Chip>}
           </div>

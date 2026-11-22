@@ -1,7 +1,7 @@
 import Icon from '../../components/Icon.jsx'
 import { comingUp, describeDue } from '../../../shared/ceremonyTiming.js'
 import { phaseLabel } from '../../../shared/ceremonyList.js'
-import { formatDate, useLanguage, useT } from '../../i18n/index.jsx'
+import { DateText, useLanguage, useT } from '../../i18n/index.jsx'
 
 
 // What to do next, by date, like a wedding planner's "this week" list. The
@@ -27,7 +27,7 @@ export default function ComingUp({ rows, ceremony, onOpenList }) {
               <span className="block text-[14px] font-bold leading-snug text-ink">{row.label}</span>
               <span className="mt-0.5 block text-xs text-ink-muted">
                 <span className={daysLeft < 0 ? 'font-bold text-terracotta-dark' : 'font-bold text-ink'}>{t(describeDue(daysLeft))}</span>
-                {' · '}{t('aim for {date}', { date: formatDate(lang, due) })} · {t(phaseLabel(row.phase))}
+                {' · '}{t('aim for')}{lang === 'xh' ? '' : ' '}<DateText value={due} /> · {t(phaseLabel(row.phase))}
               </span>
             </span>
           </li>
