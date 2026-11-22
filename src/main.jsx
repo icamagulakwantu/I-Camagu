@@ -4,6 +4,8 @@ import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import './index.css'
 import { watchForUpdates } from './lib/appUpdate.js'
+// Catch the phone's install offer as early as it arrives (see installApp.js).
+import './lib/installApp.js'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -10,6 +10,9 @@ import { daysUntil, describeCountdown, focusDate, nextCeremony } from '../lib/co
 import { ceremonyImage } from '../data/ceremonyImages.js'
 import { labelForCeremonyType } from '../data/ceremonyLabels.js'
 import PhoneNotificationsCard from '../components/PhoneNotificationsCard.jsx'
+import InstallAppCard from '../components/InstallAppCard.jsx'
+import WelcomeTour, { TOUR_REQUEST_KEY, tourDoneKey } from '../components/WelcomeTour.jsx'
+import { useInstallOffer } from '../lib/installApp.js'
 
 // Founder-supplied photo: women in umbhaco celebrating at an umgidi.
 const HERO_IMAGE = 'https://hercules-cdn.com/file_wxyYBh6l6xbEhksr09BuCEsR'
@@ -481,6 +484,27 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
   const [ceremonies, setCeremonies] = useState([])
   const [loading, setLoading] = useState(true)
   const [hasPinSet, setHasPinSet] = useState(true)
+  const installOffer = useInstallOffer()
+  const [showTour, setShowTour] = useState(false)
+
+  // The welcome tour: once, for a member with no ceremony or stokvel yet,
+  // or whenever they ask for it from More.
+  useEffect(() => {
+    if (loading || !user?.id) return
+    let requested = false
+    let done = false
+    try {
+      requested = localStorage.getItem(TOUR_REQUEST_KEY) === '1'
+      if (requested) localStorage.removeItem(TOUR_REQUEST_KEY)
+      done = localStorage.getItem(tourDoneKey(user.id)) === '1'
+    } catch { done = true }
+    if (requested || (!done && ceremonies.length === 0 && stokvels.length === 0)) setShowTour(true)
+  }, [loading, user?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const closeTour = () => {
+    try { if (user?.id) localStorage.setItem(tourDoneKey(user.id), '1') } catch { /* storage blocked */ }
+    setShowTour(false)
+  }
 
   const pinDismissKey = user?.id ? `icamagu_pin_reminder_dismissed:${user.id}` : null
   const [pinDismissed, setPinDismissed] = useState(() => {
@@ -551,8 +575,13 @@ export default function Home({ onNavigate, basketCount = 0, pendingApprovals = 0
 
       <NeedsYou items={needs} loading={loading} />
 
-      {/* Once only: invite people to get notifications on their phone. */}
-      <PhoneNotificationsCard prompt className="mx-4 mt-6 shadow-soft" />
+      {/* Once only, one at a time: add the app to the phone, then turn on
+          notifications. */}
+      {installOffer.show
+        ? <InstallAppCard offer={installOffer} className="mx-4 mt-6 shadow-soft" />
+        : <PhoneNotificationsCard prompt className="mx-4 mt-6 shadow-soft" />}
+
+      {showTour && <WelcomeTour onClose={closeTour} onNavigate={onNavigate} />}
 
       {/* With no ceremony yet the hero already asks what you are planning, so
           the rail would only repeat it. */}

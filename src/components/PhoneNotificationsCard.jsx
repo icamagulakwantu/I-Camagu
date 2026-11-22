@@ -10,8 +10,8 @@ const MARK = '/images/brand/mark-green-96.png'
 // notifications at all.
 //
 // prompt: the one-time invitation on Home. Shown only while notifications
-// are off (or the iPhone needs the Home Screen step), until the person turns
-// them on or taps "Not now"; after that it never comes back on this phone.
+// are off and can be turned on, until the person turns them on or taps
+// "Not now"; after that it never comes back on this phone.
 const promptKey = (userId) => `icamagu_push_prompt_done:${userId}`
 
 export function pushPromptDone(userId) {
@@ -38,8 +38,9 @@ export default function PhoneNotificationsCard({ className = '', prompt = false 
   }, [hidden])
 
   if (hidden || !status || status === 'unsupported') return null
-  // On Home, only invite people who can still say yes.
-  if (prompt && status !== 'off' && status !== 'needs-install' && !justTurnedOn) return null
+  // On Home, only invite people who can say yes now. An iPhone that still
+  // needs the Home Screen step is shown that by the install card instead.
+  if (prompt && status !== 'off' && !justTurnedOn) return null
 
   const dismiss = () => { markPromptDone(user?.id); setHidden(true) }
 

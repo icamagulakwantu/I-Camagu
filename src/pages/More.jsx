@@ -4,6 +4,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import Icon from '../components/Icon.jsx'
 import AncestralRites from './AncestralRites.jsx'
 import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
+import { TOUR_REQUEST_KEY } from '../components/WelcomeTour.jsx'
 
 // One colour per kind of thing, matching Home:
 // terracotta = ceremony, sage = family & culture, ochre = money & services.
@@ -69,6 +70,7 @@ const LIST_GROUPS = [
       { id: 'activity', icon: 'activity', label: 'My activity', desc: 'Everything you have done lately' },
       { id: 'pin', icon: 'key', label: 'Security PIN', desc: 'Protects payouts and approvals' },
       { id: 'account', icon: 'lock', label: 'Account & privacy', desc: 'Password, data and deletion' },
+      { id: 'tour', icon: 'compass', label: 'Take the tour', desc: 'How i-Camagu fits together' },
       { id: 'help', icon: 'help', label: 'Help', desc: 'Answers and support' },
       { id: 'privacy', icon: 'file', label: 'Privacy policy', desc: 'How we look after your data' },
     ],
@@ -156,6 +158,11 @@ export default function More({ onNavigate }) {
     setRecent(next)
     try { localStorage.setItem(RECENT_KEY, JSON.stringify(next)) } catch { /* storage full or blocked */ }
     if (id === 'rites') { setShowRites(true); window.scrollTo(0, 0); return }
+    if (id === 'tour') {
+      try { localStorage.setItem(TOUR_REQUEST_KEY, '1') } catch { /* storage blocked */ }
+      if (typeof onNavigate === 'function') onNavigate('home')
+      return
+    }
     const screen = id === 'ubuhlanti' ? 'shrinefund' : id
     if (typeof onNavigate === 'function') onNavigate(screen)
   }
