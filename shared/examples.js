@@ -154,7 +154,7 @@ export const FRIDGE_BASKET = [
 
 export function fridgeStokvelExample() {
   const members = 14
-  const monthly = 150
+  const monthly = 250 // as in the grocery stokvel (founder, 23 Nov 2026)
   const months = 11 // January to the end of November
   const lines = FRIDGE_BASKET.map((b) => {
     const share = b.cases / members // what one member takes home, in packs
