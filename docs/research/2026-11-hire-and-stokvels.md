@@ -64,9 +64,8 @@ many ceremonies lack: by about 7:30 pm it is dark.
 | 5 kVA generator, per day | about R500 | Plant Index (national, older listing) |
 
 Not found: a published Gqeberha price for flood lights, or for the wooden
-benches township hirers keep. The card shows these as "Price coming soon"
-(the flood light is its own line, kept out of the totals and never given a
-guessed amount), and hirers whose area is unknown read "Area coming soon".
+benches township hirers keep; the founder chose to leave both out.
+Lolwethu Thys and Dima are listed in Port Elizabeth.
 
 In the app: the hire card adds benches for ootata ebuhlanti (a set seats 8;
 about a quarter of the guests), string lights (one per 40 guests, at least
@@ -167,8 +166,10 @@ for 12 and Clase Azul Reposado R41,268 for 12 (R20,634 for 6), both Norman
 Goodfellows. The below-shelf rule then holds every bulk price at least 5%
 under these.
 
-Not verified: Belgravia Gin & Dark Cherry / Dry Lemon and Smirnoff Storm
-Citrus / Pine Twist, listed as 500 ml cans. Shops sell them as 440 ml cans
-(24 × 440 ml R569.99 and R529.99); a 500 ml Belgravia appears only in one
-Pick n Pay special. Their size needs confirming before a shelf price can be
-set.
+Belgravia Gin & Dark Cherry / Dry Lemon and Smirnoff Storm Citrus / Pine
+Twist were listed as 500 ml cans; shops sell 440 ml, so on the founder's word
+they are now 440 ml (`server/scripts/cans-440ml-nov-2026.js`), with shelf
+prices: Belgravia R29.99 a can (R719.76 for 24; Shoprite, Checkers), Storm
+Pine Twist R26.00 a can (R624 for 24; Pick n Pay), Storm Citrus R529.99 for
+24 (Checkers, Shoprite). Belgravia Dry Lemon's bulk price drops to R459 for
+24 (Norman Goodfellows).

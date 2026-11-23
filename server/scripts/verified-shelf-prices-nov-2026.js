@@ -5,10 +5,8 @@
 // price drops to that (prices only go down). keepBulkBelowShelf then holds
 // every bulk price at least 5% under these shelf prices. Runs once.
 //
-// Not here, on purpose: Belgravia Gin & Dark Cherry / Dry Lemon and Smirnoff
-// Storm Citrus / Pine Twist "Can (500ml)". Shops sell them as 440 ml cans
-// (24 x 440 ml R569.99 and R529.99), so no 500 ml shelf price could be read;
-// their shelf price stays an estimate until one is.
+// Belgravia and Smirnoff Storm cans are handled in cans-440ml-nov-2026.js:
+// shops sell them as 440 ml cans, and the founder had them resized to match.
 import prisma from '../config/db.js';
 
 export const FIX_NAME = 'verified-shelf-prices-2026-11-23';

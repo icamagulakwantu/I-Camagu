@@ -89,7 +89,7 @@ const FORMAT_SPECIFIC_IMAGES = [
   // photo arrived and became the new default, so the Can now needs this
   // explicit override to keep its own real can photo.
   { name: 'Budweiser', bottleFormat: 'Can (500ml)', slug: 'budweiser-can' },
-  { name: 'Belgravia Gin & Dry Lemon', bottleFormat: 'Can (500ml)', slug: 'belgravia-dry-lemon-can' },
+  { name: 'Belgravia Gin & Dry Lemon', bottleFormat: 'Can (440ml)', slug: 'belgravia-dry-lemon-can' },
   { name: "Redd's MXD Guarana", bottleFormat: 'Can (500ml)', slug: 'redds-mxd-guarana-can' },
   { name: "Redd's MXD Pine", bottleFormat: 'Can (500ml)', slug: 'redds-mxd-pine-can' },
   { name: 'Sol', bottleFormat: 'Can (500ml)', slug: 'sol-can' },

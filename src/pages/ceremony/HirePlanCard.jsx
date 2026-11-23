@@ -5,7 +5,7 @@ import { darkness } from '../../../shared/darkness.js'
 import { useT } from '../../i18n/index.jsx'
 
 const rand = (n) => `R${Math.round(n).toLocaleString('en-ZA')}`
-const range = (i, t) => (i.upcoming ? t('Price coming soon') : i.from ? `from ${rand(i.low)}` : i.low === i.high ? rand(i.low) : `${rand(i.low)}–${rand(i.high)}`)
+const range = (i) => (i.from ? `from ${rand(i.low)}` : i.low === i.high ? rand(i.low) : `${rand(i.low)}–${rand(i.high)}`)
 
 // What to hire (founder, 23 Nov 2026: in our days everything is hired).
 // Shown as its own card, not dropped into the checklist: the family sees
@@ -79,10 +79,9 @@ export default function HirePlanCard({ ceremony, accessToken, showToast, onAdded
                           {item.tents > 1 ? t('{n} tents with chairs and tables', { n: item.tents }) : t(item.label)}
                           {item.qty > 1 && item.id !== 'tent_bundle' ? <span className="font-normal text-ink-muted"> × {item.qty}</span> : null}
                         </span>
-                        <span className={`flex-shrink-0 text-[13px] font-bold tabular-nums ${item.upcoming ? 'rounded-full bg-[#b8860b]/10 px-2 py-0.5 text-[#8a6508]' : 'text-ink'}`}>{range(item, t)}</span>
+                        <span className="flex-shrink-0 text-[13px] font-bold tabular-nums text-ink">{range(item)}</span>
                       </span>
                       <span className="mt-0.5 block text-[12px] leading-snug text-ink-muted">{t(item.why)}</span>
-                      {item.upcomingNote && <span className="mt-0.5 block text-[12px] font-semibold text-[#8a6508]">{t(item.upcomingNote)}</span>}
                       {item.night && dark && (
                         <span className="mt-1 block rounded-lg bg-[#1f3320]/[0.06] px-2 py-1 text-[12px] font-semibold text-[#2e4a2e]">
                           {t('On your day the sun sets at about {sunset} and it is dark by {dark}.', dark)}

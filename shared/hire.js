@@ -21,13 +21,13 @@ export const HIRE_VENDORS = {
   },
   LOLWETHU: {
     name: 'Lolwethu Thys Rental Services',
-    area: 'Area coming soon',
+    area: 'Port Elizabeth',
     contact: '067 667 1745',
     note: '4 big pots R350; 4-burner gas stove with (empty) cylinder R350, with 4 pots R500; folding trestle table R100.',
   },
   DIMA: {
     name: 'Dima Events and Decor',
-    area: 'Area coming soon',
+    area: 'Port Elizabeth',
     contact: 'Della 064 083 3727 · Dima 078 747 5037',
     note: 'Gas stove 3-plate R200, 2-plate R180; pots from R80; chafing dish R85; beverage dispenser from R40; plastic chair R6; trestle table R45; dinner plate R5; trailer R450.',
   },
@@ -116,7 +116,6 @@ export const HIRE_ITEMS = [
     price: () => [200, 230],
     vendor: ['RED_CHERRY', 'TUMIS'],
     why: 'Ootata sit ebuhlanti, on benches and grass mats rather than plastic chairs in the tent. Township hirers often have benches too: ask when you book the tent.',
-    upcomingNote: 'Township hirers’ bench prices: coming soon.',
   },
   {
     id: 'lights',
@@ -128,20 +127,6 @@ export const HIRE_ITEMS = [
     vendor: ['LEDZ', 'EXTREME_HIRING'],
     why: 'Many ceremonies forget the lights, and the yard goes dark while people are still eating and dancing. Light the tent, the path to ebuhlanti, the kitchen and the way to the toilets.',
     night: true,
-  },
-  {
-    id: 'flood_light',
-    label: 'Flood light for the kraal and the gate',
-    unit: 'light',
-    qty: (guests) => Math.max(1, Math.ceil(guests / 150)),
-    // No Gqeberha hirer publishes a flood-light price yet (searched 23 Nov
-    // 2026): shown as coming, never guessed, and left out of the totals.
-    price: () => [0, 0],
-    upcoming: true,
-    vendor: ['RED_CHERRY', 'LEDZ'],
-    why: 'Where string lights do not reach: ebuhlanti, the gate and where cars park. Ask for one when you book the tent or the lights.',
-    night: true,
-    optional: true,
   },
   {
     id: 'generator',
@@ -241,8 +226,6 @@ export function hirePlan(guests) {
       optional: Boolean(item.optional),
       why: item.why,
       night: Boolean(item.night),
-      upcoming: Boolean(item.upcoming),
-      upcomingNote: item.upcomingNote || null,
       // Who hires it out, local hirers first; vendor is the first of them.
       vendors: [].concat(item.vendor).map((key) => HIRE_VENDORS[key]),
       vendor: HIRE_VENDORS[[].concat(item.vendor)[0]],
@@ -271,8 +254,6 @@ export function hireCostLine(itemId, guests) {
     unitCost: round((item.low + item.high) / 2),
     isInputField: true,
     inputType: 'number',
-    suggestedAmount: item.upcoming
-      ? `Price coming soon: ask ${item.vendor.name} for a quote`
-      : `R${Math.round(item.low).toLocaleString('en-ZA')}–R${Math.round(item.high).toLocaleString('en-ZA')} (${item.vendor.name})`,
+    suggestedAmount: `R${Math.round(item.low).toLocaleString('en-ZA')}–R${Math.round(item.high).toLocaleString('en-ZA')} (${item.vendor.name})`,
   }
 }

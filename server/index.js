@@ -26,7 +26,7 @@ import { fixUlwalukoDietWording } from './scripts/ulwaluko-diet-wording-nov-2026
 import { loadClanPraises } from './scripts/load-clan-praises.js';
 import { updateUlwalukoPlans } from './scripts/ulwaluko-umgidi-nov-2026.js';
 import { updateWeddingAndMourningPlans } from './scripts/wedding-mourning-nov-2026.js';
-import { updateDirectoryListings, addMoreDirectoryListings, addHireListings, addTownshipHireListings, addLightingListings, markAreasComingSoon } from './scripts/directory-listings-nov-2026.js';
+import { updateDirectoryListings, addMoreDirectoryListings, addHireListings, addTownshipHireListings, addLightingListings, setHirerAreas } from './scripts/directory-listings-nov-2026.js';
 import { addUlwalukoRegistrationSteps } from './scripts/ulwaluko-registration-nov-2026.js';
 import { switchPapToSamp } from './scripts/samp-nov-2026.js';
 import { applyGrocerySpecials } from './scripts/grocery-specials-nov-2026.js';
@@ -36,6 +36,7 @@ import { applyDrinksPhotosPrices, fixTsitsikammaSparklingPhoto } from './scripts
 import { applyPriceChecks } from './scripts/apply-price-checks.js';
 import { keepBulkBelowShelf } from './scripts/bulk-below-shelf.js';
 import { applyVerifiedShelfPrices } from './scripts/verified-shelf-prices-nov-2026.js';
+import { fixCanSizes } from './scripts/cans-440ml-nov-2026.js';
 import { fixCourtesyDrinks } from './scripts/courtesy-drinks-nov-2026.js';
 import { addIbhomaItems } from './scripts/ibhoma-items-nov-2026.js';
 import { mergeClanForms } from './scripts/merge-clan-forms-nov-2026.js';
@@ -349,6 +350,11 @@ if (startup.schemaReady) {
   } catch (err) {
     console.error('Verified shelf prices failed:', err?.message);
   }
+  try {
+    await fixCanSizes();
+  } catch (err) {
+    console.error('Can sizes failed:', err?.message);
+  }
   // Every start: a bulk price stays at least 5% below a checked shelf price.
   try {
     await keepBulkBelowShelf();
@@ -396,9 +402,9 @@ if (startup.schemaReady) {
     console.error('Lighting listings failed:', err?.message);
   }
   try {
-    await markAreasComingSoon();
+    await setHirerAreas();
   } catch (err) {
-    console.error('Areas coming soon failed:', err?.message);
+    console.error('Hirer areas failed:', err?.message);
   }
   try {
     await fixCourtesyDrinks();
