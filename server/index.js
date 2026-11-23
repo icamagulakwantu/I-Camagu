@@ -41,6 +41,7 @@ import { keepBulkBelowShelf } from './scripts/bulk-below-shelf.js';
 import { applyVerifiedShelfPrices } from './scripts/verified-shelf-prices-nov-2026.js';
 import { fixCanSizes } from './scripts/cans-440ml-nov-2026.js';
 import { addProductPhotos, addRemainingPhotos, fixChillersCans, replaceChickenPhotos } from './scripts/product-photos-nov-2026.js';
+import { addFridgeMeats } from './scripts/fridge-meats-nov-2026.js';
 import { fixCourtesyDrinks } from './scripts/courtesy-drinks-nov-2026.js';
 import { addIbhomaItems } from './scripts/ibhoma-items-nov-2026.js';
 import { mergeClanForms } from './scripts/merge-clan-forms-nov-2026.js';
@@ -369,6 +370,12 @@ if (startup.schemaReady) {
     await fixShopSizes();
   } catch (err) {
     console.error('Product photos failed:', err?.message);
+  }
+  // Fridge products a grocery stokvel buys together (Russians, polony...). Runs once.
+  try {
+    await addFridgeMeats();
+  } catch (err) {
+    console.error('Fridge meats failed:', err?.message);
   }
   // Live examples: built once, in the background, so start-up is not held up.
   loadExamples().catch((err) => console.error('Loading live examples failed:', err?.message));

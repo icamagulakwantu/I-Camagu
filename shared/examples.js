@@ -134,6 +134,47 @@ export function groceryStokvelExample() {
 }
 
 // ---------------------------------------------------------------------------
+// 2b. Fridge stokvel (founder, 23 Nov 2026, from a real grocery club's
+// Bidfood quote): 14 members buy fridge products in one wholesale order and
+// split it. In Dec 2023 the order cost R21,578.98 with VAT (R1,541.36 each).
+// Today's bulk prices are the Bulk Buy prices (server/scripts/
+// fridge-meats-nov-2026.js, read 23 Nov 2026); shop prices only where a
+// shop's regular price was checked. Members and contributions are made up.
+export const FRIDGE_2023 = { total: 21578.98, members: 14, date: '7 Dec 2023' }
+// cases: what the whole group orders; shop: the same amount in a shop, or
+// null where no shelf price was checked.
+export const FRIDGE_BASKET = [
+  { name: 'Burger patties', pack: 'box of 20 × 90 g', cases: 14, casePrice: 74.77, shop: 129.99 },
+  { name: 'Russians (short)', pack: 'case of 5 × 1 kg', cases: 14, casePrice: 442.57, shop: null },
+  { name: 'Cheese grillers', pack: 'case of 12 × 500 g', cases: 14, casePrice: 665.21, shop: 1079.88 },
+  { name: 'Back bacon', pack: 'case of 6 × 1 kg', cases: 7, casePrice: 555.64, shop: null },
+  { name: 'French polony', pack: '3 kg loaf', cases: 14, casePrice: 79.05, shop: 143.97 },
+  { name: 'Ham & tongue', pack: '2 kg loaf', cases: 14, casePrice: 91.99, shop: 189.98 },
+]
+
+export function fridgeStokvelExample() {
+  const members = 14
+  const monthly = 150
+  const months = 11 // January to the end of November
+  const lines = FRIDGE_BASKET.map((b) => {
+    const share = b.cases / members // what one member takes home, in packs
+    return { ...b, share, total: r2(b.cases * b.casePrice), perMember: r2(share * b.casePrice), shopPerMember: b.shop == null ? null : r2(share * b.shop) }
+  })
+  const groupTotal = r2(lines.reduce((s, l) => s + l.total, 0))
+  const perMember = r2(groupTotal / members)
+  const checked = lines.filter((l) => l.shopPerMember != null)
+  const checkedBulk = r2(checked.reduce((s, l) => s + l.perMember, 0))
+  const checkedShop = r2(checked.reduce((s, l) => s + l.shopPerMember, 0))
+  const contributed = monthly * months
+  return {
+    members, monthly, months, contributed, lines, groupTotal, perMember,
+    checkedBulk, checkedShop, savedOnChecked: r2(checkedShop - checkedBulk),
+    leftover: r2(contributed - perMember),
+    was2023: { ...FRIDGE_2023, perMember: r2(FRIDGE_2023.total / FRIDGE_2023.members) },
+  }
+}
+
+// ---------------------------------------------------------------------------
 // 3. A society (club): money only, from R100 a month with no maximum. Each
 // member raises their own interest and at year end takes home their own
 // contributions plus their own interest (founder).

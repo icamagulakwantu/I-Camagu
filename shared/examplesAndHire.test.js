@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { hirePlan, hireCostLine } from './hire.js'
 import { darkness } from './darkness.js'
-import { drinksPoolExample, groceryStokvelExample, societyExample, lendingCap, memberYear } from './examples.js'
+import { drinksPoolExample, groceryStokvelExample, fridgeStokvelExample, societyExample, lendingCap, memberYear } from './examples.js'
 import { exampleMembers } from './clanExample.js'
 import { PHASE_SEQUENCES } from './ceremonyPhases.js'
 
@@ -74,6 +74,14 @@ describe('worked examples (founder’s rules)', () => {
     expect(g.fridgeTotal).toBeLessThanOrEqual(g.fridgeMonthly * g.months + g.target)
     expect(g.leftover).toBeGreaterThan(0)
     expect(g.members).toBeGreaterThanOrEqual(15)
+  })
+  it('fridge stokvel: 14 members, one order, contributions cover each share', () => {
+    const f = fridgeStokvelExample()
+    expect(f.members).toBe(14)
+    expect(f.groupTotal).toBeCloseTo(f.perMember * f.members, 1)
+    expect(f.contributed).toBeGreaterThanOrEqual(f.perMember)
+    expect(f.savedOnChecked).toBeGreaterThan(0)
+    expect(f.was2023.perMember).toBeCloseTo(1541.36, 2)
   })
   it('society: from R100 a month, each takes home their own money and their own interest', () => {
     const s = societyExample()

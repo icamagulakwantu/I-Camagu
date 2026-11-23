@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import Icon from '../components/Icon.jsx'
-import { drinksPoolExample, groceryStokvelExample, societyExample, LENDING_RULES } from '../../shared/examples.js'
+import { drinksPoolExample, groceryStokvelExample, fridgeStokvelExample, societyExample, LENDING_RULES } from '../../shared/examples.js'
 import { useT } from '../i18n/index.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLiveExamples } from '../lib/liveExamples.js'
@@ -15,6 +15,7 @@ const zar0 = (n) => `R${Math.round(Number(n || 0)).toLocaleString('en-ZA')}`
 export const EXAMPLES = [
   { id: 'drinks', title: 'Umgidi drinks stokvel', note: '50 members buying together', icon: 'cart' },
   { id: 'grocery', title: 'Grocery stokvel', note: 'Fridge and dry goods, Jan–Nov', icon: 'coins' },
+  { id: 'fridge', title: 'Fridge stokvel', note: '14 members, one wholesale order', icon: 'drumstick' },
   { id: 'society', title: 'Society', note: 'Money only, your own interest', icon: 'users' },
   { id: 'ceremony', title: 'Ulwaluko to umgidi', note: 'A fully prepared plan', icon: 'calendar' },
 ]
@@ -143,6 +144,46 @@ function GroceryExample({ t }) {
         <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">{t('Shared out for school uniform and stationery. Each member brings the receipts to show what it was spent on, so the money never goes to alcohol.')}</p>
       </Card>
       <MembersCard t={t} sample={g.sample} target={g.target} />
+    </div>
+  )
+}
+
+function FridgeExample({ t }) {
+  const f = useMemo(() => fridgeStokvelExample(), [])
+  const share = (n) => (Number.isInteger(n) ? String(n) : n.toLocaleString('en-ZA', { maximumFractionDigits: 1 }))
+  return (
+    <div className="space-y-3">
+      <Card>
+        <Label>{t('The group')}</Label>
+        <p className="mt-1 text-[14px] leading-relaxed text-ink">{t('{n} members each pay {m} a month from January to the end of November. At year end they place one order with a food-service wholesaler and share the fridge meat equally.', { n: f.members, m: zar0(f.monthly) })}</p>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <Stat label={t('Paid in by each member')} value={zar0(f.contributed)} />
+          <Stat label={t('Each member’s share')} value={zar(f.perMember)} tone="text-[#2e4a2e]" />
+        </div>
+      </Card>
+      <Card>
+        <Label>{t('The order (bulk prices, 23 Nov 2026)')}</Label>
+        <Rows rows={f.lines.map((l) => ({ label: `${l.cases} × ${l.name} (${l.pack})`, value: zar(l.total) }))} />
+        <div className="mt-2 flex items-baseline justify-between border-t border-ink/[0.1] pt-2 text-[15px] font-bold"><span>{t('One order')}</span><span className="tabular-nums">{zar(f.groupTotal)}</span></div>
+      </Card>
+      <Card>
+        <Label>{t('What each member takes home')}</Label>
+        <Rows rows={f.lines.map((l) => ({ label: `${share(l.share)} × ${l.name} (${l.pack})`, value: zar(l.perMember) }))} />
+        <div className="mt-2 flex items-baseline justify-between border-t border-ink/[0.1] pt-2 text-[15px] font-bold"><span>{t('Each member')}</span><span className="tabular-nums">{zar(f.perMember)}</span></div>
+        <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">{t('On the four items we checked in the shops (burgers, cheese grillers, polony, ham & tongue) each member pays {bulk} instead of {shop}: {saved} saved.', { bulk: zar(f.checkedBulk), shop: zar(f.checkedShop), saved: zar(f.savedOnChecked) })}</p>
+      </Card>
+      <Card>
+        <Label>{t('The same order in {date}', { date: f.was2023.date })}</Label>
+        <p className="mt-1 text-[14px] leading-relaxed text-ink">{t('A real grocery club of {n} members paid {total} for this order, {each} each. Prices have gone up since; the group still buys far below shop prices.', { n: f.was2023.members, total: zar(f.was2023.total), each: zar(f.was2023.perMember) })}</p>
+      </Card>
+      <Card>
+        <Label>{t('On the day')}</Label>
+        <ul className="mt-2 space-y-1.5 text-[14px] leading-relaxed text-ink">
+          <li>• {t('One member collects the order, or the wholesaler delivers to one address.')}</li>
+          <li>• {t('Members come with cooler boxes the same day: fridge meat must go straight into a fridge or freezer.')}</li>
+          <li>• {t('Half-cases (here the bacon) are split at the table and written down, so everyone sees a fair share.')}</li>
+        </ul>
+      </Card>
     </div>
   )
 }
@@ -303,6 +344,7 @@ export default function Examples({ onBack, initialExample = 'drinks', onOpenLive
         })()}
         {active === 'drinks' && <DrinksExample t={t} />}
         {active === 'grocery' && <GroceryExample t={t} />}
+        {active === 'fridge' && <FridgeExample t={t} />}
         {active === 'society' && <SocietyExample t={t} />}
         {active === 'ceremony' && <CeremonyExample t={t} />}
       </div>
