@@ -100,8 +100,8 @@ function StatementReport({ stokvelId, stokvelName }) {
         <p className="font-display font-bold text-xl">{stokvelName} statement</p>
         <p className="text-sm">{fmtDate(from)} to {fmtDate(to)}</p>
       </div>
-      <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3 print:hidden">
-        <p className="text-xs font-black uppercase text-ink-muted">Statement period</p>
+      <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 space-y-3 print:hidden">
+        <p className="text-xs font-extrabold uppercase text-ink-muted">Statement period</p>
         <div className="flex gap-2 overflow-x-auto pb-0.5">
           {PRESETS.map((p) => {
             const [pf, pt] = p.range()
@@ -128,7 +128,7 @@ function StatementReport({ stokvelId, stokvelName }) {
             Download spreadsheet
           </button>
           <button type="button" onClick={() => window.print()} disabled={!data?.entries?.length}
-            className={`flex-1 border-2 border-terracotta/25 text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}>
+            className={`flex-1 border border-ink/15 text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}>
             Print
           </button>
         </div>
@@ -138,7 +138,7 @@ function StatementReport({ stokvelId, stokvelName }) {
         <div className="space-y-2"><Skeleton className="h-32 w-full" /><Skeleton className="h-16 w-full" /></div>
       ) : !data ? null : (
         <>
-          <div className="bg-white border-2 border-terracotta/20 rounded-soft p-4">
+          <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4">
             {summary.map((s) => (
               <div key={s.label} className="flex justify-between text-sm py-1">
                 <span className="text-ink-muted">{s.label}</span>
@@ -154,7 +154,7 @@ function StatementReport({ stokvelId, stokvelName }) {
           {data.entries.length === 0 ? (
             <SubEmpty icon="file" title="Nothing in this period" description="No confirmed money moved between these dates. Try a wider date range." />
           ) : (
-            <div className="bg-white border-2 border-terracotta/20 rounded-soft divide-y divide-cream-dark">
+            <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] divide-y divide-cream-dark">
               {data.entries.map((e, i) => (
                 <div key={i} className="flex items-center justify-between gap-3 px-4 py-2.5">
                   <div className="min-w-0">

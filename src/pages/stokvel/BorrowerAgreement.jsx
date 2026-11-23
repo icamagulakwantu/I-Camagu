@@ -29,7 +29,7 @@ function PhotoField({ label, hint, value, onChange, facing }) {
     <div>
       <p className="text-xs font-bold text-ink mb-1">{label}</p>
       <button type="button" onClick={() => inputRef.current?.click()}
-        className={`w-full flex items-center gap-3 border-2 border-dashed border-terracotta/30 rounded-soft p-3 text-left ${pressable}`}>
+        className={`w-full flex items-center gap-3 border-2 border-dashed border-terracotta/30 rounded-[20px] p-3 text-left ${pressable}`}>
         {value ? (
           <img src={value} alt={label} className="h-16 w-16 rounded-[12px] object-cover flex-shrink-0" />
         ) : (
@@ -108,7 +108,7 @@ function SignaturePad({ onChange }) {
       </div>
       <canvas ref={canvasRef}
         onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerLeave={end}
-        className="w-full h-32 bg-cream border-2 border-terracotta/25 rounded-soft touch-none" />
+        className="w-full h-32 bg-cream border border-ink/[0.08] rounded-[20px] touch-none" />
       {!signed && <p className="text-xs text-ink-muted mt-1">Sign with your finger inside the box.</p>}
     </div>
   )
@@ -120,7 +120,7 @@ export default function BorrowerAgreement({ amount, interest, months, totalDue, 
   const set = (key) => (v) => onChange({ ...value, [key]: v })
   return (
     <div className="space-y-3 pt-1">
-      <div className="bg-terracotta/5 border-2 border-terracotta/20 rounded-soft p-3 flex gap-2">
+      <div className="bg-terracotta/5 border border-ink/[0.08] rounded-[20px] p-3 flex gap-2">
         <Icon name="shieldCheck" size={18} color="#c45c26" className="flex-shrink-0 mt-0.5" />
         <p className="text-xs text-ink leading-relaxed">
           This agreement protects the group and the borrower. Only officials can see these photos.
@@ -132,7 +132,7 @@ export default function BorrowerAgreement({ amount, interest, months, totalDue, 
         <input type="tel" inputMode="tel" placeholder="072 123 4567" value={value.borrowerPhone || ''}
           onChange={(e) => set('borrowerPhone')(e.target.value)} className={`${inp} mt-1`} />
       </label>
-      <div className="bg-white border-2 border-terracotta/20 rounded-soft p-3 text-xs text-ink leading-relaxed">
+      <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-3 text-xs text-ink leading-relaxed">
         I agree to borrow <strong>{money(amount)}</strong> from the group at <strong>{interest}%</strong> interest and
         to repay <strong>{money(totalDue)}</strong> over <strong>{months} month(s)</strong>. If I do not pay, the group
         may share this agreement with the authorities.

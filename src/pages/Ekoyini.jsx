@@ -45,20 +45,20 @@ function MyQuoteRequests({ onBack }) {
 
   return (
     <div className="min-h-screen pb-24 bg-cream px-4 pt-12">
-      <button type="button" onClick={onBack} className={`text-sm text-brand-black/60 mb-4 block ${pressable}`}>← Back</button>
+      <button type="button" onClick={onBack} className={`text-sm text-ink-muted mb-4 block ${pressable}`}>← Back</button>
       <h1 className="font-display font-bold text-2xl text-ink mb-1">My Quote Requests</h1>
       <p className="text-xs text-ink-muted mb-5">Status of every Ekoyini booking request you've sent</p>
 
       {loading ? (
         <p className="text-sm text-ink-muted">Loading…</p>
       ) : quotes.length === 0 ? (
-        <div className="bg-white border-2 border-terracotta/25 rounded-soft p-5 text-center">
+        <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-5 text-center">
           <p className="text-sm text-ink-muted">You haven't requested a quote yet.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {quotes.map((q) => (
-            <div key={q.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
+            <div key={q.id} className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4">
               <div className="flex justify-between items-start gap-2">
                 <div>
                   <p className="font-bold text-[15px] text-ink">{q.packageSelected} package</p>
@@ -148,7 +148,7 @@ export default function Ekoyini({ onBack }) {
             type="button"
             onClick={() => setSelectedPackage(pkg.id)}
             className={cn(
-              'w-full bg-white border-2 rounded-soft p-4 flex items-center gap-4 text-left transition-all duration-200 border-terracotta/25 hover:border-sage-300 hover:-translate-y-0.5 hover:shadow-card',
+              'w-full bg-[#fffdf9] border rounded-[20px] p-4 flex items-center gap-4 text-left transition-all duration-200 border-ink/[0.08] hover:border-sage-300 hover:-translate-y-0.5 hover:shadow-card',
               pressable
             )}
           >

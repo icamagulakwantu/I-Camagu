@@ -58,7 +58,7 @@ function LeaveStokvelButton({ stokvelId, stokvelName, isOrganiser, onLeft }) {
       <StokvelApprovalsPanel stokvelId={stokvelId} />
       <OfficialsPanel stokvelId={stokvelId} />
       <StokvelInvite stokvelId={stokvelId} stokvelName={stokvelName} />
-      <p className="text-xs font-black uppercase tracking-wider text-terracotta mb-2">Leave group</p>
+      <p className="text-xs font-extrabold uppercase tracking-wider text-terracotta mb-2">Leave group</p>
       {!confirm ? (
         <button
           type="button"
@@ -68,7 +68,7 @@ function LeaveStokvelButton({ stokvelId, stokvelName, isOrganiser, onLeft }) {
           Leave this stokvel
         </button>
       ) : (
-        <div className="bg-terracotta/5 border-2 border-terracotta rounded-soft p-4 animate-fade-in">
+        <div className="bg-terracotta/5 border-2 border-terracotta rounded-[20px] p-4 animate-fade-in">
           <p className="text-sm font-bold text-ink mb-1">Leave "{stokvelName}"?</p>
           <p className="text-xs text-ink-muted mb-3">
             You will be removed from the group. Your financial history stays on record.
@@ -87,7 +87,7 @@ function LeaveStokvelButton({ stokvelId, stokvelName, isOrganiser, onLeft }) {
               type="button"
               onClick={() => setConfirm(false)}
               disabled={isLeaving}
-              className={`flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm ${pressable}`}
+              className={`flex-1 border border-ink/15 font-bold py-2 rounded-pill text-sm ${pressable}`}
             >
               Cancel
             </button>

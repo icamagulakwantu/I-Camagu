@@ -53,8 +53,8 @@ export default function SmartMatchLink({ groupBalance, memberCount }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4">
-        <p className="text-xs font-black uppercase tracking-widest text-white/80">Savings into buying power</p>
+      <div className="bg-gradient-to-br from-[#1f3320] to-[#3f6b3f] text-white rounded-[20px] p-4">
+        <p className="text-xs font-extrabold uppercase tracking-widest text-white/80">Savings into buying power</p>
         <p className="text-sm mt-1">
           Use the group pot for a SmartMatch bulk order: alcohol, groceries or meat at supplier prices, not retail.
         </p>
@@ -69,7 +69,7 @@ export default function SmartMatchLink({ groupBalance, memberCount }) {
       ) : results.length === 0 ? (
         <SubEmpty icon="search" title={search ? 'No matches' : 'Catalogue unavailable'} description={search ? 'Try a shorter word, like the brand name.' : 'SmartMatch prices could not be loaded right now.'} />
       ) : (
-        <div className="bg-white border border-terracotta/15 rounded-soft divide-y divide-cream-dark">
+        <div className="bg-white border border-terracotta/15 rounded-[20px] divide-y divide-cream-dark">
           {results.map((s) => (
             <div key={s.id} className="flex items-center gap-3 px-3 py-2.5">
               <div className="min-w-0 flex-1">
@@ -89,7 +89,7 @@ export default function SmartMatchLink({ groupBalance, memberCount }) {
       )}
 
       {picked.length > 0 && (
-        <div className="sticky bottom-20 bg-white border-2 border-terracotta rounded-soft p-4 shadow-lg space-y-2">
+        <div className="sticky bottom-20 bg-white border-2 border-terracotta rounded-[20px] p-4 shadow-lg space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-ink-muted">Order total ({picked.length} item{picked.length === 1 ? '' : 's'})</span>
             <span className="font-display font-bold text-lg text-ink">{money(total)}</span>

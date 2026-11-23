@@ -45,9 +45,9 @@ export default function LendingTargets({ stokvelId }) {
   const profit = Number(round.returned || 0) - Number(round.lent || 0)
 
   return (
-    <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
+    <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 space-y-3">
       <div>
-        <p className="text-xs font-black uppercase text-ink-muted">Umbutho lending target</p>
+        <p className="text-xs font-extrabold uppercase text-ink-muted">Umbutho lending target</p>
         <p className="text-xs text-ink-muted mt-0.5">Lend money out, bring it back with interest. The interest you bring back counts towards your target.</p>
       </div>
 
@@ -117,7 +117,7 @@ export default function LendingTargets({ stokvelId }) {
 
       {data.members.length > 1 && (
         <div className="space-y-2 pt-1">
-          <p className="text-xs font-black uppercase text-ink-muted">Group progress</p>
+          <p className="text-xs font-extrabold uppercase text-ink-muted">Group progress</p>
           {data.members.map((m) => (
             <div key={m.memberId}>
               <div className="flex justify-between text-xs">

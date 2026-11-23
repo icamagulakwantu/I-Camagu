@@ -222,8 +222,8 @@ function Hierarchy({ onBack, initialCeremonyId }) {
   }
 
   return (
-    <div className="px-4 pt-6 pb-24 icamagu-bg min-h-screen">
-      <button onClick={onBack} className="text-sm text-brand-black/60 mb-4">
+    <div className="min-h-screen bg-cream px-4 pb-24 pt-6">
+      <button onClick={onBack} className="text-sm text-ink-muted mb-4">
         &larr; Back
       </button>
       <h2 className="font-display text-[1.75rem] font-semibold leading-tight text-ink">Seating and groups</h2>
@@ -232,12 +232,12 @@ function Hierarchy({ onBack, initialCeremonyId }) {
         At umgidi and every ceremony of isiko lakwaXhosa, each group sits in its own place: ootata ebuhlanti, oomama endlini enkulu, abafana and iintombi apart. Set out the groups, then give each its share.
       </p>
 
-      <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 space-y-2">
+      <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 mb-4 space-y-2">
         {ceremonies.length === 0 ? (
-          <p className="text-xs text-brand-black/50">You don't have any ceremonies yet — create one in Ceremonies first.</p>
+          <p className="text-xs text-ink-muted">You don't have any ceremonies yet — create one in Ceremonies first.</p>
         ) : (
           <select value={ceremonyId} onChange={(e) => setCeremonyId(e.target.value)}
-            className="w-full border border-brand-black/30 rounded-soft px-3 py-2 text-sm" required>
+            className="w-full border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required>
             <option value="">Choose a ceremony</option>
             {ceremonies.map((c) => (
               <option key={c.id} value={c.id}>
@@ -246,7 +246,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
             ))}
           </select>
         )}
-        {error && <p className="text-brand-ochre text-xs">{error}</p>}
+        {error && <p className="text-terracotta-dark text-xs">{error}</p>}
         <form onSubmit={generateGroups}>
           <button type="submit" disabled={!ceremonyId}
             className={`w-full bg-terracotta text-white font-bold py-2 rounded-pill disabled:opacity-50 ${pressable}`}>
@@ -261,23 +261,23 @@ function Hierarchy({ onBack, initialCeremonyId }) {
 
           <h3 className="font-display text-[1.2rem] font-semibold text-ink">Who brings what</h3>
           <p className="mb-2 text-[13px] text-ink-muted">Each group's share of drinks and meat.</p>
-          <div className="bg-white border border-terracotta/20 rounded-soft p-4 mb-4">
-            <p className="text-xs font-black uppercase text-brand-black/40 mb-2">Set an allocation</p>
+          <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 mb-4">
+            <p className="text-xs font-extrabold uppercase text-ink-muted mb-2">Set an allocation</p>
             <form onSubmit={addAllocation} className="space-y-2">
               <select value={activeGroupId} onChange={(e) => setActiveGroupId(e.target.value)}
-                className="w-full border border-brand-black/30 rounded-soft px-3 py-2 text-sm" required>
+                className="w-full border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required>
                 <option value="">Choose a group</option>
                 {groups.map(g => <option key={g.id} value={g.id}>{g.groupLabel}</option>)}
               </select>
               <input type="text" placeholder="Item (e.g. Commando Brandy)" value={itemDescription}
                 onChange={(e) => setItemDescription(e.target.value)}
-                className="w-full border border-brand-black/30 rounded-soft px-3 py-2 text-sm" required />
+                className="w-full border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required />
               <div className="flex gap-2">
                 <input type="number" placeholder="Qty" value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
-                  className="w-1/3 border border-brand-black/30 rounded-soft px-3 py-2 text-sm" required />
+                  className="w-1/3 border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required />
                 <select value={unitType} onChange={(e) => setUnitType(e.target.value)}
-                  className="flex-1 border border-brand-black/30 rounded-soft px-3 py-2 text-sm">
+                  className="flex-1 border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white">
                   <option value="CASE">Case(s)</option>
                   <option value="BOTTLE">Bottle(s)</option>
                 </select>
@@ -288,17 +288,17 @@ function Hierarchy({ onBack, initialCeremonyId }) {
 
           <div className="space-y-2 mb-4">
             {groups.map((g) => (
-              <div key={g.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-3">
+              <div key={g.id} className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-3">
                 <p className="font-bold text-sm text-ink">{g.groupLabel}</p>
                 {(g.allocations || []).length === 0 ? (
-                  <p className="text-xs text-brand-black/40">No allocation set</p>
+                  <p className="text-xs text-ink-muted">No allocation set</p>
                 ) : (
                   <div className="mt-1 space-y-0.5">
                     {g.allocations.map((a) => {
                       const key = a.itemDescription.trim().toLowerCase()
                       const entry = unitPriceMap[key]
                       return (
-                        <p key={a.id} className="text-xs text-brand-black/60">
+                        <p key={a.id} className="text-xs text-ink-muted">
                           {a.quantity} {a.unitType.toLowerCase()}(s) of {a.itemDescription}
                           {entry?.source === 'store' && (
                             <span className="ml-1.5 text-xs font-bold bg-sage-100 text-sage-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide">
@@ -315,8 +315,8 @@ function Hierarchy({ onBack, initialCeremonyId }) {
           </div>
 
           {storeMatchCount > 0 && (
-            <div className="bg-sage-50 border border-sage-200 rounded-soft px-4 py-3 mb-3">
-              <p className="text-xs font-black text-sage-700 mb-1">
+            <div className="bg-sage-50 border border-sage-200 rounded-[20px] px-4 py-3 mb-3">
+              <p className="text-xs font-extrabold text-sage-700 mb-1">
                 {storeMatchCount} item{storeMatchCount > 1 ? 's' : ''} matched to live i-Camagu store prices
               </p>
               <p className="text-xs text-sage-600 leading-relaxed">
@@ -336,9 +336,9 @@ function Hierarchy({ onBack, initialCeremonyId }) {
               </button>
 
               {showCalculator && (
-                <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3 mb-2">
+                <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 space-y-3 mb-2">
                   <div>
-                    <p className="text-xs font-black uppercase text-ink-muted">Price per unit (ZAR)</p>
+                    <p className="text-xs font-extrabold uppercase text-ink-muted">Price per unit (ZAR)</p>
                     <p className="text-xs text-ink-muted leading-relaxed mt-0.5">
                       Store prices are auto-filled. You can override any price manually.
                     </p>
@@ -392,9 +392,9 @@ function Hierarchy({ onBack, initialCeremonyId }) {
           {summary && (
             <div className="space-y-3 mb-4">
               {summary.groupSummaries.filter((g) => g.items.length > 0).map((g) => (
-                <div key={g.groupLabel} className="bg-white border border-terracotta/20 rounded-soft p-4">
+                <div key={g.groupLabel} className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-black uppercase text-ink-muted">{g.groupLabel}</p>
+                    <p className="text-xs font-extrabold uppercase text-ink-muted">{g.groupLabel}</p>
                     {g.groupTotal > 0 && <p className="text-sm font-bold text-terracotta">{money(g.groupTotal)}</p>}
                   </div>
                   <div className="space-y-1">
@@ -416,8 +416,8 @@ function Hierarchy({ onBack, initialCeremonyId }) {
                 </div>
               ))}
 
-              <div className="bg-white border-2 border-terracotta rounded-soft p-4">
-                <p className="text-xs font-black uppercase text-terracotta mb-3">
+              <div className="bg-white border-2 border-terracotta rounded-[20px] p-4">
+                <p className="text-xs font-extrabold uppercase text-terracotta mb-3">
                   Grand Total — All {groups.length} Groups
                 </p>
                 <div className="space-y-2">
@@ -438,7 +438,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
                 </div>
                 {summary.grandTotal > 0 && (
                   <div className="flex items-center justify-between mt-3 pt-3 border-t-2 border-terracotta/30">
-                    <p className="font-black text-sm text-ink uppercase tracking-wide">Total Cost</p>
+                    <p className="font-extrabold text-sm text-ink uppercase tracking-wide">Total Cost</p>
                     <p className="font-display font-extrabold text-xl text-terracotta">{money(summary.grandTotal)}</p>
                   </div>
                 )}

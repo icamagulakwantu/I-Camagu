@@ -175,7 +175,7 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-0.5">
                         {i === 0 && (
-                          <span className="text-xs font-black bg-terracotta text-white px-1.5 py-0.5 rounded-full uppercase">Best</span>
+                          <span className="text-xs font-extrabold bg-terracotta text-white px-1.5 py-0.5 rounded-full uppercase">Best</span>
                         )}
                         <p className="font-bold text-sm text-ink">{b.name}</p>
                       </div>
@@ -237,12 +237,12 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
 
             <div className="grid grid-cols-2 gap-2 text-center">
               <div className="bg-cream rounded-2xl p-3">
-                <p className="text-xs font-black uppercase text-ink-muted">Bank interest</p>
+                <p className="text-xs font-extrabold uppercase text-ink-muted">Bank interest</p>
                 <p className="font-display font-bold text-base text-ink mt-0.5">{money(bankOnRemainder)}</p>
                 <p className="text-xs text-ink-muted">on {money(bankAmount)}</p>
               </div>
               <div className="bg-terracotta/8 rounded-2xl p-3">
-                <p className="text-xs font-black uppercase text-terracotta">SmartMatch saving</p>
+                <p className="text-xs font-extrabold uppercase text-terracotta">SmartMatch saving</p>
                 <p className="font-display font-bold text-base text-terracotta mt-0.5">{money(retailSaving)}</p>
                 <p className="text-xs text-ink-muted">on {money(tradeAmount)} of goods</p>
               </div>
@@ -250,7 +250,7 @@ export default function BankInterestCalc({ groupBalance = 0 }) {
 
             <div className="flex items-center justify-between border-t border-terracotta/15 pt-3">
               <div>
-                <p className="text-xs font-black text-ink">Combined benefit</p>
+                <p className="text-xs font-extrabold text-ink">Combined benefit</p>
                 <p className="text-xs text-ink-muted">bank interest + retail savings</p>
               </div>
               <p className="font-display font-bold text-xl text-terracotta">{money(totalTradeModel)}</p>

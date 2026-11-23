@@ -56,7 +56,7 @@ const cardBase = "card-paper p-4 transition-all duration-300 ease-[cubic-bezier(
 const cardHover = "hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] hover:border-sage-400/30"
 const cardActive = "active:scale-[0.98] active:shadow-none"
 const pressable = "transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none"
-const inputStyle = "w-full border border-ink/30 rounded-soft px-3 py-2 text-sm focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
+const inputStyle = "w-full min-h-11 bg-white border border-ink/15 rounded-xl px-3.5 py-2.5 text-[15px] focus:outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20"
 
 // topSlot / bottomSlot let the wrapper add invites, discovery and profile
 // cards to the list view only, below the page header, so the header always
@@ -815,8 +815,8 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
               </div>
 
               {announcements[0] && (
-                <button type="button" onClick={() => setDetailTab('announcements')} className="w-full text-left bg-sage-50 rounded-soft p-3">
-                  <p className="text-xs font-black uppercase text-sage-700 mb-1">{t('Latest announcement')}</p>
+                <button type="button" onClick={() => setDetailTab('announcements')} className="w-full text-left bg-sage-50 rounded-[20px] p-3">
+                  <p className="text-xs font-extrabold uppercase text-sage-700 mb-1">{t('Latest announcement')}</p>
                   <p className="text-sm text-ink line-clamp-2">{announcements[0].message}</p>
                 </button>
               )}
@@ -824,8 +824,8 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           )}
 
           {detailTab === 'members' && (
-            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-              <p className="text-xs font-black uppercase text-ink-muted mb-3">Members ({stokvel.members.length})</p>
+            <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4">
+              <p className="text-xs font-extrabold uppercase text-ink-muted mb-3">Members ({stokvel.members.length})</p>
               <div className="space-y-2">
                 {stokvel.members.map((m) => {
                   const official = stokvel.officials?.some((o) => o.userId === m.userId)
@@ -855,12 +855,12 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           )}
 
           {detailTab === 'announcements' && (
-          <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-            <p className="text-xs font-black uppercase text-ink-muted mb-2">{t('Announcements')}</p>
+          <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4">
+            <p className="text-xs font-extrabold uppercase text-ink-muted mb-2">{t('Announcements')}</p>
             {isOfficial && (
               <form onSubmit={postAnnouncement} className="flex gap-2 mb-3">
                 <input placeholder={t('Post an update...')} value={newAnnouncement} onChange={(e) => setNewAnnouncement(e.target.value)}
-                  className="flex-1 border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
+                  className="flex-1 border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required />
                 <button type="submit" className="bg-sage-500 text-white font-bold px-4 rounded-pill text-sm">{t('Post')}</button>
               </form>
             )}
@@ -869,7 +869,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
             ) : (
               <div className="space-y-2">
                 {announcements.map((a) => (
-                  <div key={a.id} className="bg-sage-50 rounded-soft p-2.5">
+                  <div key={a.id} className="bg-sage-50 rounded-[20px] p-2.5">
                     <p className="text-sm text-ink">{a.message}</p>
                     <p className="text-xs text-ink-muted mt-1">
                       {a.postedBy?.firstName} {a.postedBy?.lastName} · {new Date(a.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
@@ -884,8 +884,8 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           {detailTab === 'contributions' && (
           <>
           {/* Submit Contribution Form */}
-          <form onSubmit={submitContribution} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-2">
-            <p className="text-xs font-black uppercase text-ink-muted tracking-wider">{t('Submit a contribution')}</p>
+          <form onSubmit={submitContribution} className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 space-y-2">
+            <p className="text-xs font-extrabold uppercase text-ink-muted tracking-wider">{t('Submit a contribution')}</p>
             <input
               type="number"
               placeholder={t('Amount (ZAR)')}
@@ -915,9 +915,9 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           {/* Pending Confirmations */}
           {isOfficial && myPending.length > 0 && (
             <div>
-              <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">{t('Pending confirmations')}</p>
+              <p className="text-xs font-extrabold uppercase text-ink-muted mb-2 tracking-wider">{t('Pending confirmations')}</p>
               {myPending.map((c) => (
-                <div key={c.id} className="bg-white border-2 border-terracotta rounded-soft p-3 mb-2 flex justify-between items-center shadow-sm">
+                <div key={c.id} className="bg-white border-2 border-terracotta rounded-[20px] p-3 mb-2 flex justify-between items-center shadow-sm">
                   <div className="min-w-0">
                     <p className="text-sm font-bold">{zar(Number(c.amount || 0))}</p>
                     <p className="text-xs text-ink-muted truncate">{memberName(c.memberId)}</p>
@@ -937,8 +937,8 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
 
           {/* Recent contributions — real history, previously fetched but
               never shown anywhere in this screen. */}
-          <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-            <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">{t('Recent contributions')}</p>
+          <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4">
+            <p className="text-xs font-extrabold uppercase text-ink-muted mb-2 tracking-wider">{t('Recent contributions')}</p>
             {contributions.length === 0 ? (
               <p className="text-xs text-ink-muted">{t('No contributions recorded yet.')}</p>
             ) : (
@@ -967,9 +967,9 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           <>
           {/* Rotation Order (umgalelo stokvels only) */}
           {stokvel.type === 'UMGALELO_ROTATING' && (
-            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
+            <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4">
               <div className="flex justify-between items-center mb-2">
-                <p className="text-xs font-black uppercase text-ink-muted tracking-wider">{t('Rotation Order')}</p>
+                <p className="text-xs font-extrabold uppercase text-ink-muted tracking-wider">{t('Rotation Order')}</p>
                 {isOfficial && !editingRotation && (
                   <button type="button" onClick={startEditingRotation} className="text-xs text-sage-600 font-bold underline">
                     {Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0 ? t('Edit') : t('Set order')}
@@ -983,17 +983,17 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                     const member = stokvel.members.find(m => m.userId === mUserId)
                     const name = member ? `${member.user.firstName} ${member.user.lastName}` : t('Unknown member')
                     return (
-                      <div key={mUserId} className="flex items-center justify-between bg-cream rounded-soft px-3 py-2">
+                      <div key={mUserId} className="flex items-center justify-between bg-cream rounded-[20px] px-3 py-2">
                         <span className="text-sm font-bold text-ink">{idx + 1}. {name}</span>
                         <div className="flex gap-1">
                           <button type="button" onClick={() => moveInRotation(idx, -1)} disabled={idx === 0}
                             aria-label={`Move ${name} up in the rotation order`}
-                            className="w-11 h-11 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center">
+                            className="w-11 h-11 rounded-pill bg-white border border-ink/[0.08] disabled:opacity-30 flex items-center justify-center">
                             <Icon name="arrowUp" size={14} />
                           </button>
                           <button type="button" onClick={() => moveInRotation(idx, 1)} disabled={idx === rotationDraft.length - 1}
                             aria-label={`Move ${name} down in the rotation order`}
-                            className="w-11 h-11 rounded-pill bg-white border border-terracotta/20 disabled:opacity-30 flex items-center justify-center">
+                            className="w-11 h-11 rounded-pill bg-white border border-ink/[0.08] disabled:opacity-30 flex items-center justify-center">
                             <Icon name="arrowDown" size={14} />
                           </button>
                         </div>
@@ -1005,7 +1005,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                       className={`flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
                       {savingRotation ? t('Saving...') : t('Save order')}
                     </button>
-                    <button type="button" onClick={() => setEditingRotation(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">
+                    <button type="button" onClick={() => setEditingRotation(false)} className="flex-1 border border-ink/[0.08] font-bold py-2 rounded-pill text-sm">
                       {t('Cancel')}
                     </button>
                   </div>
@@ -1017,9 +1017,9 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                     const name = member ? `${member.user.firstName} ${member.user.lastName}` : t('Unknown member')
                     const isNext = idx === (stokvel.currentRotationIndex % stokvel.rotationOrder.length)
                     return (
-                      <div key={mUserId} className={`flex items-center justify-between px-3 py-2 rounded-soft ${isNext ? 'bg-sage-50 border-2 border-sage-500' : 'bg-cream'}`}>
+                      <div key={mUserId} className={`flex items-center justify-between px-3 py-2 rounded-[20px] ${isNext ? 'bg-sage-50 border-2 border-sage-500' : 'bg-cream'}`}>
                         <span className="text-sm font-bold text-ink">{idx + 1}. {name}</span>
-                        {isNext && <span className="text-xs font-black text-sage-600 uppercase">{t('Next')}</span>}
+                        {isNext && <span className="text-xs font-extrabold text-sage-600 uppercase">{t('Next')}</span>}
                       </div>
                     )
                   })}
@@ -1033,8 +1033,8 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           )}
 
           {/* Request Payout Form */}
-          <form onSubmit={requestPayout} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-2">
-            <p className="text-xs font-black uppercase text-ink-muted tracking-wider">{t('Request a payout')}</p>
+          <form onSubmit={requestPayout} className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 space-y-2">
+            <p className="text-xs font-extrabold uppercase text-ink-muted tracking-wider">{t('Request a payout')}</p>
             {stokvel.type === 'UMGALELO_ROTATING' && (
               <p className="text-xs text-ink-muted">
                 {Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0
@@ -1075,9 +1075,9 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           {/* Pending Payout Approvals */}
           {payouts.filter(p => p.status === 'PENDING_APPROVAL').length > 0 && (
             <div>
-              <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">{t('Pending payouts')}</p>
+              <p className="text-xs font-extrabold uppercase text-ink-muted mb-2 tracking-wider">{t('Pending payouts')}</p>
               {payouts.filter(p => p.status === 'PENDING_APPROVAL').map((p) => (
-                <div key={p.id} className="bg-white border-2 border-sage-500 rounded-soft p-3 mb-2 shadow-sm">
+                <div key={p.id} className="bg-white border-2 border-sage-500 rounded-[20px] p-3 mb-2 shadow-sm">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-bold">{zar(Number(p.amount || 0))}</span>
                     <span className="text-xs text-ink-muted">{p.approvals?.length || 0} of {stokvel.requiredApprovals} approval{stokvel.requiredApprovals === 1 ? '' : 's'}</span>
@@ -1102,9 +1102,9 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           <>
           {/* Organiser-only: edit stokvel details */}
           {stokvel.organiserId === user?.id && (
-            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
+            <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-black uppercase text-ink-muted tracking-wider">{t('Stokvel Details')}</p>
+                <p className="text-xs font-extrabold uppercase text-ink-muted tracking-wider">{t('Stokvel Details')}</p>
                 <button
                   type="button"
                   onClick={() => editingDetails ? setEditingDetails(false) : openEditDetails()}
@@ -1156,8 +1156,8 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
 
           {/* Officials-only group settings */}
           {isOfficial && (
-            <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-4">
-              <p className="text-xs font-black uppercase text-ink-muted tracking-wider">{t('Group Settings')}</p>
+            <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 space-y-4">
+              <p className="text-xs font-extrabold uppercase text-ink-muted tracking-wider">{t('Group Settings')}</p>
 
               <form onSubmit={recordInterest} className="space-y-2">
                 <p className="text-xs font-bold text-ink">{t('Record interest earned')}</p>
@@ -1212,7 +1212,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                     type="button"
                     onClick={toggleBereavement}
                     disabled={togglingBereavement}
-                    className={`text-xs font-bold px-3 py-1.5 rounded-pill flex-shrink-0 ${stokvel.bereavementActive ? 'bg-terracotta text-white' : 'border-2 border-terracotta/20 text-ink-muted'} ${pressable}`}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-pill flex-shrink-0 ${stokvel.bereavementActive ? 'bg-terracotta text-white' : 'border border-ink/15 text-ink-muted'} ${pressable}`}
                   >
                     {stokvel.bereavementActive ? t('Deactivate') : t('Activate')}
                   </button>
@@ -1233,7 +1233,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
               </button>
 
               {confirmDelete && (
-                <div className="mt-3 bg-white border-2 border-terracotta rounded-soft p-4 shadow-lg animate-fade-in">
+                <div className="mt-3 bg-white border-2 border-terracotta rounded-[20px] p-4 shadow-lg animate-fade-in">
                   <p className="text-sm font-bold text-ink mb-3">
                     Delete "{stokvel.name}" permanently? This action cannot be undone.
                   </p>
@@ -1250,7 +1250,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                       type="button"
                       onClick={() => setConfirmDelete(false)}
                       disabled={isDeleting}
-                      className={`flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm ${pressable}`}
+                      className={`flex-1 border border-ink/[0.08] font-bold py-2 rounded-pill text-sm ${pressable}`}
                     >
                       {t('Cancel')}
                     </button>
@@ -1265,7 +1265,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
 
         {pinModal && (
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 px-4 pb-6">
-            <div className="w-full max-w-sm bg-white border-2 border-sage-500 rounded-soft p-4 shadow-lg animate-fade-in">
+            <div className="w-full max-w-sm bg-white border-2 border-sage-500 rounded-[20px] p-4 shadow-lg animate-fade-in">
               <form onSubmit={submitPin}>
                 <h2 className="text-sm font-bold text-ink mb-1">{pinModal.label}</h2>
                 <p className="text-xs text-ink-muted mb-3">{t('Enter your security PIN to authorise this action.')}</p>
@@ -1279,7 +1279,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                     autoComplete="off"
                     value={pinInput}
                     onChange={(e) => { setPinInput(e.target.value.replace(/\D/g, '').slice(0, 6)); setPinError('') }}
-                    className="w-full border-2 border-cream-dark rounded-soft pl-3 pr-12 py-2 text-ink tracking-widest"
+                    className="w-full border-2 border-cream-dark rounded-[20px] pl-3 pr-12 py-2 text-ink tracking-widest"
                     autoFocus
                   />
                   <button type="button" onClick={() => setShowPinInput((shown) => !shown)} aria-label={showPinInput ? t('Hide PIN') : t('Show PIN')} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted">
@@ -1335,7 +1335,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
               </div>
               <div className="text-right">
                 <p className="text-[11px] font-bold text-ink-muted">{t('Your groups hold')}</p>
-                <p className="tabular font-display text-lg font-semibold text-sage">{rand(combined, 0)}</p>
+                <p className="tabular font-display text-lg font-semibold text-sage">{rand(combined)}</p>
                 <p className="text-[11px] text-ink-muted">{myStokvels.length === 1 ? t('across 1 group') : t('across {n} groups', { n: myStokvels.length })}</p>
               </div>
             </div>
@@ -1405,7 +1405,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                   <div>
                     {/* This member's own confirmed contributions — not the
                         group total, which is a different (larger) number. */}
-                    <p className="text-xs font-black uppercase tracking-widest text-ink-muted">{t('Your balance')}</p>
+                    <p className="text-xs font-extrabold uppercase tracking-widest text-ink-muted">{t('Your balance')}</p>
                     <p className="tabular font-display font-bold text-2xl text-ink mt-0.5">
                       R{Number(m.myBalance || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
@@ -1413,7 +1413,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                   <p className="text-xs text-ink-muted text-right leading-snug">
                     Group holds<br />
                     <span className="font-bold text-ink tabular">
-                      R{Number(m.stokvel?.groupLedger?.totalBalance || 0).toLocaleString('en-ZA', { maximumFractionDigits: 0 })}
+                      {zar(m.stokvel?.groupLedger?.totalBalance)}
                     </span>
                   </p>
                 </div>

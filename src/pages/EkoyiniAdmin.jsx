@@ -44,7 +44,7 @@ function EkoyiniAdmin({ onBack }) {
     }
   }
 
-  if (loading) return <div className="p-4 space-y-3"><Skeleton className="h-20 w-full rounded-soft" /><Skeleton className="h-20 w-full rounded-soft" /></div>
+  if (loading) return <div className="p-4 space-y-3"><Skeleton className="h-20 w-full rounded-[20px]" /><Skeleton className="h-20 w-full rounded-[20px]" /></div>
 
   if (forbidden) {
     return (
@@ -65,13 +65,13 @@ function EkoyiniAdmin({ onBack }) {
       ) : (
         <div className="space-y-3">
           {quotes.map((q) => (
-            <div key={q.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
+            <div key={q.id} className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4">
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <p className="font-bold text-sm">{q.fullName} {q.surname}</p>
                   <p className="text-xs text-ink-muted">{q.clientEmail} · {q.cellPhone}</p>
                 </div>
-                <span className={`text-xs font-black uppercase px-2 py-1 rounded-pill ${STATUS_COLORS[q.status]}`}>{q.status}</span>
+                <span className={`text-xs font-extrabold uppercase px-2 py-1 rounded-pill ${STATUS_COLORS[q.status]}`}>{q.status}</span>
               </div>
               <p className="text-xs text-ink-muted mb-1 flex items-center gap-1.5">
                 <Icon name="calendar" size={12} /> {new Date(q.eventDate).toLocaleDateString()}
@@ -84,7 +84,7 @@ function EkoyiniAdmin({ onBack }) {
               <div className="flex gap-2 flex-wrap">
                 {STATUSES.map((s) => (
                   <button key={s} onClick={() => updateStatus(q.id, s)}
-                    className={`text-xs font-bold px-3 py-1.5 rounded-pill ${q.status === s ? 'bg-ink text-white' : 'border border-terracotta/20 text-ink-muted'}`}>
+                    className={`text-xs font-bold px-3 py-1.5 rounded-pill ${q.status === s ? 'bg-ink text-white' : 'border border-ink/[0.08] text-ink-muted'}`}>
                     {s}
                   </button>
                 ))}

@@ -3,12 +3,12 @@ import { pressable } from './shared.js'
 
 // Shared UI for stokvel sub-pages: one primary button style, an empty state
 // with an icon and optional action, and a bottom-sheet confirmation.
-export const primaryBtn = `bg-terracotta text-white font-bold rounded-pill text-sm ${pressable}`
-export const secondaryBtn = `border-2 border-terracotta/25 text-ink font-bold rounded-pill text-sm ${pressable}`
+export const primaryBtn = `min-h-11 bg-terracotta text-white font-bold rounded-pill text-sm ${pressable}`
+export const secondaryBtn = `min-h-11 border border-ink/15 bg-white text-ink font-bold rounded-pill text-sm ${pressable}`
 
 export function SubEmpty({ icon, title, description, actionLabel, onAction }) {
   return (
-    <div className="bg-white border-2 border-dashed border-terracotta/20 rounded-soft px-5 py-7 text-center">
+    <div className="bg-[#fffdf9] border border-dashed border-ink/[0.08] rounded-[20px] px-5 py-7 text-center">
       <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sage-50">
         <Icon name={icon} size={22} color="#4a7a4a" />
       </span>
@@ -25,7 +25,7 @@ export function ConfirmSheet({ open, title, message, confirmLabel = 'Confirm', d
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 px-4 pb-6 print:hidden" onClick={onCancel}>
-      <div role="dialog" aria-modal="true" className="w-full max-w-sm bg-white rounded-soft p-5 shadow-lg animate-fade-in" onClick={(e) => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" className="w-full max-w-sm bg-white rounded-[20px] p-5 shadow-lg animate-fade-in" onClick={(e) => e.stopPropagation()}>
         <p className="font-display font-bold text-lg text-ink">{title}</p>
         {message && <p className="text-sm text-ink-muted mt-1.5 leading-relaxed">{message}</p>}
         <div className="flex gap-2 mt-5">

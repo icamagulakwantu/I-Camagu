@@ -176,7 +176,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
             {agendaItems.map((item, i) => (
               <div key={i} className="border border-terracotta/15 rounded-2xl p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-black text-ink-muted uppercase">Item {i + 1}</p>
+                  <p className="text-xs font-extrabold text-ink-muted uppercase">Item {i + 1}</p>
                   {agendaItems.length > 1 && (
                     <button type="button" onClick={() => removeAgenda(i)}
                       className="text-xs text-terracotta font-bold">Remove</button>
@@ -205,7 +205,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
             {actionItems.map((item, i) => (
               <div key={i} className="border border-terracotta/15 rounded-2xl p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-black text-ink-muted uppercase">Action {i + 1}</p>
+                  <p className="text-xs font-extrabold text-ink-muted uppercase">Action {i + 1}</p>
                   {actionItems.length > 1 && (
                     <button type="button" onClick={() => removeAction(i)}
                       className="text-xs text-terracotta font-bold">Remove</button>
@@ -308,7 +308,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
                   {/* Attendance */}
                   {(m.attendees?.length > 0 || m.apologies?.length > 0) && (
                     <div>
-                      <p className="text-xs font-black uppercase text-ink-muted mb-1">Attendance</p>
+                      <p className="text-xs font-extrabold uppercase text-ink-muted mb-1">Attendance</p>
                       {m.attendees?.length > 0 && (
                         <p className="text-xs text-ink"><span className="font-bold">Present:</span> {m.attendees.join(', ')}</p>
                       )}
@@ -321,7 +321,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
                   {/* Agenda */}
                   {m.agendaItems?.length > 0 && (
                     <div>
-                      <p className="text-xs font-black uppercase text-ink-muted mb-2">Agenda</p>
+                      <p className="text-xs font-extrabold uppercase text-ink-muted mb-2">Agenda</p>
                       <div className="space-y-2">
                         {m.agendaItems.map((a, i) => (
                           <div key={i} className="border-l-2 border-terracotta/30 pl-3">
@@ -341,7 +341,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
                   {/* Action items */}
                   {m.actionItems?.length > 0 && (
                     <div>
-                      <p className="text-xs font-black uppercase text-ink-muted mb-2">Action items</p>
+                      <p className="text-xs font-extrabold uppercase text-ink-muted mb-2">Action items</p>
                       <div className="space-y-1.5">
                         {m.actionItems.map((a, i) => (
                           <div key={i} className="flex items-start justify-between gap-2">
@@ -364,7 +364,7 @@ export default function MeetingMinutes({ stokvelId, isOrganiser }) {
                   {/* Next meeting */}
                   {m.nextMeetingDate && (
                     <div className="bg-terracotta/5 rounded-2xl px-3 py-2">
-                      <p className="text-xs font-black uppercase text-terracotta mb-0.5">Next meeting</p>
+                      <p className="text-xs font-extrabold uppercase text-terracotta mb-0.5">Next meeting</p>
                       <p className="text-xs text-ink">
                         {fmt(m.nextMeetingDate)}
                         {m.nextMeetingLocation ? ` at ${m.nextMeetingLocation}` : ''}

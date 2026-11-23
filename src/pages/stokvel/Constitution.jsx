@@ -97,7 +97,7 @@ export default function Constitution({ stokvelId, isOrganiser }) {
   const Field = ({ label, value }) =>
     value ? (
       <div>
-        <p className="text-xs font-black uppercase text-ink-muted mb-0.5">{label}</p>
+        <p className="text-xs font-extrabold uppercase text-ink-muted mb-0.5">{label}</p>
         <p className="text-sm text-ink">{value}</p>
       </div>
     ) : null
@@ -107,16 +107,16 @@ export default function Constitution({ stokvelId, isOrganiser }) {
   return (
     <div className="space-y-4 pb-6">
       {/* Section toggle */}
-      <div className="flex rounded-pill border-2 border-terracotta/20 bg-white p-1">
+      <div className="flex rounded-pill border border-ink/15 bg-white p-1">
         <button type="button" onClick={() => setActiveSection('constitution')}
           className={`flex-1 rounded-pill py-1.5 text-[12px] font-bold transition-colors ${
-            activeSection === 'constitution' ? 'bg-terracotta text-white' : 'text-ink-muted'
+            activeSection === 'constitution' ? 'bg-[#1f3320] text-cream' : 'text-ink-muted'
           }`}>
           Constitution
         </button>
         <button type="button" onClick={() => setActiveSection('audit')}
           className={`flex-1 rounded-pill py-1.5 text-[12px] font-bold transition-colors ${
-            activeSection === 'audit' ? 'bg-terracotta text-white' : 'text-ink-muted'
+            activeSection === 'audit' ? 'bg-[#1f3320] text-cream' : 'text-ink-muted'
           }`}>
           Audit trail ({auditLog.length})
         </button>

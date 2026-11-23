@@ -191,8 +191,8 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
       ) : (
         <div className="px-4 mt-4 space-y-4">
           {/* Bar booking */}
-          <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-            <p className="text-xs font-black uppercase text-ink-muted mb-2">Bar Service</p>
+          <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4">
+            <p className="text-xs font-extrabold uppercase text-ink-muted mb-2">Bar Service</p>
             {!booking ? (
               <div>
                 <p className="text-xs text-ink-muted mb-3">Book Ekoyini Mobile Bar for this ceremony — we handle the bar, you enjoy the moment.</p>
@@ -205,7 +205,7 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
               </div>
             ) : (
               <div>
-                <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-pill ${BOOKING_STATUS_COLOR[booking.status] || 'bg-cream-dark text-ink-muted'}`}>
+                <span className={`text-xs font-extrabold uppercase px-2 py-0.5 rounded-pill ${BOOKING_STATUS_COLOR[booking.status] || 'bg-cream-dark text-ink-muted'}`}>
                   {booking.status}
                 </span>
 
@@ -216,7 +216,7 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
                   ) : (
                     <div className="space-y-2 mb-3">
                       {booking.wristbandTiers.map((t) => (
-                        <div key={t.id} className="flex items-center justify-between bg-cream rounded-soft p-2.5">
+                        <div key={t.id} className="flex items-center justify-between bg-cream rounded-[20px] p-2.5">
                           <div>
                             <p className="text-sm font-bold text-ink">{t.colorLabel}</p>
                             <p className="text-xs text-ink-muted">{t.entitlement}{t.guestCount ? ` · ${t.guestCount} guests` : ''}</p>
@@ -231,21 +231,21 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
                     <input
                       type="text" placeholder="Wristband colour (e.g. Red)" value={colorLabel}
                       onChange={(e) => setColorLabel(e.target.value)}
-                      className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required
+                      className="w-full border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required
                     />
                     <input
                       type="text" placeholder="Entitlement (e.g. 2 drinks)" value={entitlement}
                       onChange={(e) => setEntitlement(e.target.value)}
-                      className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required
+                      className="w-full border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required
                     />
                     <input
                       type="number" placeholder="Guest count (optional)" value={guestCount}
                       onChange={(e) => setGuestCount(e.target.value)}
-                      className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm"
+                      className="w-full border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white"
                     />
                     <button
                       type="submit" disabled={addingTier}
-                      className={`w-full border-2 border-terracotta/25 text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}
+                      className={`w-full border border-ink/15 text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}
                     >
                       {addingTier ? 'Adding...' : '+ Add Tier'}
                     </button>
@@ -256,13 +256,13 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
           </div>
 
           {/* Tourism package */}
-          <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
+          <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-black uppercase text-ink-muted">Cultural Tourism Add-on</p>
+              <p className="text-xs font-extrabold uppercase text-ink-muted">Cultural Tourism Add-on</p>
               {tourism && (
                 <button
                   onClick={toggleTourism}
-                  className={`text-xs font-bold px-3 py-1 rounded-pill ${tourism.isEnabled ? 'bg-sage-500 text-white' : 'border-2 border-terracotta/20 text-ink-muted'} ${pressable}`}
+                  className={`text-xs font-bold px-3 py-1 rounded-pill ${tourism.isEnabled ? 'bg-sage-500 text-white' : 'border-2 border-ink/15 text-ink-muted'} ${pressable}`}
                 >
                   {tourism.isEnabled ? 'Enabled' : 'Disabled'}
                 </button>
@@ -273,17 +273,17 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
               <input
                 type="number" placeholder="Price per head (ZAR)" value={pricePerHead}
                 onChange={(e) => setPricePerHead(e.target.value)}
-                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required
+                className="w-full border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required
               />
               <input
                 type="number" placeholder="Your share (ZAR, max 30% of price)" value={hostShare}
                 onChange={(e) => setHostShare(e.target.value)}
-                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required
+                className="w-full border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required
               />
               <input
                 type="number" placeholder="Max group size (optional)" value={maxGroupSize}
                 onChange={(e) => setMaxGroupSize(e.target.value)}
-                className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm"
+                className="w-full border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white"
               />
               <button
                 type="submit" disabled={savingTourism}
@@ -310,23 +310,23 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
                     <input
                       type="text" placeholder="Tour company / group name" value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
-                      className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm" required
+                      className="w-full border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required
                     />
                     <div className="flex gap-2">
                       <input
                         type="number" placeholder="Group size" value={bookingGroupSize}
                         onChange={(e) => setBookingGroupSize(e.target.value)}
-                        className="flex-1 border border-ink/30 rounded-soft px-3 py-2 text-sm" required
+                        className="flex-1 border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required
                       />
                       <input
                         type="number" placeholder="Total paid (ZAR)" value={totalPaid}
                         onChange={(e) => setTotalPaid(e.target.value)}
-                        className="flex-1 border border-ink/30 rounded-soft px-3 py-2 text-sm" required
+                        className="flex-1 border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required
                       />
                     </div>
                     <button
                       type="submit" disabled={loggingBooking}
-                      className={`w-full border-2 border-terracotta/25 text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}
+                      className={`w-full border border-ink/15 text-ink font-bold py-2 rounded-pill text-sm ${pressable}`}
                     >
                       {loggingBooking ? 'Saving...' : 'Log Booking'}
                     </button>
@@ -338,12 +338,12 @@ function EkoyiniBooking({ ceremonyId, ceremonyTitle, onBack }) {
                 ) : (
                   <div className="space-y-2">
                     {tourismBookings.map((b) => (
-                      <div key={b.id} className="flex items-center justify-between bg-cream rounded-soft p-2.5">
+                      <div key={b.id} className="flex items-center justify-between bg-cream rounded-[20px] p-2.5">
                         <div>
                           <p className="text-xs font-bold text-ink">{b.tourismCompanyName}</p>
                           <p className="text-xs text-ink-muted">{b.groupSize} people · R{parseFloat(b.totalPaidZAR).toFixed(0)}</p>
                         </div>
-                        <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-pill ${BOOKING_STATUS_COLOR[b.status] || 'bg-cream-dark text-ink-muted'}`}>
+                        <span className={`text-xs font-extrabold uppercase px-2 py-0.5 rounded-pill ${BOOKING_STATUS_COLOR[b.status] || 'bg-cream-dark text-ink-muted'}`}>
                           {b.status}
                         </span>
                       </div>

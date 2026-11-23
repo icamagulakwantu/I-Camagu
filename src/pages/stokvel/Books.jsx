@@ -106,8 +106,8 @@ export default function Books({ stokvelId }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white border-2 border-terracotta/20 rounded-soft p-4">
-        <p className="text-xs font-black uppercase text-ink-muted mb-1">The group's books</p>
+      <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4">
+        <p className="text-xs font-extrabold uppercase text-ink-muted mb-1">The group's books</p>
         {rows.map((r) => (
           <div key={r.account} className="flex justify-between text-sm py-1">
             <span className="text-ink-muted">{r.label}</span>
@@ -119,7 +119,7 @@ export default function Books({ stokvelId }) {
         </p>
       </div>
 
-      <div className="bg-white border-2 border-terracotta/20 rounded-soft p-4 space-y-2">
+      <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 space-y-2">
         <button type="button" onClick={verify} disabled={checking} className={`w-full py-2 ${secondaryBtn}`}>
           {checking ? 'Checking...' : 'Check the books have not been changed'}
         </button>
@@ -135,7 +135,7 @@ export default function Books({ stokvelId }) {
       {entries.length === 0 ? (
         <SubEmpty icon="file" title="No entries yet" description="Once contributions, loans or payouts are confirmed, they appear here." />
       ) : (
-        <div className="bg-white border-2 border-terracotta/20 rounded-soft divide-y divide-cream-dark">
+        <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] divide-y divide-cream-dark">
           {entries.map((e) => (
             <button key={e.id} type="button" onClick={() => setOpenId(openId === e.id ? null : e.id)}
               className="w-full text-left px-4 py-2.5">

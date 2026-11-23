@@ -108,13 +108,13 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 grid grid-cols-2 gap-3">
+      <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 grid grid-cols-2 gap-3">
         <div>
-          <p className="text-xs font-black uppercase text-ink-muted">Owed back to group</p>
+          <p className="text-xs font-extrabold uppercase text-ink-muted">Owed back to group</p>
           <p className="font-display font-bold text-xl text-ink mt-0.5">{money(outstanding)}</p>
         </div>
         <div>
-          <p className="text-xs font-black uppercase text-ink-muted">Available in group</p>
+          <p className="text-xs font-extrabold uppercase text-ink-muted">Available in group</p>
           <p className="font-display font-bold text-xl text-ink mt-0.5">{money(groupBalance)}</p>
         </div>
         <p className="col-span-2 text-xs text-ink-muted">
@@ -123,7 +123,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
       </div>
 
       {/* Signpost: the loan steps, so nobody gets lost halfway */}
-      <div className="rounded-soft border-2 border-brand-ochre/40 bg-brand-ochre/10 px-4 py-3">
+      <div className="rounded-[20px] border-2 border-brand-ochre/40 bg-brand-ochre/10 px-4 py-3">
         <p className="text-xs font-bold text-ink">How a group loan works</p>
         <ol className="text-xs text-ink-muted mt-1 space-y-0.5 list-decimal pl-4">
           <li>Borrower asks, takes a photo and signs on this phone.</li>
@@ -140,8 +140,8 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
           Ask the group for a loan
         </button>
       ) : (
-        <form onSubmit={submitRequest} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
-          <p className="text-xs font-black uppercase text-ink-muted">Loan request</p>
+        <form onSubmit={submitRequest} className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 space-y-3">
+          <p className="text-xs font-extrabold uppercase text-ink-muted">Loan request</p>
           <input type="number" min="1" step="0.01" placeholder="Amount (R)" value={amount}
             onChange={(e) => setAmount(e.target.value)} className={inp} required />
           <div className="grid grid-cols-2 gap-2">
@@ -173,7 +173,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
             </p>
           )}
           {preview > 0 && !(agreement.borrowerPhoto && agreement.signature && agreement.agreed) && (
-            <p className="text-xs font-bold text-brand-ochre">To send: take the photo, sign, and tick that you agree.</p>
+            <p className="text-xs font-bold text-terracotta-dark">To send: take the photo, sign, and tick that you agree.</p>
           )}
           <div className="flex gap-2">
             <button type="submit" disabled={saving || !termsReady || !agreement.borrowerPhoto || !agreement.signature || !agreement.agreed}
@@ -195,7 +195,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
         const canVote = isOfficial && l.status === 'PENDING' && l.borrowerId !== user?.id
         const progress = Math.min(100, (l.repaid / l.totalDue) * 100)
         return (
-          <div key={l.id} className="bg-white border-2 border-terracotta/20 rounded-soft p-4 space-y-2">
+          <div key={l.id} className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="font-bold text-sm text-ink truncate">{l.borrowerName}</p>
@@ -209,7 +209,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
               <button type="button" onClick={() => setViewAgreement(l)} className="flex items-center gap-1.5 text-xs font-bold text-sage-700">
                 <span className="text-xs bg-sage-100 px-2 py-0.5 rounded-pill">Signed agreement</span> View photo and signature
               </button>
-            ) : !l.agreedAt && <p className="text-xs text-brand-ochre font-bold">No signed agreement on file</p>}
+            ) : !l.agreedAt && <p className="text-xs text-terracotta-dark font-bold">No signed agreement on file</p>}
 
             {l.status === 'PENDING' && (
               <p className="text-xs text-ink">{yes} of {requiredApprovals} approvals{l.votes.length ? ` · voted: ${l.votes.map((v) => v.name).join(', ')}` : ''}</p>
@@ -253,7 +253,7 @@ export default function LoanBoard({ stokvelId, groupBalance }) {
       })}
       {viewAgreement?.agreement && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 px-4 pb-6" onClick={() => setViewAgreement(null)}>
-          <div role="dialog" aria-modal="true" className="w-full max-w-sm bg-white rounded-soft p-5 shadow-lg space-y-3 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div role="dialog" aria-modal="true" className="w-full max-w-sm bg-white rounded-[20px] p-5 shadow-lg space-y-3 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <p className="font-display font-bold text-lg text-ink">{viewAgreement.borrowerName}</p>
             <p className="text-xs text-ink-muted">Signed {fmtDate(viewAgreement.agreedAt)}{viewAgreement.agreement.phone ? ` · ${viewAgreement.agreement.phone}` : ''}</p>
             <div className="grid grid-cols-2 gap-2">

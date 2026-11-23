@@ -61,7 +61,7 @@ export default function AddMemberPanel({ stokvelId }) {
 
   return (
     <div className="mb-4 pb-4 border-b border-terracotta/15">
-      <p className="text-xs font-black uppercase tracking-wider text-ink-muted mb-1">Add someone</p>
+      <p className="text-xs font-extrabold uppercase tracking-wider text-ink-muted mb-1">Add someone</p>
       <p className="text-xs text-ink-muted mb-2">
         Type a name. Your family from the iziduko network show first. They get a message and choose to join.
       </p>
@@ -70,10 +70,10 @@ export default function AddMemberPanel({ stokvelId }) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search by name"
-        className="w-full border border-ink/30 rounded-soft px-3 py-3 text-base focus:outline-none focus:border-sage-500"
+        className="w-full border border-ink/15 rounded-xl px-3 py-3 text-base focus:outline-none focus:border-sage-500 bg-white"
       />
 
-      <ul className="mt-2 divide-y divide-cream-dark bg-white border border-terracotta/15 rounded-soft">
+      <ul className="mt-2 divide-y divide-cream-dark bg-white border border-terracotta/15 rounded-[20px]">
         {people === null && <li className="p-3 text-sm text-ink-muted">Looking...</li>}
         {people?.length === 0 && (
           <li className="p-3 text-sm text-ink-muted">

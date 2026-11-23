@@ -79,8 +79,8 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4">
-        <p className="text-xs font-black uppercase tracking-widest text-white/80">Bank or retailer?</p>
+      <div className="bg-gradient-to-br from-[#1f3320] to-[#3f6b3f] text-white rounded-[20px] p-4">
+        <p className="text-xs font-extrabold uppercase tracking-widest text-white/80">Bank or retailer?</p>
         <p className="text-sm mt-1">
           On {money(sim)} over {simMonths} months, a bank at about {BANK_RATE}% pays roughly <strong>{money(bankEarns)}</strong>.
           A {discount || 0}% discount from a retailer you already buy from saves <strong>{money(retailerSaves)}</strong>.
@@ -92,13 +92,13 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
       </div>
 
       {credits && active.length > 0 && (
-        <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 grid grid-cols-2 gap-3">
+        <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 grid grid-cols-2 gap-3">
           <div>
-            <p className="text-xs font-black uppercase text-ink-muted">Committed to retailers</p>
+            <p className="text-xs font-extrabold uppercase text-ink-muted">Committed to retailers</p>
             <p className="font-display font-bold text-xl text-ink">{money(committed)}</p>
           </div>
           <div>
-            <p className="text-xs font-black uppercase text-ink-muted">Expected saving</p>
+            <p className="text-xs font-extrabold uppercase text-ink-muted">Expected saving</p>
             <p className="font-display font-bold text-xl text-sage-700">{money(savedTotal)}</p>
           </div>
         </div>
@@ -111,8 +111,8 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
         </button>
       )}
       {(adding || !isOfficial) && (
-        <form onSubmit={save} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
-          <p className="text-xs font-black uppercase text-ink-muted">{isOfficial ? 'New retailer deal' : 'Try the numbers'}</p>
+        <form onSubmit={save} className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 space-y-3">
+          <p className="text-xs font-extrabold uppercase text-ink-muted">{isOfficial ? 'New retailer deal' : 'Try the numbers'}</p>
           {isOfficial && (
             <input type="text" placeholder="Retailer (e.g. Mthatha Cash and Carry)" value={retailer}
               onChange={(e) => setRetailer(e.target.value)} className={inp} required />
@@ -137,7 +137,7 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
                   {saving ? 'Saving...' : 'Save deal'}
                 </button>
                 <button type="button" onClick={() => setAdding(false)}
-                  className={`flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm ${pressable}`}>
+                  className={`flex-1 border border-ink/15 font-bold py-2 rounded-pill text-sm ${pressable}`}>
                   Cancel
                 </button>
               </div>
@@ -151,7 +151,7 @@ export default function TradeCredit({ stokvelId, isOfficial, groupBalance }) {
       ) : credits.length === 0 ? (
         <SubEmpty icon="store" title="No retailer deals yet" description="Pre-pay a wholesaler or butcher you already use in exchange for a discount." actionLabel={isOfficial && !adding ? 'Record a deal' : undefined} onAction={() => setAdding(true)} />
       ) : credits.map((c) => (
-        <div key={c.id} className="bg-white border border-terracotta/15 rounded-soft p-4 space-y-1">
+        <div key={c.id} className="bg-white border border-terracotta/15 rounded-[20px] p-4 space-y-1">
           <div className="flex items-start justify-between gap-2">
             <p className="font-bold text-sm text-ink truncate">{c.retailer}</p>
             <span className={`text-xs font-bold px-2 py-0.5 rounded-pill ${STATUS_STYLE[c.status]}`}>{c.status.toLowerCase()}</span>

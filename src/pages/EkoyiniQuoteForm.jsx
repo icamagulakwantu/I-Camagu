@@ -8,25 +8,25 @@ const HEAR_OPTIONS = ['Instagram', 'Facebook', 'Referral', 'Word of Mouth', 'Pre
 
 function Section({ title, children }) {
   return (
-    <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4">
-      <p className="text-xs font-black uppercase text-brand-ochre mb-3">{title}</p>
+    <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 mb-4">
+      <p className="mb-3 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#6f655a]">{title}</p>
       <div className="space-y-3">{children}</div>
     </div>
   )
 }
 
 function Input(props) {
-  return <input {...props} className="w-full border border-brand-black/30 rounded-soft px-3 py-2 text-sm" />
+  return <input {...props} className="w-full min-h-11 rounded-xl border border-ink/15 bg-white px-3.5 py-2.5 text-[15px] text-ink" />
 }
 
 function TextArea(props) {
-  return <textarea {...props} className="w-full border border-brand-black/30 rounded-soft px-3 py-2 text-sm" rows="2" />
+  return <textarea {...props} className="w-full min-h-11 rounded-xl border border-ink/15 bg-white px-3.5 py-2.5 text-[15px] text-ink" rows="2" />
 }
 
 function Chip({ active, onClick, children }) {
   return (
     <button type="button" onClick={onClick}
-      className={`text-xs px-3 py-1 rounded-pill border ${active ? 'bg-brand-blue text-brand-cream border-brand-blue' : 'bg-white border-brand-black/30'}`}>
+      className={`min-h-9 rounded-full border px-3.5 text-[13px] font-semibold ${active ? 'border-[#1f3320] bg-[#1f3320] text-cream' : 'border-ink/15 bg-white text-ink'}`}>
       {children}
     </button>
   )
@@ -125,11 +125,17 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
   }
 
   return (
-    <div className="px-4 pt-6 pb-24 icamagu-bg min-h-screen">
-      <button onClick={onBack} className="text-sm text-brand-black/60 mb-4">← Back to packages</button>
-      <h2 className="text-xl font-extrabold text-brand-black mb-1">Request a Quote</h2>
-      <p className="text-xs text-brand-black/50 mb-1">{selectedPackage.name} — {selectedPackage.price}</p>
-      <p className="text-xs text-brand-black/40 mb-4">Step {step} of {totalSteps}</p>
+    <div className="min-h-screen bg-cream px-4 pb-24 pt-6">
+      <button onClick={onBack} className="mb-4 inline-flex min-h-11 items-center text-sm font-semibold text-ink-muted">← Back to packages</button>
+      <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Ekoyini · {selectedPackage.name} · {selectedPackage.price}</p>
+      <h2 className="mt-1 font-display text-[1.75rem] font-semibold leading-tight text-ink">Request a quote</h2>
+      {/* Where you are in the six steps. */}
+      <div className="mt-3 mb-5 flex items-center gap-3">
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-cream-dark" role="progressbar" aria-valuenow={step} aria-valuemin={1} aria-valuemax={totalSteps}>
+          <div className="h-full rounded-full bg-[#1f3320] transition-all duration-300" style={{ width: `${(step / totalSteps) * 100}%` }} />
+        </div>
+        <span className="text-[12px] font-bold tabular-nums text-ink-muted">Step {step} of {totalSteps}</span>
+      </div>
 
       {step === 1 && (
         <Section title="A: Client Information">
@@ -140,7 +146,7 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
           <Input type="tel" placeholder="WhatsApp Number (if different)" value={form.whatsappNumber} onChange={e => set('whatsappNumber', e.target.value)} />
           <Input placeholder="Alternative Contact Name" value={form.altContactName} onChange={e => set('altContactName', e.target.value)} />
           <Input type="tel" placeholder="Alternative Contact Number" value={form.altContactNumber} onChange={e => set('altContactNumber', e.target.value)} />
-          <p className="text-xs text-brand-black/40">How did you hear about us?</p>
+          <p className="text-xs text-ink-muted">How did you hear about us?</p>
           <div className="flex flex-wrap gap-2">
             {HEAR_OPTIONS.map(o => <Chip key={o} active={form.hearAboutUs === o} onClick={() => set('hearAboutUs', o)}>{o}</Chip>)}
           </div>
@@ -150,7 +156,7 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
 
       {step === 2 && (
         <Section title="B: Event Details">
-          <select value={form.eventType} onChange={e => set('eventType', e.target.value)} className="w-full border border-brand-black/30 rounded-soft px-3 py-2 text-sm">
+          <select value={form.eventType} onChange={e => set('eventType', e.target.value)} className="w-full min-h-11 rounded-xl border border-ink/15 bg-white px-3.5 py-2.5 text-[15px] text-ink">
             {EVENT_TYPES.map(t => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
           </select>
           {form.eventType === 'OTHER' && <Input placeholder="Please specify" value={form.otherEventType} onChange={e => set('otherEventType', e.target.value)} />}
@@ -174,26 +180,26 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
           <TextArea placeholder="Physical address" value={form.physicalAddress} onChange={e => set('physicalAddress', e.target.value)} />
           <Input placeholder="Area / Suburb *" value={form.venueArea} onChange={e => set('venueArea', e.target.value)} required />
           <Input placeholder="City" value={form.city} onChange={e => set('city', e.target.value)} />
-          <p className="text-xs text-brand-black/40">Venue type</p>
+          <p className="text-xs text-ink-muted">Venue type</p>
           <div className="flex gap-2">
             <Chip active={form.venueType === 'INDOORS'} onClick={() => set('venueType', 'INDOORS')}>Indoors</Chip>
             <Chip active={form.venueType === 'OUTDOORS_COVERED'} onClick={() => set('venueType', 'OUTDOORS_COVERED')}>Outdoors (covered)</Chip>
             <Chip active={form.venueType === 'OUTDOORS_OPEN'} onClick={() => set('venueType', 'OUTDOORS_OPEN')}>Outdoors (open)</Chip>
           </div>
-          <p className="text-xs text-brand-black/40">Parking for setup vehicle?</p>
+          <p className="text-xs text-ink-muted">Parking for setup vehicle?</p>
           <div className="flex gap-2">
             <Chip active={form.parkingAvailable === 'YES'} onClick={() => set('parkingAvailable', 'YES')}>Yes</Chip>
             <Chip active={form.parkingAvailable === 'NO'} onClick={() => set('parkingAvailable', 'NO')}>No</Chip>
             <Chip active={form.parkingAvailable === 'LIMITED'} onClick={() => set('parkingAvailable', 'LIMITED')}>Limited</Chip>
           </div>
           {form.parkingAvailable === 'LIMITED' && <Input placeholder="Please advise" value={form.parkingNote} onChange={e => set('parkingNote', e.target.value)} />}
-          <p className="text-xs text-brand-black/40">Power access?</p>
+          <p className="text-xs text-ink-muted">Power access?</p>
           <div className="flex gap-2">
             <Chip active={form.powerAccess === 'YES'} onClick={() => set('powerAccess', 'YES')}>Yes</Chip>
             <Chip active={form.powerAccess === 'NO'} onClick={() => set('powerAccess', 'NO')}>No — need generator</Chip>
             <Chip active={form.powerAccess === 'NOT_SURE'} onClick={() => set('powerAccess', 'NOT_SURE')}>Not sure</Chip>
           </div>
-          <p className="text-xs text-brand-black/40">Water access?</p>
+          <p className="text-xs text-ink-muted">Water access?</p>
           <div className="flex gap-2">
             <Chip active={form.waterAccess === 'YES'} onClick={() => set('waterAccess', 'YES')}>Yes</Chip>
             <Chip active={form.waterAccess === 'NO'} onClick={() => set('waterAccess', 'NO')}>No</Chip>
@@ -205,7 +211,7 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
       {step === 4 && (
         <Section title="D: Guest Information & Package">
           <Input type="number" placeholder="Total guests expected *" value={form.guestCount} onChange={e => set('guestCount', e.target.value)} required />
-          <p className="text-xs text-brand-black/40">Age ranges (tick all that apply)</p>
+          <p className="text-xs text-ink-muted">Age ranges (tick all that apply)</p>
           <div className="flex flex-wrap gap-2">
             {AGE_RANGES.map(r => <Chip key={r} active={form.ageRanges.includes(r)} onClick={() => toggleArrayItem('ageRanges', r)}>{r}</Chip>)}
           </div>
@@ -238,7 +244,7 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
             <TextArea placeholder="Other special requests" value={form.otherRequests} onChange={e => set('otherRequests', e.target.value)} />
           </Section>
           <Section title="G: Bar & Drink Preferences">
-            <select value={form.drinkMenuStyle} onChange={e => set('drinkMenuStyle', e.target.value)} className="w-full border border-brand-black/30 rounded-soft px-3 py-2 text-sm">
+            <select value={form.drinkMenuStyle} onChange={e => set('drinkMenuStyle', e.target.value)} className="w-full min-h-11 rounded-xl border border-ink/15 bg-white px-3.5 py-2.5 text-[15px] text-ink">
               <option value="FULL_COCKTAILS">Full Cocktails Menu</option>
               <option value="BEER_CIDERS">Beer & Ciders Only</option>
               <option value="SPIRITS_MIXERS">Spirits & Mixers</option>
@@ -248,14 +254,14 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
               <option value="MIXED">Mixed — we'll advise</option>
             </select>
             <Input placeholder="Specific brands/drinks requested" value={form.specificBrands} onChange={e => set('specificBrands', e.target.value)} />
-            <p className="text-xs text-brand-black/40">Who supplies the alcohol?</p>
+            <p className="text-xs text-ink-muted">Who supplies the alcohol?</p>
             <div className="flex gap-2 flex-wrap">
               <Chip active={form.alcoholSupplier === 'CLIENT_SUPPLIES'} onClick={() => set('alcoholSupplier', 'CLIENT_SUPPLIES')}>Client supplies</Chip>
               <Chip active={form.alcoholSupplier === 'EKOYINI_SUPPLIES'} onClick={() => set('alcoholSupplier', 'EKOYINI_SUPPLIES')}>Ekoyini supplies</Chip>
               <Chip active={form.alcoholSupplier === 'MIXED'} onClick={() => set('alcoholSupplier', 'MIXED')}>Mixed</Chip>
             </div>
             {form.alcoholSupplier !== 'CLIENT_SUPPLIES' && (
-              <select value={form.budgetPerPerson} onChange={e => set('budgetPerPerson', e.target.value)} className="w-full border border-brand-black/30 rounded-soft px-3 py-2 text-sm">
+              <select value={form.budgetPerPerson} onChange={e => set('budgetPerPerson', e.target.value)} className="w-full min-h-11 rounded-xl border border-ink/15 bg-white px-3.5 py-2.5 text-[15px] text-ink">
                 <option value="">Budget per person for drinks</option>
                 <option value="R80-R120">R80 – R120</option>
                 <option value="R120-R180">R120 – R180</option>
@@ -285,14 +291,14 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
             <TextArea placeholder="Special setup instructions or venue restrictions" value={form.setupRestrictions} onChange={e => set('setupRestrictions', e.target.value)} />
           </Section>
           <Section title="I: Payment Preference">
-            <p className="text-xs text-brand-black/60">Booking fee: 50% deposit to confirm your date. Final payment due 7 days before the event.</p>
+            <p className="text-xs text-ink-muted">Booking fee: 50% deposit to confirm your date. Final payment due 7 days before the event.</p>
             <div className="flex gap-2 flex-wrap">
               <Chip active={form.preferredPaymentMethod === 'EFT'} onClick={() => set('preferredPaymentMethod', 'EFT')}>EFT / Bank Transfer</Chip>
               <Chip active={form.preferredPaymentMethod === 'CASH'} onClick={() => set('preferredPaymentMethod', 'CASH')}>Cash on setup day</Chip>
             </div>
           </Section>
-          {error && <p className="text-brand-ochre text-sm mb-2">{error}</p>}
-          <button onClick={handleSubmit} className="w-full bg-brand-blue text-brand-cream font-bold py-3 rounded-pill">
+          {error && <p className="text-terracotta-dark text-sm mb-2">{error}</p>}
+          <button onClick={handleSubmit} className="w-full bg-[#1f3320] text-cream font-bold py-3 rounded-pill">
             Submit Quote Request
           </button>
         </>
@@ -300,11 +306,11 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
 
       {step < 6 && (
         <>
-          {error && <p className="text-brand-ochre text-sm mb-2">{error}</p>}
+          {error && <p className="text-terracotta-dark text-sm mb-2">{error}</p>}
           {/* Back and Next stay in reach above the bottom bar. */}
           <div className="sticky bottom-[calc(env(safe-area-inset-bottom)+88px)] z-20 -mx-4 mt-2 flex gap-2 bg-gradient-to-t from-cream via-cream/95 to-cream/0 px-4 pb-3 pt-5">
-            {step > 1 && <button onClick={() => goToStep(step - 1)} className="h-12 flex-1 rounded-pill border-2 border-terracotta/25 bg-white text-sm font-bold text-brand-black">Back</button>}
-            <button onClick={() => goToStep(step + 1)} className="h-12 flex-[2] rounded-pill bg-brand-blue text-sm font-bold text-brand-cream">Next</button>
+            {step > 1 && <button onClick={() => goToStep(step - 1)} className="h-12 flex-1 rounded-pill border border-ink/15 bg-white text-sm font-bold text-ink">Back</button>}
+            <button onClick={() => goToStep(step + 1)} className="h-12 flex-[2] rounded-pill bg-[#1f3320] text-sm font-bold text-cream">Next</button>
           </div>
         </>
       )}

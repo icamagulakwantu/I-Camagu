@@ -175,7 +175,7 @@ export default function FinesPenalties({ stokvelId, members = [], isOrganiser })
         {['outstanding', 'paid', 'all'].map((f) => (
           <button key={f} type="button" onClick={() => setActiveFilter(f)}
             className={`flex-1 rounded-pill py-1.5 text-xs font-bold transition-colors capitalize ${
-              activeFilter === f ? 'bg-terracotta text-white' : 'bg-white border border-ink/10 text-ink-muted'
+              activeFilter === f ? 'bg-[#1f3320] text-cream' : 'bg-white border border-ink/10 text-ink-muted'
             }`}>
             {f}
           </button>
