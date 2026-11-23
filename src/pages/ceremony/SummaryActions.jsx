@@ -96,10 +96,10 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
 
       {!manage && (
       <div className="flex gap-2">
-        <button type="button" onClick={() => onShare(false)} className={cn('flex-1 h-14 border-2 border-terracotta text-terracotta rounded-pill flex items-center justify-center gap-2', pressable)}>
+        <button type="button" onClick={() => onShare(false)} className={cn('flex-1 h-12 text-[15px] font-bold ring-1 ring-terracotta/40 text-terracotta rounded-pill flex items-center justify-center gap-2', pressable)}>
           <Icon name="share" size={16} /> <Bi {...BUTTONS.share} />
         </button>
-        <button type="button" onClick={() => onShare(true)} className={cn('flex-1 h-14 bg-[#25D366] text-white font-bold rounded-pill', pressable)}>WhatsApp</button>
+        <button type="button" onClick={() => onShare(true)} className={cn('flex-1 h-12 text-[15px] font-bold bg-[#25D366] text-white rounded-pill', pressable)}>WhatsApp</button>
       </div>
       )}
       {!manage && <p className="text-xs text-ink-muted text-center -mt-1">{t('Family can pledge straight from the link. Sharing again replaces the old link.')}</p>}
@@ -110,8 +110,8 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
           <p className="text-xs text-ink-muted">{t('You can reuse it to start future ceremonies faster.')}</p>
           <input className={inputClass} value={templateTitle} onChange={(e) => setTemplateTitle(e.target.value)} autoFocus />
           <div className="flex gap-2">
-            <button type="submit" disabled={savingTemplate} className={cn('flex-1 h-14 bg-sage-600 text-white rounded-pill', pressable)}><Bi {...BUTTONS.save} /></button>
-            <button type="button" onClick={() => setTemplateOpen(false)} className={cn('flex-1 h-14 border-2 border-sage-200 rounded-pill', pressable)}><Bi {...BUTTONS.cancel} /></button>
+            <button type="submit" disabled={savingTemplate} className={cn('flex-1 h-12 text-[15px] font-bold bg-sage-600 text-white rounded-pill', pressable)}><Bi {...BUTTONS.save} /></button>
+            <button type="button" onClick={() => setTemplateOpen(false)} className={cn('flex-1 h-12 text-[15px] font-bold ring-1 ring-ink/10 rounded-pill', pressable)}><Bi {...BUTTONS.cancel} /></button>
           </div>
         </form>
       )}
@@ -125,8 +125,8 @@ export default function SummaryActions({ plan, accessToken, onShare, onViewTimel
           <p className="text-sm font-bold text-ink mb-1">{t('Delete this ceremony for good?')}</p>
           <p className="text-xs text-ink-muted mb-3">{t('This removes the ceremony, the shopping list, the budget and the pledges. It cannot be undone.')}</p>
           <div className="flex gap-2">
-            <button type="button" onClick={deleteCeremony} className={cn('flex-1 h-14 bg-terracotta text-white font-bold rounded-pill', pressable)}>{t('Yes, delete')}</button>
-            <button type="button" onClick={() => setConfirmDelete(false)} className={cn('flex-1 h-14 border-2 border-terracotta/25 rounded-pill', pressable)}><Bi {...BUTTONS.cancel} /></button>
+            <button type="button" onClick={deleteCeremony} className={cn('flex-1 h-12 text-[15px] font-bold bg-terracotta text-white rounded-pill', pressable)}>{t('Yes, delete')}</button>
+            <button type="button" onClick={() => setConfirmDelete(false)} className={cn('flex-1 h-12 text-[15px] font-bold ring-1 ring-ink/10 rounded-pill', pressable)}><Bi {...BUTTONS.cancel} /></button>
           </div>
         </div>
       )}

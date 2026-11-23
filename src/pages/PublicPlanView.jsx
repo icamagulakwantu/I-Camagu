@@ -247,7 +247,7 @@ function PublicPlanView({ token }) {
               <input className={inputClass} placeholder="Item (e.g. a goat, 2 cases of beer)" value={form.pledgedItem} onChange={(e) => setForm((f) => ({ ...f, pledgedItem: e.target.value }))} maxLength={120} />
               <input className={inputClass} type="number" inputMode="decimal" min="0" placeholder="Amount in rand (or the value of your item)" value={form.pledgedAmountZAR} onChange={(e) => setForm((f) => ({ ...f, pledgedAmountZAR: e.target.value }))} />
               {formError && <p role="alert" className="text-sm font-bold text-terracotta">{formError}</p>}
-              <button type="submit" disabled={sending} className="w-full h-14 rounded-pill bg-sage-600 text-white font-bold text-base active:scale-[0.98] transition-transform disabled:opacity-60">
+              <button type="submit" disabled={sending} className="w-full h-12 rounded-pill text-[15px] font-bold bg-sage-600 text-white font-bold text-base active:scale-[0.98] transition-transform disabled:opacity-60">
                 {sending ? 'Saving...' : 'Pledge it'}
               </button>
               <p className="text-xs text-ink-muted text-center">Only the host sees your name and amount. No account needed. i-Camagu never holds money.</p>

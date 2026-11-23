@@ -34,6 +34,8 @@ import { addEkoyiniProducts } from './scripts/ekoyini-catalogue-nov-2026.js';
 import { correctQuartSizes } from './scripts/quart-sizes-nov-2026.js';
 import { applyDrinksPhotosPrices, fixTsitsikammaSparklingPhoto } from './scripts/drinks-photos-prices-nov-2026.js';
 import { applyPriceChecks } from './scripts/apply-price-checks.js';
+import { keepBulkBelowShelf } from './scripts/bulk-below-shelf.js';
+import { fixCourtesyDrinks } from './scripts/courtesy-drinks-nov-2026.js';
 import { addIbhomaItems } from './scripts/ibhoma-items-nov-2026.js';
 import { mergeClanForms } from './scripts/merge-clan-forms-nov-2026.js';
 import { alignCeremonyOrder } from './scripts/ceremony-order-nov-2026.js';
@@ -340,6 +342,12 @@ if (startup.schemaReady) {
   } catch (err) {
     console.error('Price checks failed:', err?.message);
   }
+  // Every start: a bulk price stays at least 5% below a checked shelf price.
+  try {
+    await keepBulkBelowShelf();
+  } catch (err) {
+    console.error('Bulk below shelf failed:', err?.message);
+  }
   // The fuller ibhoma list on upcoming ulwaluko plans. Runs once.
   try {
     await addIbhomaItems();
@@ -374,6 +382,11 @@ if (startup.schemaReady) {
     await addTownshipHireListings();
   } catch (err) {
     console.error('Township hire listings failed:', err?.message);
+  }
+  try {
+    await fixCourtesyDrinks();
+  } catch (err) {
+    console.error('Courtesy drinks fix failed:', err?.message);
   }
 }
 

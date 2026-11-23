@@ -317,7 +317,7 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
       </header>
 
         {stepId !== 'summary' && (
-          <h2 className="px-5 mt-6 text-2xl text-ink"><Bi xh={step.xh} en={step.en} enClassName="text-base" /></h2>
+          <h2 className="px-5 mt-6 text-2xl text-ink"><Bi both xh={step.xh} en={step.en} enClassName="text-base" /></h2>
         )}
 
         {stepId === 'list' && (
@@ -339,10 +339,10 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
         )}
         {creating && stepId === 'money' && (
           <div className="px-4 mt-4">
-            <label className="block rounded-2xl border border-cream-dark bg-white p-4">
+            <label className="block rounded-[22px] bg-white p-4 ring-1 ring-ink/[0.07]">
               <span className="block font-bold text-ink">{t('Who can see this ceremony?')}</span>
               <span className="block mt-1 text-xs text-ink-muted">{t('Private is the default. Clan-only shares it only with people who match your registered clan lines. Public can appear in the community feed.')}</span>
-              <select value={visibility} onChange={(event) => setVisibility(event.target.value)} className="mt-3 w-full min-h-12 rounded-xl border border-cream-dark bg-white px-3 text-ink">
+              <select value={visibility} onChange={(event) => setVisibility(event.target.value)} className="mt-3 w-full min-h-12 rounded-xl bg-white px-3 text-ink ring-1 ring-ink/10">
                 <option value="PRIVATE">{t('Private — only me')}</option>
                 <option value="CLAN_ONLY">{t('Clan-only — matching clan members')}</option>
                 <option value="PUBLIC">{t('Public — community feed')}</option>
@@ -355,11 +355,11 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
             Not on the first: a tap on a ceremony already moves on, and Back
             is at the top. */}
         {stepId !== 'summary' && stepId !== 'what' && (
-          <div className="sticky bottom-[calc(env(safe-area-inset-bottom)+88px)] z-20 mt-8 grid grid-cols-2 gap-3 bg-gradient-to-t from-cream via-cream/95 to-cream/0 px-4 pb-3 pt-5">
-            <button type="button" onClick={goBack} className={cn('h-14 rounded-pill bg-white border-2 border-terracotta/25 text-ink', pressable)}>
+          <div className="sticky bottom-[calc(env(safe-area-inset-bottom)+88px)] z-20 mt-6 grid grid-cols-2 gap-3 bg-gradient-to-t from-cream via-cream/95 to-cream/0 px-4 pb-2 pt-4">
+            <button type="button" onClick={goBack} className={cn('h-12 rounded-pill text-[15px] font-bold bg-white ring-1 ring-ink/10 text-ink', pressable)}>
               <Bi {...BUTTONS.back} />
             </button>
-            <button type="button" disabled={saving} onClick={goNext} className={cn('h-14 rounded-pill bg-terracotta text-white shadow-[0_10px_24px_-12px_rgba(160,70,30,0.7)]', pressable)}>
+            <button type="button" disabled={saving} onClick={goNext} className={cn('h-12 rounded-pill text-[15px] font-bold bg-terracotta text-white shadow-[0_10px_24px_-12px_rgba(160,70,30,0.7)]', pressable)}>
               <Bi {...nextLabel} />
             </button>
           </div>
@@ -386,7 +386,7 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
       </header>
 
       <div className="px-4 mt-5">
-        <button type="button" onClick={startNew} className={cn('w-full h-16 rounded-pill bg-terracotta text-white', pressable)}>
+        <button type="button" onClick={startNew} className={cn('w-full h-12 rounded-pill text-[15px] font-bold bg-terracotta text-white', pressable)}>
           <Bi {...BUTTONS.startNew} />
         </button>
       </div>
@@ -409,7 +409,7 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
                   key={plan.id}
                   type="button"
                   onClick={() => openPlan(plan)}
-                  className={cn('w-full text-left bg-white border-2 border-terracotta/25 rounded-soft p-4 shadow-soft flex items-center gap-3', pressable)}
+                  className={cn('w-full text-left bg-white ring-1 ring-ink/10 rounded-soft p-4 shadow-soft flex items-center gap-3', pressable)}
                 >
                   <CeremonyIcon type={plan.ceremonyType} size={48} />
                   <span className="flex-1 min-w-0">

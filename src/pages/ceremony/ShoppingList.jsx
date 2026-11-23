@@ -206,7 +206,7 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
       </div>
 
       {showAdd && (
-        <form onSubmit={addItem} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
+        <form onSubmit={addItem} className="bg-white ring-1 ring-ink/10 rounded-soft p-4 space-y-3">
           <select value={form.phase} onChange={(e) => setForm({ ...form, phase: e.target.value })} className={inputClass}>
             {PHASE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{t(o.label)}</option>)}
           </select>
@@ -218,7 +218,7 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
             value={form.actual}
             onChange={(e) => setForm({ ...form, actual: e.target.value })}
           />
-          <button type="submit" disabled={adding} className={cn('w-full h-14 rounded-pill bg-terracotta text-white', pressable)}>
+          <button type="submit" disabled={adding} className={cn('w-full h-12 rounded-pill text-[15px] font-bold bg-terracotta text-white', pressable)}>
             <Bi {...BUTTONS.add} />
           </button>
         </form>

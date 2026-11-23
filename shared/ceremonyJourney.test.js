@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { groupRowsByPhase } from './ceremonyList.js'
 import { PHASE_SEQUENCES } from './ceremonyPhases.js'
-import { seatingGroupsFor, suggestedPlace } from './seating.js'
+import { fixedPlace, seatingGroupsFor, suggestedPlace } from './seating.js'
 import CEREMONY_COST_PROFILES, { getDefaultItemsForType } from '../server/controllers/ceremonyCostProfiles.js'
 
 const rowsFor = (phases) => phases.map((phase, i) => ({ key: `r${i}`, kind: 'task', phase, label: phase }))
@@ -95,5 +95,14 @@ describe('seating by groups', () => {
       expect(getDefaultItemsForType(type).some((i) => /^Seat/.test(i.label)), type).toBe(true)
     }
     expect(suggestedPlace('A group the family added')).toBeNull()
+  })
+})
+
+describe('seating: ootata always ebuhlanti', () => {
+  it('fixes ootata’s place, whatever the spelling, and nothing else', () => {
+    expect(fixedPlace('Ootata')).toMatch(/^Ebuhlanti/)
+    expect(fixedPlace(' OoTata ')).toMatch(/^Ebuhlanti/)
+    expect(fixedPlace('OoMama')).toBeNull()
+    expect(seatingGroupsFor('UMGIDI')[0]).toMatchObject({ groupLabel: 'Ootata', place: fixedPlace('Ootata') })
   })
 })

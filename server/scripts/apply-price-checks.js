@@ -73,8 +73,9 @@ export async function applyCheck(json, fixName) {
         detail.higherFound.push(row);
       } else detail.unchanged.push(row);
     }
-    const nextBulk = data.casePriceZAR ?? current;
-    if (retail != null && nextBulk != null && nextBulk <= retail) {
+    // A shelf price read off a shop is always recorded; if our bulk price is
+    // not below it, keepBulkBelowShelf (bulk-below-shelf.js) lowers it.
+    if (retail != null) {
       Object.assign(data, { retailPriceZAR: retail, retailPriceSource: 'VERIFIED', retailPriceCheckedAt: checkedAt, retailPriceNote: `Price check ${json.checkedOn}: ${c.source}` });
     }
     if (Object.keys(data).length) await prisma.sku.update({ where: { id: sku.id }, data });

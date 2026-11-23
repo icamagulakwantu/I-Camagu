@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import { seatingGroupsFor, suggestedPlace } from '../../shared/seating.js';
+import { fixedPlace, seatingGroupsFor, suggestedPlace } from '../../shared/seating.js';
 
 // Seating and groups for a ceremony: who sits where (each group in its own
 // place, in order of seniority), and who brings what for each group.
@@ -68,11 +68,13 @@ export async function getCeremonyGroups(req, res) {
   try {
     const ceremony = await ownedCeremony(req.params.ceremonyId, req.userId);
     if (!ceremony) return res.status(403).json({ error: 'Not your ceremony' });
-    // Groups set out before places existed get their place to start from.
+    // Groups set out before places existed get their place to start from,
+    // and ootata are always ebuhlanti.
     const groups = await listGroups(ceremony.id);
-    const unplaced = groups.filter((g) => !g.place && suggestedPlace(g.groupLabel));
+    const placeFor = (g) => fixedPlace(g.groupLabel) || (!g.place && suggestedPlace(g.groupLabel)) || null;
+    const unplaced = groups.filter((g) => placeFor(g) && placeFor(g) !== g.place);
     if (!unplaced.length) return res.json(groups);
-    await Promise.all(unplaced.map((g) => prisma.ceremonyGroup.update({ where: { id: g.id }, data: { place: suggestedPlace(g.groupLabel) } })));
+    await Promise.all(unplaced.map((g) => prisma.ceremonyGroup.update({ where: { id: g.id }, data: { place: placeFor(g) } })));
     res.json(await listGroups(ceremony.id));
   } catch (error) {
     console.error('Get groups error:', error.message);
@@ -83,7 +85,7 @@ export async function getCeremonyGroups(req, res) {
 // A group the family adds: amakhosikazi, abakhwenyana, the choir...
 export async function addGroup(req, res) {
   const groupLabel = clean(req.body.groupLabel, MAX_LABEL);
-  const place = clean(req.body.place, MAX_PLACE) || null;
+  const place = fixedPlace(groupLabel) || clean(req.body.place, MAX_PLACE) || null;
   if (!groupLabel) return res.status(400).json({ error: 'Give the group a name' });
   try {
     const ceremony = await ownedCeremony(req.body.ceremonyId, req.userId);
@@ -113,6 +115,9 @@ export async function updateGroup(req, res) {
   try {
     const group = await ownedGroup(req.params.groupId, req.userId);
     if (!group) return res.status(403).json({ error: 'Not your ceremony' });
+    // Ootata are always ebuhlanti: their place cannot be changed.
+    const fixed = fixedPlace(data.groupLabel ?? group.groupLabel);
+    if (fixed) data.place = fixed;
     await prisma.ceremonyGroup.update({ where: { id: group.id }, data });
     res.json(await listGroups(group.ceremonyId));
   } catch (error) {

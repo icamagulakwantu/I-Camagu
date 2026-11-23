@@ -229,7 +229,7 @@ function Hierarchy({ onBack, initialCeremonyId }) {
       <h2 className="font-display text-[1.75rem] font-semibold leading-tight text-ink">Seating and groups</h2>
       <p className="mb-1 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Ukuhlala ngamaqela</p>
       <p className="mb-4 text-[14px] leading-relaxed text-ink-muted">
-        At umgidi and every ceremony of isiko lakwaXhosa, each group sits in its own place: ootata ebuhlanti, oomama endlini enkulu, abafana and iintombi apart. Set out the groups, then give each its share.
+        At umgidi and every ceremony of isiko lakwaXhosa, each group sits in its own place. Ootata are always ebuhlanti; where the others sit is your family’s to decide, by your house. Set out the groups, then give each its share.
       </p>
 
       <div className="bg-[#fffdf9] border border-ink/[0.08] rounded-[20px] p-4 mb-4 space-y-2">

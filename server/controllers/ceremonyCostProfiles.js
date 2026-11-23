@@ -18,8 +18,13 @@ import { DRAFT_CEREMONY_TYPES, LIVE_FROM_DRAFTS } from '../data/ceremonyDrafts.j
 
 const COST_RATES = {
   alcohol: {
-    brandy_750ml: 195.00,  // Ultra Liquors 10 Sep 2026 (STALE — recheck required): Commando R196.99, KWV 3yr R179.99, Klipdrift Export R174.91/btl in case
-    gin_750ml: 160.00,  // Ultra Liquors 10 Sep 2026 (STALE — recheck required): Old Buck R154.99, Gordon's R169.99, Strettons R145.75
+    // One bottle each, from i-Camagu's own Bulk Buy prices on 23 Nov 2026
+    // (founder: a brandy is about R180, not more): Klipdrift Export R182.40,
+    // Viceroy R153.60 a bottle by the case; Old Buck and Strettons gin about
+    // R140, Gordon's R163. A courtesy line with gin AND brandy is priced as a
+    // pair (unit 'pair'), so its quantity counts pairs, never bottles twice.
+    brandy_750ml: 180.00,
+    gin_750ml: 145.00,
     whisky_750ml: 200.00,  // Ultra Liquors 10 Sep 2026 (STALE — recheck required): Three Ships R179.99, Bell's/J&B R199.99, Harrier R159.99
     beer_case_24: 330.00,  // Ultra + Prestons 10 Sep 2026 (STALE — recheck required): Castle Lager 24x500ml R299.99, Black Label R329.99, Castle Lite R364.99
     beer_bottle: 20.00,
@@ -531,7 +536,7 @@ const ULWALUKO_COST_PROFILE = {
 const UMGIDI_COST_PROFILE = {
   'ARRIVAL_INGQONGQO': [
     { label: 'Arrange Ingqongqo (women beating zinc, chanting)', category: 'services', unit: 'group', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '8-12 women' },
-    { label: 'Courtesy: bottle of gin and brandy for the women', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.gin_750ml + COST_RATES.alcohol.brandy_750ml, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '1 gin + 1 brandy' },
+    { label: 'Courtesy: bottle of gin and brandy for the women', category: 'alcohol', unit: 'pair', unitCost: COST_RATES.alcohol.gin_750ml + COST_RATES.alcohol.brandy_750ml, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '1 gin + 1 brandy' },
   ],
   'KRAAL_SEATING': [
     { label: 'Ikhukho for the ikrwala to sit on', category: 'supplies', unit: 'mat', unitCost: COST_RATES.supplies.grass_mat_ikhukho, quantity: 1, isInputField: true, inputType: 'number' },
@@ -590,7 +595,7 @@ const INTAMBO_ENKULU_COST_PROFILE = {
   ],
   'SUPPLIES_SACRED': [
     { label: 'Brew Umqombothi for the binding ceremony', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number', suggestedAmount: '50-75 litres' },
-    { label: 'Provide brandy and gin for elders and participants', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
+    { label: 'Provide brandy and gin for elders and participants', category: 'alcohol', unit: 'pair', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
     { label: 'Secure a white goat without blemish for the recognition slaughter', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'White goat ~R2,700' },
     { label: 'Gather white beads (Amaphondo) for the protective cord ceremony', category: 'supplies', unit: 'strand', unitCost: COST_RATES.supplies.amaphondo_beads_strand, quantity: 4, isInputField: true, inputType: 'number', suggestedAmount: '4-6 strands' },
     { label: 'Procure protective binding cords (Iintambo) from organic fibre as directed by elders', category: 'supplies', unit: 'set', unitCost: COST_RATES.supplies.iintambo_cord_set, quantity: 1, isInputField: true, inputType: 'number' },
@@ -644,7 +649,7 @@ const UKUKHAPHA_COST_PROFILE = {
     { label: 'Collect blood and Intlabathi for ancestral offering', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'CLOSURE_RITUAL': [
-    { label: KHAPHA_COURTESY, category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
+    { label: KHAPHA_COURTESY, category: 'alcohol', unit: 'pair', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
     { label: 'Perform Ukuxukuxa cleansing with goat, sheep, or fowl before family disperses', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_standard, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Goat ~R2,700 or fowl ~R150' },
   ],
 };
@@ -667,7 +672,7 @@ const INKOBE_COST_PROFILE = {
   ],
   'INKOBE_PREP': [
     { label: 'Brew Umqombothi for the ceremony', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number', suggestedAmount: '50-75 litres' },
-    { label: 'Provide brandy and gin for elders and participants', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
+    { label: 'Provide brandy and gin for elders and participants', category: 'alcohol', unit: 'pair', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
     { label: 'Procure high-quality whole dry white maize kernels (Inkobe)', category: 'food', unit: 'kg', unitCost: COST_RATES.food.inkobe_white_maize_kg, quantity: 10, isInputField: true, inputType: 'number', suggestedAmount: '10-15 kg' },
     { label: 'Boil Inkobe in large cast iron pots until perfectly cooked', category: 'supplies', unit: 'pot', unitCost: COST_RATES.supplies.cast_iron_pot, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2-3 pots (borrowed)' },
     { label: 'Prepare grass-woven baskets (Iintsuba / Izithebe) or pristine enamel bowls for serving', category: 'supplies', unit: 'bowl', unitCost: COST_RATES.supplies.enamel_dish_large, quantity: 6, isInputField: true, inputType: 'number', suggestedAmount: '6-10 bowls' },
@@ -699,7 +704,7 @@ const UKUBUYISA_COST_PROFILE = {
   'KRAAL_WELCOME': [
     { label: 'Brew Umqombothi (50L to 100L) — this is a festive homecoming, fermented beer IS consumed', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 75, isInputField: true, inputType: 'number', suggestedAmount: '75-100 litres' },
     { label: 'Arrange Bhekile (traditional cans) for seamless serving of Umqombothi', category: 'supplies', unit: 'can', unitCost: COST_RATES.supplies.bhekile_can, quantity: 15, isInputField: true, inputType: 'number', suggestedAmount: '15-20 cans' },
-    { label: 'Set aside brandy and gin for elder men (modern courtesy)', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
+    { label: 'Set aside brandy and gin for elder men (modern courtesy)', category: 'alcohol', unit: 'pair', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
     { label: 'Grass mats (ikhukho) for the elders ebuhlanti', category: 'supplies', unit: 'mat', unitCost: COST_RATES.supplies.grass_mat_ikhukho, quantity: 8, isInputField: true, inputType: 'number', suggestedAmount: '8-12 mats' },
   ],
   'RITUAL_EXECUTION': [
@@ -735,7 +740,7 @@ const UMSEBENZI_WEGQIRHA_COST_PROFILE = {
     { label: 'The animal for ukuphuma, as the dream (iphupha) shows: a white goat, or a beast', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'A white goat ~R2,700; a beast costs more' },
     { label: 'Brew umqombothi as the teacher instructs', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number' },
     { label: 'A new bhekile for the umqombothi, never used before', category: 'supplies', unit: 'can', unitCost: COST_RATES.supplies.bhekile_can, quantity: 1, isInputField: true, inputType: 'number' },
-    { label: 'Courtesy gin, brandy and matches for the elder amagqirha', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.gin_750ml + COST_RATES.alcohol.brandy_750ml, quantity: 2, isInputField: true, inputType: 'number' },
+    { label: 'Courtesy gin, brandy and matches for the elder amagqirha', category: 'alcohol', unit: 'set', unitCost: COST_RATES.alcohol.gin_750ml + COST_RATES.alcohol.brandy_750ml + COST_RATES.supplies.matches_box, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '1 gin + 1 brandy + matches' },
     { label: 'Drums (ingqongqo) and trained drummers and singers', category: 'services', unit: 'session', unitCost: COST_RATES.services.drummer_per_session + COST_RATES.services.singer_per_session, quantity: 1, isInputField: true, inputType: 'number' },
     { label: 'Large pots to cook the meat for everyone', category: 'supplies', unit: 'pot', unitCost: COST_RATES.supplies.cast_iron_pot, quantity: 4, isInputField: true, inputType: 'number', suggestedAmount: '4-6 pots' },
   ],

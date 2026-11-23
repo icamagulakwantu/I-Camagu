@@ -12,7 +12,7 @@ const GUEST_QUICK_PICKS = [50, 100, 150, 200]
 function Field({ label, children, hint }) {
   return (
     <label className="block">
-      <span className="block text-sm text-ink mb-1.5"><Bi {...label} /></span>
+      {label && <span className="block text-sm text-ink mb-1.5"><Bi {...label} /></span>}
       {children}
       {hint && <span className="block text-xs text-ink-muted mt-2 leading-relaxed">{hint}</span>}
     </label>
@@ -148,7 +148,7 @@ export function GuestsStep({ form, setForm, locked }) {
 export function MoneyStep({ form, setForm }) {
   const t = useT()
   return (
-    <Field label={LABELS.budget} hint={t('The most you plan to spend, in rand. You can skip this and set it later.')}>
+    <Field hint={t('The most you plan to spend, in rand. You can skip this and set it later.')}>
       <div className="relative">
         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-ink-muted">R</span>
         <input
@@ -157,6 +157,7 @@ export function MoneyStep({ form, setForm }) {
           min="0"
           step="any"
           className={cn(inputClass, 'pl-10')}
+          aria-label={t('Your budget')}
           placeholder={`${t('e.g.')} 50000`}
           value={form.budget}
           onChange={(e) => setForm((f) => ({ ...f, budget: e.target.value }))}

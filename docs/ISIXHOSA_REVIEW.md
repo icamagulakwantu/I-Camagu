@@ -753,7 +753,9 @@ Stokvel **umgalelo** · contribution **umnikelo** · payout **intlawulo** · off
 | Seating and groups | Ukuhlala ngamaqela | |
 | Who sits where, who brings what | Ngubani ohlala phi, ngubani ozisa ntoni | |
 | Who sits where | Ngubani ohlala phi | |
-| In order of seniority. Change any place to your family’s way. | Ngokobudala. Tshintsha nayiphi na indawo ngendlela yosapho lwakho. | |
+| In order of seniority. Ootata always sit ebuhlanti; every other place is your family’s to set, by your house. | Ngokobudala. Ootata bahlala ebuhlanti ngalo lonke ixesha; ezinye iindawo zibekwa lusapho lwakho, ngokwendlu yenu. | |
+| Ootata always sit ebuhlanti. | Ootata bahlala ebuhlanti ngalo lonke ixesha. | |
+| Ebuhlanti, the kraal: always | Ebuhlanti: ngalo lonke ixesha | |
 | Where they sit | Apho bahlala khona | |
 | How many people | Bangaphi | |
 | Remove group | Susa iqela | |

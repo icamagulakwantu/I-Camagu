@@ -72,16 +72,16 @@ export default function Pledges({ plan, accessToken, pledges, setPledges, onBack
       </header>
 
       <div className="mx-4 mt-5">
-        <button type="button" onClick={() => setShowForm((v) => !v)} className={cn('w-full h-14 rounded-pill bg-sage-600 text-white mb-3', pressable)}>
+        <button type="button" onClick={() => setShowForm((v) => !v)} className={cn('w-full h-12 rounded-pill text-[15px] font-bold bg-sage-600 text-white mb-3', pressable)}>
           <Bi {...(showForm ? BUTTONS.cancel : { xh: 'Ongeza isibonelelo', en: 'Add a pledge' })} />
         </button>
 
         {showForm && (
-          <form onSubmit={addPledge} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-3 space-y-3">
+          <form onSubmit={addPledge} className="bg-white ring-1 ring-ink/10 rounded-soft p-4 mb-3 space-y-3">
             <input className={inputClass} placeholder={t('Name (e.g. Uncle Sipho)')} value={draft.contributorName} onChange={(e) => setDraft((p) => ({ ...p, contributorName: e.target.value }))} required />
             <input className={inputClass} placeholder={t('Item (e.g. Goat, Groceries)')} value={draft.pledgeItem} onChange={(e) => setDraft((p) => ({ ...p, pledgeItem: e.target.value }))} required />
             <input className={inputClass} type="number" inputMode="decimal" min="0" placeholder={t('Value in rand (optional, e.g. 500)')} value={draft.pledgeValue} onChange={(e) => setDraft((p) => ({ ...p, pledgeValue: e.target.value }))} />
-            <button type="submit" className={cn('w-full h-14 rounded-pill bg-sage-500 text-white', pressable)}>
+            <button type="submit" className={cn('w-full h-12 rounded-pill text-[15px] font-bold bg-sage-500 text-white', pressable)}>
               <Bi {...BUTTONS.save} />
             </button>
           </form>
@@ -94,7 +94,7 @@ export default function Pledges({ plan, accessToken, pledges, setPledges, onBack
             description={t('Write down what each family member has promised to bring or pay for.')}
             primaryLabel={t('Add first pledge')}
             onPrimary={() => setShowForm(true)}
-            className="border-2 border-terracotta/25"
+            className="ring-1 ring-ink/10"
           />
         ) : (
           <div className="space-y-2">
@@ -103,7 +103,7 @@ export default function Pledges({ plan, accessToken, pledges, setPledges, onBack
               const paidAmount = p.paidAmountZAR != null ? parseFloat(p.paidAmountZAR) : 0
               const isPaid = pledgedAmount != null && pledgedAmount > 0 && paidAmount >= pledgedAmount
               return (
-                <div key={p.id} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 flex justify-between items-center gap-3">
+                <div key={p.id} className="bg-white ring-1 ring-ink/10 rounded-soft p-4 flex justify-between items-center gap-3">
                   <div className="min-w-0">
                     <p className="font-bold text-base text-ink break-words">{p.pledgerName}{p.relationship ? ` · ${p.relationship}` : ''}</p>
                     <p className="text-sm text-ink-muted break-words">{p.pledgedItem}{pledgedAmount != null && ` · ${rand(pledgedAmount)}`}</p>

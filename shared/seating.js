@@ -2,7 +2,10 @@
 // ceremony of isiko lakwaXhosa (inkomo, ukukhapha, ukubuyisa, intambo
 // enkulu, imbeleko...), each group sits in its own place: ootata apart from
 // oomama, abafana apart, and so on. These are the places to start from, in
-// order of seniority; every family changes them to its own way.
+// order of seniority. Founder, 23 Nov 2026: where each group sits is the
+// family's to decide, by how its house is laid out, but ootata are always
+// ebuhlanti. So ootata's place is fixed; every other place is a suggestion
+// the family changes to its own way.
 //
 // Sources agree on the shape (docs/research/2026-11-ceremony-order-and-
 // seating.md): the men ebuhlanti, in circles by age; the women in the house;
@@ -11,7 +14,7 @@
 const G = (groupLabel, place) => ({ groupLabel, place })
 
 const ELDERS = [
-  G('Ootata', 'Ebuhlanti, the kraal: the elder men, in front'),
+  G('Ootata', 'Ebuhlanti, the kraal: always'),
   G('Isekela lika Tata', 'Ebuhlanti, beside ootata'),
   G('OoMama', 'Endlini enkulu, the great house: the elder women'),
   G('Isekela lika Mama', 'Endlini enkulu, beside oomama'),
@@ -46,4 +49,11 @@ export function seatingGroupsFor(type) {
 export function suggestedPlace(groupLabel) {
   const all = [...ELDERS, ...YOUNG, INDLU_YESIBANE, ...OTHERS]
   return all.find((g) => g.groupLabel === groupLabel)?.place || null
+}
+
+// Places that never change, whatever the family's house: ootata ebuhlanti.
+const FIXED = { ootata: 'Ebuhlanti, the kraal: always' }
+
+export function fixedPlace(groupLabel) {
+  return FIXED[String(groupLabel || '').trim().toLowerCase()] || null
 }

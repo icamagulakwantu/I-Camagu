@@ -46,23 +46,23 @@ function BudgetDashboard({ planId, planTitle, onBack }) {
         <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />
         <div className="relative">
         <button onClick={onBack} className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm">← Back</button>
-        <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">Budget — {planTitle}</h1>
+        <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">{planTitle ? `Budget — ${planTitle}` : 'Budget'}</h1>
       </div>
       </header>
       <div className="px-4 mt-4">
         {allocated == null ? (
-          <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4"><p className="font-bold text-ink">No budget set yet</p><p className="text-sm text-ink-muted mt-1">Set a budget from the ceremony Budget &amp; Costs tab.</p></div>
+          <div className="bg-white ring-1 ring-ink/[0.07] rounded-[20px] p-4 mb-4"><p className="font-bold text-ink">No budget set yet</p><p className="text-sm text-ink-muted mt-1">Set a budget from the ceremony Budget &amp; Costs tab.</p></div>
         ) : (
-          <div className={'bg-white border-2 rounded-soft p-4 mb-4 ' + (overBudget ? 'border-terracotta' : 'border-sage-200')}>
+          <div className={'bg-white rounded-[20px] p-4 mb-4 ring-1 ' + (overBudget ? 'ring-terracotta/50' : 'ring-ink/[0.07]')}>
             <div className="flex justify-between items-center"><span className="text-xs text-ink-muted uppercase font-bold">Allocated budget</span><span className={(overBudget ? 'text-terracotta' : 'text-sage-600') + ' font-bold'}>R{money(allocated)}</span></div>
             <div className="grid grid-cols-2 gap-2 mt-3"><div><p className="text-xs text-ink-muted">Spent</p><p className="font-black text-lg">R{money(spent)}</p></div><div><p className="text-xs text-ink-muted">{overBudget ? 'Over budget' : 'Remaining'}</p><p className={(overBudget ? 'text-terracotta' : 'text-sage-600') + ' font-black text-lg'}>R{money(Math.abs(remaining))}</p></div></div>
           </div>
         )}
-        <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4"><div className="flex justify-between mb-1"><span className="text-xs text-ink-muted">Pledged toward estimate</span><span className="text-xs font-bold">{pledgedPercent}%</span></div><div className="h-3 bg-cream-dark rounded-pill overflow-hidden"><div className="h-full bg-sage-500 transition-all" style={{ width: pledgedPercent + '%' }} /></div></div>
-        <div className="grid grid-cols-3 gap-2 mb-4"><div className="bg-white border-2 border-terracotta/15 rounded-soft p-3 text-center"><p className="text-lg font-black text-ink">R{money(estimated)}</p><p className="text-xs text-ink-muted uppercase font-bold">Estimated</p></div><div className="bg-terracotta/10 border-2 border-terracotta/30 rounded-soft p-3 text-center"><p className="text-lg font-black text-terracotta">R{money(spent)}</p><p className="text-xs text-ink-muted uppercase font-bold">Spent</p></div><div className="bg-sage-50 border-2 border-sage-200 rounded-soft p-3 text-center"><p className="text-lg font-black text-sage-600">R{money(pledged)}</p><p className="text-xs text-ink-muted uppercase font-bold">Pledged</p></div></div>
-        {budget.pledgeShortfall > 0 && <div className="bg-terracotta/10 border-2 border-terracotta rounded-soft p-3 mb-4"><p className="text-sm font-bold text-terracotta">R{money(budget.pledgeShortfall)} still needed to reach the allocated budget</p></div>}
+        <div className="bg-white ring-1 ring-ink/[0.07] rounded-[20px] p-4 mb-4"><div className="flex justify-between mb-1"><span className="text-xs text-ink-muted">Pledged toward estimate</span><span className="text-xs font-bold">{pledgedPercent}%</span></div><div className="h-3 bg-cream-dark rounded-pill overflow-hidden"><div className="h-full bg-sage-500 transition-all" style={{ width: pledgedPercent + '%' }} /></div></div>
+        <div className="grid grid-cols-3 gap-2 mb-4"><div className="bg-white ring-1 ring-ink/[0.07] rounded-[20px] p-3 text-center"><p className="text-lg font-black text-ink">R{money(estimated)}</p><p className="text-xs text-ink-muted uppercase font-bold">Estimated</p></div><div className="bg-terracotta/10 ring-1 ring-ink/[0.07] rounded-[20px] p-3 text-center"><p className="text-lg font-black text-terracotta">R{money(spent)}</p><p className="text-xs text-ink-muted uppercase font-bold">Spent</p></div><div className="bg-sage-50 ring-1 ring-ink/[0.07] rounded-[20px] p-3 text-center"><p className="text-lg font-black text-sage-600">R{money(pledged)}</p><p className="text-xs text-ink-muted uppercase font-bold">Pledged</p></div></div>
+        {budget.pledgeShortfall > 0 && <div className="bg-terracotta/10 ring-1 ring-ink/[0.07] rounded-[20px] p-3 mb-4"><p className="text-sm font-bold text-terracotta">R{money(budget.pledgeShortfall)} still needed to reach the allocated budget</p></div>}
         <p className="text-xs font-black uppercase text-ink-muted mb-2">Provisioning &amp; cost items</p>
-        <div className="space-y-2">{budget.itemBreakdown.filter((item) => item.total > 0).map((item) => <div key={item.id} className="bg-white border border-terracotta/15 rounded-soft p-3 flex justify-between gap-3"><span className="text-sm text-ink">{item.label}</span><span className="text-xs text-ink-muted text-right">R{money(item.total)}{item.isPurchased ? ' · bought' : ' · estimated'}</span></div>)}</div>
+        <div className="space-y-2">{budget.itemBreakdown.filter((item) => item.total > 0).map((item) => <div key={item.id} className="bg-white ring-1 ring-ink/[0.07] rounded-[20px] p-3 flex justify-between gap-3"><span className="text-sm text-ink">{item.label}</span><span className="text-xs text-ink-muted text-right">R{money(item.total)}{item.isPurchased ? ' · bought' : ' · estimated'}</span></div>)}</div>
       </div>
     </div>
   )

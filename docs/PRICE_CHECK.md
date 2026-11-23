@@ -14,6 +14,9 @@ using TinyFish to read the web. Anyone can also run it by hand.
   never applied: rises are the founder's decision.
 - **retail** is the regular single-item shelf price times the units, from a
   named shop. Leave it `null` if no shelf price was read. Never a promo price.
+  Record it even when it is below i-Camagu's bulk price: a bulk price is always
+  kept at least 5% below a checked shelf price, and
+  `server/scripts/bulk-below-shelf.js` lowers it on the next start.
 - Same product, same size, same pack. Never compare a different size or
   flavour.
 - Every price names its **source**: the shop and what was read.
