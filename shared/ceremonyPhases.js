@@ -2,26 +2,31 @@
 // terms scholars use (umgeno, ubukhwetha, umphumo, ubukrwala), with umgidi as
 // part of the same plan. Stages not listed fall back to their code in words.
 export const PHASE_LABELS = {
+  // Ulwaluko, in the order of the journey (founder, 23 Nov 2026): his hair
+  // is cut at home before the ibhoma is built, then he goes in; umgidi is
+  // the one day he comes home, the last part of the journey.
   REGISTRATION: 'Umgeno · Registration and consent',
-  TRANSPORT_ARRIVAL: 'Umgeno · Going to the mountain',
-  PHYSICAL_PREPARATION: 'Umgeno · Preparing him',
+  PHYSICAL_PREPARATION: 'Umgeno · Preparing him at home',
   SPIRITUAL_ITEMS: 'Umgeno · Spiritual items',
-  IBHOMA_CONSTRUCTION: 'Ubukhwetha · Building the ibhoma',
+  IBHOMA_CONSTRUCTION: 'Umgeno · Building the ibhoma',
+  TRANSPORT_ARRIVAL: 'Umgeno · Going to the mountain',
   DAILY_ESSENTIALS: 'Ubukhwetha · Daily essentials',
   DIET_EARLY_STAGE: 'Ubukhwetha · The first seven days',
   UMOJISO: 'Ubukhwetha · uMojiso',
   EXIT_PREPARATION: 'Umphumo · Coming out',
   IBHOMA_CLOSURE: 'Umphumo · Ukutshiswa kwebhoma',
   RETURN_HOME: 'Umphumo · Going home',
-  ARRIVAL_INGQONGQO: 'Umgidi · Arrival and ingqongqo',
-  KRAAL_SEATING: 'Umgidi · Ebuhlanti',
-  ELDER_GUIDANCE: 'Umgidi · Ukuyala',
-  COOKING_EBUHLANTI: 'Umgidi · Cooking ebuhlanti',
-  COOKING_KITCHEN: 'Umgidi · The kitchen',
-  HIERARCHY_ALLOCATION: 'Umgidi · Who brings what',
-  ALCOHOL_DISTRIBUTION: 'Umgidi · Drinks',
-  VIP_EKOYINI: 'Umgidi · The bar',
-  CLOSURE: 'Umgidi · Closing',
+  // Umgidi: one day, the day he comes home. What is made ready beforehand
+  // comes first, then the day itself in the order it happens.
+  HIERARCHY_ALLOCATION: 'Umgidi · Getting ready: the groups and where they sit',
+  VIP_EKOYINI: 'Umgidi · Getting ready: the bar',
+  ALCOHOL_DISTRIBUTION: 'Umgidi · Getting ready: drinks for each group',
+  COOKING_EBUHLANTI: 'Umgidi · Getting ready: ebuhlanti',
+  COOKING_KITCHEN: 'Umgidi · Getting ready: the kitchen',
+  ARRIVAL_INGQONGQO: 'Umgidi · On the day: he arrives, ingqongqo',
+  KRAAL_SEATING: 'Umgidi · On the day: everyone in their place',
+  ELDER_GUIDANCE: 'Umgidi · On the day: ukuyala and izipho',
+  CLOSURE: 'Umgidi · Closing the day',
   UBUKRWALA: 'Ubukrwala · The new man',
   UKUCELA: 'Ukucela · Asking for her',
   LOBOLA: 'Ilobola · The negotiations',
@@ -43,9 +48,46 @@ export const PHASE_LABELS = {
 
 // The big stages of ulwaluko, in order, for the timeline.
 export const ULWALUKO_STAGES = [
-  ['UMGENO', 'Umgeno · Going in', ['REGISTRATION', 'TRANSPORT_ARRIVAL', 'PHYSICAL_PREPARATION', 'SPIRITUAL_ITEMS']],
-  ['UBUKHWETHA', 'Ubukhwetha · On the mountain', ['IBHOMA_CONSTRUCTION', 'DAILY_ESSENTIALS', 'DIET_EARLY_STAGE', 'UMOJISO']],
+  ['UMGENO', 'Umgeno · Going in', ['REGISTRATION', 'PHYSICAL_PREPARATION', 'SPIRITUAL_ITEMS', 'IBHOMA_CONSTRUCTION', 'TRANSPORT_ARRIVAL']],
+  ['UBUKHWETHA', 'Ubukhwetha · On the mountain', ['DAILY_ESSENTIALS', 'DIET_EARLY_STAGE', 'UMOJISO']],
   ['UMPHUMO', 'Umphumo · Coming out', ['EXIT_PREPARATION', 'IBHOMA_CLOSURE', 'RETURN_HOME']],
-  ['UMGIDI', 'Umgidi · The homecoming', ['ARRIVAL_INGQONGQO', 'KRAAL_SEATING', 'ELDER_GUIDANCE', 'COOKING_EBUHLANTI', 'COOKING_KITCHEN', 'HIERARCHY_ALLOCATION', 'ALCOHOL_DISTRIBUTION', 'VIP_EKOYINI', 'CLOSURE']],
+  ['UMGIDI', 'Umgidi · The day he comes home', ['HIERARCHY_ALLOCATION', 'VIP_EKOYINI', 'ALCOHOL_DISTRIBUTION', 'COOKING_EBUHLANTI', 'COOKING_KITCHEN', 'ARRIVAL_INGQONGQO', 'KRAAL_SEATING', 'ELDER_GUIDANCE', 'CLOSURE']],
   ['UBUKRWALA', 'Ubukrwala · The new man', ['UBUKRWALA']],
 ];
+
+// Each ceremony's stages in the order they happen. A plan's list follows
+// this order (the journey), not the order the stages fall due: umgidi is
+// prepared weeks ahead, but it is still the last part of ulwaluko.
+export const PHASE_SEQUENCES = {
+  ULWALUKO: ULWALUKO_STAGES.flatMap(([, , phases]) => phases),
+  UMGIDI: ULWALUKO_STAGES.find(([key]) => key === 'UMGIDI')[2],
+  WEDDING: ['UKUCELA', 'LOBOLA', 'WEDDING_PLANNING', 'WEDDING_SUPPLIERS', 'WEDDING_FINAL', 'WEDDING_DAY', 'AFTER_WEDDING'],
+  INTAMBO_ENKULU: ['PLANNING_ELDERS', 'PURPOSE_BINDING', 'SUPPLIES_SACRED', 'EXECUTION_RITUAL', 'BINDING_CORDS', 'CLOSURE'],
+  UKUKHAPHA: ['PLANNING_LINEAGE', 'PURPOSE_TRANSITION', 'KRAAL_SACRIFICE', 'ANCESTRAL_ADDRESS', 'RITUAL_SLAUGHTER', 'CLOSURE_RITUAL', 'MOURNING', 'MOURNING_END'],
+  INKOBE: ['PLANNING_MATRIARCH', 'PURPOSE_TRANSITION', 'INKOBE_PREP', 'KRAAL_SACRIFICE', 'COMMUNAL_SHARING', 'CLOSURE'],
+  UKUBUYISA: ['PLANNING_RETURN', 'PURPOSE_ENTHRONEMENT', 'SUPPLIES_LIVESTOCK', 'KRAAL_WELCOME', 'RITUAL_EXECUTION', 'RESTORATION_CLOSURE'],
+  UMSEBENZI_WEGQIRHA: ['PLANNING_HEALER', 'PURPOSE_DANCE', 'SECLUSION_RIVER', 'SUPPLIES_SACRED', 'BREWING_INTLOMBE', 'SLAUGHTER_FEAST'],
+  IMBELEKO: ['PLANNING', 'ANIMAL_AND_OFFERING', 'FOOD_AND_DRINK', 'CEREMONY_DAY', 'CLOSING'],
+  INTONJANE: ['PLANNING_WOMEN_ELDERS', 'PREPARATION', 'CELEBRATION', 'CLOSING'],
+  GENERAL: ['PLANNING', 'SUPPLIES', 'LOGISTICS'],
+};
+
+// One rank for every stage that keeps every ceremony's order at once: a
+// stage comes after everything that comes before it in any ceremony. (A
+// name such as CLOSURE ends several ceremonies, so each list alone is not
+// enough.) Stages no ceremony lists have no rank.
+function rankPhases(sequences) {
+  const rank = new Map();
+  for (let pass = 0; pass < 50; pass += 1) {
+    let changed = false;
+    for (const sequence of sequences) {
+      sequence.forEach((phase, index) => {
+        const after = index === 0 ? 0 : rank.get(sequence[index - 1]) + 1;
+        if (!rank.has(phase) || rank.get(phase) < after) { rank.set(phase, after); changed = true; }
+      });
+    }
+    if (!changed) return rank;
+  }
+  throw new Error('Ceremony stage orders contradict each other');
+}
+export const PHASE_RANK = rankPhases(Object.values(PHASE_SEQUENCES));

@@ -73,7 +73,7 @@ export default function ListRow({ row, showTick = true, busy, onToggle, onSavePr
             <button type="button" onClick={() => setEditing(true)} aria-label={t('Paid {amount}, change', { amount: rand(row.actual) })} className={cn('h-8 rounded-full bg-[#2e4a2e]/10 px-3 text-[12px] font-bold text-[#1f3320]', pressable)}>
               {t('Paid')} {rand(row.actual)}
             </button>
-          ) : (row.suggested != null || row.cost) && (
+          ) : (row.suggested != null || (row.cost && !isRitualStep(row.cost))) && (
             <button type="button" onClick={() => setEditing(true)} aria-label={t('Add what you paid for {item}', { item: row.label })} className={cn('h-8 rounded-full px-2.5 text-[12px] font-semibold text-ink-muted', pressable)}>
               {t('+ Paid')}
             </button>
@@ -82,4 +82,10 @@ export default function ListRow({ row, showTick = true, busy, onToggle, onSavePr
       )}
     </div>
   )
+}
+
+// A ritual step carried on the price list at R0 (the elders speak, the
+// intsonyama is shared...): something to do, not something to buy.
+function isRitualStep(cost) {
+  return !Number(cost.unitCost) && cost.category === 'services' && cost.unit !== 'session'
 }

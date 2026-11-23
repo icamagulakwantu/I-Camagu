@@ -13,7 +13,10 @@ import { createShareToken, isShareTokenValid } from '../utils/shareToken.js';
 // because existing rows reference them, but never offered as a choice for a
 // new ceremony. Filtered here, once, so every screen that lists ceremony
 // types gets the same real list without needing to know this history.
-const LEGACY_CEREMONY_TYPES = new Set(['UMSEBENZI_WENKOMO', 'IMIGIDI']);
+// Not offered as a new plan. Umgidi is the last day of ulwaluko, planned
+// inside the ulwaluko plan (founder, 23 Nov 2026); umgidi plans made before
+// keep working.
+const LEGACY_CEREMONY_TYPES = new Set(['UMSEBENZI_WENKOMO', 'IMIGIDI', 'UMGIDI']);
 
 export const getCeremonyTypes = async (req, res) => {
       try {

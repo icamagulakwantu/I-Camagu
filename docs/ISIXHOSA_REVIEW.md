@@ -318,7 +318,7 @@ Stokvel **umgalelo** · contribution **umnikelo** · payout **intlawulo** · off
 | Something I am adding | Into endiyongezayo | |
 | Food | Ukutya | |
 | Logistics | Amalungiselelo | |
-| Seating | Izihlalo | |
+| Seating | Ukuhlala | |
 | Speakers | Izithethi | |
 | Unexpected expense | Indleko engalindelekanga | |
 | Added by you | Yongezwe nguwe | |
@@ -738,3 +738,29 @@ Stokvel **umgalelo** · contribution **umnikelo** · payout **intlawulo** · off
 | Lay it flat in good light. Fit it inside the frame. | Yibeke ithe tyaba kwindawo ekhanyayo. Yifake ngaphakathi kwesakhelo. | |
 | Please choose a photo (JPEG or PNG). | Nceda ukhethe ifoto (JPEG okanye PNG). | |
 | That photo could not be opened. Please try another. | Loo foto ayivulekanga. Nceda uzame enye. | |
+| Umgeno · Preparing him at home | Umgeno · Ukumlungiselela ekhaya | |
+| Umgeno · Building the ibhoma | Umgeno · Ukwakha ibhoma | |
+| Umgidi · Getting ready: the groups and where they sit | Umgidi · Ukulungiselela: amaqela nalapho ahlala khona | |
+| Umgidi · Getting ready: the bar | Umgidi · Ukulungiselela: ibhari | |
+| Umgidi · Getting ready: drinks for each group | Umgidi · Ukulungiselela: iziselo zeqela ngalinye | |
+| Umgidi · Getting ready: ebuhlanti | Umgidi · Ukulungiselela: ebuhlanti | |
+| Umgidi · Getting ready: the kitchen | Umgidi · Ukulungiselela: ekhitshini | |
+| Umgidi · On the day: he arrives, ingqongqo | Umgidi · Ngomhla: uyafika, ingqongqo | |
+| Umgidi · On the day: everyone in their place | Umgidi · Ngomhla: wonke umntu endaweni yakhe | |
+| Umgidi · On the day: ukuyala and izipho | Umgidi · Ngomhla: ukuyala nezipho | |
+| Umgidi · Closing the day | Umgidi · Ukuvala usuku | |
+| Umgidi · The day he comes home | Umgidi · Usuku agoduka ngalo | |
+| Seating and groups | Ukuhlala ngamaqela | |
+| Who sits where, who brings what | Ngubani ohlala phi, ngubani ozisa ntoni | |
+| Who sits where | Ngubani ohlala phi | |
+| In order of seniority. Change any place to your family’s way. | Ngokobudala. Tshintsha nayiphi na indawo ngendlela yosapho lwakho. | |
+| Where they sit | Apho bahlala khona | |
+| How many people | Bangaphi | |
+| Remove group | Susa iqela | |
+| Add where they sit | Faka apho bahlala khona | |
+| Move {group} up | Nyusa {group} | |
+| Move {group} down | Hlisa {group} | |
+| Group, e.g. Amakhosikazi, Abakhwenyana | Iqela, umz. Amakhosikazi, Abakhwenyana | |
+| Add group | Yongeza iqela | |
+| Add a group | Yongeza iqela | |
+| Could not save. Please try again. | Akugcinwanga. Nceda uzame kwakhona. | |

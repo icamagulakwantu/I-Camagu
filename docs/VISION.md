@@ -122,6 +122,18 @@ In the Eastern Cape the ceremony starch is white samp, not pap.
   can be defended.
 - **Calm.** Cream, deep green for structure, one accent for the main action.
 
+## Ceremonies follow the journey (founder, 23 Nov 2026)
+
+- A plan reads in the order things happen. Ulwaluko runs from home (his
+  hair is cut before the ibhoma is built) to the mountain, coming out, and
+  umgidi: one day, the day he comes home as ikrwala, the last part of the
+  journey. Umgidi is planned inside ulwaluko, not as a ceremony of its own.
+- At umgidi and every ceremony of isiko lakwaXhosa each group sits in its
+  own place: ootata apart from oomama, abafana apart, and so on (Seating
+  and groups).
+- Nothing in the app describes a wound healing or drying.
+- See docs/research/2026-11-ceremony-order-and-seating.md.
+
 ## Open questions
 
 - Stokvel history: the common account is that the word comes from the

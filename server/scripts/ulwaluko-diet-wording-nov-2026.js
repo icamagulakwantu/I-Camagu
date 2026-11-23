@@ -1,15 +1,21 @@
 // Corrects the ulwaluko diet lines in existing plans, as the founder
 // described them on 17 Nov 2026: for the first seven days the initiate eats
-// no salt and nothing watery (green apples and other low-water fruit), so the
-// wound dries and heals; uMojiso comes after day 7 (named only, no detail). The old line wrongly
-// suggested spinach and cabbage, which are watery.
+// no salt and little water (green apples and other low-water fruit), as the
+// ikhankatha guides; uMojiso comes after day 7 (named only, no detail). The
+// old line wrongly suggested spinach and cabbage, which are watery. No
+// medical detail is given anywhere (founder, 23 Nov 2026): an earlier
+// wording of the first line that gave one is replaced too.
 //
 // Idempotent and narrow: only rows that still hold the exact old wording are
 // changed, ticks are kept, and the uMojiso line is added once per checklist.
 import prisma from '../config/db.js';
 
+// The old text, only so stored rows can be found and replaced.
+const EARLIER_FIRST_LINE = 'Days 1-7: food with no salt and little water, so the wound dries and heals';
 const RELABEL = [
-  ['No-salt food, steamed bread, spinach/cabbage', 'Days 1-7: food with no salt and little water, so the wound dries and heals'],
+  ['No-salt food, steamed bread, spinach/cabbage', 'Days 1-7: food with no salt and little water, as the ikhankatha guides'],
+  // The 17 Nov wording, which named the medical reason.
+  [EARLIER_FIRST_LINE, 'Days 1-7: food with no salt and little water, as the ikhankatha guides'],
   ['Green apples and low-water-content fruit', 'Days 1-7: green apples and other low-water fruit'],
   // Ulwaluko is sacred: the founder asked for uMojiso to be named only,
   // without detail (18 Nov 2026). Shortens the line this script first added.
@@ -23,6 +29,7 @@ export async function fixUlwalukoDietWording() {
   for (const [from, to] of RELABEL) {
     changed += (await prisma.ceremonyChecklistItem.updateMany({ where: { label: from }, data: { label: to } })).count;
     changed += (await prisma.checklistItem.updateMany({ where: { label: from }, data: { label: to } })).count;
+    changed += (await prisma.ceremonyCostItem.updateMany({ where: { label: from }, data: { label: to } })).count;
   }
 
   // Add the uMojiso line beside every corrected diet list that lacks it.

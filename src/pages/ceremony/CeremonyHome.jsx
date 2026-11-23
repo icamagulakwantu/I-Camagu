@@ -213,7 +213,7 @@ export default function CeremonyHome({
       <nav aria-label={t('Ceremony sections')} className="relative z-10 mx-4 -mt-[52px] grid grid-cols-4 overflow-hidden rounded-[22px] bg-[#fffdf9] shadow-[0_22px_44px_-26px_rgba(43,30,18,0.7)]">
         {[
           { id: 'plan', icon: 'clipboard', label: t('Plan'), detail: total ? `${done}/${total}` : t('List'), onClick: () => onEditStep('list') },
-          { id: 'people', icon: 'users', label: t('People'), detail: t('Groups'), onClick: () => onOpenHierarchy?.(plan.ceremonyId) },
+          { id: 'people', icon: 'users', label: t('People'), detail: t('Seating'), onClick: () => onOpenHierarchy?.(plan.ceremonyId) },
           { id: 'money', icon: 'coins', label: t('Money'), detail: budgetZAR != null ? rand(budgetZAR) : t('Budget'), onClick: () => onViewBudget?.(plan.id, title) },
           { id: 'pledges', icon: 'gift', label: t('Pledges'), detail: pledges.length ? `${pledges.length}` : t('None yet'), onClick: onOpenPledges },
         ].map((item) => (
@@ -337,8 +337,8 @@ export default function CeremonyHome({
           </button>
           <button type="button" onClick={() => onOpenHierarchy?.(plan.ceremonyId)} className="pressable relative flex min-h-[132px] flex-col justify-end rounded-[22px] bg-[#fffdf9] px-4 pb-3.5 pt-8 text-left shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
             <span className="absolute -top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-[#c1922f] text-[#1c1612] ring-4 ring-cream"><Icon name="users" size={18} /></span>
-            <span className="font-display text-[1.15rem] font-semibold leading-tight text-ink">{t('Who brings what')}</span>
-            <span className="mt-1 text-[13px] text-ink-muted">{t('Give each group its items')}</span>
+            <span className="font-display text-[1.15rem] font-semibold leading-tight text-ink">{t('Seating and groups')}</span>
+            <span className="mt-1 text-[13px] text-ink-muted">{t('Who sits where, who brings what')}</span>
           </button>
         </section>
 

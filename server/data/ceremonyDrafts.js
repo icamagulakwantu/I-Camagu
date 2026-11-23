@@ -13,6 +13,7 @@ export const DRAFT_CEREMONY_TYPES = Object.freeze({
         { label: 'Agree the date with the child’s father’s family and inform the mother’s family', quantity: 1, unit: 'task', rateKey: null },
         { label: 'Choose the elder who will speak to the ancestors for the child', quantity: 1, unit: 'task', rateKey: null },
         { label: 'Write down the child’s names and both families’ iziduko for the elder', quantity: 1, unit: 'task', rateKey: null },
+        { label: 'Seating: each group in its own place, ootata ebuhlanti and oomama endlini (open Seating and groups)', quantity: 1, unit: 'task', rateKey: null },
       ]},
       { phase: 'ANIMAL_AND_OFFERING', items: [
         { label: 'Goat for the imbeleko (its kind and colour as the family decides)', quantity: 1, unit: 'animal', rateKey: 'goat_standard' },

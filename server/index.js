@@ -35,6 +35,7 @@ import { applyDrinksPhotosPrices, fixTsitsikammaSparklingPhoto } from './scripts
 import { applyPriceChecks } from './scripts/apply-price-checks.js';
 import { addIbhomaItems } from './scripts/ibhoma-items-nov-2026.js';
 import { mergeClanForms } from './scripts/merge-clan-forms-nov-2026.js';
+import { alignCeremonyOrder } from './scripts/ceremony-order-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -348,6 +349,12 @@ if (startup.schemaReady) {
     await mergeClanForms();
   } catch (err) {
     console.error('Clan forms merge failed:', err?.message);
+  }
+  // The founder's 23 Nov 2026 review: seating, journey order, wording. Once.
+  try {
+    await alignCeremonyOrder();
+  } catch (err) {
+    console.error('Ceremony order failed:', err?.message);
   }
 }
 

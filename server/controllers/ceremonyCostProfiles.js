@@ -189,14 +189,20 @@ export const UBUKRWALA_ITEMS = [
   { phase: 'UBUKRWALA', label: 'Amakrwala clothes: hat, jacket, shirt, trousers and shoes (often brown, beige or khaki)' },
 ];
 
+// In the order of the journey (founder, 23 Nov 2026): his hair is cut at
+// home first, then the ibhoma is built, then he goes to the mountain.
+export const SEND_OFF_ITEMS = [
+  { phase: 'PHYSICAL_PREPARATION', label: 'A goat at home when he goes in, if your family does this (ask the elders)' },
+  { phase: 'SPIRITUAL_ITEMS', label: 'Ubulunga (the family necklace), if your family keeps one' },
+];
 const ULWALUKO_DEFAULT_ITEMS = [
   ...ULWALUKO_REGISTRATION_ITEMS,
-  { phase: 'TRANSPORT_ARRIVAL', label: 'Arrange transport to the mountain' },
-  { phase: 'TRANSPORT_ARRIVAL', label: 'Confirm elders/men accompanying' },
   { phase: 'PHYSICAL_PREPARATION', label: 'Head, facial, and pubic hair fully removed' },
+  SEND_OFF_ITEMS[0],
   { phase: 'SPIRITUAL_ITEMS', label: 'Ikoto (bentonite clay)' },
   { phase: 'SPIRITUAL_ITEMS', label: 'Imphepho' },
   { phase: 'SPIRITUAL_ITEMS', label: 'Arrange uqiniswa komntwana (traditional healer)' },
+  SEND_OFF_ITEMS[1],
   ...IBHOMA_TOOL_ITEMS,
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Ingubo (blanket)' },
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Sail/tarpaulin to cover ibhoma' },
@@ -205,14 +211,16 @@ const ULWALUKO_DEFAULT_ITEMS = [
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Axe, knife, wire/cable ties, firewood' },
   ...IBHOMA_EXTRA_ITEMS.filter((i) => i.phase === 'IBHOMA_CONSTRUCTION'),
   { phase: 'IBHOMA_CONSTRUCTION', label: 'Courtesy: a bottle of brandy and beers for the builders' },
+  { phase: 'TRANSPORT_ARRIVAL', label: 'Arrange transport to the mountain' },
+  { phase: 'TRANSPORT_ARRIVAL', label: 'Confirm elders/men accompanying' },
   { phase: 'DAILY_ESSENTIALS', label: 'Dish, cup, spoon' },
   { phase: 'DAILY_ESSENTIALS', label: '25L water container' },
   { phase: 'DAILY_ESSENTIALS', label: 'Matches and candles' },
   ...IBHOMA_EXTRA_ITEMS.filter((i) => i.phase === 'DAILY_ESSENTIALS'),
   { phase: 'DAILY_ESSENTIALS', label: 'A book' },
-  // The first seven days: no salt and nothing watery, so the body stays dry
-  // and the wound can dry and heal. Founder-confirmed, 17 Nov 2026.
-  { phase: 'DIET_EARLY_STAGE', label: 'Days 1-7: food with no salt and little water, so the wound dries and heals' },
+  // The first seven days: no salt and little water (founder, 17 Nov 2026).
+  // No medical detail is given anywhere in the app (founder, 23 Nov 2026).
+  { phase: 'DIET_EARLY_STAGE', label: 'Days 1-7: food with no salt and little water, as the ikhankatha guides' },
   { phase: 'DIET_EARLY_STAGE', label: 'Days 1-7: green apples and other low-water fruit' },
   { phase: 'UMOJISO', label: 'After day 7: uMojiso' },
   { phase: 'UMOJISO', label: 'Sybok for uMojiso (sheep or goat if no sybok is available)' },
@@ -258,13 +266,27 @@ export const MOURNING_ITEMS = [
   { phase: 'MOURNING_END', label: 'Ukukhulula izila at the end of mourning: a goat, and the mourning clothes are burned' },
 ];
 
+// Umgidi is one day: the day he comes home from the mountain, the last part
+// of ulwaluko (founder, 23 Nov 2026). What is made ready beforehand comes
+// first, then the day in the order it happens. Each group sits in its own
+// place (founder): ootata and the men ebuhlanti, oomama and the women in the
+// house, abafana and iintombi apart (see Seating and groups). Ukuyala: the
+// men advise him first, then the women and the eldest aunt; then the gifts.
+export const NXITYISWA_RENAME = ['Kunxitiswa - new clothes and remaining alcohol for the next day', 'Ukunxityiswa - new clothes and remaining alcohol for the next day'];
+export const SEATING_LABEL = 'Seat each group in its own place: ootata ebuhlanti, oomama endlini, abafana and iintombi apart (open Seating and groups)';
+export const HIERARCHY_RENAME = ['Set up the 14-group hierarchy allocations (see Hierarchy tool)', SEATING_LABEL];
+export const UMGIDI_EXTRA_ITEMS = [
+  { phase: 'HIERARCHY_ALLOCATION', label: 'Give each group its share of drinks and meat (who brings what)' },
+  { phase: 'KRAAL_SEATING', label: 'Everyone in their place before he is seated: the men ebuhlanti, the women in the house' },
+  { phase: 'ELDER_GUIDANCE', label: 'Ukuyala: the men advise him first, then the women and the eldest aunt' },
+  { phase: 'ELDER_GUIDANCE', label: 'Izipho: gifts for the ikrwala from family and guests' },
+];
 const UMGIDI_DEFAULT_ITEMS = [
-  { phase: 'ARRIVAL_INGQONGQO', label: 'Arrange Ingqongqo (women beating zinc, chanting)' },
-  { phase: 'ARRIVAL_INGQONGQO', label: 'Courtesy: bottle of gin and brandy for the women' },
-  { phase: 'KRAAL_SEATING', label: 'Ikhukho for the ikrwala to sit on' },
-  { phase: 'KRAAL_SEATING', label: 'Small black tree branch from the initiation site' },
-  { phase: 'ELDER_GUIDANCE', label: 'Arrange elder men for zoku yala guidance' },
-  { phase: 'ELDER_GUIDANCE', label: 'Courtesy: bottle and beers for the elders' },
+  { phase: 'HIERARCHY_ALLOCATION', label: SEATING_LABEL },
+  UMGIDI_EXTRA_ITEMS[0],
+  { phase: 'VIP_EKOYINI', label: 'Book Ekoyini Mobile Bar for VIP/friends phase' },
+  { phase: 'ALCOHOL_DISTRIBUTION', label: 'Main distribution supplies (5-8 bottles, 1-2 cases per group)' },
+  { phase: 'ALCOHOL_DISTRIBUTION', label: 'Ingxotha (final round) supplies' },
   { phase: 'COOKING_EBUHLANTI', label: 'Livestock for slaughter (sheep/cow)' },
   { phase: 'COOKING_EBUHLANTI', label: '9+ large enamel dishes, 6 cast iron pots' },
   { phase: 'COOKING_EBUHLANTI', label: '10+ bhekile for umqombothi' },
@@ -276,18 +298,31 @@ const UMGIDI_DEFAULT_ITEMS = [
   { phase: 'COOKING_KITCHEN', label: 'Cooking oil' },
   { phase: 'COOKING_KITCHEN', label: 'Sugar (for tea/drinks)' },
   { phase: 'COOKING_KITCHEN', label: 'Plastic plates and spoons for guests' },
-  { phase: 'HIERARCHY_ALLOCATION', label: 'Set up the 14-group hierarchy allocations (see Hierarchy tool)' },
-  { phase: 'ALCOHOL_DISTRIBUTION', label: 'Main distribution supplies (5-8 bottles, 1-2 cases per group)' },
-  { phase: 'ALCOHOL_DISTRIBUTION', label: 'Ingxotha (final round) supplies' },
-  { phase: 'VIP_EKOYINI', label: 'Book Ekoyini Mobile Bar for VIP/friends phase' },
-  { phase: 'CLOSURE', label: 'Kunxitiswa - new clothes and remaining alcohol for the next day' },
+  { phase: 'ARRIVAL_INGQONGQO', label: 'Arrange Ingqongqo (women beating zinc, chanting)' },
+  { phase: 'ARRIVAL_INGQONGQO', label: 'Courtesy: bottle of gin and brandy for the women' },
+  UMGIDI_EXTRA_ITEMS[1],
+  { phase: 'KRAAL_SEATING', label: 'Ikhukho for the ikrwala to sit on' },
+  { phase: 'KRAAL_SEATING', label: 'Small black tree branch from the initiation site' },
+  { phase: 'ELDER_GUIDANCE', label: 'Arrange elder men for zoku yala guidance' },
+  UMGIDI_EXTRA_ITEMS[2],
+  UMGIDI_EXTRA_ITEMS[3],
+  { phase: 'ELDER_GUIDANCE', label: 'Courtesy: bottle and beers for the elders' },
+  { phase: 'CLOSURE', label: NXITYISWA_RENAME[1] },
 ];
+
+// Seating for every isiko ceremony (founder, 23 Nov 2026): ootata and the
+// men ebuhlanti, oomama and the women in the house, the young men and girls
+// in their own places.
+export const SEATING_ALL = 'Seating: each group in its own place, ootata ebuhlanti and oomama endlini (open Seating and groups)';
+// Ukukhapha is not a celebration: no umqombothi (its own rule above).
+export const KHAPHA_COURTESY = 'Brandy and gin for the elders, if the family allows (no umqombothi: this is not a celebration)';
 
 const INTAMBO_ENKULU_DEFAULT_ITEMS = [
   { phase: 'PLANNING_ELDERS', label: 'Convene family elders (Abadala bomzi) to confirm readiness for full ancestral binding' },
   { phase: 'PLANNING_ELDERS', label: 'Identify the lineage head who will perform Ukunqula and address the ancestors by name' },
   { phase: 'PLANNING_ELDERS', label: 'Formally request aunts (Oodade bobawo) and senior matriarchs to witness the binding' },
   { phase: 'PLANNING_ELDERS', label: 'Confirm the individual has undergone Imbeleko or equivalent first rite of passage' },
+  { phase: 'PLANNING_ELDERS', label: SEATING_ALL },
   { phase: 'PURPOSE_BINDING', label: 'Establish intent: Full ancestral recognition and binding (Ukubopheleleka) into the lineage' },
   { phase: 'PURPOSE_BINDING', label: 'Declare that this rite grants permission to enter Ekoyini, become Igwirha/Intlabi, and perform all rituals' },
   { phase: 'PURPOSE_BINDING', label: 'Set taboos (IzipALO) for the initiate during the binding period' },
@@ -296,7 +331,9 @@ const INTAMBO_ENKULU_DEFAULT_ITEMS = [
   { phase: 'SUPPLIES_SACRED', label: 'Procure protective binding cords (Iintambo) from organic fibre as directed by elders' },
   { phase: 'SUPPLIES_SACRED', label: 'Prepare white clay (Ifutha) — NOT red ochre (Imbula) — for ritual marking' },
   { phase: 'SUPPLIES_SACRED', label: 'Collect ritual ash (Intlabathi) for ancestral invocation' },
-  { phase: 'EXECUTION_RITUAL', label: 'Perform Ukuxhela: ritual throat-slitting of the goat by the lineage head at dawn' },
+  { phase: 'SUPPLIES_SACRED', label: 'Brew Umqombothi for the binding ceremony' },
+  { phase: 'SUPPLIES_SACRED', label: 'Provide brandy and gin for elders and participants' },
+  { phase: 'EXECUTION_RITUAL', label: 'Ukuxhela: the lineage head slaughters the goat at dawn' },
   { phase: 'EXECUTION_RITUAL', label: 'Collect blood in a traditional vessel for ancestral offering' },
   { phase: 'EXECUTION_RITUAL', label: 'Cut Intsonyama from the inside muscle of the right foreleg, roast without salt' },
   { phase: 'EXECUTION_RITUAL', label: 'Male kin eat Intsonyama first, then female kin, in strict order of seniority' },
@@ -307,8 +344,6 @@ const INTAMBO_ENKULU_DEFAULT_ITEMS = [
   { phase: 'BINDING_CORDS', label: 'Elders declare the individual now has full access to the Xhosa spiritual realm' },
   { phase: 'CLOSURE', label: 'Dispose of ritual remains outside the homestead as directed by elders' },
   { phase: 'CLOSURE', label: 'Instruct the newly bound individual on permanent taboos and responsibilities' },
-  { phase: 'CLOSURE', label: 'Brew Umqombothi for the binding ceremony' },
-  { phase: 'CLOSURE', label: 'Provide brandy and gin for elders and participants' },
 ];
 
 const UKUKHAPHA_DEFAULT_ITEMS = [
@@ -321,6 +356,7 @@ const UKUKHAPHA_DEFAULT_ITEMS = [
   { phase: 'KRAAL_SACRIFICE', label: 'NEVER use a female cow (Inkomo yomfazi) for a male ancestor — strictly forbidden' },
   { phase: 'KRAAL_SACRIFICE', label: 'Cleanse the centre of the kraal (Intshonalanga yebuhlanti) for beast processing' },
   { phase: 'KRAAL_SACRIFICE', label: 'Lay grass mats (Ikhukho) inside the kraal for officiating elders' },
+  { phase: 'KRAAL_SACRIFICE', label: SEATING_ALL },
   { phase: 'RITUAL_SLAUGHTER', label: 'Perform Ukuxhela at dawn — lineage head slaughters the male animal' },
   { phase: 'RITUAL_SLAUGHTER', label: 'Cut Intsonyama from the right foreleg inside muscle, roast without salt' },
   { phase: 'RITUAL_SLAUGHTER', label: 'Serve Intsonyama to male kin first, then female kin, by seniority' },
@@ -329,8 +365,7 @@ const UKUKHAPHA_DEFAULT_ITEMS = [
   { phase: 'ANCESTRAL_ADDRESS', label: 'Lineage head performs Ukunqula, naming the deceased and requesting safe passage' },
   { phase: 'ANCESTRAL_ADDRESS', label: 'Collect blood and Intlabathi for ancestral offering' },
   { phase: 'CLOSURE_RITUAL', label: 'Perform Ukuxukuxa cleansing with goat, sheep, or fowl before family disperses' },
-  { phase: 'CLOSURE_RITUAL', label: 'Brew Umqombothi for the ceremony' },
-  { phase: 'CLOSURE_RITUAL', label: 'Provide brandy and gin for elders and participants' },
+  { phase: 'CLOSURE_RITUAL', label: KHAPHA_COURTESY },
 ];
 
 const INKOBE_DEFAULT_ITEMS = [
@@ -346,11 +381,12 @@ const INKOBE_DEFAULT_ITEMS = [
   { phase: 'INKOBE_PREP', label: 'Procure high-quality whole dry white maize kernels (Inkobe)' },
   { phase: 'INKOBE_PREP', label: 'Boil Inkobe in large cast iron pots until perfectly cooked' },
   { phase: 'INKOBE_PREP', label: 'Prepare grass-woven baskets (Iintsuba / Izithebe) or pristine enamel bowls for serving' },
+  { phase: 'INKOBE_PREP', label: 'Brew Umqombothi for the ceremony' },
+  { phase: 'INKOBE_PREP', label: 'Provide brandy and gin for elders and participants' },
+  { phase: 'INKOBE_PREP', label: SEATING_ALL },
   { phase: 'COMMUNAL_SHARING', label: 'Distribute ritual meat portions into enamel dishes by seniority' },
   { phase: 'COMMUNAL_SHARING', label: "Guests take handfuls of Inkobe as a sign of receiving the ancestor's blessings" },
   { phase: 'COMMUNAL_SHARING', label: 'Conclude with Izibongo (praise songs) honouring the maternal line' },
-  { phase: 'CLOSURE', label: 'Brew Umqombothi for the ceremony' },
-  { phase: 'CLOSURE', label: 'Provide brandy and gin for elders and participants' },
   { phase: 'CLOSURE', label: 'NO Ukubuyisa follows this rite — the female ancestor is not brought back; she remains in the ancestral realm' },
 ];
 
@@ -365,11 +401,11 @@ const UKUBUYISA_DEFAULT_ITEMS = [
   { phase: 'KRAAL_WELCOME', label: 'Brew Umqombothi (50L to 100L) — this is a festive homecoming, fermented beer IS consumed' },
   { phase: 'KRAAL_WELCOME', label: 'Arrange Bhekile (traditional cans) for seamless serving of Umqombothi' },
   { phase: 'KRAAL_WELCOME', label: 'Set aside brandy and gin for elder men (modern courtesy)' },
-  { phase: 'KRAAL_WELCOME', label: 'Prepare designated seating in the kraal (Ebuhlanti) by family hierarchy' },
+  { phase: 'KRAAL_WELCOME', label: SEATING_ALL },
+  { phase: 'RITUAL_EXECUTION', label: 'Lineage head performs Ukunqula calling the ancestor by name to return home' },
   { phase: 'RITUAL_EXECUTION', label: 'Perform Ukuxhela on the male ox at dawn' },
   { phase: 'RITUAL_EXECUTION', label: 'Cut Intsonyama from the right foreleg, roast without salt, distribute by seniority' },
   { phase: 'RITUAL_EXECUTION', label: 'Cook celebratory meat in 6+ cast iron pots — some portions with salt for guests, ritual portions without' },
-  { phase: 'RITUAL_EXECUTION', label: 'Lineage head performs Ukunqula calling the ancestor by name to return home' },
   { phase: 'RESTORATION_CLOSURE', label: 'Elder formally announces the ancestor is now Umkhulu — guardian seated at the kraal threshold' },
   { phase: 'RESTORATION_CLOSURE', label: 'Complete distribution of all remaining meat to extended family and neighbours — nothing is kept overnight' },
   { phase: 'RESTORATION_CLOSURE', label: 'Pour final libation of Umqombothi at the kraal gatepost for the ancestor' },
@@ -451,7 +487,7 @@ const ULWALUKO_COST_PROFILE = {
     { label: 'A book', category: 'supplies', unit: 'book', unitCost: 0, quantity: 1, isInputField: true, inputType: 'text', suggestedAmount: 'Bring a journal or religious text' },
   ],
   'DIET_EARLY_STAGE': [
-    { label: 'Days 1-7: food with no salt and little water, so the wound dries and heals', category: 'food', unit: 'weekly_groceries', unitCost: 450.00, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'R450 for the first week' },
+    { label: 'Days 1-7: food with no salt and little water, as the ikhankatha guides', category: 'food', unit: 'weekly_groceries', unitCost: 450.00, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'R450 for the first week' },
     { label: 'Days 1-7: green apples and other low-water fruit', category: 'food', unit: 'kg', unitCost: COST_RATES.food.green_apples_kg, quantity: 5, isInputField: true, inputType: 'number', suggestedAmount: '5 kg apples', skuName: 'Green Apples (per kg)' },
   ],
   'UMOJISO': [
@@ -506,9 +542,7 @@ const UMGIDI_COST_PROFILE = {
     { label: 'Sugar (for tea/drinks)', category: 'food', unit: '10kg bag', unitCost: COST_RATES.food.sugar_10kg, quantity: 1, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.002, suggestedAmount: '~20g/guest', skuName: 'Sugar 10kg' },
     { label: 'Plastic plates and spoons for guests', category: 'supplies', unit: 'guest_pack', unitCost: COST_RATES.supplies.plastic_plate_pack_50 + COST_RATES.supplies.plastic_spoon_pack_50, quantity: 4, isInputField: true, inputType: 'number', perGuestUnitFraction: 0.02, suggestedAmount: '1 pack (50) per 50 guests' },
   ],
-  'HIERARCHY_ALLOCATION': [
-    { label: 'Set up the 14-group hierarchy allocations (see Hierarchy tool)', category: 'alcohol', unit: 'allocation', unitCost: 0, quantity: 14, isInputField: true, inputType: 'number', suggestedAmount: 'See alcohol distribution calculator' },
-  ],
+  // HIERARCHY_ALLOCATION (seating and groups) is a step, not something to buy.
   'ALCOHOL_DISTRIBUTION': [
     { label: 'Main distribution supplies (5-8 bottles, 1-2 cases per group)', category: 'alcohol', unit: 'mixed', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Use alcohol distribution calculator' },
     { label: 'Ingxotha (final round) supplies', category: 'alcohol', unit: 'mixed', unitCost: 0, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '2-3 brandy + 1 beer case' },
@@ -534,6 +568,8 @@ const INTAMBO_ENKULU_COST_PROFILE = {
     { label: 'Set taboos (IzipALO) for the initiate during the binding period', category: 'services', unit: 'session', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'SUPPLIES_SACRED': [
+    { label: 'Brew Umqombothi for the binding ceremony', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number', suggestedAmount: '50-75 litres' },
+    { label: 'Provide brandy and gin for elders and participants', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
     { label: 'Secure a white goat without blemish for the recognition slaughter', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'White goat ~R2,700' },
     { label: 'Gather white beads (Amaphondo) for the protective cord ceremony', category: 'supplies', unit: 'strand', unitCost: COST_RATES.supplies.amaphondo_beads_strand, quantity: 4, isInputField: true, inputType: 'number', suggestedAmount: '4-6 strands' },
     { label: 'Procure protective binding cords (Iintambo) from organic fibre as directed by elders', category: 'supplies', unit: 'set', unitCost: COST_RATES.supplies.iintambo_cord_set, quantity: 1, isInputField: true, inputType: 'number' },
@@ -541,7 +577,7 @@ const INTAMBO_ENKULU_COST_PROFILE = {
     { label: 'Collect ritual ash (Intlabathi) for ancestral invocation', category: 'supplies', unit: 'collection', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'EXECUTION_RITUAL': [
-    { label: 'Perform Ukuxhela: ritual throat-slitting of the goat by the lineage head at dawn', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
+    { label: 'Ukuxhela: the lineage head slaughters the goat at dawn', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
     { label: 'Collect blood in a traditional vessel for ancestral offering', category: 'supplies', unit: 'vessel', unitCost: 0, quantity: 1, isInputField: true, inputType: 'text', suggestedAmount: 'Traditional clay pot or enamel basin' },
     { label: 'Cut Intsonyama from the inside muscle of the right foreleg, roast without salt', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
     { label: 'Male kin eat Intsonyama first, then female kin, in strict order of seniority', category: 'services', unit: 'protocol', unitCost: 0, quantity: 1, isInputField: false },
@@ -556,8 +592,6 @@ const INTAMBO_ENKULU_COST_PROFILE = {
   'CLOSURE': [
     { label: 'Dispose of ritual remains outside the homestead as directed by elders', category: 'services', unit: 'task', unitCost: 0, quantity: 1, isInputField: false },
     { label: 'Instruct the newly bound individual on permanent taboos and responsibilities', category: 'services', unit: 'session', unitCost: 0, quantity: 1, isInputField: false },
-    { label: 'Brew Umqombothi (50L to 75L) for the binding ceremony', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number', suggestedAmount: '50-75 litres' },
-    { label: 'Brandy and gin for elders and participants', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
   ],
 };
 
@@ -589,9 +623,8 @@ const UKUKHAPHA_COST_PROFILE = {
     { label: 'Collect blood and Intlabathi for ancestral offering', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'CLOSURE_RITUAL': [
+    { label: KHAPHA_COURTESY, category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
     { label: 'Perform Ukuxukuxa cleansing with goat, sheep, or fowl before family disperses', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_standard, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'Goat ~R2,700 or fowl ~R150' },
-    { label: 'Brew Umqombothi (50L to 75L) for the ceremony', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number', suggestedAmount: '50-75 litres' },
-    { label: 'Brandy and gin for elders and participants', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
   ],
 };
 
@@ -612,6 +645,8 @@ const INKOBE_COST_PROFILE = {
     { label: 'Cook meat with water only — no salt, no spices', category: 'services', unit: 'protocol', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'INKOBE_PREP': [
+    { label: 'Brew Umqombothi for the ceremony', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number', suggestedAmount: '50-75 litres' },
+    { label: 'Provide brandy and gin for elders and participants', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
     { label: 'Procure high-quality whole dry white maize kernels (Inkobe)', category: 'food', unit: 'kg', unitCost: COST_RATES.food.inkobe_white_maize_kg, quantity: 10, isInputField: true, inputType: 'number', suggestedAmount: '10-15 kg' },
     { label: 'Boil Inkobe in large cast iron pots until perfectly cooked', category: 'supplies', unit: 'pot', unitCost: COST_RATES.supplies.cast_iron_pot, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2-3 pots (borrowed)' },
     { label: 'Prepare grass-woven baskets (Iintsuba / Izithebe) or pristine enamel bowls for serving', category: 'supplies', unit: 'bowl', unitCost: COST_RATES.supplies.enamel_dish_large, quantity: 6, isInputField: true, inputType: 'number', suggestedAmount: '6-10 bowls' },
@@ -622,8 +657,6 @@ const INKOBE_COST_PROFILE = {
     { label: 'Conclude with Izibongo (praise songs) honouring the maternal line', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
   ],
   'CLOSURE': [
-    { label: 'Brew Umqombothi (50L to 75L) for the ceremony', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number', suggestedAmount: '50-75 litres' },
-    { label: 'Brandy and gin for elders and participants', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
     { label: 'NO Ukubuyisa follows this rite — the female ancestor is not brought back; she remains in the ancestral realm', category: 'services', unit: 'warning', unitCost: 0, quantity: 0, isInputField: false },
   ],
 };
@@ -646,7 +679,7 @@ const UKUBUYISA_COST_PROFILE = {
     { label: 'Brew Umqombothi (50L to 100L) — this is a festive homecoming, fermented beer IS consumed', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 75, isInputField: true, inputType: 'number', suggestedAmount: '75-100 litres' },
     { label: 'Arrange Bhekile (traditional cans) for seamless serving of Umqombothi', category: 'supplies', unit: 'can', unitCost: COST_RATES.supplies.bhekile_can, quantity: 15, isInputField: true, inputType: 'number', suggestedAmount: '15-20 cans' },
     { label: 'Set aside brandy and gin for elder men (modern courtesy)', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.brandy_750ml + COST_RATES.alcohol.gin_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 brandy + 2 gin' },
-    { label: 'Prepare designated seating in the kraal (Ebuhlanti) by family hierarchy', category: 'supplies', unit: 'mat', unitCost: COST_RATES.supplies.grass_mat_ikhukho, quantity: 8, isInputField: true, inputType: 'number', suggestedAmount: '8-12 mats' },
+    { label: 'Grass mats (ikhukho) for the elders ebuhlanti', category: 'supplies', unit: 'mat', unitCost: COST_RATES.supplies.grass_mat_ikhukho, quantity: 8, isInputField: true, inputType: 'number', suggestedAmount: '8-12 mats' },
   ],
   'RITUAL_EXECUTION': [
     { label: 'Perform Ukuxhela on the male ox at dawn', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },

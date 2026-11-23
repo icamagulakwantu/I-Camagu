@@ -10,10 +10,11 @@ export const PHASE_TIMING = {
   REGISTRATION: { days: -90 },
   SPIRITUAL_ITEMS: { days: -14 },
   TRANSPORT_ARRIVAL: { days: -7 },
+  // At home his hair is cut first, then the ibhoma is built (founder).
+  PHYSICAL_PREPARATION: { days: -3 },
   DAILY_ESSENTIALS: { days: -3 },
   DIET_EARLY_STAGE: { days: -2 },
   IBHOMA_CONSTRUCTION: { days: -2 },
-  PHYSICAL_PREPARATION: { days: -1 },
   UMOJISO: { days: 5 },
   // Umphumo and umgidi, counted from umgidi
   EXIT_PREPARATION: { days: -7, anchor: H },

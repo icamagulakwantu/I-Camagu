@@ -33,7 +33,7 @@ const TILE_GROUPS = [
     items: [
       { id: 'templates', icon: 'template', label: 'Ceremony templates', desc: 'Ready-made plans to start from' },
       { id: 'sharedplans', icon: 'heartHandshake', label: 'Plans shared with me', desc: 'Help family plan their ceremony', keywords: 'shared plan help edit family invite' },
-      { id: 'hierarchy', icon: 'users', label: 'Who brings what', desc: 'Give each group its items' },
+      { id: 'hierarchy', icon: 'users', label: 'Seating and groups', desc: 'Who sits where, who brings what', keywords: 'hierarchy amaqela ootata oomama ebuhlanti' },
       // Family pledges for a ceremony live on the ceremony page. This is the
       // separate record of gifts exchanged between families over the years.
       { id: 'ukugida', icon: 'send', label: 'Ukugida', desc: 'Gifts guests bring, and what you return', keywords: 'gift exchange reciprocity return gifts bottle case' },

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
+import SeatingPlan from '../components/SeatingPlan.jsx'
 
 const money = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
@@ -225,8 +226,11 @@ function Hierarchy({ onBack, initialCeremonyId }) {
       <button onClick={onBack} className="text-sm text-brand-black/60 mb-4">
         &larr; Back
       </button>
-      <h2 className="text-2xl font-extrabold text-brand-black mb-1">Umgidi Hierarchy</h2>
-      <p className="text-xs text-brand-black/50 mb-4">The 14 traditional groups, and what each one needs.</p>
+      <h2 className="font-display text-[1.75rem] font-semibold leading-tight text-ink">Seating and groups</h2>
+      <p className="mb-1 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Ukuhlala ngamaqela</p>
+      <p className="mb-4 text-[14px] leading-relaxed text-ink-muted">
+        At umgidi and every ceremony of isiko lakwaXhosa, each group sits in its own place: ootata ebuhlanti, oomama endlini enkulu, abafana and iintombi apart. Set out the groups, then give each its share.
+      </p>
 
       <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 mb-4 space-y-2">
         {ceremonies.length === 0 ? (
@@ -246,13 +250,17 @@ function Hierarchy({ onBack, initialCeremonyId }) {
         <form onSubmit={generateGroups}>
           <button type="submit" disabled={!ceremonyId}
             className={`w-full bg-terracotta text-white font-bold py-2 rounded-pill disabled:opacity-50 ${pressable}`}>
-            Generate the 14 Groups
+            {groups.length ? 'Add any missing groups' : 'Set out the groups'}
           </button>
         </form>
       </div>
 
       {groups.length > 0 && (
         <>
+          <SeatingPlan groups={groups} accessToken={accessToken} ceremonyId={ceremonyId} onGroups={setGroups} onError={(message) => showToast(message, 'error')} />
+
+          <h3 className="font-display text-[1.2rem] font-semibold text-ink">Who brings what</h3>
+          <p className="mb-2 text-[13px] text-ink-muted">Each group's share of drinks and meat.</p>
           <div className="bg-white border border-terracotta/20 rounded-soft p-4 mb-4">
             <p className="text-xs font-black uppercase text-brand-black/40 mb-2">Set an allocation</p>
             <form onSubmit={addAllocation} className="space-y-2">

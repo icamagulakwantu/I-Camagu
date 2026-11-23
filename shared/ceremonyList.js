@@ -7,7 +7,7 @@
 // The money rules do not change: a SUGGESTED price is only a hint and is never
 // deducted. Only the ACTUAL price a host types in comes off the budget.
 import { hasActual, suggestedTotal, suggestedUnitCost, summariseCosts, UNFORESEEN_PHASE } from './ceremonyCosts.js';
-import { PHASE_LABELS } from './ceremonyPhases.js';
+import { PHASE_LABELS, PHASE_RANK } from './ceremonyPhases.js';
 import { timingFor } from './ceremonyTiming.js';
 
 const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -75,14 +75,14 @@ export function buildListRows({ costItems = [], checklistItems = [] }) {
   return rows;
 }
 
-// Where a stage falls in the ceremony, for ordering: days from the start,
-// umgidi stages counted from the homecoming (about four weeks after going
-// in), and what the host added themselves at the end.
-const HOMECOMING_OFFSET_DAYS = 28;
+// Where a stage falls in the ceremony, for ordering: its place in the
+// ceremony's journey (PHASE_SEQUENCES), so ulwaluko reads from home to the
+// mountain to umgidi, never by due date. A stage no ceremony lists comes
+// after them, by when it falls due; what the host added comes last.
 export function phaseOrder(phase) {
   if (!phase || phase === 'CUSTOM' || phase === UNFORESEEN_PHASE) return Number.MAX_SAFE_INTEGER;
-  const { days = 0, anchor } = timingFor(phase);
-  return anchor === 'homecoming' ? HOMECOMING_OFFSET_DAYS + days : days;
+  if (PHASE_RANK.has(phase)) return PHASE_RANK.get(phase);
+  return 10_000 + timingFor(phase).days;
 }
 
 // Rows grouped by stage, stages in the order they happen. Stages at the same

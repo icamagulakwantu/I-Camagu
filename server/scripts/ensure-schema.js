@@ -9,6 +9,8 @@ export async function ensureCeremonyBudgetColumns() {
   await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "emailVerificationRequired" BOOLEAN NOT NULL DEFAULT false;');
   // Campaign attribution (?src=) recorded on new accounts. Nullable: existing accounts have none.
   await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "signupSource" TEXT;');
+  // Seating: where each ceremony group sits.
+  await prisma.$executeRawUnsafe('ALTER TABLE "CeremonyGroup" ADD COLUMN IF NOT EXISTS "place" TEXT;');
   // ID verification: which ID (smart ID card or green ID book) and the back of a smart ID card.
   await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "idDocumentType" TEXT;');
   await prisma.$executeRawUnsafe('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "idDocumentBackUrl" TEXT;');
