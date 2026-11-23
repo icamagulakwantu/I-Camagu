@@ -34,6 +34,7 @@ import { correctQuartSizes } from './scripts/quart-sizes-nov-2026.js';
 import { applyDrinksPhotosPrices, fixTsitsikammaSparklingPhoto } from './scripts/drinks-photos-prices-nov-2026.js';
 import { applyPriceChecks } from './scripts/apply-price-checks.js';
 import { addIbhomaItems } from './scripts/ibhoma-items-nov-2026.js';
+import { mergeClanForms } from './scripts/merge-clan-forms-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -340,6 +341,13 @@ if (startup.schemaReady) {
     await addIbhomaItems();
   } catch (err) {
     console.error('Ibhoma items failed:', err?.message);
+  }
+  // One clan, one entry: fold Tshawe into AmaTshawe and the like, then link
+  // every member to their clan. Runs once.
+  try {
+    await mergeClanForms();
+  } catch (err) {
+    console.error('Clan forms merge failed:', err?.message);
   }
 }
 

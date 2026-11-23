@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import prisma from '../config/db.js';
 import { normaliseIsiduko, clearClanIndexCache } from '../services/clanMatchService.js';
+import { isidukoRootKey } from '../../shared/isiduko.js';
 
 const DATA = join(dirname(fileURLToPath(import.meta.url)), '..', 'data', 'clanPraises.json');
 
@@ -19,13 +20,16 @@ export function readClanPraises() {
 export async function loadClanPraises(clans = readClanPraises()) {
   const existing = await prisma.clanGroup.findMany({ select: { id: true, clanName: true } });
   const byKey = new Map(existing.map((g) => [normaliseIsiduko(g.clanName), g]));
+  // Another form of the same clan already registered (Tshawe for AmaTshawe)
+  // is the same clan: add the praises there rather than open a second entry.
+  const byRoot = new Map(existing.map((g) => [isidukoRootKey(g.clanName), g]));
   let createdClans = 0;
   let addedPraises = 0;
   let removedPraises = 0;
   for (const { clan, praises } of clans) {
     const key = normaliseIsiduko(clan);
     if (!key) continue;
-    let group = byKey.get(key);
+    let group = byKey.get(key) || byRoot.get(isidukoRootKey(clan));
     if (!group) {
       group = await prisma.clanGroup.create({ data: { clanName: clan }, select: { id: true, clanName: true } });
       byKey.set(key, group);

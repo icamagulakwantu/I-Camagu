@@ -65,18 +65,12 @@ export async function deleteMyAccount(req, res) {
     const userId = req.userId;
 
     // ── 1. Remove raw-SQL ancestral rites ────────────────────────────────────
-    // These rows use a familyKey, not a userId FK, so we compute the key and
-    // wipe only the entries this user added (same ownership rule as deleteRite).
-    const { paternalIziduko, lastName } = user;
-    if (paternalIziduko && lastName) {
-      const norm = (s) => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
-      const familyKey = `${norm(paternalIziduko)}|${norm(lastName)}`;
-      await prisma.$executeRawUnsafe(
-        `DELETE FROM "AncestralRite" WHERE "familyKey" = $1 AND "addedById" = $2`,
-        familyKey,
-        userId
-      ).catch(() => {/* table may not exist yet on a fresh deployment */});
-    }
+    // These rows belong to a family (clan and surname), not to the user, so
+    // only the entries this user added are removed (same rule as deleteRite).
+    await prisma.$executeRawUnsafe(
+      `DELETE FROM "AncestralRite" WHERE "addedById" = $1`,
+      userId
+    ).catch(() => {/* table may not exist yet on a fresh deployment */});
 
     // ── 2. Prisma-managed personal data ─────────────────────────────────────
     // Delete in dependency order (FK children before parents).

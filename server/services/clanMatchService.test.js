@@ -54,6 +54,19 @@ describe('conservative isiduko matching', () => {
     expect(fuzzy.results.every((item) => item.possibleDistinct)).toBe(true);
   });
 
+  it('confirms one clan from any of its forms, straight away', async () => {
+    for (const form of ['Tshawe', 'AmaTshawe', 'Ama-Tshawe', 'ama tshawe', 'MamTshawe', 'Mamtshawe', 'Mam-Tshawe', 'MaTshawe', 'matshawe', 'Ma-Tshawe', 'uTshawe', 'ngu Tshawe', 'NguTshawe', 'Ndingu MamTshawe', 'Tshawe clan']) {
+      const result = await matchClan(form);
+      expect(result.autoSelect, form).toBe(true);
+      expect(result.results[0].head, form).toBe('Tshawe');
+    }
+    for (const form of ['Mzangwa', 'MamZangwa', 'MaZangwa', 'AmaZangwa']) {
+      expect((await matchClan(form)).results[0].head, form).toBe('Zangwa');
+    }
+    expect((await matchClan('MamKhwemte')).results[0].head).toBe('Khwemte');
+    expect((await matchClan('Mkhwemte')).results[0].head).toBe('Khwemte');
+  });
+
   it('returns fuzzy suggestions only and never auto-selects them', async () => {
     const result = await matchClan('Cira');
     expect(result.results[0].head).toBe('Cirha');

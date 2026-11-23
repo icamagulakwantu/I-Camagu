@@ -1,5 +1,7 @@
 import { randomUUID } from 'crypto';
 import prisma from '../config/db.js';
+import { matchClan } from '../services/clanMatchService.js';
+import { isidukoRootKey } from '../../shared/isiduko.js';
 
 // Ancestral rites backlog (Imisebenzi yezinyanya). A family shares one list,
 // keyed by paternal clan name + surname, so siblings and cousins of the same
@@ -41,6 +43,14 @@ function ensureTable() {
 
 const norm = (s) => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
 
+// The family is the clan and the surname. The clan is read by its root, as
+// the register knows it, so a MamTshawe, a Tshawe and an AmaTshawe of the
+// same surname share one family record (founder, 23 Nov 2026).
+async function clanKey(text) {
+  const match = await matchClan(text);
+  return isidukoRootKey(match.autoSelect ? match.results[0].head : text);
+}
+
 async function familyFor(userId) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -48,7 +58,7 @@ async function familyFor(userId) {
   });
   if (!user?.paternalIziduko || !user?.lastName) return null;
   return {
-    key: `${norm(user.paternalIziduko)}|${norm(user.lastName)}`,
+    key: `${await clanKey(user.paternalIziduko)}|${norm(user.lastName)}`,
     clan: user.paternalIziduko.trim(),
     surname: user.lastName.trim(),
   };

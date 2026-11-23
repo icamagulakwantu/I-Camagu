@@ -16,6 +16,13 @@ async function findOrCreateClanGroup(clanName) {
   if (!clanName) return null;
   const existing = await prisma.clanGroup.findUnique({ where: { clanName } });
   if (existing) return existing;
+  // Tshawe, AmaTshawe and MamTshawe are one clan: never open a second entry
+  // for another form of a registered clan.
+  const sameClan = await matchClan(clanName);
+  if (sameClan.autoSelect) {
+    const found = await prisma.clanGroup.findUnique({ where: { id: sameClan.results[0].id } });
+    if (found) return found;
+  }
 
   try {
     return await prisma.clanGroup.create({ data: { clanName } });

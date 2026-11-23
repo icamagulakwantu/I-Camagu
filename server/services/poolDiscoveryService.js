@@ -2,6 +2,7 @@ import prisma from '../config/db.js';
 import { checkAndMatchPool, parkItemsIntoPool } from './matchmakerService.js';
 import { getNextTierForMetric, getTierForMetric, palletsForCases, resolveTierLadder, amountToReachTier } from '../utils/smartMatchTiers.js';
 import { parsePositiveIntegerQuantity } from '../utils/quantity.js';
+import { isidukoKeys } from '../../shared/isiduko.js';
 
 const TAVERN_CATEGORIES = new Set([
   'BEER', 'CIDER_RTD', 'BRANDY', 'WHISKY', 'VODKA', 'VODKA_PREMIUM',
@@ -44,7 +45,8 @@ function ancestralLines(user) {
     { key: 'maternalGrandmotherIziduko', weight: 1 },
   ].filter((line) => normalise(user[line.key])).map((line) => ({
     ...line,
-    value: normalise(user[line.key]),
+    // Every form of the clan counts: AmaTshawe, MamTshawe and Tshawe.
+    keys: isidukoKeys(user[line.key]),
   }));
 }
 
@@ -55,9 +57,9 @@ function clanScore(user, pool) {
   for (const basket of pool.baskets || []) {
     const participant = basket.user;
     if (!participant) continue;
-    const otherValues = ancestralLines(participant).map((line) => line.value);
+    const otherKeys = new Set(ancestralLines(participant).flatMap((line) => line.keys));
     for (const line of lines) {
-      if (otherValues.includes(line.value)) sharedLines.add(line.key);
+      if (line.keys.some((k) => otherKeys.has(k))) sharedLines.add(line.key);
     }
   }
   const weights = { paternalIziduko: 4, maternalIziduko: 3, paternalGrandmotherIziduko: 2, maternalGrandmotherIziduko: 1 };

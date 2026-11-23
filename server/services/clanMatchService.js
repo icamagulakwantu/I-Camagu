@@ -1,35 +1,9 @@
 import prisma from '../config/db.js';
+import { normaliseIsiduko, femaleRoots, femaleForm, isidukoReadings } from '../../shared/isiduko.js';
 
-export function normaliseIsiduko(value) {
-  return String(value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLocaleLowerCase()
-    .replace(/^(?:abakwa|akwa|ama|aba|abe|oo|o)\s*/i, '')
-    .replace(/[^a-z0-9]/g, '');
-}
-
-// Female forms of a clan name: a woman of AmaCirha is MamCirha, of
-// AmaTshawe Mam-Tshawe. Same clan, male and female. Only "Mam" (with or
-// without a hyphen or space) or "Ma-" / "Ma " is read as the female prefix,
-// so a clan name that simply starts with "Ma" (Madiba) is never cut.
-// Returns the possible clan roots, or [] when the text is not a female form.
-// "MaMadiba" could be Ma + Madiba or Mam + adiba, so both are tried.
-export function femaleRoots(value) {
-  const text = String(value || '').trim();
-  const mam = text.match(/^mam[-\s]?(.{2,})$/i);
-  if (mam) return /^m[aeiou]/i.test(text.slice(2)) ? [mam[1], text.slice(2)] : [mam[1]];
-  const ma = text.match(/^ma[-\s](.{2,})$/i);
-  return ma ? [ma[1]] : [];
-}
-
-// The female form shown beside a clan: Mam before most roots (MamCirha,
-// MamTshawe), Ma before a root that starts with M (MaMadiba).
-export function femaleForm(head) {
-  const root = String(head || '').replace(/^(?:Abakwa|Akwa|Ama|Aba|Abe|Oo)(?=[A-Z])/, '');
-  if (!root) return null;
-  return /^M/.test(root) ? `Ma${root}` : `Mam${root}`;
-}
+// The clan-name rules (plural, female, one person, "ngu Tshawe") live in
+// shared/isiduko.js so the phone and the server read names the same way.
+export { normaliseIsiduko, femaleRoots, femaleForm, isidukoReadings };
 
 function consonantSkeleton(value) {
   return normaliseIsiduko(value).replace(/[aeiou]/g, '');
@@ -90,14 +64,41 @@ export function clearClanIndexCache() {
   clanIndexCachedAt = 0;
 }
 
+// Confirms one clan from what someone typed. The text as typed comes first;
+// if it matches no registered name exactly, the other readings of it are
+// tried in turn (AmaTshawe, MamTshawe, MaTshawe, Mzangwa, uTshawe, "ngu
+// Tshawe": see shared/isiduko.js), and the first that matches exactly wins.
+// None of those readings is ever a guess: fuzzy suggestions still come only
+// from the text as typed, and never confirm a clan on their own.
 export async function matchClan(query) {
   const asTyped = await matchClanAsTyped(query);
-  if (asTyped.autoSelect || asTyped.results.some((r) => !r.fuzzy)) return asTyped;
-  for (const root of femaleRoots(query)) {
-    const asFemale = await matchClanAsTyped(root);
-    if (asFemale.autoSelect || asFemale.results.some((r) => !r.fuzzy)) return { ...asFemale, query: asTyped.query };
+  if (asTyped.autoSelect || asTyped.results.some((r) => !r.fuzzy) || !asTyped.normalised) return asTyped;
+  for (const key of isidukoReadings(query).slice(1)) {
+    const exact = await exactMatches(key);
+    if (exact.length) return exactResult(asTyped.query, key, exact);
   }
   return asTyped;
+}
+
+async function exactMatches(normalised) {
+  const index = await buildClanIndex();
+  const exact = [];
+  for (const clan of index) {
+    const match = clan.names.find((name) => normaliseIsiduko(name.label) === normalised);
+    if (match) exact.push({ id: clan.id, head: clan.head, display: clan.display, nation: clan.nation, matchedName: match.label, matchedAs: match.kind, fuzzy: false, possibleDistinct: false });
+  }
+  return exact;
+}
+
+function exactResult(query, normalised, exact) {
+  return {
+    query,
+    normalised,
+    results: exact,
+    ambiguous: exact.length > 1,
+    autoSelect: exact.length === 1,
+    advice: exact.length > 1 ? 'This name is shared. Choose the clan that matches your family.' : 'Choose to confirm this clan identity.',
+  };
 }
 
 async function matchClanAsTyped(query) {
@@ -118,23 +119,10 @@ async function matchClanAsTyped(query) {
     return { query: q, normalised, results: [], ambiguous: false, autoSelect: false, advice: 'Type at least two letters to search.' };
   }
 
-  const index = await buildClanIndex();
-  const exact = [];
-  for (const clan of index) {
-    const match = clan.names.find((name) => normaliseIsiduko(name.label) === normalised);
-    if (match) exact.push({ id: clan.id, head: clan.head, display: clan.display, nation: clan.nation, matchedName: match.label, matchedAs: match.kind, fuzzy: false, possibleDistinct: false });
-  }
-  if (exact.length) {
-    return {
-      query: q,
-      normalised,
-      results: exact,
-      ambiguous: exact.length > 1,
-      autoSelect: exact.length === 1,
-      advice: exact.length > 1 ? 'This name is shared. Choose the clan that matches your family.' : 'Choose to confirm this clan identity.',
-    };
-  }
+  const exact = await exactMatches(normalised);
+  if (exact.length) return exactResult(q, normalised, exact);
 
+  const index = await buildClanIndex();
   const suggestions = [];
   for (const clan of index) {
     let best = Infinity;
@@ -230,7 +218,8 @@ export async function searchClans(query, { limit = 40 } = {}) {
   }
   found.sort((a, b) => a.rank - b.rank || a.result.head.localeCompare(b.result.head));
 
-  // Nothing contains the text: fall back to close spellings (e.g. "Cira" -> Cirha)
+  // Nothing contains the text: fall back to the other readings of it
+  // (MaTshawe, Mzangwa, "ngu Tshawe") and then close spellings ("Cira" -> Cirha)
   if (found.length === 0 && q.length >= 2) {
     const fuzzy = await matchClan(rawQuery);
     const byId = new Map(index.map((clan) => [clan.id, clan]));
@@ -238,7 +227,7 @@ export async function searchClans(query, { limit = 40 } = {}) {
       .map((item) => byId.get(item.id))
       .filter(Boolean)
       .map((clan) => toSearchResult(clan, clan.names[0]));
-    return { query: rawQuery, total: results.length, suggestions: results.length > 0, results: results.slice(0, safeLimit) };
+    return { query: rawQuery, total: results.length, suggestions: fuzzy.results.some((r) => r.fuzzy), results: results.slice(0, safeLimit) };
   }
 
   return {

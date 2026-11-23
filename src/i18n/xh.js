@@ -731,6 +731,14 @@ const XH = {
   'My Cart': 'Ingobozi yam',
   'Invite on WhatsApp': 'Mema ku-WhatsApp',
   "Prices here are SmartMatch bulk prices, set at the shops' special prices. They unlock only when your group order reaches its bulk tier, and are not prices for buying one on its own. You only pay once the group reaches its minimum and the supplier confirms the price.": 'Amaxabiso apha ngamaxabiso amaninzi e-SmartMatch, abekwe ngamaxabiso ezaphulelo zeevenkile. Avuleka kuphela xa i-odolo yeqela lakho ifika kwinqanaba elikhulu, kwaye awangomaxabiso okuthenga into enye wedwa. Uhlawula kuphela xa iqela lifike kwinani elincinci kwaye umthengisi eqinisekisa ixabiso.',
+  // Recognising a clan in any form (founder, 23 Nov 2026)
+  'Checking registered names…': 'Kujongwa amagama abhalisiweyo…',
+  'Recognised: {clan}': 'Siyasazi: {clan}',
+  '{root}, {plural} and {female} are all this clan.': '{root}, {plural} no{female} sisiduko esinye.',
+  'Choose to confirm this clan identity.': 'Khetha ukuqinisekisa esi siduko.',
+  'This name is shared. Choose the clan that matches your family.': 'Eli gama labelwana. Khetha isiduko esihambelana nentsapho yakho.',
+  'These are suggestions only. Check the spelling and choose the clan yourself.': 'Ezi ziingcebiso nje. Jonga upelo uze ukhethe isiduko ngokwakho.',
+  'No registered clan matches this text. You can submit it for community review.': 'Akukho siduko sibhalisiweyo esihambelana nale nto. Ungasithumela ukuze sihlolwe ngabantu.',
 }
 
 export default XH

@@ -2,20 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { Skeleton } from './ui/Skeleton.jsx'
 import Icon from './Icon.jsx'
+// Same rules as the server: AmaTshawe, MamTshawe and Tshawe are one clan.
+import { isidukoKeys, normaliseIsiduko } from '../../shared/isiduko.js'
 
 const PAGE_SIZE = 40
 const AVATAR_COLORS = ['bg-terracotta', 'bg-sage-500', 'bg-ochre', 'bg-sage-700']
 const EMPTY = { status: 'idle', results: [], total: 0, suggestions: false }
-
-// Same rules as the server, so "AmaCirha" and "Cirha" count as one clan.
-function normalise(value) {
-  return String(value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/^(?:abakwa|akwa|ama|aba|abe|oo|o)\s*/i, '')
-    .replace(/[^a-z0-9]/g, '')
-}
 
 function avatarColor(name) {
   const sum = [...name].reduce((total, ch) => total + ch.charCodeAt(0), 0)
@@ -70,8 +62,8 @@ export default function ClanSearch({ onPickClan }) {
 
   const myClanKeys = useMemo(() => new Set(
     [user?.paternalIziduko, user?.maternalIziduko, user?.paternalGrandmotherIziduko, user?.maternalGrandmotherIziduko]
-      .map(normalise)
-      .filter(Boolean),
+      // Every form counts: a MamTshawe sees AmaTshawe as her clan.
+      .flatMap(isidukoKeys),
   ), [user])
 
   useEffect(() => {
@@ -108,7 +100,9 @@ export default function ClanSearch({ onPickClan }) {
     setOpenId(null)
   }
 
-  const isMine = (clan) => myClanKeys.has(normalise(clan.head)) || clan.praises.some((p) => myClanKeys.has(normalise(p)))
+  const isMine = (clan) => clan.id === user?.clanGroupId
+    || isidukoKeys(clan.head).some((k) => myClanKeys.has(k))
+    || clan.praises.some((p) => myClanKeys.has(normaliseIsiduko(p)))
   const firstLoad = state.status === 'loading' && state.results.length === 0
 
   return (
