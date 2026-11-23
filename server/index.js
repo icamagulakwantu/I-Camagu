@@ -32,6 +32,7 @@ import { switchPapToSamp } from './scripts/samp-nov-2026.js';
 import { applyGrocerySpecials } from './scripts/grocery-specials-nov-2026.js';
 import { addEkoyiniProducts } from './scripts/ekoyini-catalogue-nov-2026.js';
 import { correctQuartSizes } from './scripts/quart-sizes-nov-2026.js';
+import { fixShopSizes } from './scripts/shop-sizes-nov-2026.js';
 import { applyDrinksPhotosPrices, fixTsitsikammaSparklingPhoto } from './scripts/drinks-photos-prices-nov-2026.js';
 import { exampleView, loadExamples } from './services/exampleAccess.js';
 import { buildLiveExamples } from './scripts/live-examples-nov-2026.js';
@@ -365,6 +366,7 @@ if (startup.schemaReady) {
     await addProductPhotos();
     await replaceChickenPhotos();
     await addRemainingPhotos();
+    await fixShopSizes();
   } catch (err) {
     console.error('Product photos failed:', err?.message);
   }
