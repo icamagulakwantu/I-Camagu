@@ -379,28 +379,47 @@ export async function buildCeremony(savingStokvelId) {
 }
 
 // Only one server process builds at a time (two can be running during a
-// deploy): it claims the build first. A claim older than CLAIM_MINUTES is
-// from a process that stopped, so it is taken over.
+// deploy): it claims the build and keeps the claim fresh while it works. A
+// claim not refreshed for STALE_MS is from a process that stopped, so it is
+// taken over. A process that finds the build busy looks again later, until
+// the examples exist, so a build cut short by a restart is always finished.
 const CLAIM = `${FIX_NAME}-building`;
-const CLAIM_MINUTES = 30;
+const HEARTBEAT_MS = 30 * 1000;
+const STALE_MS = 2 * 60 * 1000;
+const RETRY_MS = 2.5 * 60 * 1000;
+const MAX_RETRIES = 40;
+
 async function claimBuild() {
   try {
     await prisma.dataFix.create({ data: { name: CLAIM } });
     return true;
   } catch {
-    const stale = new Date(Date.now() - CLAIM_MINUTES * 60 * 1000);
+    const stale = new Date(Date.now() - STALE_MS);
     const { count } = await prisma.dataFix.updateMany({ where: { name: CLAIM, appliedAt: { lt: stale } }, data: { appliedAt: new Date() } });
     return count === 1;
   }
 }
 
 let running = null;
-export function buildLiveExamples() {
+export function buildLiveExamples({ retries = MAX_RETRIES } = {}) {
   if (running) return running;
   running = (async () => {
     if (await prisma.dataFix.findUnique({ where: { name: FIX_NAME } })) { await loadExamples(); return { skipped: true }; }
-    if (!(await claimBuild())) return { skipped: true, busy: true };
-    try { return await build(); } finally { await prisma.dataFix.deleteMany({ where: { name: CLAIM } }); }
+    if (!(await claimBuild())) {
+      if (retries > 0) {
+        const t = setTimeout(() => { buildLiveExamples({ retries: retries - 1 }).catch((e) => console.error('Live examples:', e.message)); }, RETRY_MS);
+        t.unref?.();
+      }
+      return { skipped: true, busy: true };
+    }
+    const beat = setInterval(() => {
+      prisma.dataFix.updateMany({ where: { name: CLAIM }, data: { appliedAt: new Date() } }).catch(() => {});
+    }, HEARTBEAT_MS);
+    beat.unref?.();
+    try { return await build(); } finally {
+      clearInterval(beat);
+      await prisma.dataFix.deleteMany({ where: { name: CLAIM } });
+    }
   })().finally(() => { running = null; });
   return running;
 }

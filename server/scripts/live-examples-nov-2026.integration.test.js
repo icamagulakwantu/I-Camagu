@@ -56,7 +56,7 @@ integrationDescribe('live examples (real database)', () => {
     await prisma.dataFix.delete({ where: { name: FIX_NAME } });
     await prisma.dataFix.create({ data: { name: `${FIX_NAME}-building` } });
     try {
-      expect(await buildLiveExamples()).toEqual({ skipped: true, busy: true });
+      expect(await buildLiveExamples({ retries: 0 })).toEqual({ skipped: true, busy: true });
     } finally {
       await prisma.dataFix.deleteMany({ where: { name: `${FIX_NAME}-building` } });
       await prisma.dataFix.create({ data: { name: FIX_NAME } });
