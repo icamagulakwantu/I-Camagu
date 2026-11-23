@@ -156,14 +156,14 @@ export const TOWNSHIP_HIRE_LISTINGS = [
   {
     name: 'Lolwethu Thys Rental Services',
     category: 'EQUIPMENT_HIRE',
-    area: 'Area to confirm',
+    area: 'Area coming soon',
     contactInfo: '067 667 1745 · thyslolwethu340@gmail.com',
     description: '4 big pots (2 × 21 L and others) R350; 4-burner gas stove with empty cylinder R350, with 4 pots R500, with 4 pots and 2 folding tables R700; folding trestle table R100.',
   },
   {
     name: 'Dima Events and Decor',
     category: 'EQUIPMENT_HIRE',
-    area: 'Area to confirm',
+    area: 'Area coming soon',
     contactInfo: 'Della 064 083 3727 · Dima 078 747 5037 · Dmahloane@yahoo.com',
     description: 'Catering equipment since 2017: gas stove 3-plate R200, 2-plate R180; chafing dish R85; pots from R80; beverage dispenser from R40; dinner plate R5, side plate R3.50, bowl R4; plastic chair R6; trestle table R45; table cloth R45; grass mat from R250; medium trailer R450. What they don’t have they outsource.',
   },
@@ -196,4 +196,11 @@ export async function addLightingListings() {
   await prisma.dataFix.create({ data: { name: FIX_NAME_5 } });
   if (added) console.log(`Directory: ${added} lighting hirer(s) added.`);
   return { added, skipped: false };
+}
+
+// A hirer whose area is not known yet reads "Area coming soon", never a
+// guess (founder, 23 Nov 2026). Idempotent: changes nothing once done.
+export async function markAreasComingSoon() {
+  const { count } = await prisma.vendor.updateMany({ where: { area: 'Area to confirm' }, data: { area: 'Area coming soon' } });
+  return count;
 }

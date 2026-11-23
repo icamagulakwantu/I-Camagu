@@ -39,6 +39,13 @@ describe('what to hire', () => {
     expect(item('mobile_fridge').qty).toBe(1)
     expect(hirePlan(300).items.find((i) => i.id === 'mobile_fridge').qty).toBe(2)
   })
+  it('a price nobody has published yet shows as coming, is never guessed, and stays out of the totals', () => {
+    const p = hirePlan(150)
+    const flood = p.items.find((i) => i.id === 'flood_light')
+    expect(flood).toMatchObject({ upcoming: true, optional: true, low: 0, high: 0 })
+    expect(hireCostLine('flood_light', 150)).toMatchObject({ unitCost: 0, suggestedAmount: expect.stringMatching(/^Price coming soon/) })
+    expect(p.items.find((i) => i.id === 'benches').upcomingNote).toMatch(/coming soon/)
+  })
   it('knows when it gets dark in Gqeberha', () => {
     expect(darkness('2026-12-21')).toEqual({ sunset: '19:28', dark: '19:57' })
     expect(darkness('2026-06-21').sunset).toBe('17:16')

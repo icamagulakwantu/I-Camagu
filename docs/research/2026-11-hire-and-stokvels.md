@@ -64,7 +64,9 @@ many ceremonies lack: by about 7:30 pm it is dark.
 | 5 kVA generator, per day | about R500 | Plant Index (national, older listing) |
 
 Not found: a published Gqeberha price for flood lights, or for the wooden
-benches township hirers keep; the card tells families to ask.
+benches township hirers keep. The card shows these as "Price coming soon"
+(the flood light is its own line, kept out of the totals and never given a
+guessed amount), and hirers whose area is unknown read "Area coming soon".
 
 In the app: the hire card adds benches for ootata ebuhlanti (a set seats 8;
 about a quarter of the guests), string lights (one per 40 guests, at least
@@ -142,3 +144,31 @@ Regulator.)
 - Makro Eastern Cape stokvel deals (Nov–Dec 2025): https://www.makro.co.za/sys-master/root/h40/h48/29782489595934/Food-Trader-ECAPE.pdf
 - Massmart, stokvel favourites (Oct 2026): https://www.massmart.co.za/news/2026/10/from-savings-to-shopping--south-african-stokvel-favourites
 - Cliffe Dekker Hofmeyr, Stokvels and the National Credit Regulator: https://www.cliffedekkerhofmeyr.com/practice-areas/guides/downloads/Stokvels-and-the-National-Credit-Regulator.pdf
+
+## Shelf prices verified for estimate-priced products (23 Nov 2026)
+Read on PriceCheck via TinyFish (and a TinyFish search for carrots), applied
+once by `server/scripts/verified-shelf-prices-nov-2026.js`:
+
+| Product | Shelf price | Shop |
+|---|---|---|
+| Butlers Banana, Blue Curacao, Cherry Kirsch, Espresso, Ginger, Peppermint 750 ml | R219.00 a bottle | takealot.com (regular; special R189) |
+| San Basile Triple Sec 750 ml | R479.99 | Mothercity Liquor |
+| Ponchos Tequila Coffee 750 ml | R339.99 | Shoprite, Checkers |
+| Martell Blue Swift 750 ml | R999.99 | Shoprite |
+| Remy Martin 1738 750 ml | R1,599.99 | Pick n Pay |
+| Clase Azul Plata 750 ml | R2,999.99 | Mothercity Liquor |
+| Clase Azul Reposado 750 ml | R4,299.99 | Woolworths (Pick n Pay R4,999.99) |
+| Corona Extra 12 × 600 ml | R329.99 | Shoprite |
+| Carrots 10 kg | R99.95 | Evergreens |
+
+Cheaper case prices found and taken: Butlers Blue Curacao and Cherry Kirsch
+R2,268 a case (Norman Goodfellows, R1,134 for 6); Martell Blue Swift R10,188
+for 12 and Clase Azul Reposado R41,268 for 12 (R20,634 for 6), both Norman
+Goodfellows. The below-shelf rule then holds every bulk price at least 5%
+under these.
+
+Not verified: Belgravia Gin & Dark Cherry / Dry Lemon and Smirnoff Storm
+Citrus / Pine Twist, listed as 500 ml cans. Shops sell them as 440 ml cans
+(24 × 440 ml R569.99 and R529.99); a 500 ml Belgravia appears only in one
+Pick n Pay special. Their size needs confirming before a shelf price can be
+set.
