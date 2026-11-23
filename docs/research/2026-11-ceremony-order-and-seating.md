@@ -89,15 +89,56 @@ Ulwaluko is sacred: nothing about what happens on the mountain is added.
 7. Saved plans were brought up to date once (`ceremony-order-nov-2026`),
    keeping every tick and everything already bought.
 
-## For the founder to confirm
-- The **place** suggested for each of the fourteen groups (especially
-  abayeni, abafazi and isekela lika tata / lika mama).
-- The **goat at home** and **ubulunga** lines (sources support them; both
-  say "if your family does this").
-- **Intambo Enkulu:** the ceremony card says it binds two families, but its
-  checklist is about one person's full recognition by the ancestors. Which
-  is right?
-- The stages of **ukuphuthuma** (still waiting).
+## The founder's answers (23 Nov 2026)
+- **Abayeni** are the men married to the daughters of the house hosting the
+  ceremony; **abafazi** are the women married into that house. The seating
+  places now say so.
+- **Intambo Enkulu** is mainly about being accepted at a higher level: like
+  a second imbeleko, after which you may do things you could not before.
+  The ceremony card now says so (it wrongly said it binds two families).
+- "Demos" was a slip; nothing to add.
+
+## Ukuphuthuma: the stages of the igqirha's calling
+The founder asked for the stages to be researched. No source uses the word
+"ukuphuthuma", so the founder's name is kept for the ceremony. The stages
+follow Mlisa (2009), *Ukuthwasa initiation of amagqirha: identity
+construction and the training of Xhosa women as traditional healers*
+(University of the Free State), on Xhosa women in the Eastern Cape:
+
+1. The calling is foretold.
+2. Signs of the calling (ubizo) appear.
+3. A time of intense affliction.
+4. Confusion, resistance and/or acceptance.
+5. **Ukuvuma ukufa**, accepting the calling: ukungqawa (beads),
+   ukungqwamba (goatskins), each with a cleansing (ukuhlamba) and an
+   acceptance; ukubekwa ephehlweni, being placed with the teacher. One
+   account: two goats, one for the cleansing and one for the ancestors.
+6. **Ukuphuma**, coming out: ukutshotsha, umgongqo and ukubaleka.
+7. **Ukuphinda indlela**, going back along the path.
+
+Other sources agree on the shape: the calling comes through dreams and
+illness; training under an experienced igqirha takes months to years;
+imfukamo, a seclusion in a reed hut by the river; intlombe, the singing
+and dancing gathering at the heart of every stage; and a coming out with
+drums through the night.
+
+In the app the plan has five stages: Ubizo (1-4), Ukuvuma ukufa (5),
+Ukuthwasa (the training, with imfukamo), Ukuphuma (6) and Ukuphinda
+indlela (7). Each ritual step is named and marked "as the teacher
+directs": the app lists what the family provides, never how a step is
+done.
+
+Still for the founder: are these the stages your family knows by
+ukuphuthuma, and is anything missing or in the wrong order?
+
+Sources for this section:
+- Mlisa (2009), UFS. https://scholar.ufs.ac.za/items/3b86d11d-060b-45b9-b92f-ff43ae955125
+- The transformative journey of ukuthwasa (UWC). https://uwcscholar.uwc.ac.za:8443/server/api/core/bitstreams/19ae2761-1472-4018-ba3a-bca29a974033/content
+- I am an igqirha: phenomenological and experiential spiritual journey. https://www.researchgate.net/publication/339180344_I_am_an_igqirha_healer_phenomenological_and_experiential_spiritual_journey_towards_healing_identity_construction
+- Becoming a Xhosa healer: Nomzi's story. https://www.researchgate.net/publication/266956659_Becoming_a_Xhosa_Healer_Nomzi's_Story
+- Albany Museum, Ukwenziwa kweGqirha (exhibition). https://am.org.za/exhibitions/ukwenziwa-kwegqirha/
+- Ukuthwasa (Wikipedia). https://en.wikipedia.org/wiki/Ukuthwasa
+- Bührmann (1981), Intlombe and xhentsa. https://pubmed.ncbi.nlm.nih.gov/7275804/
 
 ## Sources
 - Ulwaluko (Wikipedia). https://en.wikipedia.org/wiki/Ulwaluko

@@ -15,8 +15,10 @@ const ELDERS = [
   G('Isekela lika Tata', 'Ebuhlanti, beside ootata'),
   G('OoMama', 'Endlini enkulu, the great house: the elder women'),
   G('Isekela lika Mama', 'Endlini enkulu, beside oomama'),
-  G('Abayeni', 'A place of honour kept for them'),
-  G('Abafazi', 'Near the house, on the kitchen side: the married women'),
+  // Founder: abayeni are the men married to the daughters of the house
+  // hosting the ceremony; abafazi are the women married into that house.
+  G('Abayeni', 'Their own place: the men married to the daughters of this house'),
+  G('Abafazi', 'Near the house, on the kitchen side: the women married into this house'),
 ]
 const YOUNG = [
   G('Abafana belali', 'Their own circle outside, near the kraal: the young men of the village'),

@@ -68,6 +68,11 @@ export async function getCeremonyGroups(req, res) {
   try {
     const ceremony = await ownedCeremony(req.params.ceremonyId, req.userId);
     if (!ceremony) return res.status(403).json({ error: 'Not your ceremony' });
+    // Groups set out before places existed get their place to start from.
+    const groups = await listGroups(ceremony.id);
+    const unplaced = groups.filter((g) => !g.place && suggestedPlace(g.groupLabel));
+    if (!unplaced.length) return res.json(groups);
+    await Promise.all(unplaced.map((g) => prisma.ceremonyGroup.update({ where: { id: g.id }, data: { place: suggestedPlace(g.groupLabel) } })));
     res.json(await listGroups(ceremony.id));
   } catch (error) {
     console.error('Get groups error:', error.message);

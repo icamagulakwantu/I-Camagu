@@ -793,6 +793,13 @@ const XH = {
   'Add group': 'Yongeza iqela',
   'Add a group': 'Yongeza iqela',
   'Could not save. Please try again.': 'Akugcinwanga. Nceda uzame kwakhona.',
+  // Ukuphuthuma stages; Intambo Enkulu (founder, 23 Nov 2026)
+  'Ubizo · The calling': 'Ubizo · Ubizo',
+  'Ukuvuma ukufa · Accepting the calling': 'Ukuvuma ukufa · Ukwamkela ubizo',
+  'Ukuthwasa · The training': 'Ukuthwasa · Uqeqesho',
+  'Ukuphuma · Coming out as igqirha': 'Ukuphuma · Ukuphuma njengegqirha',
+  'Ukuphinda indlela · Going back along the path': 'Ukuphinda indlela · Ukubuyela endleleni',
+  'Like a second imbeleko: accepted by the ancestors at a higher level, able to do what you could not before.': 'Njengembeleko yesibini: wamkelwa ngamanyange kwinqanaba eliphezulu, ukwazi ukwenza oko ubungakwazi ukukwenza ngaphambili.',
 }
 
 export default XH

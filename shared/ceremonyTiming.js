@@ -43,6 +43,13 @@ export const PHASE_TIMING = {
   FOOD_AND_DRINK: { days: -3 },
   PREPARATION: { days: -7 },
   CELEBRATION: { days: 21 },
+  // Ukuphuthuma: the date is the coming out (ukuphuma); the calling and
+  // the acceptance come months before, as the teacher sets them.
+  GQIRHA_UBIZO: { days: -180 },
+  GQIRHA_UKUVUMA: { days: -150 },
+  GQIRHA_UKUTHWASA: { days: -120 },
+  GQIRHA_UKUPHUMA: { days: -14 },
+  GQIRHA_UKUPHINDA: { days: 14 },
   // Mourning, after the funeral
   MOURNING: { days: 7 },
   MOURNING_END: { days: 365 },

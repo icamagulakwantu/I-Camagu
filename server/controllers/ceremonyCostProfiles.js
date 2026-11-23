@@ -413,28 +413,49 @@ const UKUBUYISA_DEFAULT_ITEMS = [
   { phase: 'RESTORATION_CLOSURE', label: 'Ukubuyisa is COMPLETE — the male ancestor now broods over the homestead permanently; never repeat for the same ancestor' },
 ];
 
+// Ukuphuthuma: the igqirha's calling, in its stages (founder, 23 Nov 2026,
+// asked for them to be researched). Stages from Mlisa (2009), Ukuthwasa
+// initiation of amagqirha (University of the Free State), on Xhosa women
+// training as amagqirha in the Eastern Cape: the calling (foretold, the
+// signs, the hard time, resistance and acceptance); ukuvuma ukufa,
+// accepting the calling (ukubekwa ephehlweni, ukuhlamba, ukungqawa,
+// ukungqwamba); the training (ukuthwasa, with imfukamo by the river);
+// ukuphuma, coming out (ukutshotsha, umgongqo, ukubaleka); and ukuphinda
+// indlela. Every ritual step is as the teacher (the igqirha who trains
+// them) directs: the app names them and lists what the family provides,
+// never how they are done.
 const UMSEBENZI_WEGQIRHA_DEFAULT_ITEMS = [
-  { phase: 'PLANNING_HEALER', label: 'Confirm the specific graduation stage with the practising Igqirha and fellow Amaqhirha' },
-  { phase: 'PLANNING_HEALER', label: 'Verify the Igqirha has undergone Intambo Enkulu — prerequisite for all healer ceremonies' },
-  { phase: 'PLANNING_HEALER', label: 'Confirm the ancestral dream (Iphupha) directing the specific ritual requirements' },
-  { phase: 'PURPOSE_DANCE', label: 'Establish intent: Harmonising spiritual callings, ancestral alignment, and healing-path recognition' },
-  { phase: 'PURPOSE_DANCE', label: 'Secure structural space for the drum-and-dance circle (Intlombe)' },
-  { phase: 'SECLUSION_RIVER', label: 'Build reed seclusion hut (Ibhuma) by the river for Imfukamo overnight seclusion' },
-  { phase: 'SECLUSION_RIVER', label: 'Place ritual items in the water for Abantu bomlambo — greet with "Camagu"' },
-  { phase: 'SECLUSION_RIVER', label: 'Ancestor speaks during seclusion — observe all taboos strictly' },
-  { phase: 'SECLUSION_RIVER', label: 'Destroy Ibhuma after seclusion is complete' },
-  { phase: 'SUPPLIES_SACRED', label: 'Secure white goat without blemish as directed by the ancestral dream' },
-  { phase: 'SUPPLIES_SACRED', label: 'Prepare white clay (Ifutha) for healer markings — NOT red ochre (Imbula)' },
-  { phase: 'SUPPLIES_SACRED', label: 'Procure snuff (Isidlo / Isemfu) for spiritual protocols' },
-  { phase: 'SUPPLIES_SACRED', label: 'Secure traditional leather drums (Ingqongqo / Amagomana) in working condition' },
-  { phase: 'SUPPLIES_SACRED', label: 'Arrange trained drum beaters and singers versed in ancestral rhythms' },
-  { phase: 'BREWING_INTLOMBE', label: 'Brew Umqombothi observing sacred purity instructions from the Igqirha' },
-  { phase: 'BREWING_INTLOMBE', label: 'Serve Umqombothi in new billy can (Intsimbi emhlophe) — never used before' },
-  { phase: 'BREWING_INTLOMBE', label: 'Secure courtesy gin, brandy, and matches for elder healers' },
-  { phase: 'SLAUGHTER_FEAST', label: 'Perform Ukuxhela on the white goat' },
-  { phase: 'SLAUGHTER_FEAST', label: 'Cut and distribute Intsonyama by healer seniority' },
-  { phase: 'SLAUGHTER_FEAST', label: 'Cook meat in large pots for the feasting community' },
-  { phase: 'SLAUGHTER_FEAST', label: 'Launch Intlombe: drum, sing, and dance through the night to celebrate graduation' },
+  { phase: 'GQIRHA_UBIZO', label: 'Write down the dreams and signs, to share with the igqirha' },
+  { phase: 'GQIRHA_UBIZO', label: 'Ukuvumisa: consult an igqirha about the calling' },
+  { phase: 'GQIRHA_UBIZO', label: 'The family meets: the elders accept the calling together' },
+  { phase: 'GQIRHA_UBIZO', label: 'Ask the elders whether Intambo Enkulu must be done first' },
+  { phase: 'GQIRHA_UBIZO', label: 'Choose the igqirha who will train them (their teacher)' },
+  { phase: 'GQIRHA_UKUVUMA', label: 'Ukubekwa ephehlweni: agree with the teacher when the training begins and where they will stay' },
+  { phase: 'GQIRHA_UKUVUMA', label: 'Ukuhlamba: the cleansing, as the teacher directs' },
+  { phase: 'GQIRHA_UKUVUMA', label: 'Ukungqawa: white beads (amaphondo), as the teacher directs' },
+  { phase: 'GQIRHA_UKUVUMA', label: 'Ukungqwamba: the goatskins, as the teacher directs' },
+  { phase: 'GQIRHA_UKUVUMA', label: 'Two goats, if the teacher asks: one for the cleansing, one for the ancestors' },
+  { phase: 'GQIRHA_UKUVUMA', label: 'Umqombothi for the acceptance, brewed as the teacher instructs' },
+  { phase: 'GQIRHA_UKUVUMA', label: 'Intlombe: drummers and singers for the acceptance' },
+  { phase: 'GQIRHA_UKUTHWASA', label: 'Food and keep while they train with the teacher' },
+  { phase: 'GQIRHA_UKUTHWASA', label: 'White clay (ifutha), not red ochre (imbola)' },
+  { phase: 'GQIRHA_UKUTHWASA', label: 'Snuff (isidlo) for the spiritual protocols' },
+  { phase: 'GQIRHA_UKUTHWASA', label: 'Imfukamo: the reed hut (ibhuma) by the river, if the teacher directs' },
+  { phase: 'GQIRHA_UKUTHWASA', label: 'Ritual items in the water for abantu bomlambo; greet with "Camagu"' },
+  { phase: 'GQIRHA_UKUTHWASA', label: 'Take down the ibhuma after the seclusion' },
+  { phase: 'GQIRHA_UKUPHUMA', label: 'Confirm with the teacher and the amagqirha that they are ready to come out' },
+  { phase: 'GQIRHA_UKUPHUMA', label: 'The animal for ukuphuma, as the dream (iphupha) shows: a white goat, or a beast' },
+  { phase: 'GQIRHA_UKUPHUMA', label: 'Brew umqombothi as the teacher instructs' },
+  { phase: 'GQIRHA_UKUPHUMA', label: 'A new bhekile for the umqombothi, never used before' },
+  { phase: 'GQIRHA_UKUPHUMA', label: 'Courtesy gin, brandy and matches for the elder amagqirha' },
+  { phase: 'GQIRHA_UKUPHUMA', label: 'Drums (ingqongqo) and trained drummers and singers' },
+  { phase: 'GQIRHA_UKUPHUMA', label: SEATING_ALL },
+  { phase: 'GQIRHA_UKUPHUMA', label: 'Ukutshotsha, umgongqo and ukubaleka, as the teacher leads them' },
+  { phase: 'GQIRHA_UKUPHUMA', label: 'Intsonyama shared by seniority among the amagqirha' },
+  { phase: 'GQIRHA_UKUPHUMA', label: 'Large pots to cook the meat for everyone' },
+  { phase: 'GQIRHA_UKUPHUMA', label: 'Intlombe through the night: they come out as igqirha' },
+  { phase: 'GQIRHA_UKUPHINDA', label: 'Ukuphinda indlela: go back to the teacher with thanks, as agreed' },
+  { phase: 'GQIRHA_UKUPHINDA', label: 'Record who came and what they brought (ukugida)' },
 ];
 
 const GENERIC_DEFAULT_ITEMS = [
@@ -697,38 +718,26 @@ const UKUBUYISA_COST_PROFILE = {
 };
 
 const UMSEBENZI_WEGQIRHA_COST_PROFILE = {
-  'PLANNING_HEALER': [
-    { label: 'Confirm the specific graduation stage with the practising Igqirha and fellow Amaqhirha', category: 'services', unit: 'consultation', unitCost: 0, quantity: 1, isInputField: false },
-    { label: 'Verify the Igqirha has undergone Intambo Enkulu — prerequisite for all healer ceremonies', category: 'services', unit: 'check', unitCost: 0, quantity: 1, isInputField: false },
-    { label: 'Confirm the ancestral dream (Iphupha) directing the specific ritual requirements', category: 'services', unit: 'consultation', unitCost: 0, quantity: 1, isInputField: false },
+  'GQIRHA_UBIZO': [
+    { label: 'Ukuvumisa: consult an igqirha about the calling', category: 'services', unit: 'session', unitCost: COST_RATES.services.igqirha_session, quantity: 1, isInputField: true, inputType: 'number' },
   ],
-  'PURPOSE_DANCE': [
-    { label: 'Establish intent: Harmonising spiritual callings, ancestral alignment, and healing-path recognition', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
-    { label: 'Secure structural space for the drum-and-dance circle (Intlombe)', category: 'services', unit: 'space', unitCost: 0, quantity: 1, isInputField: true, inputType: 'text', suggestedAmount: 'Venue arranged by community' },
+  'GQIRHA_UKUVUMA': [
+    { label: 'Ukungqawa: white beads (amaphondo), as the teacher directs', category: 'supplies', unit: 'strand', unitCost: COST_RATES.supplies.amaphondo_beads_strand, quantity: 2, isInputField: true, inputType: 'number' },
+    { label: 'Two goats, if the teacher asks: one for the cleansing, one for the ancestors', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_standard, quantity: 2, isInputField: true, inputType: 'number' },
+    { label: 'Umqombothi for the acceptance, brewed as the teacher instructs', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 25, isInputField: true, inputType: 'number' },
+    { label: 'Intlombe: drummers and singers for the acceptance', category: 'services', unit: 'session', unitCost: COST_RATES.services.drummer_per_session + COST_RATES.services.singer_per_session, quantity: 1, isInputField: true, inputType: 'number' },
   ],
-  'SECLUSION_RIVER': [
-    { label: 'Build reed seclusion hut (Ibhuma) by the river for Imfukamo overnight seclusion', category: 'supplies', unit: 'structure', unitCost: 0, quantity: 1, isInputField: true, inputType: 'text', suggestedAmount: 'Reeds and poles from riverbank' },
-    { label: 'Place ritual items in the water for Abantu bomlambo — greet with "Camagu"', category: 'supplies', unit: 'offering', unitCost: 0, quantity: 1, isInputField: false },
-    { label: 'Ancestor speaks during seclusion — observe all taboos strictly', category: 'services', unit: 'protocol', unitCost: 0, quantity: 1, isInputField: false },
-    { label: 'Destroy Ibhuma after seclusion is complete', category: 'services', unit: 'task', unitCost: 0, quantity: 1, isInputField: false },
+  'GQIRHA_UKUTHWASA': [
+    { label: 'White clay (ifutha), not red ochre (imbola)', category: 'supplies', unit: 'pack', unitCost: COST_RATES.supplies.ifutha_white_clay_pack, quantity: 2, isInputField: true, inputType: 'number' },
+    { label: 'Snuff (isidlo) for the spiritual protocols', category: 'supplies', unit: 'tin', unitCost: COST_RATES.supplies.isidlo_snuff_tin, quantity: 2, isInputField: true, inputType: 'number' },
   ],
-  'SUPPLIES_SACRED': [
-    { label: 'Secure white goat without blemish as directed by the ancestral dream', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'White goat ~R2,700' },
-    { label: 'Prepare white clay (Ifutha) for healer markings — NOT red ochre (Imbula)', category: 'supplies', unit: 'pack', unitCost: COST_RATES.supplies.ifutha_white_clay_pack, quantity: 2, isInputField: true, inputType: 'number' },
-    { label: 'Procure snuff (Isidlo / Isemfu) for spiritual protocols', category: 'supplies', unit: 'tin', unitCost: COST_RATES.supplies.isidlo_snuff_tin, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 tins' },
-    { label: 'Secure traditional leather drums (Ingqongqo / Amagomana) in working condition', category: 'supplies', unit: 'set', unitCost: 0, quantity: 1, isInputField: true, inputType: 'text', suggestedAmount: 'Borrow or hire from community' },
-    { label: 'Arrange trained drum beaters and singers versed in ancestral rhythms', category: 'services', unit: 'session', unitCost: COST_RATES.services.drummer_per_session + COST_RATES.services.singer_per_session, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: '1 drummer + 1 singer ~R1,400' },
-  ],
-  'BREWING_INTLOMBE': [
-    { label: 'Brew Umqombothi observing sacred purity instructions from the Igqirha', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number', suggestedAmount: '50-75 litres' },
-    { label: 'Serve Umqombothi in new billy can (Intsimbi emhlophe) — never used before', category: 'supplies', unit: 'can', unitCost: COST_RATES.supplies.bhekile_can, quantity: 1, isInputField: true, inputType: 'number' },
-    { label: 'Secure courtesy gin, brandy, and matches for elder healers', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.gin_750ml + COST_RATES.alcohol.brandy_750ml, quantity: 2, isInputField: true, inputType: 'number', suggestedAmount: '2 gin + 2 brandy' },
-  ],
-  'SLAUGHTER_FEAST': [
-    { label: 'Perform Ukuxhela on the white goat', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
-    { label: 'Cut and distribute Intsonyama by healer seniority', category: 'services', unit: 'ritual', unitCost: 0, quantity: 1, isInputField: false },
-    { label: 'Cook meat in large pots for the feasting community', category: 'supplies', unit: 'pot', unitCost: COST_RATES.supplies.cast_iron_pot, quantity: 4, isInputField: true, inputType: 'number', suggestedAmount: '4-6 pots' },
-    { label: 'Launch Intlombe: drum, sing, and dance through the night to celebrate graduation', category: 'services', unit: 'event', unitCost: 0, quantity: 1, isInputField: false },
+  'GQIRHA_UKUPHUMA': [
+    { label: 'The animal for ukuphuma, as the dream (iphupha) shows: a white goat, or a beast', category: 'livestock', unit: 'animal', unitCost: COST_RATES.livestock.goat_white, quantity: 1, isInputField: true, inputType: 'number', suggestedAmount: 'A white goat ~R2,700; a beast costs more' },
+    { label: 'Brew umqombothi as the teacher instructs', category: 'alcohol', unit: 'litre', unitCost: COST_RATES.alcohol.umqombothi_50l_drum / 50, quantity: 50, isInputField: true, inputType: 'number' },
+    { label: 'A new bhekile for the umqombothi, never used before', category: 'supplies', unit: 'can', unitCost: COST_RATES.supplies.bhekile_can, quantity: 1, isInputField: true, inputType: 'number' },
+    { label: 'Courtesy gin, brandy and matches for the elder amagqirha', category: 'alcohol', unit: 'bottle', unitCost: COST_RATES.alcohol.gin_750ml + COST_RATES.alcohol.brandy_750ml, quantity: 2, isInputField: true, inputType: 'number' },
+    { label: 'Drums (ingqongqo) and trained drummers and singers', category: 'services', unit: 'session', unitCost: COST_RATES.services.drummer_per_session + COST_RATES.services.singer_per_session, quantity: 1, isInputField: true, inputType: 'number' },
+    { label: 'Large pots to cook the meat for everyone', category: 'supplies', unit: 'pot', unitCost: COST_RATES.supplies.cast_iron_pot, quantity: 4, isInputField: true, inputType: 'number', suggestedAmount: '4-6 pots' },
   ],
 };
 
