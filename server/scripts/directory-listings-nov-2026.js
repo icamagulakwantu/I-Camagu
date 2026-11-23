@@ -133,3 +133,46 @@ export async function addHireListings() {
   if (added) console.log(`Directory: ${added} hire company(ies) added.`);
   return { added, skipped: false };
 }
+
+// Fourth batch, 23 Nov 2026: township hirers the founder found, from their
+// own adverts (Google Maps, Facebook, Instagram). Bank details in adverts
+// are left out on purpose.
+export const FIX_NAME_4 = 'directory-listings-2026-11-23-township-hire';
+export const TOWNSHIP_HIRE_LISTINGS = [
+  {
+    name: 'Tumi’s Tents and Equipment Hire (TMZ)',
+    category: 'EQUIPMENT_HIRE',
+    area: '192 Mpenzu Street, NU 7, Motherwell, Gqeberha',
+    contactInfo: '074 216 7874 · 068 350 9214',
+    description: 'Tents, chairs and deco; pots and gas stoves, plates and cutlery; toilet hire and catering (Hlelo15 Foods and Catering), for events of up to 500 people. Quote on request.',
+  },
+  {
+    name: 'LiDa Pots Hire Hub',
+    category: 'EQUIPMENT_HIRE',
+    area: 'Port Elizabeth (free delivery)',
+    contactInfo: '065 918 0834 (call or WhatsApp)',
+    description: 'Hart pots for hire: 21 L, 36 L and 50 L; all three for R250 (special, Sep 2026). Cleaned and delivered free.',
+  },
+  {
+    name: 'Lolwethu Thys Rental Services',
+    category: 'EQUIPMENT_HIRE',
+    area: 'Area to confirm',
+    contactInfo: '067 667 1745 · thyslolwethu340@gmail.com',
+    description: '4 big pots (2 × 21 L and others) R350; 4-burner gas stove with empty cylinder R350, with 4 pots R500, with 4 pots and 2 folding tables R700; folding trestle table R100.',
+  },
+  {
+    name: 'Dima Events and Decor',
+    category: 'EQUIPMENT_HIRE',
+    area: 'Area to confirm',
+    contactInfo: 'Della 064 083 3727 · Dima 078 747 5037 · Dmahloane@yahoo.com',
+    description: 'Catering equipment since 2017: gas stove 3-plate R200, 2-plate R180; chafing dish R85; pots from R80; beverage dispenser from R40; dinner plate R5, side plate R3.50, bowl R4; plastic chair R6; trestle table R45; table cloth R45; grass mat from R250; medium trailer R450. What they don’t have they outsource.',
+  },
+];
+
+export async function addTownshipHireListings() {
+  if (await prisma.dataFix.findUnique({ where: { name: FIX_NAME_4 } })) return { added: 0, skipped: true };
+  const added = await addVendors(TOWNSHIP_HIRE_LISTINGS);
+  await prisma.dataFix.create({ data: { name: FIX_NAME_4 } });
+  if (added) console.log(`Directory: ${added} township hirer(s) added.`);
+  return { added, skipped: false };
+}

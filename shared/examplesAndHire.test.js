@@ -18,7 +18,10 @@ describe('what to hire', () => {
   })
   it('every item names who hires it out, and the usual items exclude the optional', () => {
     const p = hirePlan(150)
-    expect(p.items.every((i) => i.vendor?.name && i.vendor?.contact)).toBe(true)
+    expect(p.items.every((i) => i.vendor?.name && i.vendor?.contact && i.vendors.length >= 1)).toBe(true)
+    // Township hirers first where they priced it: pots and stoves.
+    expect(p.items.find((i) => i.id === 'big_pots').vendor.name).toBe('LiDa Pots Hire Hub')
+    expect(p.items.find((i) => i.id === 'gas_stove').vendor.name).toBe('Dima Events and Decor')
     expect(p.usualLow).toBe(p.items.filter((i) => !i.optional).reduce((s, i) => s + i.low, 0))
   })
   it('a chosen item becomes a guide-priced line in its own Hire stage', () => {

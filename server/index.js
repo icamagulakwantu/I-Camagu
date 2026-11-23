@@ -26,7 +26,7 @@ import { fixUlwalukoDietWording } from './scripts/ulwaluko-diet-wording-nov-2026
 import { loadClanPraises } from './scripts/load-clan-praises.js';
 import { updateUlwalukoPlans } from './scripts/ulwaluko-umgidi-nov-2026.js';
 import { updateWeddingAndMourningPlans } from './scripts/wedding-mourning-nov-2026.js';
-import { updateDirectoryListings, addMoreDirectoryListings, addHireListings } from './scripts/directory-listings-nov-2026.js';
+import { updateDirectoryListings, addMoreDirectoryListings, addHireListings, addTownshipHireListings } from './scripts/directory-listings-nov-2026.js';
 import { addUlwalukoRegistrationSteps } from './scripts/ulwaluko-registration-nov-2026.js';
 import { switchPapToSamp } from './scripts/samp-nov-2026.js';
 import { applyGrocerySpecials } from './scripts/grocery-specials-nov-2026.js';
@@ -369,6 +369,11 @@ if (startup.schemaReady) {
     await addHireListings();
   } catch (err) {
     console.error('Hire listings failed:', err?.message);
+  }
+  try {
+    await addTownshipHireListings();
+  } catch (err) {
+    console.error('Township hire listings failed:', err?.message);
   }
 }
 

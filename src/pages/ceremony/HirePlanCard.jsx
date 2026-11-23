@@ -78,7 +78,11 @@ export default function HirePlanCard({ ceremony, accessToken, showToast, onAdded
                         <span className="flex-shrink-0 text-[13px] font-bold tabular-nums text-ink">{range(item)}</span>
                       </span>
                       <span className="mt-0.5 block text-[12px] leading-snug text-ink-muted">{t(item.why)}</span>
-                      <span className="mt-0.5 block text-[12px] font-semibold text-[#2e4a2e]">{item.vendor.name} · {item.vendor.contact}</span>
+                      {item.vendors.map((v, n) => (
+                        <span key={v.name} className={`mt-0.5 block text-[12px] ${n === 0 ? 'font-semibold text-[#2e4a2e]' : 'text-ink-muted'}`}>
+                          {n === 1 ? `${t('Also')}: ` : ''}{v.name} · {v.contact}{v.area && !v.area.startsWith('Area to') ? ` · ${v.area}` : ''}
+                        </span>
+                      ))}
                     </span>
                   </label>
                 </li>
@@ -86,7 +90,7 @@ export default function HirePlanCard({ ceremony, accessToken, showToast, onAdded
             })}
           </ul>
           <p className="mt-2 text-[12px] leading-relaxed text-ink-muted">
-            {t('Prices are ranges from the hire companies’ own lists (Gqeberha, 2025–26); delivery and gas are extra. Ask two for a quote before you book.')}
+            {t('Prices are ranges from the hirers’ own price lists and adverts (Gqeberha, 2025–26); delivery and gas may be extra. Ask two for a quote before you book.')}
           </p>
           <button type="button" disabled={busy || !picked.length} onClick={add} className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-terracotta-dark text-[14px] font-bold text-white disabled:opacity-50">
             {busy ? t('Adding…') : t('Add to my budget · about {low}–{high}', { low: rand(low), high: rand(high) })}

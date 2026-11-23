@@ -31,8 +31,23 @@ the founder's own; the prices below are dated and sourced.
   before. It names umembeso and imigidi among the functions it rigs.
 - Libhongo Decor & Hire (Gqeberha and 200 km) styles imigidi and hires tents,
   chairs, tables and cutlery; prices on quote.
-- Potjie pots: no Gqeberha price list found; national hirers list them from
-  about R44 (6 L) to R275 (58 L).
+- Potjie pots: national hirers list them from about R44 (6 L) to R275
+  (58 L); Gqeberha township hirers now found (below).
+
+### Township hirers the founder found (23 Nov 2026)
+From the hirers' own adverts (screenshots sent by the founder). Bank details
+in the adverts are left out of the app.
+
+| Hirer | Where | Contact | Prices |
+|---|---|---|---|
+| Tumi's Tents and Equipment Hire (TMZ; Hlelo15 Foods and Catering) | 192 Mpenzu St, NU 7, Motherwell | 074 216 7874 · 068 350 9214 | Tents, chairs, pots, gas stoves, plates, cutlery, toilets, catering; up to 500 people; quote on request |
+| LiDa Pots Hire Hub | Port Elizabeth, free delivery | 065 918 0834 | Hart pots 21 L, 36 L and 50 L: all three R250 (special, Sep 2026) |
+| Lolwethu Thys Rental Services | to confirm | 067 667 1745 | 4 big pots R350; 4-burner gas stove with empty cylinder R350, with 4 pots R500, with 4 pots and 2 tables R700; trestle table R100 |
+| Dima Events and Decor | to confirm | Della 064 083 3727 · Dima 078 747 5037 | Gas stove 3-plate R200, 2-plate R180; chafing dish R85; pots from R80; beverage dispenser from R40; dinner plate R5, side plate R3.50, bowl R4; plastic chair R6; trestle table R45; table cloth R45; trailer R450 |
+
+These now set the stove, pot, urn, crockery and chafing ranges in the hire
+card, with the township hirer named first; Tumi's sits beside Tent Hire Wiz
+for tents. For 150 guests the usual items come to about R7,740–R12,770.
 
 ### In the app
 - "What to hire" is its own card on the ceremony page, not part of the
@@ -42,7 +57,8 @@ the founder's own; the prices below are dated and sourced.
   it needs; only then is it added to the budget, as its own stage, priced at
   the middle of the range as a guide (`shared/hire.js`).
 - Tent Hire Wiz, Extreme Hiring EC and Red Cherry Events added to the
-  directory beside Libhongo and Shwabz KwaSintu.
+  directory beside Libhongo and Shwabz KwaSintu; then Tumi's, LiDa Pots Hire
+  Hub, Lolwethu Thys Rental Services and Dima Events and Decor.
 
 ## Grocery stokvel prices (Eastern Cape)
 Makro's Eastern Cape stokvel deals, 20 Nov to 3 Dec 2025, for example: Spekko
