@@ -91,3 +91,32 @@ export async function fixChillersCans(names = CHILLERS, fixName = CHILLERS_FIX) 
   if (resized) console.log(`Chillers Punch: ${resized} can row(s) now 440 ml.`);
   return { resized, skipped: false };
 }
+
+// Second round (founder, 23 Nov 2026: "fix that chicken image"): the old
+// chicken photos are replaced with the shops' packshots, and three more
+// groceries get theirs. A replaced photo is changed only while it is still
+// the old one. Runs once.
+export const FIX_NAME_2 = 'product-photos-2026-11-23-chicken';
+export const REPLACE_PHOTOS = [
+  // [name, bottleFormat, old photo it replaces, new photo]
+  ['Whole Chicken', 'Box (Bulk, ~1.8kg each bird)', 'https://hercules-cdn.com/file_XPFTde3NRaR0itfh1NJ8HuQ2', 'whole-chicken'],
+  ['Chicken Trays', 'Box (Bulk)', 'https://hercules-cdn.com/file_c7TK0RMBga1tw4532ity5fFh', 'chicken-trays-box-bulk'],
+];
+export const MORE_PHOTOS = [
+  ['Mayonnaise', '3kg Tub', 'mayonnaise-3kg-tub', 'Crosse & Blackwell Tangy Mayonnaise 3kg (Shoprite)'],
+  ['Maize Meal', '50kg Bag', 'maize-meal-50kg-bag', 'White Star Super Maize Meal 50kg (Checkers)'],
+  ['Sugar', '12.5kg Bag', 'sugar-12-5kg-bag', 'Huletts White Sugar 12.5kg (Shoprite)'],
+];
+
+export async function replaceChickenPhotos() {
+  if (await prisma.dataFix.findUnique({ where: { name: FIX_NAME_2 } })) return { changed: 0, skipped: true };
+  let changed = 0;
+  for (const [name, bottleFormat, oldUrl, slug] of REPLACE_PHOTOS) {
+    const { count } = await prisma.sku.updateMany({ where: { name, bottleFormat, imageUrl: oldUrl }, data: { imageUrl: photoUrl(slug) } });
+    changed += count;
+  }
+  await prisma.dataFix.create({ data: { name: FIX_NAME_2 } });
+  const more = await addProductPhotos(MORE_PHOTOS, `${FIX_NAME_2}-more`);
+  if (changed) console.log(`Product photos: ${changed} chicken photo(s) replaced.`);
+  return { changed, added: more.added, skipped: false };
+}

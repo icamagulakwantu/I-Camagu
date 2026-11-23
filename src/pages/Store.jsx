@@ -32,11 +32,13 @@ const DEPARTMENT_ICON = {
   other: 'store',
 }
 
-// Livestock, meat and fresh produce come as photographs, which look best
+// Livestock and fresh produce come as photographs, which look best
 // filling their tile. Everything else is a packshot on a white background,
 // shown whole on a warm tile with the white blended away.
-const PHOTO_DEPARTMENTS = new Set(['livestock', 'meat'])
-const isPhotograph = (sku) => PHOTO_DEPARTMENTS.has(departmentOf(sku).id) || aisleOf(sku).id === 'produce'
+// Meat is now shown as the shops' packshots, so only livestock fills the tile.
+const PHOTO_DEPARTMENTS = new Set(['livestock'])
+// The shops' packshots (i-Camagu's Cloudinary copies) are always shown whole.
+const isPhotograph = (sku) => !String(sku.imageUrl || '').includes('/icamagu/products/') && (PHOTO_DEPARTMENTS.has(departmentOf(sku).id) || aisleOf(sku).id === 'produce')
 
 // Placeholder colours per department, for products still waiting for a photo.
 const PLACEHOLDER_TONE = {
