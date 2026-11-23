@@ -26,14 +26,14 @@ integrationDescribe('clan praise names (real database)', () => {
     expect(await prisma.clanGroup.count({ where: { clanName: 'AmaCirha' } })).toBe(1);
     expect(await prisma.clanPraise.count({ where: { clanGroupId: cirha.id } })).toBeGreaterThan(5);
     expect(await loadClanPraises()).toEqual({ createdClans: 0, addedPraises: 0, removedPraises: 0 });
-  });
+  }, 60000); // over a thousand praises, loaded twice: slow on a busy CI runner
 
   it('removes a praise that was taken out of the list', async () => {
     await prisma.clanPraise.create({ data: { clanGroupId: cirha.id, praise: 'Mfengu/Hlubi', sourceCount: 1 } });
     const res = await loadClanPraises();
     expect(res.removedPraises).toBe(1);
     expect(await prisma.clanPraise.count({ where: { praise: 'Mfengu/Hlubi' } })).toBe(0);
-  });
+  }, 60000);
 
   it('finds a clan by one of its praises and shows its praises', async () => {
     clearClanIndexCache();
