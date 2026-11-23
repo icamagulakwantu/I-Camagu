@@ -120,3 +120,16 @@ export async function replaceChickenPhotos() {
   if (changed) console.log(`Product photos: ${changed} chicken photo(s) replaced.`);
   return { changed, added: more.added, skipped: false };
 }
+
+// Founder, 23 Nov 2026: find photos for the remaining products with TinyFish.
+// Only where a shop sells that product in that pack; the generic rows show
+// the usual shop brand at that pack.
+export const FIX_NAME_3 = 'product-photos-2026-11-23-remaining';
+export const REMAINING_PHOTOS = [
+  ['Beef Stock', 'Box', 'beef-stock-box', 'Knorrox Beef Flavoured Stock Cubes 24 x 10g (Shoprite)'],
+  ['Samp', '12.5kg Bag', 'samp-12-5kg-bag', 'ACE Samp 12.5kg (Makro)'],
+  ['Mayonnaise', '5kg Tub', 'mayonnaise-5kg-tub', 'Nola Original Mayonnaise 5kg (Makro)'],
+  ['Amazimba', '10kg Bag', 'amazimba-10kg-bag', 'King Korn Home Brew sorghum malt 10kg (Shoprite)'],
+  ['Umbona', '10kg Bag', 'umbona-10kg-bag', 'Gold Power Whole Yellow Maize 10kg (Makro)'],
+];
+export const addRemainingPhotos = () => addProductPhotos(REMAINING_PHOTOS, FIX_NAME_3);
