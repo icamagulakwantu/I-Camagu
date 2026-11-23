@@ -112,19 +112,20 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
         )}
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col px-1 pt-5">
-        {showDepartment && <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#6f655a]">{t(dept.short)}</p>}
-        <h3 className="line-clamp-2 font-display text-[15px] font-semibold leading-snug text-ink">{sku.name}</h3>
-        <p className="mt-0.5 line-clamp-2 text-xs leading-snug text-ink-muted">{pack}</p>
-        {casePrice != null && <p className="mt-0.5 text-[11px] font-semibold leading-snug text-[#2e4a2e]">{t('Bulk price · unlocks at the group\'s bulk tier')}</p>}
-        {savings !== null && retail && <p className="mt-0.5 text-xs tabular-nums text-ink-muted line-through">{price(retail)} retail</p>}
-        {flock && <p className="mt-0.5 text-xs text-ink-muted">Pooled into a {flock}</p>}
-        {casePrice != null && (
-          <button type="button" onClick={onOffers} className="pressable mt-1.5 self-start py-1 text-xs font-extrabold text-terracotta-dark">
-            {t('Group prices →')}
-          </button>
-        )}
-      </div>
+      {/* The whole card opens the group prices; no repeated notices: the
+          rule that these are bulk prices is stated once, at the top. */}
+      <button
+        type="button"
+        onClick={casePrice != null ? onOffers : undefined}
+        disabled={casePrice == null}
+        className="flex min-w-0 flex-1 flex-col px-1 pt-5 text-left disabled:cursor-default"
+      >
+        {showDepartment && <span className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#6f655a]">{t(dept.short)}</span>}
+        <span className="line-clamp-2 font-display text-[15px] font-semibold leading-snug text-ink">{sku.name}</span>
+        <span className="mt-0.5 line-clamp-1 text-xs leading-snug text-ink-muted">{pack}</span>
+        {savings !== null && retail && <span className="mt-0.5 text-xs tabular-nums text-ink-muted"><span className="line-through">{price(retail)}</span> {t('retail')}</span>}
+        {flock && <span className="mt-0.5 text-xs text-ink-muted">Pooled into a {flock}</span>}
+      </button>
     </li>
   )
 }
@@ -351,26 +352,25 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
         </ul>
       </nav>
 
-      {/* ---------- How it works: one slim strip ---------- */}
-      {!isSearching && (
-        <ol aria-label={t('How Bulk Buy works')} className="mx-4 mt-2 grid grid-cols-3 overflow-hidden rounded-[18px] border border-ink/[0.08]">
+      {/* ---------- The bulk-price rule, once; how it works on a tap ----------
+          Founder's rule: listed prices are special-level bulk prices,
+          unlocked by the group order's bulk tier, never single prices. */}
+      <details className="group mx-4 mt-3 rounded-[16px] bg-[#2e4a2e]/[0.07] px-3.5 py-2.5 text-[12px] leading-relaxed text-ink">
+        <summary className="flex cursor-pointer list-none items-start gap-2 [&::-webkit-details-marker]:hidden">
+          <Icon name="info" size={15} color="#1f3320" className="mt-0.5 flex-shrink-0" />
+          <span className="min-w-0 flex-1"><span className="font-extrabold text-[#1f3320]">{t('Bulk prices, not single prices.')}</span> {t('You pay only once your group order reaches its bulk tier.')}</span>
+          <span className="flex-shrink-0 font-extrabold text-[#1f3320] underline underline-offset-2 group-open:hidden">{t('How it works')}</span>
+        </summary>
+        <ol aria-label={t('How Bulk Buy works')} className="mt-3 space-y-2">
           {HOW_IT_WORKS.map((s) => (
-            <li key={s.n} className="border-r border-ink/[0.08] px-2.5 py-2.5 last:border-r-0">
-              <span className="flex items-center gap-1.5">
-                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#1f3320] text-xs font-extrabold text-cream">{s.n}</span>
-                <span className="truncate text-xs font-extrabold text-ink">{t(s.title)}</span>
-              </span>
-              <span className="mt-1 block text-xs leading-snug text-ink-muted">{t(s.desc)}</span>
+            <li key={s.n} className="flex gap-2">
+              <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#1f3320] text-xs font-extrabold text-cream">{s.n}</span>
+              <span><span className="font-extrabold">{t(s.title)}.</span> {t(s.desc)}</span>
             </li>
           ))}
         </ol>
-      )}
-
-      {/* Founder's rule: listed prices are special-level bulk prices, unlocked
-          by the group order's bulk tier, never single-purchase prices. */}
-      <p className="mx-4 mt-3 rounded-[14px] bg-[#2e4a2e]/[0.07] px-3.5 py-2.5 text-[12px] leading-relaxed text-ink">
-        <span className="font-extrabold text-[#1f3320]">{t('Bulk prices, not single prices.')}</span> {t("Prices here are SmartMatch bulk prices, set at the shops' special prices. They unlock only when your group order reaches its bulk tier, and are not prices for buying one on its own. You only pay once the group reaches its minimum and the supplier confirms the price.")}
-      </p>
+        <p className="mt-2 text-ink-muted">{t("Prices here are SmartMatch bulk prices, set at the shops' special prices. They unlock only when your group order reaches its bulk tier, and are not prices for buying one on its own. You only pay once the group reaches its minimum and the supplier confirms the price.")}</p>
+      </details>
 
       {/* ---------- Group orders filling near you ---------- */}
       {!isSearching && nearbyPools.length > 0 && (
@@ -392,10 +392,10 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">{activeDepartment.xhosa}</p>
               <h2 className="mt-0.5 font-display text-[1.45rem] font-semibold leading-tight tracking-tight text-ink">{t(activeDepartment.name)}</h2>
             </div>
-            <span className="flex-shrink-0 pb-1 text-xs font-bold tabular-nums text-ink-muted">{skus.length} item{skus.length === 1 ? '' : 's'}</span>
+            <span className="flex-shrink-0 pb-1 text-xs font-bold tabular-nums text-ink-muted">{skus.length === 1 ? t('1 item') : t('{n} items', { n: skus.length })}</span>
           </div>
           {liveAisles.length > 1 && (
-            <div className="mt-3 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="sticky top-0 z-20 mt-3 flex gap-2 overflow-x-auto bg-cream/95 px-4 pb-2 pt-2 backdrop-blur-md [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {[{ id: 'all', name: t('All') }, ...liveAisles].map((a) => (
                 <button
                   key={a.id}

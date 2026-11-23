@@ -800,6 +800,18 @@ const XH = {
   'Ukuphuma · Coming out as igqirha': 'Ukuphuma · Ukuphuma njengegqirha',
   'Ukuphinda indlela · Going back along the path': 'Ukuphinda indlela · Ukubuyela endleleni',
   'Like a second imbeleko: accepted by the ancestors at a higher level, able to do what you could not before.': 'Njengembeleko yesibini: wamkelwa ngamanyange kwinqanaba eliphezulu, ukwazi ukwenza oko ubungakwazi ukukwenza ngaphambili.',
+  // Design pass (23 Nov 2026)
+  'retail': 'evenkileni',
+  'You pay only once your group order reaches its bulk tier.': 'Uhlawula kuphela xa i-odolo yeqela lakho ifika kwinqanaba layo elikhulu.',
+  'How it works': 'Isebenza njani',
+  'See the whole plan': 'Bona isicwangciso sonke',
+  'See the whole plan ({n} more due)': 'Bona isicwangciso sonke (ezinye ezingu-{n})',
+  'A second imbeleko: a higher acceptance': 'Imbeleko yesibini: ukwamkelwa okuphezulu',
+  'Accompanying the departed': 'Ukukhapha oswelekileyo',
+  'A thanksgiving for a mother': 'Umbulelo ngomama',
+  'Bringing the departed home': 'Ukubuyisa oswelekileyo ekhaya',
+  '1 item': 'into enye',
+  '{n} items': 'izinto ezi-{n}',
 }
 
 export default XH

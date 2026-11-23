@@ -128,19 +128,22 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
             </button>
           )}
 
-          <div className="space-y-2.5">
-            {restTypes.map((type) => {
+          {/* Every other rite as one compact list: one tap opens it. */}
+          <div className="overflow-hidden rounded-[22px] bg-[#fffdf9] ring-1 ring-ink/[0.07]">
+            {restTypes.map((type, index) => {
               const meta = CEREMONY_META[type] || {}
               return (
                 <button key={type} onClick={() => onOpenType(type)}
-                  className={`card-paper w-full text-left overflow-hidden p-4 flex items-center gap-4 ${pressable}`}>
-                  <CeremonyIcon type={type} size={48} />
+                  className={`flex w-full items-center gap-3 px-3.5 py-3 text-left active:bg-cream ${index > 0 ? 'border-t border-ink/[0.06]' : ''}`}>
+                  <CeremonyIcon type={type} size={42} />
                   <div className="min-w-0 flex-1">
-                    <p className="font-display text-[17px] font-semibold text-ink">{meta.label || type.replace(/_/g, ' ')}</p>
-                    {meta.english && <p className="text-xs uppercase tracking-[0.12em] text-ochre-dark font-bold mt-0.5">{meta.english}</p>}
-                    <p className="text-xs text-ink-muted mt-1 line-clamp-1">{meta.desc || 'Ceremony planning and preparation'}</p>
+                    <p className="flex items-baseline gap-2">
+                      <span className="font-display text-[16px] font-semibold text-ink">{meta.label || type.replace(/_/g, ' ')}</span>
+                      {meta.english && <span className="truncate text-[11px] font-bold uppercase tracking-[0.1em] text-ochre-dark">{meta.english}</span>}
+                    </p>
+                    <p className="mt-0.5 line-clamp-1 text-[13px] text-ink-muted">{meta.desc || 'Ceremony planning and preparation'}</p>
                   </div>
-                  <Icon name="arrowRight" size={16} color="#6b645a" />
+                  <Icon name="chevron-right" size={18} color="#b5ab9f" />
                 </button>
               )
             })}
@@ -213,8 +216,8 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
                     className="w-full border-t border-ink/[0.06] px-5 py-3 flex items-center justify-between gap-3 text-left hover:bg-cream/60 transition-colors"
                   >
                     <span className="min-w-0">
-                      <span className="block text-xs font-bold text-ink leading-tight">Who brings what</span>
-                      <span className="block text-xs text-ink-muted mt-0.5">Give alcohol, food & supplies to each of the 14 groups</span>
+                      <span className="block text-xs font-bold text-ink leading-tight">Seating and groups</span>
+                      <span className="block text-xs text-ink-muted mt-0.5">Who sits where, who brings what</span>
                     </span>
                     <span className="flex flex-shrink-0 items-center gap-1 text-xs font-bold text-terracotta">
                       Open <Icon name="arrowRight" size={12} color="#c45c26" />

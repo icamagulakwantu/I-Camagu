@@ -269,6 +269,22 @@ export default function CeremonyHome({
 
         <ComingUp rows={rows} ceremony={{ ...ceremony, type }} onOpenList={() => onEditStep('list')} />
 
+        {/* ---------- Plan and people: icon discs break out of the tiles ---------- */}
+        <section aria-label={t('Plan and people')} className="grid grid-cols-2 gap-3 pt-4">
+          <button type="button" onClick={() => onEditStep('list')} className="pressable relative flex min-h-[132px] flex-col justify-end rounded-[22px] bg-[#fffdf9] px-4 pb-3.5 pt-8 text-left shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
+            <span className="absolute -top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-terracotta-dark text-white ring-4 ring-cream"><Icon name="clipboard" size={18} /></span>
+            <span className="font-display text-[1.15rem] font-semibold leading-tight text-ink">{t('The list')}</span>
+            <span className="mt-1 text-[13px] text-ink-muted">{total ? t('{done} of {total} done', { done, total }) : t('Nothing on it yet')}</span>
+            <span className="mt-2 block h-1 overflow-hidden rounded-full bg-cream-dark"><span className="block h-full rounded-full bg-terracotta-dark" style={{ width: `${Math.max(percent, 3)}%` }} /></span>
+          </button>
+          <button type="button" onClick={() => onOpenHierarchy?.(plan.ceremonyId)} className="pressable relative flex min-h-[132px] flex-col justify-end rounded-[22px] bg-[#fffdf9] px-4 pb-3.5 pt-8 text-left shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
+            <span className="absolute -top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-[#c1922f] text-[#1c1612] ring-4 ring-cream"><Icon name="users" size={18} /></span>
+            <span className="font-display text-[1.15rem] font-semibold leading-tight text-ink">{t('Seating and groups')}</span>
+            <span className="mt-1 text-[13px] text-ink-muted">{t('Who sits where, who brings what')}</span>
+          </button>
+        </section>
+
+
         {type === 'ULWALUKO' && <MothersGuide onOpenUmqombothi={() => onNavigate?.('umqombothi')} />}
 
         {/* ---------- The money picture, with a tab on its top edge ---------- */}
@@ -325,21 +341,6 @@ export default function CeremonyHome({
               {summary.unforeseen > 0 && ` ${t('Unexpected costs so far: {amount}.', { amount: rand(summary.unforeseen) })}`}
             </p>
           </div>
-        </section>
-
-        {/* ---------- Plan and people: icon discs break out of the tiles ---------- */}
-        <section aria-label={t('Plan and people')} className="grid grid-cols-2 gap-3 pt-3">
-          <button type="button" onClick={() => onEditStep('list')} className="pressable relative flex min-h-[132px] flex-col justify-end rounded-[22px] bg-[#fffdf9] px-4 pb-3.5 pt-8 text-left shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
-            <span className="absolute -top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-terracotta-dark text-white ring-4 ring-cream"><Icon name="clipboard" size={18} /></span>
-            <span className="font-display text-[1.15rem] font-semibold leading-tight text-ink">{t('The list')}</span>
-            <span className="mt-1 text-[13px] text-ink-muted">{total ? t('{done} of {total} done', { done, total }) : t('Nothing on it yet')}</span>
-            <span className="mt-2 block h-1 overflow-hidden rounded-full bg-cream-dark"><span className="block h-full rounded-full bg-terracotta-dark" style={{ width: `${Math.max(percent, 3)}%` }} /></span>
-          </button>
-          <button type="button" onClick={() => onOpenHierarchy?.(plan.ceremonyId)} className="pressable relative flex min-h-[132px] flex-col justify-end rounded-[22px] bg-[#fffdf9] px-4 pb-3.5 pt-8 text-left shadow-[0_18px_36px_-26px_rgba(43,30,18,0.55)]">
-            <span className="absolute -top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-[#c1922f] text-[#1c1612] ring-4 ring-cream"><Icon name="users" size={18} /></span>
-            <span className="font-display text-[1.15rem] font-semibold leading-tight text-ink">{t('Seating and groups')}</span>
-            <span className="mt-1 text-[13px] text-ink-muted">{t('Who sits where, who brings what')}</span>
-          </button>
         </section>
 
         <ConnectedCard ceremony={ceremony} title={title} accessToken={accessToken} onNavigate={onNavigate} onChanged={onPlanChanged} showToast={showToast} />

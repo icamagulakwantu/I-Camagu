@@ -5,6 +5,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import PoolOfferCard from '../components/PoolOfferCard.jsx'
 import DidYouKnow from '../components/DidYouKnow.jsx'
 import Icon from '../components/Icon.jsx'
+import CeremonyIcon from '../components/CeremonyIcon.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { daysUntil, describeCountdown, focusDate, nextCeremony } from '../lib/countdown.js'
 import { ceremonyImage } from '../data/ceremonyImages.js'
@@ -266,33 +267,26 @@ function CeremonyCard({ ceremony, onOpen }) {
   const focus = focusDate(ceremony)
   const days = daysUntil(focus.date)
   const badge = days != null
-    ? `${focus.isHomecoming ? 'Umgidi ' : ''}${focus.isHomecoming ? describeCountdown(days) : capitalise(describeCountdown(days))}`
+    ? (focus.isHomecoming ? `Umgidi ${t(describeCountdown(days))}` : capitalise(t(describeCountdown(days))))
     : ceremony.eventDate ? t('Date passed') : t('No date yet')
   const { done, total } = checklistCounts(ceremony)
   const progress = total ? Math.round((done / total) * 100) : 0
   const soon = days != null && days <= 14
 
   return (
-    <li className="w-[208px] flex-shrink-0">
-      <button type="button" onClick={onOpen} className="pressable block w-full text-left">
-        <span className="relative block h-[132px] overflow-hidden rounded-[22px] bg-cream-dark">
-          <img src={ceremonyImage(ceremony.type)} alt="" loading="lazy" className="h-full w-full object-cover" />
-          <span className={`absolute left-0 top-3 rounded-r-full py-1 pl-3 pr-3 text-xs font-extrabold ${soon ? 'bg-terracotta-dark text-white' : 'bg-ink/80 text-cream'}`}>
-            {badge}
+    <li className="border-b border-ink/[0.06]">
+      <button type="button" onClick={onOpen} className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-cream">
+        <CeremonyIcon type={ceremony.type} size={40} />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-display text-[16px] font-semibold leading-tight text-ink">{ceremony.title}</span>
+          <span className="mt-0.5 block truncate text-[12px] text-ink-muted">
+            {labelForCeremonyType(ceremony.type)}{ceremony.eventDate ? ` · ${shortDate(ceremony.eventDate)}` : ''}{total ? ` · ${done}/${total}` : ''}
+          </span>
+          <span className="mt-1.5 block h-1 overflow-hidden rounded-full bg-cream-dark">
+            <span className="block h-full rounded-full bg-[#2e4a2e]" style={{ width: `${Math.max(progress, 3)}%` }} />
           </span>
         </span>
-        <span className="relative mx-2.5 -mt-8 block rounded-[18px] bg-[#fffdf9] px-3.5 pb-3 pt-3 shadow-[0_16px_30px_-20px_rgba(43,30,18,0.6)]">
-          <span className="block truncate text-xs font-extrabold uppercase tracking-[0.12em] text-ink-muted">
-            {labelForCeremonyType(ceremony.type)}{ceremony.eventDate ? ` · ${shortDate(ceremony.eventDate)}` : ''}
-          </span>
-          <span className="mt-0.5 block truncate font-display text-[1.15rem] font-semibold leading-tight text-ink">{ceremony.title}</span>
-          <span className="mt-2 flex items-center gap-2">
-            <span className="h-1 flex-1 overflow-hidden rounded-full bg-cream-dark">
-              <span className="block h-full rounded-full bg-[#2e4a2e]" style={{ width: `${Math.max(progress, 3)}%` }} />
-            </span>
-            <span className="text-xs font-bold tabular-nums text-ink-muted">{total ? `${done}/${total}` : '—'}</span>
-          </span>
-        </span>
+        <span className={`flex-shrink-0 rounded-full px-2.5 py-1 text-[11px] font-extrabold ${soon ? 'bg-terracotta-dark text-white' : 'bg-cream-dark text-ink'}`}>{badge}</span>
       </button>
     </li>
   )
@@ -300,25 +294,25 @@ function CeremonyCard({ ceremony, onOpen }) {
 
 function CeremonyRail({ ceremonies, loading, onSelectCeremony, onNavigate }) {
   const t = useT()
+  const shown = ceremonies.slice(0, 3)
   return (
     <section aria-label="Your ceremonies" className="mt-12">
       <SectionTitle eyebrow="Imisebenzi yakho" title={t('Your ceremonies')} actionLabel={ceremonies.length ? t('See all') : null} onAction={() => onNavigate('ceremonyhub')} />
-      <ul className="flex snap-x gap-3 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* A short list, one row each: the soonest first, then a way to start
+          another. Compact, so the rest of Home stays in reach. */}
+      <ul className="mx-5 overflow-hidden rounded-[22px] bg-[#fffdf9] shadow-[0_16px_32px_-26px_rgba(43,30,18,0.55)] ring-1 ring-ink/[0.06]">
         {loading && [0, 1].map((i) => (
-          <li key={i} className="w-[208px] flex-shrink-0"><Skeleton className="h-[200px] w-full rounded-[22px]" /></li>
+          <li key={i} className="px-4 py-3"><Skeleton className="h-11 w-full rounded-xl" /></li>
         ))}
-        {!loading && ceremonies.map((ceremony) => (
+        {!loading && shown.map((ceremony) => (
           <CeremonyCard key={ceremony.id} ceremony={ceremony} onOpen={() => onSelectCeremony?.(ceremony.id)} />
         ))}
         {!loading && (
-          <li className="w-[150px] flex-shrink-0">
-            <button
-              type="button"
-              onClick={() => onNavigate('ceremonyhub')}
-              className="pressable flex h-[200px] w-full flex-col items-center justify-center gap-2 rounded-[22px] border-2 border-dashed border-ink/15 text-center"
-            >
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2e4a2e] text-2xl font-light leading-none text-white">+</span>
-              <span className="px-3 text-sm font-extrabold text-ink">{t('Plan a ceremony')}</span>
+          <li>
+            <button type="button" onClick={() => onNavigate('ceremonyhub')} className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-cream">
+              <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#2e4a2e] text-white"><Icon name="plus" size={18} /></span>
+              <span className="flex-1 text-[15px] font-bold text-ink">{t('Plan a ceremony')}</span>
+              <Icon name="chevron-right" size={18} color="#b5ab9f" />
             </button>
           </li>
         )}
