@@ -199,6 +199,9 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
     }
   }
 
+  // Each step opens at its top, never part-way down the last one.
+  useEffect(() => { window.scrollTo({ top: 0 }) }, [stepId])
+
   const stepIndex = STEPS.findIndex((s) => s.id === stepId)
   const isFormStep = FORM_STEP_IDS.includes(stepId)
 
@@ -215,6 +218,13 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
       return
     }
     setStepId(STEPS[stepIndex + 1].id)
+  }
+
+  // Choosing the kind of ceremony is the whole first step: one tap picks it
+  // and moves on, so nobody has to scroll to find Next.
+  const chooseType = (type) => {
+    setForm((f) => ({ ...f, type }))
+    if (!activePlan && !returnToSummary && stepId === 'what') setStepId(STEPS[stepIndex + 1].id)
   }
 
   const goBack = () => {
@@ -324,7 +334,7 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
 
         {isFormStep && (
           <div className="px-4 mt-5">
-            <FormStep form={form} setForm={setForm} ceremonyTypes={ceremonyTypes} locked={Boolean(activePlan)} />
+            <FormStep form={form} setForm={setForm} ceremonyTypes={ceremonyTypes} locked={Boolean(activePlan)} onChosen={chooseType} />
           </div>
         )}
         {creating && stepId === 'money' && (
@@ -341,12 +351,15 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
           </div>
         )}
 
-        {stepId !== 'summary' && (
-          <div className="grid grid-cols-2 gap-3 px-4 mt-8">
-            <button type="button" onClick={goBack} className={cn('h-16 rounded-pill bg-white border-2 border-terracotta/25 text-ink', pressable)}>
+        {/* Back and Next stay in reach above the bottom bar, on every step.
+            Not on the first: a tap on a ceremony already moves on, and Back
+            is at the top. */}
+        {stepId !== 'summary' && stepId !== 'what' && (
+          <div className="sticky bottom-[calc(env(safe-area-inset-bottom)+88px)] z-20 mt-8 grid grid-cols-2 gap-3 bg-gradient-to-t from-cream via-cream/95 to-cream/0 px-4 pb-3 pt-5">
+            <button type="button" onClick={goBack} className={cn('h-14 rounded-pill bg-white border-2 border-terracotta/25 text-ink', pressable)}>
               <Bi {...BUTTONS.back} />
             </button>
-            <button type="button" disabled={saving} onClick={goNext} className={cn('h-16 rounded-pill bg-terracotta text-white', pressable)}>
+            <button type="button" disabled={saving} onClick={goNext} className={cn('h-14 rounded-pill bg-terracotta text-white shadow-[0_10px_24px_-12px_rgba(160,70,30,0.7)]', pressable)}>
               <Bi {...nextLabel} />
             </button>
           </div>

@@ -10,7 +10,7 @@ const CEREMONY_ICONS = {
   UKUKHAPHA: 'footprints',
   INKOBE_ZIKA_MAMA: 'wheat',
   UKUBUYISA: 'houseHeart',
-  UMSEBENZI_WEGQIRHA: 'sprout',
+  UMSEBENZI_WEGQIRHA: 'beads',
   WEDDING: 'heartHandshake',
   IMBELEKO: 'sprout',
   INTONJANE: 'heart',

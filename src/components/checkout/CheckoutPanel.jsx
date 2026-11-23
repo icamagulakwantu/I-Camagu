@@ -231,6 +231,8 @@ export default function CheckoutPanel({
             <span>{t('i-Camagu never holds your money. You pay the merchant once their offer is confirmed.')}</span>
           </li>
         </ul>
+        {/* The order button stays in reach above the bottom bar. */}
+        <div className="sticky bottom-[calc(env(safe-area-inset-bottom)+88px)] z-20 -mx-1 rounded-pill pt-2">
         <button
           type="button"
           onClick={submit}
@@ -244,6 +246,7 @@ export default function CheckoutPanel({
             </>
           )}
         </button>
+        </div>
       </div>
     </div>
   )

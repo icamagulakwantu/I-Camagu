@@ -47,6 +47,9 @@ const PATHS = {
   // Used by Bulk Buy's department toggle and the "Lost page" screen; they
   // were referenced before but missing, so they rendered as blank space.
   'chevron-down': <path d="M6 9l6 6 6-6" />,
+  'chevron-right': <path d="M9 6l6 6-6 6" />,
+  // A string of white beads (amaphondo): the igqirha's calling.
+  beads: <><path d="M5 6c1.5 7 12.5 7 14 0" /><circle cx="6.2" cy="10.2" r="1.6" /><circle cx="9.3" cy="12.6" r="1.6" /><circle cx="12" cy="13.3" r="1.6" /><circle cx="14.7" cy="12.6" r="1.6" /><circle cx="17.8" cy="10.2" r="1.6" /><path d="M12 15v4" /><circle cx="12" cy="20" r="1" /></>,
   'chevron-up': <path d="M6 15l6-6 6 6" />,
   compass: <><circle cx="12" cy="12" r="8.5" /><path d="M15.5 8.5l-2 5-5 2 2-5z" /></>,
   camera: <><path d="M4 8h3l1.5-2h7L17 8h3v11H4z" /><circle cx="12" cy="13" r="3.3" /></>,

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, useNavigationType, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import { CommunityProvider } from './context/CommunityContext.jsx'
 import { BASKET_CHANGED_EVENT } from './lib/basketEvents.js'
@@ -193,6 +193,13 @@ function MainApp() {
     setScreenState(nextScreen)
     navigate(SCREEN_PATHS[nextScreen] || '/')
   }
+
+  // A new screen opens at its top: a tap lands exactly where it says. The
+  // browser's back button keeps where you were.
+  const navigationType = useNavigationType()
+  useEffect(() => {
+    if (navigationType !== 'POP') window.scrollTo({ top: 0 })
+  }, [location.pathname, navigationType])
 
   useEffect(() => {
     const path = location.pathname;

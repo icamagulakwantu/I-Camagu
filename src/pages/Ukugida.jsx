@@ -142,7 +142,7 @@ export default function Ukugida({ onBack, ceremonyTitle = '' }) {
               'font-display font-semibold text-2xl mt-1',
               balance >= 0 ? 'text-cream' : 'text-ochre-light'
             )}>
-              {balance >= 0 ? '+' : ''}{balance} items
+              {balance === 0 ? 'Even: nothing owed either way' : `${balance > 0 ? '+' : ''}${balance} ${Math.abs(balance) === 1 ? 'item' : 'items'}`}
             </p>
           </div>
       </HeroHeader>

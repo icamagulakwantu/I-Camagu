@@ -19,14 +19,17 @@ function Field({ label, children, hint }) {
   )
 }
 
-// Step 1: one big tap per ceremony type. A plan's type cannot change once it
-// exists (its lists were built for that type), so it is shown but locked.
-export function TypeStep({ form, setForm, ceremonyTypes, locked }) {
+// Step 1: one tap per ceremony type, and that tap moves on to the next step
+// (onChosen). Rows are compact so the whole list fits on a phone. A plan's
+// type cannot change once it exists (its lists were built for that type),
+// so it is shown but locked.
+export function TypeStep({ form, setForm, ceremonyTypes, locked, onChosen }) {
   const t = useT()
   const types = ceremonyTypes.length ? ceremonyTypes : Object.keys(CEREMONY_META)
+  const choose = (typeId) => (onChosen ? onChosen(typeId) : setForm((f) => ({ ...f, type: typeId })))
   return (
-    <div className="space-y-2">
-      {types.map((typeId) => {
+    <div className="overflow-hidden rounded-[22px] bg-white ring-1 ring-ink/[0.07]">
+      {types.map((typeId, index) => {
         const selected = form.type === typeId
         return (
           <button
@@ -34,24 +37,26 @@ export function TypeStep({ form, setForm, ceremonyTypes, locked }) {
             type="button"
             disabled={locked && !selected}
             aria-pressed={selected}
-            onClick={() => setForm((f) => ({ ...f, type: typeId }))}
+            onClick={() => choose(typeId)}
             className={cn(
-              'w-full flex items-center gap-3 p-3 rounded-soft border-2 text-left bg-white',
-              selected ? 'border-sage-500 bg-sage-50' : 'border-cream-dark',
+              'flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition-colors',
+              index > 0 && 'border-t border-ink/[0.06]',
+              selected ? 'bg-sage-50' : 'active:bg-cream',
               locked && !selected && 'opacity-40',
-              pressable,
             )}
           >
-            <CeremonyIcon type={typeId} size={52} />
-            <span className="flex-1 min-w-0">
-              <span className="block text-base font-bold text-ink">{t(typeName(typeId))}</span>
-              <span className="block text-xs text-ink-muted">{t(CEREMONY_META[typeId]?.desc || 'Ceremony planning')}</span>
+            <CeremonyIcon type={typeId} size={40} />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-bold leading-tight text-ink">{t(typeName(typeId))}</span>
+              <span className="block truncate text-[13px] text-ink-muted">{t(CEREMONY_META[typeId]?.desc || 'Ceremony planning')}</span>
             </span>
-            {selected && <Icon name="check" size={22} color="#4a7a4a" strokeWidth={2.5} />}
+            {selected
+              ? <Icon name="check" size={20} color="#4a7a4a" strokeWidth={2.5} />
+              : !locked && <Icon name="chevron-right" size={18} color="#b5ab9f" />}
           </button>
         )
       })}
-      {locked && <p className="text-xs text-ink-muted pt-1">{t('The kind of ceremony cannot be changed once the plan is made.')}</p>}
+      {locked && <p className="border-t border-ink/[0.06] px-3.5 py-2.5 text-xs text-ink-muted">{t('The kind of ceremony cannot be changed once the plan is made.')}</p>}
     </div>
   )
 }

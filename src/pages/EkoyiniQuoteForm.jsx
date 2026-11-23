@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 
 const EVENT_TYPES = ['UMGIDI', 'ULWALUKO', 'INTAMBO_ENKULU', 'UKUKHAPHA', 'INKOBE_ZIKA_MAMA', 'UKUBUYISA', 'UMSEBENZI_WEGQIRHA', 'WEDDING', 'BIRTHDAY', 'CORPORATE', 'OTHER']
@@ -39,7 +39,7 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
 
   const [form, setForm] = useState({
     fullName: user ? user.firstName : '', surname: user ? user.lastName : '', clientEmail: user?.email || '',
-    cellPhone: '', whatsappNumber: '', altContactName: '', altContactNumber: '', hearAboutUs: '', referralName: '',
+    cellPhone: user?.phoneNumber || '', whatsappNumber: '', altContactName: '', altContactNumber: '', hearAboutUs: '', referralName: '',
     // Must match the first entry in EVENT_TYPES — the <select> below falls
     // back to displaying its first option when the bound value doesn't
     // match any of them, which silently desyncs what's shown from what's
@@ -93,6 +93,9 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
     setError('')
     return true
   }
+
+  // Each step opens at its top.
+  useEffect(() => { window.scrollTo({ top: 0 }) }, [step])
 
   const goToStep = (nextStep) => {
     if (nextStep > step && !validateStep(step)) return
@@ -298,9 +301,10 @@ function EkoyiniQuoteForm({ selectedPackage, onBack, onSubmitted }) {
       {step < 6 && (
         <>
           {error && <p className="text-brand-ochre text-sm mb-2">{error}</p>}
-          <div className="flex gap-2 mt-2">
-            {step > 1 && <button onClick={() => goToStep(step - 1)} className="flex-1 border-2 border-terracotta/25 text-brand-black font-bold py-2 rounded-pill text-sm">Back</button>}
-            <button onClick={() => goToStep(step + 1)} className="flex-1 bg-brand-blue text-brand-cream font-bold py-2 rounded-pill text-sm">Next</button>
+          {/* Back and Next stay in reach above the bottom bar. */}
+          <div className="sticky bottom-[calc(env(safe-area-inset-bottom)+88px)] z-20 -mx-4 mt-2 flex gap-2 bg-gradient-to-t from-cream via-cream/95 to-cream/0 px-4 pb-3 pt-5">
+            {step > 1 && <button onClick={() => goToStep(step - 1)} className="h-12 flex-1 rounded-pill border-2 border-terracotta/25 bg-white text-sm font-bold text-brand-black">Back</button>}
+            <button onClick={() => goToStep(step + 1)} className="h-12 flex-[2] rounded-pill bg-brand-blue text-sm font-bold text-brand-cream">Next</button>
           </div>
         </>
       )}
