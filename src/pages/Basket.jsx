@@ -11,6 +11,7 @@ import { resolveOrderStage } from '../data/orderStages.js'
 import { OrderStageTracker } from '../components/ui/OrderStageTracker.jsx'
 import { CATEGORY_LABEL } from '../data/poolCategories.js'
 import CheckoutPanel from '../components/checkout/CheckoutPanel.jsx'
+import { useT } from '../i18n/index.jsx'
 
 // Same key the /pool/:id invite route uses — "Add to this pool" reuses it,
 // so a member's own pool and an invited pool follow exactly one join path.
@@ -37,6 +38,7 @@ function tierValueLabel(tier, basis) {
 }
 
 export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
+  const t = useT()
   const { accessToken, user, updateUser } = useAuth()
   const { refreshPools } = useCommunity()
   const { showToast } = useToast()
@@ -85,7 +87,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       setBasketData(formattedData)
       if (onBasketChanged) onBasketChanged(formattedData.totalCases)
     } catch {
-      showToast('Could not load basket', 'error')
+      showToast(t('Could not load basket'), 'error')
     } finally {
       setLoading(false)
     }
@@ -152,7 +154,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       if (!res.ok) throw new Error()
       fetchBasket()
     } catch {
-      showToast('Could not update quantity', 'error')
+      showToast(t('Could not update quantity'), 'error')
     }
   }
 
@@ -162,10 +164,10 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${accessToken}` },
       })
-      showToast('Item removed from cart', 'info')
+      showToast(t('Item removed from cart'), 'info')
       fetchBasket()
     } catch {
-      showToast('Could not remove item', 'error')
+      showToast(t('Could not remove item'), 'error')
     }
   }
 
@@ -235,7 +237,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
         const data = await res.json()
         if (!res.ok) throw new Error(data.error || 'Could not withdraw cart')
       }
-      showToast('Withdrawn from pool', 'info')
+      showToast(t('Withdrawn from pool'), 'info')
       if (joiningPool?.id === poolStatus.poolId) dismissJoiningPool()
       setPoolStatuses((prev) => prev.filter((p) => p.poolId !== poolStatus.poolId))
     } catch (err) {
@@ -258,7 +260,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
     } else {
       navigator.clipboard.writeText(summary)
       setCopied(true)
-      showToast('Cart copied to clipboard', 'info')
+      showToast(t('Cart copied to clipboard'), 'info')
       setTimeout(() => setCopied(false), 2000)
     }
   }
@@ -289,7 +291,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
     } else {
       navigator.clipboard.writeText(text)
       setInvitedId(poolStatus.poolId)
-      showToast('Invite copied — paste it into WhatsApp', 'info')
+      showToast(t('Invite copied — paste it into WhatsApp'), 'info')
       setTimeout(() => setInvitedId(null), 2000)
     }
   }
@@ -328,7 +330,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           onClick={onBack}
           className="cursor-pointer text-xs font-bold text-sage-600 hover:text-sage-700 uppercase tracking-wider flex items-center gap-1"
         >
-          ← Back to Store
+          {t('← Back to Store')}
         </button>
         {itemsList.length > 0 && (
           <button
@@ -336,23 +338,23 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
             onClick={shareBasket}
             className="cursor-pointer bg-terracotta text-cream text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform flex items-center gap-1.5"
           >
-            {copied ? 'Copied!' : <><Icon name="share" size={12} color="#fdf8f0" /> Share Cart</>}
+            {copied ? t('Copied!') : <><Icon name="share" size={12} color="#fdf8f0" /> {t('Share Cart')}</>}
           </button>
         )}
       </div>
 
       <h2 className="font-display font-bold text-2xl text-ink mb-4 flex items-center gap-2">
-        <Icon name="cart" size={22} color="#2b2620" /> My Cart
+        <Icon name="cart" size={22} color="#2b2620" /> {t('My Cart')}
       </h2>
 
       {joiningPool && (
         <div className="bg-white border-2 border-sage-600 rounded-soft p-4 mb-4 shadow-soft">
           <div className="flex items-start justify-between gap-2 mb-1">
             <p className="text-xs font-black uppercase tracking-wider text-sage-700">
-              {joiningPool.isMine ? 'Shopping for your pool' : 'You were invited to a pool'}
+              {joiningPool.isMine ? t('Shopping for your pool') : t('You were invited to a pool')}
             </p>
             <button type="button" onClick={dismissJoiningPool} className="cursor-pointer text-ink/40 hover:text-ink/70 text-xs font-bold shrink-0">
-              {joiningPool.isMine ? 'Cancel' : 'Not now'}
+              {joiningPool.isMine ? t('Cancel') : t('Not now')}
             </button>
           </div>
           <p className="text-sm font-bold text-ink mb-1">
@@ -367,7 +369,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       {poolStatuses.map((poolStatus) => (
         <div key={`${poolStatus.poolId}:${poolStatus.basketStatus}`} className="bg-gradient-to-br from-terracotta to-brand-ochre text-white rounded-soft p-4 mb-4 shadow-soft">
           <p className="text-xs font-black uppercase tracking-wider text-white/80 mb-1">
-            {poolStatus.isPrivate ? 'My own order' : 'Smart Match'} — {CATEGORY_LABEL[poolStatus.category]}
+            {poolStatus.isPrivate ? t('My own order') : 'Smart Match'} — {CATEGORY_LABEL[poolStatus.category]}
           </p>
           {/* Only shown once the admin has accepted a merchant's offer on this
               group order — members never choose a merchant themselves. */}
@@ -380,10 +382,10 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
             {poolStatus.poolStatus === 'OPEN'
               ? `Pooling with other members near ${poolStatus.area}. Merchants send offers on the whole group order — the more people join, the stronger the offers can be.`
               : poolStatus.poolStatus === 'FULFILLED'
-                ? 'Delivered/collected — your order is complete.'
+                ? t('Delivered/collected — your order is complete.')
                 : poolStatus.isPrivate
                   ? `Order placed for delivery to ${poolStatus.area}.`
-                  : 'Matched! Your order pooled with other members.'}
+                  : t('Matched! Your order pooled with other members.')}
           </p>
           {poolStatus.myCases > 0 && !poolStatus.isPrivate && (
             <p className="text-xs text-white/85 mb-2">You've added {poolStatus.myCases} to this pool.</p>
@@ -396,16 +398,16 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           {poolStatus.poolStatus !== 'OPEN' && (
             <div className="mb-3 pt-3 border-t border-white/20">
               {poolStatus.poolStatus === 'FULFILLED' ? (
-                <p className="text-xs text-white/90 mb-2">This order is done — see the full record any time in My Orders.</p>
+                <p className="text-xs text-white/90 mb-2">{t('This order is done — see the full record any time in My Orders.')}</p>
               ) : poolStatus.payment?.status === 'CLEARED' ? (
-                <p className="text-xs text-white/90 mb-2">Your payment is confirmed — waiting on the merchant to fulfil the order.</p>
+                <p className="text-xs text-white/90 mb-2">{t('Your payment is confirmed — waiting on the merchant to fulfil the order.')}</p>
               ) : poolStatus.payment?.hasReference ? (
-                <p className="text-xs text-white/90 mb-2">Your EFT reference is in — waiting on the merchant to confirm receipt.</p>
+                <p className="text-xs text-white/90 mb-2">{t('Your EFT reference is in — waiting on the merchant to confirm receipt.')}</p>
               ) : !poolStatus.partnerName ? (
                 <p className="text-xs text-white/90 mb-2">
                   {poolStatus.isPrivate
-                    ? 'Merchants are sending offers on your order — payment details will show here once the best offer is confirmed.'
-                    : 'Minimum reached! Merchants are sending offers on this group order — payment details will show here once the best offer is confirmed.'}
+                    ? t('Merchants are sending offers on your order — payment details will show here once the best offer is confirmed.')
+                    : t('Minimum reached! Merchants are sending offers on this group order — payment details will show here once the best offer is confirmed.')}
                 </p>
               ) : (
                 <p className="text-xs text-white/90 mb-2">
@@ -418,7 +420,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                   onClick={onGoToOrders}
                   className="cursor-pointer bg-white text-terracotta text-xs font-black px-3 py-1.5 rounded-pill shadow-soft active:scale-95 transition-transform"
                 >
-                  Track my order →
+                  {t('Track my order →')}
                 </button>
               )}
             </div>
@@ -470,7 +472,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                     })}
                   </div>
                 ) : (
-                  <p className="text-xs text-white/90 mb-1.5">Volume discount tiers aren't set up for this pool yet.</p>
+                  <p className="text-xs text-white/90 mb-1.5">{t('Volume discount tiers aren\'t set up for this pool yet.')}</p>
                 )}
 
                 {sm.ladder && !isAmount && (
@@ -488,7 +490,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                   )}
                 </p>
                 {sm.ladder && !sm.nextTier && (
-                  <p className="text-xs text-white/90 mb-1">Top tier reached — thank the people who joined you.</p>
+                  <p className="text-xs text-white/90 mb-1">{t('Top tier reached — thank the people who joined you.')}</p>
                 )}
                 {poolStatus.windowDeadline && (
                   <p className="text-xs text-white/75 mb-2">{windowClosesLabel(poolStatus.windowDeadline)}</p>
@@ -500,14 +502,14 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                     disabled={isShoppingThisPool}
                     className="cursor-pointer bg-white text-terracotta text-xs font-black px-3 py-2.5 rounded-pill shadow-soft active:scale-95 transition-transform flex items-center justify-center gap-1.5 disabled:opacity-80"
                   >
-                    <Icon name="cart" size={12} color="#c45c26" /> {isShoppingThisPool ? 'Shopping for this' : 'Add to this pool'}
+                    <Icon name="cart" size={12} color="#c45c26" /> {isShoppingThisPool ? t('Shopping for this') : t('Add to this pool')}
                   </button>
                   <button
                     type="button"
                     onClick={() => inviteToSmartMatch(poolStatus)}
                     className="cursor-pointer bg-white/15 border border-white/40 text-white text-xs font-black px-3 py-2.5 rounded-pill active:scale-95 transition-transform flex items-center justify-center gap-1.5"
                   >
-                    {invitedId === poolStatus.poolId ? 'Copied!' : <><Icon name="send" size={12} color="#fff" /> Invite</>}
+                    {invitedId === poolStatus.poolId ? t('Copied!') : <><Icon name="send" size={12} color="#fff" /> {t('Invite')}</>}
                   </button>
                 </div>
                 <button
@@ -516,7 +518,7 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
                   disabled={cancellingId === poolStatus.poolId}
                   className="cursor-pointer mt-2 text-xs font-bold text-white/85 underline disabled:opacity-50"
                 >
-                  {cancellingId === poolStatus.poolId ? 'Withdrawing...' : 'Withdraw from this pool'}
+                  {cancellingId === poolStatus.poolId ? t('Withdrawing...') : t('Withdraw from this pool')}
                 </button>
               </>
             )
@@ -527,11 +529,11 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
       {itemsList.length === 0 ? (
         <EmptyState
           emoji="🛒"
-          title="Let’s fill the table"
+          title={t('Let’s fill the table')}
           description={myOpenPools.length
-            ? 'Tap "Add to this pool" on a pool above, or browse Bulk Buy.'
-            : 'Drinks, meat, livestock and groceries for the celebration, bought together at member prices.'}
-          primaryLabel="Go to Bulk Buy"
+            ? t('Tap "Add to this pool" on a pool above, or browse Bulk Buy.')
+            : t('Drinks, meat, livestock and groceries for the celebration, bought together at member prices.')}
+          primaryLabel={t('Go to Bulk Buy')}
           onPrimary={onBack}
         />
       ) : (
@@ -610,18 +612,18 @@ export default function Basket({ onBack, onBasketChanged, onGoToOrders }) {
           {/* Totals Summary */}
           <div className="bg-sage-50 border-2 border-sage-500 rounded-soft p-4 mb-4">
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-ink-light">Total units</span>
+              <span className="text-ink-light">{t('Total units')}</span>
               <span className="font-bold text-ink">{basketData.totalCases}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-ink-light">Total Value</span>
+              <span className="text-sm text-ink-light">{t('Total Value')}</span>
               <span className="font-display font-extrabold text-lg text-sage-700">
                 R{basketData.totalZAR.toFixed(2)}
               </span>
             </div>
             {totalSavings > 0 && (
               <div className="flex justify-between items-center mt-1 pt-1 border-t border-sage-200">
-                <span className="text-xs font-bold text-sage-700">vs. retail price</span>
+                <span className="text-xs font-bold text-sage-700">{t('vs. retail price')}</span>
                 <span className="text-sm font-black text-sage-700">You're saving R{totalSavings.toFixed(2)}</span>
               </div>
             )}

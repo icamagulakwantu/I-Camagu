@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Icon from '../Icon.jsx'
 import { captureLocation } from '../../lib/geolocation.js'
+import { useT } from '../../i18n/index.jsx'
 
 const SEARCH_DELAY_MS = 450
 
@@ -8,6 +9,7 @@ const SEARCH_DELAY_MS = 450
 // "Use my location". Calls onChange({ address, area, latitude, longitude });
 // coordinates are null when the member typed without picking a suggestion.
 export default function AddressField({ accessToken, value, onChange, autoFocus = false, highlight = false }) {
+  const t = useT()
   const [text, setText] = useState(value?.address || '')
   const [suggestions, setSuggestions] = useState([])
   const [open, setOpen] = useState(false)
@@ -78,8 +80,8 @@ export default function AddressField({ accessToken, value, onChange, autoFocus =
       if (!place.address) setHint('Got your location. Add your street or suburb so the merchant can find you.')
     } catch (err) {
       setHint(err.message === 'Location permission denied'
-        ? 'Location is blocked. Allow it in your browser settings, or just type the address.'
-        : 'Could not get your location. Please type the address instead.')
+        ? t('Location is blocked. Allow it in your browser settings, or just type the address.')
+        : t('Could not get your location. Please type the address instead.'))
     } finally {
       setLocating(false)
     }
@@ -98,11 +100,11 @@ export default function AddressField({ accessToken, value, onChange, autoFocus =
           onChange={(e) => typeAddress(e.target.value)}
           onFocus={() => suggestions.length && setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
-          placeholder="e.g. 12 Ncedo St, Motherwell, Gqeberha"
-          aria-label="Delivery address"
+          placeholder={t('e.g. 12 Ncedo St, Motherwell, Gqeberha')}
+          aria-label={t('Delivery address')}
           className="flex-1 min-w-0 bg-transparent py-3 text-sm font-semibold text-ink placeholder:text-ink/35 outline-none"
         />
-        {searching && <span className="text-xs font-bold text-ink-muted">Searching…</span>}
+        {searching && <span className="text-xs font-bold text-ink-muted">{t('Searching…')}</span>}
       </div>
 
       {open && suggestions.length > 0 && (
@@ -132,7 +134,7 @@ export default function AddressField({ accessToken, value, onChange, autoFocus =
         disabled={locating}
         className="cursor-pointer mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-sage-700 hover:text-sage-600 disabled:opacity-60"
       >
-        <Icon name="compass" size={13} color="#4a7a4a" /> {locating ? 'Finding you…' : 'Use my current location'}
+        <Icon name="compass" size={13} color="#4a7a4a" /> {locating ? t('Finding you…') : t('Use my current location')}
       </button>
       {hint && <p className="text-xs text-ink-muted mt-1">{hint}</p>}
     </div>

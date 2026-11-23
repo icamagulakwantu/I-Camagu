@@ -3,6 +3,7 @@ import Icon from '../Icon.jsx'
 import AddressField from './AddressField.jsx'
 import NearbyPoolList from './NearbyPoolList.jsx'
 import { CATEGORY_LABEL, poolCategoryForSku } from '../../data/poolCategories.js'
+import { useT } from '../../i18n/index.jsx'
 
 const MODES = [
   { id: 'POOL', title: 'Buy together', blurb: 'Pool with people near the address. Bigger group order, better merchant offers.', icon: 'users' },
@@ -17,6 +18,7 @@ const tomorrow = () => new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().
 export default function CheckoutPanel({
   accessToken, user, items, totalZAR, joiningPool, onDismissJoiningPool, submitting, onSubmit, areaMissing, onSaveAddress,
 }) {
+  const t = useT()
   const profileDelivery = useMemo(() => {
     const address = (user?.address || user?.location || '').trim()
     return address
@@ -125,7 +127,7 @@ export default function CheckoutPanel({
       {/* Step 1: how */}
       <section>
         <StepLabel n={1} text="How do you want to buy?" />
-        <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="How do you want to buy?">
+        <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t('How do you want to buy?')}>
           {MODES.map((m) => {
             const active = mode === m.id
             return (
@@ -140,8 +142,8 @@ export default function CheckoutPanel({
                 <span className={`inline-flex w-8 h-8 rounded-full items-center justify-center mb-1.5 ${active ? 'bg-terracotta' : 'bg-cream-dark'}`}>
                   <Icon name={m.icon} size={16} color={active ? '#fff' : '#2b2620'} />
                 </span>
-                <p className="text-sm font-black text-ink">{m.title}</p>
-                <p className="text-xs text-ink-muted leading-snug mt-0.5">{m.blurb}</p>
+                <p className="text-sm font-black text-ink">{t(m.title)}</p>
+                <p className="text-xs text-ink-muted leading-snug mt-0.5">{t(m.blurb)}</p>
               </button>
             )
           })}
@@ -161,14 +163,14 @@ export default function CheckoutPanel({
               highlight={areaMissing}
             />
             <p className="text-xs text-ink-muted mt-2">
-              It can be anywhere: you can live in Joburg and send this to family in Gqeberha.
+              {t('It can be anywhere: you can live in Joburg and send this to family in Gqeberha.')}
             </p>
             {areaMissing && (
-              <p role="alert" className="text-xs font-bold text-terracotta mt-1">Type the delivery address so we know where this order goes.</p>
+              <p role="alert" className="text-xs font-bold text-terracotta mt-1">{t('Type the delivery address so we know where this order goes.')}</p>
             )}
             <label className="mt-2 flex items-center gap-2 text-xs text-ink cursor-pointer">
               <input type="checkbox" checked={saveAddress} onChange={(e) => setSaveAddress(e.target.checked)} className="accent-sage-500 w-4 h-4" />
-              Save as my usual address
+              {t('Save as my usual address')}
             </label>
           </>
         ) : (
@@ -181,7 +183,7 @@ export default function CheckoutPanel({
               <p className="text-xs text-ink-muted truncate">{delivery.address}</p>
             </div>
             <button type="button" onClick={() => setEditingAddress(true)} className="cursor-pointer text-xs font-black text-sage-700 underline shrink-0">
-              Change
+              {t('Change')}
             </button>
           </div>
         )}
@@ -194,7 +196,7 @@ export default function CheckoutPanel({
           <NearbyPoolList pools={pools} loading={loadingPools} chosenIds={chosenIds} onToggle={togglePool} areaLabel={areaLabel} />
           {pools.length > 0 && (
             <p className="text-xs text-ink-muted mt-2">
-              Tap a pool to join it. Not picking one? We'll put you in the closest open pool for each kind of item.
+              {t('Tap a pool to join it. Not picking one? We\'ll put you in the closest open pool for each kind of item.')}
             </p>
           )}
         </section>
@@ -202,7 +204,7 @@ export default function CheckoutPanel({
 
       <details className="group">
         <summary className="cursor-pointer list-none text-xs font-bold text-ink-muted flex items-center gap-1">
-          <Icon name="calendar" size={13} /> {mode === 'SOLO' ? 'Need it by a certain date?' : 'Planning ahead? Set a target date'}
+          <Icon name="calendar" size={13} /> {mode === 'SOLO' ? t('Need it by a certain date?') : t('Planning ahead? Set a target date')}
           <Icon name="chevron-down" size={13} className="group-open:rotate-180 transition-transform" />
         </summary>
         <input
@@ -212,12 +214,12 @@ export default function CheckoutPanel({
           min={tomorrow()}
           className="mt-2 w-full border border-cream-dark rounded-soft px-3 py-2.5 bg-cream text-xs font-bold text-ink"
         />
-        {mode === 'POOL' && <p className="text-xs text-ink-muted mt-1">Only used if this starts a new pool.</p>}
+        {mode === 'POOL' && <p className="text-xs text-ink-muted mt-1">{t('Only used if this starts a new pool.')}</p>}
       </details>
 
       {/* Summary + action */}
       <div className="rounded-soft bg-ink text-cream p-4">
-        <p className="text-xs font-black uppercase tracking-wider text-cream/60 mb-1">What happens next</p>
+        <p className="text-xs font-black uppercase tracking-wider text-cream/60 mb-1">{t('What happens next')}</p>
         <ul className="space-y-1 mb-3">
           {summary.map((line) => (
             <li key={line} className="text-xs leading-snug flex gap-1.5">
@@ -226,7 +228,7 @@ export default function CheckoutPanel({
           ))}
           <li className="text-xs leading-snug flex gap-1.5">
             <Icon name="shieldCheck" size={12} color="#9bb89b" className="mt-0.5 shrink-0" />
-            <span>i-Camagu never holds your money. You pay the merchant once their offer is confirmed.</span>
+            <span>{t('i-Camagu never holds your money. You pay the merchant once their offer is confirmed.')}</span>
           </li>
         </ul>
         <button
@@ -235,9 +237,9 @@ export default function CheckoutPanel({
           disabled={submitting}
           className="cursor-pointer w-full bg-terracotta hover:brightness-110 text-white font-black py-3.5 rounded-pill shadow-terracotta active:scale-[0.97] transition-transform text-sm disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {submitting ? 'Placing your order…' : (
+          {submitting ? t('Placing your order…') : (
             <>
-              {!hasAddress ? 'Add a delivery address' : mode === 'SOLO' ? `Place my order · R${totalZAR.toFixed(2)}` : chosenPools.length ? 'Join pool' + (chosenPools.length > 1 ? 's' : '') : 'Join the nearest pool'}
+              {!hasAddress ? t('Add a delivery address') : mode === 'SOLO' ? `Place my order · R${totalZAR.toFixed(2)}` : chosenPools.length ? t('Join pool') + (chosenPools.length > 1 ? 's' : '') : t('Join the nearest pool')}
               <Icon name="arrowRight" size={15} color="#fff" />
             </>
           )}

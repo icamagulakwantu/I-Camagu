@@ -1,5 +1,6 @@
 import { CATEGORY_LABEL } from '../../data/poolCategories.js'
 import Icon from '../Icon.jsx'
+import { useT } from '../../i18n/index.jsx'
 
 function distanceLabel(km) {
   if (km == null) return ''
@@ -10,6 +11,7 @@ function distanceLabel(km) {
 // Pools near the typed address, one row each. Tapping a row picks it for that
 // kind of item (only one pool per kind); tapping again un-picks it.
 export default function NearbyPoolList({ pools, loading, chosenIds, onToggle, areaLabel }) {
+  const t = useT()
   if (loading) {
     return (
       <div className="space-y-2" aria-busy="true">
@@ -51,7 +53,7 @@ export default function NearbyPoolList({ pools, loading, chosenIds, onToggle, ar
                 </span>
               </div>
               <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 text-xs text-ink-muted">
-                {pool.isMine && <span className="font-black text-terracotta uppercase tracking-wide">You're in this one</span>}
+                {pool.isMine && <span className="font-black text-terracotta uppercase tracking-wide">{t('You\'re in this one')}</span>}
                 <span>{distanceLabel(pool.distanceKm)}</span>
                 <span>· {pool.members} {pool.members === 1 ? 'member' : 'members'}</span>
               </div>

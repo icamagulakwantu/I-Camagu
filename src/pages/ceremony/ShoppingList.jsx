@@ -85,7 +85,7 @@ export default function ShoppingList({ ceremonyId, accessToken, budgetZAR, legac
     ? task
     : request(taskEndpoints(task).toggle, accessToken, { method: 'PATCH' }))
 
-  const replaceTask = (tasks, updated) => tasks.map((t) => (t.id === updated.id ? updated : t))
+  const replaceTask = (tasks, updated) => tasks.map((item) => (item.id === updated.id ? updated : item))
 
   const toggleRow = async (row) => {
     const makeDone = !row.done

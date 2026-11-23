@@ -9,6 +9,7 @@ import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf, aisleOf, sectionOf } from '../data/storeTaxonomy.js'
 import { unitOf, collectiveNoun } from '../data/bulkUnits.js'
 import { notifyBasketChanged } from '../lib/basketEvents.js'
+import { useLanguage, useT } from '../i18n/index.jsx'
 
 // Layout idea, shared with Home and the ceremony page: a compact dark header,
 // the department rail rising out of it, and product cards whose price tab and
@@ -58,6 +59,7 @@ const HOW_IT_WORKS = [
 const price = (n) => `R${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, onAdd, onOffers }) {
+  const t = useT()
   const retail = sku.retailPriceZAR ? parseFloat(sku.retailPriceZAR) : null
   const casePrice = sku.casePriceZAR != null ? parseFloat(sku.casePriceZAR) : null
   const savings = retail && casePrice != null && retail > casePrice ? retail - casePrice : null
@@ -86,7 +88,7 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
               <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/60">
                 <Icon name={DEPARTMENT_ICON[dept.id] || 'package'} size={26} />
               </span>
-              <span className="text-xs font-bold opacity-80">Photo coming soon</span>
+              <span className="text-xs font-bold opacity-80">{t('Photo coming soon')}</span>
             </span>
           )}
         </div>
@@ -95,7 +97,7 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
         )}
         {/* Price only: the unit ("per case") is in the line under the name. */}
         <span className="absolute -bottom-3 left-2 max-w-[calc(100%-4.5rem)] truncate rounded-[12px] bg-[#1f3320] px-2.5 py-1 text-[13px] font-extrabold tabular-nums text-cream shadow-[0_8px_16px_-8px_rgba(0,0,0,0.6)]">
-          {casePrice != null ? price(casePrice) : 'Price soon'}
+          {casePrice != null ? price(casePrice) : t('Price soon')}
         </span>
         {casePrice != null && (
           <button
@@ -111,15 +113,15 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col px-1 pt-5">
-        {showDepartment && <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#6f655a]">{dept.short}</p>}
+        {showDepartment && <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#6f655a]">{t(dept.short)}</p>}
         <h3 className="line-clamp-2 font-display text-[15px] font-semibold leading-snug text-ink">{sku.name}</h3>
         <p className="mt-0.5 line-clamp-2 text-xs leading-snug text-ink-muted">{pack}</p>
-        {casePrice != null && <p className="mt-0.5 text-[11px] font-semibold leading-snug text-[#2e4a2e]">Bulk price · unlocks at the group's bulk tier</p>}
+        {casePrice != null && <p className="mt-0.5 text-[11px] font-semibold leading-snug text-[#2e4a2e]">{t('Bulk price · unlocks at the group\'s bulk tier')}</p>}
         {savings !== null && retail && <p className="mt-0.5 text-xs tabular-nums text-ink-muted line-through">{price(retail)} retail</p>}
         {flock && <p className="mt-0.5 text-xs text-ink-muted">Pooled into a {flock}</p>}
         {casePrice != null && (
           <button type="button" onClick={onOffers} className="pressable mt-1.5 self-start py-1 text-xs font-extrabold text-terracotta-dark">
-            Group prices →
+            {t('Group prices →')}
           </button>
         )}
       </div>
@@ -128,6 +130,8 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
 }
 
 function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
+  const t = useT()
+  const { lang } = useLanguage()
   const { accessToken } = useAuth()
   const { location, feed } = useCommunity()
   const { showToast } = useToast()
@@ -161,7 +165,7 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
         if (cancelled) return
         setAllSkus([])
         setCatalogueError(true)
-        showToast('Could not load products', 'error')
+        showToast(t('Could not load products'), 'error')
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -270,17 +274,17 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-cream/60">
               SmartMatch · Thengani kunye{location.label ? ` · Near ${location.label}` : ''}
             </p>
-            <h1 className="mt-1 font-display text-[2.1rem] font-semibold leading-none tracking-tight">Bulk Buy</h1>
+            <h1 className="mt-1 font-display text-[2.1rem] font-semibold leading-none tracking-tight">{t('Bulk Buy')}</h1>
             <p className="mt-2 text-sm text-[#c9bfb2]">
               {nearbyPools.length > 0
                 ? `${nearbyPools.length} group order${nearbyPools.length === 1 ? '' : 's'} filling near you`
-                : 'Group prices on drinks, meat, groceries and livestock'}
+                : t('Group prices on drinks, meat, groceries and livestock')}
             </p>
           </div>
           <button
             type="button"
             onClick={onGoToBasket}
-            aria-label={basketCount > 0 ? `Basket, ${basketCount} item${basketCount === 1 ? '' : 's'}` : 'Basket'}
+            aria-label={basketCount > 0 ? `Basket, ${basketCount} item${basketCount === 1 ? '' : 's'}` : t('Basket')}
             className="pressable relative flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-cream text-ink"
           >
             <Icon name="cart" size={20} />
@@ -291,16 +295,16 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
         </div>
         <label className="mt-5 flex h-12 items-center gap-2.5 rounded-full bg-cream/10 px-4 ring-1 ring-cream/20 focus-within:ring-2 focus-within:ring-ochre-light">
           <Icon name="search" size={18} color="#c9bfb2" />
-          <span className="sr-only">Search all departments</span>
+          <span className="sr-only">{t('Search all departments')}</span>
           <input
             type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search, e.g. Amstel, maize meal, sheep"
+            placeholder={t('Search, e.g. Amstel, maize meal, sheep')}
             className="min-w-0 flex-1 bg-transparent text-[15px] text-cream [-webkit-text-fill-color:#f5f1e8] placeholder:text-[#a8a097] placeholder:[-webkit-text-fill-color:#a8a097] focus:outline-none"
           />
           {isSearching && (
-            <button type="button" onClick={() => setSearchQuery('')} aria-label="Clear search" className="pressable -mr-2 flex h-11 w-11 items-center justify-center text-[#c9bfb2]">
+            <button type="button" onClick={() => setSearchQuery('')} aria-label={t('Clear search')} className="pressable -mr-2 flex h-11 w-11 items-center justify-center text-[#c9bfb2]">
               <Icon name="close" size={16} />
             </button>
           )}
@@ -308,7 +312,7 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
       </header>
 
       {/* ---------- Department rail rising out of the header ---------- */}
-      <nav aria-label="Departments" className="relative z-10 -mt-[60px]">
+      <nav aria-label={t('Departments')} className="relative z-10 -mt-[60px]">
         <ul className="flex gap-2.5 overflow-x-auto px-4 pb-3 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {DEPARTMENTS.filter((d) => loading || deptCounts[d.id] || d.id === activeDept).map((d) => {
             const active = !isSearching && activeDept === d.id
@@ -337,8 +341,8 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
                     )}
                   </span>
                   <span className="min-w-0 px-2.5 pb-2.5 pt-2">
-                    <span className="block truncate text-[13px] font-extrabold leading-tight">{d.short}</span>
-                    <span className={`block truncate text-xs ${active ? 'text-[#a3471a]' : 'text-ink-muted'}`}>{d.xhosa}</span>
+                    <span className="block truncate text-[13px] font-extrabold leading-tight">{lang === 'xh' ? d.xhosa : d.short}</span>
+                    <span className={`block truncate text-xs ${active ? 'text-[#a3471a]' : 'text-ink-muted'}`}>{lang === 'xh' ? d.short : d.xhosa}</span>
                   </span>
                 </button>
               </li>
@@ -349,14 +353,14 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
 
       {/* ---------- How it works: one slim strip ---------- */}
       {!isSearching && (
-        <ol aria-label="How Bulk Buy works" className="mx-4 mt-2 grid grid-cols-3 overflow-hidden rounded-[18px] border border-ink/[0.08]">
+        <ol aria-label={t('How Bulk Buy works')} className="mx-4 mt-2 grid grid-cols-3 overflow-hidden rounded-[18px] border border-ink/[0.08]">
           {HOW_IT_WORKS.map((s) => (
             <li key={s.n} className="border-r border-ink/[0.08] px-2.5 py-2.5 last:border-r-0">
               <span className="flex items-center gap-1.5">
                 <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#1f3320] text-xs font-extrabold text-cream">{s.n}</span>
-                <span className="truncate text-xs font-extrabold text-ink">{s.title}</span>
+                <span className="truncate text-xs font-extrabold text-ink">{t(s.title)}</span>
               </span>
-              <span className="mt-1 block text-xs leading-snug text-ink-muted">{s.desc}</span>
+              <span className="mt-1 block text-xs leading-snug text-ink-muted">{t(s.desc)}</span>
             </li>
           ))}
         </ol>
@@ -365,13 +369,13 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
       {/* Founder's rule: listed prices are special-level bulk prices, unlocked
           by the group order's bulk tier, never single-purchase prices. */}
       <p className="mx-4 mt-3 rounded-[14px] bg-[#2e4a2e]/[0.07] px-3.5 py-2.5 text-[12px] leading-relaxed text-ink">
-        <span className="font-extrabold text-[#1f3320]">Bulk prices, not single prices.</span> Prices here are SmartMatch bulk prices, set at the shops' special prices. They unlock only when your group order reaches its bulk tier, and are not prices for buying one on its own. You only pay once the group reaches its minimum and the supplier confirms the price.
+        <span className="font-extrabold text-[#1f3320]">{t('Bulk prices, not single prices.')}</span> {t("Prices here are SmartMatch bulk prices, set at the shops' special prices. They unlock only when your group order reaches its bulk tier, and are not prices for buying one on its own. You only pay once the group reaches its minimum and the supplier confirms the price.")}
       </p>
 
       {/* ---------- Group orders filling near you ---------- */}
       {!isSearching && nearbyPools.length > 0 && (
-        <section aria-label="Group orders near you" className="mt-6 px-4">
-          <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">Filling near you</p>
+        <section aria-label={t('Group orders near you')} className="mt-6 px-4">
+          <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">{t('Filling near you')}</p>
           <PoolOfferCard variant="feed" pool={nearbyPools[0]} />
         </section>
       )}
@@ -386,13 +390,13 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
           <div className="flex items-end justify-between gap-3 px-5">
             <div className="min-w-0">
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f655a]">{activeDepartment.xhosa}</p>
-              <h2 className="mt-0.5 font-display text-[1.45rem] font-semibold leading-tight tracking-tight text-ink">{activeDepartment.name}</h2>
+              <h2 className="mt-0.5 font-display text-[1.45rem] font-semibold leading-tight tracking-tight text-ink">{t(activeDepartment.name)}</h2>
             </div>
             <span className="flex-shrink-0 pb-1 text-xs font-bold tabular-nums text-ink-muted">{skus.length} item{skus.length === 1 ? '' : 's'}</span>
           </div>
           {liveAisles.length > 1 && (
             <div className="mt-3 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {[{ id: 'all', name: 'All' }, ...liveAisles].map((a) => (
+              {[{ id: 'all', name: t('All') }, ...liveAisles].map((a) => (
                 <button
                   key={a.id}
                   type="button"
@@ -400,7 +404,7 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
                   aria-pressed={activeAisle === a.id}
                   className={`pressable min-h-9 flex-shrink-0 rounded-full px-3.5 text-[13px] font-bold ${activeAisle === a.id ? 'bg-[#1f3320] text-cream' : 'border border-ink/10 bg-[#fffdf9] text-ink-muted'}`}
                 >
-                  {a.name}
+                  {t(a.name)}
                 </button>
               ))}
             </div>
@@ -432,20 +436,20 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
         ) : catalogueError ? (
           <EmptyState
             emoji="📦"
-            title="Products couldn't load"
-            description="Check your connection, then try again. Your basket and other i-Camagu features are unchanged."
-            primaryLabel="Try again"
+            title={t('Products couldn\'t load')}
+            description={t('Check your connection, then try again. Your basket and other i-Camagu features are unchanged.')}
+            primaryLabel={t('Try again')}
             onPrimary={() => setCatalogueRetry((attempt) => attempt + 1)}
           />
         ) : skus.length === 0 ? (
-          <EmptyState emoji="📦" title="No items found" description={isSearching ? 'Try another product name, size or category, or clear your search.' : 'Try another department or aisle.'} />
+          <EmptyState emoji="📦" title={t('No items found')} description={isSearching ? t('Try another product name, size or category, or clear your search.') : t('Try another department or aisle.')} />
         ) : (
           <div className="space-y-8">
             {groups.map((group) => (
               <section key={group.key} aria-label={group.label || undefined}>
                 {group.label && (
                   <h3 className="mb-3 flex items-baseline gap-2 px-1">
-                    <span className="font-display text-[1.15rem] font-semibold text-ink">{group.label}</span>
+                    <span className="font-display text-[1.15rem] font-semibold text-ink">{t(group.label)}</span>
                     <span className="text-xs font-bold tabular-nums text-ink-muted">{group.items.length}</span>
                   </h3>
                 )}
@@ -479,7 +483,7 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
           >
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-sm font-extrabold">{basketCount}</span>
             <span className="flex-1 text-left text-[15px] font-extrabold">{basketCount === 1 ? '1 item' : `${basketCount} items`} in your basket</span>
-            <span className="flex items-center gap-1 text-sm font-extrabold">View <Icon name="arrowRight" size={15} /></span>
+            <span className="flex items-center gap-1 text-sm font-extrabold">{t('View')} <Icon name="arrowRight" size={15} /></span>
           </button>
         </div>
       )}

@@ -16,6 +16,7 @@ import SmartMatchLink from './stokvel/SmartMatchLink.jsx'
 
 import { STOKVEL_TYPES, stokvelType } from '../data/stokvelTypes.js'
 import { stokvelInviteMessage, stokvelInviteUrl, whatsappShareUrl } from '../lib/inviteLinks.js'
+import { useT } from '../i18n/index.jsx'
 
 // Joining accepts the invite link an organiser shares, or the bare id.
 export function stokvelIdFromInput(value) {
@@ -59,6 +60,7 @@ const inputStyle = "w-full border border-ink/30 rounded-soft px-3 py-2 text-sm f
 // sits at the top like every other tab and the extras never leak into the
 // create, join or detail views.
 function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
+  const t = useT()
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
 
@@ -174,7 +176,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
       if (!res.ok) throw new Error(data.error || 'Could not post announcement')
       setNewAnnouncement('')
       setAnnouncements(prev => [data, ...prev])
-      showToast('Announcement posted', 'success')
+      showToast(t('Announcement posted'), 'success')
     } catch (err) {
       showToast(err.message, 'error')
     }
@@ -309,7 +311,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
       setNewContribution('')
       await fetchMyStokvels()
       setView('list')
-      showToast('Stokvel created successfully', 'success')
+      showToast(t('Stokvel created successfully'), 'success')
     } catch (err) {
       setError(err.message)
       showToast(err.message, 'error')
@@ -323,7 +325,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
     if (isJoining) return
     const trimmedId = stokvelIdFromInput(joinId)
     if (!trimmedId) {
-      setError('Paste the invite link the organiser sent you')
+      setError(t('Paste the invite link the organiser sent you'))
       return
     }
 
@@ -349,7 +351,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
       setJoinId('')
       await fetchMyStokvels()
       setView('list')
-      showToast('Joined stokvel successfully', 'success')
+      showToast(t('Joined stokvel successfully'), 'success')
     } catch (err) {
       setError(err.message)
       showToast(err.message, 'error')
@@ -383,7 +385,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
 
       setContribAmount('')
       setContribNote('')
-      showToast('Contribution submitted', 'success')
+      showToast(t('Contribution submitted'), 'success')
       await fetchDetail(detail.stokvel.id)
     } catch (err) {
       setError(err.message)
@@ -394,7 +396,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
   }
 
   const confirmContribution = (contributionId) => {
-    setPinModal({ kind: 'contribution', id: contributionId, label: 'Confirm this contribution' })
+    setPinModal({ kind: 'contribution', id: contributionId, label: t('Confirm this contribution') })
     setPinInput('')
     setPinError('')
   }
@@ -424,7 +426,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
 
       setPayoutAmount('')
       setContributeOptIn(false)
-      showToast('Payout requested', 'success')
+      showToast(t('Payout requested'), 'success')
       await fetchDetail(detail.stokvel.id)
     } catch (err) {
       setError(err.message)
@@ -466,7 +468,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Could not save rotation order')
 
-      showToast('Rotation order saved', 'success')
+      showToast(t('Rotation order saved'), 'success')
       setEditingRotation(false)
       await fetchDetail(detail.stokvel.id)
     } catch (err) {
@@ -477,7 +479,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
   }
 
   const approvePayout = (payoutId) => {
-    setPinModal({ kind: 'payout', id: payoutId, label: 'Approve this payout' })
+    setPinModal({ kind: 'payout', id: payoutId, label: t('Approve this payout') })
     setPinInput('')
     setPinError('')
   }
@@ -500,10 +502,10 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
         }
       )
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || (isContribution ? 'Confirmation failed' : 'Payout approval failed'))
+      if (!res.ok) throw new Error(data.error || (isContribution ? t('Confirmation failed') : t('Payout approval failed')))
       setPinModal(null)
       setPinInput('')
-      showToast(data.message || (isContribution ? 'Contribution confirmed' : 'Payout approved'), 'success')
+      showToast(data.message || (isContribution ? t('Contribution confirmed') : t('Payout approved')), 'success')
       await fetchDetail(detail.stokvel.id)
     } catch (err) {
       setPinError(err.message || 'Incorrect PIN, please try again')
@@ -523,7 +525,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Deletion failed')
 
-      showToast('Stokvel deleted', 'info')
+      showToast(t('Stokvel deleted'), 'info')
       setConfirmDelete(false)
       setDetail(null)
       setView('list')
@@ -544,13 +546,13 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           onClick={() => { setError(''); setView('list'); }}
           className={`text-sm text-ink-muted mb-4 ${pressable}`}
         >
-          ← Back
+          {t('← Back')}
         </button>
-        <h2 className="font-display font-bold text-2xl text-ink mb-4">Create Stokvel</h2>
+        <h2 className="font-display font-bold text-2xl text-ink mb-4">{t('Create Stokvel')}</h2>
         <form onSubmit={createStokvel} className={`${cardBase} space-y-3`}>
           <input
             type="text"
-            placeholder="Stokvel name"
+            placeholder={t('Stokvel name')}
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             className={inputStyle}
@@ -562,14 +564,14 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
             onChange={(e) => setNewType(e.target.value)}
             className={inputStyle}
           >
-            {STOKVEL_TYPES.map((t) => (
-              <option key={t.id} value={t.id}>{t.label}</option>
+            {STOKVEL_TYPES.map((type) => (
+              <option key={type.id} value={type.id}>{t(type.label)}</option>
             ))}
           </select>
           <p className="px-2 text-xs leading-relaxed text-ink-muted">{stokvelType(newType).purpose}</p>
           <input
             type="number"
-            placeholder="Contribution amount (ZAR, optional)"
+            placeholder={t('Contribution amount (ZAR, optional)')}
             value={newContribution}
             onChange={(e) => setNewContribution(e.target.value)}
             className={inputStyle}
@@ -582,7 +584,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
             disabled={isSubmitting}
             className={`w-full bg-sage-500 text-white font-bold py-3 rounded-pill ${pressable}`}
           >
-            {isSubmitting ? 'Creating...' : 'Create'}
+            {isSubmitting ? t('Creating...') : t('Create')}
           </button>
         </form>
       </div>
@@ -598,13 +600,13 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           onClick={() => { setError(''); setView('list'); }}
           className={`text-sm text-ink-muted mb-4 ${pressable}`}
         >
-          ← Back
+          {t('← Back')}
         </button>
-        <h2 className="font-display font-bold text-2xl text-ink mb-4">Join Stokvel</h2>
+        <h2 className="font-display font-bold text-2xl text-ink mb-4">{t('Join Stokvel')}</h2>
         <form onSubmit={joinStokvel} className={`${cardBase} space-y-3`}>
           <input
             type="text"
-            placeholder="Paste the invite link or code"
+            placeholder={t('Paste the invite link or code')}
             value={joinId}
             onChange={(e) => setJoinId(e.target.value)}
             className={inputStyle}
@@ -616,7 +618,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
             disabled={isJoining}
             className={`w-full bg-sage-500 text-white font-bold py-3 rounded-pill ${pressable}`}
           >
-            {isJoining ? 'Joining...' : 'Join'}
+            {isJoining ? t('Joining...') : t('Join')}
           </button>
         </form>
       </div>
@@ -643,7 +645,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
     // Settings only has something to show for an organiser or an official —
     // hide the tab entirely for a plain member instead of showing an empty page.
     const showSettingsTab = isOfficial || stokvel.organiserId === user?.id
-    const tabs = DETAIL_TABS.filter((t) => t.id !== 'settings' || showSettingsTab)
+    const tabs = DETAIL_TABS.filter((tab) => tab.id !== 'settings' || showSettingsTab)
     const nextRotationMember = stokvel.type === 'UMGALELO_ROTATING' && Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0
       ? stokvel.members.find((m) => m.userId === stokvel.rotationOrder[stokvel.currentRotationIndex % stokvel.rotationOrder.length])
       : null
@@ -653,7 +655,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
     // Contribution.memberId is the membership id (m.id), not the user id.
     const memberName = (membershipId) => {
       const m = stokvel.members.find((x) => x.id === membershipId)
-      return m ? `${m.user.firstName} ${m.user.lastName}` : 'Former member'
+      return m ? `${m.user.firstName} ${m.user.lastName}` : t('Former member')
     }
     const memberConfirmedTotal = (membershipId) => contributions
       .filter((c) => c.memberId === membershipId && c.status === 'CONFIRMED')
@@ -670,21 +672,21 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
             onClick={() => { setError(''); setView('list'); }}
             className={`mb-5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-sm font-bold text-cream backdrop-blur-sm ${pressable}`}
           >
-            ← All stokvels
+            {t('← All stokvels')}
           </button>
           <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">{stokvel.name}</h1>
-          <p className="text-white/70 text-xs uppercase mt-1 tracking-wider">{stokvelType(stokvel.type).label}</p>
+          <p className="text-white/70 text-xs uppercase mt-1 tracking-wider">{t(stokvelType(stokvel.type).label)}</p>
           <p className="text-white/90 text-sm mt-2">Ref: <strong className="font-mono bg-white/10 px-2 py-0.5 rounded">{myReferenceCode}</strong></p>
           <button
             type="button"
             onClick={() => {
               Promise.resolve(navigator.clipboard?.writeText(stokvelInviteUrl(stokvel.id)))
-                .then(() => showToast('Invite link copied. Send it to the people you want to invite.', 'success'))
-                .catch(() => showToast('Could not copy the link. Use WhatsApp instead.', 'error'))
+                .then(() => showToast(t('Invite link copied. Send it to the people you want to invite.'), 'success'))
+                .catch(() => showToast(t('Could not copy the link. Use WhatsApp instead.'), 'error'))
             }}
             className={`text-xs text-white/80 mt-1.5 flex items-center gap-1 ${pressable}`}
           >
-            <Icon name="copy" size={13} color="#fff" /> Copy invite link
+            <Icon name="copy" size={13} color="#fff" /> {t('Copy invite link')}
           </button>
           <a
             href={whatsappShareUrl(stokvelInviteMessage(stokvel.name, stokvel.id))}
@@ -692,7 +694,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
             rel="noopener noreferrer"
             className={`text-xs text-white/80 mt-1.5 flex items-center gap-1 ${pressable}`}
           >
-            <Icon name="share" size={13} color="#fff" /> Invite on WhatsApp
+            <Icon name="share" size={13} color="#fff" /> {t('Invite on WhatsApp')}
           </a>
           <p className="font-display font-semibold text-[2rem] leading-[1.08] mt-2">R{balance.toFixed(2)}</p>
           {(Number(stokvel.groupLedger?.interestEarned || 0) > 0 || Number(stokvel.groupLedger?.groupExpenses || 0) > 0) && (
@@ -702,21 +704,21 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
               {Number(stokvel.groupLedger?.groupExpenses || 0) > 0 && <>−R{Number(stokvel.groupLedger.groupExpenses).toFixed(2)} group expenses</>}
             </p>
           )}
-          {isOfficial && <p className="text-xs text-white/90 font-bold mt-2 bg-white/20 inline-block px-2.5 py-1 rounded-pill">You are an official</p>}
+          {isOfficial && <p className="text-xs text-white/90 font-bold mt-2 bg-white/20 inline-block px-2.5 py-1 rounded-pill">{t('You are an official')}</p>}
         </div>
       </header>
 
         <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-1">
-          {tabs.map((t) => (
+          {tabs.map((tab) => (
             <button
-              key={t.id}
+              key={tab.id}
               type="button"
-              onClick={() => setDetailTab(t.id)}
+              onClick={() => setDetailTab(tab.id)}
               className={`flex-shrink-0 px-3.5 py-1.5 rounded-pill text-[12px] font-bold transition-colors ${
-                detailTab === t.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
+                detailTab === tab.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
               }`}
             >
-              {t.label}
+              {t(tab.label)}
             </button>
           ))}
         </div>
@@ -750,26 +752,26 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           {detailTab === 'overview' && (
             <div className="space-y-3">
               <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-                <p className="text-xs font-black uppercase text-ink-muted mb-2">At a glance · tap to open</p>
+                <p className="text-xs font-black uppercase text-ink-muted mb-2">{t('At a glance · tap to open')}</p>
                 <button type="button" onClick={() => setDetailTab('members')} className="flex w-full items-center justify-between gap-3 rounded-lg px-2 py-2 text-left text-sm transition-colors hover:bg-sage-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500">
-                  <span className="text-ink-muted">Members</span>
+                  <span className="text-ink-muted">{t('Members')}</span>
                   <span className="flex items-center gap-2 font-bold text-ink">{stokvel.members.length}<Icon name="arrowRight" size={16} /></span>
                 </button>
                 {nextRotationMember && (
                   <div className="flex justify-between text-sm py-1 border-t border-terracotta/10">
-                    <span className="text-ink-muted">Next payout</span>
+                    <span className="text-ink-muted">{t('Next payout')}</span>
                     <span className="font-bold text-ink">{nextRotationMember.user.firstName} {nextRotationMember.user.lastName}</span>
                   </div>
                 )}
                 {myPending.length > 0 && (
                   <button type="button" onClick={() => setDetailTab('contributions')} className="flex w-full items-center justify-between gap-3 border-t border-terracotta/10 px-2 py-2 text-left text-sm rounded-lg transition-colors hover:bg-terracotta/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500">
-                    <span className="text-ink-muted">Awaiting your confirmation</span>
+                    <span className="text-ink-muted">{t('Awaiting your confirmation')}</span>
                     <span className="flex items-center gap-2 font-bold text-terracotta">{myPending.length}<Icon name="arrowRight" size={16} /></span>
                   </button>
                 )}
                 {payouts.filter((p) => p.status === 'PENDING_APPROVAL').length > 0 && (
                   <div className="flex justify-between text-sm py-1 border-t border-terracotta/10">
-                    <span className="text-ink-muted">Payouts awaiting approval</span>
+                    <span className="text-ink-muted">{t('Payouts awaiting approval')}</span>
                     <span className="font-bold text-terracotta">{payouts.filter((p) => p.status === 'PENDING_APPROVAL').length}</span>
                   </div>
                 )}
@@ -777,7 +779,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
 
               {announcements[0] && (
                 <button type="button" onClick={() => setDetailTab('announcements')} className="w-full text-left bg-sage-50 rounded-soft p-3">
-                  <p className="text-xs font-black uppercase text-sage-700 mb-1">Latest announcement</p>
+                  <p className="text-xs font-black uppercase text-sage-700 mb-1">{t('Latest announcement')}</p>
                   <p className="text-sm text-ink line-clamp-2">{announcements[0].message}</p>
                 </button>
               )}
@@ -795,7 +797,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                       <div className="min-w-0">
                         <p className="font-bold text-sm text-ink truncate">{m.user.firstName} {m.user.lastName}</p>
                         <p className="text-xs text-ink-muted">
-                          {official ? 'Official' : 'Member'}
+                          {official ? t('Official') : t('Member')}
                           {stokvel.organiserId === m.userId ? ' · Organiser' : ''}
                         </p>
                       </div>
@@ -817,16 +819,16 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
 
           {detailTab === 'announcements' && (
           <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-            <p className="text-xs font-black uppercase text-ink-muted mb-2">Announcements</p>
+            <p className="text-xs font-black uppercase text-ink-muted mb-2">{t('Announcements')}</p>
             {isOfficial && (
               <form onSubmit={postAnnouncement} className="flex gap-2 mb-3">
-                <input placeholder="Post an update..." value={newAnnouncement} onChange={(e) => setNewAnnouncement(e.target.value)}
+                <input placeholder={t('Post an update...')} value={newAnnouncement} onChange={(e) => setNewAnnouncement(e.target.value)}
                   className="flex-1 border border-ink/30 rounded-soft px-3 py-2 text-sm" required />
-                <button type="submit" className="bg-sage-500 text-white font-bold px-4 rounded-pill text-sm">Post</button>
+                <button type="submit" className="bg-sage-500 text-white font-bold px-4 rounded-pill text-sm">{t('Post')}</button>
               </form>
             )}
             {announcements.length === 0 ? (
-              <p className="text-xs text-ink-muted">No announcements yet.</p>
+              <p className="text-xs text-ink-muted">{t('No announcements yet.')}</p>
             ) : (
               <div className="space-y-2">
                 {announcements.map((a) => (
@@ -846,10 +848,10 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           <>
           {/* Submit Contribution Form */}
           <form onSubmit={submitContribution} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-2">
-            <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Submit a contribution</p>
+            <p className="text-xs font-black uppercase text-ink-muted tracking-wider">{t('Submit a contribution')}</p>
             <input
               type="number"
-              placeholder="Amount (ZAR)"
+              placeholder={t('Amount (ZAR)')}
               value={contribAmount}
               onChange={(e) => setContribAmount(e.target.value)}
               className={inputStyle}
@@ -859,7 +861,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
             />
             <input
               type="text"
-              placeholder="Note (e.g. EFT reference)"
+              placeholder={t('Note (e.g. EFT reference)')}
               value={contribNote}
               onChange={(e) => setContribNote(e.target.value)}
               className={inputStyle}
@@ -869,14 +871,14 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
               disabled={isSubmitting}
               className={`w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? t('Submitting...') : t('Submit')}
             </button>
           </form>
 
           {/* Pending Confirmations */}
           {isOfficial && myPending.length > 0 && (
             <div>
-              <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">Pending confirmations</p>
+              <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">{t('Pending confirmations')}</p>
               {myPending.map((c) => (
                 <div key={c.id} className="bg-white border-2 border-terracotta rounded-soft p-3 mb-2 flex justify-between items-center shadow-sm">
                   <div className="min-w-0">
@@ -889,7 +891,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                     disabled={confirmingId === c.id}
                     className={`bg-terracotta text-white text-xs font-bold px-3 py-1.5 rounded-pill ${pressable}`}
                   >
-                    {confirmingId === c.id ? 'Confirming...' : 'Confirm'}
+                    {confirmingId === c.id ? t('Confirming...') : t('Confirm')}
                   </button>
                 </div>
               ))}
@@ -899,9 +901,9 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           {/* Recent contributions — real history, previously fetched but
               never shown anywhere in this screen. */}
           <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-            <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">Recent contributions</p>
+            <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">{t('Recent contributions')}</p>
             {contributions.length === 0 ? (
-              <p className="text-xs text-ink-muted">No contributions recorded yet.</p>
+              <p className="text-xs text-ink-muted">{t('No contributions recorded yet.')}</p>
             ) : (
               <div className="space-y-2">
                 {contributions.slice(0, 10).map((c) => {
@@ -930,10 +932,10 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           {stokvel.type === 'UMGALELO_ROTATING' && (
             <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
               <div className="flex justify-between items-center mb-2">
-                <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Rotation Order</p>
+                <p className="text-xs font-black uppercase text-ink-muted tracking-wider">{t('Rotation Order')}</p>
                 {isOfficial && !editingRotation && (
                   <button type="button" onClick={startEditingRotation} className="text-xs text-sage-600 font-bold underline">
-                    {Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0 ? 'Edit' : 'Set order'}
+                    {Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0 ? t('Edit') : t('Set order')}
                   </button>
                 )}
               </div>
@@ -942,7 +944,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                 <div className="space-y-2">
                   {rotationDraft.map((mUserId, idx) => {
                     const member = stokvel.members.find(m => m.userId === mUserId)
-                    const name = member ? `${member.user.firstName} ${member.user.lastName}` : 'Unknown member'
+                    const name = member ? `${member.user.firstName} ${member.user.lastName}` : t('Unknown member')
                     return (
                       <div key={mUserId} className="flex items-center justify-between bg-cream rounded-soft px-3 py-2">
                         <span className="text-sm font-bold text-ink">{idx + 1}. {name}</span>
@@ -964,10 +966,10 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                   <div className="flex gap-2 pt-1">
                     <button type="button" onClick={saveRotationOrder} disabled={savingRotation}
                       className={`flex-1 bg-sage-500 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
-                      {savingRotation ? 'Saving...' : 'Save order'}
+                      {savingRotation ? t('Saving...') : t('Save order')}
                     </button>
                     <button type="button" onClick={() => setEditingRotation(false)} className="flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm">
-                      Cancel
+                      {t('Cancel')}
                     </button>
                   </div>
                 </div>
@@ -975,19 +977,19 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                 <div className="space-y-1.5">
                   {stokvel.rotationOrder.map((mUserId, idx) => {
                     const member = stokvel.members.find(m => m.userId === mUserId)
-                    const name = member ? `${member.user.firstName} ${member.user.lastName}` : 'Unknown member'
+                    const name = member ? `${member.user.firstName} ${member.user.lastName}` : t('Unknown member')
                     const isNext = idx === (stokvel.currentRotationIndex % stokvel.rotationOrder.length)
                     return (
                       <div key={mUserId} className={`flex items-center justify-between px-3 py-2 rounded-soft ${isNext ? 'bg-sage-50 border-2 border-sage-500' : 'bg-cream'}`}>
                         <span className="text-sm font-bold text-ink">{idx + 1}. {name}</span>
-                        {isNext && <span className="text-xs font-black text-sage-600 uppercase">Next</span>}
+                        {isNext && <span className="text-xs font-black text-sage-600 uppercase">{t('Next')}</span>}
                       </div>
                     )
                   })}
                 </div>
               ) : (
                 <p className="text-xs text-ink-muted">
-                  {isOfficial ? 'Set the payout order so everyone gets a fair turn.' : 'An official still needs to set the rotation order.'}
+                  {isOfficial ? t('Set the payout order so everyone gets a fair turn.') : t('An official still needs to set the rotation order.')}
                 </p>
               )}
             </div>
@@ -995,17 +997,17 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
 
           {/* Request Payout Form */}
           <form onSubmit={requestPayout} className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-2">
-            <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Request a payout</p>
+            <p className="text-xs font-black uppercase text-ink-muted tracking-wider">{t('Request a payout')}</p>
             {stokvel.type === 'UMGALELO_ROTATING' && (
               <p className="text-xs text-ink-muted">
                 {Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0
                   ? "This pays out to whoever's next in the rotation, whoever submits it."
-                  : 'Set a rotation order above before requesting a payout.'}
+                  : t('Set a rotation order above before requesting a payout.')}
               </p>
             )}
             <input
               type="number"
-              placeholder="Amount (ZAR)"
+              placeholder={t('Amount (ZAR)')}
               value={payoutAmount}
               onChange={(e) => setPayoutAmount(e.target.value)}
               className={inputStyle}
@@ -1029,14 +1031,14 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
               disabled={isSubmitting || (stokvel.type === 'UMGALELO_ROTATING' && !(Array.isArray(stokvel.rotationOrder) && stokvel.rotationOrder.length > 0))}
               className={`w-full bg-ink text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
             >
-              {isSubmitting ? 'Requesting...' : 'Request'}
+              {isSubmitting ? t('Requesting...') : t('Request')}
             </button>
           </form>
 
           {/* Pending Payout Approvals */}
           {payouts.filter(p => p.status === 'PENDING_APPROVAL').length > 0 && (
             <div>
-              <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">Pending payouts</p>
+              <p className="text-xs font-black uppercase text-ink-muted mb-2 tracking-wider">{t('Pending payouts')}</p>
               {payouts.filter(p => p.status === 'PENDING_APPROVAL').map((p) => (
                 <div key={p.id} className="bg-white border-2 border-sage-500 rounded-soft p-3 mb-2 shadow-sm">
                   <div className="flex justify-between items-center">
@@ -1049,7 +1051,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                       onClick={() => approvePayout(p.id)}
                       className={`w-full mt-2 bg-sage-500 text-white text-xs font-bold py-2 rounded-pill ${pressable}`}
                     >
-                      Approve Payout
+                      {t('Approve Payout')}
                     </button>
                   )}
                 </div>
@@ -1065,39 +1067,39 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           {stokvel.organiserId === user?.id && (
             <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Stokvel Details</p>
+                <p className="text-xs font-black uppercase text-ink-muted tracking-wider">{t('Stokvel Details')}</p>
                 <button
                   type="button"
                   onClick={() => editingDetails ? setEditingDetails(false) : openEditDetails()}
                   className={`text-xs font-bold text-sage-600 ${pressable}`}
                 >
-                  {editingDetails ? 'Cancel' : 'Edit'}
+                  {editingDetails ? 'Cancel' : t('Edit')}
                 </button>
               </div>
               {editingDetails && (
                 <form onSubmit={saveStokvelDetails} className="space-y-2">
                   <input
-                    type="text" placeholder="Stokvel name" value={editName}
+                    type="text" placeholder={t('Stokvel name')} value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     className={inputStyle} required minLength={2}
                   />
                   <input
-                    type="number" placeholder="Contribution amount (ZAR)" value={editContribution}
+                    type="number" placeholder={t('Contribution amount (ZAR)')} value={editContribution}
                     onChange={(e) => setEditContribution(e.target.value)}
                     className={inputStyle} min="0" step="any"
                   />
                   <input
-                    type="text" placeholder="Contribution frequency (e.g. Monthly)" value={editFrequency}
+                    type="text" placeholder={t('Contribution frequency (e.g. Monthly)')} value={editFrequency}
                     onChange={(e) => setEditFrequency(e.target.value)}
                     className={inputStyle}
                   />
                   <input
-                    type="number" placeholder="Target amount (ZAR, optional)" value={editTargetAmount}
+                    type="number" placeholder={t('Target amount (ZAR, optional)')} value={editTargetAmount}
                     onChange={(e) => setEditTargetAmount(e.target.value)}
                     className={inputStyle} min="0" step="any"
                   />
                   <div>
-                    <label className="text-xs text-ink-muted block mb-1">Target date (optional)</label>
+                    <label className="text-xs text-ink-muted block mb-1">{t('Target date (optional)')}</label>
                     <input
                       type="date" value={editTargetDate}
                       onChange={(e) => setEditTargetDate(e.target.value)}
@@ -1108,7 +1110,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                     type="submit" disabled={savingDetails}
                     className={`w-full bg-sage-500 text-white font-bold py-2.5 rounded-pill text-sm ${pressable}`}
                   >
-                    {savingDetails ? 'Saving...' : 'Save changes'}
+                    {savingDetails ? t('Saving...') : t('Save changes')}
                   </button>
                 </form>
               )}
@@ -1118,13 +1120,13 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           {/* Officials-only group settings */}
           {isOfficial && (
             <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4 space-y-4">
-              <p className="text-xs font-black uppercase text-ink-muted tracking-wider">Group Settings</p>
+              <p className="text-xs font-black uppercase text-ink-muted tracking-wider">{t('Group Settings')}</p>
 
               <form onSubmit={recordInterest} className="space-y-2">
-                <p className="text-xs font-bold text-ink">Record interest earned</p>
+                <p className="text-xs font-bold text-ink">{t('Record interest earned')}</p>
                 <div className="flex gap-2">
                   <input
-                    type="number" placeholder="Amount (ZAR)" value={interestAmount}
+                    type="number" placeholder={t('Amount (ZAR)')} value={interestAmount}
                     onChange={(e) => setInterestAmount(e.target.value)}
                     className={`${inputStyle} flex-1`} min="0.01" step="any" required
                   />
@@ -1132,17 +1134,17 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                     type="submit" disabled={recordingInterest}
                     className={`bg-sage-500 text-white font-bold px-4 rounded-pill text-sm ${pressable}`}
                   >
-                    {recordingInterest ? '...' : 'Add'}
+                    {recordingInterest ? '...' : t('Add')}
                   </button>
                 </div>
-                <p className="text-xs text-ink-muted">Adds to the group balance, e.g. bank/savings interest received this cycle.</p>
+                <p className="text-xs text-ink-muted">{t('Adds to the group balance, e.g. bank/savings interest received this cycle.')}</p>
               </form>
 
               <form onSubmit={recordExpense} className="space-y-2 pt-2 border-t border-terracotta/10">
-                <p className="text-xs font-bold text-ink">Record a group expense</p>
+                <p className="text-xs font-bold text-ink">{t('Record a group expense')}</p>
                 <div className="flex gap-2">
                   <input
-                    type="number" placeholder="Amount (ZAR)" value={expenseAmount}
+                    type="number" placeholder={t('Amount (ZAR)')} value={expenseAmount}
                     onChange={(e) => setExpenseAmount(e.target.value)}
                     className={`${inputStyle} flex-1`} min="0.01" step="any" required
                   />
@@ -1150,23 +1152,23 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                     type="submit" disabled={recordingExpense}
                     className={`bg-terracotta text-white font-bold px-4 rounded-pill text-sm ${pressable}`}
                   >
-                    {recordingExpense ? '...' : 'Deduct'}
+                    {recordingExpense ? '...' : t('Deduct')}
                   </button>
                 </div>
                 <input
-                  type="text" placeholder="What was it for? (e.g. bank fee, venue deposit)" value={expenseNote}
+                  type="text" placeholder={t('What was it for? (e.g. bank fee, venue deposit)')} value={expenseNote}
                   onChange={(e) => setExpenseNote(e.target.value)}
                   className={inputStyle}
                 />
-                <p className="text-xs text-ink-muted">Deducts from the group balance — money spent directly by the group, not paid out to a member.</p>
+                <p className="text-xs text-ink-muted">{t('Deducts from the group balance — money spent directly by the group, not paid out to a member.')}</p>
               </form>
 
               <div className="pt-2 border-t border-terracotta/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-bold text-ink">Bereavement mode</p>
+                    <p className="text-xs font-bold text-ink">{t('Bereavement mode')}</p>
                     <p className="text-xs text-ink-muted mt-0.5">
-                      {stokvel.bereavementActive ? 'Active — flagged as a sensitive period for this group.' : 'Not active.'}
+                      {stokvel.bereavementActive ? t('Active — flagged as a sensitive period for this group.') : t('Not active.')}
                     </p>
                   </div>
                   <button
@@ -1175,7 +1177,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                     disabled={togglingBereavement}
                     className={`text-xs font-bold px-3 py-1.5 rounded-pill flex-shrink-0 ${stokvel.bereavementActive ? 'bg-terracotta text-white' : 'border-2 border-terracotta/20 text-ink-muted'} ${pressable}`}
                   >
-                    {stokvel.bereavementActive ? 'Deactivate' : 'Activate'}
+                    {stokvel.bereavementActive ? t('Deactivate') : t('Activate')}
                   </button>
                 </div>
               </div>
@@ -1205,7 +1207,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                       disabled={isDeleting}
                       className={`flex-1 bg-terracotta text-white font-bold py-2 rounded-pill text-sm ${pressable}`}
                     >
-                      {isDeleting ? 'Deleting...' : 'Yes, delete'}
+                      {isDeleting ? t('Deleting...') : t('Yes, delete')}
                     </button>
                     <button
                       type="button"
@@ -1213,7 +1215,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                       disabled={isDeleting}
                       className={`flex-1 border-2 border-terracotta/25 font-bold py-2 rounded-pill text-sm ${pressable}`}
                     >
-                      Cancel
+                      {t('Cancel')}
                     </button>
                   </div>
                 </div>
@@ -1229,8 +1231,8 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
             <div className="w-full max-w-sm bg-white border-2 border-sage-500 rounded-soft p-4 shadow-lg animate-fade-in">
               <form onSubmit={submitPin}>
                 <h2 className="text-sm font-bold text-ink mb-1">{pinModal.label}</h2>
-                <p className="text-xs text-ink-muted mb-3">Enter your security PIN to authorise this action.</p>
-                <label htmlFor="stokvel-pin" className="block text-xs font-bold text-ink-muted mb-1">Security PIN</label>
+                <p className="text-xs text-ink-muted mb-3">{t('Enter your security PIN to authorise this action.')}</p>
+                <label htmlFor="stokvel-pin" className="block text-xs font-bold text-ink-muted mb-1">{t('Security PIN')}</label>
                 <div className="relative">
                   <input
                     id="stokvel-pin"
@@ -1243,17 +1245,17 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                     className="w-full border-2 border-cream-dark rounded-soft pl-3 pr-12 py-2 text-ink tracking-widest"
                     autoFocus
                   />
-                  <button type="button" onClick={() => setShowPinInput((shown) => !shown)} aria-label={showPinInput ? 'Hide PIN' : 'Show PIN'} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted">
+                  <button type="button" onClick={() => setShowPinInput((shown) => !shown)} aria-label={showPinInput ? t('Hide PIN') : t('Show PIN')} className="absolute inset-y-0 right-0 px-4 flex items-center text-ink-muted">
                     <Icon name={showPinInput ? 'eye-off' : 'eye'} size={18} />
                   </button>
                 </div>
                 {pinError && <p className="text-xs text-terracotta font-bold mt-1.5">{pinError}</p>}
                 <div className="flex gap-2 mt-3">
                   <button type="submit" disabled={submittingPin} className={`flex-1 bg-sage-600 text-white font-bold py-2 rounded-pill text-sm ${pressable}`}>
-                    {submittingPin ? 'Submitting…' : 'Confirm'}
+                    {submittingPin ? t('Submitting…') : t('Confirm')}
                   </button>
                   <button type="button" onClick={() => { setPinModal(null); setPinInput(''); setPinError('') }} disabled={submittingPin} className={`flex-1 border-2 border-sage-200 font-bold py-2 rounded-pill text-sm ${pressable}`}>
-                    Cancel
+                    {t('Cancel')}
                   </button>
                 </div>
               </form>
@@ -1278,33 +1280,32 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
         <div className="relative">
           <p className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-cream/60">Yonga kunye · Save together</p>
           <h1 className="mt-2 font-display text-[2.3rem] font-semibold leading-[1.04] text-balance">
-            Stokvels that <span className="italic text-ochre-light">run properly.</span>
+            {t('Stokvels that')} <span className="italic text-ochre-light">{t('run properly.')}</span>
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-cream/85">
-            Simple systems for group savings: a ledger every member can see, approvals, and every contribution,
-            payout and loan interest recorded. Pool together for bulk discounts.
+            {t('Simple systems for group savings: a ledger every member can see, approvals, and every contribution, payout and loan interest recorded. Pool together for bulk discounts.')}
           </p>
         </div>
       </header>
 
       <div className="relative z-10 -mt-12 px-4">
-        <section aria-label="Your savings" className="rounded-[26px] bg-white p-5 shadow-[0_22px_44px_-22px_rgba(28,22,18,0.55)]">
+        <section aria-label={t('Your savings')} className="rounded-[26px] bg-white p-5 shadow-[0_22px_44px_-22px_rgba(28,22,18,0.55)]">
           {!loading && myStokvels.length > 0 ? (
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p className="eyebrow">Your savings</p>
+                <p className="eyebrow">{t('Your savings')}</p>
                 <p className="tabular mt-1 font-display text-[2.2rem] font-semibold leading-none text-ink">{rand(mine)}</p>
               </div>
               <div className="text-right">
-                <p className="text-[11px] font-bold text-ink-muted">Your groups hold</p>
+                <p className="text-[11px] font-bold text-ink-muted">{t('Your groups hold')}</p>
                 <p className="tabular font-display text-lg font-semibold text-sage">{rand(combined, 0)}</p>
-                <p className="text-[11px] text-ink-muted">across {myStokvels.length} group{myStokvels.length === 1 ? '' : 's'}</p>
+                <p className="text-[11px] text-ink-muted">{myStokvels.length === 1 ? t('across 1 group') : t('across {n} groups', { n: myStokvels.length })}</p>
               </div>
             </div>
           ) : (
             <div>
-              <p className="eyebrow">Start your circle</p>
-              <p className="mt-1 font-display text-xl font-semibold leading-snug text-ink">Start one for your family, or join one with a code.</p>
+              <p className="eyebrow">{t('Start your circle')}</p>
+              <p className="mt-1 font-display text-xl font-semibold leading-snug text-ink">{t('Start one for your family, or join one with a code.')}</p>
             </div>
           )}
           <div className="mt-5 flex gap-2">
@@ -1313,14 +1314,14 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
               onClick={() => { setError(''); setView('create'); }}
               className={`flex min-h-[48px] flex-1 items-center justify-center gap-1.5 rounded-full bg-terracotta text-sm font-bold text-white shadow-terracotta ${pressable}`}
             >
-              <Icon name="plus" size={16} color="#ffffff" /> Start a stokvel
+              <Icon name="plus" size={16} color="#ffffff" /> {t('Start a stokvel')}
             </button>
             <button
               type="button"
               onClick={() => { setError(''); setView('join'); }}
               className={`min-h-[48px] flex-1 rounded-full bg-cream-dark text-sm font-bold text-ink ${pressable}`}
             >
-              Join with a code
+              {t('Join with a code')}
             </button>
           </div>
         </section>
@@ -1337,12 +1338,12 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
       ) : myStokvels.length === 0 ? (
         <EmptyState
           icon="users"
-          title="No stokvels yet"
-          description="Start your group’s stokvel or join one with a code. Every contribution, payout and loan is recorded, and every member can see the books."
+          title={t('No stokvels yet')}
+          description={t('Start your group’s stokvel or join one with a code. Every contribution, payout and loan is recorded, and every member can see the books.')}
         />
       ) : (
         <>
-          <SectionRule label="Member balances" trailing={new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })} />
+          <SectionRule label={t('Member balances')} trailing={new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })} />
           <div className="space-y-3">
             {myStokvels.map((m) => (
               <button
@@ -1358,7 +1359,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                   <div className="min-w-0 flex-1">
                     <p className="font-display font-bold text-base text-ink leading-tight">{m.stokvel?.name || 'Unnamed Stokvel'}</p>
                     <p className="text-xs text-ink-muted mt-0.5">
-                      {m.stokvel?._count?.members || 0} member{(m.stokvel?._count?.members || 0) === 1 ? '' : 's'}
+                      {(m.stokvel?._count?.members || 0) === 1 ? t('1 member') : t('{n} members', { n: m.stokvel?._count?.members || 0 })}
                     </p>
                   </div>
                   <Icon name="arrowRight" size={16} color="#8a8278" />
@@ -1367,7 +1368,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                   <div>
                     {/* This member's own confirmed contributions — not the
                         group total, which is a different (larger) number. */}
-                    <p className="text-xs font-black uppercase tracking-widest text-ink-muted">Your balance</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-ink-muted">{t('Your balance')}</p>
                     <p className="tabular font-display font-bold text-2xl text-ink mt-0.5">
                       R{Number(m.myBalance || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
@@ -1388,7 +1389,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
       {/* Discovery stays below the member's own stokvels. Ubuhlanti is in More. */}
       {bottomSlot && (
         <>
-          <SectionRule label="Grow your circle" />
+          <SectionRule label={t('Grow your circle')} />
           <div className="space-y-3">{bottomSlot}</div>
         </>
       )}
