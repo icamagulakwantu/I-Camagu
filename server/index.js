@@ -36,6 +36,7 @@ import { applyPriceChecks } from './scripts/apply-price-checks.js';
 import { addIbhomaItems } from './scripts/ibhoma-items-nov-2026.js';
 import { mergeClanForms } from './scripts/merge-clan-forms-nov-2026.js';
 import { alignCeremonyOrder } from './scripts/ceremony-order-nov-2026.js';
+import { mergeCete } from './scripts/clan-cete-merge-nov-2026.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import izidukoRoutes from './routes/iziduko.js';
@@ -355,6 +356,12 @@ if (startup.schemaReady) {
     await alignCeremonyOrder();
   } catch (err) {
     console.error('Ceremony order failed:', err?.message);
+  }
+  // AmaCethe and AmaCete are one clan (founder, 23 Nov 2026). Once.
+  try {
+    await mergeCete();
+  } catch (err) {
+    console.error('Clan Cete merge failed:', err?.message);
   }
 }
 

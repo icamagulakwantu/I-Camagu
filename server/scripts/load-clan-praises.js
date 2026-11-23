@@ -18,8 +18,11 @@ export function readClanPraises() {
 }
 
 export async function loadClanPraises(clans = readClanPraises()) {
-  const existing = await prisma.clanGroup.findMany({ select: { id: true, clanName: true } });
+  const existing = await prisma.clanGroup.findMany({ select: { id: true, clanName: true, aliases: { select: { aliasForm: true } } } });
   const byKey = new Map(existing.map((g) => [normaliseIsiduko(g.clanName), g]));
+  // A clan's other recognised spellings (AmaCethe for AmaCete) never open a
+  // second entry either.
+  for (const g of existing) for (const { aliasForm } of g.aliases) if (!byKey.has(normaliseIsiduko(aliasForm))) byKey.set(normaliseIsiduko(aliasForm), g);
   // Another form of the same clan already registered (Tshawe for AmaTshawe)
   // is the same clan: add the praises there rather than open a second entry.
   const byRoot = new Map(existing.map((g) => [isidukoRootKey(g.clanName), g]));

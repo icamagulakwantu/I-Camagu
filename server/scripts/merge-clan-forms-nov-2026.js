@@ -50,7 +50,8 @@ async function keepName(tx, groupId, form) {
   await tx.clanAlias.upsert({ where: { aliasForm: form }, update: { clanGroupId: groupId }, create: { aliasForm: form, clanGroupId: groupId } });
 }
 
-async function mergeInto(tx, from, to) {
+// Folds one clan entry into another (exported for later merges).
+export async function mergeInto(tx, from, to) {
   await tx.user.updateMany({ where: { clanGroupId: from.id }, data: { clanGroupId: to.id } });
   await tx.isidukoSubmission.updateMany({ where: { resolvedClanGroupId: from.id }, data: { resolvedClanGroupId: to.id } });
 
