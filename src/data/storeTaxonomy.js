@@ -78,9 +78,9 @@ export const DEPARTMENTS = [
     name: 'Meat & poultry',
     short: 'Meat',
     xhosa: 'Inyama',
-    // The shop's whole-chicken packshot, as on the Whole Chicken product
-    // (founder, 23 Nov 2026: fix that chicken image).
-    image: 'https://res.cloudinary.com/fuhfi2ft/image/upload/e_trim/b_white,c_pad,h_540,w_540/b_white,c_pad,h_600,w_600/f_auto/q_auto/icamagu/products/whole-chicken',
+    // Chicken drumsticks, the shop's packshot (founder, 23 Nov 2026: "use
+    // drumsticks", not the whole bagged chicken).
+    image: 'https://res.cloudinary.com/fuhfi2ft/image/upload/e_trim/b_white,c_pad,h_540,w_540/b_white,c_pad,h_600,w_600/f_auto/q_auto/icamagu/products/chicken-drumsticks-5kg',
     aisles: [
       { id: 'meat', name: 'Meat & poultry', categories: ['MEAT'] },
     ],

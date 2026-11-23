@@ -384,6 +384,22 @@ function Store({ onGoToBasket, basketCount, initialSearch = '', onOpenExample })
     const out = []
     const photo = (re) => allSkus.find((s) => re.test(s.name) && s.imageUrl && !failedImageIds.has(s.id))?.imageUrl
     const top = deals[0]
+    // The deal banner shows the deal product plus other brands from the same
+    // aisle standing beside it (Valpre with Bonaqua and Tsitsikamma, say),
+    // like the Ekoyini drinks banners (founder, 23 Nov 2026).
+    const brandOf = (s) => String(s.name || '').trim().split(/\s+/)[0].toLowerCase()
+    const dealPictures = (sku) => {
+      const aisle = aisleOf(sku).id
+      const seen = new Set([brandOf(sku)])
+      const pics = [sku.imageUrl]
+      for (const s of allSkus) {
+        if (pics.length >= 3) break
+        if (!s.imageUrl || failedImageIds.has(s.id) || aisleOf(s).id !== aisle || seen.has(brandOf(s))) continue
+        seen.add(brandOf(s))
+        pics.push(s.imageUrl)
+      }
+      return pics
+    }
     if (top) {
       const saving = savingOf(top)
       out.push({
@@ -393,7 +409,7 @@ function Store({ onGoToBasket, basketCount, initialSearch = '', onOpenExample })
         body: t('{name}: {price} a {unit} in a group order, {retail} in the shops.', { name: top.name, price: rands(saving.casePrice), unit: unitOf(top), retail: rands(saving.retail) }),
         cta: t('See the deal'),
         onClick: () => setOfferSku(top),
-        images: [top.imageUrl],
+        images: dealPictures(top),
       })
     }
     const pool = [photo(/^Commando/i), photo(/^Old Buck Gin/i), photo(/^Black Label/i) || photo(/^Castle Lager/i)].filter(Boolean)
@@ -520,7 +536,7 @@ function Store({ onGoToBasket, basketCount, initialSearch = '', onOpenExample })
                     >
                       <span className={`relative block h-[84px] w-[84px] overflow-hidden rounded-[26px] bg-[#f3e8d4] ring-2 transition ${active ? 'ring-[#c2410c]' : 'ring-transparent'}`}>
                         {d.image ? (
-                          <img src={d.image} alt="" loading="lazy" className={PHOTO_TILES.has(d.id) || PHOTO_DEPARTMENTS.has(d.id) ? 'h-full w-full object-cover' : 'h-full w-full object-contain p-2.5 mix-blend-multiply'} />
+                          <img src={d.image} alt="" loading="lazy" className={PHOTO_TILES.has(d.id) ? 'h-full w-full object-cover' : 'h-full w-full object-contain p-2 mix-blend-multiply'} />
                         ) : (
                           <span className="flex h-full items-center justify-center text-[#a3471a]"><Icon name={DEPARTMENT_ICON[d.id] || 'package'} size={26} /></span>
                         )}
