@@ -1,5 +1,6 @@
 import prisma from '../config/db.js';
 import { normaliseIsiduko, femaleRoots, femaleForm, isidukoReadings } from '../../shared/isiduko.js';
+import { exampleMembers } from '../../shared/clanExample.js';
 
 // The clan-name rules (plural, female, one person, "ngu Tshawe") live in
 // shared/isiduko.js so the phone and the server read names the same way.
@@ -44,7 +45,13 @@ export async function buildClanIndex({ forceRefresh = false } = {}) {
     if (!praisesByClan.has(row.clanGroupId)) praisesByClan.set(row.clanGroupId, []);
     praisesByClan.get(row.clanGroupId).push(row.praise);
   }
+  let counts = [];
+  try {
+    counts = await prisma.user.groupBy({ by: ['clanGroupId'], where: { clanGroupId: { not: null } }, _count: { _all: true } });
+  } catch { /* counts are a nicety: search works without them */ }
+  const realByClan = new Map(counts.map((c) => [c.clanGroupId, c._count._all]));
   clanIndexCache = groups.map((group) => ({
+    realMembers: realByClan.get(group.id) || 0,
     praises: praisesByClan.get(group.id) || [],
     id: group.id,
     head: group.clanName,
@@ -176,6 +183,9 @@ function toSearchResult(clan, matched) {
   return {
     id: clan.id,
     head: clan.head,
+    // Real members linked to the clan, plus its example members (see
+    // shared/clanExample.js); the screen always says so.
+    memberCount: (clan.realMembers || 0) + exampleMembers(clan.head),
     female: femaleForm(clan.head),
     praises: praiseNamesFor(clan),
     matchedName: matched.label,

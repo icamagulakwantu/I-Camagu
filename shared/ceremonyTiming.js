@@ -22,6 +22,7 @@ export const PHASE_TIMING = {
   IBHOMA_CLOSURE: { days: -1, anchor: H },
   VIP_EKOYINI: { days: -45, anchor: H },
   HIERARCHY_ALLOCATION: { days: -30, anchor: H },
+  HIRE: { days: -21, anchor: H },
   ALCOHOL_DISTRIBUTION: { days: -21, anchor: H },
   ARRIVAL_INGQONGQO: { days: -14, anchor: H },
   ELDER_GUIDANCE: { days: -14, anchor: H },

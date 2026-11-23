@@ -1,3 +1,4 @@
+import { hireCostLine } from '../../shared/hire.js';
 import prisma from '../config/db.js';
 import { suggestedUnitCost, suggestedTotal, TRANSPORT_SUGGESTED_CAP } from '../../shared/ceremonyCosts.js';
 
@@ -102,5 +103,29 @@ export const setCostActual = async (req, res) => {
   } catch (error) {
     console.error('Set cost actual error:', error.message);
     res.status(500).json({ error: 'Could not save the amount paid' });
+  }
+};
+
+// POST /:id/hire - add the hire items the family chose to the budget, as
+// their own stage (shared/hire.js). Only items from the researched hire list
+// can be added, priced at the middle of their range as a guide; an item
+// already on the plan is not added twice.
+export const addHireItems = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ids = Array.isArray(req.body?.items) ? req.body.items.map(String).slice(0, 20) : [];
+    if (!ids.length) return res.status(400).json({ error: 'Choose at least one thing to hire' });
+    const ceremony = await prisma.ceremony.findUnique({ where: { id }, select: { id: true, hostId: true, guestCount: true } });
+    if (!ceremony) return res.status(404).json({ error: 'Ceremony not found' });
+    if (ceremony.hostId !== req.user.id) return res.status(403).json({ error: 'Not your ceremony' });
+    const lines = ids.map((itemId) => hireCostLine(itemId, ceremony.guestCount || 150)).filter(Boolean);
+    if (!lines.length) return res.status(400).json({ error: 'Unknown hire item' });
+    const have = new Set((await prisma.ceremonyCostItem.findMany({ where: { ceremonyId: id, phase: 'HIRE' }, select: { label: true } })).map((r) => r.label));
+    const fresh = lines.filter((l) => !have.has(l.label));
+    if (fresh.length) await prisma.ceremonyCostItem.createMany({ data: fresh.map((l) => ({ ...l, ceremonyId: id })) });
+    res.status(201).json({ added: fresh.length, alreadyOnPlan: lines.length - fresh.length });
+  } catch (error) {
+    console.error('Add hire items error:', error.message);
+    res.status(500).json({ error: 'Could not add the hire items' });
   }
 };

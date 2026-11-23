@@ -5,7 +5,7 @@ import * as collab from '../controllers/templateCollabController.js';
 import { requireAuth } from '../middleware/auth.js';
 import { getCeremonyTimeline } from '../controllers/ceremonyController.js';
 import { getPlanBudget } from '../controllers/budgetController.js';
-import { getCeremonyCosts, setCostActual } from '../controllers/ceremonyCostController.js';
+import { addHireItems, getCeremonyCosts, setCostActual } from '../controllers/ceremonyCostController.js';
 import { saveAsTemplate, getMyTemplates, useTemplate } from '../controllers/templateController.js';
 import {
   generateShareLink,
@@ -115,6 +115,7 @@ router.patch('/cost/:id/actual', requireAuth, setCostActual);
 
 // Everything the combined Checklist & Budget tab shows
 router.get('/:id/costs', requireAuth, getCeremonyCosts);
+router.post('/:id/hire', requireAuth, addHireItems);
 
 // Get cost estimate (sum of all cost items)
 router.get('/:id/estimate', requireAuth, getCostEstimate);

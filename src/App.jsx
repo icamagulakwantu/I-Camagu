@@ -47,6 +47,7 @@ const PriceCheckAdmin = lazy(() => import('./pages/PriceCheckAdmin.jsx'))
 const DemandDashboard = lazy(() => import('./pages/DemandDashboard.jsx'))
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy.jsx'))
 const Hierarchy = lazy(() => import('./pages/Hierarchy.jsx'))
+const Examples = lazy(() => import('./pages/Examples.jsx'))
 const MyOrders = lazy(() => import('./pages/MyOrders.jsx'))
 const Expenditure = lazy(() => import('./pages/Expenditure.jsx'))
 const ShrineFund = lazy(() => import('./pages/ShrineFund.jsx'))
@@ -76,7 +77,7 @@ const MORE_SCREENS = [
   'ekoyiniadmin', 'identityadmin', 'marginadmin', 'pricecheckadmin', 'demandadmin',
   'privacy', 'hierarchy', 'myorders', 'expenditure', 'shrinefund',
   'legends', 'directory', 'umqombothi', 'isidlo', 'sharedplans', 'pin', 'profile',
-  'notifications', 'account', 'help', 'activity',
+  'notifications', 'account', 'help', 'activity', 'examples',
 ]
 
 // Screens that belong to one ceremony plan. They light up the Ceremonies tab.
@@ -163,6 +164,8 @@ function MainApp() {
   const [clanGroupId, setClanGroupId] = useState(null)
   // Hierarchy: optionally pre-select a ceremony from CeremonyHub
   const [hierarchyCeremonyId, setHierarchyCeremonyId] = useState(null)
+  // Which worked example to open (see Examples).
+  const [exampleId, setExampleId] = useState('drinks')
   // Set while a tool was opened from a ceremony page, so Back returns there.
   const [returnToCeremonyId, setReturnToCeremonyId] = useState(null)
   // What the tool needs to know about that ceremony (its title and guests).
@@ -244,6 +247,7 @@ function MainApp() {
     }
   }, [accessToken])
 
+  const openExample = (id) => { setExampleId(id); setScreen('examples') }
   const goHome = () => setScreen('home')
   const goMore = () => setScreen('more')
 
@@ -355,10 +359,11 @@ function MainApp() {
             onOpenType={openCeremonyType}
             onSelectCeremony={openExistingCeremony}
             onGoToHierarchy={openHierarchyForCeremony}
+            onOpenExample={openExample}
           />
         )
       case 'store':
-        return <Store onGoToBasket={() => setScreen('basket')} basketCount={basketCount} initialSearch={storeSearch} />
+        return <Store onGoToBasket={() => setScreen('basket')} basketCount={basketCount} initialSearch={storeSearch} onOpenExample={openExample} />
       case 'basket':
         return <Basket onBack={() => setScreen('store')} onBasketChanged={setBasketCount} onGoToOrders={() => setScreen('myorders')} />
       case 'ceremony':
@@ -449,7 +454,9 @@ function MainApp() {
       case 'pin':
         return <PinSetup onBack={goMore} />
       case 'stokvels':
-        return <Stokvels onBack={goHome} onNavigate={setScreen} />
+        return <Stokvels onBack={goHome} onNavigate={setScreen} onOpenExample={openExample} />
+      case 'examples':
+        return <Examples onBack={() => window.history.back()} initialExample={exampleId} />
       case 'notifications':
         return <Notifications onBack={goHome} onNavigate={setScreen} />
       case 'activity':

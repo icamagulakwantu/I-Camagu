@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton, StokvelCardSkeleton, StokvelDetailSkeleton } from '../components/ui/Skeleton.jsx'
+import { SeeExampleButton } from './Examples.jsx'
 import Icon from '../components/Icon.jsx'
 import MeetingMinutes from './stokvel/MeetingMinutes.jsx'
 import LeaveStokvelButton from './stokvel/LeaveStokvelButton.jsx'
@@ -62,7 +63,7 @@ const inputStyle = "w-full min-h-11 bg-white border border-ink/15 rounded-xl px-
 // cards to the list view only, below the page header, so the header always
 // sits at the top like every other tab and the extras never leak into the
 // create, join or detail views.
-function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
+function Stokvels({ onBack, onNavigate, onOpenExample, topSlot = null, bottomSlot = null }) {
   const t = useT()
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
@@ -1365,6 +1366,13 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
       </div>
 
       <div className="px-4 pt-5">
+      {/* Worked examples: how a stokvel runs when it is fully used. */}
+      {onOpenExample && (
+        <div className="mb-4 space-y-2">
+          <SeeExampleButton onClick={() => onOpenExample('grocery')} label="See a grocery stokvel, fully used" />
+          <SeeExampleButton onClick={() => onOpenExample('society')} label="See a society, fully used" />
+        </div>
+      )}
       {topSlot}
 
       {loading ? (

@@ -9,6 +9,7 @@ import { CEREMONY_META as STORY } from '../../data/ceremonyTypes.js'
 import SummaryActions from './SummaryActions.jsx'
 import ConnectedCard from './ConnectedCard.jsx'
 import TemplateShareCard from '../templates/TemplateShareCard.jsx'
+import HirePlanCard from './HirePlanCard.jsx'
 import ProposalReview from '../templates/ProposalReview.jsx'
 import { PLAN_API } from '../templates/collabApi.js'
 import { planDocumentHtml, printHtml } from '../../lib/printDoc.js'
@@ -284,6 +285,8 @@ export default function CeremonyHome({
           </button>
         </section>
 
+        {/* What to hire: its own card; nothing is added until the family chooses. */}
+        {ceremony.id && <HirePlanCard ceremony={ceremony} accessToken={accessToken} showToast={showToast} onAdded={onPlanChanged} />}
 
         {type === 'ULWALUKO' && <MothersGuide onOpenUmqombothi={() => onNavigate?.('umqombothi')} />}
 

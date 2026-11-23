@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import CeremonyIcon from '../components/CeremonyIcon.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import PageHeader from '../components/ui/PageHeader.jsx'
+import { SeeExampleButton } from './Examples.jsx'
 import Icon from '../components/Icon.jsx'
 import { CEREMONY_META } from '../data/ceremonyTypes.js'
 
@@ -22,7 +23,7 @@ const STATUS_LABEL = {
 
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.97]'
 
-function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) {
+function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy, onOpenExample }) {
   const { accessToken } = useAuth()
   const [ceremonies, setCeremonies] = useState([])
   const [ceremonyTypes, setCeremonyTypes] = useState([])
@@ -128,6 +129,11 @@ function CeremonyHub({ onBack, onOpenType, onSelectCeremony, onGoToHierarchy }) 
             </button>
           )}
 
+          {onOpenExample && (
+            <div className="mb-3">
+              <SeeExampleButton onClick={() => onOpenExample('ceremony')} label="See a fully prepared ulwaluko to umgidi" />
+            </div>
+          )}
           {/* Every other rite as one compact list: one tap opens it. */}
           <div className="overflow-hidden rounded-[22px] bg-[#fffdf9] ring-1 ring-ink/[0.07]">
             {restTypes.map((type, index) => {

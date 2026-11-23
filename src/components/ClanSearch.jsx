@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { Skeleton } from './ui/Skeleton.jsx'
 import Icon from './Icon.jsx'
+import { EXAMPLE_MEMBERS_NOTE } from '../../shared/clanExample.js'
 // Same rules as the server: AmaTshawe, MamTshawe and Tshawe are one clan.
 import { isidukoKeys, normaliseIsiduko } from '../../shared/isiduko.js'
 
@@ -29,6 +30,7 @@ function ClanTile({ clan, isMine, open, onToggle, onPickClan }) {
           {(clan.matchedAs === 'alias' || clan.matchedAs === 'praise') && (
             <span className="block text-xs font-bold text-terracotta">Found by praise name: {clan.matchedName}</span>
           )}
+          {clan.memberCount > 0 && <span className="block text-xs font-bold text-[#2e4a2e]">{clan.memberCount.toLocaleString('en-ZA')} members*</span>}
           <span className={`block text-xs text-ink-muted mt-0.5 ${open ? '' : 'line-clamp-2'}`}>
             {clan.praises.length ? clan.praises.join(' · ') : 'No praise names recorded yet'}
           </span>
@@ -144,6 +146,7 @@ export default function ClanSearch({ onPickClan }) {
             </p>
             <button type="button" onClick={close} className="text-xs font-bold text-terracotta cursor-pointer">Close</button>
           </div>
+          <p className="mb-2 text-[11px] text-ink-muted">* {EXAMPLE_MEMBERS_NOTE}</p>
 
           {firstLoad ? (
             <div className="space-y-2">

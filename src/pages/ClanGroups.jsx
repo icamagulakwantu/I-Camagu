@@ -7,6 +7,8 @@ import { clanInviteMessage, clanInviteUrl, whatsappShareUrl } from '../lib/invit
 import HeroHeader from '../components/ui/HeroHeader.jsx'
 import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
+import { exampleMembers, EXAMPLE_MEMBERS_NOTE } from '../../shared/clanExample.js'
+
 const pressable = 'transition-transform duration-100 ease-out active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none'
 const inputClass = 'w-full border-2 border-ink/20 rounded-soft px-4 py-3 text-base focus:outline-none focus:border-sage-500'
 
@@ -15,7 +17,8 @@ function GroupCard({ group, actionLabel, onAction, busy }) {
     <div className="bg-white border-2 border-terracotta/15 rounded-soft p-4 shadow-soft">
       <p className="text-xs font-black uppercase tracking-wide text-terracotta">{group.clanName}</p>
       <p className="font-display font-bold text-lg text-ink leading-tight mt-0.5">{group.name}</p>
-      <p className="text-xs text-ink-muted mt-0.5">{group.memberCount} member{group.memberCount === 1 ? '' : 's'}</p>
+      <p className="text-xs text-ink-muted mt-0.5">{group.memberCount} member{group.memberCount === 1 ? '' : 's'} in this group · {(exampleMembers(group.clanName) + group.memberCount).toLocaleString('en-ZA')} in the {group.clanName} clan*</p>
+      <p className="mt-0.5 text-[11px] text-ink-muted">* {EXAMPLE_MEMBERS_NOTE}</p>
       {group.description && <p className="text-sm text-ink mt-2">{group.description}</p>}
       <button type="button" onClick={onAction} disabled={busy}
         className={`mt-3 w-full bg-sage-500 text-white font-bold py-3 rounded-pill text-base ${pressable}`}>

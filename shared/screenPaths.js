@@ -43,4 +43,5 @@ export const SCREEN_PATHS = {
   ekoyiniadmin: '/admin/ekoyini',
   izidukoprofile: '/me/iziduko-profile',
   izidukochat: '/me/messages',
+  examples: '/examples',
 };

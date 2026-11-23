@@ -5,6 +5,7 @@ import PoolOfferCard from '../components/PoolOfferCard.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { Skeleton } from '../components/ui/Skeleton.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
+import { SeeExampleButton } from './Examples.jsx'
 import Icon from '../components/Icon.jsx'
 import { DEPARTMENTS, departmentOf, aisleOf, sectionOf } from '../data/storeTaxonomy.js'
 import { unitOf, collectiveNoun } from '../data/bulkUnits.js'
@@ -130,7 +131,7 @@ function ProductCard({ sku, showDepartment, adding, imageFailed, onImageError, o
   )
 }
 
-function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
+function Store({ onGoToBasket, basketCount, initialSearch = '', onOpenExample }) {
   const t = useT()
   const { lang } = useLanguage()
   const { accessToken } = useAuth()
@@ -371,6 +372,13 @@ function Store({ onGoToBasket, basketCount, initialSearch = '' }) {
         </ol>
         <p className="mt-2 text-ink-muted">{t("Prices here are SmartMatch bulk prices, set at the shops' special prices. They unlock only when your group order reaches its bulk tier, and are not prices for buying one on its own. You only pay once the group reaches its minimum and the supplier confirms the price.")}</p>
       </details>
+
+      {/* A worked example: an umgidi drinks stokvel buying together. */}
+      {onOpenExample && !isSearching && (
+        <div className="mx-4 mt-3">
+          <SeeExampleButton onClick={() => onOpenExample('drinks')} label="See an umgidi drinks pool: 50 members buying together" />
+        </div>
+      )}
 
       {/* ---------- Group orders filling near you ---------- */}
       {!isSearching && nearbyPools.length > 0 && (

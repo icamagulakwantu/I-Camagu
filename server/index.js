@@ -5,6 +5,7 @@ import publicRoutes from './routes/public.js';
 import stokvelRoutes from './routes/stokvel.js';
 import legendRoutes from './routes/legend.js';
 import hierarchyRoutes from './routes/hierarchy.js';
+import exampleRoutes from './routes/examples.js';
 import ekoyiniRoutes from './routes/ekoyini.js';
 import expenditureRoutes from './routes/expenditure.js';
 import express from 'express';
@@ -25,7 +26,7 @@ import { fixUlwalukoDietWording } from './scripts/ulwaluko-diet-wording-nov-2026
 import { loadClanPraises } from './scripts/load-clan-praises.js';
 import { updateUlwalukoPlans } from './scripts/ulwaluko-umgidi-nov-2026.js';
 import { updateWeddingAndMourningPlans } from './scripts/wedding-mourning-nov-2026.js';
-import { updateDirectoryListings, addMoreDirectoryListings } from './scripts/directory-listings-nov-2026.js';
+import { updateDirectoryListings, addMoreDirectoryListings, addHireListings } from './scripts/directory-listings-nov-2026.js';
 import { addUlwalukoRegistrationSteps } from './scripts/ulwaluko-registration-nov-2026.js';
 import { switchPapToSamp } from './scripts/samp-nov-2026.js';
 import { applyGrocerySpecials } from './scripts/grocery-specials-nov-2026.js';
@@ -156,6 +157,7 @@ app.use('/api/reciprocity', reciprocityRoutes);
 app.use('/api/portals', portalRoutes);
 app.use('/api/legends', legendRoutes);
 app.use('/api/hierarchy', hierarchyRoutes);
+app.use('/api/examples', exampleRoutes);
 app.use('/api/ekoyini', ekoyiniRoutes);
 app.use('/api/stokvels', stokvelRoutes);
 app.use('/api/expenditure', expenditureRoutes);
@@ -362,6 +364,11 @@ if (startup.schemaReady) {
     await mergeCete();
   } catch (err) {
     console.error('Clan Cete merge failed:', err?.message);
+  }  // Hire companies for ceremonies at home (23 Nov 2026). Once.
+  try {
+    await addHireListings();
+  } catch (err) {
+    console.error('Hire listings failed:', err?.message);
   }
 }
 

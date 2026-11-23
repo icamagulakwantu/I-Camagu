@@ -97,3 +97,39 @@ if (isMain) {
     .catch((err) => { console.error(err); process.exitCode = 1; })
     .finally(() => prisma.$disconnect());
 }
+
+// Third batch, 23 Nov 2026: hire companies for ceremonies at home in
+// Gqeberha, from their own published pages and price lists (see
+// shared/hire.js and docs/research/2026-11-hire-and-stokvels.md).
+export const FIX_NAME_3 = 'directory-listings-2026-11-23-hire';
+export const HIRE_VENDOR_LISTINGS = [
+  {
+    name: 'Tent Hire Wiz Port Elizabeth',
+    category: 'EQUIPMENT_HIRE',
+    area: 'Motherwell, Zwide, KwaZakhele, New Brighton, KwaDwesi, Bethelsdorp, Kwanobuhle',
+    contactInfo: 'pe.tent-hirewiz.co.za',
+    description: 'Tent, chairs and tables as one bundle for imigidi, umembeso and funerals, delivered, rigged and collected. 50 seats R1,800–R3,200; 100 seats R3,500–R6,000; kitchen gazebo from R850; mobile fridge R650–R1,200.',
+  },
+  {
+    name: 'Extreme Hiring EC',
+    category: 'EQUIPMENT_HIRE',
+    area: 'Lorraine, Gqeberha',
+    contactInfo: 'extremehiringec.co.za',
+    description: 'Plastic chairs R7.50, trestle tables R45, 20 L urn R120, plate gas burner R350–R400, crockery and cutlery (price list of 17 Nov 2025). Delivery priced by area.',
+  },
+  {
+    name: 'Red Cherry Events',
+    category: 'EQUIPMENT_HIRE',
+    area: 'North End, Gqeberha',
+    contactInfo: 'redcherryevents.co.za',
+    description: 'Tents from R650 and furniture from R100; delivery R12/km for the return trip.',
+  },
+];
+
+export async function addHireListings() {
+  if (await prisma.dataFix.findUnique({ where: { name: FIX_NAME_3 } })) return { added: 0, skipped: true };
+  const added = await addVendors(HIRE_VENDOR_LISTINGS);
+  await prisma.dataFix.create({ data: { name: FIX_NAME_3 } });
+  if (added) console.log(`Directory: ${added} hire company(ies) added.`);
+  return { added, skipped: false };
+}
