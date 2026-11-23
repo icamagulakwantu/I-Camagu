@@ -220,7 +220,8 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
           >
             {user?.profileImage ? (
               <img src={user.profileImage} alt="Profile" className="w-full h-full object-cover" />
-            ) : <Icon name="user" size={32} color="#fff" />}
+            ) : <span className="font-display text-[1.9rem] font-semibold text-cream">{`${user?.firstName?.[0] || ''}${user?.lastName?.[0] || ''}`.toUpperCase() || '?'}</span>}
+            <span className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-cream text-[#1f3320] shadow"><Icon name="camera" size={13} color="#1f3320" /></span>
             {uploading && (
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-xs font-bold">...</div>
             )}
@@ -230,9 +231,15 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
           <div>
             <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">{user?.firstName || ''} {user?.lastName || ''}</h1>
             <p className="text-white/70 text-sm">@{user?.username || ''}</p>
-            <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs underline mt-1 text-white/80 block">
-              Change photo
-            </button>
+            {/* Who you are at a glance: your clan and whether your ID is verified. */}
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {user?.paternalIziduko && (
+                <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-bold text-cream">{user.paternalIziduko}</span>
+              )}
+              <button type="button" onClick={() => setTab('verification')} className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${identity?.status === 'VERIFIED' ? 'bg-sage-500 text-white' : 'bg-white/15 text-cream'}`}>
+                {identity?.status === 'VERIFIED' ? '✓ ID verified' : identity?.status === 'PENDING' ? 'ID being checked' : 'ID not verified'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -240,13 +247,13 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
 
       {/* Tabs */}
       <div className="px-4 -mt-4 relative z-10">
-        <div className="flex rounded-pill border-2 border-terracotta/20 bg-white p-1 shadow-elevated">
+        <div className="flex rounded-full bg-[#fffdf9] p-1 shadow-[0_14px_30px_-20px_rgba(43,30,18,0.55)] ring-1 ring-ink/[0.06]">
           {TABS.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => setTab(t.id)}
-              className={`flex-1 rounded-pill py-2 text-[12px] font-bold transition-colors ${tab === t.id ? 'bg-terracotta text-white' : 'text-ink-muted'}`}
+              className={`flex-1 rounded-full py-2.5 text-[13px] font-bold transition-colors ${tab === t.id ? 'bg-[#1f3320] text-cream' : 'text-ink-muted'}`}
             >
               {t.label}
               {t.id === 'verification' && identity && identity.status !== 'UNVERIFIED' && (
@@ -258,7 +265,7 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
       </div>
 
       {tab === 'personal' && (
-        <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-elevated">
+        <div className="mx-4 mt-4 rounded-[22px] bg-[#fffdf9] p-5 ring-1 ring-ink/[0.07] shadow-[0_16px_32px_-26px_rgba(43,30,18,0.55)]">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Personal Details</h3>
             {!editingPersonal && (
@@ -290,24 +297,30 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
               </div>
             </form>
           ) : (
-            <div className="space-y-2">
-              {user?.address && (
-                <p className="text-sm text-ink-muted flex items-center gap-1.5">
-                  <Icon name="mapPin" size={13} /> {user.address}{user?.latitude != null && <span className="text-sage-600 font-bold"> · located</span>}
-                </p>
-              )}
-              {user?.phoneNumber && <p className="text-sm text-ink-muted flex items-center gap-1.5"><Icon name="phone" size={13} /> {user.phoneNumber}</p>}
-              {user?.age && <p className="text-sm text-ink-muted">Age: <strong className="text-ink">{user.age}</strong></p>}
-              {!user?.address && !user?.phoneNumber && !user?.age && (
-                <p className="text-sm text-ink-muted">No personal details added yet.</p>
-              )}
-            </div>
+            <ul className="-mx-1 divide-y divide-ink/[0.06]">
+              {[
+                { icon: 'phone', label: 'Phone', value: user?.phoneNumber },
+                { icon: 'mapPin', label: 'Address', value: user?.address ? `${user.address}${user?.latitude != null ? ' · located' : ''}` : null },
+                { icon: 'calendar', label: 'Age', value: user?.age },
+              ].map((row) => (
+                <li key={row.label}>
+                  <button type="button" onClick={() => setEditingPersonal(true)} className="flex w-full items-center gap-3 px-1 py-2.5 text-left">
+                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-cream"><Icon name={row.icon} size={15} color="#1f3320" /></span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[12px] text-ink-muted">{row.label}</span>
+                      <span className={`block truncate text-[15px] ${row.value ? 'font-semibold text-ink' : 'text-ink-muted'}`}>{row.value || 'Not added'}</span>
+                    </span>
+                    <span className="text-[13px] font-bold text-[#2e4a2e]">{row.value ? 'Change' : 'Add'}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       )}
 
       {tab === 'clan' && (
-        <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-elevated">
+        <div className="mx-4 mt-4 rounded-[22px] bg-[#fffdf9] p-5 ring-1 ring-ink/[0.07] shadow-[0_16px_32px_-26px_rgba(43,30,18,0.55)]">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Iziduko (Clan Lines)</h3>
             {!editingClan && (
@@ -350,7 +363,7 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
       )}
 
       {tab === 'verification' && (
-        <div className="mx-4 mt-4 bg-white border-2 border-terracotta/25 rounded-soft p-5 shadow-elevated">
+        <div className="mx-4 mt-4 rounded-[22px] bg-[#fffdf9] p-5 ring-1 ring-ink/[0.07] shadow-[0_16px_32px_-26px_rgba(43,30,18,0.55)]">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-xs font-extrabold text-ink-muted uppercase tracking-wider">Identity Verification</h3>
             {identity && (
@@ -442,13 +455,9 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
         <button
           type="button"
           onClick={handleLogout}
-          className={cn(
-            'w-full bg-white border-2 border-terracotta/25 text-ink font-bold py-3.5 rounded-pill flex items-center justify-center gap-2',
-            'hover:bg-ink hover:text-white transition-colors duration-200',
-            pressable
-          )}
+          className={cn('mx-auto flex min-h-11 items-center justify-center gap-2 px-4 text-[14px] font-semibold text-ink-muted', pressable)}
         >
-          <Icon name="logout" size={16} /> Log Out
+          <Icon name="logout" size={16} /> Log out
         </button>
       </div>
     </div>

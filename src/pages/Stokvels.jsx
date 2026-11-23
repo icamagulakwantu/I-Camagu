@@ -32,6 +32,9 @@ export function stokvelIdFromInput(value) {
 // form, rotation order, a payout form, organiser settings and officials-only
 // settings all stacked on top of each other. Splitting it into named
 // sections (per the Lovable review) instead of one 500-line column.
+// One way to write money everywhere in Stokvels: R1 234,56.
+const zar = (n) => `R${Number(n || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+
 const DETAIL_TABS = [
   { id: 'overview', label: 'Overview' },
   { id: 'members', label: 'Members' },
@@ -663,7 +666,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
 
     return (
       <div className="min-h-screen pb-24 bg-cream">
-        <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
+        <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-16 pt-6 text-cream">
         <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />
         <div className="relative">
@@ -674,9 +677,36 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
           >
             {t('← All stokvels')}
           </button>
-          <h1 className="font-display font-semibold text-[2rem] leading-[1.08]">{stokvel.name}</h1>
-          <p className="text-white/70 text-xs uppercase mt-1 tracking-wider">{t(stokvelType(stokvel.type).label)}</p>
-          <p className="text-white/90 text-sm mt-2">Ref: <strong className="font-mono bg-white/10 px-2 py-0.5 rounded">{myReferenceCode}</strong></p>
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/70">{t(stokvelType(stokvel.type).label)}</p>
+          <h1 className="mt-1 font-display text-[2rem] font-semibold leading-[1.08]">{stokvel.name}</h1>
+        </div>
+      </header>
+
+      {/* The money, your place in it, and inviting people: one card. */}
+      <section className="relative z-10 mx-4 -mt-10 rounded-[24px] bg-[#fffdf9] p-4 shadow-[0_22px_44px_-24px_rgba(28,22,18,0.6)]">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#6f655a]">{t('The group holds')}</p>
+            <p className="mt-0.5 font-display text-[2rem] font-semibold leading-none tabular-nums text-ink">{zar(balance)}</p>
+            {(Number(stokvel.groupLedger?.interestEarned || 0) > 0 || Number(stokvel.groupLedger?.groupExpenses || 0) > 0) && (
+              <p className="mt-1 text-xs text-ink-muted">
+                {Number(stokvel.groupLedger?.interestEarned || 0) > 0 && <>+{zar(stokvel.groupLedger.interestEarned)} {t('interest')}</>}
+                {Number(stokvel.groupLedger?.interestEarned || 0) > 0 && Number(stokvel.groupLedger?.groupExpenses || 0) > 0 && ' · '}
+                {Number(stokvel.groupLedger?.groupExpenses || 0) > 0 && <>−{zar(stokvel.groupLedger.groupExpenses)} {t('group expenses')}</>}
+              </p>
+            )}
+          </div>
+          {isOfficial && <span className="flex-shrink-0 rounded-full bg-sage-500/15 px-2.5 py-1 text-[11px] font-extrabold text-[#2e4a2e]">{t('You are an official')}</span>}
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <a
+            href={whatsappShareUrl(stokvelInviteMessage(stokvel.name, stokvel.id))}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex h-11 items-center justify-center gap-1.5 rounded-full bg-[#1f3320] text-[13px] font-bold text-white ${pressable}`}
+          >
+            <Icon name="share" size={15} color="#fff" /> {t('Invite on WhatsApp')}
+          </a>
           <button
             type="button"
             onClick={() => {
@@ -684,38 +714,22 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                 .then(() => showToast(t('Invite link copied. Send it to the people you want to invite.'), 'success'))
                 .catch(() => showToast(t('Could not copy the link. Use WhatsApp instead.'), 'error'))
             }}
-            className={`text-xs text-white/80 mt-1.5 flex items-center gap-1 ${pressable}`}
+            className={`flex h-11 items-center justify-center gap-1.5 rounded-full border border-ink/15 text-[13px] font-bold text-ink ${pressable}`}
           >
-            <Icon name="copy" size={13} color="#fff" /> {t('Copy invite link')}
+            <Icon name="copy" size={15} color="#1f3320" /> {t('Copy link')}
           </button>
-          <a
-            href={whatsappShareUrl(stokvelInviteMessage(stokvel.name, stokvel.id))}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`text-xs text-white/80 mt-1.5 flex items-center gap-1 ${pressable}`}
-          >
-            <Icon name="share" size={13} color="#fff" /> {t('Invite on WhatsApp')}
-          </a>
-          <p className="font-display font-semibold text-[2rem] leading-[1.08] mt-2">R{balance.toFixed(2)}</p>
-          {(Number(stokvel.groupLedger?.interestEarned || 0) > 0 || Number(stokvel.groupLedger?.groupExpenses || 0) > 0) && (
-            <p className="text-xs text-white/70 mt-1">
-              {Number(stokvel.groupLedger?.interestEarned || 0) > 0 && <>+R{Number(stokvel.groupLedger.interestEarned).toFixed(2)} interest</>}
-              {Number(stokvel.groupLedger?.interestEarned || 0) > 0 && Number(stokvel.groupLedger?.groupExpenses || 0) > 0 && ' · '}
-              {Number(stokvel.groupLedger?.groupExpenses || 0) > 0 && <>−R{Number(stokvel.groupLedger.groupExpenses).toFixed(2)} group expenses</>}
-            </p>
-          )}
-          {isOfficial && <p className="text-xs text-white/90 font-bold mt-2 bg-white/20 inline-block px-2.5 py-1 rounded-pill">{t('You are an official')}</p>}
         </div>
-      </header>
+        <p className="mt-3 text-[12px] text-ink-muted">{t('Your reference')}: <span className="font-mono font-bold text-ink">{myReferenceCode}</span></p>
+      </section>
 
-        <div className="flex gap-2 px-4 mt-4 overflow-x-auto pb-1">
+        <div className="sticky top-0 z-20 mt-3 flex gap-2 overflow-x-auto bg-cream/95 px-4 pb-2 pt-2 backdrop-blur-md [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setDetailTab(tab.id)}
-              className={`flex-shrink-0 px-3.5 py-1.5 rounded-pill text-[12px] font-bold transition-colors ${
-                detailTab === tab.id ? 'bg-ink text-white' : 'bg-white border border-ink/10 text-ink-muted'
+              className={`min-h-9 flex-shrink-0 rounded-full px-3.5 text-[13px] font-bold transition-colors ${
+                detailTab === tab.id ? 'bg-[#1f3320] text-cream' : 'border border-ink/10 bg-[#fffdf9] text-ink-muted'
               }`}
             >
               {t(tab.label)}
@@ -751,8 +765,31 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
 
           {detailTab === 'overview' && (
             <div className="space-y-3">
-              <div className="bg-white border-2 border-terracotta/25 rounded-soft p-4">
-                <p className="text-xs font-black uppercase text-ink-muted mb-2">{t('At a glance · tap to open')}</p>
+              {/* A new stokvel: the first three things to do. */}
+              {(stokvel.members.length <= 1 || contributions.length === 0) && (
+                <div className="rounded-[22px] bg-[#fffdf9] p-4 ring-1 ring-ink/[0.07]">
+                  <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#6f655a]">{t('Get started')}</p>
+                  <ol className="mt-2 divide-y divide-ink/[0.06]">
+                    {[
+                      { done: stokvel.members.length > 1, label: t('Invite the members'), tab: 'members' },
+                      { done: contributions.length > 0, label: t('Record the first contribution'), tab: 'contributions' },
+                      { done: Boolean(stokvel.rotationOrder?.length), label: t('Agree the payout order'), tab: 'payout' },
+                    ].map((step, index) => (
+                      <li key={step.tab}>
+                        <button type="button" onClick={() => setDetailTab(step.tab)} className="flex w-full items-center gap-3 py-2.5 text-left">
+                          <span className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold ${step.done ? 'bg-sage-500 text-white' : 'bg-cream-dark text-ink'}`}>
+                            {step.done ? <Icon name="check" size={14} color="#fff" /> : index + 1}
+                          </span>
+                          <span className={`flex-1 text-[14px] font-semibold ${step.done ? 'text-ink-muted line-through' : 'text-ink'}`}>{step.label}</span>
+                          <Icon name="chevron-right" size={16} color="#b5ab9f" />
+                        </button>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+              <div className="rounded-[22px] bg-[#fffdf9] p-4 ring-1 ring-ink/[0.07]">
+                <p className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#6f655a]">{t('At a glance · tap to open')}</p>
                 <button type="button" onClick={() => setDetailTab('members')} className="flex w-full items-center justify-between gap-3 rounded-lg px-2 py-2 text-left text-sm transition-colors hover:bg-sage-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500">
                   <span className="text-ink-muted">{t('Members')}</span>
                   <span className="flex items-center gap-2 font-bold text-ink">{stokvel.members.length}<Icon name="arrowRight" size={16} /></span>
@@ -882,7 +919,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
               {myPending.map((c) => (
                 <div key={c.id} className="bg-white border-2 border-terracotta rounded-soft p-3 mb-2 flex justify-between items-center shadow-sm">
                   <div className="min-w-0">
-                    <p className="text-sm font-bold">R{Number(c.amount || 0).toFixed(2)}</p>
+                    <p className="text-sm font-bold">{zar(Number(c.amount || 0))}</p>
                     <p className="text-xs text-ink-muted truncate">{memberName(c.memberId)}</p>
                   </div>
                   <button
@@ -914,7 +951,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
                         <p className="text-xs text-ink-muted">{new Date(c.createdAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="tabular text-sm font-bold text-ink">R{Number(c.amount || 0).toFixed(2)}</p>
+                        <p className="tabular text-sm font-bold text-ink">{zar(Number(c.amount || 0))}</p>
                         <p className={`text-xs font-bold ${c.status === 'CONFIRMED' ? 'text-sage-600' : 'text-brand-ochre'}`}>{c.status}</p>
                       </div>
                     </div>
@@ -1042,7 +1079,7 @@ function Stokvels({ onBack, onNavigate, topSlot = null, bottomSlot = null }) {
               {payouts.filter(p => p.status === 'PENDING_APPROVAL').map((p) => (
                 <div key={p.id} className="bg-white border-2 border-sage-500 rounded-soft p-3 mb-2 shadow-sm">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-bold">R{Number(p.amount || 0).toFixed(2)}</span>
+                    <span className="text-sm font-bold">{zar(Number(p.amount || 0))}</span>
                     <span className="text-xs text-ink-muted">{p.approvals?.length || 0} of {stokvel.requiredApprovals} approval{stokvel.requiredApprovals === 1 ? '' : 's'}</span>
                   </div>
                   {isOfficial && (

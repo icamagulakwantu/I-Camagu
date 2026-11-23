@@ -781,3 +781,12 @@ Stokvel **umgalelo** · contribution **umnikelo** · payout **intlawulo** · off
 | Bringing the departed home | Ukubuyisa oswelekileyo ekhaya | |
 | 1 item | into enye | |
 | {n} items | izinto ezi-{n} | |
+| The group holds | Iqela linayo | |
+| interest | inzala | |
+| group expenses | iindleko zeqela | |
+| Your reference | Inombolo yakho yesalathiso | |
+| Get started | Qalisa | |
+| Invite the members | Mema amalungu | |
+| Record the first contribution | Bhala umnikelo wokuqala | |
+| Agree the payout order | Vumelanani ngolandelelwano lwentlawulo | |
+| Copy link | Khuphela ikhonkco | |
