@@ -29,8 +29,11 @@ integrationDescribe('courtesy drinks priced right (real database)', () => {
 
   it('reprices unpaid lines at the old guide, counts a pair once, and leaves paid or own figures alone', async () => {
     expect(await fixCourtesyDrinks()).toMatchObject({ skipped: false });
-    const rows = await prisma.ceremonyCostItem.findMany({ where: { ceremonyId: ceremony.id }, orderBy: [{ label: 'asc' }, { unitCost: 'asc' }] });
+    const rows = await prisma.ceremonyCostItem.findMany({ where: { ceremonyId: ceremony.id } });
+    // Sorted here, not by the database: collations order "Courtesy gin" and
+    // "Courtesy:" differently.
     const view = rows.map((r) => [r.label.slice(0, 20), r.unit, r.unitCost, r.quantity, r.isPurchased])
+      .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[2] - b[2]))
     expect(view).toEqual([
       ['Courtesy gin, brandy', 'set', 340, 1, false],
       ['Courtesy: bottle and', 'bottle', 180, 1, false],
