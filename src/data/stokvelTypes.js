@@ -42,6 +42,8 @@ export const STOKVEL_TYPES = [
     id: 'EXISTING_STOKVEL_UPGRADE',
     label: 'Bring an existing stokvel',
     short: 'Community stokvel',
+    // On the stokvel's own page: the group is already on i-Camagu.
+    heading: 'Community stokvel · society',
     purpose: 'An existing stokvel that now keeps its records on i-Camagu.',
   },
 ]

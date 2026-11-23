@@ -250,6 +250,7 @@ function CeremonyExample({ t }) {
 const LIVE = {
   grocery: { type: 'GROCERY_STOKVEL', title: 'Step inside Masibambane Grocery Stokvel', body: '15 members and a whole year: every contribution in the ledger, the fines, loans with their votes and repayments, the lending rounds, minutes, the rules and the statement.' },
   drinks: { type: 'ALCOHOL_BULK_POOL', title: 'Step inside the Umgidi Drinks Pool', body: '50 members saving R1,500 a month: ten months of contributions in the ledger, the interest, fines, minutes and the rules.' },
+  society: { type: 'EXISTING_STOKVEL_UPGRADE', title: 'Step inside Siyaphambili Savings Society', body: '12 members, each saving her own amount from R100 a month: every payment in the ledger, each member’s own lending and interest, a loan with its votes, fines, minutes and the rules.' },
   ceremony: { ceremony: true, title: 'Step inside Ulwaluko lukaLwazi', body: 'The whole plan, from going to the mountain to umgidi: the shopping list with what is bought, the tasks done, what to hire, seating, who brings what, the family’s pledges and who is coming.' },
 }
 

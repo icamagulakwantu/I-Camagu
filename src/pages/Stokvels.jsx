@@ -689,7 +689,7 @@ function Stokvels({ onBack, onNavigate, onOpenExample, openStokvelId = null, onL
           >
             {t('← All stokvels')}
           </button>
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/70">{t(stokvelType(stokvel.type).label)}</p>
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cream/70">{t(stokvelType(stokvel.type).heading || stokvelType(stokvel.type).label)}</p>
           <h1 className="mt-1 font-display text-[2rem] font-semibold leading-[1.08]">{stokvel.name}</h1>
         </div>
       </header>

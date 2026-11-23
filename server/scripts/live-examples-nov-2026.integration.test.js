@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import prisma from '../config/db.js';
-import { buildLiveExamples, FIX_NAME } from './live-examples-nov-2026.js';
+import { buildLiveExamples, FIX_NAME, DONE_NAME } from './live-examples-nov-2026.js';
 import { exampleList, exampleView, EXAMPLE_REFUSAL } from '../services/exampleAccess.js';
 import { verifyLedger, checkStokvelBalance } from '../services/ledgerService.js';
 
@@ -23,7 +23,7 @@ integrationDescribe('live examples (real database)', () => {
 
   it('builds a grocery stokvel, a drinks pool and a ceremony, with books that verify and balance', async () => {
     const list = exampleList();
-    expect(list.stokvels.map((s) => s.type).sort()).toEqual(['ALCOHOL_BULK_POOL', 'GROCERY_STOKVEL']);
+    expect(list.stokvels.map((s) => s.type).sort()).toEqual(['ALCOHOL_BULK_POOL', 'EXISTING_STOKVEL_UPGRADE', 'GROCERY_STOKVEL']);
     expect(list.ceremonies).toHaveLength(1);
     for (const s of list.stokvels) {
       expect((await verifyLedger(s.id)).ok).toBe(true);
@@ -53,13 +53,36 @@ integrationDescribe('live examples (real database)', () => {
   });
 
   it('leaves the build to another process that is already building', async () => {
-    await prisma.dataFix.delete({ where: { name: FIX_NAME } });
+    await prisma.dataFix.delete({ where: { name: DONE_NAME } });
     await prisma.dataFix.create({ data: { name: `${FIX_NAME}-building` } });
     try {
       expect(await buildLiveExamples({ retries: 0 })).toEqual({ skipped: true, busy: true });
     } finally {
       await prisma.dataFix.deleteMany({ where: { name: `${FIX_NAME}-building` } });
-      await prisma.dataFix.create({ data: { name: FIX_NAME } });
+      await prisma.dataFix.create({ data: { name: DONE_NAME } });
     }
   });
+
+  it('a society: each her own amount and her own interest, with books that balance', async () => {
+    const society = exampleList().stokvels.find((s) => s.type === 'EXISTING_STOKVEL_UPGRADE');
+    expect(society.name).toBe('Siyaphambili Savings Society');
+    const amounts = await prisma.contribution.groupBy({ by: ['amount'], where: { stokvelId: society.id } });
+    expect(amounts.length).toBeGreaterThan(5);
+    expect(Math.min(...amounts.map((a) => Number(a.amount)))).toBe(100);
+    expect(await prisma.contribution.count({ where: { stokvelId: society.id, status: 'PENDING' } })).toBe(2);
+    const rounds = await prisma.$queryRawUnsafe('SELECT count(DISTINCT "memberId")::int n FROM "StokvelLendingEntry" WHERE "stokvelId" = $1', society.id);
+    expect(rounds[0].n).toBe(11);
+    expect((await verifyLedger(society.id)).ok).toBe(true);
+    expect((await checkStokvelBalance(society.id)).agrees).toBe(true);
+  });
+
+  it('builds an example added later on a server that has the earlier ones', async () => {
+    const society = exampleList().stokvels.find((s) => s.type === 'EXISTING_STOKVEL_UPGRADE');
+    await prisma.stokvel.update({ where: { id: society.id }, data: { name: 'Siyaphambili Savings Society (incomplete)' } });
+    await prisma.dataFix.deleteMany({ where: { name: { in: [DONE_NAME, `${FIX_NAME}-society`] } } });
+    expect(await buildLiveExamples()).toEqual({ skipped: false });
+    const list = exampleList();
+    expect(list.stokvels.filter((s) => s.type === 'EXISTING_STOKVEL_UPGRADE')).toHaveLength(1);
+    expect(list.stokvels.filter((s) => s.type === 'GROCERY_STOKVEL')).toHaveLength(1);
+  }, 120000);
 });

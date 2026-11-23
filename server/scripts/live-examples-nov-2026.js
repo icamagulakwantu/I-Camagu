@@ -3,7 +3,8 @@
 // a ceremony with everything in it, and everything clickable, so it feels like
 // an actual journey". So these are real records, built with the app's own
 // steps (the same handlers a member's taps call), replaying a year: a grocery
-// stokvel, an umgidi drinks pool and an ulwaluko-to-umgidi plan.
+// stokvel, an umgidi drinks pool, a savings society and an ulwaluko-to-umgidi
+// plan.
 //
 // - The people are example people (email @examples.i-camagu.invalid): they
 //   cannot sign in, and every screen marks the record as an example.
@@ -34,6 +35,8 @@ import { EXAMPLE_PHOTO, EXAMPLE_SIGNATURE } from './live-examples-images.js';
 import { dueDateFor } from '../../shared/ceremonyTiming.js';
 
 export const FIX_NAME = 'live-examples-2026-11-23';
+// Every example built (bumped when an example is added, so it is built too).
+export const DONE_NAME = `${FIX_NAME}-with-society`;
 const at = (s) => new Date(`${s}T09:00:00+02:00`);
 
 // ---------- calling the app's own handlers ----------
@@ -378,6 +381,114 @@ export async function buildCeremony(savingStokvelId) {
   return ceremony.id;
 }
 
+// ---------- 4. A society: money only, each member's own interest ----------
+
+// As the worked example (founder): at least R100 a month with no maximum;
+// each member lends out to raise her own interest, and at year end takes home
+// what she paid in plus the interest she raised herself.
+const SOCIETY_MONTHLY = [1000, 500, 250, 100, 300, 750, 200, 400, 150, 500, 100, 250];
+export async function buildSociety() {
+  const key = `${FIX_NAME}-society`;
+  if (await prisma.dataFix.findUnique({ where: { name: key } })) return null;
+  const NAME = 'Siyaphambili Savings Society';
+  const people = [];
+  for (let n = 80; n < 80 + SOCIETY_MONTHLY.length; n += 1) people.push(await examplePerson(n));
+  const [chair, treasurer, secretary] = people;
+  await setAsideIncomplete(chair.id, NAME);
+
+  const created = await call(createStokvel, { userId: chair.id, body: { name: NAME, type: 'EXISTING_STOKVEL_UPGRADE', contributionAmount: '100', contributionFrequency: 'Monthly, by the 7th: R100 or more', targetDate: '2026-12-05' } }, day(1, 8));
+  const stokvelId = created.stokvel.id;
+  await prisma.stokvel.update({ where: { id: stokvelId }, data: { createdAt: day(1, 8) } });
+  const members = await addMembers(stokvelId, people, day(1, 8));
+  const S = (handler, args, when) => step(stokvelId, handler, { ...args, params: { stokvelId, ...(args.params || {}) } }, when);
+  const approverFor = (member) => (member.userId === treasurer.id ? chair.id : treasurer.id);
+
+  await S(setOfficial, { userId: chair.id, body: { memberUserId: treasurer.id, role: 'TREASURER' } }, day(1, 8));
+  await S(setOfficial, { userId: chair.id, body: { memberUserId: secretary.id, role: 'SECRETARY' } }, day(1, 8));
+  await S(saveConstitution, { userId: chair.id, body: {
+    purpose: 'To save money together, each at her own pace, and grow it by lending: money only, no groceries or drinks.',
+    meetingFrequency: 'Every second month, and a year-end meeting', meetingDay: 'First Sunday', meetingLocation: 'Zwide, at the chairperson’s home',
+    contributionAmount: '100', contributionDueDay: '7', lateFineAmount: '30', lateFineDays: '7', absenceFineAmount: '20', maxAbsences: '3',
+    payoutOrder: 'No rotation: everyone is paid out together at the year-end meeting.',
+    payoutSchedule: 'First Saturday of December: each member takes home what she paid in plus the interest she raised herself.',
+    membershipRequirements: 'At least R100 a month from January to November, with no maximum. Each member chooses her own amount at the start of the year.',
+    terminationRules: 'Three missed months in a row ends membership; what you paid in and your own interest are returned less fines.',
+    bankName: 'African Bank (group savings account)', bankAccountHolder: 'Siyaphambili Savings Society', signatories: 'Chairperson and Treasurer, two signatures on every withdrawal',
+    additionalRules: 'Each member may lend out what she has paid in, at 30% interest, and her interest is hers alone: there is no shared interest. Each member sets her own interest target. Fines go to the society’s costs (year-end meeting, bank fees).',
+  } }, day(1, 8));
+  await S(postAnnouncement, { userId: chair.id, body: { stokvelId, message: 'Welcome to Siyaphambili! Pay R100 or more by the 7th of every month. What you raise by lending is yours alone. First meeting Sunday 11 January.' } }, day(1, 9));
+  await S(createMinutes, { userId: secretary.id, body: {
+    date: '2026-01-11', location: 'Zwide, at the chairperson’s home', chairperson: chair.firstName, secretary: secretary.firstName,
+    attendees: members.map((m) => m.name), apologies: [],
+    agendaItems: [
+      { title: 'Opening and welcome', notes: 'Opened at 14:00 by the chairperson.' },
+      { title: 'Each member’s amount', notes: members.map((m, i) => `${m.firstName} R${SOCIETY_MONTHLY[i]}`).join(', ') + ' a month.' },
+      { title: 'Lending', notes: 'Each member lends from what she paid in, at 30%. Her interest is her own; each sets her own target.' },
+      { title: 'Fines', notes: 'R30 for paying after the 7th; R20 for missing a meeting without apology. Fines pay for the year-end meeting.' },
+    ],
+    actionItems: [{ task: 'Open the group bank account', owner: treasurer.firstName, due: '2026-01-31' }],
+    nextMeetingDate: '2026-03-01', nextMeetingLocation: 'Zwide',
+  } }, day(1, 11));
+  // Each member's own interest target: about a third of a year's saving.
+  for (const [i, member] of members.entries()) {
+    const target = Math.max(300, Math.round((SOCIETY_MONTHLY[i] * 11) / 300) * 100);
+    await S(setLendingTarget, { userId: treasurer.id, body: { memberId: member.userId, target: String(target) } }, day(1, 11));
+  }
+
+  // Contributions January to October, each her own amount; two late.
+  const late = { '4-4': 12, '9-8': 10 };
+  for (let m = 1; m <= 10; m += 1) {
+    for (const [i, member] of members.entries()) {
+      const lateDay = late[`${m}-${i}`];
+      await confirmedContribution({ stokvelId, member, amount: SOCIETY_MONTHLY[i], when: day(m, lateDay || 1 + (i % 6)), approverId: approverFor(member), note: MONTHS[m - 1] });
+      if (lateDay) await S(issueFine, { userId: treasurer.id, body: { memberId: member.userId, fineType: 'LATE_CONTRIBUTION', amount: '30', note: `${MONTHS[m - 1]} paid on the ${lateDay}th`, date: `2026-${String(m).padStart(2, '0')}-${lateDay}` } }, day(m, lateDay));
+    }
+  }
+  // November: two still waiting for the treasurer.
+  for (const [i, member] of members.entries()) {
+    if (i === 6 || i === 10) {
+      await prisma.contribution.create({ data: { stokvelId, memberId: member.membershipId, amount: SOCIETY_MONTHLY[i], status: 'PENDING', note: 'November', createdAt: day(11, 6) } });
+    } else {
+      await confirmedContribution({ stokvelId, member, amount: SOCIETY_MONTHLY[i], when: day(11, 1 + (i % 6)), approverId: approverFor(member), note: 'November' });
+    }
+  }
+  const absence = await S(issueFine, { userId: treasurer.id, body: { memberId: members[9].userId, fineType: 'ABSENCE', amount: '20', note: 'Missed the September meeting without apology', date: '2026-09-06' } }, day(9, 6));
+  await S(payFine, { userId: treasurer.id, params: { fineId: absence?.id || absence?.fine?.id } }, day(10, 4));
+
+  // Lending: each member lends from what she has paid in, at 30%, and her
+  // interest is recorded as hers (member 5 chose not to lend this year).
+  for (const [m, d] of [[3, 28], [6, 27], [9, 26]]) {
+    for (const [i, member] of members.entries()) {
+      if (i === 4) continue;
+      const lent = Math.round((SOCIETY_MONTHLY[i] * m * 0.6) / 50) * 50;
+      if (lent < 100) continue;
+      const returned = Math.round(lent * 1.3);
+      await S(recordLendingRound, { userId: treasurer.id, body: { memberId: member.userId, lent: String(lent), returned: String(returned), note: `${MONTHS[m - 1]} round` } }, day(m, d));
+      await S(recordInterest, { userId: treasurer.id, body: { stokvelId, amount: String(returned - lent), note: `${member.name}'s own interest, ${MONTHS[m - 1]} round (hers alone)` } }, day(m, d + 1));
+    }
+  }
+
+  // A loan from the society, with the signed agreement and two votes.
+  const loanTerms = { interestPercent: '30', rateBasis: 'ONE_TIME_FLAT', agreed: true, borrowerPhoto: EXAMPLE_PHOTO, signature: EXAMPLE_SIGNATURE };
+  const loan = await S(requestLoan, { userId: members[7].userId, body: { ...loanTerms, amount: '2000', repayMonths: 3, reason: 'Registration and books for my daughter at college' } }, day(2, 3));
+  await S(voteLoan, { userId: chair.id, params: { loanId: loan.id }, body: { approve: true } }, day(2, 4));
+  await S(voteLoan, { userId: treasurer.id, params: { loanId: loan.id }, body: { approve: true } }, day(2, 5));
+  for (const m of [3, 4, 5]) await S(repayLoan, { userId: treasurer.id, params: { loanId: loan.id }, body: { amount: m === 5 ? '600' : '1000' } }, day(m, 25));
+
+  await S(createMinutes, { userId: secretary.id, body: {
+    date: '2026-07-05', location: 'Zwide', chairperson: chair.firstName, secretary: secretary.firstName,
+    attendees: members.filter((_, i) => i !== 9).map((m) => m.name), apologies: [members[9].name],
+    agendaItems: [{ title: 'Treasurer’s report', notes: 'Everyone paid up to June. One late payment fined in April. Each member’s interest so far is on the Lending tab.' },
+      { title: 'Loans', notes: `${members[7].firstName}’s loan from February is paid back in full with interest.` }],
+    actionItems: [{ task: 'Remind members below their interest target', owner: treasurer.firstName, due: '2026-08-31' }],
+    nextMeetingDate: '2026-09-06', nextMeetingLocation: 'Zwide',
+  } }, day(7, 5));
+  await S(postAnnouncement, { userId: treasurer.id, body: { stokvelId, message: 'Year-end meeting and payout: Saturday 5 December. Each of you takes home what you paid in plus your own interest. Two of us still need to pay November.' } }, day(11, 15));
+
+  await prisma.dataFix.create({ data: { name: key } });
+  return stokvelId;
+}
+
 // Only one server process builds at a time (two can be running during a
 // deploy): it claims the build and keeps the claim fresh while it works. A
 // claim not refreshed for STALE_MS is from a process that stopped, so it is
@@ -404,7 +515,7 @@ let running = null;
 export function buildLiveExamples({ retries = MAX_RETRIES } = {}) {
   if (running) return running;
   running = (async () => {
-    if (await prisma.dataFix.findUnique({ where: { name: FIX_NAME } })) { await loadExamples(); return { skipped: true }; }
+    if (await prisma.dataFix.findUnique({ where: { name: DONE_NAME } })) { await loadExamples(); return { skipped: true }; }
     if (!(await claimBuild())) {
       if (retries > 0) {
         const t = setTimeout(() => { buildLiveExamples({ retries: retries - 1 }).catch((e) => console.error('Live examples:', e.message)); }, RETRY_MS);
@@ -430,7 +541,9 @@ async function build() {
   const drinksId = await buildDrinksPool();
   const pool = drinksId || (await prisma.stokvel.findFirst({ where: { name: 'Umgidi Drinks Pool', organiser: { email: { endsWith: `@${EXAMPLE_EMAIL_DOMAIN}` } } }, select: { id: true } }))?.id;
   await buildCeremony(pool);
-  await prisma.dataFix.create({ data: { name: FIX_NAME } });
+  await buildSociety();
+  await prisma.dataFix.upsert({ where: { name: FIX_NAME }, update: {}, create: { name: FIX_NAME } });
+  await prisma.dataFix.create({ data: { name: DONE_NAME } });
   const list = await loadExamples();
   console.log(`Live examples ready: ${list.stokvels.length} stokvel(s), ${list.ceremonies.length} ceremony(ies).`);
   return { skipped: false };
