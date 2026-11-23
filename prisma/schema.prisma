@@ -143,6 +143,11 @@ model User {
   idNumberEncrypted          String?                     @db.Text
   idNumberLast4              String?
   idDocumentUrl               String?                    @db.Text
+  // Which ID was photographed: SMART_ID (card, front and back) or
+  // GREEN_BOOK (the green ID book, its photo page). idDocumentUrl is the
+  // front or the photo page; idDocumentBackUrl the back of a smart ID card.
+  idDocumentType              String?
+  idDocumentBackUrl           String?                    @db.Text
   identityVerificationStatus IdentityVerificationStatus @default(UNVERIFIED)
   identitySubmittedAt         DateTime?
   identityVerifiedAt          DateTime?

@@ -50,6 +50,7 @@ const PATHS = {
   'chevron-up': <path d="M6 15l6-6 6 6" />,
   compass: <><circle cx="12" cy="12" r="8.5" /><path d="M15.5 8.5l-2 5-5 2 2-5z" /></>,
   camera: <><path d="M4 8h3l1.5-2h7L17 8h3v11H4z" /><circle cx="12" cy="13" r="3.3" /></>,
+  upload: <><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5" /><path d="M4 14v5h16v-5" /></>,
   video: <><rect x="3" y="6" width="12" height="12" rx="1.5" /><path d="M15 10l6-3v10l-6-3z" /></>,
   file: <><path d="M6 3.5h8l4 4v13H6z" /><path d="M14 3.5v4h4" /></>,
   info: <><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5.5" /><path d="M12 8v.1" /></>,

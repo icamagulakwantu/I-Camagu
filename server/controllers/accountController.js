@@ -153,6 +153,8 @@ export async function deleteMyAccount(req, res) {
         idNumberEncrypted: null,
         idNumberLast4: null,
         idDocumentUrl: null,
+        idDocumentType: null,
+        idDocumentBackUrl: null,
         identityVerificationStatus: 'UNVERIFIED',
         identitySubmittedAt: null,
         identityVerifiedAt: null,

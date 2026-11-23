@@ -54,4 +54,42 @@ describe('identity document upload validation', () => {
       data: expect.objectContaining({ idDocumentUrl: 'data:image/png;base64,aGVsbG8=', identityVerificationStatus: 'PENDING' }),
     }));
   });
+
+  const IMG = 'data:image/jpeg;base64,aGVsbG8=';
+  const submit = async (body) => {
+    const res = responseRecorder();
+    await submitIdentityVerification({ userId: 'user-1', body: { idNumber: '1234567890123', ...body } }, res);
+    return res;
+  };
+
+  it('needs both sides of a smart ID card', async () => {
+    const res = await submit({ idDocumentType: 'SMART_ID', idDocumentUrl: IMG });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toMatch(/back of your smart ID/);
+    expect(prisma.user.update).not.toHaveBeenCalled();
+  });
+
+  it('saves the front and back of a smart ID card', async () => {
+    const res = await submit({ idDocumentType: 'SMART_ID', idDocumentUrl: IMG, idDocumentBackUrl: 'data:image/jpeg;base64,YmFjaw==' });
+    expect(res.statusCode).toBe(200);
+    expect(prisma.user.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ idDocumentType: 'SMART_ID', idDocumentUrl: IMG, idDocumentBackUrl: 'data:image/jpeg;base64,YmFjaw==' }),
+    }));
+  });
+
+  it('takes one photo page for a green ID book, and no back', async () => {
+    expect((await submit({ idDocumentType: 'GREEN_BOOK', idDocumentUrl: IMG })).statusCode).toBe(200);
+    expect(prisma.user.update).toHaveBeenLastCalledWith(expect.objectContaining({ data: expect.objectContaining({ idDocumentType: 'GREEN_BOOK', idDocumentBackUrl: null }) }));
+    expect((await submit({ idDocumentType: 'GREEN_BOOK', idDocumentUrl: IMG, idDocumentBackUrl: IMG })).statusCode).toBe(400);
+  });
+
+  it('checks the back photo like the front', async () => {
+    const res = await submit({ idDocumentType: 'SMART_ID', idDocumentUrl: IMG, idDocumentBackUrl: 'data:text/html;base64,PHNjcmlwdD4=' });
+    expect(res.statusCode).toBe(400);
+    expect(prisma.user.update).not.toHaveBeenCalled();
+  });
+
+  it('refuses an unknown ID type', async () => {
+    expect((await submit({ idDocumentType: 'PASSPORT', idDocumentUrl: IMG })).statusCode).toBe(400);
+  });
 });

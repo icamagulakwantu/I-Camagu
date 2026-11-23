@@ -13,6 +13,7 @@ function IdentityAdmin({ onBack }) {
   const [forbidden, setForbidden] = useState(false)
   const [rejecting, setRejecting] = useState(null)
   const [rejectionReason, setRejectionReason] = useState('')
+  const [zoomed, setZoomed] = useState(null)
 
   const fetchPending = () => {
     fetch('/api/identity/pending', { headers: { Authorization: `Bearer ${accessToken}` } })
@@ -76,19 +77,25 @@ function IdentityAdmin({ onBack }) {
                 <p className="font-mono font-bold text-sm tracking-wider bg-cream px-2 py-1 rounded-soft">{p.idNumber}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className={`grid gap-2 mb-3 ${p.idDocumentBackUrl ? 'grid-cols-3' : 'grid-cols-2'}`}>
                 <div>
                   <p className="text-xs font-bold text-ink-muted uppercase tracking-wider mb-1">Profile photo</p>
                   <div className="w-full aspect-square rounded-soft bg-cream overflow-hidden flex items-center justify-center">
                     {p.profileImage ? <img src={p.profileImage} alt="Profile" className="w-full h-full object-cover" /> : <Icon name="user" size={28} color="#8a8278" />}
                   </div>
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-ink-muted uppercase tracking-wider mb-1">ID document</p>
-                  <div className="w-full aspect-square rounded-soft bg-cream overflow-hidden flex items-center justify-center">
-                    {p.idDocumentUrl ? <img src={p.idDocumentUrl} alt="ID document" className="w-full h-full object-cover" /> : <Icon name="file" size={28} color="#8a8278" />}
+                {[
+                  [p.idDocumentUrl, p.idDocumentType === 'GREEN_BOOK' ? 'ID book, photo page' : p.idDocumentType === 'SMART_ID' ? 'Smart ID, front' : 'ID document'],
+                  ...(p.idDocumentBackUrl ? [[p.idDocumentBackUrl, 'Smart ID, back']] : []),
+                ].map(([src, label]) => (
+                  <div key={label}>
+                    <p className="text-xs font-bold text-ink-muted uppercase tracking-wider mb-1">{label}</p>
+                    {/* The whole document, never cropped; tap to read it full size. */}
+                    <button type="button" disabled={!src} onClick={() => setZoomed({ src, label })} className="w-full aspect-square rounded-soft bg-cream overflow-hidden flex items-center justify-center">
+                      {src ? <img src={src} alt={label} className="w-full h-full object-contain" /> : <Icon name="file" size={28} color="#8a8278" />}
+                    </button>
                   </div>
-                </div>
+                ))}
               </div>
 
               {rejecting === p.id ? (
@@ -116,6 +123,16 @@ function IdentityAdmin({ onBack }) {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {zoomed && (
+        <div role="dialog" aria-modal="true" aria-label={zoomed.label} onClick={() => setZoomed(null)} className="fixed inset-0 z-50 flex flex-col bg-black/90 p-3">
+          <div className="flex items-center justify-between pb-2 text-white">
+            <p className="text-sm font-bold">{zoomed.label}</p>
+            <button type="button" onClick={() => setZoomed(null)} className="min-h-11 px-3 text-sm font-bold">Close</button>
+          </div>
+          <img src={zoomed.src} alt={zoomed.label} className="min-h-0 flex-1 object-contain" />
         </div>
       )}
     </div>

@@ -5,6 +5,7 @@ import { cn } from '../lib/utils'
 import { captureLocation } from '../lib/geolocation.js'
 import Icon from '../components/Icon.jsx'
 import IsidukoTypeahead from '../components/IsidukoTypeahead.jsx'
+import IdDocumentCapture, { idPhotosComplete } from '../components/IdDocumentCapture.jsx'
 import { CEREMONY_IMAGE } from '../data/ceremonyImages.js'
 
 // No nation / sub-group picker: every clan sits under one Xhosa umbrella.
@@ -36,7 +37,6 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
   const { user, logout, accessToken, updateUser } = useAuth()
   const { showToast } = useToast()
   const fileInputRef = useRef(null)
-  const idDocInputRef = useRef(null)
 
   const [tab, setTab] = useState(initialTab || 'personal')
 
@@ -53,7 +53,9 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
   const [identity, setIdentity] = useState(null)
   const [identityForm, setIdentityForm] = useState(false)
   const [idNumber, setIdNumber] = useState('')
-  const [idDocumentUrl, setIdDocumentUrl] = useState(null)
+  // Which ID, and its photos: a smart ID card front and back, or the photo
+  // page of the green ID book (see IdDocumentCapture).
+  const [idPhotos, setIdPhotos] = useState({ type: null, front: null, back: null })
   const [submittingId, setSubmittingId] = useState(false)
   const [consented, setConsented] = useState(false)
 
@@ -69,22 +71,14 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
     return () => { cancelled = true }
   }, [accessToken])
 
-  const handleIdDocSelect = (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    if (file.size > 1_800_000) {
-      showToast('Photo too large — please choose an image under 1.8MB', 'error')
-      return
-    }
-    const reader = new FileReader()
-    reader.onload = () => setIdDocumentUrl(reader.result)
-    reader.readAsDataURL(file)
-  }
-
   const submitIdentity = async (e) => {
     e.preventDefault()
-    if (!idDocumentUrl) {
-      showToast('Please attach a photo of your ID document', 'error')
+    if (!idPhotos.type) {
+      showToast('Choose your ID: a smart ID card or a green ID book', 'error')
+      return
+    }
+    if (!idPhotosComplete(idPhotos)) {
+      showToast(idPhotos.type === 'SMART_ID' ? 'Add photos of the front and the back of your smart ID card' : 'Add a photo of the photo page of your ID book', 'error')
       return
     }
     if (!consented) {
@@ -96,14 +90,14 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
       const res = await fetch('/api/identity/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ idNumber, idDocumentUrl }),
+        body: JSON.stringify({ idNumber, idDocumentType: idPhotos.type, idDocumentUrl: idPhotos.front, idDocumentBackUrl: idPhotos.type === 'SMART_ID' ? idPhotos.back : null }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to submit')
       setIdentity({ status: data.status, last4: data.last4, submittedAt: data.submittedAt, verifiedAt: null, rejectionReason: null })
       setIdentityForm(false)
       setIdNumber('')
-      setIdDocumentUrl(null)
+      setIdPhotos({ type: null, front: null, back: null })
       setConsented(false)
       showToast('Submitted — an admin will review your ID shortly', 'success')
     } catch (err) {
@@ -411,20 +405,9 @@ export default function Profile({ onNavigate, initialTab, onConsumeInitialTab })
                 className="w-full border border-ink/30 rounded-soft px-3 py-2 text-sm tracking-wider"
                 required
               />
-              <input ref={idDocInputRef} type="file" accept="image/*" onChange={handleIdDocSelect} className="hidden" />
-              <button
-                type="button"
-                onClick={() => idDocInputRef.current?.click()}
-                className="w-full border-2 border-dashed border-ink/30 rounded-soft py-3 text-sm font-bold text-ink-muted flex items-center justify-center gap-2"
-              >
-                {idDocumentUrl ? (
-                  <><Icon name="check" size={14} color="#4a7a4a" /> ID photo attached</>
-                ) : (
-                  <><Icon name="camera" size={14} /> Attach a photo of your ID</>
-                )}
-              </button>
+              <IdDocumentCapture value={idPhotos} onChange={setIdPhotos} onError={(message) => showToast(message, 'error')} />
               <p className="text-xs text-ink-muted -mt-1 flex items-start gap-1">
-                <Icon name="key" size={11} className="mt-0.5 flex-shrink-0" /> Only an admin reviewing your submission can see this photo — it's never shown to other members or on your public profile.
+                <Icon name="key" size={11} className="mt-0.5 flex-shrink-0" /> Only an admin reviewing your submission can see these photos — they're never shown to other members or on your public profile.
               </p>
               <label className="flex items-start gap-2 pt-1 cursor-pointer">
                 <input
