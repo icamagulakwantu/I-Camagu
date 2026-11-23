@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { hirePlan, hireCostLine } from './hire.js'
+import { darkness } from './darkness.js'
 import { drinksPoolExample, groceryStokvelExample, societyExample, lendingCap, memberYear } from './examples.js'
 import { exampleMembers } from './clanExample.js'
 import { PHASE_SEQUENCES } from './ceremonyPhases.js'
@@ -28,6 +29,20 @@ describe('what to hire', () => {
     const line = hireCostLine('mobile_fridge', 150)
     expect(line).toMatchObject({ phase: 'HIRE', label: 'Hire: Mobile fridge', unitCost: 925, quantity: 1 })
     expect(hireCostLine('not-an-item', 150)).toBeNull()
+  })
+  it('benches for ootata, lights for the evening, a second fridge for a big ceremony', () => {
+    const p = hirePlan(150)
+    const item = (id) => p.items.find((i) => i.id === id)
+    expect(item('benches')).toMatchObject({ qty: 5, low: 1000, optional: false })
+    expect(item('lights')).toMatchObject({ qty: 4, night: true, optional: false })
+    expect(item('generator').optional).toBe(true)
+    expect(item('mobile_fridge').qty).toBe(1)
+    expect(hirePlan(300).items.find((i) => i.id === 'mobile_fridge').qty).toBe(2)
+  })
+  it('knows when it gets dark in Gqeberha', () => {
+    expect(darkness('2026-12-21')).toEqual({ sunset: '19:28', dark: '19:57' })
+    expect(darkness('2026-06-21').sunset).toBe('17:16')
+    expect(darkness(null)).toBeNull()
   })
   it('the Hire stage sits with the preparations, before the day', () => {
     const u = PHASE_SEQUENCES.ULWALUKO

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import Icon from '../../components/Icon.jsx'
 import { hirePlan } from '../../../shared/hire.js'
+import { darkness } from '../../../shared/darkness.js'
 import { useT } from '../../i18n/index.jsx'
 
 const rand = (n) => `R${Math.round(n).toLocaleString('en-ZA')}`
@@ -14,6 +15,9 @@ const range = (i) => (i.from ? `from ${rand(i.low)}` : i.low === i.high ? rand(i
 export default function HirePlanCard({ ceremony, accessToken, showToast, onAdded }) {
   const t = useT()
   const plan = useMemo(() => hirePlan(ceremony?.guestCount || 150), [ceremony?.guestCount])
+  // The day the guests are there: for ulwaluko that is umgidi.
+  const day = ceremony?.homecomingDate || ceremony?.eventDate
+  const dark = useMemo(() => darkness(day), [day])
   const [open, setOpen] = useState(false)
   const [chosen, setChosen] = useState(() => new Set(plan.items.filter((i) => !i.optional).map((i) => i.id)))
   const [busy, setBusy] = useState(false)
@@ -53,7 +57,7 @@ export default function HirePlanCard({ ceremony, accessToken, showToast, onAdded
       <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="flex w-full items-center gap-3 text-left">
         <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[#1f3320] text-cream"><Icon name="package" size={18} /></span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#6f655a]">{t('Tent, chairs, stoves, fridge')}</span>
+          <span className="block text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#6f655a]">{t('Tent, benches, fridge, lights')}</span>
           <span id="hire-title" className="block font-display text-[1.15rem] font-semibold leading-tight text-ink">{t('What to hire')}</span>
           <span className="block text-[13px] text-ink-muted">{t('For {n} guests: about {low}–{high}', { n: plan.guests, low: rand(plan.usualLow), high: rand(plan.usualHigh) })}</span>
         </span>
@@ -78,6 +82,11 @@ export default function HirePlanCard({ ceremony, accessToken, showToast, onAdded
                         <span className="flex-shrink-0 text-[13px] font-bold tabular-nums text-ink">{range(item)}</span>
                       </span>
                       <span className="mt-0.5 block text-[12px] leading-snug text-ink-muted">{t(item.why)}</span>
+                      {item.night && dark && (
+                        <span className="mt-1 block rounded-lg bg-[#1f3320]/[0.06] px-2 py-1 text-[12px] font-semibold text-[#2e4a2e]">
+                          {t('On your day the sun sets at about {sunset} and it is dark by {dark}.', dark)}
+                        </span>
+                      )}
                       {item.vendors.map((v, n) => (
                         <span key={v.name} className={`mt-0.5 block text-[12px] ${n === 0 ? 'font-semibold text-[#2e4a2e]' : 'text-ink-muted'}`}>
                           {n === 1 ? `${t('Also')}: ` : ''}{v.name} · {v.contact}{v.area && !v.area.startsWith('Area to') ? ` · ${v.area}` : ''}

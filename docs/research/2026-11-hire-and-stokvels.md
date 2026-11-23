@@ -49,6 +49,33 @@ These now set the stove, pot, urn, crockery and chafing ranges in the hire
 card, with the township hirer named first; Tumi's sits beside Tent Hire Wiz
 for tents. For 150 guests the usual items come to about R7,740–R12,770.
 
+### Fridges, benches and lighting (23 Nov 2026)
+The founder: look at mobile fridges, traditional benches, and lighting, which
+many ceremonies lack: by about 7:30 pm it is dark.
+
+| What | Price | Source |
+|---|---|---|
+| Mobile fridge | R650–R1,200 | Tent Hire Wiz (Motherwell page) |
+| Mobile fridge trailer, per day | R1,500 | Kwena Hire (national) |
+| Beer bench set: 1 table, 2 benches | R200 excl. VAT, 3 nights | Red Cherry Events, North End |
+| Generator, per day | R450 excl. VAT | Red Cherry Events |
+| String lights / fairy lights, per day | R140 / R65 incl. VAT | LEDZ Hire, 2 Springfield Rd, 041 363 0190 |
+| Battery fairy lights 2.5 m / oil lamp | R10 / R20 | Extreme Hiring EC |
+| 5 kVA generator, per day | about R500 | Plant Index (national, older listing) |
+
+Not found: a published Gqeberha price for flood lights, or for the wooden
+benches township hirers keep; the card tells families to ask.
+
+In the app: the hire card adds benches for ootata ebuhlanti (a set seats 8;
+about a quarter of the guests), string lights (one per 40 guests, at least
+three: tent, path to ebuhlanti, kitchen, toilets), a generator (optional, for
+no plug point or load-shedding), and a second fridge from about 200 guests.
+For the ceremony's own date (umgidi's date for ulwaluko) it shows when the
+sun sets in Gqeberha and when it is dark, from the NOAA solar formulas
+(`shared/darkness.js`): about 19:28 and 19:57 on 21 December, 17:16 and
+17:43 on 21 June. For 150 guests the usual items now come to about
+R9,000–R14,480.
+
 ### In the app
 - "What to hire" is its own card on the ceremony page, not part of the
   checklist: quantities from the guest count (tents sized as 100-seat
@@ -103,6 +130,8 @@ they lend. (Cliffe Dekker Hofmeyr, Stokvels and the National Credit
 Regulator.)
 
 ## Sources
+- LEDZ Hire: https://ledz.co.za/ledz-hire-home/
+- Plant Index, generator hire: https://plantindex.co.za/product/generator-5kva/
 - Tent Hire Wiz: https://pe.tent-hirewiz.co.za/tent-hire-motherwell · https://pe.tent-hirewiz.co.za/funeral-tent-hire-pe · https://pe.tent-hirewiz.co.za/tables-chairs-hire-pe/
 - Extreme Hiring EC price list: https://www.extremehiringec.co.za/hire-price-list/
 - Libhongo Decor & Hire: https://libhongoevents.co.za/

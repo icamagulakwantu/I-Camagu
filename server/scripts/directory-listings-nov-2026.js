@@ -176,3 +176,24 @@ export async function addTownshipHireListings() {
   if (added) console.log(`Directory: ${added} township hirer(s) added.`);
   return { added, skipped: false };
 }
+
+// Fifth batch, 23 Nov 2026: lighting, so a ceremony is not left in the dark
+// when the sun goes down (founder). From LEDZ Hire's own site.
+export const FIX_NAME_5 = 'directory-listings-2026-11-23-lighting';
+export const LIGHTING_LISTINGS = [
+  {
+    name: 'LEDZ Hire',
+    category: 'EQUIPMENT_HIRE',
+    area: '2 Springfield Road, Gqeberha',
+    contactInfo: '041 363 0190 · ledz.co.za',
+    description: 'Lighting for hire: string lights R140 a day, fairy lights R65 a day (incl. VAT), table and solar lighting, backup power. Rental only, no set-up; a refundable deposit is asked.',
+  },
+];
+
+export async function addLightingListings() {
+  if (await prisma.dataFix.findUnique({ where: { name: FIX_NAME_5 } })) return { added: 0, skipped: true };
+  const added = await addVendors(LIGHTING_LISTINGS);
+  await prisma.dataFix.create({ data: { name: FIX_NAME_5 } });
+  if (added) console.log(`Directory: ${added} lighting hirer(s) added.`);
+  return { added, skipped: false };
+}

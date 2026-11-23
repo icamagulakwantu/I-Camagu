@@ -53,8 +53,20 @@ export const HIRE_VENDORS = {
   RED_CHERRY: {
     name: 'Red Cherry Events',
     area: 'North End, Gqeberha (R12/km return delivery)',
-    contact: 'redcherryevents.co.za',
-    note: 'Tents from R650, furniture from R100.',
+    contact: '041 581 5335 · redcherryevents.co.za',
+    note: 'Beer bench set (1 table, 2 benches) R200; generator R450 a day; prices excl. VAT, for 3 nights.',
+  },
+  LEDZ: {
+    name: 'LEDZ Hire',
+    area: '2 Springfield Road, Gqeberha',
+    contact: '041 363 0190',
+    note: 'String lights R140 a day, fairy lights R65 a day (incl. VAT); solar lighting and backup power on quote. Rental only, no set-up; refundable deposit.',
+  },
+  KWENA: {
+    name: 'Kwena Hire',
+    area: 'National, delivers to Gqeberha',
+    contact: 'kwenahire.co.za',
+    note: 'Mobile fridge trailer R1,500 a day.',
   },
 }
 
@@ -87,10 +99,45 @@ export const HIRE_ITEMS = [
     id: 'mobile_fridge',
     label: 'Mobile fridge',
     unit: 'fridge',
-    qty: () => 1,
+    // One holds the meat of a beast and the drinks; a second from about 200
+    // guests, or when drinks and meat are kept apart.
+    qty: (guests) => Math.max(1, Math.ceil(guests / 200)),
     price: () => [650, 1200],
-    vendor: 'TENT_HIRE_WIZ',
-    why: 'For the meat and the drinks, so nothing spoils before the day.',
+    vendor: ['TENT_HIRE_WIZ', 'KWENA'],
+    why: 'For the meat and the drinks, so nothing spoils before the day. Have it delivered the day before the slaughter, plugged in where the cooks can reach it; it needs a plug point or a generator.',
+  },
+  {
+    id: 'benches',
+    label: 'Wooden benches and tables for ootata ebuhlanti',
+    unit: 'set (1 table, 2 benches)',
+    // About a quarter of the guests are the men ebuhlanti; a set seats 8.
+    qty: (guests) => Math.max(2, Math.ceil((guests * 0.25) / 8)),
+    // Red Cherry R200 a set excl. VAT, R230 with it.
+    price: () => [200, 230],
+    vendor: ['RED_CHERRY', 'TUMIS'],
+    why: 'Ootata sit ebuhlanti, on benches and grass mats rather than plastic chairs in the tent. Township hirers often have benches too: ask when you book the tent.',
+  },
+  {
+    id: 'lights',
+    label: 'String lights for the tent, the yard and ebuhlanti',
+    unit: 'string',
+    qty: (guests) => Math.max(3, Math.ceil(guests / 40)),
+    // LEDZ fairy lights R65 to string lights R140 a day.
+    price: () => [65, 140],
+    vendor: ['LEDZ', 'EXTREME_HIRING'],
+    why: 'Many ceremonies forget the lights, and the yard goes dark while people are still eating and dancing. Light the tent, the path to ebuhlanti, the kitchen and the way to the toilets. For the kraal itself, ask the hirer for a flood light.',
+    night: true,
+  },
+  {
+    id: 'generator',
+    label: 'Generator for the lights and the fridge',
+    unit: 'day',
+    qty: () => 1,
+    // Red Cherry R450 a day excl. VAT (R517.50 with it).
+    price: () => [450, 520],
+    vendor: ['RED_CHERRY', 'LEDZ'],
+    why: 'If there is no plug point near the tent, or for load-shedding. Fill it with petrol before the evening, and keep it away from where people sit.',
+    optional: true,
   },
   {
     id: 'gas_stove',
@@ -178,6 +225,7 @@ export function hirePlan(guests) {
       from: Boolean(item.from),
       optional: Boolean(item.optional),
       why: item.why,
+      night: Boolean(item.night),
       // Who hires it out, local hirers first; vendor is the first of them.
       vendors: [].concat(item.vendor).map((key) => HIRE_VENDORS[key]),
       vendor: HIRE_VENDORS[[].concat(item.vendor)[0]],
