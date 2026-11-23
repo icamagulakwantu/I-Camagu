@@ -1,3 +1,4 @@
+import { EXAMPLE_EMAIL_DOMAIN } from '../services/exampleAccess.js';
 import { randomUUID } from 'crypto';
 import prisma from '../config/db.js';
 import { createNotification } from '../services/notificationDbService.js';
@@ -78,7 +79,8 @@ export async function searchPeople(req, res) {
       : { id: { in: [...familyIds] } };
 
     const users = await prisma.user.findMany({
-      where,
+      // The live examples' people are not real and can never be invited.
+      where: { AND: [where, { NOT: { email: { endsWith: `@${EXAMPLE_EMAIL_DOMAIN}` } } }] },
       select: { id: true, firstName: true, lastName: true, username: true },
       take: 15,
     });

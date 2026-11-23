@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import Icon from '../components/Icon.jsx'
 import { drinksPoolExample, groceryStokvelExample, societyExample, LENDING_RULES } from '../../shared/examples.js'
 import { useT } from '../i18n/index.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
+import { useLiveExamples } from '../lib/liveExamples.js'
 
 // Worked examples, open to every member and marked "Example" (founder,
 // 23 Nov 2026): a full umgidi drinks stokvel buying together, a grocery
@@ -243,8 +245,31 @@ function CeremonyExample({ t }) {
   )
 }
 
-export default function Examples({ onBack, initialExample = 'drinks' }) {
+// What each worked example opens when you step inside: the real screen, with
+// everything in it, that every tab of can be clicked (read-only).
+const LIVE = {
+  grocery: { type: 'GROCERY_STOKVEL', title: 'Step inside Masibambane Grocery Stokvel', body: '15 members and a whole year: every contribution in the ledger, the fines, loans with their votes and repayments, the lending rounds, minutes, the rules and the statement.' },
+  drinks: { type: 'ALCOHOL_BULK_POOL', title: 'Step inside the Umgidi Drinks Pool', body: '50 members saving R1,500 a month: ten months of contributions in the ledger, the interest, fines, minutes and the rules.' },
+  ceremony: { ceremony: true, title: 'Step inside Ulwaluko lukaLwazi', body: 'The whole plan, from going to the mountain to umgidi: the shopping list with what is bought, the tasks done, what to hire, seating, who brings what, the family’s pledges and who is coming.' },
+}
+
+function StepInside({ t, live, onOpen }) {
+  return (
+    <button type="button" onClick={onOpen} className="mb-4 mt-2 flex w-full items-center gap-3 rounded-[22px] bg-[radial-gradient(120%_120%_at_0%_0%,#14240f_0%,#1f3320_55%,#3c6a37_100%)] p-4 text-left text-cream shadow-[0_18px_34px_-22px_rgba(20,36,15,0.9)]">
+      <span className="min-w-0 flex-1">
+        <span className="block text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#f5d58a]">{t('Live example · tap every tab')}</span>
+        <span className="mt-1 block font-display text-[1.25rem] font-semibold leading-tight">{t(live.title)}</span>
+        <span className="mt-1 block text-[13px] leading-snug text-cream/80">{t(live.body)}</span>
+      </span>
+      <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[#c1922f] text-[#1c1612]"><Icon name="arrowRight" size={18} /></span>
+    </button>
+  )
+}
+
+export default function Examples({ onBack, initialExample = 'drinks', onOpenLiveStokvel, onOpenLiveCeremony }) {
   const t = useT()
+  const { accessToken } = useAuth()
+  const liveExamples = useLiveExamples(accessToken)
   const [active, setActive] = useState(EXAMPLES.some((e) => e.id === initialExample) ? initialExample : 'drinks')
   useEffect(() => { window.scrollTo({ top: 0 }) }, [active])
   const current = EXAMPLES.find((e) => e.id === active)
@@ -265,6 +290,16 @@ export default function Examples({ onBack, initialExample = 'drinks' }) {
         ))}
       </div>
       <div className="px-4 pt-2">
+        {(() => {
+          const live = LIVE[active]
+          if (!live) return null
+          if (live.ceremony) {
+            const c = liveExamples.ceremonies[0]
+            return c && onOpenLiveCeremony ? <StepInside t={t} live={live} onOpen={() => onOpenLiveCeremony(c.id)} /> : null
+          }
+          const s = liveExamples.stokvels.find((x) => x.type === live.type)
+          return s && onOpenLiveStokvel ? <StepInside t={t} live={live} onOpen={() => onOpenLiveStokvel(s.id)} /> : null
+        })()}
         {active === 'drinks' && <DrinksExample t={t} />}
         {active === 'grocery' && <GroceryExample t={t} />}
         {active === 'society' && <SocietyExample t={t} />}

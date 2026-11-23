@@ -33,6 +33,8 @@ import { applyGrocerySpecials } from './scripts/grocery-specials-nov-2026.js';
 import { addEkoyiniProducts } from './scripts/ekoyini-catalogue-nov-2026.js';
 import { correctQuartSizes } from './scripts/quart-sizes-nov-2026.js';
 import { applyDrinksPhotosPrices, fixTsitsikammaSparklingPhoto } from './scripts/drinks-photos-prices-nov-2026.js';
+import { exampleView, loadExamples } from './services/exampleAccess.js';
+import { buildLiveExamples } from './scripts/live-examples-nov-2026.js';
 import { applyPriceChecks } from './scripts/apply-price-checks.js';
 import { keepBulkBelowShelf } from './scripts/bulk-below-shelf.js';
 import { applyVerifiedShelfPrices } from './scripts/verified-shelf-prices-nov-2026.js';
@@ -150,6 +152,8 @@ app.get('/api/health/storage', async (req, res) => {
   res.json(await storageStatus());
 });
 
+// Live examples: read as their own people, never changed (services/exampleAccess.js).
+app.use('/api', exampleView);
 app.use('/api/auth', authRoutes);
 app.use('/api/ukusoka', ukusokaRoutes);
 app.use('/api/user', userRoutes);
@@ -363,6 +367,9 @@ if (startup.schemaReady) {
   } catch (err) {
     console.error('Product photos failed:', err?.message);
   }
+  // Live examples: built once, in the background, so start-up is not held up.
+  loadExamples().catch((err) => console.error('Loading live examples failed:', err?.message));
+  buildLiveExamples().catch((err) => console.error('Building live examples failed:', err?.message));
   // Every start: a bulk price stays at least 5% below a checked shelf price.
   try {
     await keepBulkBelowShelf();

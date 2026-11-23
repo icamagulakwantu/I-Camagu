@@ -21,6 +21,8 @@ import {
 } from './ceremony/ceremonyForm.js'
 import { CEREMONY_IMAGE, ceremonyImage } from '../data/ceremonyImages.js'
 import { useT } from '../i18n/index.jsx'
+import ExampleBanner from '../components/ExampleBanner.jsx'
+import { useLiveExamples, liveExampleFor } from '../lib/liveExamples.js'
 
 const INVALID_MESSAGE = {
   what: 'Please choose the kind of ceremony',
@@ -67,11 +69,16 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
     setShowPledges(false)
   }
 
+  // A live example's plan is asked for as the example (the server answers as
+  // its host); an ordinary member's own plans otherwise.
+  const plansUrl = selectedCeremonyId ? `/api/ceremonies/plans/my?example=${encodeURIComponent(selectedCeremonyId)}` : '/api/ceremonies/plans/my'
+  const liveExamples = useLiveExamples(accessToken)
+
   // Reload the open plan after something outside the wizard changed it, such
   // as accepting a family suggestion onto the checklist.
   const refreshActivePlan = () => {
     if (!activePlan?.id) return
-    request('/api/ceremonies/plans/my', accessToken)
+    request(plansUrl, accessToken)
       .then((data) => {
         const fresh = Array.isArray(data) ? data.find((plan) => plan.id === activePlan.id) : null
         if (!fresh) return
@@ -83,7 +90,7 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
   }
 
   const fetchPlans = () => {
-    request('/api/ceremonies/plans/my', accessToken)
+    request(plansUrl, accessToken)
       .then((data) => {
         const nextPlans = Array.isArray(data)
           ? data.map((plan) => ({
@@ -257,7 +264,10 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
 
   // ----- The ceremony page -----
   if (activePlan && stepId === 'summary') {
+    const example = liveExampleFor(liveExamples, activePlan.ceremonyId)
     return (
+      <>
+      {example && <ExampleBanner seenAs={example.seenAs} onLeave={onBack} />}
       <CeremonyHome
         plan={activePlan}
         pledges={pledges}
@@ -273,6 +283,7 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
         onDeleted={handleDeleted}
         onPlanChanged={refreshActivePlan}
       />
+      </>
     )
   }
 
@@ -288,8 +299,10 @@ export default function CeremonyPlanner({ onBack, defaultType, autoStartType = n
       return BUTTONS.next
     })()
 
+    const example = liveExampleFor(liveExamples, activePlan?.ceremonyId)
     return (
       <div className="min-h-screen pb-24 bg-cream">
+        {example && <ExampleBanner seenAs={example.seenAs} onLeave={onBack} />}
         <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-8 pt-6 text-cream">
         <img src={ceremonyImage(activePlan?.ceremonyType)} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />

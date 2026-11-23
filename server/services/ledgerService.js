@@ -5,6 +5,7 @@ import {
 } from '../utils/ledgerRules.js';
 import { fromCents } from '../utils/money.js';
 import { bankDeltaCents, summariseBalanceCheck } from '../utils/balanceRules.js';
+import { now } from '../utils/clock.js';
 
 // The stokvel ledger. I-Camagu RECORDS money movements here; it never holds,
 // lends or transfers the money. Rows are append-only: the database itself
@@ -99,7 +100,7 @@ export async function postEntryTx(tx, {
     SELECT "seq", "hash" FROM "LedgerEntry" WHERE "stokvelId" = ${stokvelId} ORDER BY "seq" DESC LIMIT 1`;
   const seq = (last[0]?.seq ?? 0) + 1;
   const prevHash = last[0]?.hash ?? GENESIS_HASH;
-  const createdAt = new Date();
+  const createdAt = now();
   const id = randomUUID();
   const hash = computeEntryHash({
     prevHash, stokvelId, seq, kind, memo, createdById, approvedById, reversesEntryId,

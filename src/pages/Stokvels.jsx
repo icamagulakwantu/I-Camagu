@@ -3,6 +3,8 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Skeleton, StokvelCardSkeleton, StokvelDetailSkeleton } from '../components/ui/Skeleton.jsx'
+import ExampleBanner from '../components/ExampleBanner.jsx'
+import { useLiveExamples, liveExampleFor } from '../lib/liveExamples.js'
 import { SeeExampleButton } from './Examples.jsx'
 import Icon from '../components/Icon.jsx'
 import MeetingMinutes from './stokvel/MeetingMinutes.jsx'
@@ -63,7 +65,7 @@ const inputStyle = "w-full min-h-11 bg-white border border-ink/15 rounded-xl px-
 // cards to the list view only, below the page header, so the header always
 // sits at the top like every other tab and the extras never leak into the
 // create, join or detail views.
-function Stokvels({ onBack, onNavigate, onOpenExample, topSlot = null, bottomSlot = null }) {
+function Stokvels({ onBack, onNavigate, onOpenExample, openStokvelId = null, onLeaveExample, topSlot = null, bottomSlot = null }) {
   const t = useT()
   const { accessToken, user } = useAuth()
   const { showToast } = useToast()
@@ -139,6 +141,13 @@ function Stokvels({ onBack, onNavigate, onOpenExample, topSlot = null, bottomSlo
   useEffect(() => {
     fetchMyStokvels()
   }, [])
+
+  // A live example opens straight onto its own page.
+  const liveExamples = useLiveExamples(accessToken)
+  useEffect(() => {
+    if (openStokvelId) fetchDetail(openStokvelId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openStokvelId])
 
   const fetchDetail = async (stokvelId) => {
     setLoading(true)
@@ -665,8 +674,10 @@ function Stokvels({ onBack, onNavigate, onOpenExample, topSlot = null, bottomSlo
       .filter((c) => c.memberId === membershipId && c.status === 'CONFIRMED')
       .reduce((sum, c) => sum + Number(c.amount || 0), 0)
 
+    const example = liveExampleFor(liveExamples, stokvel.id)
     return (
       <div className="min-h-screen pb-24 bg-cream">
+        {example && <ExampleBanner seenAs={example.seenAs} onLeave={onLeaveExample || (() => setView('list'))} />}
         <header className="relative overflow-hidden bg-[#1f3320] px-5 pb-16 pt-6 text-cream">
         <img src="/images/home-hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#1f3320]/40 via-[#1f3320]/55 to-[#1f3320]" />
@@ -699,7 +710,8 @@ function Stokvels({ onBack, onNavigate, onOpenExample, topSlot = null, bottomSlo
           </div>
           {isOfficial && <span className="flex-shrink-0 rounded-full bg-sage-500/15 px-2.5 py-1 text-[11px] font-extrabold text-[#2e4a2e]">{t('You are an official')}</span>}
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-2">
+        {/* An example is never shared: no invite link to it. */}
+        {!example && <div className="mt-4 grid grid-cols-2 gap-2">
           <a
             href={whatsappShareUrl(stokvelInviteMessage(stokvel.name, stokvel.id))}
             target="_blank"
@@ -719,7 +731,7 @@ function Stokvels({ onBack, onNavigate, onOpenExample, topSlot = null, bottomSlo
           >
             <Icon name="copy" size={15} color="#1f3320" /> {t('Copy link')}
           </button>
-        </div>
+        </div>}
         <p className="mt-3 text-[12px] text-ink-muted">{t('Your reference')}: <span className="font-mono font-bold text-ink">{myReferenceCode}</span></p>
       </section>
 

@@ -13,8 +13,12 @@ export function requireAuth(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
-    req.user = { id: decoded.userId };
-    req.userId = decoded.userId;
+    // A live example is read as its own person (see services/exampleAccess.js);
+    // only ever set on GET requests that name an example.
+    const actAs = req.exampleActAs || decoded.userId;
+    req.viewerId = decoded.userId;
+    req.user = { id: actAs };
+    req.userId = actAs;
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Invalid or expired access token' });

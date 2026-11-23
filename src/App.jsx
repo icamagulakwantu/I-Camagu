@@ -248,6 +248,12 @@ function MainApp() {
   }, [accessToken])
 
   const openExample = (id) => { setExampleId(id); setScreen('examples') }
+  // A live example opens the real screen, seen as the example's own people.
+  const [liveStokvelId, setLiveStokvelId] = useState(null)
+  const openLiveStokvel = (id) => { setLiveStokvelId(id); setScreen('stokvels') }
+  const leaveLiveStokvel = () => { setLiveStokvelId(null); setScreen('examples') }
+  // Leaving the Stokvels screen leaves the example: the tab opens your own again.
+  useEffect(() => { if (screen !== 'stokvels' && liveStokvelId) setLiveStokvelId(null) }, [screen, liveStokvelId])
   const goHome = () => setScreen('home')
   const goMore = () => setScreen('more')
 
@@ -454,9 +460,9 @@ function MainApp() {
       case 'pin':
         return <PinSetup onBack={goMore} />
       case 'stokvels':
-        return <Stokvels onBack={goHome} onNavigate={setScreen} onOpenExample={openExample} />
+        return <Stokvels key={liveStokvelId || 'mine'} onBack={goHome} onNavigate={setScreen} onOpenExample={openExample} openStokvelId={liveStokvelId} onLeaveExample={liveStokvelId ? leaveLiveStokvel : undefined} />
       case 'examples':
-        return <Examples onBack={() => window.history.back()} initialExample={exampleId} />
+        return <Examples onBack={() => window.history.back()} initialExample={exampleId} onOpenLiveStokvel={openLiveStokvel} onOpenLiveCeremony={openExistingCeremony} />
       case 'notifications':
         return <Notifications onBack={goHome} onNavigate={setScreen} />
       case 'activity':

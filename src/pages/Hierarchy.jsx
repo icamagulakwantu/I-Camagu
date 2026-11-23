@@ -239,6 +239,8 @@ function Hierarchy({ onBack, initialCeremonyId }) {
           <select value={ceremonyId} onChange={(e) => setCeremonyId(e.target.value)}
             className="w-full border border-ink/15 rounded-xl px-3 py-2.5 text-sm bg-white" required>
             <option value="">Choose a ceremony</option>
+            {/* A ceremony opened from elsewhere (such as a live example) that is not in your own list. */}
+            {ceremonyId && !ceremonies.some((c) => c.id === ceremonyId) && <option value={ceremonyId}>This ceremony</option>}
             {ceremonies.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.title} &mdash; {c.type?.replace(/_/g, ' ')} ({new Date(c.eventDate).toLocaleDateString()})
