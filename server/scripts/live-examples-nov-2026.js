@@ -378,20 +378,41 @@ export async function buildCeremony(savingStokvelId) {
   return ceremony.id;
 }
 
+// Only one server process builds at a time (two can be running during a
+// deploy): it claims the build first. A claim older than CLAIM_MINUTES is
+// from a process that stopped, so it is taken over.
+const CLAIM = `${FIX_NAME}-building`;
+const CLAIM_MINUTES = 30;
+async function claimBuild() {
+  try {
+    await prisma.dataFix.create({ data: { name: CLAIM } });
+    return true;
+  } catch {
+    const stale = new Date(Date.now() - CLAIM_MINUTES * 60 * 1000);
+    const { count } = await prisma.dataFix.updateMany({ where: { name: CLAIM, appliedAt: { lt: stale } }, data: { appliedAt: new Date() } });
+    return count === 1;
+  }
+}
+
 let running = null;
 export function buildLiveExamples() {
   if (running) return running;
   running = (async () => {
     if (await prisma.dataFix.findUnique({ where: { name: FIX_NAME } })) { await loadExamples(); return { skipped: true }; }
-    await ensureLedgerTables();
-    await buildGroceryStokvel();
-    const drinksId = await buildDrinksPool();
-    const pool = drinksId || (await prisma.stokvel.findFirst({ where: { name: 'Umgidi Drinks Pool', organiser: { email: { endsWith: `@${EXAMPLE_EMAIL_DOMAIN}` } } }, select: { id: true } }))?.id;
-    await buildCeremony(pool);
-    await prisma.dataFix.create({ data: { name: FIX_NAME } });
-    const list = await loadExamples();
-    console.log(`Live examples ready: ${list.stokvels.length} stokvel(s), ${list.ceremonies.length} ceremony(ies).`);
-    return { skipped: false };
+    if (!(await claimBuild())) return { skipped: true, busy: true };
+    try { return await build(); } finally { await prisma.dataFix.deleteMany({ where: { name: CLAIM } }); }
   })().finally(() => { running = null; });
   return running;
+}
+
+async function build() {
+  await ensureLedgerTables();
+  await buildGroceryStokvel();
+  const drinksId = await buildDrinksPool();
+  const pool = drinksId || (await prisma.stokvel.findFirst({ where: { name: 'Umgidi Drinks Pool', organiser: { email: { endsWith: `@${EXAMPLE_EMAIL_DOMAIN}` } } }, select: { id: true } }))?.id;
+  await buildCeremony(pool);
+  await prisma.dataFix.create({ data: { name: FIX_NAME } });
+  const list = await loadExamples();
+  console.log(`Live examples ready: ${list.stokvels.length} stokvel(s), ${list.ceremonies.length} ceremony(ies).`);
+  return { skipped: false };
 }

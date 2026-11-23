@@ -49,5 +49,17 @@ integrationDescribe('live examples (real database)', () => {
 
   it('builds only once', async () => {
     expect(await buildLiveExamples()).toMatchObject({ skipped: true });
+    expect(await prisma.dataFix.findUnique({ where: { name: `${FIX_NAME}-building` } })).toBeNull();
+  });
+
+  it('leaves the build to another process that is already building', async () => {
+    await prisma.dataFix.delete({ where: { name: FIX_NAME } });
+    await prisma.dataFix.create({ data: { name: `${FIX_NAME}-building` } });
+    try {
+      expect(await buildLiveExamples()).toEqual({ skipped: true, busy: true });
+    } finally {
+      await prisma.dataFix.deleteMany({ where: { name: `${FIX_NAME}-building` } });
+      await prisma.dataFix.create({ data: { name: FIX_NAME } });
+    }
   });
 });
