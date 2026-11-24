@@ -156,12 +156,14 @@ export default function DemandDashboard({ onBack }) {
         authedFetch('/api/supplier/admin/merchants'),
       ])
       if (overviewRes.status === 403) { setDenied(true); return }
-      if (!overviewRes.ok || !unassignedRes.ok || !payoutsRes.ok || !refundsRes.ok || !merchantsRes.ok) throw new Error('Could not load demand data')
+      if (!overviewRes.ok || !unassignedRes.ok || !merchantsRes.ok) throw new Error('Could not load demand data')
       setMerchants(await merchantsRes.json())
       setOverview(await overviewRes.json())
       setUnassigned(await unassignedRes.json())
-      setPendingPayouts(await payoutsRes.json())
-      setPendingRefunds(await refundsRes.json())
+      // Payouts and refunds through i-Camagu are switched off while members pay
+      // suppliers directly (record-only mode): then there are none to show.
+      setPendingPayouts(payoutsRes.ok ? await payoutsRes.json() : [])
+      setPendingRefunds(refundsRes.ok ? await refundsRes.json() : [])
     } catch (err) {
       showToast(err.message, 'error')
     } finally {

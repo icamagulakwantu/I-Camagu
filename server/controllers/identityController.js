@@ -104,6 +104,10 @@ export async function getMyIdentityStatus(req, res) {
   }
 }
 
+function safeDecrypt(value) {
+  try { return decryptSensitive(value); } catch { return null; }
+}
+
 export async function listPendingIdentityVerifications(req, res) {
   try {
     const admin = await prisma.user.findUnique({ where: { id: req.userId } });
@@ -124,7 +128,9 @@ export async function listPendingIdentityVerifications(req, res) {
       firstName: u.firstName,
       lastName: u.lastName,
       email: u.email,
-      idNumber: decryptSensitive(u.idNumberEncrypted),
+      // One record that cannot be read (e.g. encrypted under an older key)
+      // must not hide everyone else's: show it without the number.
+      idNumber: safeDecrypt(u.idNumberEncrypted),
       idDocumentUrl: u.idDocumentUrl,
       idDocumentType: u.idDocumentType,
       idDocumentBackUrl: u.idDocumentBackUrl,

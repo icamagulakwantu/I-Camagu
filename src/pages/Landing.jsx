@@ -179,7 +179,12 @@ export default function Landing({ onJoin, onSignIn }) {
 
   useEffect(() => {
     try {
-      if (localStorage.getItem('icamagu_join_stokvel_id')) setInviteType('stokvel')
+      // The invite opened last is the one the visitor is here for.
+      const last = localStorage.getItem('icamagu_last_invite')
+      const has = { stokvel: 'icamagu_join_stokvel_id', clan: 'icamagu_join_clan_code', pool: 'icamagu_join_pool_id' }
+      if (last && has[last] && localStorage.getItem(has[last])) setInviteType(last)
+      else if (last === 'template' && (localStorage.getItem('icamagu_template_invite') || localStorage.getItem('icamagu_plan_invite'))) setInviteType('template')
+      else if (localStorage.getItem('icamagu_join_stokvel_id')) setInviteType('stokvel')
       else if (localStorage.getItem('icamagu_join_clan_code')) setInviteType('clan')
       else if (localStorage.getItem('icamagu_join_pool_id')) setInviteType('pool')
       else if (localStorage.getItem('icamagu_template_invite') || localStorage.getItem('icamagu_plan_invite')) setInviteType('template')

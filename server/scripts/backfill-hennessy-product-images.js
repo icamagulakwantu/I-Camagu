@@ -20,12 +20,12 @@ import { backfillFounderSourcedSkus } from './backfill-founder-sourced-skus.js';
 // rewrite its image back and forth on every boot.
 const PACKSHOTS_750ML = {
   // These replacement source listings explicitly identify the matching 750ml variant; verify commercial image-use permission and keep a fallback if hotlinking fails.
-  'Hennessy VSOP': 'https://assets.woolworthsstatic.co.za/Hennessy-V-S-O-P-Privilege-Cognac-750-ml-3245990969402.jpg?V=SaGx&o=eyJidWNrZXQiOiJ3dy1vbmxpbmUtaW1hZ2UtcmVzaXplIiwia2V5IjoiaW1hZ2VzL2VsYXN0aWNlcmEvcHJvZHVjdHMvaGVyby8yMDIxLTA4LTAzLzMyNDU5OTA5Njk0MDJfaGVyby5qcGcifQ',
+  'Hennessy VSOP': 'https://res.cloudinary.com/fuhfi2ft/image/upload/f_auto/q_auto/icamagu/mirror/hennessy-vsop-750ml',
   'Hennessy XO': '/images/brands/hennessy-xo.png',
-  'Remy Martin VSOP': 'https://cdn.shopify.com/s/files/1/0987/1588/products/remy-martin-vsop-cognac_1200x1200.jpg?v=1601327577',
-  'Remy Martin 1738 Accord Royal': 'https://static-prod.remymartin.com/app/uploads/2026/05/collection-remy-martin-1738-accord-royal-lps-260527-01.jpg',
-  'Martell VS': 'https://thedrinkshopsa.com/cdn/shop/files/martell1.webp?v=1735993297&width=1080',
-  'Martell Blue Swift VSOP': 'https://cdn.shopify.com/s/files/1/2788/1238/files/Martell-Blue-Sw-ift-Cognac-750ml.jpg?v=1686640195',
+  'Remy Martin VSOP': 'https://res.cloudinary.com/fuhfi2ft/image/upload/f_auto/q_auto/icamagu/mirror/remy-martin-vsop-750ml',
+  'Remy Martin 1738 Accord Royal': 'https://res.cloudinary.com/fuhfi2ft/image/upload/f_auto/q_auto/icamagu/mirror/remy-martin-1738-750ml',
+  'Martell VS': 'https://res.cloudinary.com/fuhfi2ft/image/upload/f_auto/q_auto/icamagu/mirror/martell-vs-750ml',
+  'Martell Blue Swift VSOP': 'https://res.cloudinary.com/fuhfi2ft/image/upload/f_auto/q_auto/icamagu/mirror/martell-blue-swift-750ml',
 };
 
 async function applyVerifiedCognacPackshots() {

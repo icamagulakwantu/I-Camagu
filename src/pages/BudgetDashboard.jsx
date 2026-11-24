@@ -11,7 +11,7 @@ function BudgetDashboard({ planId, planTitle, onBack }) {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!planId) { setError('No ceremony plan was selected'); return }
+    if (!planId) return
     setError('')
     setBudget(null)
     fetch('/api/ceremonies/plans/' + planId + '/budget', { headers: { Authorization: 'Bearer ' + accessToken } })
@@ -23,6 +23,13 @@ function BudgetDashboard({ planId, planTitle, onBack }) {
       .catch((err) => setError(err.message))
   }, [planId, accessToken])
 
+  // Opened without a plan (an old link, or a bookmark): ask which one.
+  if (!planId) return (
+    <div className="min-h-screen bg-cream px-4 pt-10">
+      <button onClick={onBack} className="text-sm text-ink-muted mb-4 block">← Back</button>
+      <EmptyState icon="calendar" title="Choose a ceremony" description="Each ceremony plan has its own budget. Open the plan, then its Budget." primaryLabel="Open my ceremonies" onPrimary={onBack} />
+    </div>
+  )
   if (error) return (
     <div className="min-h-screen bg-cream px-4 pt-10">
       <button onClick={onBack} className="text-sm text-ink-muted mb-4 block">← Back</button>

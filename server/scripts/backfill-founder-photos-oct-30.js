@@ -84,8 +84,8 @@ const PHOTOS = [
   { names: ['Strettons Ruby Orange'], format: '750ml', only750: true, id: '1RiVHLFL4ctD73StunX3tjww' },
 
   // Meat, clothing and ceremony supplies: same look in every pack.
-  { names: ['Whole Chicken'], format: null, id: 'XPFTde3NRaR0itfh1NJ8HuQ2' },
-  { names: ['Chicken Trays'], format: null, id: 'c7TK0RMBga1tw4532ity5fFh' },
+  // Whole Chicken and Chicken Trays: replaced by the shops' packshots
+  // (founder, 23 Nov 2026; product-photos-nov-2026.js), so not forced here.
   { names: ['Chicken Legs'], format: null, id: 'lOQzQKzOOqqZJDRo0Hud5w1z' },
   { names: ['Boerewors'], format: null, id: '8FUj7MmJc6jp2CDWnqmRZNui' },
   { names: ['Beef Mince'], format: null, id: 'g1mWtMJDLMW4HBZRaaxfiL6G' },

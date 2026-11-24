@@ -512,6 +512,8 @@ function MainApp() {
 // ---------- AuthenticatedApp ----------
 function AuthenticatedApp() {
   const { accessToken, user, checkingSession } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [onboardingComplete, setOnboardingComplete] = useState(false)
   // Invites remain in their existing localStorage keys while the visitor learns about i-Camagu.
   // The Landing is always first for signed-out visitors, including stokvel, clan and pool invites.
@@ -530,6 +532,17 @@ function AuthenticatedApp() {
 
   if (!accessToken) {
     if (showAuth) return <Login />
+    // The worked examples are open to everyone: a visitor can see how a
+    // stokvel or a ceremony runs before joining. The live ones need an account.
+    if (location.pathname === '/examples') {
+      return (
+        <Examples
+          onBack={() => navigate('/')}
+          onOpenLiveStokvel={() => setShowAuth(true)}
+          onOpenLiveCeremony={() => setShowAuth(true)}
+        />
+      )
+    }
     return (
       <Landing
         onJoin={() => setShowAuth(true)}
@@ -559,7 +572,7 @@ function PoolJoinRoute() {
   const { id } = useParams()
   const navigate = useNavigate()
   useEffect(() => {
-    if (id) localStorage.setItem('icamagu_join_pool_id', id)
+    if (id) { localStorage.setItem('icamagu_join_pool_id', id); try { localStorage.setItem('icamagu_last_invite', 'pool') } catch { /* storage blocked */ } }
     navigate('/', { replace: true })
   }, [id, navigate])
   return null
@@ -572,7 +585,7 @@ function StokvelJoinRoute() {
   const { id } = useParams()
   const navigate = useNavigate()
   useEffect(() => {
-    if (id) localStorage.setItem(PENDING_STOKVEL_KEY, id)
+    if (id) { localStorage.setItem(PENDING_STOKVEL_KEY, id); try { localStorage.setItem('icamagu_last_invite', 'stokvel') } catch { /* storage blocked */ } }
     navigate('/', { replace: true })
   }, [id, navigate])
   return null
@@ -583,7 +596,7 @@ function TemplateInviteRoute() {
   const { token } = useParams()
   const navigate = useNavigate()
   useEffect(() => {
-    if (token) { try { localStorage.setItem(PENDING_TEMPLATE_KEY, token) } catch { /* storage blocked */ } }
+    if (token) { try { localStorage.setItem(PENDING_TEMPLATE_KEY, token); localStorage.setItem('icamagu_last_invite', 'template') } catch { /* storage blocked */ } }
     navigate('/', { replace: true })
   }, [token, navigate])
   return null
@@ -595,7 +608,7 @@ function PlanInviteRoute() {
   const { token } = useParams()
   const navigate = useNavigate()
   useEffect(() => {
-    if (token) { try { localStorage.setItem(PENDING_PLAN_KEY, token) } catch { /* storage blocked */ } }
+    if (token) { try { localStorage.setItem(PENDING_PLAN_KEY, token); localStorage.setItem('icamagu_last_invite', 'template') } catch { /* storage blocked */ } }
     navigate('/', { replace: true })
   }, [token, navigate])
   return null
@@ -607,7 +620,7 @@ function ClanJoinRoute() {
   const { code } = useParams()
   const navigate = useNavigate()
   useEffect(() => {
-    if (code) localStorage.setItem(PENDING_CLAN_KEY, code)
+    if (code) { localStorage.setItem(PENDING_CLAN_KEY, code); try { localStorage.setItem('icamagu_last_invite', 'clan') } catch { /* storage blocked */ } }
     navigate('/', { replace: true })
   }, [code, navigate])
   return null

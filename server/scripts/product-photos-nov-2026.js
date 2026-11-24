@@ -108,16 +108,18 @@ export const MORE_PHOTOS = [
   ['Sugar', '12.5kg Bag', 'sugar-12-5kg-bag', 'Huletts White Sugar 12.5kg (Shoprite)'],
 ];
 
+// The swap runs on every boot (it only touches a row still showing the old
+// photo): an older boot script used to put the old photos back.
 export async function replaceChickenPhotos() {
-  if (await prisma.dataFix.findUnique({ where: { name: FIX_NAME_2 } })) return { changed: 0, skipped: true };
   let changed = 0;
   for (const [name, bottleFormat, oldUrl, slug] of REPLACE_PHOTOS) {
     const { count } = await prisma.sku.updateMany({ where: { name, bottleFormat, imageUrl: oldUrl }, data: { imageUrl: photoUrl(slug) } });
     changed += count;
   }
+  if (changed) console.log(`Product photos: ${changed} chicken photo(s) replaced.`);
+  if (await prisma.dataFix.findUnique({ where: { name: FIX_NAME_2 } })) return { changed, skipped: true };
   await prisma.dataFix.create({ data: { name: FIX_NAME_2 } });
   const more = await addProductPhotos(MORE_PHOTOS, `${FIX_NAME_2}-more`);
-  if (changed) console.log(`Product photos: ${changed} chicken photo(s) replaced.`);
   return { changed, added: more.added, skipped: false };
 }
 
@@ -133,3 +135,27 @@ export const REMAINING_PHOTOS = [
   ['Umbona', '10kg Bag', 'umbona-10kg-bag', 'Gold Power Whole Yellow Maize 10kg (Makro)'],
 ];
 export const addRemainingPhotos = () => addProductPhotos(REMAINING_PHOTOS, FIX_NAME_3);
+
+// Photos that were hotlinked from shops' and brands' own sites (which can
+// block hotlinking or move a file at any time) are copied to i-Camagu's
+// Cloudinary account and served from there. Swaps the old address wherever a
+// row still has it; runs on every boot and is a no-op once done.
+const MIRROR = 'https://res.cloudinary.com/fuhfi2ft/image/upload/f_auto/q_auto/icamagu/mirror/';
+export const MIRRORED_PHOTOS = [
+  ['https://res.cloudinary.com/agrimark/image/upload/v1645439722/uploads/assets/597-HP-500ml-can-render-225d1a.png', 'hansa-pilsener-can-500ml'],
+  ['https://assets.woolworthsstatic.co.za/Hennessy-V-S-O-P-Privilege-Cognac-750-ml-3245990969402.jpg?V=SaGx&o=eyJidWNrZXQiOiJ3dy1vbmxpbmUtaW1hZ2UtcmVzaXplIiwia2V5IjoiaW1hZ2VzL2VsYXN0aWNlcmEvcHJvZHVjdHMvaGVyby8yMDIxLTA4LTAzLzMyNDU5OTA5Njk0MDJfaGVyby5qcGcifQ', 'hennessy-vsop-750ml'],
+  ['https://cdn.shopify.com/s/files/1/0987/1588/products/remy-martin-vsop-cognac_1200x1200.jpg?v=1601327577', 'remy-martin-vsop-750ml'],
+  ['https://static-prod.remymartin.com/app/uploads/2026/05/collection-remy-martin-1738-accord-royal-lps-260527-01.jpg', 'remy-martin-1738-750ml'],
+  ['https://thedrinkshopsa.com/cdn/shop/files/martell1.webp?v=1735993297&width=1080', 'martell-vs-750ml'],
+  ['https://cdn.shopify.com/s/files/1/2788/1238/files/Martell-Blue-Sw-ift-Cognac-750ml.jpg?v=1686640195', 'martell-blue-swift-750ml'],
+  ['https://thedrinkshopsa.com/cdn/shop/files/honorvs.jpg?v=1749290413&width=1080', 'honor-vs-750ml'],
+];
+export async function useMirroredPhotos(list = MIRRORED_PHOTOS) {
+  let changed = 0;
+  for (const [oldUrl, slug] of list) {
+    const { count } = await prisma.sku.updateMany({ where: { imageUrl: oldUrl }, data: { imageUrl: MIRROR + slug } });
+    changed += count;
+  }
+  if (changed) console.log(`Product photos: ${changed} hotlinked photo(s) now served from i-Camagu's own copy.`);
+  return { changed };
+}

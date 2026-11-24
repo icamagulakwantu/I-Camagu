@@ -134,7 +134,7 @@ const EXTERNAL_FORMAT_SPECIFIC_IMAGES = [
   {
     name: 'Hansa Pilsener',
     bottleFormat: 'Can (500ml)',
-    imageUrl: 'https://res.cloudinary.com/agrimark/image/upload/v1645439722/uploads/assets/597-HP-500ml-can-render-225d1a.png',
+    imageUrl: 'https://res.cloudinary.com/fuhfi2ft/image/upload/f_auto/q_auto/icamagu/mirror/hansa-pilsener-can-500ml',
   },
   { name: 'Castle Lager', bottleFormat: 'Quart (750ml)', imageUrl: `${CAPTAINS}castlq750qz_1.jpg` },
   { name: 'Castle Lager', bottleFormat: 'Dumpy (330ml)', imageUrl: `${CAPTAINS}castln340_1.jpg` },
