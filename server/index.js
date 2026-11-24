@@ -40,7 +40,7 @@ import { applyPriceChecks } from './scripts/apply-price-checks.js';
 import { keepBulkBelowShelf } from './scripts/bulk-below-shelf.js';
 import { applyVerifiedShelfPrices } from './scripts/verified-shelf-prices-nov-2026.js';
 import { fixCanSizes } from './scripts/cans-440ml-nov-2026.js';
-import { addProductPhotos, addRemainingPhotos, fixChillersCans, replaceChickenPhotos, useMirroredPhotos } from './scripts/product-photos-nov-2026.js';
+import { addProductPhotos, addRemainingPhotos, fixChillersCans, replaceChickenPhotos, useMirroredPhotos, useSharperPhotos } from './scripts/product-photos-nov-2026.js';
 import { addFridgeMeats } from './scripts/fridge-meats-nov-2026.js';
 import { fixCourtesyDrinks } from './scripts/courtesy-drinks-nov-2026.js';
 import { addIbhomaItems } from './scripts/ibhoma-items-nov-2026.js';
@@ -367,6 +367,7 @@ if (startup.schemaReady) {
     await addProductPhotos();
     await replaceChickenPhotos();
     await useMirroredPhotos();
+    await useSharperPhotos();
     await addRemainingPhotos();
     await fixShopSizes();
   } catch (err) {

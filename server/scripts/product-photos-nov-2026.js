@@ -159,3 +159,26 @@ export async function useMirroredPhotos(list = MIRRORED_PHOTOS) {
   if (changed) console.log(`Product photos: ${changed} hotlinked photo(s) now served from i-Camagu's own copy.`);
   return { changed };
 }
+
+// Sharper packshots (founder, 24 Nov 2026: fix the low-resolution bottle
+// shots). These were 60-78 px wide; the shops' own 1200 px packshots replace
+// them, same product and pack. Runs on every boot; only touches a row still
+// showing the old file.
+export const SHARPER_PHOTOS = [
+  ['Ciroc Original Premium', '/images/brands/ciroc-original.png', 'ciroc-original-750ml'],
+  ['Ciroc Pineapple', '/images/brands/ciroc-pineapple.png', 'ciroc-pineapple-750ml'],
+  ['Johnnie Walker Gold Label Reserve', '/images/brands/johnnie-walker-gold-label.png', 'johnnie-walker-gold-label-750ml'],
+  ['Moet & Chandon Imperial Brut', '/images/brands/moet-chandon.png', 'moet-chandon-brut-imperial-750ml'],
+  ['Smirnoff Infusions', '/images/brands/smirnoff-infusions.png', 'smirnoff-infusions-750ml'],
+  ["Redd's Original", '/images/brands/redds-original.png', 'redds-original-330ml'],
+  ['Stella Artois', '/images/brands/stella-artois-can.png', 'stella-artois-can-500ml'],
+];
+export async function useSharperPhotos(list = SHARPER_PHOTOS) {
+  let changed = 0;
+  for (const [name, oldUrl, slug] of list) {
+    const { count } = await prisma.sku.updateMany({ where: { name, imageUrl: oldUrl }, data: { imageUrl: photoUrl(slug) } });
+    changed += count;
+  }
+  if (changed) console.log(`Product photos: ${changed} low-resolution photo(s) replaced by sharp packshots.`);
+  return { changed };
+}

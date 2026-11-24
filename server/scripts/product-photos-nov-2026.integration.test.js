@@ -1,11 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import prisma from '../config/db.js';
-import { addProductPhotos, fixChillersCans, photoUrl, replaceChickenPhotos, useMirroredPhotos } from './product-photos-nov-2026.js';
+import { addProductPhotos, fixChillersCans, photoUrl, replaceChickenPhotos, useMirroredPhotos, useSharperPhotos } from './product-photos-nov-2026.js';
 
 const integrationDescribe = process.env.RUN_POSTGRES_INTEGRATION === 'true' ? describe : describe.skip;
 const FIX = 'product-photos-test';
 const CFIX = 'chillers-test';
-const names = ['Test Samp PP', 'Test Bread PP', 'Test Cooler PP', 'Whole Chicken', 'Test Cognac PP'];
+const names = ['Test Samp PP', 'Test Bread PP', 'Test Cooler PP', 'Whole Chicken', 'Test Cognac PP', 'Test Vodka PP'];
 
 integrationDescribe('product photos (real database)', () => {
   beforeAll(async () => {
@@ -55,5 +55,12 @@ integrationDescribe('product photos (real database)', () => {
     expect(await useMirroredPhotos([[old, 'cognac']])).toEqual({ changed: 1 });
     expect((await prisma.sku.findUnique({ where: { id: row.id } })).imageUrl).toMatch(/fuhfi2ft\/.+\/icamagu\/mirror\/cognac$/);
     expect(await useMirroredPhotos([[old, 'cognac']])).toEqual({ changed: 0 });
+  });
+
+  it('replaces a low-resolution photo with the sharp packshot, only where it is still the old file', async () => {
+    const row = await prisma.sku.create({ data: { name: 'Test Vodka PP', bottleFormat: '750ml Bottle', category: 'SPIRITS', productType: 'ALCOHOL', unitsPerCase: 12, imageUrl: '/images/brands/old.png' } });
+    expect(await useSharperPhotos([['Test Vodka PP', '/images/brands/old.png', 'vodka-750ml']])).toEqual({ changed: 1 });
+    expect((await prisma.sku.findUnique({ where: { id: row.id } })).imageUrl).toBe(photoUrl('vodka-750ml'));
+    expect(await useSharperPhotos([['Test Vodka PP', '/images/brands/old.png', 'vodka-750ml']])).toEqual({ changed: 0 });
   });
 });
