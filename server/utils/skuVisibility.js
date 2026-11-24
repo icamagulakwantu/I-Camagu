@@ -38,11 +38,23 @@ export function isRetired(sku) {
 // Strips the retail price from a catalogue row unless it has been verified,
 // and drops the provenance fields — a member has no use for them. Returns a
 // new object; never mutates the row Prisma handed us.
+// A saving above this is not believable for a group order against a regular
+// shelf price (founder, 24 Nov 2026: "62% off ... where did you get those").
+// Above it the price needs checking, so no saving is claimed at all.
+export const MAX_SHOWN_SAVING = 0.25;
+
+export function isBelievableSaving(sku) {
+  const retail = sku?.retailPriceZAR == null ? null : Number(sku.retailPriceZAR);
+  const bulk = sku?.casePriceZAR == null ? null : Number(sku.casePriceZAR);
+  if (!retail || bulk == null) return true;
+  return bulk >= retail * (1 - MAX_SHOWN_SAVING);
+}
+
 export function toPublicSku(sku) {
   const { retailPriceSource, retailPriceCheckedAt, retailPriceNote, ...rest } = sku;
   return {
     ...rest,
-    retailPriceZAR: isVerifiedRetail(sku) ? sku.retailPriceZAR : null,
+    retailPriceZAR: isVerifiedRetail(sku) && isBelievableSaving(sku) ? sku.retailPriceZAR : null,
   };
 }
 

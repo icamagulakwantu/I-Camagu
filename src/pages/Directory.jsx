@@ -12,7 +12,7 @@ import CommunityVerification from '../components/CommunityVerification.jsx'
 const PRACTITIONER_ROLES = ['INGCIBI', 'IKHANKATHA', 'CULTURAL_ADVISOR']
 const CATEGORY_NAMES = {
   TRADITIONAL_GOODS: 'Traditional goods', ATTIRE: 'Attire', CATERING: 'Catering',
-  EQUIPMENT_HIRE: 'Tents & hire', COOKWARE: 'Pots & cookware', LIVESTOCK_FARM: 'Livestock',
+  EQUIPMENT_HIRE: 'Tents & hire', COOKWARE: 'Pots & cookware', LIVESTOCK_FARM: 'Livestock', MEAT_SUPPLIER: 'Meat',
   LIQUOR_SUPPLIER: 'Drinks', IKRWALA_CLOTHING: 'Ikrwala clothing', FORMALWEAR: 'Formalwear',
 }
 const categoryName = (c) => CATEGORY_NAMES[c] || c.replace(/_/g, ' ').toLowerCase()
@@ -35,7 +35,7 @@ function ContactLinks({ text }) {
   )
 }
 
-const VENDOR_CATEGORIES = ['TRADITIONAL_GOODS', 'ATTIRE', 'CATERING', 'EQUIPMENT_HIRE', 'COOKWARE', 'LIVESTOCK_FARM', 'LIQUOR_SUPPLIER', 'IKRWALA_CLOTHING', 'FORMALWEAR']
+const VENDOR_CATEGORIES = ['TRADITIONAL_GOODS', 'ATTIRE', 'CATERING', 'EQUIPMENT_HIRE', 'COOKWARE', 'LIVESTOCK_FARM', 'MEAT_SUPPLIER', 'LIQUOR_SUPPLIER', 'IKRWALA_CLOTHING', 'FORMALWEAR']
 
 function Directory({ onBack }) {
   const { accessToken, user } = useAuth()

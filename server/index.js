@@ -33,6 +33,8 @@ import { applyGrocerySpecials } from './scripts/grocery-specials-nov-2026.js';
 import { addEkoyiniProducts } from './scripts/ekoyini-catalogue-nov-2026.js';
 import { correctQuartSizes } from './scripts/quart-sizes-nov-2026.js';
 import { fixShopSizes } from './scripts/shop-sizes-nov-2026.js';
+import { makePricesHonest } from './scripts/honest-prices-nov-2026.js';
+import { addSamMeats } from './scripts/sam-meats-nov-2026.js';
 import { applyDrinksPhotosPrices, fixTsitsikammaSparklingPhoto } from './scripts/drinks-photos-prices-nov-2026.js';
 import { exampleView, loadExamples } from './services/exampleAccess.js';
 import { buildLiveExamples } from './scripts/live-examples-nov-2026.js';
@@ -384,6 +386,8 @@ if (startup.schemaReady) {
   buildLiveExamples().catch((err) => console.error('Building live examples failed:', err?.message));
   // Every start: a bulk price stays at least 5% below a checked shelf price.
   try {
+    await makePricesHonest();
+    await addSamMeats();
     await keepBulkBelowShelf();
   } catch (err) {
     console.error('Bulk below shelf failed:', err?.message);

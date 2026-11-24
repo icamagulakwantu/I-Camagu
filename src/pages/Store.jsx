@@ -20,7 +20,7 @@ import { useLanguage, useT } from '../i18n/index.jsx'
 // Department tiles whose picture is a full photograph rather than a
 // product on a white background. Packshots (bottles, the chicken, the
 // sheep) sit on white and are shown whole, never cropped.
-const PHOTO_TILES = new Set(['nonconsumables'])
+const PHOTO_TILES = new Set(['nonconsumables', 'meat'])
 
 const DEPARTMENT_ICON = {
   alcohol: 'beer',
@@ -165,6 +165,15 @@ const TONES = {
   earth: 'bg-[radial-gradient(120%_120%_at_0%_0%,#4a2a12_0%,#7a4419_55%,#b26a28_100%)]',
 }
 
+// Banner pictures stand side by side at one height, so they use the photo cut
+// tight to the product (no white square around it): otherwise a tall bottle
+// on a square shrinks to a dot with white gaps between them.
+const CLOUD = 'https://res.cloudinary.com/fuhfi2ft/image/upload/'
+function bannerImage(url) {
+  const m = String(url || '').match(/^https:\/\/res\.cloudinary\.com\/fuhfi2ft\/image\/upload\/(?:.*\/)?(icamagu\/(?:products|mirror)\/[^/?]+)$/)
+  return m ? `${CLOUD}e_trim/h_360,c_limit/f_auto/q_auto/${m[1]}` : url
+}
+
 function OffersBanner({ slides }) {
   const t = useT()
   const ref = useRef(null)
@@ -205,13 +214,13 @@ function OffersBanner({ slides }) {
               </div>
               {/* The products, cut out, on a white disc breaking out of the corner. */}
               <div className="absolute -bottom-12 -right-16 h-[214px] w-[214px] rounded-full bg-white/95" aria-hidden="true" />
-              <div className="absolute bottom-3 right-1 flex h-[150px] w-[40%] items-end justify-center" aria-hidden="true">
+              <div className="absolute bottom-4 right-2 flex h-[150px] w-[42%] items-end justify-center" aria-hidden="true">
                 {slide.images.slice(0, 3).map((src, n) => (
                   <img
                     key={src}
-                    src={src}
+                    src={bannerImage(src)}
                     alt=""
-                    className={`object-contain mix-blend-multiply ${slide.images.length === 1 ? 'h-[140px] w-[120px]' : n === 0 ? 'z-10 h-[138px] w-[56px]' : n === 1 ? 'z-[5] -ml-2 h-[118px] w-[46px]' : '-ml-2 h-[100px] w-[42px]'}`}
+                    className={`w-auto object-contain mix-blend-multiply ${slide.images.length === 1 ? 'h-[140px] max-w-full' : `h-[124px] max-w-[48%] ${n === 0 ? 'z-10' : '-ml-3'} ${n === 1 ? 'z-[5]' : ''}`}`}
                   />
                 ))}
               </div>
@@ -435,7 +444,10 @@ function Store({ onGoToBasket, basketCount, initialSearch = '', onOpenExample })
         images: DEPARTMENTS.filter((d) => d.image && !PHOTO_TILES.has(d.id)).slice(0, 3).map((d) => d.image),
       })
     } else if (deptCounts.groceries) {
-      const groceryPics = allSkus.filter((s) => departmentOf(s).id === 'groceries' && s.imageUrl && !failedImageIds.has(s.id)).slice(0, 3).map((s) => s.imageUrl)
+      // The bags the slide talks about (maize meal, rice, samp, sugar), so the
+      // pictures sit together at one size, not a big tin beside a small case.
+      const bag = (re) => allSkus.find((s) => re.test(s.name) && /kg Bag/i.test(s.bottleFormat || '') && s.imageUrl && !failedImageIds.has(s.id))?.imageUrl
+      const groceryPics = [bag(/^Maize Meal/i), bag(/^Rice/i), bag(/^Samp/i), bag(/^Sugar/i)].filter(Boolean).slice(0, 3)
       const pics = groceryPics.length ? groceryPics : [DEPARTMENTS.find((d) => d.id === 'groceries')?.image].filter(Boolean)
       if (pics.length) {
         out.push({
